@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <chucho/pattern_formatter.hpp>
 #include <sstream>
+#include <thread>
 
 namespace
 {
@@ -79,3 +80,10 @@ TEST_F(pattern_formatter_test, level)
     EXPECT_STREQ("INFO", f.format(evt_).c_str());
 }
 
+TEST_F(pattern_formatter_test, thread)
+{
+    std::ostringstream stream;
+    stream << std::this_thread::get_id();
+    chucho::pattern_formatter f("%t");
+    EXPECT_EQ(stream.str(), f.format(evt_));
+}
