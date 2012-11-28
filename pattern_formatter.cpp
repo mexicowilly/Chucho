@@ -34,13 +34,13 @@ pattern_formatter::pattern_formatter(const std::string& pattern)
     parse(pattern);
 }
 
-std::unique_ptr<pattern_formatter::piece> pattern_formatter::create_piece(std::string::const_iterator& pos,
+std::shared_ptr<pattern_formatter::piece> pattern_formatter::create_piece(std::string::const_iterator& pos,
                                                                           std::string::const_iterator end,
                                                                           justification just,
                                                                           std::size_t min_width,
                                                                           std::size_t max_width)
 {
-    std::unique_ptr<piece> result;
+    std::shared_ptr<piece> result;
     std::string arg;
     char c = *pos;
     switch (c)
@@ -100,7 +100,7 @@ std::unique_ptr<pattern_formatter::piece> pattern_formatter::create_piece(std::s
 std::string pattern_formatter::format(const event& evt)
 {
     std::string result;
-    for (std::unique_ptr<piece>& p : pieces_)
+    for (std::shared_ptr<piece>& p : pieces_)
         result += p->get_text(evt);
     return result;
 }
@@ -132,7 +132,7 @@ void pattern_formatter::parse(const std::string& pattern)
     parser_state state = parser_state::LITERAL;
     auto last_char = pattern.end() - 1;
     std::string text;
-    justification just;
+    justification just = justification::UNSET;
     std::size_t min_width = 0;
     std::size_t max_width = std::numeric_limits<std::size_t>::max();
     for (auto i = pattern.begin(); i != pattern.end(); i++)
@@ -155,8 +155,8 @@ void pattern_formatter::parse(const std::string& pattern)
                 {
                     if (!text.empty())
                     {
-                        std::unique_ptr<piece> p(new literal_piece(text));
-                        pieces_.push_back(std::move(p));
+                        std::shared_ptr<piece> p(new literal_piece(text));
+                        pieces_.push_back(p);
                     }
                     state = parser_state::BEGIN;
                 }
@@ -173,7 +173,8 @@ void pattern_formatter::parse(const std::string& pattern)
             }
             else
             {
-                just = justification::RIGHT;
+                if (just == justification::UNSET)
+                    just = justification::RIGHT;
                 if (*i == '.')
                 {
                     state = parser_state::DOT;
@@ -185,11 +186,12 @@ void pattern_formatter::parse(const std::string& pattern)
                 }
                 else
                 {
-                    pieces_.push_back(std::move(create_piece(i, pattern.end(), just, min_width, max_width)));
+                    pieces_.push_back(create_piece(i, pattern.end(), just, min_width, max_width));
                     min_width = 0;
                     max_width = std::numeric_limits<std::size_t>::max();
                     state = parser_state::LITERAL;
                     text.clear();
+                    just = justification::UNSET;
                 }
             }
             break;
@@ -207,11 +209,12 @@ void pattern_formatter::parse(const std::string& pattern)
                 }
                 else
                 {
-                    pieces_.push_back(std::move(create_piece(i, pattern.end(), just, min_width, max_width)));
+                    pieces_.push_back(create_piece(i, pattern.end(), just, min_width, max_width));
                     min_width = 0;
                     max_width = std::numeric_limits<std::size_t>::max();
                     state = parser_state::LITERAL;
                     text.clear();
+                    just = justification::UNSET;
                 }
             }
             break;
@@ -236,19 +239,21 @@ void pattern_formatter::parse(const std::string& pattern)
             }
             else
             {
-                pieces_.push_back(std::move(create_piece(i, pattern.end(), just, min_width, max_width)));
+                max_width = std::stoi(text);
+                pieces_.push_back(create_piece(i, pattern.end(), just, min_width, max_width));
                 min_width = 0;
                 max_width = std::numeric_limits<std::size_t>::max();
                 state = parser_state::LITERAL;
                 text.clear();
+                just = justification::UNSET;
             }
             break;
         }
     }
     if (!text.empty())
     {
-        std::unique_ptr<piece> p(new literal_piece(text));
-        pieces_.push_back(std::move(p));
+        std::shared_ptr<piece> p(new literal_piece(text));
+        pieces_.push_back(p);
     }
 }
 
@@ -350,7 +355,7 @@ std::string pattern_formatter::date_time_piece::get_text_impl(const event& evt) 
             pat.replace(p, 2, buf.data());
     }
     std::array<char, 4096> buf;
-    struct tm cal;
+    struct std::tm cal;
     to_calendar(millis.count() / 1000, cal);
     std::string result;
     if (std::strftime(buf.data(), buf.size(), pat.c_str(), &cal) != 0)

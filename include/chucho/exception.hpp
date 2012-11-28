@@ -1,13 +1,14 @@
 #if !defined(CHUCHO_EXCEPTION_HPP__)
 #define CHUCHO_EXCEPTION_HPP__
 
+#include <chucho/export.hpp>
 #include <exception>
 #include <string>
 
 namespace chucho
 {
 
-class exception : public std::exception
+class CHUCHO_EXPORT exception : public std::exception
 {
 public:
     exception(const std::string& msg);

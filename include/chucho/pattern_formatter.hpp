@@ -26,7 +26,8 @@ private:
     enum class justification
     {
         LEFT,
-        RIGHT
+        RIGHT,
+        UNSET
     };
 
     class CHUCHO_NO_EXPORT piece
@@ -238,7 +239,7 @@ private:
         virtual std::string get_text_impl(const event& evt) const override;
     };
     
-    CHUCHO_NO_EXPORT std::unique_ptr<piece> create_piece(std::string::const_iterator& pos,
+    CHUCHO_NO_EXPORT std::shared_ptr<piece> create_piece(std::string::const_iterator& pos,
                                                          std::string::const_iterator end,
                                                          justification just,
                                                          std::size_t min_width,
@@ -247,7 +248,7 @@ private:
     CHUCHO_NO_EXPORT std::string get_argument(std::string::const_iterator& pos,
                                               std::string::const_iterator end);
 
-    std::vector<std::unique_ptr<piece>> pieces_;
+    std::vector<std::shared_ptr<piece>> pieces_;
 };
 
 }
