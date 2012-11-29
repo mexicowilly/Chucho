@@ -2,13 +2,14 @@
 #define CHUCHO_EVENT_HPP__
 
 #include <chucho/level.hpp>
-#include <chucho/logger.hpp>
 #include <string>
 #include <chrono>
 #include <memory>
 
 namespace chucho
 {
+
+class logger;
 
 class CHUCHO_EXPORT event
 {

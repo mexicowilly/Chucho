@@ -2,7 +2,9 @@
 #define CHUCHO_WRITER_HPP__
 
 #include <chucho/filter.hpp>
+#include <chucho/formatter.hpp>
 #include <vector>
+#include <mutex>
 
 namespace chucho
 {
@@ -10,26 +12,29 @@ namespace chucho
 class CHUCHO_EXPORT writer
 {
 public:
-    writer();
     virtual ~writer();
 
     void add_filter(std::shared_ptr<filter> flt);
     void clear_filters();
-    virtual void write(const event& evt) = 0;
+    void set_formatter(std::shared_ptr<formatter> fmt);
+    void write(const event& evt);
+
+protected:
+    virtual void write_impl(const event& evt) = 0;
+
+    std::shared_ptr<formatter> formatter_;
 
 private:
+    /**
+     * @pre guard_ must be locked
+     * @param evt the event to evaluate
+     * @return bool if this writer can write the event
+     */
+    bool permits(const event& evt);
+
     std::vector<std::shared_ptr<filter>> filters_;
+    std::recursive_mutex guard_;
 };
-
-inline void writer::add_filter(std::shared_ptr<filter> flt)
-{
-    filters_.push_back(flt);
-}
-
-inline void writer::clear_filters()
-{
-    filters_.clear();
-}
 
 }
 

@@ -1,4 +1,5 @@
 #include <chucho/pattern_formatter.hpp>
+#include <chucho/logger.hpp>
 #include <limits>
 #include <sstream>
 #include <array>

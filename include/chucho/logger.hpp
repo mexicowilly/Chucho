@@ -1,7 +1,7 @@
 #if !defined(CHUCHO_LOGGER_HPP__)
 #define CHUCHO_LOGGER_HPP__
 
-#include <chucho/level.hpp>
+#include <chucho/writer.hpp>
 #include <vector>
 
 namespace chucho
@@ -20,6 +20,9 @@ public:
     std::shared_ptr<level> get_level() const;
     const std::string& get_name() const;
     void set_level(std::shared_ptr<level> lvl);
+    void set_writes_to_ancestors(bool val);
+    void write(const event& evt);
+    bool writes_to_ancestors() const;
 
 private:
     static std::shared_ptr<logger> get_logger_impl(const std::string& name);
@@ -30,11 +33,24 @@ private:
     std::shared_ptr<logger> parent_;
     std::string name_;
     std::shared_ptr<level> level_;
+    std::vector<std::shared_ptr<writer>> writers_;
+    std::mutex writers_guard_;
+    bool writes_to_ancestors_;
 };
 
 inline const std::string& logger::get_name() const
 {
     return name_;
+}
+
+inline void logger::set_writes_to_ancestors(bool val)
+{
+    writes_to_ancestors_ = val;
+}
+
+inline bool logger::writes_to_ancestors() const
+{
+    return writes_to_ancestors_;
 }
 
 }

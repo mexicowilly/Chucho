@@ -10,7 +10,7 @@ namespace chucho
 class CHUCHO_EXPORT level_threshold_filter : public filter
 {
 public:
-    virtual result permits(const event& evt) override;
+    virtual result evaluate(const event& evt) override;
 
     void set_level(std::shared_ptr<level> lvl);
 

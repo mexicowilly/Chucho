@@ -18,7 +18,7 @@ public:
 
     virtual ~filter();
 
-    virtual result permits(const event& evt) = 0;
+    virtual result evaluate(const event& evt) = 0;
 };
 
 }

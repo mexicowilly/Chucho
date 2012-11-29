@@ -31,7 +31,8 @@ namespace chucho
 
 logger::logger(const std::string& name, std::shared_ptr<level> lvl)
     : name_(name),
-      level_(lvl)
+      level_(lvl),
+      writes_to_ancestors_(true)
 {
     auto ancestors = split(name);
     ancestors.pop_back();
@@ -135,6 +136,16 @@ void logger::static_init()
     std::lock_guard<std::recursive_mutex> lg(loggers_guard);
     root_logger.reset(new logger("", info));
     all_loggers[""] = std::weak_ptr<logger>(root_logger);
+}
+
+void logger::write(const event& evt)
+{
+    std::unique_lock<std::mutex> ul(writers_guard_);
+    for (std::shared_ptr<writer> w : writers_)
+        w->write(evt);
+    ul.unlock();
+    if (writes_to_ancestors_)
+        parent_->write(evt);
 }
 
 }

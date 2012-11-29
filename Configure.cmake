@@ -72,6 +72,12 @@ IF(CHUCHO_POSIX)
     IF(NOT CHUCHO_HAVE_GETPID)
         MESSAGE(FATAL_ERROR "getpid is required")
     ENDIF()
+
+    # stat
+    CHECK_CXX_SYMBOL_EXISTS(stat sys/stat.h CHUCHO_HAVE_STAT)
+    IF(NOT CHUCHO_HAVE_STAT)
+        MESSAGE(FATAL_ERROR "stat is required")
+    ENDIF()
 ENDIF()
 ADD_CUSTOM_TARGET(external)
 
