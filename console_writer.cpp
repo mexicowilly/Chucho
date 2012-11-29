@@ -12,6 +12,7 @@ console_writer::console_writer(std::ostream& stream)
 void console_writer::write_impl(const event& evt)
 {
     stream_ << formatter_->format(evt);
+    stream_.flush();
 }
 
 cout_writer::cout_writer()

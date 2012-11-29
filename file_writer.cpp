@@ -8,13 +8,18 @@ file_exception::file_exception(const std::string& msg)
 {
 }
 
-file_writer::file_writer(on_start start)
-    : start_(start)
+file_writer::file_writer(on_start start,
+                         bool flush)
+    : start_(start),
+      flush_(flush)
 {
 }
 
-file_writer::file_writer(const std::string& file_name, on_start start)
-    : start_(start)
+file_writer::file_writer(const std::string& file_name,
+                         on_start start,
+                         bool flush)
+    : start_(start),
+      flush_(flush)
 {
     open(file_name);
 }
@@ -33,6 +38,8 @@ void file_writer::write_impl(const event& evt)
     try
     {
         file_ << formatter_->format(evt);
+        if (flush_)
+            file_.flush();
     }
     catch (std::ios::failure&)
     {

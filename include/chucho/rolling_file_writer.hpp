@@ -12,6 +12,7 @@ class rolling_file_writer : public file_writer
 {
 public:
     rolling_file_writer(on_start start,
+                        bool flush,
                         std::shared_ptr<file_roller> roller,
                         std::shared_ptr<file_roll_trigger> trigger = std::shared_ptr<file_roll_trigger>());
 

@@ -24,12 +24,15 @@ public:
         TRUNCATE
     };
 
-    file_writer(const std::string& file_name, on_start start);
+    file_writer(const std::string& file_name,
+                on_start start,
+                bool flush);
 
     const std::string& get_file_name() const;
 
 protected:
-    file_writer(on_start start);
+    file_writer(on_start start,
+                bool flush);
 
     void close();
     void open(const std::string& file_name);
@@ -39,6 +42,7 @@ private:
     std::string file_name_;
     std::ofstream file_;
     on_start start_;
+    bool flush_;
 };
 
 inline void file_writer::close()
