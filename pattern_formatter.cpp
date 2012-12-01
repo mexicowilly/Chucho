@@ -1,5 +1,7 @@
 #include <chucho/pattern_formatter.hpp>
 #include <chucho/logger.hpp>
+#include <chucho/calendar.hpp>
+#include <chucho/file.hpp>
 #include <limits>
 #include <sstream>
 #include <array>
@@ -17,8 +19,6 @@ enum class parser_state
     MIN,
     MAX
 };
-
-std::mutex calendar_guard;
 
 }
 
@@ -294,13 +294,8 @@ pattern_formatter::base_file_piece::base_file_piece(justification just,
 
 std::string pattern_formatter::base_file_piece::get_text_impl(const event& evt) const
 {
-    #if defined(_WIN32)
-    char sep = '\\';
-    #else
-    char sep = '/';
-    #endif
     const char* fn = evt.get_file_name();
-    char* found = strrchr(fn, sep);
+    char* found = strrchr(fn, file::dir_sep);
     return (found == nullptr) ? fn : found + 1;
 }
 
@@ -374,8 +369,7 @@ pattern_formatter::utc_date_time_piece::utc_date_time_piece(const std::string& d
 
 void pattern_formatter::utc_date_time_piece::to_calendar(time_t t, struct std::tm& cal) const
 {
-    std::lock_guard<std::mutex> lg(calendar_guard);
-    cal = *std::gmtime(&t);
+    cal = calendar::get_utc(t);
 }
 
 pattern_formatter::local_date_time_piece::local_date_time_piece(const std::string& date_pattern,
@@ -388,8 +382,7 @@ pattern_formatter::local_date_time_piece::local_date_time_piece(const std::strin
 
 void pattern_formatter::local_date_time_piece::to_calendar(time_t t, struct std::tm& cal) const
 {
-    std::lock_guard<std::mutex> lg(calendar_guard);
-    cal = *std::localtime(&t);
+    cal = calendar::get_local(t);
 }
 
 std::string pattern_formatter::base_host_piece::get_text_impl(const event& evt) const

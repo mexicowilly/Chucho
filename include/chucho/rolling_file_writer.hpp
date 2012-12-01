@@ -13,15 +13,23 @@ class rolling_file_writer : public file_writer
 public:
     rolling_file_writer(on_start start,
                         bool flush,
-                        std::shared_ptr<file_roller> roller,
+                        std::unique_ptr<file_roller> roller,
                         std::shared_ptr<file_roll_trigger> trigger = std::shared_ptr<file_roll_trigger>());
 
 protected:
     virtual void write_impl(const event& evt) override;
 
 private:
-    std::shared_ptr<file_roller> roller_;
-    std::shared_ptr<file_roll_trigger> trigger_;
+    std::unique_ptr<file_roller> roller_;
+    std::shared_ptr<file_roll_trigger> shared_trigger_;
+    /**
+     * You don't own this pointer. It is just a settable reference.
+     * The trigger will either be what's in shared_trigger_ or 
+     * what's in roller_. If shared_trigger_ has no pointer, then 
+     * roller_ is checked to see if it is also a file_roll_trigger. 
+     * If so, then it's pointer is used for trigger_. 
+     */
+    file_roll_trigger* trigger_;
 };
 
 }

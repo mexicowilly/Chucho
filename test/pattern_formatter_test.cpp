@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <chucho/pattern_formatter.hpp>
+#include <chucho/logger.hpp>
 #include <sstream>
 #include <thread>
 #include <array>

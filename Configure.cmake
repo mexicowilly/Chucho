@@ -78,12 +78,41 @@ IF(CHUCHO_POSIX)
     IF(NOT CHUCHO_HAVE_STAT)
         MESSAGE(FATAL_ERROR "stat is required")
     ENDIF()
+
+    # gmtime/localtime
+    FOREACH(SYM gmtime localtime)
+        CHECK_CXX_SYMBOL_EXISTS(${SYM}_r time.h CHUCHO_HAVE_${SYM}_R)
+        IF(CHUCHO_HAVE_${SYM}_R)
+            STRING(TOUPPER ${SYM} CHUCHO_UPPER_SYM)
+            ADD_DEFINITIONS(-DCHUCHO_HAVE_${CHUCHO_UPPER_SYM}_R)
+        ENDIF()
+    ENDFOREACH()
+
+    # fts
+    FOREACH(SYM fts_open fts_read fts_close)
+        CHECK_CXX_SYMBOL_EXISTS(${SYM} fts.h CHUCHO_HAVE_${SYM})
+        IF(NOT CHUCHO_HAVE_${SYM})
+            MESSAGE(FATAL_ERROR "FTS functions are required")
+        ENDIF()
+    ENDFOREACH()
+
+    # remove
+    CHECK_CXX_SYMBOL_EXISTS(remove stdio.h CHUCHO_HAVE_REMOVE)
+    IF(NOT CHUCHO_HAVE_REMOVE)
+        MESSAGE(FATAL_ERROR "remove is required")
+    ENDIF()
+
+    # realpath
+    CHECK_CXX_SYMBOL_EXISTS(realpath stdlib.h CHUCHO_HAVE_REALPATH)
+    IF(NOT CHUCHO_HAVE_REALPATH)
+        MESSAGE(FATAL_ERROR "realpath is required")
+    ENDIF()
 ENDIF()
-ADD_CUSTOM_TARGET(external)
 
 #
 # External projects
 #
+ADD_CUSTOM_TARGET(external)
 SET(CHUCHO_EXTERNAL_PREFIX "${CMAKE_BINARY_DIR}")
 SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX "${CHUCHO_EXTERNAL_PREFIX}")
 

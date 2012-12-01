@@ -1,8 +1,9 @@
 INCLUDE_DIRECTORIES("${CHUCHO_EXTERNAL_PREFIX}/include")
 LINK_DIRECTORIES("${CHUCHO_EXTERNAL_PREFIX}/lib")
-ADD_DEFINITIONS(-DGTEST_HAS_TR1_TUPLE=0)
+ADD_DEFINITIONS(-DGTEST_HAS_TR1_TUPLE=0 -Dchucho_EXPORTS)
 
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
+               file_test.cpp
                level_test.cpp
                logger_test.cpp
                pattern_formatter_test.cpp)

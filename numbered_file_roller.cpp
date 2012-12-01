@@ -1,5 +1,6 @@
 #include <chucho/numbered_file_roller.hpp>
 #include <chucho/file_writer.hpp>
+#include <chucho/file.hpp>
 #include <stdexcept>
 #include <cstdio>
 #include <sstream>
@@ -33,7 +34,7 @@ void numbered_file_roller::roll()
     for (int i = max_index_; i > min_index_; i--)
     {
         std::string name = get_name(i - 1);
-        if (exists(name))
+        if (file::exists(name))
             std::rename(name.c_str(), get_name(i).c_str());
     }
     std::rename(file_writer_->get_file_name().c_str(),

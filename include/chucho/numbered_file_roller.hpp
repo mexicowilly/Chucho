@@ -15,8 +15,7 @@ public:
     virtual void roll() override;
 
 private:
-    bool exists(const std::string& file_name) const;
-    std::string get_name(int number) const;
+    CHUCHO_NO_EXPORT std::string get_name(int number) const;
 
     int min_index_;
     int max_index_;

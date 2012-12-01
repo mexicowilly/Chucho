@@ -5,15 +5,15 @@ namespace chucho
 
 rolling_file_writer::rolling_file_writer(on_start start,
                                          bool flush,
-                                         std::shared_ptr<file_roller> roller,
+                                         std::unique_ptr<file_roller> roller,
                                          std::shared_ptr<file_roll_trigger> trigger)
     : file_writer(start, flush),
-      roller_(roller),
-      trigger_(trigger)
+      roller_(std::move(roller)),
+      shared_trigger_(trigger)
 {
-    if (!trigger_)
-        trigger_ = std::dynamic_pointer_cast<file_roll_trigger>(roller);
-    if (!trigger_)
+    trigger_ = shared_trigger_ ?
+        shared_trigger_.get() : dynamic_cast<file_roll_trigger*>(roller_.get());
+    if (trigger_ == nullptr)
         throw file_exception("The rolling_file_writer has no file_roll_trigger");
     roller_->set_file_writer(this);
 }
