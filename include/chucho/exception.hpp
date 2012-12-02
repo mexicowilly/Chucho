@@ -15,6 +15,8 @@ namespace chucho
 class CHUCHO_EXPORT exception : public std::exception
 {
 public:
+    static std::string nested_whats(const std::exception& e);
+
     exception(const std::string& msg);
 
     virtual const char* what() const noexcept override;
