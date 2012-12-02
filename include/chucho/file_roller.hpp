@@ -1,7 +1,7 @@
 #if !defined(CHUCHO_FILE_ROLLER_HPP__)
 #define CHUCHO_FILE_ROLLER_HPP__
 
-#include <chucho/export.hpp>
+#include <chucho/status_reporter.hpp>
 #include <string>
 
 namespace chucho
@@ -9,7 +9,7 @@ namespace chucho
 
 class file_writer;
 
-class CHUCHO_EXPORT file_roller
+class CHUCHO_EXPORT file_roller : public status_reporter
 {
 public:
     virtual std::string get_active_file_name() = 0;

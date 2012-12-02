@@ -11,9 +11,8 @@ SET(CHUCHO_SOVERSION 1)
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
         platform/posix/calendar_posix.cpp
-        platform/posix/file.cpp
-        platform/posix/pattern_formatter_posix.cpp
-        platform/posix/size_file_roll_trigger_posix.cpp)
+        platform/posix/file_posix.cpp
+        platform/posix/pattern_formatter_posix.cpp)
 ENDIF()
 
 ADD_LIBRARY(chucho SHARED
@@ -22,8 +21,6 @@ ADD_LIBRARY(chucho SHARED
             exception.cpp
             file_roller.cpp
             file_writer.cpp
-            filter.cpp
-            formatter.cpp
             level.cpp
             level_threshold_filter.cpp
             logger.cpp
@@ -31,6 +28,9 @@ ADD_LIBRARY(chucho SHARED
             pattern_formatter.cpp
             rolling_file_writer.cpp
             size_file_roll_trigger.cpp
+            status.cpp
+            status_manager.cpp
+            status_reporter.cpp
             time_file_roller.cpp
             writer.cpp
             include/chucho/calendar.hpp
@@ -51,6 +51,9 @@ ADD_LIBRARY(chucho SHARED
             include/chucho/pattern_formatter.hpp
             include/chucho/rolling_file_writer.hpp
             include/chucho/size_file_roll_trigger.hpp
+            include/chucho/status.hpp
+            include/chucho/status_manager.hpp
+            include/chucho/status_reporter.hpp
             include/chucho/time_file_roller.hpp
             include/chucho/writer.hpp
             ${CHUCHO_PLATFORM_SOURCES})

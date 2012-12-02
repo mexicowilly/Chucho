@@ -9,11 +9,9 @@
 namespace chucho
 {
 
-class CHUCHO_EXPORT writer
+class CHUCHO_EXPORT writer : public status_reporter
 {
 public:
-    virtual ~writer();
-
     void add_filter(std::shared_ptr<filter> flt);
     void clear_filters();
     void set_formatter(std::shared_ptr<formatter> fmt);
@@ -30,7 +28,7 @@ private:
      * @param evt the event to evaluate
      * @return bool if this writer can write the event
      */
-    bool permits(const event& evt);
+    CHUCHO_NO_EXPORT bool permits(const event& evt);
 
     std::vector<std::shared_ptr<filter>> filters_;
     std::recursive_mutex guard_;

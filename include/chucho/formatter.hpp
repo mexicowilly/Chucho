@@ -2,16 +2,15 @@
 #define CHUCHO_FORMATTER_HPP__
 
 #include <chucho/event.hpp>
+#include <chucho/status_reporter.hpp>
 #include <string>
 
 namespace chucho
 {
 
-class CHUCHO_EXPORT formatter
+class CHUCHO_EXPORT formatter : public status_reporter
 {
 public:
-    virtual ~formatter();
-
     virtual std::string format(const event& evt) = 0;
 };
 

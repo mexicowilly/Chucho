@@ -3,17 +3,10 @@
 
 #include <chucho/file_roller.hpp>
 #include <chucho/file_roll_trigger.hpp>
-#include <chucho/exception.hpp>
 #include <chrono>
 
 namespace chucho
 {
-
-class CHUCHO_EXPORT time_file_roller_exception : public exception
-{
-public:
-    time_file_roller_exception(const std::string& msg);
-};
 
 class CHUCHO_EXPORT time_file_roller : public file_roller,
                                        public file_roll_trigger

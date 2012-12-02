@@ -4,10 +4,6 @@
 namespace chucho
 {
 
-writer::~writer()
-{
-}
-
 void writer::add_filter(std::shared_ptr<filter> flt)
 {
     std::lock_guard<std::recursive_mutex> lg(guard_);

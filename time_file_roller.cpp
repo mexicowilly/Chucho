@@ -1,6 +1,7 @@
 #include <chucho/time_file_roller.hpp>
 #include <chucho/calendar.hpp>
 #include <chucho/file.hpp>
+#include <chucho/exception.hpp>
 #include <regex>
 #include <algorithm>
 #include <array>
@@ -54,11 +55,6 @@ std::string find_time_spec(const std::string& str, std::size_t& start, std::size
 
 namespace chucho
 {
-
-time_file_roller_exception::time_file_roller_exception(const std::string& msg)
-    : exception(msg)
-{
-}
 
 void time_file_roller::compute_next_roll(const time_type& now)
 {

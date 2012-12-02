@@ -7,7 +7,8 @@
 namespace chucho
 {
 
-class CHUCHO_EXPORT logger : public std::enable_shared_from_this<logger>
+class CHUCHO_EXPORT logger : public std::enable_shared_from_this<logger>,
+                             public status_reporter
 {
 public:
     static std::vector<std::shared_ptr<logger>> get_existing_loggers();

@@ -2,6 +2,7 @@
 #include <chucho/logger.hpp>
 #include <chucho/calendar.hpp>
 #include <chucho/file.hpp>
+#include <chucho/exception.hpp>
 #include <limits>
 #include <sstream>
 #include <array>
@@ -24,11 +25,6 @@ enum class parser_state
 
 namespace chucho
 {
-
-pattern_exception::pattern_exception(const std::string& msg)
-    : exception(msg)
-{
-}
 
 pattern_formatter::pattern_formatter(const std::string& pattern)
 {

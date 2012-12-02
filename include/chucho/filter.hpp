@@ -2,11 +2,12 @@
 #define CHUCHO_FILTER_HPP__
 
 #include <chucho/event.hpp>
+#include <chucho/status_reporter.hpp>
 
 namespace chucho
 {
 
-class CHUCHO_EXPORT filter
+class CHUCHO_EXPORT filter : public status_reporter
 {
 public:
     enum class result
@@ -15,8 +16,6 @@ public:
         NEUTRAL,
         ACCEPT
     };
-
-    virtual ~filter();
 
     virtual result evaluate(const event& evt) = 0;
 };

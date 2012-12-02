@@ -1,4 +1,5 @@
 #include <chucho/rolling_file_writer.hpp>
+#include <chucho/exception.hpp>
 
 namespace chucho
 {

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <chucho/file.hpp>
+#include <fstream>
 
 TEST(file_test, base_name)
 {
@@ -46,12 +47,26 @@ TEST(file_test, multiple_directories)
     EXPECT_TRUE(chucho::file::exists("one/two"));
     EXPECT_TRUE(chucho::file::exists("one/two/three"));
     ASSERT_NO_THROW(chucho::file::remove_all("one"));
+    EXPECT_FALSE(chucho::file::exists("one"));
+    EXPECT_FALSE(chucho::file::exists("one/two"));
+    EXPECT_FALSE(chucho::file::exists("one/two/three"));
 }
 
 TEST(file_test, single_directory)
 {
-    ASSERT_NO_THROW(chucho::file::remove_directory("file_test"));
+    ASSERT_NO_THROW(chucho::file::remove("file_test"));
     ASSERT_NO_THROW(chucho::file::create_directory("file_test"));
     EXPECT_TRUE(chucho::file::exists("file_test"));
-    ASSERT_NO_THROW(chucho::file::remove_directory("file_test"));
+    ASSERT_NO_THROW(chucho::file::remove("file_test"));
+    EXPECT_FALSE(chucho::file::exists("file_test"));
+}
+
+TEST(file_test, size)
+{
+    std::ofstream f("file_test_size.txt");
+    ASSERT_TRUE(f.is_open());
+    f << "hello";
+    f.close();
+    EXPECT_EQ(5, chucho::file::size("file_test_size.txt"));
+    ASSERT_NO_THROW(chucho::file::remove("file_test_size.txt"));
 }

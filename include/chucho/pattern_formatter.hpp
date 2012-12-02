@@ -2,18 +2,11 @@
 #define CHUCHO_PATTERN_FORMATTER_HPP__
 
 #include <chucho/formatter.hpp>
-#include <chucho/exception.hpp>
 #include <vector>
 #include <ctime>
 
 namespace chucho
 {
-
-class CHUCHO_EXPORT pattern_exception : public exception
-{
-public:
-    pattern_exception(const std::string& msg);
-};
 
 class CHUCHO_EXPORT pattern_formatter : public formatter
 {

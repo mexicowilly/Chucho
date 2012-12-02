@@ -1,12 +1,8 @@
 #include <chucho/file_writer.hpp>
+#include <chucho/exception.hpp>
 
 namespace chucho
 {
-
-file_exception::file_exception(const std::string& msg)
-    : exception(msg)
-{
-}
 
 file_writer::file_writer(on_start start,
                          bool flush)

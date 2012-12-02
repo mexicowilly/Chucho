@@ -2,18 +2,11 @@
 #define CHUCHO_FILE_WRITER__
 
 #include <chucho/writer.hpp>
-#include <chucho/exception.hpp>
 #include <fstream>
 #include <string>
 
 namespace chucho
 {
-
-class CHUCHO_EXPORT file_exception : public exception
-{
-public:
-    file_exception(const std::string& msg);
-};
 
 class CHUCHO_EXPORT file_writer : public writer
 {
