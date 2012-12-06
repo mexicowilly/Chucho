@@ -17,7 +17,7 @@ std::ostream& operator<< (std::ostream& stream, const status& st)
 {
     if (st.level_ == status::level::INFO)
         stream << "INFO";
-    else if (st.level_ == status::level::WARN)
+    else if (st.level_ == status::level::WARNING)
         stream << "WARN";
     else if (st.level_ == status::level::ERROR)
         stream << "ERROR";

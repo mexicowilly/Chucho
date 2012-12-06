@@ -11,6 +11,11 @@ namespace chucho
 class rolling_file_writer : public file_writer
 {
 public:
+    rolling_file_writer(const std::string& file_name,
+                        on_start start,
+                        bool flush,
+                        std::unique_ptr<file_roller> roller,
+                        std::shared_ptr<file_roll_trigger> trigger = std::shared_ptr<file_roll_trigger>());
     rolling_file_writer(on_start start,
                         bool flush,
                         std::unique_ptr<file_roller> roller,
@@ -20,6 +25,8 @@ protected:
     virtual void write_impl(const event& evt) override;
 
 private:
+    CHUCHO_NO_EXPORT void init();
+
     std::unique_ptr<file_roller> roller_;
     std::shared_ptr<file_roll_trigger> shared_trigger_;
     /**

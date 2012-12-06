@@ -13,7 +13,7 @@ namespace chucho
 namespace calendar
 {
 
-struct std::tm get_local(std::time_t);
+struct std::tm get_local(std::time_t t);
 struct std::tm get_utc(std::time_t t);
 
 }

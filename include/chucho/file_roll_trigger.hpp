@@ -7,7 +7,7 @@
 namespace chucho
 {
 
-class CHUCHO_EXPORT file_roll_trigger : public status_reporter
+class CHUCHO_EXPORT file_roll_trigger : public virtual status_reporter
 {
 public:
     virtual bool is_triggered(const std::string& active_file, const event& e) = 0;

@@ -15,6 +15,8 @@ public:
     const std::size_t FIXED_CACHE_MAX = 150;
     const std::size_t TAILED_CACHE_MAX = 150;
 
+    static std::shared_ptr<status_manager> get();
+
     status_manager();
 
     void add(const status& st);
@@ -24,6 +26,11 @@ public:
     status::level get_level();
 
 private:
+    /**
+     * @pre guard_ must be locked
+     */
+    void adjust_level();
+
     std::vector<status> fixed_cache_;
     std::deque<status> tailed_cache_;
     std::mutex cache_guard_;

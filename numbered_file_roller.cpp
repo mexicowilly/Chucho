@@ -1,6 +1,7 @@
 #include <chucho/numbered_file_roller.hpp>
 #include <chucho/file_writer.hpp>
 #include <chucho/file.hpp>
+#include <chucho/exception.hpp>
 #include <stdexcept>
 #include <cstdio>
 #include <sstream>
@@ -30,15 +31,22 @@ std::string numbered_file_roller::get_name(int number) const
 
 void numbered_file_roller::roll()
 {
-    std::remove(get_name(max_index_).c_str());
-    for (int i = max_index_; i > min_index_; i--)
+    try
     {
-        std::string name = get_name(i - 1);
-        if (file::exists(name))
-            std::rename(name.c_str(), get_name(i).c_str());
+        file::remove(get_name(max_index_));
+        for (int i = max_index_; i > min_index_; i--)
+        {
+            std::string name = get_name(i - 1);
+            if (file::exists(name))
+                std::rename(name.c_str(), get_name(i).c_str());
+        }
+        std::rename(file_writer_->get_file_name().c_str(),
+                    get_name(min_index_).c_str());
     }
-    std::rename(file_writer_->get_file_name().c_str(),
-                get_name(min_index_).c_str());
+    catch (std::exception& e)
+    {
+        std::throw_with_nested(exception("Could not roll the file " + file_writer_->get_file_name()));
+    }
 }
 
 }

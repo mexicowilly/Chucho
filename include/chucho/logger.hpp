@@ -17,6 +17,7 @@ public:
     logger(const logger&) = delete;
     logger& operator= (const logger&) = delete;
 
+    void add_writer(std::shared_ptr<writer> wrt);
     std::shared_ptr<level> get_effective_level() const;
     std::shared_ptr<level> get_level() const;
     const std::string& get_name() const;

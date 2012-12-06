@@ -19,7 +19,7 @@ public:
     enum class level
     {
         INFO,
-        WARN,
+        WARNING,
         ERROR
     };
 

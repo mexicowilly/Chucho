@@ -33,9 +33,7 @@ pattern_formatter::pattern_formatter(const std::string& pattern)
 
 std::shared_ptr<pattern_formatter::piece> pattern_formatter::create_piece(std::string::const_iterator& pos,
                                                                           std::string::const_iterator end,
-                                                                          justification just,
-                                                                          std::size_t min_width,
-                                                                          std::size_t max_width)
+                                                                          const format_params& params)
 {
     std::shared_ptr<piece> result;
     std::string arg;
@@ -43,10 +41,10 @@ std::shared_ptr<pattern_formatter::piece> pattern_formatter::create_piece(std::s
     switch (c)
     {
     case 'b':
-        result.reset(new base_file_piece(just, min_width, max_width));
+        result.reset(new base_file_piece(params));
         break;
     case 'c':
-        result.reset(new logger_piece(just, min_width, max_width));
+        result.reset(new logger_piece(params));
         break;
     case 'd':
     case 'D':
@@ -54,42 +52,43 @@ std::shared_ptr<pattern_formatter::piece> pattern_formatter::create_piece(std::s
         if (arg.empty())
             arg = "%Y-%m-%d %H:%M:%S";
         if (c == 'd')
-            result.reset(new utc_date_time_piece(arg, just, min_width, max_width));
+            result.reset(new utc_date_time_piece(arg, params));
         else
-            result.reset(new local_date_time_piece(arg, just, min_width, max_width));
+            result.reset(new local_date_time_piece(arg, params));
         break;
     case 'F':
-        result.reset(new full_file_piece(just, min_width, max_width));
+        result.reset(new full_file_piece(params));
         break;
     case 'h':
-        result.reset(new base_host_piece(just, min_width, max_width));
+        result.reset(new base_host_piece(params));
         break;
     case 'i':
-        result.reset(new pid_piece(just, min_width, max_width));
+        result.reset(new pid_piece(params));
         break;
     case 'L':
-        result.reset(new line_number_piece(just, min_width, max_width));
+        result.reset(new line_number_piece(params));
         break;
     case 'm':
-        result.reset(new message_piece(just, min_width, max_width));
+        result.reset(new message_piece(params));
         break;
     case 'M':
-        result.reset(new function_piece(just, min_width, max_width));
+        result.reset(new function_piece(params));
         break;
     case 'n':
-        result.reset(new end_of_line_piece(just, min_width, max_width));
+        result.reset(new end_of_line_piece(params));
         break;
     case 'p':
-        result.reset(new level_piece(just, min_width, max_width));
+        result.reset(new level_piece(params));
         break;
     case 'r':
-        result.reset(new milliseconds_since_start_piece(just, min_width, max_width));
+        result.reset(new milliseconds_since_start_piece(params));
         break;
     case 't':
-        result.reset(new thread_piece(just, min_width, max_width));
+        result.reset(new thread_piece(params));
         break;
     default:
-        throw pattern_exception(std::string("Unexpected character '") + c + "' in pattern");
+        report_error(std::string("Unexpected character '") + c + "' in pattern");
+        throw exception("Invalid parameter");
     }
     return result;
 }
@@ -111,7 +110,7 @@ std::string pattern_formatter::get_argument(std::string::const_iterator& pos,
         auto last = std::find(++pos, end, '}');
         if (last == end)
         {
-            throw pattern_exception("Expected '}' in the pattern");
+            report_error("Expected '}' in the pattern");
         }
         else
         {
@@ -125,126 +124,137 @@ std::string pattern_formatter::get_argument(std::string::const_iterator& pos,
 void pattern_formatter::parse(const std::string& pattern)
 {
     if (pattern.empty())
-        throw pattern_exception("Empty pattern");
+    {
+        report_error("Empty pattern");
+        return;
+    }
     parser_state state = parser_state::LITERAL;
     auto last_char = pattern.end() - 1;
     std::string text;
-    justification just = justification::UNSET;
-    std::size_t min_width = 0;
-    std::size_t max_width = std::numeric_limits<std::size_t>::max();
+    format_params params;
+    std::string::const_iterator begin_pos;
     for (auto i = pattern.begin(); i != pattern.end(); i++)
     {
-        switch (state)
+        try
         {
-        case parser_state::LITERAL:
-            if (i == last_char)
+            switch (state)
             {
-                text += *i;
-                continue;
-            }
-            if (*i == '%')
-            {
-                if (*(i + 1) == '%')
+            case parser_state::LITERAL:
+                if (i == last_char)
                 {
-                    text += *i++;
+                    text += *i;
+                    continue;
+                }
+                if (*i == '%')
+                {
+                    if (*(i + 1) == '%')
+                    {
+                        text += *i++;
+                    }
+                    else
+                    {
+                        if (!text.empty())
+                        {
+                            std::shared_ptr<piece> p(new literal_piece(text));
+                            pieces_.push_back(p);
+                        }
+                        state = parser_state::BEGIN;
+                        begin_pos = i;
+                    }
                 }
                 else
                 {
-                    if (!text.empty())
-                    {
-                        std::shared_ptr<piece> p(new literal_piece(text));
-                        pieces_.push_back(p);
-                    }
-                    state = parser_state::BEGIN;
+                    text += *i;
                 }
-            }
-            else
-            {
-                text += *i;
-            }
-            break;
-        case parser_state::BEGIN:
-            if (*i == '-')
-            {
-                just = justification::LEFT;
-            }
-            else
-            {
-                if (just == justification::UNSET)
-                    just = justification::RIGHT;
-                if (*i == '.')
+                break;
+            case parser_state::BEGIN:
+                if (*i == '-')
                 {
-                    state = parser_state::DOT;
+                    params.just_ = justification::LEFT;
                 }
-                else if (*i >= '0' && *i <= '9')
+                else
+                {
+                    if (params.just_ == justification::UNSET)
+                        params.just_ = justification::RIGHT;
+                    if (*i == '.')
+                    {
+                        state = parser_state::DOT;
+                    }
+                    else if (*i >= '0' && *i <= '9')
+                    {
+                        text = *i;
+                        state = parser_state::MIN;
+                    }
+                    else
+                    {
+                        pieces_.push_back(create_piece(i, pattern.end(), params));
+                        state = parser_state::LITERAL;
+                        text.clear();
+                        params.reset();
+                    }
+                }
+                break;
+            case parser_state::MIN:
+                if (*i >= '0' && *i <= '9')
                 {
                     text = *i;
-                    state = parser_state::MIN;
                 }
                 else
                 {
-                    pieces_.push_back(create_piece(i, pattern.end(), just, min_width, max_width));
-                    min_width = 0;
-                    max_width = std::numeric_limits<std::size_t>::max();
-                    state = parser_state::LITERAL;
-                    text.clear();
-                    just = justification::UNSET;
+                    params.min_width_ = std::stoi(text);
+                    if (*i == '.')
+                    {
+                        state = parser_state::DOT;
+                    }
+                    else
+                    {
+                        pieces_.push_back(create_piece(i, pattern.end(), params));
+                        state = parser_state::LITERAL;
+                        text.clear();
+                        params.reset();
+                    }
                 }
-            }
-            break;
-        case parser_state::MIN:
-            if (*i >= '0' && *i <= '9')
-            {
-                text = *i;
-            }
-            else
-            {
-                min_width = std::stoi(text);
-                if (*i == '.')
+                break;
+            case parser_state::DOT:
+                if (*i >= '0' && *i <= '9')
                 {
-                    state = parser_state::DOT;
+                    text = *i;
+                    state = parser_state::MAX;
                 }
                 else
                 {
-                    pieces_.push_back(create_piece(i, pattern.end(), just, min_width, max_width));
-                    min_width = 0;
-                    max_width = std::numeric_limits<std::size_t>::max();
+                    std::ostringstream stream;
+                    stream << "Invalid pattern: Expected a digit but got '" <<
+                        *i << "'";
+                    report_error(stream.str());
+                    state = parser_state::LITERAL;
+                    params.reset();
+                    text.assign(begin_pos, i + 1);
+                }
+                break;
+            case parser_state::MAX:
+                if (*i >= '0' && *i <= '9')
+                {
+                    text += *i;
+                }
+                else
+                {
+                    params.max_width_ = std::stoi(text);
+                    pieces_.push_back(create_piece(i, pattern.end(), params));
                     state = parser_state::LITERAL;
                     text.clear();
-                    just = justification::UNSET;
+                    params.reset();
                 }
+                break;
             }
-            break;
-        case parser_state::DOT:
-            if (*i >= '0' && *i <= '9')
-            {
-                text = *i;
-                state = parser_state::MAX;
-            }
-            else
-            {
-                std::ostringstream stream;
-                stream << "Invalid pattern: Expected '.' but got '" <<
-                    *i << "'";
-                throw pattern_exception(stream.str());
-            }
-            break;
-        case parser_state::MAX:
-            if (*i >= '0' && *i <= '9')
-            {
-                text += *i;
-            }
-            else
-            {
-                max_width = std::stoi(text);
-                pieces_.push_back(create_piece(i, pattern.end(), just, min_width, max_width));
-                min_width = 0;
-                max_width = std::numeric_limits<std::size_t>::max();
-                state = parser_state::LITERAL;
-                text.clear();
-                just = justification::UNSET;
-            }
-            break;
+        }
+        catch (...)
+        {
+            std::shared_ptr<piece> p(new literal_piece(std::string(begin_pos, i + 1)));
+            pieces_.push_back(p);
+            state = parser_state::LITERAL;
+            text.clear();
+            params.reset();
         }
     }
     if (!text.empty())
@@ -254,26 +264,22 @@ void pattern_formatter::parse(const std::string& pattern)
     }
 }
 
-pattern_formatter::piece::piece(justification just,
-                                std::size_t min_width,
-                                std::size_t max_width)
-    : just_(just),
-      min_width_(min_width),
-      max_width_(max_width)
+pattern_formatter::piece::piece(const format_params& params)
+    : params_(params)
 {
 }
 
 std::string pattern_formatter::piece::get_text(const event& evt) const
 {
     std::string result = get_text_impl(evt);
-    if (result.length() > max_width_)
+    if (result.length() > params_.max_width_)
     {
-        result.erase(result.begin(), result.begin() + (result.length() - max_width_));
+        result.erase(result.begin(), result.begin() + (result.length() - params_.max_width_));
     }
-    else if (result.length() < min_width_)
+    else if (result.length() < params_.min_width_)
     {
-        std::size_t pad = min_width_ - result.length();
-        if (just_ == justification::LEFT)
+        std::size_t pad = params_.min_width_ - result.length();
+        if (params_.just_ == justification::LEFT)
             result.append(pad, ' ');
         else
             result.insert(0, pad, ' ');
@@ -281,24 +287,18 @@ std::string pattern_formatter::piece::get_text(const event& evt) const
     return result;
 }
 
-pattern_formatter::base_file_piece::base_file_piece(justification just,
-                                                    std::size_t min_width,
-                                                    std::size_t max_width)
-    : piece(just, min_width, max_width)
+pattern_formatter::base_file_piece::base_file_piece(const format_params& params)
+    : piece(params)
 {
 }
 
 std::string pattern_formatter::base_file_piece::get_text_impl(const event& evt) const
 {
-    const char* fn = evt.get_file_name();
-    char* found = strrchr(fn, file::dir_sep);
-    return (found == nullptr) ? fn : found + 1;
+    return file::base_name(evt.get_file_name());
 }
 
-pattern_formatter::full_file_piece::full_file_piece(justification just,
-                                                    std::size_t min_width,
-                                                    std::size_t max_width)
-    : piece(just, min_width, max_width)
+pattern_formatter::full_file_piece::full_file_piece(const format_params& params)
+    : piece(params)
 {
 }
 
@@ -307,10 +307,8 @@ std::string pattern_formatter::full_file_piece::get_text_impl(const event& evt) 
     return evt.get_file_name();
 }
 
-pattern_formatter::logger_piece::logger_piece(justification just,
-                                              std::size_t min_width,
-                                              std::size_t max_width)
-    : piece(just, min_width, max_width)
+pattern_formatter::logger_piece::logger_piece(const format_params& params)
+    : piece(params)
 {
 }
 
@@ -320,10 +318,8 @@ std::string pattern_formatter::logger_piece::get_text_impl(const event& evt) con
 }
 
 pattern_formatter::date_time_piece::date_time_piece(const std::string& date_pattern,
-                                                    justification just,
-                                                    std::size_t min_width,
-                                                    std::size_t max_width)
-    : piece(just, min_width, max_width),
+                                                    const format_params& params)
+    : piece(params),
       date_pattern_(date_pattern)
 {
     std::size_t pos = date_pattern.find("%q", 0);
@@ -356,10 +352,8 @@ std::string pattern_formatter::date_time_piece::get_text_impl(const event& evt) 
 }
 
 pattern_formatter::utc_date_time_piece::utc_date_time_piece(const std::string& date_pattern,
-                                                            justification just,
-                                                            std::size_t min_width,
-                                                            std::size_t max_width)
-    : date_time_piece(date_pattern, just, min_width, max_width)
+                                                            const format_params& params)
+    : date_time_piece(date_pattern, params)
 {
 }
 
@@ -369,10 +363,8 @@ void pattern_formatter::utc_date_time_piece::to_calendar(time_t t, struct std::t
 }
 
 pattern_formatter::local_date_time_piece::local_date_time_piece(const std::string& date_pattern,
-                                                                justification just,
-                                                                std::size_t min_width,
-                                                                std::size_t max_width)
-    : date_time_piece(date_pattern, just, min_width, max_width)
+                                                                const format_params& params)
+    : date_time_piece(date_pattern, params)
 {
 }
 
@@ -386,10 +378,8 @@ std::string pattern_formatter::base_host_piece::get_text_impl(const event& evt) 
     return name_;
 }
 
-pattern_formatter::line_number_piece::line_number_piece(justification just,
-                                                        std::size_t min_width,
-                                                        std::size_t max_width)
-    : piece(just, min_width, max_width)
+pattern_formatter::line_number_piece::line_number_piece(const format_params& params)
+    : piece(params)
 {
 }
 
@@ -398,10 +388,8 @@ std::string pattern_formatter::line_number_piece::get_text_impl(const event& evt
     return std::to_string(evt.get_line_number());
 }
 
-pattern_formatter::message_piece::message_piece(justification just,
-                                                std::size_t min_width,
-                                                std::size_t max_width)
-    : piece(just, min_width, max_width)
+pattern_formatter::message_piece::message_piece(const format_params& params)
+    : piece(params)
 {
 }
 
@@ -410,10 +398,8 @@ std::string pattern_formatter::message_piece::get_text_impl(const event& evt) co
     return evt.get_message();
 }
 
-pattern_formatter::function_piece::function_piece(justification just,
-                                                  std::size_t min_width,
-                                                  std::size_t max_width)
-    : piece(just, min_width, max_width)
+pattern_formatter::function_piece::function_piece(const format_params& params)
+    : piece(params)
 {
 }
 
@@ -422,10 +408,8 @@ std::string pattern_formatter::function_piece::get_text_impl(const event& evt) c
     return evt.get_function_name();
 }
 
-pattern_formatter::end_of_line_piece::end_of_line_piece(justification just,
-                                                        std::size_t min_width,
-                                                        std::size_t max_width)
-    : piece(just, min_width, max_width)
+pattern_formatter::end_of_line_piece::end_of_line_piece(const format_params& params)
+    : piece(params)
 {
     std::ostringstream stream;
     stream << std::endl;
@@ -437,10 +421,8 @@ std::string pattern_formatter::end_of_line_piece::get_text_impl(const event& evt
     return eol_;
 }
 
-pattern_formatter::level_piece::level_piece(justification just,
-                                            std::size_t min_width,
-                                            std::size_t max_width)
-    : piece(just, min_width, max_width)
+pattern_formatter::level_piece::level_piece(const format_params& params)
+    : piece(params)
 {
 }
 
@@ -449,22 +431,18 @@ std::string pattern_formatter::level_piece::get_text_impl(const event& evt) cons
     return evt.get_logger()->get_effective_level()->get_name();
 }
 
-pattern_formatter::milliseconds_since_start_piece::milliseconds_since_start_piece(justification just,
-                                                                                  std::size_t min_width,
-                                                                                  std::size_t max_width)
-    : piece(just, min_width, max_width)
+pattern_formatter::milliseconds_since_start_piece::milliseconds_since_start_piece(const format_params& params)
+    : piece(params)
 {
 }
 
-pattern_formatter::pid_piece::pid_piece(justification just,
-                                        std::size_t min_width,
-                                        std::size_t max_width)
-    : piece(just, min_width, max_width)
+pattern_formatter::pid_piece::pid_piece(const format_params& params)
+    : piece(params)
 {
 }
 
 pattern_formatter::literal_piece::literal_piece(const std::string& text)
-    : piece(justification::RIGHT, 0, std::numeric_limits<std::size_t>::max()),
+    : piece(format_params()),
       text_(text)
 {
 }
@@ -474,10 +452,8 @@ std::string pattern_formatter::literal_piece::get_text_impl(const event& evt) co
     return text_;
 }
 
-pattern_formatter::thread_piece::thread_piece(justification just,
-                                              std::size_t min_width,
-                                              std::size_t max_width)
-    : piece(just, min_width, max_width)
+pattern_formatter::thread_piece::thread_piece(const format_params& params)
+    : piece(params)
 {
 }
 
@@ -486,6 +462,18 @@ std::string pattern_formatter::thread_piece::get_text_impl(const event& evt) con
     std::ostringstream stream;
     stream << std::this_thread::get_id();
     return stream.str();
+}
+
+pattern_formatter::format_params::format_params()
+{
+    reset();
+}
+
+void pattern_formatter::format_params::reset()
+{
+    min_width_ = 0;
+    max_width_ = std::numeric_limits<std::size_t>::max();
+    just_ = justification::UNSET;
 }
 
 }

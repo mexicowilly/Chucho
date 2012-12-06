@@ -6,10 +6,8 @@
 namespace chucho
 {
 
-pattern_formatter::base_host_piece::base_host_piece(justification just,
-                                                    std::size_t min_width,
-                                                    std::size_t max_width)
-    : piece(just, min_width, max_width)
+pattern_formatter::base_host_piece::base_host_piece(const format_params& params)
+    : piece(params)
 {
     struct utsname info;
     uname(&info);

@@ -1,5 +1,20 @@
 #include <chucho/status_manager.hpp>
 
+namespace
+{
+
+struct level_less
+{
+    bool operator() (const chucho::status& st1, const chucho::status& st2) const
+    {
+        return st1.get_level() < st2.get_level();
+    }
+};
+
+std::shared_ptr<chucho::status_manager> smgr(std::make_shared<chucho::status_manager>());
+
+}
+
 namespace chucho
 {
 
@@ -13,8 +28,6 @@ void status_manager::add(const status& st)
 {
     std::lock_guard<std::mutex> lg(cache_guard_);
     count_++;
-    if (st.get_level() > level_)
-        level_ = st.get_level();
     if (fixed_cache_.size() < FIXED_CACHE_MAX)
     {
         fixed_cache_.push_back(st);
@@ -25,6 +38,22 @@ void status_manager::add(const status& st)
         if (tailed_cache_.size() > TAILED_CACHE_MAX)
             tailed_cache_.pop_front();
     }
+    adjust_level();
+}
+
+void status_manager::adjust_level()
+{
+    status::level fixed_max = fixed_cache_.empty() ?
+        status::level::INFO :
+        (*std::max_element(fixed_cache_.begin(),
+                           fixed_cache_.end(),
+                           level_less())).get_level();
+    status::level tailed_max = tailed_cache_.empty() ?
+        status::level::INFO :
+        (*std::max_element(tailed_cache_.begin(),
+                           tailed_cache_.end(),
+                           level_less())).get_level();
+    level_ = std::max(fixed_max, tailed_max);
 }
 
 void status_manager::clear()
@@ -33,6 +62,12 @@ void status_manager::clear()
     count_ = 0;
     fixed_cache_.clear();
     tailed_cache_.clear();
+    level_ = status::level::INFO;
+}
+
+std::shared_ptr<status_manager> status_manager::get()
+{
+    return smgr;
 }
 
 std::vector<status> status_manager::get_all()

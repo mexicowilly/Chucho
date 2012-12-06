@@ -22,6 +22,7 @@ public:
                 bool flush);
 
     const std::string& get_file_name() const;
+    const std::string& get_initial_file_name() const;
 
 protected:
     file_writer(on_start start,
@@ -32,6 +33,7 @@ protected:
     virtual void write_impl(const event& evt) override;
 
 private:
+    std::string initial_file_name_;
     std::string file_name_;
     std::ofstream file_;
     on_start start_;
@@ -46,6 +48,11 @@ inline void file_writer::close()
 inline const std::string& file_writer::get_file_name() const
 {
     return file_name_;
+}
+
+inline const std::string& file_writer::get_initial_file_name() const
+{
+    return initial_file_name_;
 }
 
 }

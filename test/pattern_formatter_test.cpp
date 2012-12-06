@@ -181,8 +181,21 @@ TEST_F(pattern_formatter_test, format_params)
 
 TEST_F(pattern_formatter_test, invalid)
 {
-    ASSERT_THROW(chucho::pattern_formatter("%z"), chucho::pattern_exception);
-    ASSERT_THROW(chucho::pattern_formatter("%1.m"), chucho::pattern_exception);
-    ASSERT_THROW(chucho::pattern_formatter(""), chucho::pattern_exception);
-    ASSERT_THROW(chucho::pattern_formatter("%d{%Ym"), chucho::pattern_exception);
+    std::shared_ptr<chucho::status_manager> smgr = chucho::status_manager::get();
+    smgr->clear();
+    chucho::pattern_formatter f("%z");
+    EXPECT_EQ(1, smgr->get_count());
+    EXPECT_EQ(chucho::status::level::ERROR, smgr->get_level());
+    EXPECT_STREQ("%z", f.format(evt_).c_str());
+    f = chucho::pattern_formatter("%1.m");
+    EXPECT_EQ(2, smgr->get_count());
+    EXPECT_EQ(chucho::status::level::ERROR, smgr->get_level());
+    EXPECT_STREQ("%1.m", f.format(evt_).c_str());
+    f = chucho::pattern_formatter("");
+    EXPECT_EQ(3, smgr->get_count());
+    EXPECT_EQ(chucho::status::level::ERROR, smgr->get_level());
+    EXPECT_STREQ("", f.format(evt_).c_str());
+    f = chucho::pattern_formatter("%d{%Ym");
+    EXPECT_EQ(5, smgr->get_count());
+    EXPECT_EQ(chucho::status::level::ERROR, smgr->get_level());
 }
