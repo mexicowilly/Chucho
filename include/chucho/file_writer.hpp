@@ -18,8 +18,8 @@ public:
     };
 
     file_writer(const std::string& file_name,
-                on_start start,
-                bool flush);
+                on_start start = on_start::APPEND,
+                bool flush = true);
 
     const std::string& get_file_name() const;
     const std::string& get_initial_file_name() const;

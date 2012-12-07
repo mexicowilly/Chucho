@@ -30,6 +30,7 @@ ADD_LIBRARY(chucho SHARED
             size_file_roll_trigger.cpp
             status.cpp
             status_manager.cpp
+            status_observer.cpp
             status_reporter.cpp
             time_file_roller.cpp
             writer.cpp
@@ -53,6 +54,7 @@ ADD_LIBRARY(chucho SHARED
             include/chucho/size_file_roll_trigger.hpp
             include/chucho/status.hpp
             include/chucho/status_manager.hpp
+            include/chucho/status_observer.hpp
             include/chucho/status_reporter.hpp
             include/chucho/time_file_roller.hpp
             include/chucho/writer.hpp

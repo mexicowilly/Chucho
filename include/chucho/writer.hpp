@@ -26,7 +26,7 @@ private:
     /**
      * @pre guard_ must be locked
      * @param evt the event to evaluate
-     * @return bool if this writer can write the event
+     * @return true if this writer can write the event
      */
     CHUCHO_NO_EXPORT bool permits(const event& evt);
 

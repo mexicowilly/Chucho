@@ -26,7 +26,7 @@ status_manager::status_manager()
 
 void status_manager::add(const status& st)
 {
-    std::lock_guard<std::mutex> lg(cache_guard_);
+    std::unique_lock<std::mutex> ul(cache_guard_);
     count_++;
     if (fixed_cache_.size() < FIXED_CACHE_MAX)
     {
@@ -39,6 +39,16 @@ void status_manager::add(const status& st)
             tailed_cache_.pop_front();
     }
     adjust_level();
+    ul.unlock();
+    ul = std::unique_lock<std::mutex>(observer_guard_);
+    for (std::shared_ptr<status_observer> obs : observers_)
+        obs->status_reported(st);
+}
+
+void status_manager::add(std::shared_ptr<status_observer> obs)
+{
+    std::lock_guard<std::mutex> lg(observer_guard_);
+    observers_.insert(obs);
 }
 
 void status_manager::adjust_level()
@@ -88,6 +98,12 @@ status::level status_manager::get_level()
 {
     std::lock_guard<std::mutex> lg(cache_guard_);
     return level_;
+}
+
+void status_manager::remove(std::shared_ptr<status_observer> obs)
+{
+    std::lock_guard<std::mutex> lg(observer_guard_);
+    observers_.erase(obs);
 }
 
 }

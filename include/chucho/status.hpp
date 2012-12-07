@@ -13,7 +13,7 @@ namespace chucho
 class CHUCHO_EXPORT status
 {
 public:
-    typedef std::chrono::system_clock clock_type;
+    typedef std::chrono::high_resolution_clock clock_type;
     typedef std::chrono::time_point<clock_type> time_type;
 
     enum class level
@@ -33,7 +33,7 @@ public:
     const time_type& get_time() const;
 
 protected:
-    friend std::ostream& operator<< (std::ostream& stream, const status& st);
+    friend CHUCHO_EXPORT std::ostream& operator<< (std::ostream& stream, const status& st);
 
 private:
     time_type time_;

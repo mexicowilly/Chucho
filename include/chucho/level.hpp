@@ -23,7 +23,7 @@ public:
     virtual int get_value() const = 0;
 };
 
-std::ostream& operator<< (std::ostream& stream, const level& lvl);
+CHUCHO_EXPORT std::ostream& operator<< (std::ostream& stream, const level& lvl);
 
 class CHUCHO_EXPORT trace_level : public level
 {

@@ -11,7 +11,7 @@ size_file_roll_trigger::size_file_roll_trigger(unsigned long long max_size)
 
 bool size_file_roll_trigger::is_triggered(const std::string& active_file, const event& e)
 {
-    return file::size(active_file) >= max_size_;
+    return file::exists(active_file) && file::size(active_file) >= max_size_;
 }
 
 }

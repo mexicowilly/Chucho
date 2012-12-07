@@ -25,9 +25,10 @@ void file_writer::open(const std::string& file_name)
 {
     file_name_ = file_name;
     file_.open(file_name, std::ios::out | ((start_ == on_start::APPEND) ? std::ios::app : std::ios::trunc));
-    if (!file_.is_open())
+    if (file_.is_open())
+        file_.exceptions(std::ios::badbit | std::ios::failbit | std::ios::eofbit);
+    else
         report_error("Could not open " + file_name + " for writing");
-    file_.exceptions(std::ios::badbit | std::ios::failbit | std::ios::eofbit);
 }
 
 void file_writer::write_impl(const event& evt)
