@@ -9,6 +9,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                level_test.cpp
                logger_test.cpp
                pattern_formatter_test.cpp
+               rolling_file_writer_test.cpp
                size_file_roll_trigger_test.cpp)
 TARGET_LINK_LIBRARIES(unit-test chucho ${CHUCHO_GTEST_LIB})
 ADD_DEPENDENCIES(unit-test gtest-external)

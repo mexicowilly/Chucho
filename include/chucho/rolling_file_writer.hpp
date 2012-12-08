@@ -8,9 +8,14 @@
 namespace chucho
 {
 
-class rolling_file_writer : public file_writer
+class CHUCHO_EXPORT rolling_file_writer : public file_writer
 {
 public:
+    rolling_file_writer(std::unique_ptr<file_roller> roller,
+                        std::shared_ptr<file_roll_trigger> trigger = std::shared_ptr<file_roll_trigger>());
+    rolling_file_writer(const std::string& file_name,
+                        std::unique_ptr<file_roller> roller,
+                        std::shared_ptr<file_roll_trigger> trigger = std::shared_ptr<file_roll_trigger>());
     rolling_file_writer(const std::string& file_name,
                         on_start start,
                         bool flush,

@@ -4,6 +4,26 @@
 namespace chucho
 {
 
+rolling_file_writer::rolling_file_writer(std::unique_ptr<file_roller> roller,
+                                         std::shared_ptr<file_roll_trigger> trigger)
+    : rolling_file_writer(file_writer::on_start::APPEND,
+                          true,
+                          std::move(roller),
+                          trigger)
+{
+}
+
+rolling_file_writer::rolling_file_writer(const std::string& file_name,
+                                         std::unique_ptr<file_roller> roller,
+                                         std::shared_ptr<file_roll_trigger> trigger)
+    : rolling_file_writer(file_name,
+                          file_writer::on_start::APPEND,
+                          true,
+                          std::move(roller),
+                          trigger)
+{
+}
+
 rolling_file_writer::rolling_file_writer(const std::string& file_name,
                                          on_start start,
                                          bool flush,

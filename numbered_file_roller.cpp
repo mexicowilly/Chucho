@@ -43,7 +43,7 @@ void numbered_file_roller::roll()
         std::rename(file_writer_->get_file_name().c_str(),
                     get_name(min_index_).c_str());
     }
-    catch (std::exception& e)
+    catch (std::exception&)
     {
         std::throw_with_nested(exception("Could not roll the file " + file_writer_->get_file_name()));
     }
