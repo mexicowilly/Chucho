@@ -5,6 +5,10 @@
 #include <chucho/pattern_formatter.hpp>
 #include <chucho/file.hpp>
 #include <chucho/logger.hpp>
+#include <chucho/calendar.hpp>
+#include <chucho/time_file_roller.hpp>
+#include <chucho/status_manager.hpp>
+#include <array>
 
 class rolling_file_writer_test : public ::testing::Test
 {
@@ -13,7 +17,10 @@ protected:
         : logger_(chucho::logger::get_logger("rolling_file_writer_test")),
           dir_name_("rolling_file_writer_test")
     {
+        if (chucho::file::exists(dir_name_))
+            chucho::file::remove_all(dir_name_);
         chucho::file::create_directory(dir_name_);
+        chucho::status_manager::get()->clear();
     }
 
     ~rolling_file_writer_test()
@@ -29,7 +36,7 @@ protected:
 
     chucho::event get_event(const std::string& msg)
     {
-        return chucho::event(logger_, msg, __FILE__, __LINE__, __FUNCTION__);
+        return chucho::event(logger_, chucho::INFO_LEVEL, msg, __FILE__, __LINE__, __FUNCTION__);
     }
 
     std::string get_file_name(const std::string& base)
@@ -45,6 +52,15 @@ protected:
         return line;
     }
 
+    std::string get_time(const std::string& fmt)
+    {
+        struct std::tm t = chucho::calendar::get_utc(
+            std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+        std::array<char, 1024> buf;
+        std::strftime(buf.data(), buf.size(), fmt.c_str(), &t);
+        return buf.data();
+    }
+
 private:
     std::shared_ptr<chucho::logger> logger_;
     std::string dir_name_;
@@ -55,8 +71,8 @@ TEST_F(rolling_file_writer_test, numbered)
     std::shared_ptr<chucho::file_roll_trigger> trig(std::make_shared<chucho::size_file_roll_trigger>(5));
     std::unique_ptr<chucho::file_roller> roll(new chucho::numbered_file_roller(1, 2));
     std::string fn = get_file_name("num");
-    chucho::rolling_file_writer w(fn, std::move(roll), trig);
-    w.set_formatter(std::make_shared<chucho::pattern_formatter>("%m%n"));
+    std::shared_ptr<chucho::formatter> fmt(new chucho::pattern_formatter("%m%n"));
+    chucho::rolling_file_writer w(fmt, fn, std::move(roll), trig);
     w.write(get_event("one:hello"));
     w.write(get_event("two:hello"));
     EXPECT_TRUE(chucho::file::exists(fn));
@@ -78,4 +94,44 @@ TEST_F(rolling_file_writer_test, numbered)
     EXPECT_TRUE(chucho::file::exists(fn + ".2"));
     EXPECT_STREQ("two:hello", get_line(fn + ".2").c_str());
     EXPECT_FALSE(chucho::file::exists(fn + ".3"));
+}
+
+TEST_F(rolling_file_writer_test, time_names)
+{
+    std::shared_ptr<chucho::formatter> fmt(new chucho::pattern_formatter("%m%n"));
+    std::unique_ptr<chucho::file_roller> roll;
+    std::unique_ptr<chucho::rolling_file_writer> w;
+    std::string fname;
+    for (char c : std::string("MHdVmY"))
+    {
+        chucho::status_manager::get()->clear();
+        std::string simple("%d{%$}");
+        std::replace(simple.begin(), simple.end(), '$', c);
+        roll.reset(new chucho::time_file_roller(get_file_name(simple), 1));
+        w.reset(new chucho::rolling_file_writer(fmt, std::move(roll)));
+        w->write(get_event("one"));
+        EXPECT_EQ(0, chucho::status_manager::get()->get_count());
+        fname = get_file_name(get_time(std::string("%") + c));
+        EXPECT_TRUE(chucho::file::exists(fname));
+        chucho::file::remove(fname);
+    }
+    roll.reset(new chucho::time_file_roller(get_file_name("sub1/sub2/%d{%Y,aux}/%d{%m}"), 1));
+    w.reset(new chucho::rolling_file_writer(fmt, std::move(roll)));
+    w->write(get_event("one"));
+    EXPECT_EQ(0, chucho::status_manager::get()->get_count());
+    fname = get_file_name("sub1/sub2/" + get_time("%Y") + "/" + get_time("%m"));
+    EXPECT_TRUE(chucho::file::exists(fname));
+}
+
+TEST_F(rolling_file_writer_test, time_name_errors)
+{
+    auto smgr = chucho::status_manager::get();
+    std::array<const char*, 5> names = { "%d{%m, aux}", "%d{%m} %d{%Y}", "%d{%S}", "", "my dog has fleas" };
+    std::unique_ptr<chucho::time_file_roller> r;
+    for (auto name : names)
+    {
+        smgr->clear();
+        r.reset(new chucho::time_file_roller(name, 1));
+        EXPECT_GE(smgr->get_count(), 1);
+    }
 }

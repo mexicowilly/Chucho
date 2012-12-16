@@ -10,18 +10,13 @@ namespace chucho
 class CHUCHO_EXPORT level_threshold_filter : public filter
 {
 public:
-    virtual result evaluate(const event& evt) override;
+    level_threshold_filter(std::shared_ptr<level> lvl);
 
-    void set_level(std::shared_ptr<level> lvl);
+    virtual result evaluate(const event& evt) override;
 
 private:
     std::shared_ptr<level> level_;
 };
-
-inline void level_threshold_filter::set_level(std::shared_ptr<level> lvl)
-{
-    level_ = lvl;
-}
 
 }
 

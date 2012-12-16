@@ -9,12 +9,18 @@
 namespace chucho
 {
 
+numbered_file_roller::numbered_file_roller(int max_index)
+    : numbered_file_roller(1, max_index)
+{
+}
+
 numbered_file_roller::numbered_file_roller(int min_index, int max_index)
     : min_index_(min_index),
       max_index_(max_index)
 {
     if (min_index > max_index)
         throw std::invalid_argument("numbered_file_roller: min_index must be less than or equal to max_index");
+    set_status_origin("numbered_file_roller");
 }
 
 std::string numbered_file_roller::get_active_file_name()

@@ -2,6 +2,7 @@
 #include <chucho/pattern_formatter.hpp>
 #include <chucho/logger.hpp>
 #include <chucho/exception.hpp>
+#include <chucho/status_manager.hpp>
 #include <sstream>
 #include <thread>
 #include <array>
@@ -25,6 +26,7 @@ class pattern_formatter_test : public ::testing::Test
 public:
     pattern_formatter_test()
         : evt_(chucho::logger::get_logger("pattern logger"),
+               chucho::INFO_LEVEL,
                "hi",
                file_name,
                10,

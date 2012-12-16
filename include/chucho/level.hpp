@@ -7,6 +7,16 @@
 namespace chucho
 {
 
+class level;
+
+extern CHUCHO_EXPORT std::shared_ptr<level> TRACE_LEVEL;
+extern CHUCHO_EXPORT std::shared_ptr<level> DEBUG_LEVEL;
+extern CHUCHO_EXPORT std::shared_ptr<level> INFO_LEVEL;
+extern CHUCHO_EXPORT std::shared_ptr<level> WARN_LEVEL;
+extern CHUCHO_EXPORT std::shared_ptr<level> ERROR_LEVEL;
+extern CHUCHO_EXPORT std::shared_ptr<level> FATAL_LEVEL;
+extern CHUCHO_EXPORT std::shared_ptr<level> OFF_LEVEL;
+
 class CHUCHO_EXPORT level
 {
 public:

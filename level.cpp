@@ -4,6 +4,14 @@
 namespace chucho
 {
 
+std::shared_ptr<level> TRACE_LEVEL(new trace_level());
+std::shared_ptr<level> DEBUG_LEVEL(new debug_level());
+std::shared_ptr<level> INFO_LEVEL(new info_level());
+std::shared_ptr<level> WARN_LEVEL(new warn_level());
+std::shared_ptr<level> ERROR_LEVEL(new error_level());
+std::shared_ptr<level> FATAL_LEVEL(new fatal_level());
+std::shared_ptr<level> OFF_LEVEL(new off_level());
+
 std::ostream& operator<< (std::ostream& stream, const level& lvl)
 {
     stream << lvl.get_name();

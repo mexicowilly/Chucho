@@ -12,9 +12,13 @@ namespace chucho
 class CHUCHO_EXPORT writer : public status_reporter
 {
 public:
+    writer(std::shared_ptr<formatter> fmt);
+    writer(const writer&) = delete;
+
+    writer& operator= (const writer&) = delete;
+
     void add_filter(std::shared_ptr<filter> flt);
     void clear_filters();
-    void set_formatter(std::shared_ptr<formatter> fmt);
     void write(const event& evt);
 
 protected:

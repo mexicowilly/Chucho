@@ -14,10 +14,11 @@ class logger;
 class CHUCHO_EXPORT event
 {
 public:
-    typedef std::chrono::high_resolution_clock clock_type;
+    typedef std::chrono::system_clock clock_type;
     typedef std::chrono::time_point<clock_type> time_type;
 
     event(std::shared_ptr<logger> lgr,
+          std::shared_ptr<level> lvl,
           const std::string& msg,
           const char* const file_name,
           unsigned line_number,
@@ -25,6 +26,7 @@ public:
 
     const char* get_file_name() const;
     const char* get_function_name() const;
+    std::shared_ptr<level> get_level() const;
     unsigned get_line_number() const;
     std::shared_ptr<logger> get_logger() const;
     const std::string& get_message() const;
@@ -32,6 +34,7 @@ public:
 
 private:
     std::shared_ptr<logger> logger_;
+    std::shared_ptr<level> level_;
     std::string message_;
     time_type time_;
     const char* file_name_;
@@ -47,6 +50,11 @@ inline const char* event::get_file_name() const
 inline const char* event::get_function_name() const
 {
     return function_name_;
+}
+
+inline std::shared_ptr<level> event::get_level() const
+{
+    return level_;
 }
 
 inline unsigned event::get_line_number() const

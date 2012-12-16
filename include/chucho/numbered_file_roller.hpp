@@ -9,6 +9,7 @@ namespace chucho
 class CHUCHO_EXPORT numbered_file_roller : public file_roller
 {
 public:
+    numbered_file_roller(int max_index);
     numbered_file_roller(int min_index, int max_index);
 
     virtual std::string get_active_file_name() override;

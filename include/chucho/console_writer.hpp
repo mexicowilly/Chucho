@@ -10,7 +10,8 @@ namespace chucho
 class CHUCHO_EXPORT console_writer : public writer
 {
 protected:
-    console_writer(std::ostream& stream);
+    console_writer(std::shared_ptr<formatter> fmt,
+                   std::ostream& stream);
 
     virtual void write_impl(const event& evt) override;
 
@@ -20,13 +21,13 @@ protected:
 class CHUCHO_EXPORT cout_writer : public console_writer
 {
 public:
-    cout_writer();
+    cout_writer(std::shared_ptr<formatter> fmt);
 };
 
 class CHUCHO_EXPORT cerr_writer : public console_writer
 {
 public:
-    cerr_writer();
+    cerr_writer(std::shared_ptr<formatter> fmt);
 };
 
 }

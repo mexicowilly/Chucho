@@ -7,6 +7,7 @@ TEST(size_file_roll_trigger_test, trigger)
 {
     chucho::size_file_roll_trigger t(512);
     chucho::event evt(chucho::logger::get_logger("size_file_roll_trigger_test"),
+                      chucho::INFO_LEVEL,
                       "hello",
                       __FILE__,
                       __LINE__,

@@ -17,7 +17,8 @@ public:
         TRUNCATE
     };
 
-    file_writer(const std::string& file_name,
+    file_writer(std::shared_ptr<formatter> fmt,
+                const std::string& file_name,
                 on_start start = on_start::APPEND,
                 bool flush = true);
 
@@ -25,7 +26,8 @@ public:
     const std::string& get_initial_file_name() const;
 
 protected:
-    file_writer(on_start start,
+    file_writer(std::shared_ptr<formatter> fmt,
+                on_start start,
                 bool flush);
 
     void close();

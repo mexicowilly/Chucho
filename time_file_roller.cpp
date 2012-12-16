@@ -42,6 +42,7 @@ time_file_roller::time_file_roller(const std::string file_name_pattern,
     : max_history_(max_history),
       file_name_pattern_(file_name_pattern)
 {
+    set_status_origin("time_file_roller");
     set_period();
     cleaner_.reset(new cleaner(*this));
     compute_next_roll(clock_type::now());
@@ -49,13 +50,17 @@ time_file_roller::time_file_roller(const std::string file_name_pattern,
 
 void time_file_roller::compute_next_roll(const time_type& now)
 {
-    struct std::tm next_cal = calendar::get_local(clock_type::to_time_t(next_roll_));
+    struct std::tm next_cal = calendar::get_utc(clock_type::to_time_t(now));
     while (now >= next_roll_)
     {
-        if (period_ == period::HOUR)
+        if (period_ == period::MINUTE)
+            next_cal.tm_min++;
+        else if (period_ == period::HOUR)
             next_cal.tm_hour++;
         else if (period_ == period::DAY)
             next_cal.tm_mday++;
+        else if (period_ == period::WEEK)
+            next_cal.tm_mday += 7;
         else if (period_ == period::MONTH)
             next_cal.tm_mon++;
         else if (period_ == period::YEAR)
@@ -69,7 +74,7 @@ std::string time_file_roller::find_time_spec(const std::string& str,
                                              std::size_t& end)
 {
     std::string result;
-    start = find_time_token(str, 'd');
+    start = find_time_token(str, 'd', start);
     if (start == std::string::npos)
     {
         end = std::string::npos;
@@ -94,7 +99,8 @@ std::string time_file_roller::find_time_spec(const std::string& str,
             else
             {
                 result = str.substr(found, end - found);
-                ++end;
+                if (++end >= str.length())
+                    end = std::string::npos;
             }
         }
     }
@@ -126,26 +132,30 @@ bool time_file_roller::is_triggered(const std::string& active_file, const event&
 
 std::string time_file_roller::resolve_file_name(const time_type& tm)
 {
-    std::tm cal = calendar::get_local(clock_type::to_time_t(tm));
+    std::tm cal = calendar::get_utc(clock_type::to_time_t(tm));
     std::size_t start;
     std::size_t end;
     std::string result = file_name_pattern_;
-    do
+    bool got_one = false;
+    while (true)
     {
         start = 0;
         std::string spec = find_time_spec(result, start, end);
-        if (spec.empty())
+        if (start == std::string::npos)
         {
-            report_error("The file name pattern " + file_name_pattern_ + " contains no date specification");
+            if (!got_one)
+                report_error("The file name pattern " + file_name_pattern_ + " contains no date specification");
+            break;
         }
         else
         {
-            std::regex_replace(spec, aux_time_spec_re, "");
+            got_one = true;
+            spec = std::regex_replace(spec, aux_time_spec_re, "");
             std::string fmt = format(cal, spec);
             if (!fmt.empty())
                 result.replace(start, end - start, fmt);
         }
-    } while (start != std::string::npos);
+    }
     if (file::dir_sep == '\\')
         std::replace(result.begin(), result.end(), '/', '\\');
     else
@@ -165,7 +175,6 @@ void time_file_roller::roll()
         std::string target = resolve_file_name(now);
         if (file::exists(target))
             file::remove(target);
-        file::create_directories(file::directory_name(target));
         std::rename(get_active_file_name().c_str(), target.c_str());
         compute_next_roll(now);
         cleaner_->clean(now);
@@ -178,15 +187,25 @@ void time_file_roller::set_period()
     std::size_t end;
     period_ = period::UNKNOWN;
     bool found_aux = false;
+    std::string primary_spec;
     do
     {
         std::string spec = find_time_spec(file_name_pattern_, pos, end);
+        if (spec.empty())
+            break;
+        pos = end;
         if (std::regex_search(spec, aux_time_spec_re))
         {
             found_aux = true;
         }
         else
         {
+            if (!primary_spec.empty())
+            {
+                report_error("The file name pattern " + file_name_pattern_ + " can have only one primary date specification. The others must be marked with \",aux\". Found " + primary_spec + " and " + spec + ".");
+                return;
+            }
+            primary_spec = spec;
             struct std::tm epoch = calendar::get_utc(0);
             std::string fmt1 = format(epoch, spec);
             if (fmt1.empty())
@@ -218,24 +237,21 @@ void time_file_roller::set_period()
                     rolled.tm_mon++;
                 else
                     rolled.tm_year++;
+                rolled = calendar::get_local(std::mktime(&rolled));
                 std::string fmt2 = format(rolled, spec);
                 if (fmt1 != fmt2)
-                {
                     period_ = p;
-                    break;
-                }
             }
             if (period_ == period::UNKNOWN)
                 report_error("The data specification " + spec + " does not contain sufficient information to determine the rolling period");
-            break;
         }
     } while (pos != std::string::npos);
     if (period_ == period::UNKNOWN)
     {
         if (found_aux)
-            report_error("No non-auxillary date specifications were found in the pattern " + file_name_pattern_);
+            report_error("No non-auxillary date specifications were found in the pattern \"" + file_name_pattern_ + "\"");
         else
-            report_error("No suitable date specifications were found in the pattern " + file_name_pattern_);
+            report_error("No suitable date specifications were found in the pattern \"" + file_name_pattern_ + "\"");
     }
 }
 
@@ -243,6 +259,7 @@ time_file_roller::cleaner::cleaner(time_file_roller& roller)
     : roller_(roller),
       oldest_period_offset_(-roller.max_history_ - 1)
 {
+    set_status_origin("time_file_roller::cleaner");
 }
 
 void time_file_roller::cleaner::clean(const time_type& now)

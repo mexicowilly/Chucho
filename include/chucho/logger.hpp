@@ -13,6 +13,7 @@ class CHUCHO_EXPORT logger : public std::enable_shared_from_this<logger>,
 public:
     static std::vector<std::shared_ptr<logger>> get_existing_loggers();
     static std::shared_ptr<logger> get_logger(const std::string& name);
+    static void remove_unused_loggers();
 
     logger(const logger&) = delete;
     logger& operator= (const logger&) = delete;
@@ -21,16 +22,17 @@ public:
     std::shared_ptr<level> get_effective_level() const;
     std::shared_ptr<level> get_level() const;
     const std::string& get_name() const;
+    bool permits(std::shared_ptr<level> lvl) const;
     void set_level(std::shared_ptr<level> lvl);
     void set_writes_to_ancestors(bool val);
     void write(const event& evt);
     bool writes_to_ancestors() const;
 
 private:
-    static std::shared_ptr<logger> get_logger_impl(const std::string& name);
-    static void static_init();
+    static CHUCHO_NO_EXPORT std::shared_ptr<logger> get_logger_impl(const std::string& name);
+    static CHUCHO_NO_EXPORT void static_init();
 
-    logger(const std::string& name, std::shared_ptr<level> lvl = std::shared_ptr<level>());
+    CHUCHO_NO_EXPORT logger(const std::string& name, std::shared_ptr<level> lvl = std::shared_ptr<level>());
 
     std::shared_ptr<logger> parent_;
     std::string name_;
@@ -43,6 +45,11 @@ private:
 inline const std::string& logger::get_name() const
 {
     return name_;
+}
+
+inline bool logger::permits(std::shared_ptr<level> lvl) const
+{
+    return *lvl <= *get_effective_level();
 }
 
 inline void logger::set_writes_to_ancestors(bool val)

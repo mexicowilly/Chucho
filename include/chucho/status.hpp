@@ -13,7 +13,7 @@ namespace chucho
 class CHUCHO_EXPORT status
 {
 public:
-    typedef std::chrono::high_resolution_clock clock_type;
+    typedef std::chrono::system_clock clock_type;
     typedef std::chrono::time_point<clock_type> time_type;
 
     enum class level
@@ -25,11 +25,13 @@ public:
 
     status(level lvl,
            const std::string& message,
+           const std::string& origin,
            std::exception_ptr ex = std::exception_ptr());
 
     std::exception_ptr get_exception() const;
     level get_level() const;
     const std::string& get_message() const;
+    const std::string& get_origin() const;
     const time_type& get_time() const;
 
 protected:
@@ -40,6 +42,7 @@ private:
     level level_;
     std::string message_;
     std::exception_ptr exception_;
+    std::string origin_;
 };
 
 inline std::exception_ptr status::get_exception() const
@@ -55,6 +58,11 @@ inline status::level status::get_level() const
 inline const std::string& status::get_message() const
 {
     return message_;
+}
+
+inline const std::string& status::get_origin() const
+{
+    return origin_;
 }
 
 inline const status::time_type& status::get_time() const

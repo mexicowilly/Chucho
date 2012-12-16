@@ -3,6 +3,7 @@
 #include <chucho/calendar.hpp>
 #include <chucho/file.hpp>
 #include <chucho/exception.hpp>
+#include <chucho/clock_util.hpp>
 #include <limits>
 #include <sstream>
 #include <array>
@@ -28,6 +29,7 @@ namespace chucho
 
 pattern_formatter::pattern_formatter(const std::string& pattern)
 {
+    set_status_origin("pattern_formatter");
     parse(pattern);
 }
 
@@ -322,12 +324,14 @@ pattern_formatter::date_time_piece::date_time_piece(const std::string& date_patt
     : piece(params),
       date_pattern_(date_pattern)
 {
-    std::size_t pos = date_pattern.find("%q", 0);
+    std::size_t pos = date_pattern.rfind("%q");
     while (pos != std::string::npos)
     {
         if (pos == 0 || date_pattern[pos - 1] != '%')
             milli_positions_.push_back(pos);
-        pos = date_pattern.find("%q", pos + 1);
+        if (pos == 0)
+            break;
+        pos = date_pattern.rfind("%q", pos - 1);
     }
 }
 
@@ -337,10 +341,18 @@ std::string pattern_formatter::date_time_piece::get_text_impl(const event& evt) 
     std::string pat = date_pattern_;
     if (!milli_positions_.empty())
     {
-        std::array<char, 4> buf;
-        std::snprintf(buf.data(), buf.size(), "%03lli", millis.count() % 1000);
-        for (std::size_t p : milli_positions_)
-            pat.replace(p, 2, buf.data());
+        if (clock_util::system_clock_supports_milliseconds)
+        {
+            std::array<char, 4> buf;
+            std::snprintf(buf.data(), buf.size(), "%03lli", millis.count() % 1000);
+            for (std::size_t p : milli_positions_)
+                pat.replace(p, 2, buf.data());
+        }
+        else
+        {
+            for (std::size_t p : milli_positions_)
+                pat.replace(p, 2, "");
+        }
     }
     std::array<char, 4096> buf;
     struct std::tm cal;
@@ -428,7 +440,7 @@ pattern_formatter::level_piece::level_piece(const format_params& params)
 
 std::string pattern_formatter::level_piece::get_text_impl(const event& evt) const
 {
-    return evt.get_logger()->get_effective_level()->get_name();
+    return evt.get_level()->get_name();
 }
 
 pattern_formatter::milliseconds_since_start_piece::milliseconds_since_start_piece(const format_params& params)

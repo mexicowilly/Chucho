@@ -1,7 +1,7 @@
 #include <chucho/writer.hpp>
-#include <chucho/level_threshold_filter.hpp>
 #include <chucho/exception.hpp>
 #include <atomic>
+#include <stdexcept>
 
 namespace
 {
@@ -12,6 +12,13 @@ std::atomic<bool> write_same_thread_guard(false);
 
 namespace chucho
 {
+
+writer::writer(std::shared_ptr<formatter> fmt)
+    : formatter_(fmt)
+{
+    if (!formatter_)
+        throw std::invalid_argument("The formatter cannot be a nullptr");
+}
 
 void writer::add_filter(std::shared_ptr<filter> flt)
 {
@@ -36,12 +43,6 @@ bool writer::permits(const event& evt)
             return true;
     }
     return true;
-}
-
-void writer::set_formatter(std::shared_ptr<formatter> fmt)
-{
-    std::lock_guard<std::mutex> lg(guard_);
-    formatter_ = fmt;
 }
 
 void writer::write(const event& evt)

@@ -46,9 +46,4 @@ file_exception::file_exception(const std::string& msg)
 {
 }
 
-time_file_roller_exception::time_file_roller_exception(const std::string& msg)
-    : exception(msg)
-{
-}
-
 }

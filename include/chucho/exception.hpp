@@ -31,12 +31,6 @@ public:
     file_exception(const std::string& msg);
 };
 
-class CHUCHO_EXPORT time_file_roller_exception : public exception
-{
-public:
-    time_file_roller_exception(const std::string& msg);
-};
-
 }
 
 #endif

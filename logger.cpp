@@ -130,6 +130,19 @@ std::shared_ptr<logger> logger::get_logger_impl(const std::string& name)
     return result;
 }
 
+void logger::remove_unused_loggers()
+{
+    std::lock_guard<std::recursive_mutex> lg(loggers_guard);
+    auto itor = all_loggers.begin();
+    while (itor != all_loggers.end())
+    {
+        if (itor->second.expired())
+            all_loggers.erase(itor++);
+        else
+            ++itor;
+    }
+}
+
 void logger::set_level(std::shared_ptr<level> lvl)
 {
     std::lock_guard<std::recursive_mutex> lg(loggers_guard);

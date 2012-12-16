@@ -7,6 +7,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                file_writer_test.cpp
                harness.cpp
                level_test.cpp
+               level_threshold_filter_test.cpp
                logger_test.cpp
                pattern_formatter_test.cpp
                rolling_file_writer_test.cpp

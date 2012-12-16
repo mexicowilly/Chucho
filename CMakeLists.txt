@@ -32,9 +32,11 @@ ADD_LIBRARY(chucho SHARED
             status_manager.cpp
             status_observer.cpp
             status_reporter.cpp
+            clock_util.cpp
             time_file_roller.cpp
             writer.cpp
             include/chucho/calendar.hpp
+            include/chucho/clock_util.hpp
             include/chucho/console_writer.hpp
             include/chucho/exception.hpp
             include/chucho/event.hpp

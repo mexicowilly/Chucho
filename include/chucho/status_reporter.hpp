@@ -1,7 +1,7 @@
 #if !defined(CHUCHO_STATUS_REPORTER_HPP__)
 #define CHUCHO_STATUS_REPORTER_HPP__
 
-#include <chucho/status_manager.hpp>
+#include <chucho/status.hpp>
 
 namespace chucho
 {
@@ -16,10 +16,16 @@ protected:
     void report_info(const std::string& message, std::exception_ptr ex = std::exception_ptr());
     void report_status(const status& st);
     void report_warning(const std::string& message, std::exception_ptr ex = std::exception_ptr());
+    void set_status_origin(const std::string& origin);
 
 private:
-    std::shared_ptr<status_manager> smgr_;
+    std::string origin_;
 };
+
+inline void status_reporter::set_status_origin(const std::string& origin)
+{
+    origin_ = origin;
+} 
 
 }
 
