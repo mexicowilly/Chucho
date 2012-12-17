@@ -66,7 +66,7 @@ TEST_F(file_writer_test, write)
 {
     auto w = get_writer();
     EXPECT_EQ(0, chucho::status_manager::get()->get_count());
-    std::shared_ptr<chucho::logger> log = chucho::logger::get_logger("file_writer_test");
+    std::shared_ptr<chucho::logger> log = chucho::logger::get("file_writer_test");
     chucho::event evt(log, chucho::INFO_LEVEL, "hello", __FILE__, __LINE__, __FUNCTION__);
     w->write(evt);
     evt = chucho::event(log, chucho::INFO_LEVEL, "goodbye", __FILE__, __LINE__, __FUNCTION__);

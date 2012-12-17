@@ -4,6 +4,7 @@
 #include <chucho/file.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/clock_util.hpp>
+#include <chucho/marker.hpp>
 #include <limits>
 #include <sstream>
 #include <array>
@@ -66,6 +67,9 @@ std::shared_ptr<pattern_formatter::piece> pattern_formatter::create_piece(std::s
         break;
     case 'i':
         result.reset(new pid_piece(params));
+        break;
+    case 'k':
+        result.reset(new marker_piece(params));
         break;
     case 'L':
         result.reset(new line_number_piece(params));
@@ -473,6 +477,18 @@ std::string pattern_formatter::thread_piece::get_text_impl(const event& evt) con
 {
     std::ostringstream stream;
     stream << std::this_thread::get_id();
+    return stream.str();
+}
+
+pattern_formatter::marker_piece::marker_piece(const format_params& params)
+    : piece(params)
+{
+}
+
+std::string pattern_formatter::marker_piece::get_text_impl(const event& evt) const
+{
+    std::ostringstream stream;
+    stream << evt.get_marker()->get_name();
     return stream.str();
 }
 

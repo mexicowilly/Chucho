@@ -24,6 +24,7 @@ ADD_LIBRARY(chucho SHARED
             level.cpp
             level_threshold_filter.cpp
             logger.cpp
+            marker.cpp
             numbered_file_roller.cpp
             pattern_formatter.cpp
             rolling_file_writer.cpp
@@ -50,6 +51,7 @@ ADD_LIBRARY(chucho SHARED
             include/chucho/level.hpp
             include/chucho/level_threshold_filter.hpp
             include/chucho/logger.hpp
+            include/chucho/marker.hpp
             include/chucho/numbered_file_roller.hpp
             include/chucho/pattern_formatter.hpp
             include/chucho/rolling_file_writer.hpp

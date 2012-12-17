@@ -10,6 +10,7 @@ namespace chucho
 {
 
 class logger;
+class marker;
 
 class CHUCHO_EXPORT event
 {
@@ -22,11 +23,13 @@ public:
           const std::string& msg,
           const char* const file_name,
           unsigned line_number,
-          const char* const function_name);
+          const char* const function_name,
+          std::shared_ptr<marker> mark = std::shared_ptr<marker>());
 
     const char* get_file_name() const;
     const char* get_function_name() const;
     std::shared_ptr<level> get_level() const;
+    std::shared_ptr<marker> get_marker() const;
     unsigned get_line_number() const;
     std::shared_ptr<logger> get_logger() const;
     const std::string& get_message() const;
@@ -40,6 +43,7 @@ private:
     const char* file_name_;
     unsigned line_number_;
     const char* function_name_;
+    std::shared_ptr<marker> marker_;
 };
 
 inline const char* event::get_file_name() const
@@ -65,6 +69,11 @@ inline unsigned event::get_line_number() const
 inline std::shared_ptr<logger> event::get_logger() const
 {
     return logger_;
+}
+
+inline std::shared_ptr<marker> event::get_marker() const
+{
+    return marker_;
 }
 
 inline const std::string& event::get_message() const

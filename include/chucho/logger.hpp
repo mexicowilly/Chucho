@@ -12,7 +12,7 @@ class CHUCHO_EXPORT logger : public std::enable_shared_from_this<logger>,
 {
 public:
     static std::vector<std::shared_ptr<logger>> get_existing_loggers();
-    static std::shared_ptr<logger> get_logger(const std::string& name);
+    static std::shared_ptr<logger> get(const std::string& name);
     static void remove_unused_loggers();
 
     logger(const logger&) = delete;

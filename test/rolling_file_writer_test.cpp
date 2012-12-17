@@ -14,7 +14,7 @@ class rolling_file_writer_test : public ::testing::Test
 {
 protected:
     rolling_file_writer_test()
-        : logger_(chucho::logger::get_logger("rolling_file_writer_test")),
+        : logger_(chucho::logger::get("rolling_file_writer_test")),
           dir_name_("rolling_file_writer_test")
     {
         if (chucho::file::exists(dir_name_))

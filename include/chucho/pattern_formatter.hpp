@@ -208,6 +208,15 @@ private:
         virtual std::string get_text_impl(const event& evt) const override;
     };
 
+    class CHUCHO_NO_EXPORT marker_piece : public piece
+    {
+    public:
+        marker_piece(const format_params& params);
+
+    protected:
+        virtual std::string get_text_impl(const event& evt) const override;
+    };
+
     CHUCHO_NO_EXPORT std::shared_ptr<piece> create_piece(std::string::const_iterator& pos,
                                                          std::string::const_iterator end,
                                                          const format_params& params);

@@ -3,6 +3,7 @@
 #include <chucho/logger.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/status_manager.hpp>
+#include <chucho/marker.hpp>
 #include <sstream>
 #include <thread>
 #include <array>
@@ -25,12 +26,13 @@ class pattern_formatter_test : public ::testing::Test
 {
 public:
     pattern_formatter_test()
-        : evt_(chucho::logger::get_logger("pattern logger"),
+        : evt_(chucho::logger::get("pattern logger"),
                chucho::INFO_LEVEL,
                "hi",
                file_name,
                10,
-               "dowdy")
+               "dowdy",
+               std::make_shared<chucho::marker>("chucho"))
     {
     }
 
@@ -201,3 +203,10 @@ TEST_F(pattern_formatter_test, invalid)
     EXPECT_EQ(5, smgr->get_count());
     EXPECT_EQ(chucho::status::level::ERROR, smgr->get_level());
 }
+
+TEST_F(pattern_formatter_test, marker)
+{
+    chucho::pattern_formatter f("%k");
+    EXPECT_STREQ("chucho", f.format(evt_).c_str());
+}
+

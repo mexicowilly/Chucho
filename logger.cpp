@@ -105,7 +105,7 @@ std::shared_ptr<level> logger::get_level() const
     return level_;
 }
 
-std::shared_ptr<logger> logger::get_logger(const std::string& name)
+std::shared_ptr<logger> logger::get(const std::string& name)
 {
     std::call_once(logger_init_once, static_init);
     return get_logger_impl(name);

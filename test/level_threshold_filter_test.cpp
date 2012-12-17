@@ -6,7 +6,7 @@ class level_threshold_filter_test : public ::testing::Test
 {
 protected:
     level_threshold_filter_test()
-        : logger_(chucho::logger::get_logger("level_threshold_filter_test"))
+        : logger_(chucho::logger::get("level_threshold_filter_test"))
     {
     }
 
