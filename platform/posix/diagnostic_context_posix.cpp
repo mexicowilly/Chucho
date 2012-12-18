@@ -64,6 +64,11 @@ void diagnostic_context::clear()
     get_map().clear();
 }
 
+bool diagnostic_context::empty()
+{
+    return get().empty();
+}
+
 void diagnostic_context::erase(const std::string& key)
 {
     get_map().erase(key);
