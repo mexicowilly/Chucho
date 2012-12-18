@@ -25,6 +25,14 @@ public:
           unsigned line_number,
           const char* const function_name,
           std::shared_ptr<marker> mark = std::shared_ptr<marker>());
+    event(std::shared_ptr<logger> lgr,
+          std::shared_ptr<level> lvl,
+          const std::string& msg,
+          const char* const file_name,
+          unsigned line_number,
+          const char* const function_name,
+          const std::string& mark);
+
 
     const char* get_file_name() const;
     const char* get_function_name() const;

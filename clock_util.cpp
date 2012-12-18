@@ -7,7 +7,7 @@ namespace chucho
 namespace clock_util
 {
 
-bool system_clock_supports_milliseconds =
+const bool system_clock_supports_milliseconds =
     (static_cast<double>(std::chrono::system_clock::period::num) / static_cast<double>(std::chrono::system_clock::period::den))
     <=
     (1.0 / 1000.0);

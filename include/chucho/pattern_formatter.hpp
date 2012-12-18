@@ -217,6 +217,19 @@ private:
         virtual std::string get_text_impl(const event& evt) const override;
     };
 
+    class CHUCHO_NO_EXPORT diagnostic_context_piece : public piece
+    {
+    public:
+        diagnostic_context_piece(const std::string& key,
+                                 const format_params& params);
+
+    protected:
+        virtual std::string get_text_impl(const event& evt) const override;
+
+    private:
+        std::string key_;
+    };
+
     CHUCHO_NO_EXPORT std::shared_ptr<piece> create_piece(std::string::const_iterator& pos,
                                                          std::string::const_iterator end,
                                                          const format_params& params);

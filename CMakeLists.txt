@@ -11,6 +11,7 @@ SET(CHUCHO_SOVERSION 1)
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
         platform/posix/calendar_posix.cpp
+        platform/posix/diagnostic_context_posix.cpp
         platform/posix/file_posix.cpp
         platform/posix/pattern_formatter_posix.cpp)
 ENDIF()
@@ -39,6 +40,7 @@ ADD_LIBRARY(chucho SHARED
             include/chucho/calendar.hpp
             include/chucho/clock_util.hpp
             include/chucho/console_writer.hpp
+            include/chucho/diagnostic_context.hpp
             include/chucho/exception.hpp
             include/chucho/event.hpp
             include/chucho/export.hpp

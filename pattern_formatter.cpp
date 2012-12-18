@@ -5,6 +5,7 @@
 #include <chucho/exception.hpp>
 #include <chucho/clock_util.hpp>
 #include <chucho/marker.hpp>
+#include <chucho/diagnostic_context.hpp>
 #include <limits>
 #include <sstream>
 #include <array>
@@ -48,6 +49,13 @@ std::shared_ptr<pattern_formatter::piece> pattern_formatter::create_piece(std::s
         break;
     case 'c':
         result.reset(new logger_piece(params));
+        break;
+    case 'C':
+        arg = get_argument(pos, end);
+        if (arg.empty())
+            report_error("The pattern parameter %C requires an argument");
+        else
+            result.reset(new diagnostic_context_piece(arg, params));
         break;
     case 'd':
     case 'D':
@@ -490,6 +498,18 @@ std::string pattern_formatter::marker_piece::get_text_impl(const event& evt) con
     std::ostringstream stream;
     stream << evt.get_marker()->get_name();
     return stream.str();
+}
+
+pattern_formatter::diagnostic_context_piece::diagnostic_context_piece(const std::string& key,
+                                                                      const format_params& params)
+    : piece(params),
+      key_(key)
+{
+}
+
+std::string pattern_formatter::diagnostic_context_piece::get_text_impl(const event& evt) const
+{
+    return diagnostic_context::at(key_);
 }
 
 pattern_formatter::format_params::format_params()

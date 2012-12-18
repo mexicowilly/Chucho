@@ -243,7 +243,7 @@ void time_file_roller::set_period()
                     period_ = p;
             }
             if (period_ == period::UNKNOWN)
-                report_error("The data specification " + spec + " does not contain sufficient information to determine the rolling period");
+                report_error("The date specification " + spec + " does not contain sufficient information to determine the rolling period");
         }
     } while (pos != std::string::npos);
     if (period_ == period::UNKNOWN)

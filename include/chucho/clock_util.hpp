@@ -11,7 +11,7 @@ namespace chucho
 namespace clock_util
 {
 
-extern bool system_clock_supports_milliseconds;
+extern const bool system_clock_supports_milliseconds;
 
 }
 
