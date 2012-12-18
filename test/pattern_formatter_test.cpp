@@ -4,6 +4,7 @@
 #include <chucho/exception.hpp>
 #include <chucho/status_manager.hpp>
 #include <chucho/marker.hpp>
+#include <chucho/diagnostic_context.hpp>
 #include <sstream>
 #include <thread>
 #include <array>
@@ -202,6 +203,9 @@ TEST_F(pattern_formatter_test, invalid)
     f = chucho::pattern_formatter("%d{%Ym");
     EXPECT_EQ(5, smgr->get_count());
     EXPECT_EQ(chucho::status::level::ERROR, smgr->get_level());
+    f = chucho::pattern_formatter("%C");
+    EXPECT_EQ(6, smgr->get_count());
+    EXPECT_EQ(chucho::status::level::ERROR, smgr->get_level());
 }
 
 TEST_F(pattern_formatter_test, marker)
@@ -210,3 +214,11 @@ TEST_F(pattern_formatter_test, marker)
     EXPECT_STREQ("chucho", f.format(evt_).c_str());
 }
 
+TEST_F(pattern_formatter_test, diagnostic_context)
+{
+    chucho::pattern_formatter f("%C{name}");
+    EXPECT_STREQ("", f.format(evt_).c_str());
+    f = chucho::pattern_formatter("%C{name}");
+    chucho::diagnostic_context::at("name") = "funky";
+    EXPECT_STREQ("funky", f.format(evt_).c_str());
+}
