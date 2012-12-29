@@ -1,5 +1,7 @@
 #include <chucho/level.hpp>
+#include <chucho/exception.hpp>
 #include <limits>
+#include <vector>
 
 namespace chucho
 {
@@ -20,6 +22,31 @@ std::ostream& operator<< (std::ostream& stream, const level& lvl)
 
 level::~level()
 {
+}
+
+std::shared_ptr<level> level::from_text(const std::string& text)
+{
+    std::string up;
+    std::transform(text.begin(),
+                   text.end(),
+                   std::back_inserter(up),
+                   (int(*)(int))std::toupper);
+    std::vector<std::shared_ptr<level>> lvls =
+    {
+        TRACE_LEVEL,
+        DEBUG_LEVEL,
+        INFO_LEVEL,
+        WARN_LEVEL,
+        ERROR_LEVEL,
+        FATAL_LEVEL,
+        OFF_LEVEL
+    };
+    for (std::shared_ptr<level> lvl : lvls)
+    {
+        if (up == lvl->get_name())
+            return lvl;
+    }
+    throw exception("The text " + text + " does not describe a valid log level");
 }
 
 const char* trace_level::get_name() const

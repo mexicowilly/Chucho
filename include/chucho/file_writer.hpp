@@ -8,6 +8,8 @@
 namespace chucho
 {
 
+class file_writer_memento;
+
 class CHUCHO_EXPORT file_writer : public writer
 {
 public:
@@ -21,6 +23,7 @@ public:
                 const std::string& file_name,
                 on_start start = on_start::APPEND,
                 bool flush = true);
+    file_writer(const file_writer_memento& mento);
 
     const std::string& get_file_name() const;
     const std::string& get_initial_file_name() const;

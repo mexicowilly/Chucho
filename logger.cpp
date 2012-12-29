@@ -1,11 +1,12 @@
 #include <chucho/logger.hpp>
+#include <chucho/logger_memento.hpp>
 #include <map>
 
 namespace
 {
 
 std::shared_ptr<chucho::logger> root_logger;
-std::map<std::string, std::weak_ptr<chucho::logger>> all_loggers;
+std::map<std::string, std::shared_ptr<chucho::logger>> all_loggers;
 std::recursive_mutex loggers_guard;
 std::once_flag logger_init_once;
 
@@ -44,17 +45,17 @@ logger::logger(const std::string& name, std::shared_ptr<level> lvl)
         if (!ancestor_name.empty())
             ancestor_name += '.';
         ancestor_name += a;
-        resolved.push_back(get_logger_impl(ancestor_name));
+        resolved.push_back(get_impl(ancestor_name));
     }
     if (resolved.empty())
     {
         if (!name.empty())
-            parent_ = get_logger_impl("");
+            parent_ = get_impl("");
     }
     else
     {
         if (!resolved[0]->parent_)
-            resolved[0]->parent_ = get_logger_impl("");
+            resolved[0]->parent_ = get_impl("");
         for (std::size_t i = 1; i < resolved.size(); i++)
         {
             if (!resolved[i]->parent_)
@@ -68,6 +69,23 @@ void logger::add_writer(std::shared_ptr<writer> wrt)
 {
     std::lock_guard<std::mutex> lg(writers_guard_);
     writers_.push_back(wrt);
+}
+
+std::shared_ptr<logger> logger::get(const std::string& name)
+{
+    std::call_once(logger_init_once, static_init);
+    return get_impl(name);
+}
+
+std::shared_ptr<logger> logger::get(const logger_memento& mnto)
+{
+    std::shared_ptr<logger> lgr(get(mnto.get_name()));
+    if (mnto.get_level())
+        lgr->set_level(mnto.get_level());
+    lgr->writers_ = mnto.get_writers();
+    if (mnto.get_writes_to_ancestors())
+        lgr->set_writes_to_ancestors(*mnto.get_writes_to_ancestors());
+    return lgr;
 }
 
 std::shared_ptr<level> logger::get_effective_level() const
@@ -86,13 +104,13 @@ std::vector<std::shared_ptr<logger>> logger::get_existing_loggers()
     auto itor = all_loggers.begin();
     while (itor != all_loggers.end())
     {
-        if (itor->second.expired())
+        if (itor->second.unique())
         {
             all_loggers.erase(itor++);
         }
         else
         {
-            result.push_back(itor->second.lock());
+            result.push_back(itor->second);
             ++itor;
         }
     }
@@ -105,29 +123,16 @@ std::shared_ptr<level> logger::get_level() const
     return level_;
 }
 
-std::shared_ptr<logger> logger::get(const std::string& name)
+std::shared_ptr<logger> logger::get_impl(const std::string& name)
 {
-    std::call_once(logger_init_once, static_init);
-    return get_logger_impl(name);
-}
-
-std::shared_ptr<logger> logger::get_logger_impl(const std::string& name)
-{
-    std::shared_ptr<logger> result;
     std::lock_guard<std::recursive_mutex> lg(loggers_guard);
     auto found = all_loggers.find(name);
-    if (found == all_loggers.end() || found->second.expired())
+    if (found == all_loggers.end())
     {
-        if (found != all_loggers.end())
-            all_loggers.erase(found);
-        result.reset(new logger(name));
-        found = all_loggers.emplace(name, std::weak_ptr<logger>(result)).first;
+        std::shared_ptr<logger> lgr(new logger(name));
+        found = all_loggers.emplace(name, lgr).first;
     }
-    else
-    {
-        result = found->second.lock();
-    }
-    return result;
+    return found->second;
 }
 
 void logger::remove_unused_loggers()
@@ -136,7 +141,7 @@ void logger::remove_unused_loggers()
     auto itor = all_loggers.begin();
     while (itor != all_loggers.end())
     {
-        if (itor->second.expired())
+        if (itor->second.unique())
             all_loggers.erase(itor++);
         else
             ++itor;
@@ -154,7 +159,7 @@ void logger::static_init()
     std::shared_ptr<level> info(new info_level());
     std::lock_guard<std::recursive_mutex> lg(loggers_guard);
     root_logger.reset(new logger("", info));
-    all_loggers[""] = std::weak_ptr<logger>(root_logger);
+    all_loggers[""] = std::shared_ptr<logger>(root_logger);
 }
 
 void logger::write(const event& evt)

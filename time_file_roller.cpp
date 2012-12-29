@@ -10,7 +10,7 @@
 namespace
 {
 
-const std::basic_regex<char> aux_time_spec_re(" *, *aux *$");
+const std::regex aux_time_spec_re(" *, *aux *$");
 const std::size_t SECONDS_PER_DAY(86400);
 // Only look for files to delete that are less than 64 days old, in case
 // we don't know when last time we checked was.

@@ -6,11 +6,14 @@
 namespace chucho
 {
 
+class numbered_file_roller_memento;
+
 class CHUCHO_EXPORT numbered_file_roller : public file_roller
 {
 public:
     numbered_file_roller(int max_index);
     numbered_file_roller(int min_index, int max_index);
+    numbered_file_roller(const numbered_file_roller_memento& mnto);
 
     virtual std::string get_active_file_name() override;
     virtual void roll() override;

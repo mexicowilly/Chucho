@@ -2,6 +2,7 @@
 #include <chucho/file_writer.hpp>
 #include <chucho/file.hpp>
 #include <chucho/exception.hpp>
+#include <chucho/numbered_file_roller_memento.hpp>
 #include <stdexcept>
 #include <cstdio>
 #include <sstream>
@@ -19,6 +20,17 @@ numbered_file_roller::numbered_file_roller(int min_index, int max_index)
       max_index_(max_index)
 {
     if (min_index > max_index)
+        throw std::invalid_argument("numbered_file_roller: min_index must be less than or equal to max_index");
+    set_status_origin("numbered_file_roller");
+}
+
+numbered_file_roller::numbered_file_roller(const numbered_file_roller_memento& mnto)
+{
+    if (!mnto.get_max_index())
+        throw exception("numbered_file_roller: max_index is required");
+    max_index_ = *mnto.get_max_index();
+    min_index_ = mnto.get_min_index() ? *mnto.get_min_index() : 1;
+    if (min_index_ > max_index_)
         throw std::invalid_argument("numbered_file_roller: min_index must be less than or equal to max_index");
     set_status_origin("numbered_file_roller");
 }

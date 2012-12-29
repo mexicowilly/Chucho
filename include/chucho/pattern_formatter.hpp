@@ -8,10 +8,13 @@
 namespace chucho
 {
 
+class pattern_formatter_memento;
+
 class CHUCHO_EXPORT pattern_formatter : public formatter
 {
 public:
     pattern_formatter(const std::string& pattern);
+    pattern_formatter(const pattern_formatter_memento& mnto);
 
     virtual std::string format(const event& evt) override;
 

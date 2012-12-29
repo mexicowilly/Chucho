@@ -1,6 +1,7 @@
 #include <chucho/file_writer.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/file.hpp>
+#include <chucho/file_writer_memento.hpp>
 
 namespace chucho
 {
@@ -26,6 +27,14 @@ file_writer::file_writer(std::shared_ptr<formatter> fmt,
 {
     set_status_origin("file_writer");
     open(file_name);
+}
+
+file_writer::file_writer(const file_writer_memento& mento)
+    : file_writer(mento.get_formatter(),
+                  mento.get_file_name(),
+                  mento.get_on_start(),
+                  mento.get_flush())
+{
 }
 
 void file_writer::open(const std::string& file_name)

@@ -61,7 +61,7 @@ void rolling_file_writer::init()
         shared_trigger_.get() : dynamic_cast<file_roll_trigger*>(roller_.get());
     if (trigger_ == nullptr)
         throw file_exception("The rolling_file_writer has no file_roll_trigger");
-    roller_->set_file_writer(this);
+    roller_->set_file_writer(*this);
 }
 
 void rolling_file_writer::write_impl(const event& evt)

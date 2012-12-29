@@ -3,7 +3,8 @@ PROJECT(chuhco CXX)
 
 INCLUDE(Configure.cmake)
 
-INCLUDE_DIRECTORIES(include)
+INCLUDE_DIRECTORIES(include "${CHUCHO_EXTERNAL_PREFIX}/include")
+LINK_DIRECTORIES("${CHUCHO_EXTERNAL_PREFIX}/lib")
 
 SET(CHUCHO_VERSION 1.1)
 SET(CHUCHO_SOVERSION 1)
@@ -17,17 +18,39 @@ IF(CHUCHO_POSIX)
 ENDIF()
 
 ADD_LIBRARY(chucho SHARED
+            cerr_writer.cpp
+            cerr_writer_factory.cpp
+            cerr_writer_memento.cpp
+            configurable.cpp
+            configurable_factory.cpp
+            configurator.cpp
             console_writer.cpp
+            cout_writer.cpp
+            cout_writer_factory.cpp
+            cout_writer_memento.cpp
+            demangle.cpp
             event.cpp
             exception.cpp
             file_roller.cpp
             file_writer.cpp
+            file_writer_factory.cpp
+            file_writer_memento.cpp
+            identifiable_factory.cpp
             level.cpp
             level_threshold_filter.cpp
+            level_threshold_filter_factory.cpp
+            level_threshold_filter_memento.cpp
             logger.cpp
+            logger_factory.cpp
+            logger_memento.cpp
             marker.cpp
+            memento.cpp
             numbered_file_roller.cpp
+            numbered_file_roller_factory.cpp
+            numbered_file_roller_memento.cpp
             pattern_formatter.cpp
+            pattern_formatter_factory.cpp
+            pattern_formatter_memento.cpp
             rolling_file_writer.cpp
             size_file_roll_trigger.cpp
             status.cpp
@@ -37,9 +60,21 @@ ADD_LIBRARY(chucho SHARED
             clock_util.cpp
             time_file_roller.cpp
             writer.cpp
+            writer_memento.cpp
+            yaml_configurator.cpp
             include/chucho/calendar.hpp
+            include/chucho/cerr_writer.hpp
+            include/chucho/cerr_writer_factory.hpp
+            include/chucho/cerr_writer_memento.hpp
             include/chucho/clock_util.hpp
+            include/chucho/configurable.hpp
+            include/chucho/configurable_factory.hpp
+            include/chucho/configurator.hpp
             include/chucho/console_writer.hpp
+            include/chucho/cout_writer.hpp
+            include/chucho/cout_writer_factory.hpp
+            include/chucho/cout_writer_memento.hpp
+            include/chucho/demangle.hpp
             include/chucho/diagnostic_context.hpp
             include/chucho/exception.hpp
             include/chucho/event.hpp
@@ -48,14 +83,26 @@ ADD_LIBRARY(chucho SHARED
             include/chucho/file_roller.hpp
             include/chucho/file_roll_trigger.hpp
             include/chucho/file_writer.hpp
+            include/chucho/file_writer_factory.hpp
+            include/chucho/file_writer_memento.hpp
             include/chucho/filter.hpp
             include/chucho/formatter.hpp
+            include/chucho/identifiable_factory.hpp
             include/chucho/level.hpp
             include/chucho/level_threshold_filter.hpp
+            include/chucho/level_threshold_filter_factory.hpp
+            include/chucho/level_threshold_filter_memento.hpp
             include/chucho/logger.hpp
+            include/chucho/logger_factory.hpp
+            include/chucho/logger_memento.hpp
             include/chucho/marker.hpp
+            include/chucho/memento.hpp
             include/chucho/numbered_file_roller.hpp
+            include/chucho/numbered_file_roller_factory.hpp
+            include/chucho/numbered_file_roller_memento.hpp
             include/chucho/pattern_formatter.hpp
+            include/chucho/pattern_formatter_factory.hpp
+            include/chucho/pattern_formatter_memento.hpp
             include/chucho/rolling_file_writer.hpp
             include/chucho/size_file_roll_trigger.hpp
             include/chucho/status.hpp
@@ -64,7 +111,11 @@ ADD_LIBRARY(chucho SHARED
             include/chucho/status_reporter.hpp
             include/chucho/time_file_roller.hpp
             include/chucho/writer.hpp
+            include/chucho/writer_memento.hpp
+            include/chucho/yaml_configurator.hpp
             ${CHUCHO_PLATFORM_SOURCES})
+
+TARGET_LINK_LIBRARIES(chucho yaml-cpp)
 
 SET_TARGET_PROPERTIES(chucho PROPERTIES
                       COMPILE_FLAGS "${CHUCHO_CXX_SO_FLAGS}"

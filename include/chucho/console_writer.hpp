@@ -18,18 +18,6 @@ protected:
     std::ostream& stream_;
 };
 
-class CHUCHO_EXPORT cout_writer : public console_writer
-{
-public:
-    cout_writer(std::shared_ptr<formatter> fmt);
-};
-
-class CHUCHO_EXPORT cerr_writer : public console_writer
-{
-public:
-    cerr_writer(std::shared_ptr<formatter> fmt);
-};
-
 }
 
 #endif

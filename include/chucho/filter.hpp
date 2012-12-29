@@ -3,11 +3,13 @@
 
 #include <chucho/event.hpp>
 #include <chucho/status_reporter.hpp>
+#include <chucho/configurable.hpp>
 
 namespace chucho
 {
 
-class CHUCHO_EXPORT filter : public status_reporter
+class CHUCHO_EXPORT filter : public status_reporter,
+                             public configurable
 {
 public:
     enum class result

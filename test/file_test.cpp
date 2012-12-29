@@ -52,6 +52,22 @@ TEST(file_test, multiple_directories)
     EXPECT_FALSE(chucho::file::exists("one/two/three"));
 }
 
+TEST(file_test, non_directory)
+{
+    std::ofstream f("file_test_non_directory.txt");
+    ASSERT_TRUE(f.is_open());
+    f << "hello";
+    f.close();
+    ASSERT_NO_THROW(chucho::file::remove_all("file_test_non_directory.txt"));
+    EXPECT_FALSE(chucho::file::exists("file_test_non_directory.txt"));
+    f.open("file_test_non_directory.txt");
+    ASSERT_TRUE(f.is_open());
+    f << "hello";
+    f.close();
+    ASSERT_NO_THROW(chucho::file::remove("file_test_non_directory.txt"));
+    EXPECT_FALSE(chucho::file::exists("file_test_non_directory.txt"));
+}
+
 TEST(file_test, single_directory)
 {
     ASSERT_NO_THROW(chucho::file::remove("file_test"));

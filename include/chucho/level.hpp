@@ -20,6 +20,8 @@ extern CHUCHO_EXPORT std::shared_ptr<level> OFF_LEVEL;
 class CHUCHO_EXPORT level
 {
 public:
+    static std::shared_ptr<level> from_text(const std::string& text);
+
     virtual ~level();
 
     bool operator== (const level& other) const;

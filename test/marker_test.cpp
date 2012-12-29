@@ -21,11 +21,11 @@ TEST(marker_test, children)
 TEST(marker_test, format)
 {
     chucho::marker mark("one");
-    mark.insert(std::make_shared<chucho::marker>("1"));
-    mark.insert(std::make_shared<chucho::marker>("2"));
+    mark.insert(std::make_shared<chucho::marker>("a"));
+    mark.insert(std::make_shared<chucho::marker>("b"));
     std::ostringstream stream;
     stream << mark;
-    EXPECT_STREQ("one [ 1, 2 ]", stream.str().c_str());
+    EXPECT_STREQ("one [ a, b ]", stream.str().c_str());
 }
 
 TEST(marker_test, name)

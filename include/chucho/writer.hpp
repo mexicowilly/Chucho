@@ -3,13 +3,15 @@
 
 #include <chucho/filter.hpp>
 #include <chucho/formatter.hpp>
+#include <chucho/configurable.hpp>
 #include <vector>
 #include <mutex>
 
 namespace chucho
 {
 
-class CHUCHO_EXPORT writer : public status_reporter
+class CHUCHO_EXPORT writer : public status_reporter,
+                             public configurable
 {
 public:
     writer(std::shared_ptr<formatter> fmt);

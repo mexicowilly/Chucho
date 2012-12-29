@@ -1,7 +1,16 @@
 #include <gtest/gtest.h>
 #include <chucho/logger.hpp>
 
-TEST(log_test, existing_loggers)
+class log_test : public ::testing::Test
+{
+public:
+    log_test()
+    {
+        chucho::logger::remove_unused_loggers();
+    }
+};
+
+TEST_F(log_test, existing_loggers)
 {
     std::shared_ptr<chucho::logger> l = chucho::logger::get("eight.nine.ten.eleven");
     std::vector<std::shared_ptr<chucho::logger> > all = chucho::logger::get_existing_loggers();
@@ -18,7 +27,7 @@ TEST(log_test, existing_loggers)
                               [](std::shared_ptr<chucho::logger> l) { return l->get_name() ==  "eight.nine.ten.eleven"; }) == all.end());
 }
 
-TEST(log_test, levels)
+TEST_F(log_test, levels)
 {
     std::shared_ptr<chucho::logger> root = chucho::logger::get("");
     std::shared_ptr<chucho::level> warn(std::make_shared<chucho::warn_level>());
@@ -44,10 +53,3 @@ TEST(log_test, levels)
     EXPECT_EQ(info, root->get_effective_level());
     ASSERT_TRUE(static_cast<bool>(root->get_level()));
 }
-
-TEST(log_test, sizeof_weak_ptr)
-{
-    std::cout << "sizeof std::weak_ptr<chucho::logger> " << sizeof(std::weak_ptr<chucho::logger>) << std::endl;
-}
-
-

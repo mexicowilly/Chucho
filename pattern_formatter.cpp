@@ -6,6 +6,7 @@
 #include <chucho/clock_util.hpp>
 #include <chucho/marker.hpp>
 #include <chucho/diagnostic_context.hpp>
+#include <chucho/pattern_formatter_memento.hpp>
 #include <limits>
 #include <sstream>
 #include <array>
@@ -33,6 +34,11 @@ pattern_formatter::pattern_formatter(const std::string& pattern)
 {
     set_status_origin("pattern_formatter");
     parse(pattern);
+}
+
+pattern_formatter::pattern_formatter(const pattern_formatter_memento& mnto)
+    : pattern_formatter(mnto.get_pattern())
+{
 }
 
 std::shared_ptr<pattern_formatter::piece> pattern_formatter::create_piece(std::string::const_iterator& pos,

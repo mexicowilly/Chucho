@@ -90,10 +90,25 @@ void remove_all(const std::string& name)
 {
     if (access(name.c_str(), F_OK) != 0)
         return;
+    struct stat stat_buf;
+    if (stat(name.c_str(), &stat_buf) != 0)
+    {
+        int this_err = errno;
+        throw file_exception("Could not stat\"" + name + "\": " + strerror(this_err));
+    }
+    if (!(stat_buf.st_mode & S_IFDIR))
+    {
+        if (::remove(name.c_str()) != 0)
+        {
+            int this_err = errno;
+            throw file_exception("Could not remove \"" + name + "\"" + strerror(this_err));
+        }
+        return;
+    }
     const char* names[] = { name.c_str(), nullptr };
     FTS* fts = fts_open(const_cast<char* const*>(names), FTS_NOSTAT, nullptr);
     if (fts == nullptr)
-        throw file_exception("Could not open directory hierarchy for reading");
+        throw file_exception("Could not open directory hierarchy of \"" + name + "\" for reading");
     struct sentry
     {
         sentry(FTS* f) { fts_ = f; }
@@ -110,7 +125,7 @@ void remove_all(const std::string& name)
             {
                 int this_err = errno;
                 realpath(ent->fts_accpath, path_buf.data());
-                throw file_exception(std::string("Could not remove directory ") + path_buf.data() + ": " + strerror(this_err));
+                throw file_exception(std::string("Could not remove \"") + path_buf.data() + "\": " + strerror(this_err));
             }
         }
         ent = fts_read(fts);
