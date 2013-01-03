@@ -41,9 +41,4 @@ const char* exception::what() const noexcept
     return message_.c_str();
 }
 
-file_exception::file_exception(const std::string& msg)
-    : exception(msg)
-{
-}
-
 }

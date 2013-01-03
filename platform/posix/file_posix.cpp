@@ -1,5 +1,5 @@
 #include <chucho/file.hpp>
-#include <chucho/exception.hpp>
+#include <chucho/file_exception.hpp>
 #include <vector>
 #include <array>
 #include <sys/stat.h>
@@ -49,7 +49,7 @@ void create_directories(const std::string& name)
 void create_directory(const std::string& name)
 {
     if (::mkdir(name.c_str(), 0755) != 0)
-        throw file_exception("Could not create directory " + name + ": " + std::string(strerror(errno)));
+        throw file_exception("Could not create directory " + name + ": " + std::string(std::strerror(errno)));
 }
 
 std::string directory_name(const std::string& name)
@@ -83,7 +83,7 @@ bool is_fully_qualified(const std::string& name)
 void remove(const std::string& name)
 {
     if (access(name.c_str(), F_OK) == 0 && ::remove(name.c_str()) != 0)
-        throw file_exception("Unable to remove " + name + ": " + strerror(errno));
+        throw file_exception("Unable to remove " + name + ": " + std::strerror(errno));
 }
 
 void remove_all(const std::string& name)
@@ -94,14 +94,14 @@ void remove_all(const std::string& name)
     if (stat(name.c_str(), &stat_buf) != 0)
     {
         int this_err = errno;
-        throw file_exception("Could not stat\"" + name + "\": " + strerror(this_err));
+        throw file_exception("Could not stat\"" + name + "\": " + std::strerror(this_err));
     }
     if (!(stat_buf.st_mode & S_IFDIR))
     {
         if (::remove(name.c_str()) != 0)
         {
             int this_err = errno;
-            throw file_exception("Could not remove \"" + name + "\"" + strerror(this_err));
+            throw file_exception("Could not remove \"" + name + "\"" + std::strerror(this_err));
         }
         return;
     }
@@ -125,7 +125,7 @@ void remove_all(const std::string& name)
             {
                 int this_err = errno;
                 realpath(ent->fts_accpath, path_buf.data());
-                throw file_exception(std::string("Could not remove \"") + path_buf.data() + "\": " + strerror(this_err));
+                throw file_exception(std::string("Could not remove \"") + path_buf.data() + "\": " + std::strerror(this_err));
             }
         }
         ent = fts_read(fts);

@@ -7,15 +7,12 @@
 namespace chucho
 {
 
-class logger_memento;
-
 class CHUCHO_EXPORT logger : public std::enable_shared_from_this<logger>,
                              public status_reporter,
                              public configurable
 {
 public:
     static std::shared_ptr<logger> get(const std::string& name);
-    static std::shared_ptr<logger> get(const logger_memento& mnto);
     static std::vector<std::shared_ptr<logger>> get_existing_loggers();
     static void remove_unused_loggers();
 

@@ -1,5 +1,4 @@
 #include <chucho/logger.hpp>
-#include <chucho/logger_memento.hpp>
 #include <map>
 
 namespace
@@ -75,17 +74,6 @@ std::shared_ptr<logger> logger::get(const std::string& name)
 {
     std::call_once(logger_init_once, static_init);
     return get_impl(name);
-}
-
-std::shared_ptr<logger> logger::get(const logger_memento& mnto)
-{
-    std::shared_ptr<logger> lgr(get(mnto.get_name()));
-    if (mnto.get_level())
-        lgr->set_level(mnto.get_level());
-    lgr->writers_ = mnto.get_writers();
-    if (mnto.get_writes_to_ancestors())
-        lgr->set_writes_to_ancestors(*mnto.get_writes_to_ancestors());
-    return lgr;
 }
 
 std::shared_ptr<level> logger::get_effective_level() const

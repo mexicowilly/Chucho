@@ -3,6 +3,7 @@
 
 #include <chucho/writer_memento.hpp>
 #include <chucho/file_writer.hpp>
+#include <chucho/optional.hpp>
 
 namespace chucho
 {
@@ -13,15 +14,15 @@ public:
     file_writer_memento(const configurator& cfg);
 
     const std::string& get_file_name() const;
-    bool get_flush() const;
-    file_writer::on_start get_on_start() const;
+    const optional<bool>& get_flush() const;
+    const optional<file_writer::on_start>& get_on_start() const;
 
 private:
     void set_on_start(const std::string& value);
 
     std::string file_name_;
-    file_writer::on_start start_;
-    bool flush_;
+    optional<file_writer::on_start> start_;
+    optional<bool> flush_;
 };
 
 inline const std::string& file_writer_memento::get_file_name() const
@@ -29,12 +30,12 @@ inline const std::string& file_writer_memento::get_file_name() const
     return file_name_;
 }
 
-inline bool file_writer_memento::get_flush() const
+inline const optional<bool>& file_writer_memento::get_flush() const
 {
     return flush_;
 }
 
-inline file_writer::on_start file_writer_memento::get_on_start() const
+inline const optional<file_writer::on_start>& file_writer_memento::get_on_start() const
 {
     return start_;
 }

@@ -11,8 +11,6 @@ struct level_less
     }
 };
 
-std::shared_ptr<chucho::status_manager> smgr(std::make_shared<chucho::status_manager>());
-
 }
 
 namespace chucho
@@ -77,6 +75,8 @@ void status_manager::clear()
 
 std::shared_ptr<status_manager> status_manager::get()
 {
+    static std::shared_ptr<chucho::status_manager> smgr(std::make_shared<chucho::status_manager>());
+
     return smgr;
 }
 

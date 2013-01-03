@@ -21,14 +21,8 @@ public:
 
     virtual const char* what() const noexcept override;
 
-private:
+protected:
     std::string message_;
-};
-
-class CHUCHO_EXPORT file_exception : public exception
-{
-public:
-    file_exception(const std::string& msg);
 };
 
 }

@@ -9,7 +9,7 @@ namespace chucho
 class CHUCHO_EXPORT identifiable_factory : public configurable_factory
 {
 protected:
-    void validate(std::shared_ptr<memento> mnto);
+    void validate_id(std::shared_ptr<memento> mnto);
 };
 
 }

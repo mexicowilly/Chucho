@@ -69,7 +69,7 @@ private:
 TEST_F(rolling_file_writer_test, numbered)
 {
     std::shared_ptr<chucho::file_roll_trigger> trig(std::make_shared<chucho::size_file_roll_trigger>(5));
-    std::unique_ptr<chucho::file_roller> roll(new chucho::numbered_file_roller(1, 2));
+    std::shared_ptr<chucho::file_roller> roll(new chucho::numbered_file_roller(1, 2));
     std::string fn = get_file_name("num");
     std::shared_ptr<chucho::formatter> fmt(new chucho::pattern_formatter("%m%n"));
     chucho::rolling_file_writer w(fmt, fn, std::move(roll), trig);
@@ -99,7 +99,7 @@ TEST_F(rolling_file_writer_test, numbered)
 TEST_F(rolling_file_writer_test, time_names)
 {
     std::shared_ptr<chucho::formatter> fmt(new chucho::pattern_formatter("%m%n"));
-    std::unique_ptr<chucho::file_roller> roll;
+    std::shared_ptr<chucho::file_roller> roll;
     std::unique_ptr<chucho::rolling_file_writer> w;
     std::string fname;
     for (char c : std::string("MHdVmY"))
@@ -127,7 +127,7 @@ TEST_F(rolling_file_writer_test, time_name_errors)
 {
     auto smgr = chucho::status_manager::get();
     std::array<const char*, 5> names = { "%d{%m, aux}", "%d{%m} %d{%Y}", "%d{%S}", "", "my dog has fleas" };
-    std::unique_ptr<chucho::time_file_roller> r;
+    std::shared_ptr<chucho::time_file_roller> r;
     for (auto name : names)
     {
         smgr->clear();

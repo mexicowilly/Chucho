@@ -14,6 +14,7 @@ IF(CHUCHO_POSIX)
         platform/posix/calendar_posix.cpp
         platform/posix/diagnostic_context_posix.cpp
         platform/posix/file_posix.cpp
+        platform/posix/line_ending_posix.cpp
         platform/posix/pattern_formatter_posix.cpp)
 ENDIF()
 
@@ -31,6 +32,7 @@ ADD_LIBRARY(chucho SHARED
             demangle.cpp
             event.cpp
             exception.cpp
+            file_exception.cpp
             file_roller.cpp
             file_writer.cpp
             file_writer_factory.cpp
@@ -52,7 +54,11 @@ ADD_LIBRARY(chucho SHARED
             pattern_formatter_factory.cpp
             pattern_formatter_memento.cpp
             rolling_file_writer.cpp
+            rolling_file_writer_factory.cpp
+            rolling_file_writer_memento.cpp
             size_file_roll_trigger.cpp
+            size_file_roll_trigger_factory.cpp
+            size_file_roll_trigger_memento.cpp
             status.cpp
             status_manager.cpp
             status_observer.cpp
@@ -80,6 +86,7 @@ ADD_LIBRARY(chucho SHARED
             include/chucho/event.hpp
             include/chucho/export.hpp
             include/chucho/file.hpp
+            include/chucho/file_exception.hpp
             include/chucho/file_roller.hpp
             include/chucho/file_roll_trigger.hpp
             include/chucho/file_writer.hpp
@@ -92,6 +99,7 @@ ADD_LIBRARY(chucho SHARED
             include/chucho/level_threshold_filter.hpp
             include/chucho/level_threshold_filter_factory.hpp
             include/chucho/level_threshold_filter_memento.hpp
+            include/chucho/line_ending.hpp
             include/chucho/logger.hpp
             include/chucho/logger_factory.hpp
             include/chucho/logger_memento.hpp
@@ -104,7 +112,11 @@ ADD_LIBRARY(chucho SHARED
             include/chucho/pattern_formatter_factory.hpp
             include/chucho/pattern_formatter_memento.hpp
             include/chucho/rolling_file_writer.hpp
+            include/chucho/rolling_file_writer_factory.hpp
+            include/chucho/rolling_file_writer_memento.hpp
             include/chucho/size_file_roll_trigger.hpp
+            include/chucho/size_file_roll_trigger_factory.hpp
+            include/chucho/size_file_roll_trigger_memento.hpp
             include/chucho/status.hpp
             include/chucho/status_manager.hpp
             include/chucho/status_observer.hpp

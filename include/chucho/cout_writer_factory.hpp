@@ -9,6 +9,8 @@ namespace chucho
 class CHUCHO_EXPORT cout_writer_factory : public identifiable_factory
 {
 public:
+    cout_writer_factory();
+
     virtual named_configurable create_configurable(std::shared_ptr<memento> mnto) override;
     virtual std::shared_ptr<memento> create_memento(const configurator& cfg) override;
 };

@@ -1,6 +1,8 @@
 #include <chucho/level_threshold_filter_factory.hpp>
 #include <chucho/level_threshold_filter_memento.hpp>
 #include <chucho/level_threshold_filter.hpp>
+#include <chucho/exception.hpp>
+#include <chucho/demangle.hpp>
 #include <assert.h>
 
 CHUCHO_REGISTER_CONFIGURABLE_FACTORY(chucho, level_threshold_filter_factory)
@@ -8,11 +10,21 @@ CHUCHO_REGISTER_CONFIGURABLE_FACTORY(chucho, level_threshold_filter_factory)
 namespace chucho
 {
 
+level_threshold_filter_factory::level_threshold_filter_factory()
+{
+    set_status_origin("level_threshold_filter_factory");
+}
+
 named_configurable level_threshold_filter_factory::create_configurable(std::shared_ptr<memento> mnto)
 {
-    validate(mnto);
+    validate_id(mnto);
     assert(dynamic_cast<level_threshold_filter_memento*>(mnto.get()));
-    std::shared_ptr<configurable> cnf(new level_threshold_filter(*static_cast<level_threshold_filter_memento*>(mnto.get())));
+    auto ltfm = std::dynamic_pointer_cast<level_threshold_filter_memento>(mnto);
+    assert(ltfm);
+    if (!ltfm->get_level())
+        throw exception("level_threshold_filter_factory: The level must be set");
+    std::shared_ptr<configurable> cnf(new level_threshold_filter(ltfm->get_level()));
+    report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
     return named_configurable(mnto->get_id(), cnf);
 }
 

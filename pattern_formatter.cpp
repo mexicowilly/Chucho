@@ -6,7 +6,7 @@
 #include <chucho/clock_util.hpp>
 #include <chucho/marker.hpp>
 #include <chucho/diagnostic_context.hpp>
-#include <chucho/pattern_formatter_memento.hpp>
+#include <chucho/line_ending.hpp>
 #include <limits>
 #include <sstream>
 #include <array>
@@ -34,11 +34,6 @@ pattern_formatter::pattern_formatter(const std::string& pattern)
 {
     set_status_origin("pattern_formatter");
     parse(pattern);
-}
-
-pattern_formatter::pattern_formatter(const pattern_formatter_memento& mnto)
-    : pattern_formatter(mnto.get_pattern())
-{
 }
 
 std::shared_ptr<pattern_formatter::piece> pattern_formatter::create_piece(std::string::const_iterator& pos,
@@ -441,14 +436,11 @@ std::string pattern_formatter::function_piece::get_text_impl(const event& evt) c
 pattern_formatter::end_of_line_piece::end_of_line_piece(const format_params& params)
     : piece(params)
 {
-    std::ostringstream stream;
-    stream << std::endl;
-    eol_ = stream.str();
 }
 
 std::string pattern_formatter::end_of_line_piece::get_text_impl(const event& evt) const
 {
-    return eol_;
+    return line_ending::EOL;
 }
 
 pattern_formatter::level_piece::level_piece(const format_params& params)

@@ -1,16 +1,14 @@
-#if !defined(CHUCHO_FILE_WRITER_FACTORY_HPP__)
-#define CHUCHO_FILE_WRITER_FACTORY_HPP__
+#if !defined(CHUCHO_SIZE_FILE_ROLL_TRIGGER_FACTORY_HPP__)
+#define CHUCHO_SIZE_FILE_ROLL_TRIGGER_FACTORY_HPP__
 
 #include <chucho/identifiable_factory.hpp>
 
 namespace chucho
 {
 
-class file_writer_factory : public identifiable_factory
+class size_file_roll_trigger_factory : public identifiable_factory
 {
 public:
-    file_writer_factory();
-
     virtual named_configurable create_configurable(std::shared_ptr<memento> mnto) override;
     virtual std::shared_ptr<memento> create_memento(const configurator& cfg) override;
 };
