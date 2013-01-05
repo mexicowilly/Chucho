@@ -1,6 +1,10 @@
 #if !defined(CHUCHO_ROLLING_FILE_WRITER_MEMENTO_HPP__)
 #define CHUCHO_ROLLING_FILE_WRITER_MEMENTO_HPP__
 
+#if !defined(chucho_shared_EXPORTS)
+#error "This header is private"
+#endif
+
 #include <chucho/file_writer_memento.hpp>
 #include <chucho/file_roller.hpp>
 #include <chucho/file_roll_trigger.hpp>

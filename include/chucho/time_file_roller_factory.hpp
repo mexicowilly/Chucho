@@ -1,19 +1,19 @@
-#if !defined(CHUCHO_SIZE_FILE_ROLL_TRIGGER_FACTORY_HPP__)
-#define CHUCHO_SIZE_FILE_ROLL_TRIGGER_FACTORY_HPP__
+#if !defined(CHUCHO_TIME_FILE_ROLLER_FACTORY_HPP__)
+#define CHUCHO_TIME_FILE_ROLLER_FACTORY_HPP__
 
 #if !defined(chucho_shared_EXPORTS)
 #error "This header is private"
 #endif
 
-#include <chucho/identifiable_factory.hpp>
+#include <chucho/configurable_factory.hpp>
 
 namespace chucho
 {
 
-class size_file_roll_trigger_factory : public identifiable_factory
+class time_file_roller_factory : public configurable_factory
 {
 public:
-    size_file_roll_trigger_factory();
+    time_file_roller_factory();
 
     virtual named_configurable create_configurable(std::shared_ptr<memento> mnto) override;
     virtual std::shared_ptr<memento> create_memento(const configurator& cfg) override;

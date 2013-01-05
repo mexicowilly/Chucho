@@ -5,8 +5,15 @@
 #include <chucho/demangle.hpp>
 #include <assert.h>
 
+CHUCHO_REGISTER_CONFIGURABLE_FACTORY(chucho, size_file_roll_trigger_factory)
+
 namespace chucho
 {
+
+size_file_roll_trigger_factory::size_file_roll_trigger_factory()
+{
+    set_status_origin("sile_file_roll_trigger_factory");
+}
 
 named_configurable size_file_roll_trigger_factory::create_configurable(std::shared_ptr<memento> mnto)
 {

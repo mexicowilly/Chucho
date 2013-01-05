@@ -1,13 +1,17 @@
 #if !defined(CHUCHO_NUMBERED_FILE_ROLLER_MEMENTO_HPP__)
 #define CHUCHO_NUMBERED_FILE_ROLLER_MEMENTO_HPP__
 
+#if !defined(chucho_shared_EXPORTS)
+#error "This header is private"
+#endif
+
 #include <chucho/memento.hpp>
 #include <chucho/optional.hpp>
 
 namespace chucho
 {
 
-class CHUCHO_EXPORT numbered_file_roller_memento : public memento
+class numbered_file_roller_memento : public memento
 {
 public:
     numbered_file_roller_memento(const configurator& cfg);

@@ -1,12 +1,16 @@
 #if !defined(CHUCHO_PATTERN_FORMATTER_MEMENTO_HPP__)
 #define CHUCHO_PATTERN_FORMATTER_MEMENTO_HPP__
 
+#if !defined(chucho_shared_EXPORTS)
+#error "This header is private"
+#endif
+
 #include <chucho/memento.hpp>
 
 namespace chucho
 {
 
-class CHUCHO_EXPORT pattern_formatter_memento : public memento
+class pattern_formatter_memento : public memento
 {
 public:
     pattern_formatter_memento(const configurator& cfg);

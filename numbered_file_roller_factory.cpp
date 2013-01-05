@@ -5,6 +5,8 @@
 #include <chucho/demangle.hpp>
 #include <assert.h>
 
+CHUCHO_REGISTER_CONFIGURABLE_FACTORY(chucho, numbered_file_roller_factory)
+
 namespace chucho
 {
 

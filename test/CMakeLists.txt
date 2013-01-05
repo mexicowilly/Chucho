@@ -1,4 +1,10 @@
-ADD_DEFINITIONS(-DGTEST_HAS_TR1_TUPLE=0 -Dchucho_EXPORTS)
+ADD_DEFINITIONS(-DGTEST_HAS_TR1_TUPLE=0 -Dchucho_shared_EXPORTS)
+
+IF(ENABLE_SHARED)
+    SET(CHUCHO_LIB chucho-shared)
+ELSE()
+    SET(CHUCHO_LIB chucho-static)
+ENDIF()
 
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                diagnostic_context_test.cpp
@@ -13,7 +19,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                pattern_formatter_test.cpp
                rolling_file_writer_test.cpp
                size_file_roll_trigger_test.cpp)
-TARGET_LINK_LIBRARIES(unit-test chucho ${CHUCHO_GTEST_LIB})
+TARGET_LINK_LIBRARIES(unit-test ${CHUCHO_LIB} ${CHUCHO_GTEST_LIB})
 ADD_DEPENDENCIES(unit-test gtest-external)
 
 ADD_CUSTOM_TARGET(check

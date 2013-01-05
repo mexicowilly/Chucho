@@ -1,12 +1,16 @@
 #if !defined(CHUCHO_LEVEL_THRESHOLD_FILTER_FACTORY_HPP__)
 #define CHUCHO_LEVEL_THRESHOLD_FILTER_FACTORY_HPP__
 
+#if !defined(chucho_shared_EXPORTS)
+#error "This header is private"
+#endif
+
 #include <chucho/identifiable_factory.hpp>
 
 namespace chucho
 {
 
-class CHUCHO_EXPORT level_threshold_filter_factory : public identifiable_factory
+class level_threshold_filter_factory : public identifiable_factory
 {
 public:
     level_threshold_filter_factory();

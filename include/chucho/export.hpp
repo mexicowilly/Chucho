@@ -1,7 +1,7 @@
 #if !defined(CHUCHO_EXPORT_HPP__)
 #define CHUCHO_EXPORT_HPP__
 
-#if defined(chucho_EXPORTS)
+#if defined(chucho_shared_EXPORTS)
 
 #if defined(_MSC_VER)
 #define CHUCHO_EXPORT __declspec(dllexport)

@@ -1,7 +1,7 @@
 #if !defined(CHUCHO_CALENDAR_HPP__)
 #define CHUCHO_CALENDAR_HPP__
 
-#if !defined(chucho_EXPORTS)
+#if !defined(chucho_shared_EXPORTS)
 #error "This header is private"
 #endif
 

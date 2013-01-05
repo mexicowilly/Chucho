@@ -1,13 +1,17 @@
 #if !defined(CHUCHO_LEVEL_THRESHOLD_FILTER_MEMENTO_HPP__)
 #define CHUCHO_LEVEL_THRESHOLD_FILTER_MEMENTO_HPP__
 
+#if !defined(chucho_shared_EXPORTS)
+#error "This header is private"
+#endif
+
 #include <chucho/memento.hpp>
 #include <chucho/level.hpp>
 
 namespace chucho
 {
 
-class CHUCHO_EXPORT level_threshold_filter_memento : public memento
+class level_threshold_filter_memento : public memento
 {
 public:
     level_threshold_filter_memento(const configurator& cfg);

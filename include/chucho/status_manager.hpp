@@ -39,7 +39,7 @@ private:
     std::mutex cache_guard_;
     std::size_t count_;
     status::level level_;
-    std::set<std::shared_ptr<status_observer>, std::owner_less<std::shared_ptr<status_observer>>> observers_;
+    std::set<std::shared_ptr<status_observer>> observers_;
     std::mutex observer_guard_;
 };
 

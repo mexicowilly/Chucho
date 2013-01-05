@@ -2,6 +2,14 @@ INCLUDE(CheckCXXCompilerFlag)
 INCLUDE(CheckCXXSymbolExists)
 INCLUDE(ExternalProject)
 
+# static and shared
+OPTION(ENABLE_SHARED "Whether to build a shared object" FALSE)
+OPTION(ENABLE_STATIC "Whether to build a static library" TRUE)
+
+IF(NOT ENABLE_SHARED AND NOT ENABLE_STATIC)
+    MESSAGE(FATAL_ERROR "Either ENABLE_SHARED or ENABLE_STATIC must be TRUE")
+ENDIF()
+
 # Set consistent platform names
 IF(CMAKE_SYSTEM_NAME STREQUAL Windows)
     SET(CHUCHO_WINDOWS TRUE)
@@ -161,3 +169,16 @@ ExternalProject_Add(yaml-cpp-external
                     URL_MD5 9aa519205a543f9372bf4179071c8ac6
                     CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}" -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
 ADD_DEPENDENCIES(external yaml-cpp-external)
+
+# utf8-cpp
+ExternalProject_Add(utf8-cpp-external
+                    URL http://sourceforge.net/projects/utfcpp/files/utf8cpp_2x/Release%202.3.2/utf8_v2_3_2.zip/download
+                    CONFIGURE_COMMAND ""
+                    BUILD_COMMAND ""
+                    INSTALL_COMMAND "")
+ExternalProject_Add_Step(utf8-cpp-external
+                         install-headers
+                         COMMAND "${CMAKE_COMMAND}" -E make_directory <INSTALL_DIR>/include
+                         COMMAND "${CMAKE_COMMAND}" -E copy_directory <SOURCE_DIR>/source <INSTALL_DIR>/include
+                         DEPENDEES install)
+ADD_DEPENDENCIES(external utf8-cpp-external)

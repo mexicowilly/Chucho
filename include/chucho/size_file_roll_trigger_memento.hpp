@@ -1,13 +1,17 @@
 #if !defined(CHUCHO_SIZE_FILE_ROLL_TRIGGER_MEMENTO_HPP__)
 #define CHUCHO_SIZE_FILE_ROLL_TRIGGER_MEMENTO_HPP__
 
+#if !defined(chucho_shared_EXPORTS)
+#error "This header is private"
+#endif
+
 #include <chucho/memento.hpp>
 #include <chucho/optional.hpp>
 
 namespace chucho
 {
 
-class CHUCHO_EXPORT size_file_roll_trigger_memento : public memento
+class size_file_roll_trigger_memento : public memento
 {
 public:
     size_file_roll_trigger_memento(const configurator& cfg);

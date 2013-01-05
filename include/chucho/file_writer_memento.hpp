@@ -1,6 +1,10 @@
 #if !defined(CHUCHO_FILE_WRITER_MEMENTO_HPP__)
 #define CHUCHO_FILE_WRITER_MEMENTO_HPP__
 
+#if !defined(chucho_shared_EXPORTS)
+#error "This header is private"
+#endif
+
 #include <chucho/writer_memento.hpp>
 #include <chucho/file_writer.hpp>
 #include <chucho/optional.hpp>
@@ -8,7 +12,7 @@
 namespace chucho
 {
 
-class CHUCHO_EXPORT file_writer_memento : public writer_memento
+class file_writer_memento : public writer_memento
 {
 public:
     file_writer_memento(const configurator& cfg);

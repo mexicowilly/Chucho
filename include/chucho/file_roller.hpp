@@ -11,7 +11,7 @@ namespace chucho
 class file_writer;
 
 class CHUCHO_EXPORT file_roller : public virtual status_reporter,
-                                  public configurable
+                                  public virtual configurable
 {
 public:
     file_roller();

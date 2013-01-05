@@ -1,6 +1,10 @@
 #if !defined(CHUCHO_LOGGER_MEMENTO_HPP__)
 #define CHUCHO_LOGGER_MEMENTO_HPP__
 
+#if !defined(chucho_shared_EXPORTS)
+#error "This header is private"
+#endif
+
 #include <chucho/memento.hpp>
 #include <chucho/level.hpp>
 #include <chucho/writer.hpp>
@@ -10,7 +14,7 @@
 namespace chucho
 {
 
-class CHUCHO_EXPORT logger_memento : public memento
+class logger_memento : public memento
 {
 public:
     logger_memento(const configurator& cfg);
