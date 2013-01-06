@@ -12,6 +12,7 @@ public:
     writer_memento(const configurator& cfg);
 
     std::shared_ptr<formatter> get_formatter() const;
+    virtual void handle(std::shared_ptr<configurable> cnf) override;
 
 private:
     std::shared_ptr<formatter> fmt_;
