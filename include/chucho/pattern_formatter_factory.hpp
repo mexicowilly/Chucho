@@ -5,12 +5,12 @@
 #error "This header is private"
 #endif
 
-#include <chucho/identifiable_factory.hpp>
+#include <chucho/configurable_factory.hpp>
 
 namespace chucho
 {
 
-class pattern_formatter_factory : public identifiable_factory
+class pattern_formatter_factory : public configurable_factory
 {
 public:
     pattern_formatter_factory();

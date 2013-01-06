@@ -17,6 +17,14 @@ std::map<std::string, std::shared_ptr<configurable_factory>>& configurator::get_
     return factories;
 }
 
+std::shared_ptr<filter> configurator::get_filter(const std::string& name) const
+{
+    auto found = filters_.find(name);
+    if (found == filters_.end())
+        throw exception("The filter " + name + " was not found in this configuration");
+    return found->second;
+}
+
 std::shared_ptr<formatter> configurator::get_formatter(const std::string& name) const
 {
     auto found = formatters_.find(name);
@@ -39,18 +47,24 @@ void configurator::handle(const named_configurable& cnf)
     if (fmt)
     {
         if (cnf.get_name().empty())
-            report_error("The formatter has no id, so it cannot be used by writers");
-        else
-            formatters_[cnf.get_name()] = fmt;
+            throw exception("The formatter has no id, so it cannot be used by writers");
+        formatters_[cnf.get_name()] = fmt;
         return;
     }
     std::shared_ptr<writer> wrt = std::dynamic_pointer_cast<writer>(cnf.get_configurable());
     if (wrt)
     {
         if (cnf.get_name().empty())
-            report_error("The writer has no id, so it cannot be used by loggers");
-        else
-            writers_[cnf.get_name()] = wrt;
+            throw exception("The writer has no id, so it cannot be used by loggers");
+        writers_[cnf.get_name()] = wrt;
+        return;
+    }
+    std::shared_ptr<filter> flt = std::dynamic_pointer_cast<filter>(cnf.get_configurable());
+    if (flt)
+    {
+        if (cnf.get_name().empty())
+            throw exception("The filter has no id, so it cannot be used by writers");
+        filters_[cnf.get_name()] = flt;
     }
 }
 

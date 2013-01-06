@@ -5,12 +5,12 @@
 #error "This header is private"
 #endif
 
-#include <chucho/identifiable_factory.hpp>
+#include <chucho/configurable_factory.hpp>
 
 namespace chucho
 {
 
-class level_threshold_filter_factory : public identifiable_factory
+class level_threshold_filter_factory : public configurable_factory
 {
 public:
     level_threshold_filter_factory();

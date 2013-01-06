@@ -17,7 +17,6 @@ level_threshold_filter_factory::level_threshold_filter_factory()
 
 named_configurable level_threshold_filter_factory::create_configurable(std::shared_ptr<memento> mnto)
 {
-    validate_id(mnto);
     assert(dynamic_cast<level_threshold_filter_memento*>(mnto.get()));
     auto ltfm = std::dynamic_pointer_cast<level_threshold_filter_memento>(mnto);
     assert(ltfm);

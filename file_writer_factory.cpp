@@ -16,7 +16,6 @@ file_writer_factory::file_writer_factory()
 
 named_configurable file_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
 {
-    validate_id(mnto);
     std::shared_ptr<configurable> cnf;
     auto fwm = std::dynamic_pointer_cast<file_writer_memento>(mnto);
     assert(fwm);
@@ -49,6 +48,7 @@ named_configurable file_writer_factory::create_configurable(std::shared_ptr<meme
         cnf.reset(new file_writer(fwm->get_formatter(),
                                   fwm->get_file_name()));
     }
+    set_filters(cnf, fwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
     return named_configurable(mnto->get_id(), cnf);
 }

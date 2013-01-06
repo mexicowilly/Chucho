@@ -12,6 +12,7 @@ rolling_file_writer_memento::rolling_file_writer_memento(const configurator& cfg
 
 void rolling_file_writer_memento::handle(std::shared_ptr<configurable> cnf)
 {
+    file_writer_memento::handle(cnf);
     auto roller = std::dynamic_pointer_cast<file_roller>(cnf);
     if (roller)
     {

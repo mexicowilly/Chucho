@@ -37,7 +37,6 @@ SET(CHUCHO_SOURCES
     file_writer.cpp
     file_writer_factory.cpp
     file_writer_memento.cpp
-    identifiable_factory.cpp
     level.cpp
     level_threshold_filter.cpp
     level_threshold_filter_factory.cpp
@@ -69,6 +68,7 @@ SET(CHUCHO_SOURCES
     time_file_roller_memento.cpp
     utf8_validator.cpp
     writer.cpp
+    writer_factory.cpp
     writer_memento.cpp
     yaml_configurator.cpp
     include/chucho/calendar.hpp
@@ -97,7 +97,6 @@ SET(CHUCHO_SOURCES
     include/chucho/file_writer_memento.hpp
     include/chucho/filter.hpp
     include/chucho/formatter.hpp
-    include/chucho/identifiable_factory.hpp
     include/chucho/level.hpp
     include/chucho/level_threshold_filter.hpp
     include/chucho/level_threshold_filter_factory.hpp
@@ -129,6 +128,7 @@ SET(CHUCHO_SOURCES
     include/chucho/time_file_roller_memento.hpp
     include/chucho/utf8_validator.hpp
     include/chucho/writer.hpp
+    include/chucho/writer_factory.hpp
     include/chucho/writer_memento.hpp
     include/chucho/yaml_configurator.hpp
     ${CHUCHO_PLATFORM_SOURCES})

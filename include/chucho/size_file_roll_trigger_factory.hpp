@@ -5,12 +5,12 @@
 #error "This header is private"
 #endif
 
-#include <chucho/identifiable_factory.hpp>
+#include <chucho/configurable_factory.hpp>
 
 namespace chucho
 {
 
-class size_file_roll_trigger_factory : public identifiable_factory
+class size_file_roll_trigger_factory : public configurable_factory
 {
 public:
     size_file_roll_trigger_factory();

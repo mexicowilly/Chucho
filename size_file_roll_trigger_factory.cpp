@@ -17,7 +17,6 @@ size_file_roll_trigger_factory::size_file_roll_trigger_factory()
 
 named_configurable size_file_roll_trigger_factory::create_configurable(std::shared_ptr<memento> mnto)
 {
-    validate_id(mnto);
     auto sfrtm = std::dynamic_pointer_cast<size_file_roll_trigger_memento>(mnto);
     assert(sfrtm);
     if (!sfrtm->get_max_size())

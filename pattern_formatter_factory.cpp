@@ -17,7 +17,6 @@ pattern_formatter_factory::pattern_formatter_factory()
 
 named_configurable pattern_formatter_factory::create_configurable(std::shared_ptr<memento> mnto)
 {
-    validate_id(mnto);
     auto pfm = std::dynamic_pointer_cast<pattern_formatter_memento>(mnto);
     assert(pfm);
     if (pfm->get_pattern().empty())

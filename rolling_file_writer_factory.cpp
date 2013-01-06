@@ -17,7 +17,6 @@ rolling_file_writer_factory::rolling_file_writer_factory()
 
 named_configurable rolling_file_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
 {
-    validate_id(mnto);
     auto rfwm = std::dynamic_pointer_cast<rolling_file_writer_memento>(mnto);
     assert(rfwm);
     if (!rfwm->get_file_roller())
@@ -95,6 +94,7 @@ named_configurable rolling_file_writer_factory::create_configurable(std::shared_
                                               rfwm->get_file_roll_trigger()));
         }
     }
+    set_filters(cnf, rfwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
     return named_configurable(mnto->get_id(), cnf);
 }

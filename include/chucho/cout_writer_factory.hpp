@@ -5,12 +5,12 @@
 #error "This header is private"
 #endif
 
-#include <chucho/identifiable_factory.hpp>
+#include <chucho/writer_factory.hpp>
 
 namespace chucho
 {
 
-class cout_writer_factory : public identifiable_factory
+class cout_writer_factory : public writer_factory
 {
 public:
     cout_writer_factory();

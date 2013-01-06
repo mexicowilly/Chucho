@@ -25,8 +25,8 @@ public:
     const type* operator-> () const;
 
 private:
-    void construct(const type& val);
-    void destruct();
+    CHUCHO_NO_EXPORT void construct(const type& val);
+    CHUCHO_NO_EXPORT void destruct();
 
     typename std::aligned_storage<sizeof(type), std::alignment_of<type>::value>::type data_;
     bool initialized_;

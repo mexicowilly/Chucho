@@ -20,6 +20,7 @@ public:
     configurator();
 
     virtual void configure(std::istream& in) = 0;
+    std::shared_ptr<filter> get_filter(const std::string& name) const;
     std::shared_ptr<formatter> get_formatter(const std::string& name) const;
     std::shared_ptr<writer> get_writer(const std::string& name) const;
 
@@ -34,6 +35,7 @@ private:
     std::map<std::string, std::shared_ptr<formatter>> formatters_;
     std::map<std::string, std::shared_ptr<writer>> writers_;
     std::map<std::string, std::string> variables_;
+    std::map<std::string, std::shared_ptr<filter>> filters_;
 };
 
 #define CHUCHO_REGISTER_CONFIGURABLE_FACTORY(ns, nm) \

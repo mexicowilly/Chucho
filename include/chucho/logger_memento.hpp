@@ -23,6 +23,7 @@ public:
     const optional<std::string>& get_name() const;
     const std::vector<std::shared_ptr<writer>> get_writers() const;
     const optional<bool>& get_writes_to_ancestors() const;
+    virtual void handle(std::shared_ptr<configurable> cnf) override;
 
 private:
     optional<std::string> name_;

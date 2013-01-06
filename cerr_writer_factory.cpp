@@ -16,9 +16,10 @@ cerr_writer_factory::cerr_writer_factory()
 
 named_configurable cerr_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
 {
-    validate_id(mnto);
-    assert(dynamic_cast<cerr_writer_memento*>(mnto.get()));
-    std::shared_ptr<configurable> cnf(new cerr_writer(*static_cast<cerr_writer_memento*>(mnto.get())));
+    auto cwm = std::dynamic_pointer_cast<cerr_writer_memento>(mnto);
+    assert(cwm);
+    std::shared_ptr<configurable> cnf(new cerr_writer(cwm->get_formatter()));
+    set_filters(cnf, cwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
     return named_configurable(mnto->get_id(), cnf);
 }
