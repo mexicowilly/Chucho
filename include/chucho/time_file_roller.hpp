@@ -16,6 +16,8 @@ public:
                      std::size_t max_history);
 
     virtual std::string get_active_file_name() override;
+    const std::string& get_file_name_pattern() const;
+    std::size_t get_max_history() const;
     virtual bool is_triggered(const std::string& active_file, const event& e) override;
     virtual void roll() override;
 
@@ -66,6 +68,16 @@ private:
     period period_;
     std::unique_ptr<cleaner> cleaner_;
 };
+
+inline const std::string& time_file_roller::get_file_name_pattern() const
+{
+    return file_name_pattern_;
+}
+
+inline std::size_t time_file_roller::get_max_history() const
+{
+    return max_history_;
+}
 
 }
 

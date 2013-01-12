@@ -13,6 +13,8 @@ public:
     numbered_file_roller(int min_index, int max_index);
 
     virtual std::string get_active_file_name() override;
+    int get_max_index() const;
+    int get_min_index() const;
     virtual void roll() override;
 
 private:
@@ -21,6 +23,16 @@ private:
     int min_index_;
     int max_index_;
 };
+
+inline int numbered_file_roller::get_max_index() const
+{
+    return max_index_;
+}
+
+inline int numbered_file_roller::get_min_index() const
+{
+    return min_index_;
+}
 
 }
 

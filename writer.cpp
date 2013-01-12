@@ -32,6 +32,12 @@ void writer::clear_filters()
     filters_.clear();
 }
 
+std::vector<std::shared_ptr<filter>> writer::get_filters()
+{
+    std::lock_guard<std::mutex> lg(guard_);
+    return filters_;
+}
+
 bool writer::permits(const event& evt)
 {
     for (std::shared_ptr<filter> f : filters_)

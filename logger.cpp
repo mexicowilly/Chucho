@@ -1,4 +1,5 @@
 #include <chucho/logger.hpp>
+#include <chucho/configurator.hpp>
 #include <map>
 
 namespace
@@ -72,7 +73,7 @@ void logger::add_writer(std::shared_ptr<writer> wrt)
 
 std::shared_ptr<logger> logger::get(const std::string& name)
 {
-    std::call_once(logger_init_once, static_init);
+    std::call_once(logger_init_once, initialize);
     return get_impl(name);
 }
 
@@ -123,6 +124,21 @@ std::shared_ptr<logger> logger::get_impl(const std::string& name)
     return found->second;
 }
 
+std::vector<std::shared_ptr<writer>> logger::get_writers()
+{
+    std::lock_guard<std::mutex> lg(writers_guard_);
+    return writers_;
+}
+
+void logger::initialize()
+{
+    std::shared_ptr<level> info(new info_level());
+    std::lock_guard<std::recursive_mutex> lg(loggers_guard);
+    root_logger.reset(new logger("", info));
+    all_loggers[root_logger->get_name()] = root_logger;
+    configurator::initialize();
+}
+
 void logger::remove_unused_loggers()
 {
     std::lock_guard<std::recursive_mutex> lg(loggers_guard);
@@ -140,14 +156,6 @@ void logger::set_level(std::shared_ptr<level> lvl)
 {
     std::lock_guard<std::recursive_mutex> lg(loggers_guard);
     level_ = lvl;
-}
-
-void logger::static_init()
-{
-    std::shared_ptr<level> info(new info_level());
-    std::lock_guard<std::recursive_mutex> lg(loggers_guard);
-    root_logger.reset(new logger("", info));
-    all_loggers[""] = std::shared_ptr<logger>(root_logger);
 }
 
 void logger::write(const event& evt)

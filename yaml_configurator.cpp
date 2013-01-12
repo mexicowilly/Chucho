@@ -1,6 +1,6 @@
 #include <chucho/yaml_configurator.hpp>
 #include <chucho/exception.hpp>
-#include <chucho/configurable_factory.hpp>
+#include <chucho/logger_factory.hpp>
 
 namespace
 {
@@ -16,8 +16,8 @@ yaml_location_exception::yaml_location_exception(const YAML::Node& node)
     : exception("")
 {
     YAML::Mark mark = node.GetMark();
-    message_ = "[line " + std::to_string(mark.line) + ", column " +
-        std::to_string(mark.column) + "]";
+    message_ = "YAML [line " + std::to_string(mark.line + 1) + ", column " +
+        std::to_string(mark.column + 1) + "]";
 }
 
 }
@@ -65,9 +65,20 @@ void yaml_configurator::configure(std::istream& in)
                         }
                         else
                         {
-                            std::shared_ptr<memento> mnto = found->second->create_memento(*this);
-                            handle(type, i.second(), mnto);
-                            configurator::handle(found->second->create_configurable(mnto));
+                            if (dynamic_cast<logger_factory*>(found->second.get()) == 0)
+                            {
+                                if (!i.second().IsAliased())
+                                {
+                                    report_error("The top-level type " + type +
+                                        " is not referenced elsewhere in configuration, so it is ignored");
+                                }
+                            }
+                            else
+                            {
+                                std::shared_ptr<memento> mnto = found->second->create_memento(*this);
+                                handle(type, i.second(), mnto);
+                                found->second->create_configurable(mnto);
+                            }
                         }
                     }
                 }
@@ -78,7 +89,7 @@ void yaml_configurator::configure(std::istream& in)
                 }
                 catch (std::exception& se)
                 {
-                    std::throw_with_nested(yaml_location_exception(*i));
+                    std::throw_with_nested(yaml_location_exception(i.first()));
                 }
             }
         }
@@ -120,50 +131,48 @@ void yaml_configurator::handle(const std::string& key,
 {
     try
     {
-        YAML::Iterator i;
         if (n.Type() == YAML::NodeType::Scalar)
         {
             mnto->handle(key, resolve_variables(n.to<std::string>()));
         }
-        else if (n.Type() == YAML::NodeType::Map)
+        else
         {
-            i = n.begin();
-            if (i.second().Type() == YAML::NodeType::Scalar)
+            for (YAML::Iterator i = n.begin(); i != n.end(); i++)
             {
-                handle(resolve_variables(i.first().to<std::string>()), i.second(), mnto);
-            }
-            else if (i.second().Type() == YAML::NodeType::Map)
-            {
-                std::string first = resolve_variables(i.first().to<std::string>());
-                auto found = get_factories().find(first);
-                if (found == get_factories().end())
+                if (n.Type() == YAML::NodeType::Sequence &&
+                    i->Type() != YAML::NodeType::Map)
                 {
-                    handle(first, i.second(), mnto);
+                    throw exception("Only sequences of maps are supported in this configuration");
+                }
+                const YAML::Node& first = (n.Type() == YAML::NodeType::Sequence) ? i->begin().first() : i.first();
+                const YAML::Node& second = (n.Type() == YAML::NodeType::Sequence) ? i->begin().second() : i.second();
+                if (second.Type() == YAML::NodeType::Scalar)
+                {
+                    handle(resolve_variables(first.to<std::string>()), second, mnto);
                 }
                 else
                 {
-                    try
+                    std::string key = resolve_variables(first.to<std::string>());
+                    auto found = get_factories().find(key);
+                    if (found == get_factories().end())
                     {
-                        std::shared_ptr<memento> sub = found->second->create_memento(*this);
-                        handle(first, i.second(), sub);
-                        auto cnf = found->second->create_configurable(sub);
-                        mnto->handle(cnf.get_configurable());
+                        handle(key, second, mnto);
                     }
-                    catch (std::exception& e)
+                    else
                     {
-                        std::throw_with_nested(yaml_location_exception(i.second()));
+                        try
+                        {
+                            std::shared_ptr<memento> sub = found->second->create_memento(*this);
+                            handle(key, second, sub);
+                            mnto->handle(found->second->create_configurable(sub));
+                        }
+                        catch (std::exception& e)
+                        {
+                            std::throw_with_nested(yaml_location_exception(second));
+                        }
                     }
                 }
             }
-            else
-            {
-                throw exception("An illegal YAML sequence was found in " + key);
-            }
-        }
-        else if (n.Type() == YAML::NodeType::Sequence)
-        {
-            for (i = n.begin(); i != n.end(); i++)
-                handle("", *i, mnto);
         }
     }
     catch (yaml_location_exception& yle)

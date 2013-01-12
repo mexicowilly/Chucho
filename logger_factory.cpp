@@ -5,8 +5,6 @@
 #include <chucho/demangle.hpp>
 #include <assert.h>
 
-CHUCHO_REGISTER_CONFIGURABLE_FACTORY(chucho, logger_factory)
-
 namespace chucho
 {
 
@@ -15,7 +13,7 @@ logger_factory::logger_factory()
     set_status_origin("logger_factory");
 }
 
-named_configurable logger_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::shared_ptr<configurable> logger_factory::create_configurable(std::shared_ptr<memento> mnto)
 {
     auto lm = std::dynamic_pointer_cast<logger_memento>(mnto);
     assert(lm);
@@ -31,7 +29,7 @@ named_configurable logger_factory::create_configurable(std::shared_ptr<memento> 
         lgr->set_writes_to_ancestors(*lm->get_writes_to_ancestors());
     std::shared_ptr<configurable> cnf = std::static_pointer_cast<configurable>(lgr);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)) + " named " + lgr->get_name());
-    return named_configurable(mnto->get_id(), cnf);
+    return cnf;
 }
 
 std::shared_ptr<memento> logger_factory::create_memento(const configurator& cfg)

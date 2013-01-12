@@ -1,4 +1,5 @@
 #include <chucho/file_writer_memento.hpp>
+#include <chucho/exception.hpp>
 
 namespace chucho
 {
@@ -22,7 +23,7 @@ void file_writer_memento::set_on_start(const std::string& value)
     else if (low == "truncate")
         start_ = file_writer::on_start::TRUNCATE;
     else
-        report_error("on_start has an invalid value of " + value);
+        throw exception("on_start has an invalid value of " + value);
 }
 
 }

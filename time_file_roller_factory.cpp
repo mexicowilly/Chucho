@@ -5,8 +5,6 @@
 #include <chucho/demangle.hpp>
 #include <assert.h>
 
-CHUCHO_REGISTER_CONFIGURABLE_FACTORY(chucho, time_file_roller_factory)
-
 namespace chucho
 {
 
@@ -15,7 +13,7 @@ time_file_roller_factory::time_file_roller_factory()
     set_status_origin("time_file_roller_factory");
 }
 
-named_configurable time_file_roller_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::shared_ptr<configurable> time_file_roller_factory::create_configurable(std::shared_ptr<memento> mnto)
 {
     auto tfrm = std::dynamic_pointer_cast<time_file_roller_memento>(mnto);
     assert(tfrm);
@@ -26,7 +24,7 @@ named_configurable time_file_roller_factory::create_configurable(std::shared_ptr
     std::shared_ptr<configurable> cnf(new time_file_roller(tfrm->get_file_name_pattern(),
                                                            *tfrm->get_max_history()));
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
-    return named_configurable(mnto->get_id(), cnf);
+    return cnf;
 }
 
 std::shared_ptr<memento> time_file_roller_factory::create_memento(const configurator& cfg)

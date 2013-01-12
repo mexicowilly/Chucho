@@ -5,8 +5,6 @@
 #include <chucho/demangle.hpp>
 #include <assert.h>
 
-CHUCHO_REGISTER_CONFIGURABLE_FACTORY(chucho, numbered_file_roller_factory)
-
 namespace chucho
 {
 
@@ -15,7 +13,7 @@ numbered_file_roller_factory::numbered_file_roller_factory()
     set_status_origin("numbered_file_roller_factory");
 }
 
-named_configurable numbered_file_roller_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::shared_ptr<configurable> numbered_file_roller_factory::create_configurable(std::shared_ptr<memento> mnto)
 {
     auto nfrm = std::dynamic_pointer_cast<numbered_file_roller_memento>(mnto);
     assert(nfrm);
@@ -27,7 +25,7 @@ named_configurable numbered_file_roller_factory::create_configurable(std::shared
     else
         nfr.reset(new numbered_file_roller(*nfrm->get_max_index()));
     report_info("Created a " + demangle::get_demangled_name(typeid(*nfr)));
-    return named_configurable(mnto->get_id(), std::static_pointer_cast<configurable>(nfr));
+    return std::static_pointer_cast<configurable>(nfr);
 }
 
 std::shared_ptr<memento> numbered_file_roller_factory::create_memento(const configurator& cfg)

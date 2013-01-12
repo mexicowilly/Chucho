@@ -9,7 +9,6 @@ memento::memento(const configurator& cfg)
     : cfg_(cfg)
 {
     set_status_origin("memento");
-    set_handler("id", [this] (const std::string& id) { id_ = id; });
 }
 
 bool memento::boolean_value(const std::string& value)

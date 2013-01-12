@@ -18,8 +18,9 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                optional_test.cpp
                pattern_formatter_test.cpp
                rolling_file_writer_test.cpp
-               size_file_roll_trigger_test.cpp)
-TARGET_LINK_LIBRARIES(unit-test ${CHUCHO_LIB} ${CHUCHO_GTEST_LIB})
+               size_file_roll_trigger_test.cpp
+               yaml_configurator_test.cpp)
+TARGET_LINK_LIBRARIES(unit-test ${CHUCHO_LIB} ${CHUCHO_GTEST_LIB} yaml-cpp)
 ADD_DEPENDENCIES(unit-test gtest-external)
 
 ADD_CUSTOM_TARGET(check

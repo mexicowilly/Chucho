@@ -30,6 +30,9 @@ public:
                         std::shared_ptr<file_roller> roller,
                         std::shared_ptr<file_roll_trigger> trigger = std::shared_ptr<file_roll_trigger>());
 
+    std::shared_ptr<file_roller> get_file_roller() const;
+    std::shared_ptr<file_roll_trigger> get_file_roll_trigger() const;
+
 protected:
     virtual void write_impl(const event& evt) override;
 
@@ -39,6 +42,16 @@ private:
     std::shared_ptr<file_roller> roller_;
     std::shared_ptr<file_roll_trigger> trigger_;
 };
+
+inline std::shared_ptr<file_roller> rolling_file_writer::get_file_roller() const
+{
+    return roller_;
+}
+
+inline std::shared_ptr<file_roll_trigger> rolling_file_writer::get_file_roll_trigger() const
+{
+    return trigger_;
+}
 
 }
 

@@ -1,5 +1,6 @@
 #include <chucho/rolling_file_writer_memento.hpp>
 #include <chucho/demangle.hpp>
+#include <chucho/exception.hpp>
 
 namespace chucho
 {
@@ -12,7 +13,6 @@ rolling_file_writer_memento::rolling_file_writer_memento(const configurator& cfg
 
 void rolling_file_writer_memento::handle(std::shared_ptr<configurable> cnf)
 {
-    file_writer_memento::handle(cnf);
     auto roller = std::dynamic_pointer_cast<file_roller>(cnf);
     if (roller)
     {
@@ -24,8 +24,7 @@ void rolling_file_writer_memento::handle(std::shared_ptr<configurable> cnf)
         if (trigger)
             trigger_ = trigger;
         else
-            report_error("A file_writer cannot be constructed with a file_roller or a file_roll_trigger of type " +
-                demangle::get_demangled_name(typeid(*cnf)));
+            file_writer_memento::handle(cnf);
     }
 }
 

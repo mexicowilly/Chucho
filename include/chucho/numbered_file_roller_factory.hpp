@@ -15,7 +15,7 @@ class numbered_file_roller_factory : public configurable_factory
 public:
     numbered_file_roller_factory();
 
-    virtual named_configurable create_configurable(std::shared_ptr<memento> mnto) override;
+    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
     virtual std::shared_ptr<memento> create_memento(const configurator& cfg) override;
 };
 

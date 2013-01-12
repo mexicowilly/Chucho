@@ -21,6 +21,7 @@ public:
 
     void add_filter(std::shared_ptr<filter> flt);
     void clear_filters();
+    std::vector<std::shared_ptr<filter>> get_filters();
     void write(const event& evt);
 
 protected:

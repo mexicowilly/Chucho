@@ -1,6 +1,10 @@
 #if !defined(CHUCHO_YAML_CONFIGURATOR_HPP__)
 #define CHUCHO_YAML_CONFIGURATOR_HPP__
 
+#if !defined(chucho_shared_EXPORTS)
+#error "This header is private"
+#endif
+
 #include <chucho/configurator.hpp>
 #include <yaml-cpp/yaml.h>
 

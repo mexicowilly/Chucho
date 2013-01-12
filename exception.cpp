@@ -8,7 +8,7 @@ void nested_what_handler(std::ostream& stream, int level, const std::exception& 
 {
     if (level > 1)
         stream << ' ';
-    stream << "{ " << level << ": " << e.what() << "}";
+    stream << "{ " << level << ": " << e.what() << " }";
     try
     {
         std::rethrow_if_nested(e);

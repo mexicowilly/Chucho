@@ -5,8 +5,6 @@
 #include <chucho/demangle.hpp>
 #include <assert.h>
 
-CHUCHO_REGISTER_CONFIGURABLE_FACTORY(chucho, rolling_file_writer_factory)
-
 namespace chucho
 {
 
@@ -15,7 +13,7 @@ rolling_file_writer_factory::rolling_file_writer_factory()
     set_status_origin("rolling_file_writer_factory");
 }
 
-named_configurable rolling_file_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::shared_ptr<configurable> rolling_file_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
 {
     auto rfwm = std::dynamic_pointer_cast<rolling_file_writer_memento>(mnto);
     assert(rfwm);
@@ -96,7 +94,7 @@ named_configurable rolling_file_writer_factory::create_configurable(std::shared_
     }
     set_filters(cnf, rfwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
-    return named_configurable(mnto->get_id(), cnf);
+    return cnf;
 }
 
 std::shared_ptr<memento> rolling_file_writer_factory::create_memento(const configurator& cfg)

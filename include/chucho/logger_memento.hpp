@@ -21,7 +21,7 @@ public:
 
     std::shared_ptr<level> get_level() const;
     const optional<std::string>& get_name() const;
-    const std::vector<std::shared_ptr<writer>> get_writers() const;
+    const std::vector<std::shared_ptr<writer>>& get_writers() const;
     const optional<bool>& get_writes_to_ancestors() const;
     virtual void handle(std::shared_ptr<configurable> cnf) override;
 
@@ -42,7 +42,7 @@ inline const optional<std::string>& logger_memento::get_name() const
     return name_;
 }
 
-inline const std::vector<std::shared_ptr<writer>> logger_memento::get_writers() const
+inline const std::vector<std::shared_ptr<writer>>& logger_memento::get_writers() const
 {
     return writers_;
 }

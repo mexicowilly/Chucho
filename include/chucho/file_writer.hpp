@@ -23,7 +23,9 @@ public:
                 bool flush = true);
 
     const std::string& get_file_name() const;
+    bool get_flush() const;
     const std::string& get_initial_file_name() const;
+    on_start get_on_start() const;
 
 protected:
     file_writer(std::shared_ptr<formatter> fmt,
@@ -52,9 +54,19 @@ inline const std::string& file_writer::get_file_name() const
     return file_name_;
 }
 
+inline bool file_writer::get_flush() const
+{
+    return flush_;
+}
+
 inline const std::string& file_writer::get_initial_file_name() const
 {
     return initial_file_name_;
+}
+
+inline file_writer::on_start file_writer::get_on_start() const
+{
+    return start_;
 }
 
 }

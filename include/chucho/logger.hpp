@@ -23,6 +23,7 @@ public:
     std::shared_ptr<level> get_effective_level() const;
     std::shared_ptr<level> get_level() const;
     const std::string& get_name() const;
+    std::vector<std::shared_ptr<writer>> get_writers();
     bool permits(std::shared_ptr<level> lvl) const;
     void set_level(std::shared_ptr<level> lvl);
     void set_writes_to_ancestors(bool val);
@@ -31,7 +32,7 @@ public:
 
 private:
     static CHUCHO_NO_EXPORT std::shared_ptr<logger> get_impl(const std::string& name);
-    static CHUCHO_NO_EXPORT void static_init();
+    static CHUCHO_NO_EXPORT void initialize();
 
     CHUCHO_NO_EXPORT logger(const std::string& name, std::shared_ptr<level> lvl = std::shared_ptr<level>());
 

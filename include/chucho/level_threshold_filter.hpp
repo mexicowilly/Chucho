@@ -13,10 +13,16 @@ public:
     level_threshold_filter(std::shared_ptr<level> lvl);
 
     virtual result evaluate(const event& evt) override;
+    std::shared_ptr<level> get_level() const;
 
 private:
     std::shared_ptr<level> level_;
 };
+
+inline std::shared_ptr<level> level_threshold_filter::get_level() const
+{
+    return level_;
+}
 
 }
 

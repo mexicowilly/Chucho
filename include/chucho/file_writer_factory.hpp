@@ -15,7 +15,7 @@ class file_writer_factory : public writer_factory
 public:
     file_writer_factory();
 
-    virtual named_configurable create_configurable(std::shared_ptr<memento> mnto) override;
+    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
     virtual std::shared_ptr<memento> create_memento(const configurator& cfg) override;
 };
 

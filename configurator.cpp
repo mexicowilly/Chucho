@@ -1,5 +1,15 @@
 #include <chucho/configurator.hpp>
 #include <chucho/exception.hpp>
+#include <chucho/cerr_writer_factory.hpp>
+#include <chucho/cout_writer_factory.hpp>
+#include <chucho/file_writer_factory.hpp>
+#include <chucho/level_threshold_filter_factory.hpp>
+#include <chucho/logger_factory.hpp>
+#include <chucho/numbered_file_roller_factory.hpp>
+#include <chucho/pattern_formatter_factory.hpp>
+#include <chucho/rolling_file_writer_factory.hpp>
+#include <chucho/size_file_roll_trigger_factory.hpp>
+#include <chucho/time_file_roller_factory.hpp>
 #include <regex>
 
 namespace chucho
@@ -17,55 +27,28 @@ std::map<std::string, std::shared_ptr<configurable_factory>>& configurator::get_
     return factories;
 }
 
-std::shared_ptr<filter> configurator::get_filter(const std::string& name) const
+void configurator::initialize()
 {
-    auto found = filters_.find(name);
-    if (found == filters_.end())
-        throw exception("The filter " + name + " was not found in this configuration");
-    return found->second;
-}
-
-std::shared_ptr<formatter> configurator::get_formatter(const std::string& name) const
-{
-    auto found = formatters_.find(name);
-    if (found == formatters_.end())
-        throw exception("The formatter " + name + " was not found in this configuration");
-    return found->second;
-}
-
-std::shared_ptr<writer> configurator::get_writer(const std::string& name) const
-{
-    auto found = writers_.find(name);
-    if (found == writers_.end())
-        throw exception("The writer " + name + " was not found in this configuration");
-    return found->second;
-}
-
-void configurator::handle(const named_configurable& cnf)
-{
-    std::shared_ptr<formatter> fmt = std::dynamic_pointer_cast<formatter>(cnf.get_configurable());
-    if (fmt)
-    {
-        if (cnf.get_name().empty())
-            throw exception("The formatter has no id, so it cannot be used by writers");
-        formatters_[cnf.get_name()] = fmt;
-        return;
-    }
-    std::shared_ptr<writer> wrt = std::dynamic_pointer_cast<writer>(cnf.get_configurable());
-    if (wrt)
-    {
-        if (cnf.get_name().empty())
-            throw exception("The writer has no id, so it cannot be used by loggers");
-        writers_[cnf.get_name()] = wrt;
-        return;
-    }
-    std::shared_ptr<filter> flt = std::dynamic_pointer_cast<filter>(cnf.get_configurable());
-    if (flt)
-    {
-        if (cnf.get_name().empty())
-            throw exception("The filter has no id, so it cannot be used by writers");
-        filters_[cnf.get_name()] = flt;
-    }
+    std::shared_ptr<configurable_factory> fact(new cerr_writer_factory());
+    add_configurable_factory("chucho::cerr_writer", fact);
+    fact.reset(new cout_writer_factory());
+    add_configurable_factory("chucho::cout_writer", fact);
+    fact.reset(new file_writer_factory());
+    add_configurable_factory("chucho::file_writer", fact);
+    fact.reset(new level_threshold_filter_factory());
+    add_configurable_factory("chucho::level_threshold_filter", fact);
+    fact.reset(new logger_factory());
+    add_configurable_factory("chucho::logger", fact);
+    fact.reset(new numbered_file_roller_factory());
+    add_configurable_factory("chucho::numbered_file_roller", fact);
+    fact.reset(new pattern_formatter_factory());
+    add_configurable_factory("chucho::pattern_formatter", fact);
+    fact.reset(new rolling_file_writer_factory());
+    add_configurable_factory("chucho::rolling_file_writer", fact);
+    fact.reset(new size_file_roll_trigger_factory());
+    add_configurable_factory("chucho::size_file_roll_trigger", fact);
+    fact.reset(new time_file_roller_factory());
+    add_configurable_factory("chucho::time_file_roller", fact);
 }
 
 std::string configurator::resolve_variables(const std::string& val)
