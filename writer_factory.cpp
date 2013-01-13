@@ -1,4 +1,5 @@
 #include <chucho/writer_factory.hpp>
+#include <chucho/writer.hpp>
 #include <assert.h>
 
 namespace chucho

@@ -2,6 +2,9 @@
 #define CHUCHO_WRITER_MEMENTO_HPP__
 
 #include <chucho/memento.hpp>
+#include <chucho/filter.hpp>
+#include <chucho/formatter.hpp>
+#include <vector>
 
 namespace chucho
 {

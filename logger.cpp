@@ -1,5 +1,6 @@
 #include <chucho/logger.hpp>
 #include <chucho/configurator.hpp>
+#include <chucho/configuration.hpp>
 #include <map>
 
 namespace
@@ -29,6 +30,8 @@ std::vector<std::string> split(const std::string& name)
 
 namespace chucho
 {
+
+bool automatically_configuring = false;
 
 logger::logger(const std::string& name, std::shared_ptr<level> lvl)
     : name_(name),
@@ -136,7 +139,12 @@ void logger::initialize()
     std::lock_guard<std::recursive_mutex> lg(loggers_guard);
     root_logger.reset(new logger("", info));
     all_loggers[root_logger->get_name()] = root_logger;
-    configurator::initialize();
+    if (configuration::get_style() == configuration::style::AUTOMATIC)
+    {
+        automatically_configuring = true;
+        configuration::perform();
+        automatically_configuring = false;
+    }
 }
 
 void logger::remove_unused_loggers()

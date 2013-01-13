@@ -6,7 +6,7 @@
 #endif
 
 #include <chucho/status_reporter.hpp>
-#include <chucho/logger.hpp>
+#include <chucho/configuration.hpp>
 #include <map>
 
 namespace chucho
@@ -25,7 +25,7 @@ public:
     virtual void configure(std::istream& in) = 0;
 
 protected:
-    friend void CHUCHO_NO_EXPORT logger::initialize();
+    friend CHUCHO_NO_EXPORT void configuration::perform();
 
     static std::map<std::string, std::shared_ptr<configurable_factory>>& get_factories();
 
@@ -34,7 +34,7 @@ protected:
 
 private:
     /**
-     * This is invoked by logger::initialize.
+     * This is invoked by configuration::perform().
      */
     static void initialize();
 

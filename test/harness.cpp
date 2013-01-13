@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <chucho/status_manager.hpp>
+#include <chucho/configuration.hpp>
 #include <iostream>
 
 class all_status : public chucho::status_observer
@@ -16,6 +17,7 @@ class global_fixture : public ::testing::Environment
 public:
     virtual void SetUp() override
     {
+        chucho::configuration::set_allow_default(false);
         observer_.reset(new all_status());
         chucho::status_manager::get()->add(observer_);
     }

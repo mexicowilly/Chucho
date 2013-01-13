@@ -24,6 +24,7 @@ SET(CHUCHO_SOURCES
     cerr_writer_memento.cpp
     configurable.cpp
     configurable_factory.cpp
+    configuration.cpp
     configurator.cpp
     console_writer.cpp
     cout_writer.cpp
@@ -78,6 +79,7 @@ SET(CHUCHO_SOURCES
     include/chucho/clock_util.hpp
     include/chucho/configurable.hpp
     include/chucho/configurable_factory.hpp
+    include/chucho/configuration.hpp
     include/chucho/configurator.hpp
     include/chucho/console_writer.hpp
     include/chucho/cout_writer.hpp
