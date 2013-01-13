@@ -18,6 +18,7 @@ public:
     yaml_configurator()
     {
         chucho::logger::remove_unused_loggers();
+        // This ensures that all factories are registered
         chucho::logger::get("");
         chucho::status_manager::get()->clear();
     }
@@ -112,6 +113,30 @@ TEST_F(yaml_configurator, logger)
     EXPECT_EQ(false, lgr->writes_to_ancestors());
 }
 
+TEST_F(yaml_configurator, multiple_writer)
+{
+    configure("chucho::logger:\n"
+              "    - name: will\n"
+              "    - chucho::file_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m%n'\n"
+              "        file_name: one.log\n"
+              "    - chucho::file_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m%n'\n"
+              "        file_name: two.log\n");
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(2, wrts.size());
+    EXPECT_EQ(typeid(chucho::file_writer), typeid(*wrts[0]));
+    auto fwrt = std::static_pointer_cast<chucho::file_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(fwrt));
+    EXPECT_EQ(std::string("one.log"), fwrt->get_file_name());
+    EXPECT_EQ(typeid(chucho::file_writer), typeid(*wrts[1]));
+    fwrt = std::static_pointer_cast<chucho::file_writer>(wrts[1]);
+    ASSERT_TRUE(static_cast<bool>(fwrt));
+    EXPECT_EQ(std::string("two.log"), fwrt->get_file_name());
+}
+
 TEST_F(yaml_configurator, rolling_file_writer)
 {
     configure("chucho::logger:\n"
@@ -176,9 +201,12 @@ TEST_F(yaml_configurator, variables)
 {
     configure("- variables:\n"
               "    MY_NAME_IS: will\n"
-              "- chucho::logger:\n"
+              "    MY_TYPE_IS: logger\n"
+              "    MY_KEY_IS: level\n"
+              "    MY_VALUE_IS: fatal\n"
+              "- 'chucho::${MY_TYPE_IS}':\n"
               "    name: '${MY_NAME_IS}'\n"
-              "    level: fatal\n"
+              "    '${MY_KEY_IS}': '${MY_VALUE_IS}'\n"
               "    writes_to_ancestors: false");
     std::shared_ptr<chucho::logger> lgr = chucho::logger::get("will");
     EXPECT_EQ(std::string("will"), lgr->get_name());
