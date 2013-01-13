@@ -84,7 +84,7 @@ TEST_F(yaml_configurator, file_writer)
 
 TEST_F(yaml_configurator, level_threshold_filter)
 {
-    configure("chucho::logger:\n"
+    configure("- chucho::logger:\n"
               "    name: will\n"
               "    chucho::cout_writer:\n"
               "        chucho::pattern_formatter:\n"
@@ -170,4 +170,18 @@ TEST_F(yaml_configurator, time_file_roller)
     EXPECT_EQ(std::string("%d{%d}"), trlr->get_file_name_pattern());
     EXPECT_EQ(5, trlr->get_max_history());
     EXPECT_EQ(trlr, fwrt->get_file_roll_trigger());
+}
+
+TEST_F(yaml_configurator, variables)
+{
+    configure("- variables:\n"
+              "    MY_NAME_IS: will\n"
+              "- chucho::logger:\n"
+              "    name: '${MY_NAME_IS}'\n"
+              "    level: fatal\n"
+              "    writes_to_ancestors: false");
+    std::shared_ptr<chucho::logger> lgr = chucho::logger::get("will");
+    EXPECT_EQ(std::string("will"), lgr->get_name());
+    EXPECT_EQ(*chucho::FATAL_LEVEL, *lgr->get_level());
+    EXPECT_EQ(false, lgr->writes_to_ancestors());
 }

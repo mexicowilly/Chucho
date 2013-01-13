@@ -40,21 +40,27 @@ void yaml_configurator::configure(std::istream& in)
         {
             for (YAML::Iterator i = doc.begin(); i != doc.end(); i++)
             {
+                bool is_map = false;
                 try
                 {
-                    std::string type;
-                    try
-                    {
-                        i.first() >> type;
-                        type = resolve_variables(type);
-                    }
-                    catch (YAML::Exception& e)
-                    {
-                        std::throw_with_nested(exception("Every top-level YAML node must be a map"));
-                    }
+                    // If the iterator can be dereferenced, then it's not is not a map. But the
+                    // dereferenced node must claim to be a map. Yeah, it took me a while to
+                    // figure this out...
+                    if (i->Type() != YAML::NodeType::Map)
+                        throw exception("The YAML configuration only supports maps or sequences of maps at the top level");
+                }
+                catch (YAML::Exception&)
+                {
+                    is_map = true;
+                }
+                const YAML::Node& first = is_map ? i.first() : i->begin().first();
+                const YAML::Node& second = is_map ? i.second() : i->begin().second();
+                try
+                {
+                    std::string type = resolve_variables(first.to<std::string>());
                     if (type == "variables")
                     {
-                        add_variables(extract_variables(i.second()));
+                        add_variables(extract_variables(second));
                     }
                     else
                     {
@@ -67,7 +73,7 @@ void yaml_configurator::configure(std::istream& in)
                         {
                             if (dynamic_cast<logger_factory*>(found->second.get()) == 0)
                             {
-                                if (!i.second().IsAliased())
+                                if (!second.IsAliased())
                                 {
                                     report_error("The top-level type " + type +
                                         " is not referenced elsewhere in configuration, so it is ignored");
@@ -76,7 +82,7 @@ void yaml_configurator::configure(std::istream& in)
                             else
                             {
                                 std::shared_ptr<memento> mnto = found->second->create_memento(*this);
-                                handle(type, i.second(), mnto);
+                                handle(type, second, mnto);
                                 found->second->create_configurable(mnto);
                             }
                         }
@@ -89,7 +95,7 @@ void yaml_configurator::configure(std::istream& in)
                 }
                 catch (std::exception& se)
                 {
-                    std::throw_with_nested(yaml_location_exception(i.first()));
+                    std::throw_with_nested(yaml_location_exception(first));
                 }
             }
         }
@@ -106,9 +112,16 @@ std::map<std::string, std::string> yaml_configurator::extract_variables(const YA
     std::map<std::string, std::string> result;
     for (YAML::Iterator i = n.begin(); i != n.end(); i++)
     {
+        if (n.Type() == YAML::NodeType::Sequence &&
+            i->Type() != YAML::NodeType::Map)
+        {
+            throw exception("Only sequences of maps are supported when defining variables");
+        }
+        const YAML::Node& first = (n.Type() == YAML::NodeType::Sequence) ? i->begin().first() : i.first();
+        const YAML::Node& second = (n.Type() == YAML::NodeType::Sequence) ? i->begin().second() : i.second();
         try
         {
-            result[i.first().to<std::string>()] = i.second().to<std::string>();
+            result[first.to<std::string>()] = second.to<std::string>();
         }
         catch (YAML::Exception& e)
         {
