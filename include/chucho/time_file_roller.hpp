@@ -3,7 +3,9 @@
 
 #include <chucho/file_roller.hpp>
 #include <chucho/file_roll_trigger.hpp>
+#include <chucho/optional.hpp>
 #include <chrono>
+#include <set>
 
 namespace chucho
 {
@@ -41,17 +43,20 @@ private:
     public:
         cleaner(time_file_roller& roller);
 
-        void clean(const time_type& now);
+        void clean(const time_type& now, const std::string& active_file_name);
 
     private:
-        void clean_one(const time_type& t, int period_offset);
+        void clean_one(const time_type& t,
+                       int period_offset,
+                       std::set<std::string>& cleaned,
+                       const std::string& active_file_name);
         std::size_t periods_elapsed(const time_type& first, const time_type& last);
         std::size_t periods_since_last(const time_type& now);
         time_type relative(const time_type& t, int period_offset);
 
         time_file_roller& roller_;
         int oldest_period_offset_;
-        std::unique_ptr<time_type> last_clean_;
+        optional<time_type> last_clean_;
     };
 
     CHUCHO_NO_EXPORT void compute_next_roll(const time_type& now);

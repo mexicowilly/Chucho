@@ -11,6 +11,23 @@
 #include <chucho/size_file_roll_trigger.hpp>
 #include <chucho/time_file_roller.hpp>
 #include <sstream>
+#if defined(_WIN32)
+#include <windows.h>
+#endif
+
+namespace
+{
+
+void setenv(const char* var, const char* val)
+{
+#if defined(_WIN32)
+    SetEnvironmentVariableA(var, val);
+#else
+    ::setenv(var, val, 1);
+#endif
+}
+
+}
 
 class yaml_configurator : public ::testing::Test
 {
@@ -199,6 +216,8 @@ TEST_F(yaml_configurator, time_file_roller)
 
 TEST_F(yaml_configurator, variables)
 {
+    setenv("CHUCHO_WRITES_KEY", "writes_to_ancestors", 1);
+    setenv("CHUCHO_WRITES_VALUE", "false", 1);
     configure("- variables:\n"
               "    MY_NAME_IS: will\n"
               "    MY_TYPE_IS: logger\n"
@@ -207,7 +226,7 @@ TEST_F(yaml_configurator, variables)
               "- 'chucho::${MY_TYPE_IS}':\n"
               "    name: '${MY_NAME_IS}'\n"
               "    '${MY_KEY_IS}': '${MY_VALUE_IS}'\n"
-              "    writes_to_ancestors: false");
+              "    '$env{CHUCHO_WRITES_KEY}': '$ENV{CHUCHO_WRITES_VALUE}'");
     std::shared_ptr<chucho::logger> lgr = chucho::logger::get("will");
     EXPECT_EQ(std::string("will"), lgr->get_name());
     EXPECT_EQ(*chucho::FATAL_LEVEL, *lgr->get_level());

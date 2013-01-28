@@ -54,17 +54,47 @@ void time_file_roller::compute_next_roll(const time_type& now)
     while (now >= next_roll_)
     {
         if (period_ == period::MINUTE)
+        {
             next_cal.tm_min++;
+            next_cal.tm_sec = 0;
+        }
         else if (period_ == period::HOUR)
+        {
             next_cal.tm_hour++;
+            next_cal.tm_min = 0;
+            next_cal.tm_sec = 0;
+        }
         else if (period_ == period::DAY)
+        {
             next_cal.tm_mday++;
+            next_cal.tm_hour = 0;
+            next_cal.tm_min = 0;
+            next_cal.tm_sec = 0;
+        }
         else if (period_ == period::WEEK)
+        {
             next_cal.tm_mday += 7;
+            next_cal.tm_hour = 0;
+            next_cal.tm_min = 0;
+            next_cal.tm_sec = 0;
+        }
         else if (period_ == period::MONTH)
+        {
             next_cal.tm_mon++;
+            next_cal.tm_mday = 1;
+            next_cal.tm_hour = 0;
+            next_cal.tm_min = 0;
+            next_cal.tm_sec = 0;
+        }
         else if (period_ == period::YEAR)
+        {
             next_cal.tm_year++;
+            next_cal.tm_mon = 0;
+            next_cal.tm_mday = 1;
+            next_cal.tm_hour = 0;
+            next_cal.tm_min = 0;
+            next_cal.tm_sec = 0;
+        }
         next_roll_ = clock_type::from_time_t(std::mktime(&next_cal));
     }
 }
@@ -127,7 +157,9 @@ std::string time_file_roller::get_active_file_name()
 
 bool time_file_roller::is_triggered(const std::string& active_file, const event& e)
 {
-    return clock_type::now() >= next_roll_;
+    struct std::tm now_cal = calendar::get_utc(clock_type::to_time_t(clock_type::now()));
+    time_type now = clock_type::from_time_t(std::mktime(&now_cal));
+    return now >= next_roll_;
 }
 
 std::string time_file_roller::resolve_file_name(const time_type& tm)
@@ -177,7 +209,7 @@ void time_file_roller::roll()
             file::remove(target);
         std::rename(get_active_file_name().c_str(), target.c_str());
         compute_next_roll(now);
-        cleaner_->clean(now);
+        cleaner_->clean(now, get_active_file_name());
     }
 }
 
@@ -239,8 +271,10 @@ void time_file_roller::set_period()
                     rolled.tm_year++;
                 rolled = calendar::get_local(std::mktime(&rolled));
                 std::string fmt2 = format(rolled, spec);
-                if (fmt1 != fmt2)
+                if (fmt1 != fmt2) {
                     period_ = p;
+                    break;
+                }
             }
             if (period_ == period::UNKNOWN)
                 report_error("The date specification " + spec + " does not contain sufficient information to determine the rolling period");
@@ -262,22 +296,32 @@ time_file_roller::cleaner::cleaner(time_file_roller& roller)
     set_status_origin("time_file_roller::cleaner");
 }
 
-void time_file_roller::cleaner::clean(const time_type& now)
+void time_file_roller::cleaner::clean(const time_type& now, const std::string& active_file_name)
 {
-    last_clean_.reset(new time_type(now));
     std::size_t periods = periods_since_last(now);
     if (periods > 1)
         report_info(std::to_string(periods) + " periods have elapsed since last clean");
+    std::set<std::string> cleaned;
     for (auto i = 0; i < periods; i++)
-        clean_one(now, oldest_period_offset_ - i);
+        clean_one(now, oldest_period_offset_ - i, cleaned, active_file_name);
+    last_clean_ = now;
 }
 
-void time_file_roller::cleaner::clean_one(const time_type& t, int period_offset)
+void time_file_roller::cleaner::clean_one(const time_type& t,
+                                          int period_offset,
+                                          std::set<std::string>& cleaned,
+                                          const std::string& active_file_name)
 {
     time_type rel = relative(t, period_offset);
     std::string name = roller_.resolve_file_name(rel);
-    report_info("Removing " + name);
-    file::remove(name);
+    if (cleaned.count(name) == 0 &&
+        name != active_file_name &&
+        file::exists(name))
+    {
+        report_info("Removing " + name);
+        file::remove(name);
+        cleaned.insert(name);
+    }
 }
 
 std::size_t time_file_roller::cleaner::periods_elapsed(const time_type& first, const time_type& last)
@@ -319,7 +363,7 @@ std::size_t time_file_roller::cleaner::periods_since_last(const time_type& now)
 time_file_roller::time_type time_file_roller::cleaner::relative(const time_type& t, int period_offset)
 {
     std::time_t st = clock_type::to_time_t(t);
-    struct std::tm cal = calendar::get_utc(st);
+    struct std::tm cal = calendar::get_local(st);
     if (roller_.period_ == period::MINUTE)
         cal.tm_min += period_offset;
     else if (roller_.period_ == period::HOUR)

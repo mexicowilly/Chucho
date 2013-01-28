@@ -53,7 +53,7 @@ void configurator::initialize()
 
 std::string configurator::resolve_variables(const std::string& val)
 {
-    static std::regex re("\\$\\{(.+?)\\}");
+    static std::regex re("\\$(ENV)?\\{(.+)\\}", std::regex::icase);
 
     std::string result(val);
     int pos_offset = 0;
@@ -62,11 +62,23 @@ std::string configurator::resolve_variables(const std::string& val)
     while (itor != end)
     {
         const std::smatch& sm(*itor);
-        auto found = variables_.find(sm[1]);
-        if (found != variables_.end())
+        if (sm.position(1) > 0)
         {
-            result.replace(sm.position() + pos_offset, sm.length(), found->second);
-            pos_offset += found->second.length() - sm.length();
+            char* env = std::getenv(sm.str(2).c_str());
+            if (env != nullptr)
+            {
+                result.replace(sm.position() + pos_offset, sm.length(), env);
+                pos_offset += std::strlen(env) - sm.length();
+            }
+        }
+        else
+        {
+            auto found = variables_.find(sm[2]);
+            if (found != variables_.end())
+            {
+                result.replace(sm.position() + pos_offset, sm.length(), found->second);
+                pos_offset += found->second.length() - sm.length();
+            }
         }
         ++itor;
     }

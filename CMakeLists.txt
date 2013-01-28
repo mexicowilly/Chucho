@@ -18,6 +18,39 @@ IF(CHUCHO_POSIX)
         platform/posix/pattern_formatter_posix.cpp)
 ENDIF()
 
+SET(CHUCHO_PUBLIC_HEADERS
+    include/chucho/cerr_writer.hpp
+    include/chucho/configurable.hpp
+    include/chucho/configurable_factory.hpp
+    include/chucho/configuration.hpp
+    include/chucho/console_writer.hpp
+    include/chucho/cout_writer.hpp
+    include/chucho/diagnostic_context.hpp
+    include/chucho/event.hpp
+    include/chucho/export.hpp
+    include/chucho/file_roller.hpp
+    include/chucho/file_roll_trigger.hpp
+    include/chucho/file_writer.hpp
+    include/chucho/filter.hpp
+    include/chucho/formatter.hpp
+    include/chucho/level.hpp
+    include/chucho/level_threshold_filter.hpp
+    include/chucho/logger.hpp
+    include/chucho/marker.hpp
+    include/chucho/memento.hpp
+    include/chucho/numbered_file_roller.hpp
+    include/chucho/pattern_formatter.hpp
+    include/chucho/rolling_file_writer.hpp
+    include/chucho/size_file_roll_trigger.hpp
+    include/chucho/status.hpp
+    include/chucho/status_manager.hpp
+    include/chucho/status_observer.hpp
+    include/chucho/status_reporter.hpp
+    include/chucho/time_file_roller.hpp
+    include/chucho/writer.hpp
+    include/chucho/writer_factory.hpp
+    include/chucho/writer_memento.hpp)
+
 SET(CHUCHO_SOURCES
     cerr_writer.cpp
     cerr_writer_factory.cpp
@@ -73,67 +106,39 @@ SET(CHUCHO_SOURCES
     writer_memento.cpp
     yaml_configurator.cpp
     include/chucho/calendar.hpp
-    include/chucho/cerr_writer.hpp
     include/chucho/cerr_writer_factory.hpp
     include/chucho/cerr_writer_memento.hpp
     include/chucho/clock_util.hpp
-    include/chucho/configurable.hpp
-    include/chucho/configurable_factory.hpp
-    include/chucho/configuration.hpp
     include/chucho/configurator.hpp
-    include/chucho/console_writer.hpp
-    include/chucho/cout_writer.hpp
     include/chucho/cout_writer_factory.hpp
     include/chucho/cout_writer_memento.hpp
     include/chucho/demangle.hpp
-    include/chucho/diagnostic_context.hpp
     include/chucho/exception.hpp
-    include/chucho/event.hpp
-    include/chucho/export.hpp
     include/chucho/file.hpp
     include/chucho/file_exception.hpp
-    include/chucho/file_roller.hpp
-    include/chucho/file_roll_trigger.hpp
-    include/chucho/file_writer.hpp
-    include/chucho/file_writer_factory.hpp
-    include/chucho/file_writer_memento.hpp
-    include/chucho/filter.hpp
-    include/chucho/formatter.hpp
-    include/chucho/level.hpp
-    include/chucho/level_threshold_filter.hpp
     include/chucho/level_threshold_filter_factory.hpp
     include/chucho/level_threshold_filter_memento.hpp
     include/chucho/line_ending.hpp
-    include/chucho/logger.hpp
     include/chucho/logger_factory.hpp
     include/chucho/logger_memento.hpp
-    include/chucho/marker.hpp
-    include/chucho/memento.hpp
-    include/chucho/numbered_file_roller.hpp
     include/chucho/numbered_file_roller_factory.hpp
     include/chucho/numbered_file_roller_memento.hpp
-    include/chucho/pattern_formatter.hpp
     include/chucho/pattern_formatter_factory.hpp
     include/chucho/pattern_formatter_memento.hpp
-    include/chucho/rolling_file_writer.hpp
     include/chucho/rolling_file_writer_factory.hpp
     include/chucho/rolling_file_writer_memento.hpp
-    include/chucho/size_file_roll_trigger.hpp
     include/chucho/size_file_roll_trigger_factory.hpp
     include/chucho/size_file_roll_trigger_memento.hpp
     include/chucho/status.hpp
     include/chucho/status_manager.hpp
     include/chucho/status_observer.hpp
     include/chucho/status_reporter.hpp
-    include/chucho/time_file_roller.hpp
     include/chucho/time_file_roller_factory.hpp
     include/chucho/time_file_roller_memento.hpp
     include/chucho/utf8_validator.hpp
-    include/chucho/writer.hpp
-    include/chucho/writer_factory.hpp
-    include/chucho/writer_memento.hpp
     include/chucho/yaml_configurator.hpp
-    ${CHUCHO_PLATFORM_SOURCES})
+    ${CHUCHO_PLATFORM_SOURCES}
+    ${CHUCHO_PUBLIC_HEADERS})
 
 ADD_CUSTOM_TARGET(chucho)
 
@@ -148,8 +153,13 @@ IF(ENABLE_SHARED)
                           COMPILE_FLAGS "${CHUCHO_CXX_SO_FLAGS}"
                           FRAMEWORK TRUE
                           VERSION ${CHUCHO_VERSION}
-                          SOVERSION ${CHUCHO_SOVERSION})
+                          SOVERSION ${CHUCHO_SOVERSION}
+                          PUBLIC_HEADER ${CHUCHO_PUBLIC_HEADERS})
     ADD_DEPENDENCIES(chucho chucho-shared)
+    INSTALL(TARGETS chucho-shared
+            LIBRARY DESTINATION lib
+            RUNTIME DESTINATION lib
+            PUBLIC_HEADER DESTINATION include/chucho)
 ENDIF()
 IF(ENABLE_STATIC)
     ADD_LIBRARY(chucho-static STATIC ${CHUCHO_SOURCES})
@@ -158,6 +168,9 @@ IF(ENABLE_STATIC)
                           OUTPUT_NAME chucho)
     ADD_DEFINITIONS(-Dchucho_shared_EXPORTS)
     ADD_DEPENDENCIES(chucho chucho-static)
+    INSTALL(TARGETS chucho-static
+            ARCHIVE DESTINATION lib
+            PUBLIC_HEADER DESTINATION include/chucho)
 ENDIF()
 
 ADD_SUBDIRECTORY(test)

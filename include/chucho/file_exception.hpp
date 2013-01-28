@@ -1,6 +1,10 @@
 #if !defined(CHUCHO_FILE_EXCEPTION_HPP__)
 #define CHUCHO_FILE_EXCEPTION_HPP__
 
+#if !defined(chucho_shared_EXPORTS)
+#error "This header is private"
+#endif
+
 #include <chucho/exception.hpp>
 
 namespace chucho

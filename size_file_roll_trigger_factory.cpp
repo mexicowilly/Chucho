@@ -10,7 +10,7 @@ namespace chucho
 
 size_file_roll_trigger_factory::size_file_roll_trigger_factory()
 {
-    set_status_origin("sile_file_roll_trigger_factory");
+    set_status_origin("size_file_roll_trigger_factory");
 }
 
 std::shared_ptr<configurable> size_file_roll_trigger_factory::create_configurable(std::shared_ptr<memento> mnto)

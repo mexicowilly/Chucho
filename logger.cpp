@@ -6,7 +6,6 @@
 namespace
 {
 
-std::shared_ptr<chucho::logger> root_logger;
 std::map<std::string, std::shared_ptr<chucho::logger>> all_loggers;
 std::recursive_mutex loggers_guard;
 std::once_flag logger_init_once;
@@ -31,6 +30,7 @@ std::vector<std::string> split(const std::string& name)
 namespace chucho
 {
 
+std::shared_ptr<chucho::logger> root_logger;
 bool automatically_configuring = false;
 
 logger::logger(const std::string& name, std::shared_ptr<level> lvl)

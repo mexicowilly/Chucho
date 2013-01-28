@@ -10,6 +10,14 @@
 #include <cstdlib>
 #include <fstream>
 
+namespace chucho
+{
+
+extern bool automatically_configuring;
+extern std::shared_ptr<chucho::logger> root_logger;
+
+}
+
 namespace
 {
 
@@ -45,13 +53,12 @@ void set_default_config()
 {
     if (allow_default_config)
     {
-        std::shared_ptr<chucho::logger> root = chucho::logger::get("");
-        if (root->get_writers().empty())
+        if (chucho::root_logger->get_writers().empty())
         {
             std::shared_ptr<chucho::formatter> fmt(
                 new chucho::pattern_formatter("%d{%H:%M:%S.%q} %-5p %.36c - %m%n"));
             std::shared_ptr<chucho::writer> wrt(new chucho::cout_writer(fmt));
-            root->add_writer(wrt);
+            chucho::root_logger->add_writer(wrt);
         }
     }
 }
@@ -60,8 +67,6 @@ void set_default_config()
 
 namespace chucho
 {
-
-extern bool automatically_configuring;
 
 namespace configuration
 {
@@ -107,16 +112,16 @@ void perform()
         fn = file_name;
     if (file::exists(fn))
     {
-        std::ifstream in(fn.c_str());
-        if (in.is_open())
+        std::ifstream val_in(fn.c_str());
+        if (val_in.is_open())
         {
             try
             {
-                utf8::validate(in);
-                in.close();
-                in.open(fn.c_str());
+                utf8::validate(val_in);
+                val_in.close();
+                std::ifstream yam_in(fn.c_str());
                 yaml_configurator yam;
-                yam.configure(in);
+                yam.configure(yam_in);
             }
             catch (exception& e)
             {
