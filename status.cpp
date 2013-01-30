@@ -3,8 +3,7 @@
 #include <chucho/exception.hpp>
 #include <chucho/clock_util.hpp>
 #include <array>
-
-#include <iostream>
+#include <iomanip>
 
 namespace chucho
 {
@@ -23,7 +22,6 @@ status::status(level lvl,
 
 std::ostream& operator<< (std::ostream& stream, const status& st)
 {
-    std::array<char, 1024> buf;
     if (clock_util::system_clock_supports_milliseconds)
     {
         auto since = st.time_.time_since_epoch();
@@ -31,15 +29,15 @@ std::ostream& operator<< (std::ostream& stream, const status& st)
         std::array<char, 13> time_fmt;
         std::snprintf(time_fmt.data(), time_fmt.size(), "%%H:%%M:%%S.%03lli", millis.count() % 1000);
         struct std::tm cal = calendar::get_utc(millis.count() / 1000);
-        std::strftime(buf.data(), buf.size(), time_fmt.data(), &cal);
+        stream << std::put_time(&cal, time_fmt.data());
     }
     else
     {
         struct std::tm cal = calendar::get_utc(status::clock_type::to_time_t(st.time_));
-        std::strftime(buf.data(), buf.size(), "%H:%M:%S", &cal);
+        stream << std::put_time(&cal, "%H:%M:%S");
 
     }
-    stream << buf.data() << ' ';
+    stream << ' ';
     if (st.level_ == status::level::INFO)
         stream << "INFO";
     else if (st.level_ == status::level::WARNING)

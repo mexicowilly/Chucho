@@ -56,9 +56,9 @@ protected:
     {
         struct std::tm t = chucho::calendar::get_utc(
             std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
-        std::array<char, 1024> buf;
-        std::strftime(buf.data(), buf.size(), fmt.c_str(), &t);
-        return buf.data();
+        std::ostringstream stream;
+        stream << std::put_time(&t, fmt.c_str());
+        return stream.str();
     }
 
 private:

@@ -12,6 +12,7 @@
 #include <array>
 #include <mutex>
 #include <thread>
+#include <iomanip>
 
 namespace
 {
@@ -370,10 +371,9 @@ std::string pattern_formatter::date_time_piece::get_text_impl(const event& evt) 
     std::array<char, 4096> buf;
     struct std::tm cal;
     to_calendar(millis.count() / 1000, cal);
-    std::string result;
-    if (std::strftime(buf.data(), buf.size(), pat.c_str(), &cal) != 0)
-        result = buf.data();
-    return result;
+    std::ostringstream stream;
+    stream << std::put_time(&cal, pat.c_str());
+    return stream.str();
 }
 
 pattern_formatter::utc_date_time_piece::utc_date_time_piece(const std::string& date_pattern,

@@ -6,6 +6,8 @@
 #include <regex>
 #include <algorithm>
 #include <array>
+#include <iomanip>
+#include <sstream>
 
 namespace
 {
@@ -139,14 +141,9 @@ std::string time_file_roller::find_time_spec(const std::string& str,
 
 std::string time_file_roller::format(const struct std::tm& cal, const std::string& spec)
 {
-    std::string result;
-    std::array<char, 1024> buf;
-    std::size_t count = std::strftime(buf.data(), buf.size(), spec.c_str(), &cal);
-    if (count == 0)
-        report_error("Unable to parse date format " + spec);
-    else
-        result.assign(buf.data(), count);
-    return result;
+    std::ostringstream stream;
+    stream << std::put_time(&cal, spec.c_str());
+    return stream.str();
 }
 
 std::string time_file_roller::get_active_file_name()
