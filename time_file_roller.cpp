@@ -103,7 +103,7 @@ void time_file_roller::compute_next_roll(const time_type& now)
 
 std::string time_file_roller::find_time_spec(const std::string& str,
                                              std::size_t& start,
-                                             std::size_t& end)
+                                             std::size_t& end) const
 {
     std::string result;
     start = find_time_token(str, 'd', start);
@@ -139,7 +139,7 @@ std::string time_file_roller::find_time_spec(const std::string& str,
     return result;
 }
 
-std::string time_file_roller::format(const struct std::tm& cal, const std::string& spec)
+std::string time_file_roller::format(const struct std::tm& cal, const std::string& spec) const
 {
     std::ostringstream stream;
     stream << std::put_time(&cal, spec.c_str());
@@ -159,7 +159,7 @@ bool time_file_roller::is_triggered(const std::string& active_file, const event&
     return now >= next_roll_;
 }
 
-std::string time_file_roller::resolve_file_name(const time_type& tm)
+std::string time_file_roller::resolve_file_name(const time_type& tm) const
 {
     std::tm cal = calendar::get_utc(clock_type::to_time_t(tm));
     std::size_t start;
@@ -299,8 +299,10 @@ void time_file_roller::cleaner::clean(const time_type& now, const std::string& a
     if (periods > 1)
         report_info(std::to_string(periods) + " periods have elapsed since last clean");
     std::set<std::string> cleaned;
+    int actual_oldest = roller_.file_writer_->get_initial_file_name().empty() ?
+        oldest_period_offset_ : oldest_period_offset_ + 1;
     for (auto i = 0; i < periods; i++)
-        clean_one(now, oldest_period_offset_ - i, cleaned, active_file_name);
+        clean_one(now, actual_oldest - i, cleaned, active_file_name);
     last_clean_ = now;
 }
 

@@ -62,9 +62,9 @@ private:
     CHUCHO_NO_EXPORT void compute_next_roll(const time_type& now);
     CHUCHO_NO_EXPORT std::string find_time_spec(const std::string& str,
                                                 std::size_t& start,
-                                                std::size_t& end);
-    CHUCHO_NO_EXPORT std::string format(const struct std::tm& cal, const std::string& spec);
-    CHUCHO_NO_EXPORT std::string resolve_file_name(const time_type& tm);
+                                                std::size_t& end) const;
+    CHUCHO_NO_EXPORT std::string format(const struct std::tm& cal, const std::string& spec) const;
+    CHUCHO_NO_EXPORT std::string resolve_file_name(const time_type& tm) const;
     CHUCHO_NO_EXPORT void set_period();
 
     time_type next_roll_;
