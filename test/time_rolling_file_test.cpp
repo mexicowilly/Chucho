@@ -52,21 +52,54 @@ private:
     std::chrono::system_clock::time_point end_;
 };
 
-class minute_test : public test
+class date_only_test : public test
 {
 public:
-    minute_test();
-
-    virtual void check_impl() override;
-};
-
-class active_minute_test : public test
-{
-public:
-    active_minute_test();
+    template <typename duration_type, typename next_type>
+    date_only_test(const std::string& pattern,
+                   std::size_t max_history,
+                   const duration_type& dur,
+                   const next_type& nxt);
 
 protected:
     virtual void check_impl() override;
+
+private:
+    std::chrono::seconds until_next_;
+    std::string pattern_;
+    std::size_t max_history_;
+};
+
+class fixed_active_test : public test
+{
+public:
+    template <typename duration_type, typename next_type>
+    fixed_active_test(const std::string& active,
+                      const std::string& pattern,
+                      std::size_t max_history,
+                      const duration_type& dur,
+                      const next_type& nxt);
+
+protected:
+    virtual void check_impl() override;
+
+private:
+    std::chrono::seconds until_next_;
+    std::string active_;
+    std::string pattern_;
+    std::size_t max_history_;
+};
+
+class minute_test : public date_only_test
+{
+public:
+    minute_test();
+};
+
+class active_minute_test : public fixed_active_test
+{
+public:
+    active_minute_test();
 };
 
 std::string test::TOP_LEVEL_DIR("time_rolling_file_test/");
@@ -161,17 +194,30 @@ bool file_doesnt_exist(const std::string& file_name)
     return !chucho::file::exists(file_name);
 }
 
-minute_test::minute_test()
-    : test("minute/test-%d{%H-%M}", 2, std::chrono::minutes(5))
+template <typename duration_type, typename next_type>
+date_only_test::date_only_test(const std::string& pattern,
+                               std::size_t max_history,
+                               const duration_type& dur,
+                               const next_type& nxt)
+    : test(pattern, max_history, dur),
+      until_next_(std::chrono::duration_cast<std::chrono::seconds>(nxt)),
+      pattern_(pattern),
+      max_history_(max_history)
 {
-    expected_file_names().push_back(format_file_name("minute/test-%H-%M"));
-    next() += std::chrono::seconds(61);
+    std::size_t pos = pattern_.find("%d{");
+    if (pos != std::string::npos)
+        pattern_.erase(pos, 3);
+    pos = pattern_.find("}");
+    if (pos != std::string::npos)
+        pattern_.erase(pos, 1);
+    expected_file_names().push_back(format_file_name(pattern_));
+    next() += until_next_;
 }
 
-void minute_test::check_impl()
+void date_only_test::check_impl()
 {
-    expected_file_names().push_back(format_file_name("minute/test-%H-%M"));
-    if (expected_file_names().size() > 3)
+    expected_file_names().push_back(format_file_name(pattern_));
+    if (expected_file_names().size() > max_history_ + 1)
     {
         unexpected_file_names().push_back(expected_file_names().front());
         expected_file_names().pop_front();
@@ -180,29 +226,61 @@ void minute_test::check_impl()
         EXPECT_PRED1(chucho::file::exists, f);
     for (auto f : unexpected_file_names())
         EXPECT_PRED1(file_doesnt_exist, f);
-    next() += std::chrono::seconds(61);
+    next() += until_next_;
+}
+
+template <typename duration_type, typename next_type>
+fixed_active_test::fixed_active_test(const std::string& active,
+                                     const std::string& pattern,
+                                     std::size_t max_history,
+                                     const duration_type& dur,
+                                     const next_type& nxt)
+    : test(active, pattern, max_history, dur),
+      until_next_(std::chrono::duration_cast<std::chrono::seconds>(nxt)),
+      active_(active),
+      pattern_(pattern),
+      max_history_(max_history)
+{
+    std::size_t pos = pattern_.find("%d{");
+    if (pos != std::string::npos)
+        pattern_.erase(pos, 3);
+    pos = pattern_.find("}");
+    if (pos != std::string::npos)
+        pattern_.erase(pos, 1);
+    next() += until_next_;
+}
+
+void fixed_active_test::check_impl()
+{
+    expected_file_names().push_back(format_file_name(pattern_));
+    if (expected_file_names().size() > max_history_)
+    {
+        unexpected_file_names().push_back(expected_file_names().front());
+        expected_file_names().pop_front();
+    }
+    EXPECT_PRED1(chucho::file::exists, TOP_LEVEL_DIR + active_);
+    for (auto f : expected_file_names())
+        EXPECT_PRED1(chucho::file::exists, f);
+    for (auto f : unexpected_file_names())
+        EXPECT_PRED1(file_doesnt_exist, f);
+    next() += until_next_;
+}
+
+minute_test::minute_test()
+    : date_only_test("minute/test-%d{%H-%M}",
+                     2,
+                     std::chrono::minutes(5),
+                     std::chrono::seconds(61))
+{
 }
 
 active_minute_test::active_minute_test()
-    : test("active-minute/active", "active-minute/test-%d{%H-%M}", 2, std::chrono::minutes(5))
+    : fixed_active_test("active-minute/active",
+                        "active-minute/test-%d{%H-%M}",
+                        2,
+                        std::chrono::minutes(5),
+                        std::chrono::seconds(62))
 {
-    next() += std::chrono::seconds(63);
-}
-
-void active_minute_test::check_impl()
-{
-    expected_file_names().push_back(format_file_name("active-minute/test-%H-%M"));
-    if (expected_file_names().size() > 2)
-    {
-        unexpected_file_names().push_back(expected_file_names().front());
-        expected_file_names().pop_front();
-    }
-    EXPECT_PRED1(chucho::file::exists, TOP_LEVEL_DIR + "active-minute/active");
-    for (auto f : expected_file_names())
-        EXPECT_PRED1(chucho::file::exists, f);
-    for (auto f : unexpected_file_names())
-        EXPECT_PRED1(file_doesnt_exist, f);
-    next() += std::chrono::seconds(61);
 }
 
 void run(std::shared_ptr<test> tst)
