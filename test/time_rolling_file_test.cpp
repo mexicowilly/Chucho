@@ -102,6 +102,18 @@ public:
     active_minute_test();
 };
 
+class hour_test : public date_only_test
+{
+public:
+    hour_test();
+};
+
+class active_hour_test : public fixed_active_test
+{
+public:
+    active_hour_test();
+};
+
 std::string test::TOP_LEVEL_DIR("time_rolling_file_test/");
 
 template <typename duration_type>
@@ -283,6 +295,23 @@ active_minute_test::active_minute_test()
 {
 }
 
+hour_test::hour_test()
+    : date_only_test("hour/test-%d{%d-%H}",
+                     2,
+                     std::chrono::hours(5),
+                     std::chrono::minutes(61))
+{
+}
+
+active_hour_test::active_hour_test()
+    : fixed_active_test("active-hour/active",
+                        "active-hour/test-%d{%d-%H}",
+                        2,
+                        std::chrono::hours(5),
+                        std::chrono::minutes(62))
+{
+}
+
 void run(std::shared_ptr<test> tst)
 {
     while (std::chrono::system_clock::now() < tst->end())
@@ -300,7 +329,9 @@ TEST(time_rolling_file_test, all)
     std::vector<std::shared_ptr<std::thread>> threads =
     {
         std::make_shared<std::thread>(run, std::make_shared<minute_test>()),
-        std::make_shared<std::thread>(run, std::make_shared<active_minute_test>())
+        std::make_shared<std::thread>(run, std::make_shared<active_minute_test>()),
+        std::make_shared<std::thread>(run, std::make_shared<hour_test>()),
+        std::make_shared<std::thread>(run, std::make_shared<active_hour_test>())
     };
     for (auto thrd : threads)
         thrd->join();

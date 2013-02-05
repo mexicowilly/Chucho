@@ -19,6 +19,8 @@ public:
     const optional<unsigned long long>& get_max_size() const;
 
 private:
+    void parse(const std::string& spec);
+
     optional<unsigned long long> max_size_;
 };
 
