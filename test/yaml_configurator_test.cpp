@@ -208,7 +208,8 @@ TEST_F(yaml_configurator, size_file_roll_trigger)
         "",
         "Willy",
         "5000x",
-        "5000gx"
+        "5000gx",
+        "5000gbx"
     };
     for (auto item : bad)
     {
