@@ -368,7 +368,6 @@ std::string pattern_formatter::date_time_piece::get_text_impl(const event& evt) 
                 pat.replace(p, 2, "");
         }
     }
-    std::array<char, 4096> buf;
     struct std::tm cal;
     to_calendar(millis.count() / 1000, cal);
     std::ostringstream stream;

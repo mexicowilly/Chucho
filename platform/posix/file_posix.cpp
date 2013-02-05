@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <fts.h>
+#include <stdlib.h>
 
 namespace chucho
 {
