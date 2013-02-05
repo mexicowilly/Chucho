@@ -31,12 +31,11 @@ void size_file_roll_trigger_memento::parse(const std::string& spec)
                        std::back_inserter(lower),
                        [&] (char c) { return std::tolower(c, c_loc); });
         if (lower.length() > 2 ||
-            (lower.length() == 1 && lower[0] != 'b') ||
             (lower.length() == 2 && lower[1] != 'b') ||
             (lower.length() == 2 && lower[0] == 'b') ||
             (std::string("bkmg").find(lower[0]) == std::string::npos))
         {
-            throw exception(get_status_origin() + ": The suffix '" + suffix + " is invalid (case-insensitive b, k[b], m[b], g[b])");
+            throw exception(get_status_origin() + ": The suffix '" + suffix + "' is invalid (case-insensitive b, k[b], m[b], g[b])");
         }
         switch (lower[0])
         {

@@ -190,6 +190,78 @@ TEST_F(yaml_configurator, rolling_file_writer)
     EXPECT_EQ(5000, strg->get_max_size());
 }
 
+TEST_F(yaml_configurator, size_file_roll_trigger)
+{
+    std::string tmpl("chucho::logger:\n"
+                     "    name: will\n"
+                     "    chucho::rolling_file_writer:\n"
+                     "        chucho::pattern_formatter:\n"
+                     "            pattern: '%m%n'\n"
+                     "        chucho::numbered_file_roller:\n"
+                     "            max_index: 1\n"
+                     "        chucho::size_file_roll_trigger:\n"
+                     "            max_size: SIZE\n"
+                     "        file_name: what.log\n");
+    std::size_t pos = tmpl.find("SIZE");
+    std::vector<std::string> bad =
+    {
+        "",
+        "Willy",
+        "5000x",
+        "5000gx"
+    };
+    for (auto item : bad)
+    {
+        chucho::logger::remove_unused_loggers();
+        chucho::status_manager::get()->clear();
+        std::string rep = tmpl;
+        rep.replace(pos, 4, item);
+        configure(rep.c_str());
+        EXPECT_EQ(chucho::status::level::ERROR, chucho::status_manager::get()->get_level());
+    }
+    chucho::status_manager::get()->clear();
+    std::map<std::string, unsigned long long> good =
+    {
+        { "5000", 5000 },
+        { "5001b", 5001 },
+        { "2k", 1024 * 2 },
+        { "3kb", 1024 * 3 },
+        { "4K", 1024 * 4 },
+        { "5Kb", 1024 * 5 },
+        { "6kB", 1024 * 6 },
+        { "7KB", 1024 * 7 },
+        { "2m", 1024 * 1024 * 2 },
+        { "3mb", 1024 * 1024 * 3 },
+        { "4M", 1024 * 1024 * 4 },
+        { "5Mb", 1024 * 1024 * 5 },
+        { "6mB", 1024 * 1024 * 6 },
+        { "7MB", 1024 * 1024 * 7 },
+        { "2g", 1024ULL * 1024ULL * 1024ULL * 2ULL },
+        { "3gb", 1024ULL * 1024ULL * 1024ULL * 3ULL },
+        { "4G", 1024ULL * 1024ULL * 1024ULL * 4ULL },
+        { "5Gb", 1024ULL * 1024ULL * 1024ULL * 5ULL },
+        { "6gB", 1024ULL * 1024ULL * 1024ULL * 6ULL },
+        { "7GB", 1024ULL * 1024ULL * 1024ULL * 7ULL }
+    };
+    for (auto item : good)
+    {
+        chucho::logger::remove_unused_loggers();
+        std::string rep = tmpl;
+        rep.replace(pos, 4, item.first);
+        configure(rep.c_str());
+        auto wrts = chucho::logger::get("will")->get_writers();
+        ASSERT_EQ(1, wrts.size());
+        ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
+        auto fwrt = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
+        ASSERT_TRUE(static_cast<bool>(fwrt));
+        auto trg = fwrt->get_file_roll_trigger();
+        ASSERT_EQ(typeid(chucho::size_file_roll_trigger), typeid(*trg));
+        auto strg = std::static_pointer_cast<chucho::size_file_roll_trigger>(trg);
+        ASSERT_TRUE(static_cast<bool>(strg));
+        EXPECT_EQ(item.second, strg->get_max_size());
+    }
+}
+
 TEST_F(yaml_configurator, time_file_roller)
 {
     configure("chucho::logger:\n"
