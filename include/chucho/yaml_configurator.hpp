@@ -13,7 +13,7 @@ namespace chucho
 
 class memento;
 
-class yaml_configurator : public configurator
+class CHUCHO_EXPORT yaml_configurator : public configurator
 {
 public:
     yaml_configurator();
