@@ -161,9 +161,11 @@ ELSE(CHUCHO_WINDOWS)
                              COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/libgtest.a <INSTALL_DIR>/lib
                              COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/libgtest_main.a <INSTALL_DIR>/lib
                              DEPENDEES install-headers)
+    ADD_LIBRARY(gtest STATIC IMPORTED)
+    SET_TARGET_PROPERTIES(gtest
+                          PROPERTIES
+                          IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/libgtest.a")
 ENDIF()
-SET(CHUCHO_GTEST_LIB "gtest")
-SET(CHUCHO_GTEST_MAIN_LIB "gtest_main")
 ADD_DEPENDENCIES(external gtest-external)
 
 # yaml-cpp
@@ -178,6 +180,10 @@ ExternalProject_Add(yaml-cpp-external
                     URL_MD5 9aa519205a543f9372bf4179071c8ac6
                     CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}" -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
 					CMAKE_GENERATOR ${CHUCHO_YAML_CPP_GENERATOR})
+ADD_LIBRARY(yaml-cpp STATIC IMPORTED)
+SET_TARGET_PROPERTIES(yaml-cpp
+                      PROPERTIES
+                      IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/libyaml-cpp.a")
 ADD_DEPENDENCIES(external yaml-cpp-external)
 
 # utf8-cpp

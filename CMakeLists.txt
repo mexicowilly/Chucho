@@ -4,7 +4,6 @@ PROJECT(chuhco CXX)
 INCLUDE(Configure.cmake)
 
 INCLUDE_DIRECTORIES(include "${CHUCHO_EXTERNAL_PREFIX}/include")
-LINK_DIRECTORIES("${CHUCHO_EXTERNAL_PREFIX}/lib")
 
 SET(CHUCHO_VERSION 1.1)
 SET(CHUCHO_SOVERSION 1)
@@ -155,10 +154,15 @@ IF(ENABLE_SHARED)
                           VERSION ${CHUCHO_VERSION}
                           SOVERSION ${CHUCHO_SOVERSION}
                           PUBLIC_HEADER ${CHUCHO_PUBLIC_HEADERS})
+    IF(CMAKE_GENERATOR STREQUAL Xcode AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+        SET_TARGET_PROPERTIES(chucho-shared PROPERTIES
+                              LINK_FLAGS "-std=c++11 -stdlib=libc++")
+    ENDIF()
     ADD_DEPENDENCIES(chucho chucho-shared)
     INSTALL(TARGETS chucho-shared
             LIBRARY DESTINATION lib
             RUNTIME DESTINATION lib
+            FRAMEWORK DESTINATION placeholder
             PUBLIC_HEADER DESTINATION include/chucho)
 ENDIF()
 IF(ENABLE_STATIC)
