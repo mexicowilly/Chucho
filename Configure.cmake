@@ -121,7 +121,7 @@ IF(CHUCHO_POSIX)
 ENDIF()
 
 # doxygen
-FIND_PROGRAM(CHUCHO_DOXYGEN doxygen)
+FIND_PACKAGE(Doxygen)
 
 #
 # External projects

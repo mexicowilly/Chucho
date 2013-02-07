@@ -53,7 +53,7 @@ public:
     /**
      * @name Constructor
      */
-//@{
+    //@{
     /**
      * Construct a status event.
      * 
@@ -67,7 +67,7 @@ public:
            const std::string& message,
            const std::string& origin,
            std::exception_ptr ex = std::exception_ptr());
-//@}
+    //@}
 
     /**
      * Return the exception associated with this status.
