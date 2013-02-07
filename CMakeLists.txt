@@ -153,7 +153,7 @@ IF(ENABLE_SHARED)
                           FRAMEWORK TRUE
                           VERSION ${CHUCHO_VERSION}
                           SOVERSION ${CHUCHO_SOVERSION}
-                          PUBLIC_HEADER ${CHUCHO_PUBLIC_HEADERS})
+                          PUBLIC_HEADER "${CHUCHO_PUBLIC_HEADERS}")
     IF(CMAKE_GENERATOR STREQUAL Xcode AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         SET_TARGET_PROPERTIES(chucho-shared PROPERTIES
                               LINK_FLAGS "-std=c++11 -stdlib=libc++")
