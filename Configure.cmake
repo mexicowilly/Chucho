@@ -120,6 +120,9 @@ IF(CHUCHO_POSIX)
     ENDIF()
 ENDIF()
 
+# doxygen
+FIND_PROGRAM(CHUCHO_DOXYGEN doxygen)
+
 #
 # External projects
 #
