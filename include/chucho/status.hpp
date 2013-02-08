@@ -10,12 +10,20 @@
 namespace chucho
 {
 
+/**
+ * @defgroup status 
+ * Classes that facilitate the status reporting system of 
+ * chucho. 
+ */
+
 /** 
  * @class status status.hpp chucho/status.hpp 
  *
  * Chucho reports what is happening internally using status 
  * messages. These can be monitored by querying the 
  * status_manager or by installing a custom status_observer. 
+ *  
+ * @ingroup status 
  */
 class CHUCHO_EXPORT status
 {

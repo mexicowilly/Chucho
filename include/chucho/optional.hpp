@@ -7,21 +7,96 @@
 namespace chucho
 {
 
+/**
+ * @class optional optional.hpp chucho/optional.hpp
+ * An object that might or might not be there. This is used as a
+ * helper during configuration of chucho. 
+ */
 template <typename type>
 class CHUCHO_EXPORT optional
 {
 public:
+    /**
+     * @name Constructors and destructor
+     */
+    //@{
+    /**
+     * Make an optional that doesn't have an object.
+     */
     optional();
+    /**
+     * Copy an object into a new optional.
+     * 
+     * @param val the object to copy
+     */
     optional(const type& val);
+    /**
+     * Copy an optional object.
+     * 
+     * @param opt the optional to copy
+     */
     optional(const optional<type>& opt);
+    /**
+     * Destroy an optional object.
+     */
     ~optional();
+    //@}
 
+    /**
+     * Copy an object into this optional.
+     * 
+     * @param val the value to copy
+     * @return this optional
+     */
     optional& operator= (const type& val);
+    /**
+     * Copy an optional object.
+     * 
+     * @param opt the optional to copy
+     * @return this optional
+     */
     optional& operator= (const optional<type>& opt);
+    /**
+     * Return whether this optional exists or not. If there is an 
+     * object lurking inside this optional, then this method returns 
+     * true. 
+     * 
+     * @return true if there is an object here
+     */
     operator bool () const;
+    /**
+     * Return a reference to the underlying object.
+     * 
+     * @note The result is undefined if this optional does not
+     *       actually have an object in it.
+     * @return a reference to the optional object
+     */
     type& operator* ();
+    /**
+     * Return a reference to the underlying object.
+     * 
+     * @note The result is undefined if this optional does not
+     *       actually have an object in it.
+     * @return a reference to the optional object
+     */
     const type& operator* () const;
+    /**
+     * Return a pointer to the underlying object. You do not own 
+     * this pointer. 
+     * 
+     * @note The result is undefined if this optional does not
+     *       actually have an object in it.
+     * @return a reference to the optional object
+     */
     type* operator-> ();
+    /**
+     * Return a pointer to the underlying object. You do not own 
+     * this pointer. 
+     * 
+     * @note The result is undefined if this optional does not
+     *       actually have an object in it.
+     * @return a reference to the optional object
+     */
     const type* operator-> () const;
 
 private:

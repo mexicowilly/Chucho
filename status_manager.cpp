@@ -26,15 +26,15 @@ void status_manager::add(const status& st)
 {
     std::unique_lock<std::mutex> ul(cache_guard_);
     count_++;
-    if (fixed_cache_.size() < FIXED_CACHE_MAX)
+    if (head_cache_.size() < HEAD_CACHE_MAX)
     {
-        fixed_cache_.push_back(st);
+        head_cache_.push_back(st);
     }
     else
     {
-        tailed_cache_.push_back(st);
-        if (tailed_cache_.size() > TAILED_CACHE_MAX)
-            tailed_cache_.pop_front();
+        tail_cache_.push_back(st);
+        if (tail_cache_.size() > TAIL_CACHE_MAX)
+            tail_cache_.pop_front();
     }
     adjust_level();
     ul.unlock();
@@ -51,15 +51,15 @@ void status_manager::add(std::shared_ptr<status_observer> obs)
 
 void status_manager::adjust_level()
 {
-    status::level fixed_max = fixed_cache_.empty() ?
+    status::level fixed_max = head_cache_.empty() ?
         status::level::INFO :
-        (*std::max_element(fixed_cache_.begin(),
-                           fixed_cache_.end(),
+        (*std::max_element(head_cache_.begin(),
+                           head_cache_.end(),
                            level_less())).get_level();
-    status::level tailed_max = tailed_cache_.empty() ?
+    status::level tailed_max = tail_cache_.empty() ?
         status::level::INFO :
-        (*std::max_element(tailed_cache_.begin(),
-                           tailed_cache_.end(),
+        (*std::max_element(tail_cache_.begin(),
+                           tail_cache_.end(),
                            level_less())).get_level();
     level_ = std::max(fixed_max, tailed_max);
 }
@@ -68,14 +68,14 @@ void status_manager::clear()
 {
     std::lock_guard<std::mutex> lg(cache_guard_);
     count_ = 0;
-    fixed_cache_.clear();
-    tailed_cache_.clear();
+    head_cache_.clear();
+    tail_cache_.clear();
     level_ = status::level::INFO;
 }
 
 std::shared_ptr<status_manager> status_manager::get()
 {
-    static std::shared_ptr<chucho::status_manager> smgr(std::make_shared<chucho::status_manager>());
+    static std::shared_ptr<status_manager> smgr(new status_manager());
 
     return smgr;
 }
@@ -83,8 +83,8 @@ std::shared_ptr<status_manager> status_manager::get()
 std::vector<status> status_manager::get_all()
 {
     std::lock_guard<std::mutex> lg(cache_guard_);
-    std::vector<status> result(fixed_cache_);
-    result.insert(result.end(), tailed_cache_.begin(), tailed_cache_.end());
+    std::vector<status> result(head_cache_);
+    result.insert(result.end(), tail_cache_.begin(), tail_cache_.end());
     return result;
 }
 

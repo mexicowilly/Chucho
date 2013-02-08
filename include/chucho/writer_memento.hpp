@@ -9,12 +9,37 @@
 namespace chucho
 {
 
+/**
+ * @class writer_memento writer_memento.hpp chucho/writer_memento.hpp
+ * A @ref memento that has common functionality for writers. All 
+ * writers share the need for a @ref formatter and optional @ref 
+ * filters. 
+ *  
+ * @ingroup configuration 
+ */
 class CHUCHO_EXPORT writer_memento : public memento
 {
 public:
+    /**
+     * Construct a writer_memento.
+     * 
+     * @param cfg the configurator that is perform configuration
+     */
     writer_memento(const configurator& cfg);
 
+    /**
+     * Return the filters that have been discovered during 
+     * configuration time. 
+     * 
+     * @return the filters
+     */
     const std::vector<std::shared_ptr<filter>>& get_filters() const;
+    /**
+     * Return the formatter that has been discovered during 
+     * configuration time. 
+     * 
+     * @return the formatter
+     */
     std::shared_ptr<formatter> get_formatter() const;
     virtual void handle(std::shared_ptr<configurable> cnf) override;
 

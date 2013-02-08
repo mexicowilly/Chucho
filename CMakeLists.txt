@@ -40,6 +40,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/marker.hpp
     include/chucho/memento.hpp
     include/chucho/numbered_file_roller.hpp
+	include/chucho/optional.hpp
     include/chucho/pattern_formatter.hpp
     include/chucho/rolling_file_writer.hpp
     include/chucho/size_file_roll_trigger.hpp

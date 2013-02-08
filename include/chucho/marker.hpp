@@ -10,24 +10,107 @@
 namespace chucho
 {
 
+/**
+ * @class marker marker.hpp chucho/marker.hpp
+ * A marker for customizing log messages. A marker is a 
+ * hierarchical tag that one can place in a log message. Its 
+ * sole attribute is its name. These can be used for 
+ * differentiating log messages that originate from the same 
+ * location, or for any other situation where distinguishing log 
+ * messages is important. 
+ */
 class CHUCHO_EXPORT marker
 {
 public:
+    /**
+     * An iterator for traversing the marker hierarchy.
+     */
     typedef std::set<std::shared_ptr<marker>, std::owner_less<std::shared_ptr<marker>>>::iterator iterator;
+    /**
+     * An iterator for traversing the marker hierarchy.
+     */
     typedef std::set<std::shared_ptr<marker>, std::owner_less<std::shared_ptr<marker>>>::const_iterator const_iterator;
 
+    /**
+     * @name Constructor
+     */
+    //@{
+    /**
+     * Construct a marker.
+     * 
+     * @param name the name of the marker
+     */
     marker(const std::string& name);
+    //@}
 
+    /**
+     * Is this marker equal to another one? The comparison is by 
+     * name only, not by any children of this marker. 
+     *
+     * @param mark the other marker
+     * @return true if the two markers are equal
+     */
     bool operator== (const marker& mark) const;
+    /**
+     * Is this marker less than another one? The comparison is by 
+     * name only, not by any children of this marker. 
+     *
+     * @param mark the other marker
+     * @return true if this marker is less than the other one
+     */
     bool operator< (const marker& mark) const;
 
+    /**
+     * Return the beginning. The first in the collection of children
+     * is returned.
+     *
+     * @return the first child marker
+     */
     iterator begin();
+    /**
+     * Return the beginning. The first in the collection of children
+     * is returned.
+     *
+     * @return the first child marker
+     */
     const_iterator begin() const;
+    /**
+     * Does this marker have any children?
+     *
+     * @return true if there are no children
+     */
     bool empty() const;
+    /**
+     * Return the end. The returned iterator does not point to a 
+     * marker.
+     *
+     * @return the first child marker
+     */
     iterator end();
+    /**
+     * Return the end. The returned iterator does not point to a 
+     * marker.
+     *
+     * @return the first child marker
+     */
     const_iterator end() const;
+    /**
+     * Remove a child.
+     * 
+     * @param mark the marker to remove
+     */
     void erase(iterator mark);
+    /**
+     * Return the name of this marker.
+     * 
+     * @return the name
+     */
     const std::string& get_name() const;
+    /**
+     * Add a child.
+     * 
+     * @param mark the child to add
+     */
     void insert(const std::shared_ptr<marker> mark);
 
 private:
