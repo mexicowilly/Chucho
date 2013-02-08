@@ -6,10 +6,26 @@
 namespace chucho
 {
 
+/**
+ * @class cerr_writer cerr_writer.hpp chucho/cerr_writer.hpp 
+ * A @ref console_writer that writes to std::cerr. 
+ * 
+ * @ingroup writers
+ */
 class CHUCHO_EXPORT cerr_writer : public console_writer
 {
 public:
+    /**
+     * @name Constructor
+     */
+    //@{
+    /**
+     * Construct a cerr_writer.
+     * 
+     * @param fmt the formatter
+     */
     cerr_writer(std::shared_ptr<formatter> fmt);
+    //@}
 };
 
 }

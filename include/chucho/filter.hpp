@@ -9,6 +9,12 @@ namespace chucho
 {
 
 /**
+ * @defgroup filters 
+ * Filters are attached to @ref writers, and they can be used to 
+ * refine log filtering beyond the basic level check. 
+ */
+
+/**
  * @class filter filter.hpp chucho/filter.hpp 
  * Conditionally filter an event. A writer may have a set of 
  * filters that provide finer-grained control of log output. 
@@ -16,6 +22,8 @@ namespace chucho
  * @ref NEUTRAL, or @ref ACCEPT. If the evaluation of all of a 
  * writer's filters results in @ref NEUTRAL or @ref ACCEPT, then 
  * the event is allowed to be written. 
+ *  
+ * @ingroup filters 
  */
 class CHUCHO_EXPORT filter : public status_reporter,
                              public configurable

@@ -11,6 +11,11 @@ namespace chucho
 {
 
 /**
+ * @defgroup writers 
+ * Writers write log events to destinations. 
+ */
+
+/**
  * @class writer writer.hpp chucho/writer.hpp
  * A writer writes events to whatever destination it is designed 
  * to use. A @ref logger can have as many writers attached to it
@@ -18,6 +23,8 @@ namespace chucho
  * filtering events, as each writer has a collection of 
  * @ref filter "filters". The filters are visited in the order 
  * in which they are added.
+ *  
+ * @ingroup writers 
  */
 class CHUCHO_EXPORT writer : public status_reporter,
                              public configurable
