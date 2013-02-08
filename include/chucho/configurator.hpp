@@ -68,7 +68,7 @@ protected:
      * The @ref configuration::perform() method must be able to call 
      * some protected and private members of this class. 
      */
-    friend CHUCHO_NO_EXPORT void configuration::perform();
+    friend CHUCHO_EXPORT void configuration::perform();
 
     /**
      * Return all known factories. Subclasses will call this method 
