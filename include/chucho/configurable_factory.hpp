@@ -18,6 +18,8 @@ namespace chucho
  * it. The factory will be asked to create first the memento and
  * then the configurable object itself using the memento as 
  * input. 
+ *  
+ * @ingroup configuration 
  */
 class CHUCHO_EXPORT configurable_factory : public status_reporter
 {

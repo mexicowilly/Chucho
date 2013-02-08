@@ -23,7 +23,8 @@ class configurable_factory;
  * information at hand about the configuration file, or lack 
  * thereof. 
  *  
- * @sa configuration 
+ * @ingroup configuration
+ * @sa @ref configuration 
  */
 class CHUCHO_EXPORT configurator : public status_reporter
 {

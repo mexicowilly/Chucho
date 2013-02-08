@@ -7,6 +7,7 @@ namespace chucho
 {
 
 /**
+ * @class configurable configurable.hpp chucho/configurable.hpp 
  * Indicates configurability of an object. A class that inherits 
  * from configurable can be configured via a chucho 
  * configuration file. Such a class will have a corresponding 
@@ -17,6 +18,8 @@ namespace chucho
  * @ref configurator::add_configurable_factory() method. For the 
  * factories associated with built-in chucho classes, this is 
  * handled automatically. 
+ *  
+ * @ingroup configuration 
  */
 class CHUCHO_EXPORT configurable
 {
