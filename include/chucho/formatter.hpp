@@ -10,7 +10,7 @@ namespace chucho
 {
 
 /**
- * @class formatter.hpp chucho/formatter.hpp
+ * @class formatter formatter.hpp chucho/formatter.hpp
  * Format an event. A formatter is responsible for turning a log 
  * event into a piece of text. Each @ref writer will have one 
  * formatter associated with it. 

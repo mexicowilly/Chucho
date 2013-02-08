@@ -6,7 +6,7 @@ INCLUDE(Configure.cmake)
 INCLUDE_DIRECTORIES(include "${CHUCHO_EXTERNAL_PREFIX}/include")
 
 SET(CHUCHO_VERSION 1.1)
-SET(CHUCHO_SOVERSION 1)
+SET(CHUCHO_SO_VERSION 1)
 
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
@@ -22,6 +22,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/configurable.hpp
     include/chucho/configurable_factory.hpp
     include/chucho/configuration.hpp
+    include/chucho/configurator.hpp
     include/chucho/console_writer.hpp
     include/chucho/cout_writer.hpp
     include/chucho/diagnostic_context.hpp
@@ -153,7 +154,7 @@ IF(ENABLE_SHARED)
                           COMPILE_FLAGS "${CHUCHO_CXX_SO_FLAGS}"
                           FRAMEWORK TRUE
                           VERSION ${CHUCHO_VERSION}
-                          SOVERSION ${CHUCHO_SOVERSION}
+                          SOVERSION ${CHUCHO_SO_VERSION}
                           PUBLIC_HEADER "${CHUCHO_PUBLIC_HEADERS}")
     IF(CMAKE_GENERATOR STREQUAL Xcode AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         SET_TARGET_PROPERTIES(chucho-shared PROPERTIES

@@ -12,12 +12,37 @@ namespace chucho
 class logger;
 class marker;
 
+/**
+ * @class event event.hpp chucho/event.hpp
+ * A log event. You don't need to worry about this. It is used 
+ * internally, but required by classes that have a public 
+ * interface. 
+ */
 class CHUCHO_EXPORT event
 {
 public:
+    /**
+     * The type of clock used by event.
+     */
     typedef std::chrono::system_clock clock_type;
+    /**
+     * The type of time_point used by event.
+     */
     typedef std::chrono::time_point<clock_type> time_type;
 
+    /**
+     * Construct an event.
+     * 
+     * @param lgr the logger
+     * @param lvl the level
+     * @param msg the message, which has already been formatted
+     * @param file_name the file name of in which the event occurred 
+     * @param line_number the line number in which the event 
+     *                    occurred
+     * @param function_name the function name in which the event 
+     *                      occured
+     * @param mark the marker associated with the event
+     */
     event(std::shared_ptr<logger> lgr,
           std::shared_ptr<level> lvl,
           const std::string& msg,
@@ -25,6 +50,19 @@ public:
           unsigned line_number,
           const char* const function_name,
           std::shared_ptr<marker> mark = std::shared_ptr<marker>());
+    /**
+     * Construct an event.
+     * 
+     * @param lgr the logger
+     * @param lvl the level
+     * @param msg the message, which has already been formatted
+     * @param file_name the file name of in which the event occurred 
+     * @param line_number the line number in which the event 
+     *                    occurred
+     * @param function_name the function name in which the event 
+     *                      occured
+     * @param mark the marker associated with the event
+     */
     event(std::shared_ptr<logger> lgr,
           std::shared_ptr<level> lvl,
           const std::string& msg,
@@ -33,14 +71,53 @@ public:
           const char* const function_name,
           const std::string& mark);
 
-
+    /**
+     * Return the file name.
+     * 
+     * @return the file name
+     */
     const char* get_file_name() const;
+    /**
+     * Return the function name.
+     * 
+     * @return the function name
+     */
     const char* get_function_name() const;
+    /**
+     * Return the level.
+     * 
+     * @return the level
+     */
     std::shared_ptr<level> get_level() const;
+    /**
+     * Return the marker.
+     * 
+     * @return the marker
+     */
     std::shared_ptr<marker> get_marker() const;
+    /**
+     * Return the line number.
+     * 
+     * @return the line number
+     */
     unsigned get_line_number() const;
+    /**
+     * Return the logger.
+     * 
+     * @return the logger
+     */
     std::shared_ptr<logger> get_logger() const;
+    /**
+     * Return the message.
+     * 
+     * @return the message
+     */
     const std::string& get_message() const;
+    /**
+     * Return the time that the event was created.
+     * 
+     * @return the time
+     */
     const time_type& get_time() const;
 
 private:

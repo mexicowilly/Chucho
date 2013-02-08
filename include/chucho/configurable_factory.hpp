@@ -10,13 +10,46 @@
 namespace chucho
 {
 
+/**
+ * @class configurable_factory configurable_factory.hpp chucho/configurable_factory.hpp 
+ * A factory for configurable classes. Each class that expects 
+ * to be instantiated during configuration time must have both a
+ * @ref configurable_factory and a @ref memento associated with 
+ * it. The factory will be asked to create first the memento and
+ * then the configurable object itself using the memento as 
+ * input. 
+ */
 class CHUCHO_EXPORT configurable_factory : public status_reporter
 {
 public:
+    /**
+     * Construct a configurable_factory.
+     */
     configurable_factory();
+    /**
+     * Destroy a configurable_factory.
+     */
     virtual ~configurable_factory();
 
+    /**
+     * Create an instance of a @ref configurable. The 
+     * @ref configurable to which this factory corresponds is 
+     * created using the memento that was previously created by this
+     * factory. 
+     * 
+     * @param mnto the memento
+     * @return the configurable
+     */
     virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) = 0;
+    /**
+     * Create an instance of a memento. The memento is used by the 
+     * @ref configurator to gather enough information to create the 
+     * @ref configurable after enough information about the @ref 
+     * configurable has been gathered at configuration time.
+     * 
+     * @param cfg the configurator currently in action
+     * @return the memento
+     */
     virtual std::shared_ptr<memento> create_memento(const configurator& cfg) = 0;
 };
 
