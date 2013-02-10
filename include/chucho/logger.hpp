@@ -99,6 +99,8 @@ public:
     * writes from this logger. 
     * 
     * @param wrt the writer
+    * @throw std::invalid_argument if wrt is an uninitialized 
+    *        std::shared_ptr
     */
     void add_writer(std::shared_ptr<writer> wrt);
    /**
@@ -201,7 +203,7 @@ inline const std::string& logger::get_name() const
 
 inline bool logger::permits(std::shared_ptr<level> lvl) const
 {
-    return *lvl <= *get_effective_level();
+    return *lvl >= *get_effective_level();
 }
 
 inline void logger::set_writes_to_ancestors(bool val)

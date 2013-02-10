@@ -16,6 +16,8 @@ class file_writer;
  * rolling_file_writer and serves as the writer's strategy for 
  * rolling files. The @ref file_roll_trigger determines when a 
  * roll happens, while a file_roller determines how.
+ *  
+ * @ingroup rolling 
  */
 class CHUCHO_EXPORT file_roller : public virtual status_reporter,
                                   public virtual configurable

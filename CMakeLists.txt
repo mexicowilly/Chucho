@@ -27,6 +27,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/cout_writer.hpp
     include/chucho/diagnostic_context.hpp
     include/chucho/event.hpp
+    include/chucho/exception.hpp
     include/chucho/export.hpp
     include/chucho/file_roller.hpp
     include/chucho/file_roll_trigger.hpp

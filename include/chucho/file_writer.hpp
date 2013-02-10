@@ -44,6 +44,8 @@ public:
      * @param start action to take at the start
      * @param flush whether to flush the file stream after each 
      *              event is written
+     * @throw std::invalid_argument if fmt is an uninitialized 
+     *        std::shared_ptr
      */
     file_writer(std::shared_ptr<formatter> fmt,
                 const std::string& file_name,
@@ -98,6 +100,8 @@ protected:
      * @param start action to take at the start
      * @param flush whether to flush the file stream after each
      *              event is written
+     * @throw std::invalid_argument if fmt is an uninitialized 
+     *        std::shared_ptr
      */
     file_writer(std::shared_ptr<formatter> fmt,
                 on_start start,

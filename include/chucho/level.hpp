@@ -27,10 +27,11 @@ extern CHUCHO_EXPORT std::shared_ptr<level> OFF_LEVEL;
  * @class level level.hpp chucho/level.hpp
  * An event level. Levels allow the fundamental event filtration 
  * mechanism to occur. A @ref logger permits a certain level 
- * only if the level's value is less than or equal to the 
+ * only if the level's value is greater than or equal to the 
  * effective level of the logger. The values of the predefined 
  * levels are as follows. 
  * <table> 
+ *     <tr><th>Level</th><th>Value</th></tr>
  *     <tr><td>TRACE</td><td>0</td></tr>
  *     <tr><td>DEBUG</td><td>10000</td></tr>
  *     <tr><td>INFO</td><td>20000</td></tr>

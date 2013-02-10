@@ -18,10 +18,11 @@ namespace chucho
  * @class filter filter.hpp chucho/filter.hpp 
  * Conditionally filter an event. A writer may have a set of 
  * filters that provide finer-grained control of log output. 
- * Filter evaluation results in one of three values @ref DENY, 
- * @ref NEUTRAL, or @ref ACCEPT. If the evaluation of all of a 
- * writer's filters results in @ref NEUTRAL or @ref ACCEPT, then 
- * the event is allowed to be written. 
+ * Filter evaluation results in one of three values @ref result
+ * "DENY", @ref result "NEUTRAL", or @ref result "ACCEPT". If 
+ * the evaluation of all of a writer's filters results in @ref 
+ * result "NEUTRAL" or @ref result "ACCEPT", then the event is 
+ * allowed to be written. 
  *  
  * @ingroup filters 
  */

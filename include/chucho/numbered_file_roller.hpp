@@ -11,6 +11,8 @@ namespace chucho
  * A @ref file_roller that numbers the rolled files. This roller 
  * can be used to created sequences of numbered files, like 
  * my.log, my.log.1, my.log.2, etc.... 
+ *  
+ * @ingroup rolling 
  */
 class CHUCHO_EXPORT numbered_file_roller : public file_roller
 {

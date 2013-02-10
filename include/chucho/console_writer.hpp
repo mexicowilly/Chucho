@@ -31,6 +31,8 @@ protected:
      * @param fmt the formatter
      * @param stream the stream, which should be either std::cout or 
      *               std::cerr
+     * @throw std::invalid_argument if fmt is an uninitialized 
+     *        std::shared_ptr
      */
     console_writer(std::shared_ptr<formatter> fmt,
                    std::ostream& stream);

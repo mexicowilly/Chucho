@@ -1,6 +1,6 @@
 #include <chucho/level_threshold_filter.hpp>
 #include <chucho/logger.hpp>
-#include <chucho/exception.hpp>
+#include <stdexcept>
 
 namespace chucho
 {
@@ -10,12 +10,12 @@ level_threshold_filter::level_threshold_filter(std::shared_ptr<level> lvl)
 {
     set_status_origin("level_threshold_filter");
     if (!level_)
-        throw exception("The level is invalid");
+        throw std::invalid_argument("The level is invalid");
 }
 
 filter::result level_threshold_filter::evaluate(const event& evt)
 {
-    return (!level_ || *evt.get_level() > *level_) ?
+    return (!level_ || *evt.get_level() >= *level_) ?
         result::NEUTRAL : result::DENY;
 }
 

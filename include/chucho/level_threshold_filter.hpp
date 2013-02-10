@@ -14,7 +14,7 @@ namespace chucho
  * is determining whether an event is filtered or not is 
  * performed by this filter. This allows further refinement. A 
  * @ref logger can have one @ref writer filtering at one @ref 
- * @ref level and another @ref writer filtering at another @ref 
+ * level and another @ref writer filtering at another @ref 
  * level.
  * 
  * @ingroup filters
@@ -30,6 +30,8 @@ public:
      * Construct a level_threshold_filter.
      * 
      * @param lvl the log level at which to filter
+     * @throw std::invalid_argument if the level is an uninitialized 
+     *        std::shared_ptr
      */
     level_threshold_filter(std::shared_ptr<level> lvl);
     //@}

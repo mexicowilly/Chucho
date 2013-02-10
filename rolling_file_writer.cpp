@@ -1,5 +1,5 @@
 #include <chucho/rolling_file_writer.hpp>
-#include <chucho/file_exception.hpp>
+#include <stdexcept>
 
 namespace chucho
 {
@@ -56,11 +56,13 @@ rolling_file_writer::rolling_file_writer(std::shared_ptr<formatter> fmt,
 
 void rolling_file_writer::init()
 {
+    if (!roller_)
+        throw std::invalid_argument("The file_roller cannot be an unintialized std::shared_ptr");
     set_status_origin("rolling_file_writer");
     if (!trigger_)
         trigger_ = std::dynamic_pointer_cast<file_roll_trigger>(roller_);
     if (!trigger_)
-        throw file_exception("The rolling_file_writer has no file_roll_trigger");
+        throw std::invalid_argument("The rolling_file_writer has no file_roll_trigger");
     roller_->set_file_writer(*this);
 }
 

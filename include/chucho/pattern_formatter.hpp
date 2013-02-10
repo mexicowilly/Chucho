@@ -52,11 +52,12 @@ namespace chucho
  *     <tr><td>c</td>
  *         <td>The name of the @ref logger that is writing this
  *         event.</td></tr>
- *     <tr><td>C{<key>}</td>
+ *     <tr><td>C{&lt;key&gt;}</td>
  *         <td>The key from this thread's @ref
  *         diagnostic_context is looked up, and its value is
- *         placed into the log message.</td></tr>
- *     <tr><td>d{<spec>}</td>
+ *         placed into the log message. The key
+ *         argument is required.</td></tr>
+ *     <tr><td>d{&lt;spec&gt;}</td>
  *         <td>The time format specification is used to format
  *         the UTC time of the @ref event. The specification
  *         must be one that is compatible with the function
@@ -65,8 +66,12 @@ namespace chucho
  *         key difference is that the token "%q" may be used to
  *         insert the number of milliseconds. This is added due
  *         to the fact that std::put_time() does not support
- *         milliseconds.</td></tr>
- *     <tr><td>D{<spec>}</td>
+ *         milliseconds.
+ *  
+ *         If the spec argument is omitted, then a
+ *         default of "%Y-%m-%d %H:%M:%S" will be
+ *         used.</td></tr>
+ *     <tr><td>D{&lt;spec&gt;}</td>
  *         <td>The time format specification is used to format
  *         the local time of the @ref event. The specification
  *         must be one that is compatible with the function
@@ -75,7 +80,11 @@ namespace chucho
  *         key difference is that the token "%q" may be used to
  *         insert the number of milliseconds. This is added due
  *         to the fact that std::put_time() does not support
- *         milliseconds.</td></tr>
+ *         milliseconds.
+ *  
+ *         If the spec argument is omitted, then a
+ *         default of "%Y-%m-%d %H:%M:%S" will be
+ *         used.</td></tr>
  *     <tr><td>F</td>
  *         <td>The fully qualified name of the file from which
  *         the log @ref event originated.</td></tr>
@@ -126,6 +135,7 @@ public:
      * Construct a formatter from the pattern specification.
      * 
      * @param pattern the pattern to use for formatting
+     * @throw exception if the pattern is invalid
      */
     pattern_formatter(const std::string& pattern);
     //@}

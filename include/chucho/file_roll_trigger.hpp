@@ -13,6 +13,8 @@ namespace chucho
  * Determine when a file should roll. A file_roll_trigger is 
  * used by a @ref rolling_file_writer to determine when a file 
  * should roll. 
+ *  
+ * @ingroup rolling 
  */
 class CHUCHO_EXPORT file_roll_trigger : public virtual status_reporter,
                                         public virtual configurable

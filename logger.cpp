@@ -2,6 +2,7 @@
 #include <chucho/configurator.hpp>
 #include <chucho/configuration.hpp>
 #include <map>
+#include <stdexcept>
 
 namespace
 {
@@ -70,6 +71,8 @@ logger::logger(const std::string& name, std::shared_ptr<level> lvl)
 
 void logger::add_writer(std::shared_ptr<writer> wrt)
 {
+    if (!wrt)
+        throw std::invalid_argument("The writer cannot be an uninitialized std::shared_ptr");
     std::lock_guard<std::mutex> lg(writers_guard_);
     writers_.push_back(wrt);
 }

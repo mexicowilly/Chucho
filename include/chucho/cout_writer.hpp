@@ -23,6 +23,8 @@ public:
      * Construct a cout_writer.
      * 
      * @param fmt the formatter
+     * @throw std::invalid_argument if fmt is an uninitialized 
+     *        std::shared_ptr
      */
     cout_writer(std::shared_ptr<formatter> fmt);
     //@}

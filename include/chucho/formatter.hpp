@@ -11,7 +11,7 @@ namespace chucho
 
 /**
  * @defgroup formatters 
- * Formatters turn a log @def event into a piece of text so that
+ * Formatters turn a log @ref event into a piece of text so that
  * a writer can write the event. 
  */
 

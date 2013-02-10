@@ -39,6 +39,8 @@ public:
      * be formatted using the formatter before being written. 
      *
      * @param fmt the formatter
+     * @throw std::invalid_argument if fmt is an uninitialized 
+     *        std::shared_ptr
      */
     writer(std::shared_ptr<formatter> fmt);
     /**

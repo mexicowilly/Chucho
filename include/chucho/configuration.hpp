@@ -14,12 +14,14 @@ namespace chucho
  */
 
 /**
- * The configuration of chucho. Configuration normally happens 
- * automatically when the first @ref logger is requested. 
- * However, this is controllable using the configuratrion style 
- * and the @ref allow_default() method. Since, configuration 
- * wants to happen using a configuration file, you may set the 
- * file name here. 
+ * The configuration of chucho. This namespace is found in the 
+ * file <chucho/configuration.hpp>. 
+ *  
+ * Configuration normally happens automatically when the first
+ * @ref logger is requested. However, this is controllable using 
+ * the configuratrion style and the @ref allow_default() method.
+ * Since, configuration wants to happen using a configuration 
+ * file, you may set the file name here. 
  *  
  * @ingroup configuration 
  */

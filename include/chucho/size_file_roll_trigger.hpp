@@ -7,6 +7,8 @@ namespace chucho
  * A @ref file_roll_trigger that monitors file size. When the 
  * active log file reaches this trigger's maximum size, then it 
  * will signal that now would be a good time to roll the file. 
+ *  
+ * @ingroup rolling 
  */
 class CHUCHO_EXPORT size_file_roll_trigger : public file_roll_trigger
 {
