@@ -8,10 +8,127 @@
 namespace chucho
 {
 
+/**
+ * @class pattern_formatter pattern_formatter.hpp chucho/pattern_formatter.hpp 
+ * A pattern_formatter accepts a pattern in its constructor that 
+ * is then used to format events. The patterns used by 
+ * pattern_formatter are based on the format patterns of the 
+ * printf() family of functions in the standard C library. Just 
+ * as with printf(), a pattern may be composed of oridnary 
+ * characters and conversion specifications. Unlike the printf() 
+ * functions, pattern_formatter does not take immediate input in 
+ * order to convert a conversion specification to text, but 
+ * rather takes information from the @ref event or from the host 
+ * operation system. 
+ *  
+ * Just as with printf(), the conversion specifications of 
+ * pattern_formatter accept modifiers that determine things like 
+ * justification and field width. 
+ *  
+ * A conversion specification always starts with the percent 
+ * sign ('%%'). This character my be followed by: 
+ * - An optional minus sign ('-'). If this field is provided, 
+ *   then justification of the text will be to the left.
+ *   Otherwise, it will be to the right.
+ * - An optional decimal digit string specifying a minimum field 
+ *   width. If the converted value has fewer characters than the
+ *   minimum field width, then it will be padded on the left or
+ *   the right, depending on whether the aforementioned minus
+ *   sign ('-') field has been used.
+ * - An optional dot ('.') followed by a decimal digit string 
+ *   specifying the maximum field width. If the converted value
+ *   is longer than the maximum width, then characters are
+ *   trimmed from the beginning of the value, leaving maximum
+ *   width trailing characters.
+ * - A character that specifies the type of conversion that will 
+ *   be performed. This must be one of the following.
+ * <table>
+ *     <tr><th>Character</th><th>Conversion Value</th></tr>
+ *     <tr><td>b</td>
+ *         <td>The base file name from which the log
+ *      @ref event originated. The base file name does not
+ *      include any path prefix from the name of the
+ *      file.</td></tr>
+ *     <tr><td>c</td>
+ *         <td>The name of the @ref logger that is writing this
+ *         event.</td></tr>
+ *     <tr><td>C{<key>}</td>
+ *         <td>The key from this thread's @ref
+ *         diagnostic_context is looked up, and its value is
+ *         placed into the log message.</td></tr>
+ *     <tr><td>d{<spec>}</td>
+ *         <td>The time format specification is used to format
+ *         the UTC time of the @ref event. The specification
+ *         must be one that is compatible with the function
+ *         std::put_time(), which is very similar to the
+ *         specifications used by the C function strftime(). A
+ *         key difference is that the token "%q" may be used to
+ *         insert the number of milliseconds. This is added due
+ *         to the fact that std::put_time() does not support
+ *         milliseconds.</td></tr>
+ *     <tr><td>D{<spec>}</td>
+ *         <td>The time format specification is used to format
+ *         the local time of the @ref event. The specification
+ *         must be one that is compatible with the function
+ *         std::put_time(), which is very similar to the
+ *         specifications used by the C function strftime(). A
+ *         key difference is that the token "%q" may be used to
+ *         insert the number of milliseconds. This is added due
+ *         to the fact that std::put_time() does not support
+ *         milliseconds.</td></tr>
+ *     <tr><td>F</td>
+ *         <td>The fully qualified name of the file from which
+ *         the log @ref event originated.</td></tr>
+ *     <tr><td>h</td>
+ *         <td>The name of the host.</td></tr>
+ *     <tr><td>i</td>
+ *         <td>The process identifier (pid) of the current
+ *         process.</td></tr>
+ *     <tr><td>k</td>
+ *         <td>The @ref marker, if any, that the log @ref event
+ *         carries.</td></tr>
+ *     <tr><td>L</td>
+ *         <td>The line number from which the @ref event
+ *         originated.</td></tr>
+ *     <tr><td>m</td>
+ *         <td>The message associated with the log @ref
+ *         event.</td></tr>
+ *     <tr><td>M</td>
+ *         <td>The name of the function from which the log
+ *         @ref event originated.</td></tr>
+ *     <tr><td>n</td>
+ *         <td>A platform-appropriate end-of-line.</td></tr>
+ *     <tr><td>p</td>
+ *         <td>The log @ref level of the @ref event.</td></tr>
+ *     <tr><td>r</td>
+ *         <td>The number of milliseconds that have elapsed
+ *         since the program started running.</td></tr>
+ *     <tr><td>t</td>
+ *         <td>The thread from which the @ref event
+ *         originated. This is the same value returned
+ *         by std::this_thread::get_id().</td></tr>
+ *     <tr><td>%</td>
+ *         <td>A literal percent sign ('%%') is placed in the
+ *         message. Justification and width modifiers
+ *         may not be used with this token.</td></tr>
+ * </table>
+ *  
+ * @ingroup formatters 
+ */
 class CHUCHO_EXPORT pattern_formatter : public formatter
 {
 public:
+    /**
+     * @name Constructor
+     */
+    //@{
+    /**
+     * Construct a formatter from the pattern specification.
+     * 
+     * @param pattern the pattern to use for formatting
+     */
     pattern_formatter(const std::string& pattern);
+    //@}
 
     virtual std::string format(const event& evt) override;
 

@@ -36,7 +36,7 @@ public:
 
     /**
      * Evaluate the event. If the log level of the event is greater 
-     * than or equal to the log level of this filter, then return 
+     * than the log level of this filter, then return 
      * @ref result "result::NEUTRAL". Otherwise, return 
      * @ref result "result::DENY".
      * 

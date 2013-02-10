@@ -10,10 +10,18 @@ namespace chucho
 {
 
 /**
+ * @defgroup formatters 
+ * Formatters turn a log @def event into a piece of text so that
+ * a writer can write the event. 
+ */
+
+/**
  * @class formatter formatter.hpp chucho/formatter.hpp
  * Format an event. A formatter is responsible for turning a log 
  * event into a piece of text. Each @ref writer will have one 
  * formatter associated with it. 
+ *  
+ * @ingroup formatters 
  */
 class CHUCHO_EXPORT formatter : public status_reporter,
                                 public configurable

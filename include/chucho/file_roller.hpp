@@ -57,7 +57,8 @@ public:
      * constructor. The file_roller must have access to the writer 
      * during the normal course of its operation. 
      * 
-     * @param the rolling_file_writer that owns this roller
+     * @param file_writer the rolling_file_writer that owns this 
+     *                    roller
      */
     void set_file_writer(file_writer& file_writer);
 
