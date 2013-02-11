@@ -10,15 +10,74 @@
 namespace chucho
 {
 
+/**
+ * @class time_file_roller time_file_roller.hpp chucho/time_file_roller.hpp 
+ * A @ref file_roller that rolls files by time. The roller 
+ * operates by taking a file name pattern in its constructor. 
+ * This pattern has a date specification that is similar to the 
+ * UTC date specification accepted by @ref pattern_formatter, 
+ * except that here the "%q" field for milliseconds is not 
+ * accepted. For example, a file name pattern might be 
+ * "/var/log/my.log.%d{%Y.%m.%d}". Only the UTC date 
+ * specification that begins with "%d" is accepted. The local 
+ * time specification that begins with "%D" does not count. 
+ *  
+ * The roller determines the rolling period by examining the 
+ * date specification. In the case of 
+ * "/var/log/my.log.%d{%Y.%m.%d}", the file would roll daily at 
+ * the beginning of each day, since the shortest time period 
+ * expressed in the date specification is day. 
+ *  
+ * More than one date specification may appear in the file name 
+ * pattern, but only one is considered the primary 
+ * specification. Any others must be tagged with ", aux", as in 
+ * "/var/%d{%Y.%m, aux}/%d{%d}". Note here that the auxillary 
+ * date specification is a directoy name in the file name 
+ * pattern. This is permitted. 
+ *  
+ * The time_file_roller also controls the number of files that 
+ * are rolled over. A maximum history parameter is accepted in 
+ * the constructor, and any files that fall outside that history 
+ * window are removed. Empty directories are never removed, but 
+ * regular files that fall outside the window are. 
+ *  
+ * @note The time_file_roller is also a @ref file_roll_trigger, 
+ * so it is not necessary to use an additional trigger when 
+ * using a time_file_roller. 
+ *  
+ * @ingroup rolling 
+ */
 class CHUCHO_EXPORT time_file_roller : public file_roller,
                                        public file_roll_trigger
 {
 public:
+    /**
+     * @name Constructor
+     */
+    //@{
+    /**
+     * Construct a time_file_roller.
+     * 
+     * @param file_name_pattern the file name pattern
+     * @param max_history the maximum number of files to be retained 
+     *                    in the rolling history
+     */
     time_file_roller(const std::string file_name_pattern,
                      std::size_t max_history);
+    //@}
 
     virtual std::string get_active_file_name() override;
+    /**
+     * Return the file name pattern that this roller is using.
+     * 
+     * @return the file name pattern
+     */
     const std::string& get_file_name_pattern() const;
+    /**
+     * Return the maximum history retained by the roller.
+     * 
+     * @return the maximum history
+     */
     std::size_t get_max_history() const;
     virtual bool is_triggered(const std::string& active_file, const event& e) override;
     virtual void roll() override;
