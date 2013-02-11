@@ -25,11 +25,11 @@ public:
     /**
      * An iterator for traversing the marker hierarchy.
      */
-    typedef std::set<std::shared_ptr<marker>, std::owner_less<std::shared_ptr<marker>>>::iterator iterator;
+    typedef std::set<marker>::iterator iterator;
     /**
      * An iterator for traversing the marker hierarchy.
      */
-    typedef std::set<std::shared_ptr<marker>, std::owner_less<std::shared_ptr<marker>>>::const_iterator const_iterator;
+    typedef std::set<marker>::const_iterator const_iterator;
 
     /**
      * @name Constructor
@@ -111,11 +111,11 @@ public:
      * 
      * @param mark the child to add
      */
-    void insert(const std::shared_ptr<marker> mark);
+    void insert(const marker& mark);
 
 private:
     std::string name_;
-    std::set<std::shared_ptr<marker>, std::owner_less<std::shared_ptr<marker>>> children_;
+    std::set<marker> children_;
 };
 
 CHUCHO_EXPORT std::ostream& operator<< (std::ostream& stream, const marker& mark);
@@ -165,7 +165,7 @@ inline const std::string& marker::get_name() const
     return name_;
 }
 
-inline void marker::insert(const std::shared_ptr<marker> mark)
+inline void marker::insert(const marker& mark)
 {
     children_.insert(mark);
 }

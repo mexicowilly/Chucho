@@ -10,7 +10,7 @@ event::event(std::shared_ptr<logger> lgr,
              const char* const file_name,
              unsigned line_number,
              const char* const function_name,
-             std::shared_ptr<marker> mark)
+             const optional<marker>& mark)
     : logger_(lgr),
       level_(lvl),
       message_(msg),
@@ -29,7 +29,7 @@ event::event(std::shared_ptr<logger> lgr,
              unsigned line_number,
              const char* const function_name,
              const std::string& mark)
-    : event(lgr, lvl, msg, file_name, line_number, function_name, std::make_shared<marker>(mark))
+    : event(lgr, lvl, msg, file_name, line_number, function_name, marker(mark))
 {
 }
 

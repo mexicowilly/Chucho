@@ -5,24 +5,24 @@
 TEST(marker_test, children)
 {
     chucho::marker mark("hello");
-    auto one = std::make_shared<chucho::marker>("one");
+    chucho::marker one("one");
     mark.insert(one);
-    auto two = std::make_shared<chucho::marker>("two");
+    chucho::marker two("two");
     mark.insert(two);
     EXPECT_FALSE(mark.empty());
     EXPECT_FALSE(std::find(mark.begin(), mark.end(), one) == mark.end());
     EXPECT_FALSE(std::find(mark.begin(), mark.end(), two) == mark.end());
-    auto three = std::make_shared<chucho::marker>("three");
+    chucho::marker three("three");
     EXPECT_TRUE(std::find(mark.begin(), mark.end(), three) == mark.end());
-    auto two2 = std::make_shared<chucho::marker>("two");
-    EXPECT_FALSE(std::find(mark.begin(), mark.end(), two) == mark.end());
+    chucho::marker two2("two");
+    EXPECT_FALSE(std::find(mark.begin(), mark.end(), two2) == mark.end());
 }
 
 TEST(marker_test, format)
 {
     chucho::marker mark("one");
-    mark.insert(std::make_shared<chucho::marker>("a"));
-    mark.insert(std::make_shared<chucho::marker>("b"));
+    mark.insert(chucho::marker("a"));
+    mark.insert(chucho::marker("b"));
     std::ostringstream stream;
     stream << mark;
     EXPECT_STREQ("one [ a, b ]", stream.str().c_str());

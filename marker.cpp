@@ -10,13 +10,13 @@ std::ostream& operator<< (std::ostream& stream, const marker& mark)
     {
         bool first = true;
         stream << " [ ";
-        for (std::shared_ptr<marker> m : mark)
+        for (auto m : mark)
         {
             if (first)
                 first = false;
             else
                 stream << ", ";
-            stream << *m;
+            stream << m;
         }
         stream << " ]";
     }

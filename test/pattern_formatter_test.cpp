@@ -32,7 +32,7 @@ public:
                file_name,
                10,
                "dowdy",
-               std::make_shared<chucho::marker>("chucho"))
+               "chucho")
     {
     }
 

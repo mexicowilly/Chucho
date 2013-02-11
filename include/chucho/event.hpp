@@ -2,6 +2,8 @@
 #define CHUCHO_EVENT_HPP__
 
 #include <chucho/level.hpp>
+#include <chucho/optional.hpp>
+#include <chucho/marker.hpp>
 #include <string>
 #include <chrono>
 #include <memory>
@@ -49,7 +51,7 @@ public:
           const char* const file_name,
           unsigned line_number,
           const char* const function_name,
-          std::shared_ptr<marker> mark = std::shared_ptr<marker>());
+          const optional<marker>& mark = optional<marker>());
     /**
      * Construct an event.
      * 
@@ -106,7 +108,7 @@ public:
      * 
      * @return the marker
      */
-    std::shared_ptr<marker> get_marker() const;
+    const optional<marker>& get_marker() const;
     /**
      * Return the message.
      * 
@@ -128,7 +130,7 @@ private:
     const char* file_name_;
     unsigned line_number_;
     const char* function_name_;
-    std::shared_ptr<marker> marker_;
+    optional<marker> marker_;
 };
 
 inline const char* event::get_file_name() const
@@ -156,7 +158,7 @@ inline std::shared_ptr<logger> event::get_logger() const
     return logger_;
 }
 
-inline std::shared_ptr<marker> event::get_marker() const
+inline const optional<marker>& event::get_marker() const
 {
     return marker_;
 }
