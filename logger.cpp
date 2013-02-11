@@ -138,9 +138,10 @@ std::vector<std::shared_ptr<writer>> logger::get_writers()
 
 void logger::initialize()
 {
-    std::shared_ptr<level> info(new info_level());
     std::lock_guard<std::recursive_mutex> lg(loggers_guard);
-    root_logger.reset(new logger("", info));
+    // Getting the level from text like this ensures that the static
+    // level objects are initialized in time.
+    root_logger.reset(new logger("", level::from_text("info")));
     all_loggers[root_logger->get_name()] = root_logger;
     if (configuration::get_style() == configuration::style::AUTOMATIC)
     {

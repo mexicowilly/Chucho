@@ -89,10 +89,15 @@ public:
     logger(const logger&) = delete;
     //@}
 
-   /**
-    * Unimplemented assignment operator.
-    */
+    /**
+     * @name Operator
+     */
+    //@{
+    /**
+     * Unimplemented assignment operator.
+     */ 
     logger& operator= (const logger&) = delete;
+    //@}
 
    /**
     * Add a writer. This writer will be written in subsequent event 

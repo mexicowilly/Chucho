@@ -43,6 +43,10 @@ public:
     //@}
 
     /**
+     * @name Operators
+     */
+    //@{
+    /**
      * Copy an object into this optional.
      * 
      * @param val the value to copy
@@ -98,6 +102,7 @@ public:
      * @return a reference to the optional object
      */
     const type* operator-> () const;
+    //@}
 
 private:
     CHUCHO_NO_EXPORT void construct(const type& val);

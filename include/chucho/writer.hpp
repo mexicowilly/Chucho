@@ -50,9 +50,14 @@ public:
     //@}
 
     /**
+     * @name Operator
+     */
+    //@{
+    /**
      * Unimplemented assignment operator.
      */
     writer& operator= (const writer&) = delete;
+    //@}
 
     /**
      * Add a filter. Filters are visited in the order in which they 

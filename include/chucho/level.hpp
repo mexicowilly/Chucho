@@ -7,22 +7,6 @@
 namespace chucho
 {
 
-class level;
-
-extern CHUCHO_EXPORT std::shared_ptr<level> TRACE_LEVEL;
-extern CHUCHO_EXPORT std::shared_ptr<level> DEBUG_LEVEL;
-extern CHUCHO_EXPORT std::shared_ptr<level> INFO_LEVEL;
-extern CHUCHO_EXPORT std::shared_ptr<level> WARN_LEVEL;
-extern CHUCHO_EXPORT std::shared_ptr<level> ERROR_LEVEL;
-extern CHUCHO_EXPORT std::shared_ptr<level> FATAL_LEVEL;
-extern CHUCHO_EXPORT std::shared_ptr<level> OFF_LEVEL;
-
-/**
- * @defgroup levels
- * Levels provide the fundamental means by which a determination 
- * is made as to whether an event is logged or not. 
- */
-
 /**
  * @class level level.hpp chucho/level.hpp
  * An event level. Levels allow the fundamental event filtration 
@@ -40,11 +24,39 @@ extern CHUCHO_EXPORT std::shared_ptr<level> OFF_LEVEL;
  *     <tr><td>FATAL</td><td>50000</td></tr>
  *     <tr><td>OFF</td><td>n/a</td></tr>
  * </table>
- * @ingroup levels
  */
 class CHUCHO_EXPORT level
 {
 public:
+    /**
+     * Trace level has a value of 0.
+     */
+    static std::shared_ptr<level> TRACE;
+    /**
+     * Debug level has a value of 10000.
+     */
+    static std::shared_ptr<level> DEBUG;
+    /**
+     * Info level has a value of 20000.
+     */
+    static std::shared_ptr<level> INFO;
+    /**
+     * Warn level has a value of 30000.
+     */
+    static std::shared_ptr<level> WARN;
+    /**
+     * Error level has a value of 40000.
+     */
+    static std::shared_ptr<level> ERROR;
+    /**
+     * Fatal level has a value of 50000.
+     */
+    static std::shared_ptr<level> FATAL;
+    /**
+     * Off level has a value that is none of your business.
+     */
+    static std::shared_ptr<level> OFF;
+
     /**
      * Figure out a level from its text. A case-insensitive 
      * comparison is performed to figure out which level a piece of 
@@ -67,6 +79,10 @@ public:
     virtual ~level();
     //@}
 
+    /**
+     * @name Operators
+     */
+    //@{
     /**
      * Is the value of this level equal to the value of another?
      * 
@@ -114,6 +130,7 @@ public:
      *         to the other's
      */
     bool operator>= (const level& other) const;
+    //@}
 
     /**
      * Return the name of the level.
@@ -139,161 +156,6 @@ public:
  * @return the stream
  */
 CHUCHO_EXPORT std::ostream& operator<< (std::ostream& stream, const level& lvl);
-
-/**
- * @class trace_level level.hpp chucho/level.hpp
- * A type of level. Its name is TRACE and its value is 0.
- * @ingroup levels
- */
-class CHUCHO_EXPORT trace_level : public level
-{
-public:
-    /**
-     * Return the name TRACE.
-     * 
-     * @return TRACE
-     */
-    virtual const char* get_name() const override;
-    /**
-     * Return the value 0.
-     * 
-     * @return 0
-     */
-    virtual int get_value() const override;
-};
-
-/**
- * @class debug_level level.hpp chucho/level.hpp
- * A type of level. Its name is DEBUG and its value is 10000.
- * @ingroup levels
- */
-class CHUCHO_EXPORT debug_level : public level
-{
-public:
-    /**
-     * Return the name DEBUG.
-     * 
-     * @return DEBUG
-     */
-    virtual const char* get_name() const override;
-    /**
-     * Return the value 10000.
-     * 
-     * @return 10000
-     */
-    virtual int get_value() const override;
-};
-
-/**
- * @class info_level level.hpp chucho/level.hpp
- * A type of level. Its name is INFO and its value is 20000.
- * @ingroup levels
- */
-class CHUCHO_EXPORT info_level : public level
-{
-public:
-    /**
-     * Return the name INFO.
-     * 
-     * @return INFO
-     */
-    virtual const char* get_name() const override;
-    /**
-     * Return the value 20000.
-     * 
-     * @return 20000
-     */
-    virtual int get_value() const override;
-};
-
-/**
- * @class warn_level level.hpp chucho/level.hpp
- * A type of level. Its name is WARN and its value is 30000.
- * @ingroup levels
- */
-class CHUCHO_EXPORT warn_level : public level
-{
-public:
-    /**
-     * Return the name WARN.
-     * 
-     * @return WARN
-     */
-    virtual const char* get_name() const override;
-    /**
-     * Return the value 30000.
-     * 
-     * @return 30000
-     */
-    virtual int get_value() const override;
-};
-
-/**
- * @class error_level level.hpp chucho/level.hpp
- * A type of level. Its name is ERROR and its value is 40000.
- * @ingroup levels
- */
-class CHUCHO_EXPORT error_level : public level
-{
-public:
-    /**
-     * Return the name ERROR.
-     * 
-     * @return ERROR
-     */
-    virtual const char* get_name() const override;
-    /**
-     * Return the value 40000.
-     * 
-     * @return 40000
-     */
-    virtual int get_value() const override;
-};
-
-/**
- * @class fatal_level level.hpp chucho/level.hpp
- * A type of level. Its name is FATAL and its value is 50000.
- * @ingroup levels
- */
-class CHUCHO_EXPORT fatal_level : public level
-{
-public:
-    /**
-     * Return the name FATAL.
-     * 
-     * @return FATAL
-     */
-    virtual const char* get_name() const override;
-    /**
-     * Return the value 50000.
-     * 
-     * @return 50000
-     */
-    virtual int get_value() const override;
-};
-
-/**
- * @class off_level level.hpp chucho/level.hpp
- * A type of level. Its name is OFF and its value is none of 
- * your business. Events of this level will never pass.
- * @ingroup levels
- */
-class CHUCHO_EXPORT off_level : public level
-{
-public:
-    /**
-     * Return the name OFF.
-     * 
-     * @return OFF
-     */
-    virtual const char* get_name() const override;
-    /**
-     * Return a value that is none of your business.
-     * 
-     * @return none of your business
-     */
-    virtual int get_value() const override;
-};
 
 inline bool level::operator== (const level& other) const
 {

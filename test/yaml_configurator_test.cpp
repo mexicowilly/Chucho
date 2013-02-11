@@ -115,7 +115,7 @@ TEST_F(yaml_configurator, level_threshold_filter)
     ASSERT_EQ(1, flts.size());
     ASSERT_EQ(typeid(chucho::level_threshold_filter), typeid(*flts[0]));
     auto thresh = std::static_pointer_cast<chucho::level_threshold_filter>(flts[0]);
-    EXPECT_EQ(*chucho::FATAL_LEVEL, *thresh->get_level());
+    EXPECT_EQ(*chucho::level::FATAL, *thresh->get_level());
 }
 
 TEST_F(yaml_configurator, logger)
@@ -126,7 +126,7 @@ TEST_F(yaml_configurator, logger)
               "    writes_to_ancestors: false");
     std::shared_ptr<chucho::logger> lgr = chucho::logger::get("will");
     EXPECT_EQ(std::string("will"), lgr->get_name());
-    EXPECT_EQ(*chucho::FATAL_LEVEL, *lgr->get_level());
+    EXPECT_EQ(*chucho::level::FATAL, *lgr->get_level());
     EXPECT_EQ(false, lgr->writes_to_ancestors());
 }
 
@@ -302,6 +302,6 @@ TEST_F(yaml_configurator, variables)
               "    '$env{CHUCHO_WRITES_KEY}': '$ENV{CHUCHO_WRITES_VALUE}'");
     std::shared_ptr<chucho::logger> lgr = chucho::logger::get("will");
     EXPECT_EQ(std::string("will"), lgr->get_name());
-    EXPECT_EQ(*chucho::FATAL_LEVEL, *lgr->get_level());
+    EXPECT_EQ(*chucho::level::FATAL, *lgr->get_level());
     EXPECT_EQ(false, lgr->writes_to_ancestors());
 }

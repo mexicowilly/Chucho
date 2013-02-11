@@ -3,16 +3,140 @@
 #include <limits>
 #include <vector>
 
+namespace
+{
+
+class trace : public chucho::level
+{
+public:
+    virtual const char* get_name() const override;
+    virtual int get_value() const override;
+};
+
+class debug : public chucho::level
+{
+public:
+    virtual const char* get_name() const override;
+    virtual int get_value() const override;
+};
+
+class info : public chucho::level
+{
+public:
+    virtual const char* get_name() const override;
+    virtual int get_value() const override;
+};
+
+class warn : public chucho::level
+{
+public:
+    virtual const char* get_name() const override;
+    virtual int get_value() const override;
+};
+
+class error : public chucho::level
+{
+public:
+    virtual const char* get_name() const override;
+    virtual int get_value() const override;
+};
+
+class fatal : public chucho::level
+{
+public:
+    virtual const char* get_name() const override;
+    virtual int get_value() const override;
+};
+
+class off : public chucho::level
+{
+public:
+    virtual const char* get_name() const override;
+    virtual int get_value() const override;
+};
+
+const char* trace::get_name() const
+{
+    return "TRACE";
+}
+
+int trace::get_value() const
+{
+    return 0;
+}
+
+const char* debug::get_name() const
+{
+    return "DEBUG";
+}
+
+int debug::get_value() const
+{
+    return 10000;
+}
+
+const char* info::get_name() const
+{
+    return "INFO";
+}
+
+int info::get_value() const
+{
+    return 20000;
+}
+
+const char* warn::get_name() const
+{
+    return "WARN";
+}
+
+int warn::get_value() const
+{
+    return 30000;
+}
+
+const char* error::get_name() const
+{
+    return "ERROR";
+}
+
+int error::get_value() const
+{
+    return 40000;
+}
+
+const char* fatal::get_name() const
+{
+    return "FATAL";
+}
+
+int fatal::get_value() const
+{
+    return 50000;
+}
+
+const char* off::get_name() const
+{
+    return "OFF";
+}
+
+int off::get_value() const
+{
+    return std::numeric_limits<int>::max();
+}
+
+}
+
 namespace chucho
 {
 
-std::shared_ptr<level> TRACE_LEVEL(new trace_level());
-std::shared_ptr<level> DEBUG_LEVEL(new debug_level());
-std::shared_ptr<level> INFO_LEVEL(new info_level());
-std::shared_ptr<level> WARN_LEVEL(new warn_level());
-std::shared_ptr<level> ERROR_LEVEL(new error_level());
-std::shared_ptr<level> FATAL_LEVEL(new fatal_level());
-std::shared_ptr<level> OFF_LEVEL(new off_level());
+std::shared_ptr<level> level::TRACE(new trace());
+std::shared_ptr<level> level::DEBUG(new debug());
+std::shared_ptr<level> level::INFO(new info());
+std::shared_ptr<level> level::WARN(new warn());
+std::shared_ptr<level> level::ERROR(new error());
+std::shared_ptr<level> level::FATAL(new fatal());
+std::shared_ptr<level> level::OFF(new off());
 
 std::ostream& operator<< (std::ostream& stream, const level& lvl)
 {
@@ -33,13 +157,13 @@ std::shared_ptr<level> level::from_text(const std::string& text)
                    (int(*)(int))std::toupper);
     std::vector<std::shared_ptr<level>> lvls =
     {
-        TRACE_LEVEL,
-        DEBUG_LEVEL,
-        INFO_LEVEL,
-        WARN_LEVEL,
-        ERROR_LEVEL,
-        FATAL_LEVEL,
-        OFF_LEVEL
+        TRACE,
+        DEBUG,
+        INFO,
+        WARN,
+        ERROR,
+        FATAL,
+        OFF
     };
     for (std::shared_ptr<level> lvl : lvls)
     {
@@ -47,76 +171,6 @@ std::shared_ptr<level> level::from_text(const std::string& text)
             return lvl;
     }
     throw exception("The text " + text + " does not describe a valid log level");
-}
-
-const char* trace_level::get_name() const
-{
-    return "TRACE";
-}
-
-int trace_level::get_value() const
-{
-    return 0;
-}
-
-const char* debug_level::get_name() const
-{
-    return "DEBUG";
-}
-
-int debug_level::get_value() const
-{
-    return 10000;
-}
-
-const char* info_level::get_name() const
-{
-    return "INFO";
-}
-
-int info_level::get_value() const
-{
-    return 20000;
-}
-
-const char* warn_level::get_name() const
-{
-    return "WARN";
-}
-
-int warn_level::get_value() const
-{
-    return 30000;
-}
-
-const char* error_level::get_name() const
-{
-    return "ERROR";
-}
-
-int error_level::get_value() const
-{
-    return 40000;
-}
-
-const char* fatal_level::get_name() const
-{
-    return "FATAL";
-}
-
-int fatal_level::get_value() const
-{
-    return 50000;
-}
-
-const char* off_level::get_name() const
-{
-    return "OFF";
-}
-
-int off_level::get_value() const
-{
-    return std::numeric_limits<int>::max();
 }
 
 }

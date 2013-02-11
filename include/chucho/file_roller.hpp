@@ -38,9 +38,14 @@ public:
     //@}
 
     /**
+     * @name Operator
+     */
+    //@{
+    /**
      * Unimplemented assignment operator.
      */
     file_roller& operator= (const file_roller&) = delete;
+    //@}
 
     /**
      * Return this roller's currently active file name. This is the 

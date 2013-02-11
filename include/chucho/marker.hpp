@@ -44,6 +44,10 @@ public:
     //@}
 
     /**
+     * @name Operators 
+     */
+    //@{
+    /**
      * Is this marker equal to another one? The comparison is by 
      * name only, not by any children of this marker. 
      *
@@ -59,6 +63,7 @@ public:
      * @return true if this marker is less than the other one
      */
     bool operator< (const marker& mark) const;
+    //@}
 
     /**
      * Return the beginning. The first in the collection of children

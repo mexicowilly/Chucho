@@ -30,26 +30,24 @@ TEST_F(log_test, existing_loggers)
 TEST_F(log_test, levels)
 {
     std::shared_ptr<chucho::logger> root = chucho::logger::get("");
-    std::shared_ptr<chucho::level> warn(std::make_shared<chucho::warn_level>());
-    root->set_level(warn);
-    EXPECT_EQ(warn, root->get_effective_level());
+    root->set_level(chucho::level::WARN);
+    EXPECT_EQ(chucho::level::WARN, root->get_effective_level());
     ASSERT_TRUE(static_cast<bool>(root->get_level()));
-    EXPECT_EQ(warn, root->get_level());
+    EXPECT_EQ(chucho::level::WARN, root->get_level());
     std::shared_ptr<chucho::logger> one = chucho::logger::get("one");
-    EXPECT_EQ(warn, one->get_effective_level());
+    EXPECT_EQ(chucho::level::WARN, one->get_effective_level());
     ASSERT_FALSE(static_cast<bool>(one->get_level()));
-    std::shared_ptr<chucho::level> info(std::make_shared<chucho::info_level>());
-    root->set_level(info);
-    EXPECT_EQ(info, one->get_effective_level());
+    root->set_level(chucho::level::INFO);
+    EXPECT_EQ(chucho::level::INFO, one->get_effective_level());
     ASSERT_FALSE(static_cast<bool>(one->get_level()));
     std::shared_ptr<chucho::logger> two = chucho::logger::get("one.two");
-    EXPECT_EQ(info, two->get_effective_level());
+    EXPECT_EQ(chucho::level::INFO, two->get_effective_level());
     ASSERT_FALSE(static_cast<bool>(two->get_level()));
-    one->set_level(warn);
+    one->set_level(chucho::level::WARN);
     ASSERT_TRUE(static_cast<bool>(one->get_level()));
-    EXPECT_EQ(warn, one->get_level());
-    EXPECT_EQ(warn, two->get_effective_level());
+    EXPECT_EQ(chucho::level::WARN, one->get_level());
+    EXPECT_EQ(chucho::level::WARN, two->get_effective_level());
     ASSERT_FALSE(static_cast<bool>(two->get_level()));
-    EXPECT_EQ(info, root->get_effective_level());
+    EXPECT_EQ(chucho::level::INFO, root->get_effective_level());
     ASSERT_TRUE(static_cast<bool>(root->get_level()));
 }

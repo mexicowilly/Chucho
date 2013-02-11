@@ -102,12 +102,12 @@ protected:
     {
         std::array<std::shared_ptr<chucho::level>, 6> lvls =
         {
-            chucho::TRACE_LEVEL,
-            chucho::DEBUG_LEVEL,
-            chucho::INFO_LEVEL,
-            chucho::WARN_LEVEL,
-            chucho::ERROR_LEVEL,
-            chucho::FATAL_LEVEL
+            chucho::level::TRACE,
+            chucho::level::DEBUG,
+            chucho::level::INFO,
+            chucho::level::WARN,
+            chucho::level::ERROR,
+            chucho::level::FATAL
         };
         std::vector<std::string> lines(wrt_->get_lines());
         std::size_t i = std::distance(lvls.begin(), std::find(lvls.begin(), lvls.end(), lvl));
@@ -129,191 +129,191 @@ protected:
 TEST_F(log_macro_test, debug)
 {
     SCOPED_TRACE("debug");
-    lgr_->set_level(chucho::DEBUG_LEVEL);
+    lgr_->set_level(chucho::level::DEBUG);
     log();
-    expect(chucho::DEBUG_LEVEL);
+    expect(chucho::level::DEBUG);
 }
 
 TEST_F(log_macro_test, debug_marker)
 {
     SCOPED_TRACE("debug_marker");
-    lgr_->set_level(chucho::DEBUG_LEVEL);
+    lgr_->set_level(chucho::level::DEBUG);
     log_marker();
-    expect(chucho::DEBUG_LEVEL, MARK);
+    expect(chucho::level::DEBUG, MARK);
 }
 
 TEST_F(log_macro_test, debug_marker_str)
 {
     SCOPED_TRACE("debug_str");
-    lgr_->set_level(chucho::DEBUG_LEVEL);
+    lgr_->set_level(chucho::level::DEBUG);
     log_marker_str();
-    expect(chucho::DEBUG_LEVEL, MARK);
+    expect(chucho::level::DEBUG, MARK);
 }
 
 TEST_F(log_macro_test, debug_str)
 {
     SCOPED_TRACE("debug_str");
-    lgr_->set_level(chucho::DEBUG_LEVEL);
+    lgr_->set_level(chucho::level::DEBUG);
     log_str();
-    expect(chucho::DEBUG_LEVEL);
+    expect(chucho::level::DEBUG);
 }
 
 TEST_F(log_macro_test, error)
 {
     SCOPED_TRACE("error");
-    lgr_->set_level(chucho::ERROR_LEVEL);
+    lgr_->set_level(chucho::level::ERROR);
     log();
-    expect(chucho::ERROR_LEVEL);
+    expect(chucho::level::ERROR);
 }
 
 TEST_F(log_macro_test, error_marker)
 {
     SCOPED_TRACE("error_marker");
-    lgr_->set_level(chucho::ERROR_LEVEL);
+    lgr_->set_level(chucho::level::ERROR);
     log_marker();
-    expect(chucho::ERROR_LEVEL, MARK);
+    expect(chucho::level::ERROR, MARK);
 }
 
 TEST_F(log_macro_test, error_marker_str)
 {
     SCOPED_TRACE("error_str");
-    lgr_->set_level(chucho::ERROR_LEVEL);
+    lgr_->set_level(chucho::level::ERROR);
     log_marker_str();
-    expect(chucho::ERROR_LEVEL, MARK);
+    expect(chucho::level::ERROR, MARK);
 }
 
 TEST_F(log_macro_test, error_str)
 {
     SCOPED_TRACE("error_str");
-    lgr_->set_level(chucho::ERROR_LEVEL);
+    lgr_->set_level(chucho::level::ERROR);
     log_str();
-    expect(chucho::ERROR_LEVEL);
+    expect(chucho::level::ERROR);
 }
 
 TEST_F(log_macro_test, fatal)
 {
     SCOPED_TRACE("fatal");
-    lgr_->set_level(chucho::FATAL_LEVEL);
+    lgr_->set_level(chucho::level::FATAL);
     log();
-    expect(chucho::FATAL_LEVEL);
+    expect(chucho::level::FATAL);
 }
 
 TEST_F(log_macro_test, fatal_marker)
 {
     SCOPED_TRACE("fatal_marker");
-    lgr_->set_level(chucho::FATAL_LEVEL);
+    lgr_->set_level(chucho::level::FATAL);
     log_marker();
-    expect(chucho::FATAL_LEVEL, MARK);
+    expect(chucho::level::FATAL, MARK);
 }
 
 TEST_F(log_macro_test, fatal_marker_str)
 {
     SCOPED_TRACE("fatal_str");
-    lgr_->set_level(chucho::FATAL_LEVEL);
+    lgr_->set_level(chucho::level::FATAL);
     log_marker_str();
-    expect(chucho::FATAL_LEVEL, MARK);
+    expect(chucho::level::FATAL, MARK);
 }
 
 TEST_F(log_macro_test, fatal_str)
 {
     SCOPED_TRACE("fatal_str");
-    lgr_->set_level(chucho::FATAL_LEVEL);
+    lgr_->set_level(chucho::level::FATAL);
     log_str();
-    expect(chucho::FATAL_LEVEL);
+    expect(chucho::level::FATAL);
 }
 
 TEST_F(log_macro_test, info)
 {
     SCOPED_TRACE("info");
-    lgr_->set_level(chucho::INFO_LEVEL);
+    lgr_->set_level(chucho::level::INFO);
     log();
-    expect(chucho::INFO_LEVEL);
+    expect(chucho::level::INFO);
 }
 
 TEST_F(log_macro_test, info_marker)
 {
     SCOPED_TRACE("info_marker");
-    lgr_->set_level(chucho::INFO_LEVEL);
+    lgr_->set_level(chucho::level::INFO);
     log_marker();
-    expect(chucho::INFO_LEVEL, MARK);
+    expect(chucho::level::INFO, MARK);
 }
 
 TEST_F(log_macro_test, info_marker_str)
 {
     SCOPED_TRACE("info_str");
-    lgr_->set_level(chucho::INFO_LEVEL);
+    lgr_->set_level(chucho::level::INFO);
     log_marker_str();
-    expect(chucho::INFO_LEVEL, MARK);
+    expect(chucho::level::INFO, MARK);
 }
 
 TEST_F(log_macro_test, info_str)
 {
     SCOPED_TRACE("info_str");
-    lgr_->set_level(chucho::INFO_LEVEL);
+    lgr_->set_level(chucho::level::INFO);
     log_str();
-    expect(chucho::INFO_LEVEL);
+    expect(chucho::level::INFO);
 }
 
 TEST_F(log_macro_test, trace)
 {
     SCOPED_TRACE("trace");
-    lgr_->set_level(chucho::TRACE_LEVEL);
+    lgr_->set_level(chucho::level::TRACE);
     log();
-    expect(chucho::TRACE_LEVEL);
+    expect(chucho::level::TRACE);
 }
 
 TEST_F(log_macro_test, trace_marker)
 {
     SCOPED_TRACE("trace_marker");
-    lgr_->set_level(chucho::TRACE_LEVEL);
+    lgr_->set_level(chucho::level::TRACE);
     log_marker();
-    expect(chucho::TRACE_LEVEL, MARK);
+    expect(chucho::level::TRACE, MARK);
 }
 
 TEST_F(log_macro_test, trace_marker_str)
 {
     SCOPED_TRACE("trace_str");
-    lgr_->set_level(chucho::TRACE_LEVEL);
+    lgr_->set_level(chucho::level::TRACE);
     log_marker_str();
-    expect(chucho::TRACE_LEVEL, MARK);
+    expect(chucho::level::TRACE, MARK);
 }
 
 TEST_F(log_macro_test, trace_str)
 {
     SCOPED_TRACE("trace_str");
-    lgr_->set_level(chucho::TRACE_LEVEL);
+    lgr_->set_level(chucho::level::TRACE);
     log_str();
-    expect(chucho::TRACE_LEVEL);
+    expect(chucho::level::TRACE);
 }
 
 TEST_F(log_macro_test, warn)
 {
     SCOPED_TRACE("warn");
-    lgr_->set_level(chucho::WARN_LEVEL);
+    lgr_->set_level(chucho::level::WARN);
     log();
-    expect(chucho::WARN_LEVEL);
+    expect(chucho::level::WARN);
 }
 
 TEST_F(log_macro_test, warn_marker)
 {
     SCOPED_TRACE("warn_marker");
-    lgr_->set_level(chucho::TRACE_LEVEL);
+    lgr_->set_level(chucho::level::TRACE);
     log_marker();
-    expect(chucho::TRACE_LEVEL, MARK);
+    expect(chucho::level::TRACE, MARK);
 }
 
 TEST_F(log_macro_test, warn_marker_str)
 {
     SCOPED_TRACE("warn_str");
-    lgr_->set_level(chucho::TRACE_LEVEL);
+    lgr_->set_level(chucho::level::TRACE);
     log_marker_str();
-    expect(chucho::TRACE_LEVEL, MARK);
+    expect(chucho::level::TRACE, MARK);
 }
 
 TEST_F(log_macro_test, warn_str)
 {
     SCOPED_TRACE("warn_str");
-    lgr_->set_level(chucho::TRACE_LEVEL);
+    lgr_->set_level(chucho::level::TRACE);
     log_str();
-    expect(chucho::TRACE_LEVEL);
+    expect(chucho::level::TRACE);
 }

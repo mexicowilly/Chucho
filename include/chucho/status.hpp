@@ -112,12 +112,17 @@ public:
 
 protected:
     /**
+     * @name Operator
+     */
+    //@{
+    /**
      * Send a status to an output stream.
      *  
      * @param stream the output stream 
      * @param st the status object 
      */
     friend CHUCHO_EXPORT std::ostream& operator<< (std::ostream& stream, const status& st);
+    //@}
 
 private:
     time_type time_;
