@@ -175,7 +175,7 @@ void logger::write(const event& evt)
     for (std::shared_ptr<writer> w : writers_)
         w->write(evt);
     ul.unlock();
-    if (writes_to_ancestors_)
+    if (parent_ && writes_to_ancestors_)
         parent_->write(evt);
 }
 

@@ -90,12 +90,6 @@ public:
      */
     std::shared_ptr<level> get_level() const;
     /**
-     * Return the marker.
-     * 
-     * @return the marker
-     */
-    std::shared_ptr<marker> get_marker() const;
-    /**
      * Return the line number.
      * 
      * @return the line number
@@ -107,6 +101,12 @@ public:
      * @return the logger
      */
     std::shared_ptr<logger> get_logger() const;
+    /**
+     * Return the marker.
+     * 
+     * @return the marker
+     */
+    std::shared_ptr<marker> get_marker() const;
     /**
      * Return the message.
      * 

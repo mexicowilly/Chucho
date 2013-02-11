@@ -14,7 +14,7 @@
 
 #if !defined(CHUCHO_DONT_DOCUMENT)
 
-#if defined(__GNUC__) || defiend(__clang__) || defined(__SUNPRO_CC)
+#if defined(__GNUC__) || defined(__clang__) || defined(__SUNPRO_CC)
 #define CHUCHO_FUNCTION_NAME __PRETTY_FUNCTION__
 #else
 #define CHUCHO_FUNCTION_NAME __FUNCTION__
@@ -24,7 +24,7 @@
 #define CHUCHO_LOG(lvl, lg, fl, ln, fnc, msg) \
     do \
     { \
-        if ((lg)->permits((lvl)) \
+        if ((lg)->permits(lvl)) \
         { \
             std::ostringstream __chucho_internal_stream; \
             __chucho_internal_stream << msg; \
@@ -35,14 +35,14 @@
 #define CHUCHO_LOG_STR(lvl, lg, fl, ln, fnc, msg) \
     do \
     { \
-        if ((lg)->permits(lvl()) \
+        if ((lg)->permits(lvl)) \
             (lg)->write(::chucho::event((lg), (lvl), (msg), (fl), (ln), (fnc))); \
     } while (false)
 
 #define CHUCHO_LOG_M(mrk, lvl, lg, fl, ln, fnc, msg) \
     do \
     { \
-        if ((lg)->permits((lvl)) \
+        if ((lg)->permits(lvl)) \
         { \
             std::ostringstream __chucho_internal_stream; \
             __chucho_internal_stream << msg; \
@@ -53,14 +53,14 @@
 #define CHUCHO_LOG_STR_M(mrk, lvl, lg, fl, ln, fnc, msg) \
     do \
     { \
-        if ((lg)->permits(lvl()) \
+        if ((lg)->permits(lvl)) \
             (lg)->write(::chucho::event((lg), (lvl), (msg), (fl), (ln), (fnc), (mrk))); \
     } while (false)
 
-#define CHUCHO_INTERNAL_LOG(lvl, lg, fl, ln, fnc, msg) CHUCHO_LOG(::chucho::##lvl##_LEVEL, lg, fl, ln, fnc, msg)
-#define CHUCHO_INTERNAL_LOG_STR(lvl, lg, fl, ln, fnc, msg) CHUCHO_LOG_STR(::chucho::##lvl##_level(), lg, fl, ln, fnc, msg)
-#define CHUCHO_INTERNAL_LOG_M(mrk, lvl, lg, fl, ln, fnc, msg) CHUCHO_LOG_M(mrk, ::chucho::##lvl##_LEVEL, lg, fl, ln, fnc, msg)
-#define CHUCHO_INTERNAL_LOG_STR_M(mrk, lvl, lg, fl, ln, fnc, msg) CHUCHO_LOG_STR_M(mrk, ::chucho::##lvl##_level(), lg, fl, ln, fnc, msg)
+#define CHUCHO_INTERNAL_LOG(lvl, lg, fl, ln, fnc, msg) CHUCHO_LOG(::chucho::lvl##_LEVEL, lg, fl, ln, fnc, msg)
+#define CHUCHO_INTERNAL_LOG_STR(lvl, lg, fl, ln, fnc, msg) CHUCHO_LOG_STR(::chucho::lvl##_LEVEL, lg, fl, ln, fnc, msg)
+#define CHUCHO_INTERNAL_LOG_M(mrk, lvl, lg, fl, ln, fnc, msg) CHUCHO_LOG_M(mrk, ::chucho::lvl##_LEVEL, lg, fl, ln, fnc, msg)
+#define CHUCHO_INTERNAL_LOG_STR_M(mrk, lvl, lg, fl, ln, fnc, msg) CHUCHO_LOG_STR_M(mrk, ::chucho::lvl##_LEVEL, lg, fl, ln, fnc, msg)
 
 #endif
 

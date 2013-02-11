@@ -493,7 +493,8 @@ pattern_formatter::marker_piece::marker_piece(const format_params& params)
 std::string pattern_formatter::marker_piece::get_text_impl(const event& evt) const
 {
     std::ostringstream stream;
-    stream << evt.get_marker()->get_name();
+    if (evt.get_marker())
+        stream << evt.get_marker()->get_name();
     return stream.str();
 }
 
