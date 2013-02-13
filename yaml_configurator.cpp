@@ -179,6 +179,11 @@ void yaml_configurator::handle(const std::string& key,
                             handle(key, second, sub);
                             mnto->handle(found->second->create_configurable(sub));
                         }
+                        catch (yaml_location_exception&)
+                        {
+                            // It already has location information
+                            throw;
+                        }
                         catch (std::exception& e)
                         {
                             std::throw_with_nested(yaml_location_exception(second));
