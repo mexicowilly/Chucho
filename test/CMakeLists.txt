@@ -32,3 +32,4 @@ ADD_EXECUTABLE(rolling-file-test EXCLUDE_FROM_ALL
                harness.cpp
                time_rolling_file_test.cpp)
 TARGET_LINK_LIBRARIES(rolling-file-test ${CHUCHO_LIB} gtest yaml-cpp)
+ADD_DEPENDENCIES(unit-test gtest-external)

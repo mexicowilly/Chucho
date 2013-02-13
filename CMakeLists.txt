@@ -172,14 +172,15 @@ IF(ENABLE_SHARED)
     INSTALL(TARGETS chucho-shared
             LIBRARY DESTINATION lib
             RUNTIME DESTINATION lib
-            FRAMEWORK DESTINATION placeholder
+            FRAMEWORK DESTINATION /Library/Frameworks
             PUBLIC_HEADER DESTINATION include/chucho)
 ENDIF()
 IF(ENABLE_STATIC)
     ADD_LIBRARY(chucho-static STATIC ${CHUCHO_SOURCES})
     ADD_DEPENDENCIES(chucho-static ${CHUCHO_EXTERNAL_DEPS})
     SET_TARGET_PROPERTIES(chucho-static PROPERTIES
-                          OUTPUT_NAME chucho)
+                          OUTPUT_NAME chucho
+                          PUBLIC_HEADER "${CHUCHO_PUBLIC_HEADERS}")
     ADD_DEFINITIONS(-Dchucho_shared_EXPORTS)
     ADD_DEPENDENCIES(chucho chucho-static)
     INSTALL(TARGETS chucho-static
