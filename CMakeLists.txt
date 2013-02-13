@@ -35,6 +35,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/filter.hpp
     include/chucho/formatter.hpp
     include/chucho/level.hpp
+    include/chucho/level_filter.hpp
     include/chucho/level_threshold_filter.hpp
     include/chucho/log.hpp
     include/chucho/logger.hpp
@@ -75,6 +76,9 @@ SET(CHUCHO_SOURCES
     file_writer_factory.cpp
     file_writer_memento.cpp
     level.cpp
+    level_filter.cpp
+    level_filter_factory.cpp
+    level_filter_memento.cpp
     level_threshold_filter.cpp
     level_threshold_filter_factory.cpp
     level_threshold_filter_memento.cpp
@@ -119,6 +123,8 @@ SET(CHUCHO_SOURCES
     include/chucho/exception.hpp
     include/chucho/file.hpp
     include/chucho/file_exception.hpp
+    include/chucho/level_filter_factory.hpp
+    include/chucho/level_filter_memento.hpp
     include/chucho/level_threshold_filter_factory.hpp
     include/chucho/level_threshold_filter_memento.hpp
     include/chucho/line_ending.hpp

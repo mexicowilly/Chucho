@@ -3,6 +3,7 @@
 #include <chucho/cerr_writer_factory.hpp>
 #include <chucho/cout_writer_factory.hpp>
 #include <chucho/file_writer_factory.hpp>
+#include <chucho/level_filter_factory.hpp>
 #include <chucho/level_threshold_filter_factory.hpp>
 #include <chucho/logger_factory.hpp>
 #include <chucho/numbered_file_roller_factory.hpp>
@@ -35,6 +36,8 @@ void configurator::initialize()
     add_configurable_factory("chucho::cout_writer", fact);
     fact.reset(new file_writer_factory());
     add_configurable_factory("chucho::file_writer", fact);
+    fact.reset(new level_filter_factory());
+    add_configurable_factory("chucho::level_filter", fact);
     fact.reset(new level_threshold_filter_factory());
     add_configurable_factory("chucho::level_threshold_filter", fact);
     fact.reset(new logger_factory());

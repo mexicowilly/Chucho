@@ -5,6 +5,7 @@
 #include <chucho/cerr_writer.hpp>
 #include <chucho/cout_writer.hpp>
 #include <chucho/file_writer.hpp>
+#include <chucho/level_filter.hpp>
 #include <chucho/level_threshold_filter.hpp>
 #include <chucho/rolling_file_writer.hpp>
 #include <chucho/numbered_file_roller.hpp>
@@ -98,6 +99,62 @@ TEST_F(yaml_configurator, file_writer)
     EXPECT_EQ(std::string("hello.log"), fwrt->get_file_name());
     EXPECT_FALSE(fwrt->get_flush());
     EXPECT_EQ(chucho::file_writer::on_start::TRUNCATE, fwrt->get_on_start());
+}
+
+TEST_F(yaml_configurator, level_filter)
+{
+    std::string tmpl("- chucho::logger:\n"
+                     "    name: will\n"
+                     "    chucho::cout_writer:\n"
+                     "        chucho::pattern_formatter:\n"
+                     "            pattern: '%m%n'\n"
+                     "        chucho::level_filter:\n"
+                     "            level: info\n"
+                     "            on_match: NEUTRAL\n"
+                     "            on_mismatch: RESULT");
+    std::size_t pos = tmpl.find("RESULT");
+    std::vector<std::string> bad =
+    {
+        "",
+        "nuetral",
+        "willy"
+    };
+    for (auto item : bad)
+    {
+        chucho::logger::remove_unused_loggers();
+        chucho::status_manager::get()->clear();
+        std::string rep = tmpl;
+        rep.replace(pos, 6, item);
+        configure(rep.c_str());
+        EXPECT_EQ(chucho::status::level::ERROR, chucho::status_manager::get()->get_level());
+    }
+    chucho::status_manager::get()->clear();
+    std::map<std::string, chucho::filter::result> good =
+    {
+        { "ACCEPT", chucho::filter::result::ACCEPT },
+        { "NEUTRAL", chucho::filter::result::NEUTRAL },
+        { "DENY", chucho::filter::result::DENY },
+        { "aCcEpT", chucho::filter::result::ACCEPT },
+        { "NEuTrAL", chucho::filter::result::NEUTRAL },
+        { "deny", chucho::filter::result::DENY }
+    };
+    for (auto item : good)
+    {
+        chucho::logger::remove_unused_loggers();
+        chucho::status_manager::get()->clear();
+        std::string rep = tmpl;
+        rep.replace(pos, 6, item.first);
+        configure(rep.c_str());
+        auto wrts = chucho::logger::get("will")->get_writers();
+        ASSERT_EQ(1, wrts.size());
+        auto flts = wrts[0]->get_filters();
+        ASSERT_EQ(1, flts.size());
+        ASSERT_EQ(typeid(chucho::level_filter), typeid(*flts[0]));
+        auto lf = std::static_pointer_cast<chucho::level_filter>(flts[0]);
+        EXPECT_EQ(*chucho::level::INFO, *lf->get_level());
+        EXPECT_EQ(chucho::filter::result::NEUTRAL, lf->get_on_match());
+        EXPECT_EQ(item.second, lf->get_on_mismatch());
+    }
 }
 
 TEST_F(yaml_configurator, level_threshold_filter)

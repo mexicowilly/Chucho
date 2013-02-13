@@ -84,9 +84,11 @@
 /**
  * @def CHUCHO_TRACE_M(mrk, lg, msg)
  * Log a trace-level message with a marker.
- * @param mrk the marker, which must be a 
- *            std::shared_ptr<marker>
- * @param lg the logger, which must be a std::shared_ptr<logger> 
+ * @param mrk the marker, which may either be a marker reference 
+ *            or a piece of text (const char* or std::string
+ *            reference), in which case a marker will be created
+ *            on the fly
+ * @param lg the logger, which must be a std::shared_ptr<logger>
  * @param msg the message to write, which may be formatted for 
  *            output to a std::stream, like "I have " << 7 << "
  *            dreams."
@@ -95,7 +97,10 @@
 /**
  * @def CHUCHO_TRACE_STR_M(lg, msg)
  * Log a trace-level message that is text only with a marker.
- * @param mrk the marker, which must be a std::shared_ptr<marker>
+ * @param mrk the marker, which may either be a marker reference 
+ *            or a piece of text (const char* or std::string
+ *            reference), in which case a marker will be created
+ *            on the fly
  * @param lg the logger, which must be a std::shared_ptr<logger> 
  * @param msg the message to write, which can only be a const 
  *            char* or a std::string
@@ -121,8 +126,10 @@
 /**
  * @def CHUCHO_DEBUG_M(mrk, lg, msg)
  * Log a debug-level message with a marker.
- * @param mrk the marker, which must be a 
- *            std::shared_ptr<marker>
+ * @param mrk the marker, which may either be a marker reference 
+ *            or a piece of text (const char* or std::string
+ *            reference), in which case a marker will be created
+ *            on the fly
  * @param lg the logger, which must be a std::shared_ptr<logger> 
  * @param msg the message to write, which may be formatted for 
  *            output to a std::stream, like "I have " << 7 << "
@@ -132,7 +139,10 @@
 /**
  * @def CHUCHO_DEBUG_STR_M(lg, msg)
  * Log a debug-level message that is text only with a marker.
- * @param mrk the marker, which must be a std::shared_ptr<marker>
+ * @param mrk the marker, which may either be a marker reference 
+ *            or a piece of text (const char* or std::string
+ *            reference), in which case a marker will be created
+ *            on the fly
  * @param lg the logger, which must be a std::shared_ptr<logger> 
  * @param msg the message to write, which can only be a const 
  *            char* or a std::string
@@ -158,8 +168,10 @@
 /**
  * @def CHUCHO_INFO_M(mrk, lg, msg)
  * Log a info-level message with a marker.
- * @param mrk the marker, which must be a 
- *            std::shared_ptr<marker>
+ * @param mrk the marker, which may either be a marker reference 
+ *            or a piece of text (const char* or std::string
+ *            reference), in which case a marker will be created
+ *            on the fly
  * @param lg the logger, which must be a std::shared_ptr<logger> 
  * @param msg the message to write, which may be formatted for 
  *            output to a std::stream, like "I have " << 7 << "
@@ -169,7 +181,10 @@
 /**
  * @def CHUCHO_INFO_STR_M(lg, msg)
  * Log a info-level message that is text only with a marker.
- * @param mrk the marker, which must be a std::shared_ptr<marker>
+ * @param mrk the marker, which may either be a marker reference 
+ *            or a piece of text (const char* or std::string
+ *            reference), in which case a marker will be created
+ *            on the fly
  * @param lg the logger, which must be a std::shared_ptr<logger> 
  * @param msg the message to write, which can only be a const 
  *            char* or a std::string
@@ -195,8 +210,10 @@
 /**
  * @def CHUCHO_WARN_M(mrk, lg, msg)
  * Log a warn-level message with a marker.
- * @param mrk the marker, which must be a 
- *            std::shared_ptr<marker>
+ * @param mrk the marker, which may either be a marker reference 
+ *            or a piece of text (const char* or std::string
+ *            reference), in which case a marker will be created
+ *            on the fly
  * @param lg the logger, which must be a std::shared_ptr<logger> 
  * @param msg the message to write, which may be formatted for 
  *            output to a std::stream, like "I have " << 7 << "
@@ -206,7 +223,10 @@
 /**
  * @def CHUCHO_WARN_STR_M(lg, msg)
  * Log a warn-level message that is text only with a marker.
- * @param mrk the marker, which must be a std::shared_ptr<marker>
+ * @param mrk the marker, which may either be a marker reference 
+ *            or a piece of text (const char* or std::string
+ *            reference), in which case a marker will be created
+ *            on the fly
  * @param lg the logger, which must be a std::shared_ptr<logger> 
  * @param msg the message to write, which can only be a const 
  *            char* or a std::string
@@ -232,8 +252,10 @@
 /**
  * @def CHUCHO_ERROR_M(mrk, lg, msg)
  * Log a error-level message with a marker.
- * @param mrk the marker, which must be a 
- *            std::shared_ptr<marker>
+ * @param mrk the marker, which may either be a marker reference 
+ *            or a piece of text (const char* or std::string
+ *            reference), in which case a marker will be created
+ *            on the fly
  * @param lg the logger, which must be a std::shared_ptr<logger> 
  * @param msg the message to write, which may be formatted for 
  *            output to a std::stream, like "I have " << 7 << "
@@ -243,7 +265,10 @@
 /**
  * @def CHUCHO_ERROR_STR_M(lg, msg)
  * Log a error-level message that is text only with a marker.
- * @param mrk the marker, which must be a std::shared_ptr<marker>
+ * @param mrk the marker, which may either be a marker reference 
+ *            or a piece of text (const char* or std::string
+ *            reference), in which case a marker will be created
+ *            on the fly
  * @param lg the logger, which must be a std::shared_ptr<logger> 
  * @param msg the message to write, which can only be a const 
  *            char* or a std::string
@@ -269,8 +294,10 @@
 /**
  * @def CHUCHO_FATAL_M(mrk, lg, msg)
  * Log a fatal-level message with a marker.
- * @param mrk the marker, which must be a 
- *            std::shared_ptr<marker>
+ * @param mrk the marker, which may either be a marker reference 
+ *            or a piece of text (const char* or std::string
+ *            reference), in which case a marker will be created
+ *            on the fly
  * @param lg the logger, which must be a std::shared_ptr<logger> 
  * @param msg the message to write, which may be formatted for 
  *            output to a std::stream, like "I have " << 7 << "
@@ -280,7 +307,10 @@
 /**
  * @def CHUCHO_FATAL_STR_M(lg, msg)
  * Log a fatal-level message that is text only with a marker.
- * @param mrk the marker, which must be a std::shared_ptr<marker>
+ * @param mrk the marker, which may either be a marker reference 
+ *            or a piece of text (const char* or std::string
+ *            reference), in which case a marker will be created
+ *            on the fly
  * @param lg the logger, which must be a std::shared_ptr<logger> 
  * @param msg the message to write, which can only be a const 
  *            char* or a std::string
