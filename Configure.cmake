@@ -118,6 +118,17 @@ IF(CHUCHO_POSIX)
     IF(NOT CHUCHO_HAVE_REALPATH)
         MESSAGE(FATAL_ERROR "realpath is required")
     ENDIF()
+
+    # ar
+    FIND_PROGRAM(CHUCHO_AR ar)
+    IF(NOT CHUCHO_AR)
+        MESSAGE(WARNING "The ar command is used to place yaml-cpp object modules in the chucho static library. Without this, it is necessary to link yaml-cpp explicitly to every component that also links chucho's static library.")
+    ENDIF()
+    IF(CHUCHO_AR AND (CMAKE_GENERATOR STREQUAL "Unix Makefiles" OR CMAKE_GENERATOR STREQUAL "NMake Makefiles"))
+        SET(CHUCHO_CAN_ARCHIVE TRUE)
+    ELSE()
+        MESSAGE(WARNING "The contents of the yaml-cpp static library cannot be added to the chucho static library because a suitable CMake generator is not being used. You must build with either Unix Makefiles or NMake Makefiles in order for yaml-cpp to be added to the chucho static library. Withtout yaml-cpp being included in chucho's static library, you will have to explicitly link yaml-cpp to components that link to chucho's static library.")
+    ENDIF()
 ENDIF()
 
 # doxygen
@@ -165,8 +176,7 @@ ELSE(CHUCHO_WINDOWS)
                              COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/libgtest_main.a <INSTALL_DIR>/lib
                              DEPENDEES install-headers)
     ADD_LIBRARY(gtest STATIC IMPORTED)
-    SET_TARGET_PROPERTIES(gtest
-                          PROPERTIES
+    SET_TARGET_PROPERTIES(gtest PROPERTIES
                           IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/libgtest.a")
 ENDIF()
 ADD_DEPENDENCIES(external gtest-external)
@@ -181,11 +191,10 @@ ENDIF()
 ExternalProject_Add(yaml-cpp-external
                     URL http://yaml-cpp.googlecode.com/files/yaml-cpp-0.3.0.tar.gz
                     URL_MD5 9aa519205a543f9372bf4179071c8ac6
-                    CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}" -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+                    CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}" -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DYAML_CPP_BUILD_TOOLS=OFF
 					CMAKE_GENERATOR ${CHUCHO_YAML_CPP_GENERATOR})
 ADD_LIBRARY(yaml-cpp STATIC IMPORTED)
-SET_TARGET_PROPERTIES(yaml-cpp
-                      PROPERTIES
+SET_TARGET_PROPERTIES(yaml-cpp PROPERTIES
                       IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/libyaml-cpp.a")
 ADD_DEPENDENCIES(external yaml-cpp-external)
 

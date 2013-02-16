@@ -22,7 +22,10 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                rolling_file_writer_test.cpp
                size_file_roll_trigger_test.cpp
                yaml_configurator_test.cpp)
-TARGET_LINK_LIBRARIES(unit-test ${CHUCHO_LIB} gtest yaml-cpp)
+TARGET_LINK_LIBRARIES(unit-test ${CHUCHO_LIB} gtest)
+IF(NOT CHUCHO_CAN_ARCHIVE)
+    TARGET_LINK_LIBRARIES(unit-test yaml-cpp)
+ENDIF()
 ADD_DEPENDENCIES(unit-test gtest-external)
 
 ADD_CUSTOM_TARGET(check
