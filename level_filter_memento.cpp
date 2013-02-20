@@ -1,5 +1,6 @@
 #include <chucho/level_filter_memento.hpp>
 #include <chucho/exception.hpp>
+#include <algorithm>
 
 namespace
 {

@@ -125,7 +125,7 @@ std::shared_ptr<logger> logger::get_impl(const std::string& name)
     if (found == all_loggers.end())
     {
         std::shared_ptr<logger> lgr(new logger(name));
-        found = all_loggers.emplace(name, lgr).first;
+        found = all_loggers.insert(std::make_pair(name, lgr)).first;
     }
     return found->second;
 }

@@ -17,6 +17,12 @@ IF(CHUCHO_POSIX)
         platform/posix/pattern_formatter_posix.cpp)
 ENDIF()
 
+IF(CHUCHO_HAVE_STD_REGEX)
+    LIST(APPEND CHUCHO_PLATFORM_SOURCES platform/std/regex_std.cpp)
+ELSEIF(CHUCHO_HAVE_POSIX_REGEX)
+    LIST(APPEND CHUCHO_PLATFORM_SOURCES platform/posix/regex_posix.cpp)
+ENDIF()
+
 SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/cerr_writer.hpp
     include/chucho/configurable.hpp
@@ -93,6 +99,7 @@ SET(CHUCHO_SOURCES
     pattern_formatter.cpp
     pattern_formatter_factory.cpp
     pattern_formatter_memento.cpp
+    regex_exception.cpp
     rolling_file_writer.cpp
     rolling_file_writer_factory.cpp
     rolling_file_writer_memento.cpp
@@ -134,6 +141,9 @@ SET(CHUCHO_SOURCES
     include/chucho/numbered_file_roller_memento.hpp
     include/chucho/pattern_formatter_factory.hpp
     include/chucho/pattern_formatter_memento.hpp
+    include/chucho/printf_util.hpp
+    include/chucho/regex.hpp
+    include/chucho/regex_exception.hpp
     include/chucho/rolling_file_writer_factory.hpp
     include/chucho/rolling_file_writer_memento.hpp
     include/chucho/size_file_roll_trigger_factory.hpp
@@ -160,10 +170,10 @@ IF(ENABLE_SHARED)
     SET_TARGET_PROPERTIES(chucho-shared PROPERTIES
                           OUTPUT_NAME chucho
                           COMPILE_FLAGS "${CHUCHO_CXX_SO_FLAGS}"
-                          FRAMEWORK TRUE
                           VERSION ${CHUCHO_VERSION}
                           SOVERSION ${CHUCHO_SO_VERSION}
-                          PUBLIC_HEADER "${CHUCHO_PUBLIC_HEADERS}")
+                          PUBLIC_HEADER "${CHUCHO_PUBLIC_HEADERS}"
+                          FRAMEWORK TRUE)
     IF(CMAKE_GENERATOR STREQUAL Xcode AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         SET_TARGET_PROPERTIES(chucho-shared PROPERTIES
                               LINK_FLAGS "-std=c++11 -stdlib=libc++")

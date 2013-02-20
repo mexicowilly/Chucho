@@ -9,6 +9,7 @@
 #include <chucho/time_file_roller.hpp>
 #include <chucho/status_manager.hpp>
 #include <array>
+#include <algorithm>
 
 class rolling_file_writer_test : public ::testing::Test
 {
@@ -56,9 +57,7 @@ protected:
     {
         struct std::tm t = chucho::calendar::get_utc(
             std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
-        std::ostringstream stream;
-        stream << std::put_time(&t, fmt.c_str());
-        return stream.str();
+        return chucho::calendar::format(t, fmt);
     }
 
 private:

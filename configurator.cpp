@@ -11,7 +11,8 @@
 #include <chucho/rolling_file_writer_factory.hpp>
 #include <chucho/size_file_roll_trigger_factory.hpp>
 #include <chucho/time_file_roller_factory.hpp>
-#include <regex>
+#include <chucho/regex.hpp>
+#include <cstring>
 
 namespace chucho
 {
@@ -56,31 +57,32 @@ void configurator::initialize()
 
 std::string configurator::resolve_variables(const std::string& val)
 {
-    static std::regex re("\\$(ENV)?\\{(.+)\\}", std::regex::icase);
+    static regex::expression re("\\$(ENV)?\\{([^}]+)\\}",
+                                regex::expression::ignore_case);
 
     std::string result(val);
     int pos_offset = 0;
-    auto itor = std::sregex_iterator(val.begin(), val.end(), re);
-    auto end = std::sregex_iterator();
+    regex::iterator itor(val, re, 2);
+    regex::iterator end;
     while (itor != end)
     {
-        const std::smatch& sm(*itor);
-        if (sm.position(1) > 0)
+        const regex::match& m(*itor);
+        if (m[1].begin() > 0)
         {
-            char* env = std::getenv(sm.str(2).c_str());
+            char* env = std::getenv(val.substr(m[2].begin(), m[2].length()).c_str());
             if (env != nullptr)
             {
-                result.replace(sm.position() + pos_offset, sm.length(), env);
-                pos_offset += std::strlen(env) - sm.length();
+                result.replace(m[0].begin() + pos_offset, m[0].length(), env);
+                pos_offset += std::strlen(env) - m[0].length();
             }
         }
         else
         {
-            auto found = variables_.find(sm[2]);
+            auto found = variables_.find(val.substr(m[2].begin(), m[2].length()));
             if (found != variables_.end())
             {
-                result.replace(sm.position() + pos_offset, sm.length(), found->second);
-                pos_offset += found->second.length() - sm.length();
+                result.replace(m[0].begin() + pos_offset, m[0].length(), found->second);
+                pos_offset += found->second.length() - m[0].length();
             }
         }
         ++itor;

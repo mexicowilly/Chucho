@@ -2,6 +2,7 @@
 #include <chucho/exception.hpp>
 #include <cctype>
 #include <sstream>
+#include <algorithm>
 
 namespace chucho
 {

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <chucho/logger.hpp>
+#include <algorithm>
 
 class log_test : public ::testing::Test
 {

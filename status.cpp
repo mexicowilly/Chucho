@@ -2,6 +2,7 @@
 #include <chucho/calendar.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/clock_util.hpp>
+#include <chucho/printf_util.hpp>
 #include <array>
 #include <iomanip>
 
@@ -27,14 +28,19 @@ std::ostream& operator<< (std::ostream& stream, const status& st)
         auto since = st.time_.time_since_epoch();
         auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(since);
         std::array<char, 13> time_fmt;
-        std::snprintf(time_fmt.data(), time_fmt.size(), "%%H:%%M:%%S.%03lli", millis.count() % 1000);
+        std::string format("%%H:%%M:%%S.");
+        format += printf::get_milli_format<std::chrono::milliseconds::rep>();
+        std::snprintf(time_fmt.data(),
+                      time_fmt.size(),
+                      format.c_str(),
+                      millis.count() % 1000);
         struct std::tm cal = calendar::get_utc(millis.count() / 1000);
-        stream << std::put_time(&cal, time_fmt.data());
+        stream << calendar::format(cal, time_fmt.data());
     }
     else
     {
         struct std::tm cal = calendar::get_utc(status::clock_type::to_time_t(st.time_));
-        stream << std::put_time(&cal, "%H:%M:%S");
+        stream << calendar::format(cal, "%H:%M:%S");
 
     }
     stream << ' ';

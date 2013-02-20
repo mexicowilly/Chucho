@@ -1,4 +1,5 @@
 #include <chucho/status_manager.hpp>
+#include <algorithm>
 
 namespace
 {

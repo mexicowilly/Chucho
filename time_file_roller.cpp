@@ -3,7 +3,7 @@
 #include <chucho/file.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/file_writer.hpp>
-#include <regex>
+#include <chucho/regex.hpp>
 #include <algorithm>
 #include <array>
 #include <iomanip>
@@ -12,7 +12,7 @@
 namespace
 {
 
-const std::regex aux_time_spec_re(" *, *aux *$");
+chucho::regex::expression aux_time_spec_re(" *, *aux *$");
 const std::size_t SECONDS_PER_DAY(86400);
 // Only look for files to delete that are less than 64 days old, in case
 // we don't know when last time we checked was.
@@ -139,13 +139,6 @@ std::string time_file_roller::find_time_spec(const std::string& str,
     return result;
 }
 
-std::string time_file_roller::format(const struct std::tm& cal, const std::string& spec) const
-{
-    std::ostringstream stream;
-    stream << std::put_time(&cal, spec.c_str());
-    return stream.str();
-}
-
 std::string time_file_roller::get_active_file_name()
 {
     return file_writer_->get_initial_file_name().empty() ?
@@ -179,8 +172,8 @@ std::string time_file_roller::resolve_file_name(const time_type& tm) const
         else
         {
             got_one = true;
-            spec = std::regex_replace(spec, aux_time_spec_re, "");
-            std::string fmt = format(cal, spec);
+            spec = regex::replace(spec, aux_time_spec_re, std::string());
+            std::string fmt = calendar::format(cal, spec);
             if (!fmt.empty())
                 result.replace(start, end - start, fmt);
         }
@@ -223,7 +216,7 @@ void time_file_roller::set_period()
         if (spec.empty())
             break;
         pos = end;
-        if (std::regex_search(spec, aux_time_spec_re))
+        if (regex::search(spec, aux_time_spec_re))
         {
             found_aux = true;
         }
@@ -236,7 +229,7 @@ void time_file_roller::set_period()
             }
             primary_spec = spec;
             struct std::tm epoch = calendar::get_utc(0);
-            std::string fmt1 = format(epoch, spec);
+            std::string fmt1 = calendar::format(epoch, spec);
             if (fmt1.empty())
             {
                 report_error("The date specification \"" + spec + "\" cannot be used to format a date");
@@ -267,7 +260,7 @@ void time_file_roller::set_period()
                 else
                     rolled.tm_year++;
                 rolled = calendar::get_local(std::mktime(&rolled));
-                std::string fmt2 = format(rolled, spec);
+                std::string fmt2 = calendar::format(rolled, spec);
                 if (fmt1 != fmt2) {
                     period_ = p;
                     break;

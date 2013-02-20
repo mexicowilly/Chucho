@@ -1,6 +1,7 @@
 #include <chucho/writer_factory.hpp>
 #include <chucho/writer.hpp>
 #include <assert.h>
+#include <algorithm>
 
 namespace chucho
 {

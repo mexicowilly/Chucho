@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <chucho/marker.hpp>
 #include <sstream>
+#include <algorithm>
 
 TEST(marker_test, children)
 {

@@ -7,12 +7,12 @@
 #include <chucho/marker.hpp>
 #include <chucho/diagnostic_context.hpp>
 #include <chucho/line_ending.hpp>
+#include <chucho/printf_util.hpp>
 #include <limits>
 #include <sstream>
 #include <array>
 #include <mutex>
 #include <thread>
-#include <iomanip>
 
 namespace
 {
@@ -25,6 +25,18 @@ enum class parser_state
     MIN,
     MAX
 };
+
+std::string::const_iterator find(std::string::const_iterator begin,
+                                 std::string::const_iterator end,
+                                 char ch)
+{
+    for ( ; begin != end; ++begin)
+    {
+        if (*begin == ch)
+            return begin;
+    }
+    return end;
+}
 
 }
 
@@ -123,7 +135,8 @@ std::string pattern_formatter::get_argument(std::string::const_iterator& pos,
     std::string result;
     if (pos != end && *(pos + 1) == '{')
     {
-        auto last = std::find(++pos, end, '}');
+        // std::find does not work under g++ 4.7
+        auto last = find(++pos, end, '}');
         if (last == end)
         {
             report_error("Expected '}' in the pattern");
@@ -358,7 +371,10 @@ std::string pattern_formatter::date_time_piece::get_text_impl(const event& evt) 
         if (clock_util::system_clock_supports_milliseconds)
         {
             std::array<char, 4> buf;
-            std::snprintf(buf.data(), buf.size(), "%03lli", millis.count() % 1000);
+            std::snprintf(buf.data(),
+                          buf.size(),
+                          printf::get_milli_format<std::chrono::milliseconds::rep>().c_str(),
+                          millis.count() % 1000);
             for (std::size_t p : milli_positions_)
                 pat.replace(p, 2, buf.data());
         }
@@ -370,9 +386,7 @@ std::string pattern_formatter::date_time_piece::get_text_impl(const event& evt) 
     }
     struct std::tm cal;
     to_calendar(millis.count() / 1000, cal);
-    std::ostringstream stream;
-    stream << std::put_time(&cal, pat.c_str());
-    return stream.str();
+    return calendar::format(cal, pat);
 }
 
 pattern_formatter::utc_date_time_piece::utc_date_time_piece(const std::string& date_pattern,

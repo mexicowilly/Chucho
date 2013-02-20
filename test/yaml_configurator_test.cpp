@@ -184,7 +184,7 @@ TEST_F(yaml_configurator, logger)
     std::shared_ptr<chucho::logger> lgr = chucho::logger::get("will");
     EXPECT_EQ(std::string("will"), lgr->get_name());
     EXPECT_EQ(*chucho::level::FATAL, *lgr->get_level());
-    EXPECT_EQ(false, lgr->writes_to_ancestors());
+    EXPECT_FALSE(lgr->writes_to_ancestors());
 }
 
 TEST_F(yaml_configurator, multiple_writer)
@@ -359,6 +359,7 @@ TEST_F(yaml_configurator, variables)
               "    '$env{CHUCHO_WRITES_KEY}': '$ENV{CHUCHO_WRITES_VALUE}'");
     std::shared_ptr<chucho::logger> lgr = chucho::logger::get("will");
     EXPECT_EQ(std::string("will"), lgr->get_name());
+    ASSERT_NE(nullptr, lgr->get_level().get());
     EXPECT_EQ(*chucho::level::FATAL, *lgr->get_level());
-    EXPECT_EQ(false, lgr->writes_to_ancestors());
+    EXPECT_FALSE(lgr->writes_to_ancestors());
 }

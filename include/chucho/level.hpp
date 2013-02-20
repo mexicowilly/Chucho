@@ -3,6 +3,7 @@
 
 #include <chucho/export.hpp>
 #include <ostream>
+#include <memory>
 
 namespace chucho
 {

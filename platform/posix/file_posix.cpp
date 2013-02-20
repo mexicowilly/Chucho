@@ -2,11 +2,13 @@
 #include <chucho/file_exception.hpp>
 #include <vector>
 #include <array>
+#include <cstring>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <errno.h>
 #include <fts.h>
 #include <stdlib.h>
+#include <limits.h>
 
 namespace chucho
 {

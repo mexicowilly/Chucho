@@ -2,6 +2,7 @@
 #include <chucho/exception.hpp>
 #include <limits>
 #include <vector>
+#include <algorithm>
 
 namespace
 {

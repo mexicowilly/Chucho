@@ -4,6 +4,7 @@
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
 #include <assert.h>
+#include <algorithm>
 
 namespace chucho
 {

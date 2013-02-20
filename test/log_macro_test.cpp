@@ -5,7 +5,8 @@
 #include <sstream>
 #include <vector>
 #include <array>
-#include <iostream>
+#include <algorithm>
+#include <cstring>
 
 namespace
 {

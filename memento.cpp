@@ -1,6 +1,7 @@
 #include <chucho/memento.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
+#include <algorithm>
 
 namespace chucho
 {

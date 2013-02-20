@@ -5,6 +5,7 @@
 #include <chucho/status_manager.hpp>
 #include <chucho/marker.hpp>
 #include <chucho/diagnostic_context.hpp>
+#include <chucho/calendar.hpp>
 #include <sstream>
 #include <thread>
 #if !defined(_WIN32)
@@ -126,13 +127,9 @@ TEST_F(pattern_formatter_test, utc_date_time)
     chucho::pattern_formatter f("%d");
     std::time_t secs = std::chrono::duration_cast<std::chrono::seconds>(evt_.get_time().time_since_epoch()).count();
     struct std::tm cal = *std::gmtime(&secs);
-    std::ostringstream stream;
-    stream << std::put_time(&cal, "%Y-%m-%d %H:%M:%S");
-    EXPECT_EQ(stream.str(), f.format(evt_));
+    EXPECT_EQ(chucho::calendar::format(cal, "%Y-%m-%d %H:%M:%S"), f.format(evt_));
     f = chucho::pattern_formatter("%d{%Y}");
-    stream.str("");
-    stream << std::put_time(&cal, "%Y");
-    EXPECT_EQ(stream.str(), f.format(evt_));
+    EXPECT_EQ(chucho::calendar::format(cal, "%Y"), f.format(evt_));
 }
 
 TEST_F(pattern_formatter_test, local_date_time)
@@ -140,13 +137,9 @@ TEST_F(pattern_formatter_test, local_date_time)
     chucho::pattern_formatter f("%D");
     std::time_t secs = std::chrono::duration_cast<std::chrono::seconds>(evt_.get_time().time_since_epoch()).count();
     struct std::tm cal = *std::localtime(&secs);
-    std::ostringstream stream;
-    stream << std::put_time(&cal, "%Y-%m-%d %H:%M:%S");
-    EXPECT_EQ(stream.str(), f.format(evt_));
+    EXPECT_EQ(chucho::calendar::format(cal, "%Y-%m-%d %H:%M:%S"), f.format(evt_));
     f = chucho::pattern_formatter("%D{%Y}");
-    stream.str("");
-    stream << std::put_time(&cal, "%Y");
-    EXPECT_EQ(stream.str(), f.format(evt_));
+    EXPECT_EQ(chucho::calendar::format(cal, "%Y"), f.format(evt_));
 }
 
 TEST_F(pattern_formatter_test, with_literal)
