@@ -10,26 +10,24 @@
 #include <iterator>
 #include <vector>
 
+struct TRex;
+
 namespace chucho
 {
 
 namespace regex
 {
 
-struct expression_handle;
-
 struct expression
 {
-    static constexpr int normal = 0;
-    static constexpr int ignore_case = 1;
-
-    expression(const std::string& re, int flags = normal);
-    expression(const expression& ex);
+public:
+    expression(const std::string& re);
+    expression(const expression& ex) = delete;
     ~expression();
 
-    expression& operator= (const expression& ex);
+    expression& operator= (const expression& ex) = delete;
 
-    std::shared_ptr<expression_handle> handle_;
+    TRex* trex_;
 };
 
 class sub_match
@@ -58,13 +56,11 @@ private:
     std::vector<sub_match> subs_;
 };
 
-struct iterator_handle;
-
 class iterator : public std::iterator<std::forward_iterator_tag, match>
 {
 public:
     iterator();
-    iterator(const std::string& text, expression& re, std::size_t groups = 0);
+    iterator(const std::string& text, expression& re);
 
     bool operator== (const iterator& it) const;
     bool operator!= (const iterator& it) const;
@@ -73,13 +69,20 @@ public:
     reference operator* ();
 
 private:
-    std::shared_ptr<iterator_handle> handle_;
+    expression* re_;
+    std::string text_;
+    std::size_t offset_;
     match match_;
-    std::size_t groups_;
 };
 
 std::string replace(const std::string& text, expression& re, const std::string& rep);
 bool search(const std::string& text, expression& re);
+
+inline sub_match::sub_match(int begin, std::size_t length)
+    : begin_(begin),
+      length_(length)
+{
+}
 
 inline int sub_match::begin() const
 {
@@ -104,6 +107,13 @@ inline std::size_t match::size() const
 inline bool iterator::operator!= (const iterator& it) const
 {
     return !operator==(it);
+}
+
+inline iterator iterator::operator++ (int)
+{
+    iterator pre = *this;
+    operator++();
+    return pre;
 }
 
 inline iterator::reference iterator::operator* ()

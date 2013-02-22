@@ -2,6 +2,7 @@
 #include <mutex>
 #include <sstream>
 #include <vector>
+#include <iomanip>
 
 #if !defined(CHUCHO_HAVE_GMTIME_R) || !defined(CHUCHO_HAVE_LOCALTIME_R)
 

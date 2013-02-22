@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
-PROJECT(chuhco CXX)
+PROJECT(chuhco CXX C)
 
 INCLUDE(Configure.cmake)
 
@@ -15,12 +15,6 @@ IF(CHUCHO_POSIX)
         platform/posix/file_posix.cpp
         platform/posix/line_ending_posix.cpp
         platform/posix/pattern_formatter_posix.cpp)
-ENDIF()
-
-IF(CHUCHO_HAVE_STD_REGEX)
-    LIST(APPEND CHUCHO_PLATFORM_SOURCES platform/std/regex_std.cpp)
-ELSEIF(CHUCHO_HAVE_POSIX_REGEX)
-    LIST(APPEND CHUCHO_PLATFORM_SOURCES platform/posix/regex_posix.cpp)
 ENDIF()
 
 SET(CHUCHO_PUBLIC_HEADERS
@@ -99,6 +93,7 @@ SET(CHUCHO_SOURCES
     pattern_formatter.cpp
     pattern_formatter_factory.cpp
     pattern_formatter_memento.cpp
+    regex.cpp
     regex_exception.cpp
     rolling_file_writer.cpp
     rolling_file_writer_factory.cpp
@@ -114,6 +109,7 @@ SET(CHUCHO_SOURCES
     time_file_roller.cpp
     time_file_roller_factory.cpp
     time_file_roller_memento.cpp
+    trex.c
     utf8_validator.cpp
     writer.cpp
     writer_factory.cpp
@@ -154,6 +150,7 @@ SET(CHUCHO_SOURCES
     include/chucho/status_reporter.hpp
     include/chucho/time_file_roller_factory.hpp
     include/chucho/time_file_roller_memento.hpp
+    trex.h
     include/chucho/utf8_validator.hpp
     include/chucho/yaml_configurator.hpp
     ${CHUCHO_PLATFORM_SOURCES}

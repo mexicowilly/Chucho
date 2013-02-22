@@ -57,12 +57,11 @@ void configurator::initialize()
 
 std::string configurator::resolve_variables(const std::string& val)
 {
-    static regex::expression re("\\$(ENV)?\\{([^}]+)\\}",
-                                regex::expression::ignore_case);
+    static regex::expression re("\\$([Ee][Nn][Vv])?\\{(.+)\\}");
 
     std::string result(val);
     int pos_offset = 0;
-    regex::iterator itor(val, re, 2);
+    regex::iterator itor(val, re);
     regex::iterator end;
     while (itor != end)
     {

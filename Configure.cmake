@@ -141,6 +141,7 @@ IF(CHUCHO_POSIX)
     ELSE()
         MESSAGE(WARNING "The contents of the yaml-cpp static library cannot be added to the chucho static library because a suitable CMake generator is not being used. You must build with either Unix Makefiles or NMake Makefiles in order for yaml-cpp to be added to the chucho static library. Withtout yaml-cpp being included in chucho's static library, you will have to explicitly link yaml-cpp to components that link to chucho's static library.")
     ENDIF()
+    SET(CHUCHO_CAN_ARCHIVE FALSE)
 
     # whether linking to libpthread is required
     SET(CHUCHO_PTHREAD_SOURCE "#include <pthread.h>\npthread_key_t k; void d(void*) { }; int main() { pthread_key_create(&k, d); return 0; }")
@@ -159,14 +160,20 @@ IF(CHUCHO_POSIX)
     ENDIF()
 ENDIF()
 
+#
+# CHECK_CXX_SYMBOL_EXISTS does not work for the following
+#
+
 # std::put_time
-CHECK_CXX_SYMBOL_EXISTS(std::put_time iomanip CHUCHO_HAVE_PUT_TIME)
+CHECK_CXX_SOURCE_COMPILES("#include <iomanip>\nint main() { std::tm t; std::put_time(&t, \\\"%Y\\\"); return 0; }"
+                          CHUCHO_HAVE_PUT_TIME)
 IF(CHUCHO_HAVE_PUT_TIME)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_PUT_TIME)
 ENDIF()
 
 # regex
-CHECK_CXX_SYMBOL_EXISTS(std::regex_iterator regex CHUCHO_HAVE_STD_REGEX)
+CHECK_CXX_SOURCE_COMPILES("#include <regex>\nint main() { std::sregex_iterator i; return 0; }"
+                          CHUCHO_HAVE_STD_REGEX)
 IF(NOT CHUCHO_HAVE_STD_REGEX)
     FOREACH(SYM regcomp regexec regerror regfree)
         CHECK_CXX_SYMBOL_EXISTS(${SYM} regex.h CHUCHO_HAVE_${SYM})
