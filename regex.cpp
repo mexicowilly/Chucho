@@ -1,5 +1,6 @@
 #include <chucho/regex.hpp>
 #include <chucho/regex_exception.hpp>
+#include <limits>
 
 extern "C"
 {

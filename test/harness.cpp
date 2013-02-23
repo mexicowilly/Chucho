@@ -2,6 +2,7 @@
 #include <chucho/status_manager.hpp>
 #include <chucho/configuration.hpp>
 #include <iostream>
+#include <fstream>
 
 class all_status : public chucho::status_observer
 {
@@ -28,6 +29,14 @@ private:
 
 int main(int argc, char* argv[])
 {
+    if (argc == 3 && strcmp(argv[1], "--location") == 0)
+    {
+        std::ofstream stream(argv[2]);
+        if (!stream.is_open())
+            return EXIT_FAILURE;
+        stream << argv[0];
+        return EXIT_SUCCESS;
+    }
     ::testing::InitGoogleTest(&argc, argv);
     ::testing::AddGlobalTestEnvironment(new global_fixture());
     return RUN_ALL_TESTS();

@@ -1,7 +1,7 @@
 #if !defined(CHUCHO_REGEX_EXCEPTION_HPP__)
 #define CHUCHO_REGEX_EXCEPTION_HPP__
 
-#if !defined(chucho_shared_EXPORTS)
+#if !defined(chucho_EXPORTS)
 #error "This header is private"
 #endif
 

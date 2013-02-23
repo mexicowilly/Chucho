@@ -5,11 +5,6 @@ INCLUDE(ExternalProject)
 
 # static and shared
 OPTION(ENABLE_SHARED "Whether to build a shared object" FALSE)
-OPTION(ENABLE_STATIC "Whether to build a static library" TRUE)
-
-IF(NOT ENABLE_SHARED AND NOT ENABLE_STATIC)
-    MESSAGE(FATAL_ERROR "Either ENABLE_SHARED or ENABLE_STATIC must be TRUE")
-ENDIF()
 
 # Set consistent platform names
 IF(CMAKE_SYSTEM_NAME STREQUAL Windows)
@@ -31,6 +26,15 @@ ELSEIF(CMAKE_SYSTEM_NAME STREQUAL AIX)
 ENDIF()
 IF(NOT CHUCHO_WINDOWS)
     SET(CHUCHO_POSIX TRUE)
+ENDIF()
+
+# The environment variable for the rtld
+IF(CHUCHO_MACINTOSH)
+    SET(CHUCHO_LD_ENV_VAR DYLD_LIBRARY_PATH)
+ELSEIF(CHUCHO_POSIX)
+    SET(CHUCHO_LD_ENV_VAR LD_LIBRARY_PATH)
+ELSEIF(CHUCHO_WINDOWS)
+    SET(CHUCHO_LD_ENV_VAR PATH)
 ENDIF()
 
 # Set default build type
@@ -59,6 +63,7 @@ IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
 	IF(CMAKE_GENERATOR STREQUAL Xcode)
 		SET(CMAKE_EXE_LINKER_FLAGS "-std=c++11 -stdlib=libc++")
 	ENDIF()
+    SET(CHUCHO_PIC_FLAGS -fPIC)
 ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
     IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.7)
         MESSAGE(FATAL_ERROR "g++ version 4.7 or later is required")
@@ -69,6 +74,7 @@ ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
     ELSE()
         MESSAGE(FATAL_ERROR "-std=c++11 is required")
     ENDIF()
+    SET(CHUCHO_PIC_FLAGS -fPIC)
 ENDIF()
 
 # rpath
@@ -131,18 +137,6 @@ IF(CHUCHO_POSIX)
         MESSAGE(FATAL_ERROR "realpath is required")
     ENDIF()
 
-    # ar
-    FIND_PROGRAM(CHUCHO_AR ar)
-    IF(NOT CHUCHO_AR)
-        MESSAGE(WARNING "The ar command is used to place yaml-cpp object modules in the chucho static library. Without this, it is necessary to link yaml-cpp explicitly to every component that also links chucho's static library.")
-    ENDIF()
-    IF(CHUCHO_AR AND (CMAKE_GENERATOR STREQUAL "Unix Makefiles" OR CMAKE_GENERATOR STREQUAL "NMake Makefiles"))
-        SET(CHUCHO_CAN_ARCHIVE TRUE)
-    ELSE()
-        MESSAGE(WARNING "The contents of the yaml-cpp static library cannot be added to the chucho static library because a suitable CMake generator is not being used. You must build with either Unix Makefiles or NMake Makefiles in order for yaml-cpp to be added to the chucho static library. Withtout yaml-cpp being included in chucho's static library, you will have to explicitly link yaml-cpp to components that link to chucho's static library.")
-    ENDIF()
-    SET(CHUCHO_CAN_ARCHIVE FALSE)
-
     # whether linking to libpthread is required
     SET(CHUCHO_PTHREAD_SOURCE "#include <pthread.h>\npthread_key_t k; void d(void*) { }; int main() { pthread_key_create(&k, d); return 0; }")
     CHECK_CXX_SOURCE_RUNS("${CHUCHO_PTHREAD_SOURCE}" CHUCHO_PTHREAD_LINK)
@@ -169,19 +163,6 @@ CHECK_CXX_SOURCE_COMPILES("#include <iomanip>\nint main() { std::tm t; std::put_
                           CHUCHO_HAVE_PUT_TIME)
 IF(CHUCHO_HAVE_PUT_TIME)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_PUT_TIME)
-ENDIF()
-
-# regex
-CHECK_CXX_SOURCE_COMPILES("#include <regex>\nint main() { std::sregex_iterator i; return 0; }"
-                          CHUCHO_HAVE_STD_REGEX)
-IF(NOT CHUCHO_HAVE_STD_REGEX)
-    FOREACH(SYM regcomp regexec regerror regfree)
-        CHECK_CXX_SYMBOL_EXISTS(${SYM} regex.h CHUCHO_HAVE_${SYM})
-        IF(NOT CHUCHO_HAVE_${SYM})
-            MESSAGE(FATAL_ERROR "Either the std::regex library or the POSIX regular expression functions are required")
-        ENDIF()
-    ENDFOREACH()
-    SET(CHUCHO_HAVE_POSIX_REGEX TRUE)
 ENDIF()
 
 # doxygen
@@ -240,15 +221,21 @@ IF(CHUCHO_WINDOWS)
 ELSE()
     SET(CHUCHO_YAML_CPP_GENERATOR "Unix Makefiles")
 ENDIF()
+IF(ENABLE_SHARED)
+    SET(CHUCHO_YAML_CMAKE_FLAGS -DBUILD_SHARED_LIBS=ON)
+    SET(CHUCHO_YAML_LIB libyaml-cpp.so.0.3)
+ELSE()
+    SET(CHUCHO_YAML_LIB libyaml-cpp.a)
+ENDIF()
 
 ExternalProject_Add(yaml-cpp-external
                     URL http://yaml-cpp.googlecode.com/files/yaml-cpp-0.3.0.tar.gz
                     URL_MD5 9aa519205a543f9372bf4179071c8ac6
-                    CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}" -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DYAML_CPP_BUILD_TOOLS=OFF
+                    CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}" -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DYAML_CPP_BUILD_TOOLS=OFF ${CHUCHO_YAML_CMAKE_FLAGS}
 					CMAKE_GENERATOR ${CHUCHO_YAML_CPP_GENERATOR})
 ADD_LIBRARY(yaml-cpp STATIC IMPORTED)
 SET_TARGET_PROPERTIES(yaml-cpp PROPERTIES
-                      IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/libyaml-cpp.a")
+                      IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/${CHUCHO_YAML_LIB}")
 ADD_DEPENDENCIES(external yaml-cpp-external)
 
 # utf8-cpp

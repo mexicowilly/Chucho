@@ -1,7 +1,7 @@
 #if !defined(CHUCHO_SIZE_FILE_ROLL_TRIGGER_FACTORY_HPP__)
 #define CHUCHO_SIZE_FILE_ROLL_TRIGGER_FACTORY_HPP__
 
-#if !defined(chucho_shared_EXPORTS)
+#if !defined(chucho_EXPORTS)
 #error "This header is private"
 #endif
 

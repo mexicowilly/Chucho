@@ -1,7 +1,7 @@
 #if !defined(CHUCHO_PATTERN_FORMATTER_MEMENTO_HPP__)
 #define CHUCHO_PATTERN_FORMATTER_MEMENTO_HPP__
 
-#if !defined(chucho_shared_EXPORTS)
+#if !defined(chucho_EXPORTS)
 #error "This header is private"
 #endif
 

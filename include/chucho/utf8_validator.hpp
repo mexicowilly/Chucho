@@ -1,7 +1,7 @@
 #if !defined(CHUCHO_UTF8_VALIDATOR_HPP__)
 #define CHUCHO_UTF8_VALIDATOR_HPP__
 
-#if !defined(chucho_shared_EXPORTS)
+#if !defined(chucho_EXPORTS)
 #error "This header is private"
 #endif
 
