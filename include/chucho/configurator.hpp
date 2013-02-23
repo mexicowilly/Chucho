@@ -1,10 +1,6 @@
 #if !defined(CHUCHO_CONFIGURATOR_HPP__)
 #define CHUCHO_CONFIGURATOR_HPP__
 
-#if !defined(chucho_EXPORTS)
-#error "This header is private"
-#endif
-
 #include <chucho/status_reporter.hpp>
 #include <chucho/configuration.hpp>
 #include <map>

@@ -183,6 +183,7 @@ TEST_F(yaml_configurator, logger)
               "    writes_to_ancestors: false");
     std::shared_ptr<chucho::logger> lgr = chucho::logger::get("will");
     EXPECT_EQ(std::string("will"), lgr->get_name());
+    ASSERT_TRUE(static_cast<bool>(lgr->get_level()));
     EXPECT_EQ(*chucho::level::FATAL, *lgr->get_level());
     EXPECT_FALSE(lgr->writes_to_ancestors());
 }

@@ -28,15 +28,6 @@ IF(NOT CHUCHO_WINDOWS)
     SET(CHUCHO_POSIX TRUE)
 ENDIF()
 
-# The environment variable for the rtld
-IF(CHUCHO_MACINTOSH)
-    SET(CHUCHO_LD_ENV_VAR DYLD_LIBRARY_PATH)
-ELSEIF(CHUCHO_POSIX)
-    SET(CHUCHO_LD_ENV_VAR LD_LIBRARY_PATH)
-ELSEIF(CHUCHO_WINDOWS)
-    SET(CHUCHO_LD_ENV_VAR PATH)
-ENDIF()
-
 # Set default build type
 IF(NOT CMAKE_BUILD_TYPE)
     SET(CMAKE_BUILD_TYPE Release CACHE STRING "Build type, one of: Release, Debug, RelWithDebInfo, or MinSizeRel" FORCE)
@@ -63,7 +54,6 @@ IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
 	IF(CMAKE_GENERATOR STREQUAL Xcode)
 		SET(CMAKE_EXE_LINKER_FLAGS "-std=c++11 -stdlib=libc++")
 	ENDIF()
-    SET(CHUCHO_PIC_FLAGS -fPIC)
 ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
     IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.7)
         MESSAGE(FATAL_ERROR "g++ version 4.7 or later is required")
@@ -74,7 +64,6 @@ ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
     ELSE()
         MESSAGE(FATAL_ERROR "-std=c++11 is required")
     ENDIF()
-    SET(CHUCHO_PIC_FLAGS -fPIC)
 ENDIF()
 
 # rpath
@@ -214,39 +203,3 @@ ELSE(CHUCHO_WINDOWS)
                           IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/libgtest.a")
 ENDIF()
 ADD_DEPENDENCIES(external gtest-external)
-
-# yaml-cpp
-IF(CHUCHO_WINDOWS)
-    SET(CHUCHO_YAML_CPP_GENERATOR "NMake Makefiles")
-ELSE()
-    SET(CHUCHO_YAML_CPP_GENERATOR "Unix Makefiles")
-ENDIF()
-IF(ENABLE_SHARED)
-    SET(CHUCHO_YAML_CMAKE_FLAGS -DBUILD_SHARED_LIBS=ON)
-    SET(CHUCHO_YAML_LIB libyaml-cpp.so.0.3)
-ELSE()
-    SET(CHUCHO_YAML_LIB libyaml-cpp.a)
-ENDIF()
-
-ExternalProject_Add(yaml-cpp-external
-                    URL http://yaml-cpp.googlecode.com/files/yaml-cpp-0.3.0.tar.gz
-                    URL_MD5 9aa519205a543f9372bf4179071c8ac6
-                    CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}" -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DYAML_CPP_BUILD_TOOLS=OFF ${CHUCHO_YAML_CMAKE_FLAGS}
-					CMAKE_GENERATOR ${CHUCHO_YAML_CPP_GENERATOR})
-ADD_LIBRARY(yaml-cpp STATIC IMPORTED)
-SET_TARGET_PROPERTIES(yaml-cpp PROPERTIES
-                      IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/${CHUCHO_YAML_LIB}")
-ADD_DEPENDENCIES(external yaml-cpp-external)
-
-# utf8-cpp
-ExternalProject_Add(utf8-cpp-external
-                    URL http://sourceforge.net/projects/utfcpp/files/utf8cpp_2x/Release%202.3.2/utf8_v2_3_2.zip/download
-                    CONFIGURE_COMMAND ""
-                    BUILD_COMMAND ""
-                    INSTALL_COMMAND "")
-ExternalProject_Add_Step(utf8-cpp-external
-                         install-headers
-                         COMMAND "${CMAKE_COMMAND}" -E make_directory <INSTALL_DIR>/include
-                         COMMAND "${CMAKE_COMMAND}" -E copy_directory <SOURCE_DIR>/source <INSTALL_DIR>/include
-                         DEPENDEES install)
-ADD_DEPENDENCIES(external utf8-cpp-external)

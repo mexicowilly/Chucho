@@ -72,9 +72,7 @@ iterator& iterator::operator++ ()
                     if (m.len == 0)
                         match_.subs_.push_back(sub_match(-1, 0));
                     else
-                    {
                         match_.subs_.push_back(sub_match(m.begin - cur + offset_, m.len));
-                    }
                 }
             }
             offset_ = match_.subs_[0].begin() + match_.subs_[0].length();

@@ -3,7 +3,7 @@ PROJECT(chuhco CXX C)
 
 INCLUDE(Configure.cmake)
 
-INCLUDE_DIRECTORIES(include "${CHUCHO_EXTERNAL_PREFIX}/include")
+INCLUDE_DIRECTORIES(include embedded/include)
 
 SET(CHUCHO_VERSION 1.1)
 SET(CHUCHO_SO_VERSION 1)
@@ -54,6 +54,34 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/writer.hpp
     include/chucho/writer_factory.hpp
     include/chucho/writer_memento.hpp)
+
+SET(CHUCHO_EMBEDDED_SOURCES
+    embedded/trex/trex.c
+    embedded/yaml-cpp/aliasmanager.cpp
+    embedded/yaml-cpp/binary.cpp
+    embedded/yaml-cpp/conversion.cpp
+    embedded/yaml-cpp/directives.cpp
+    embedded/yaml-cpp/emitfromevents.cpp
+    embedded/yaml-cpp/emitter.cpp
+    embedded/yaml-cpp/emitterstate.cpp
+    embedded/yaml-cpp/emitterutils.cpp
+    embedded/yaml-cpp/exp.cpp
+    embedded/yaml-cpp/iterator.cpp
+    embedded/yaml-cpp/node.cpp
+    embedded/yaml-cpp/null.cpp
+    embedded/yaml-cpp/nodebuilder.cpp
+    embedded/yaml-cpp/nodeownership.cpp
+    embedded/yaml-cpp/ostream.cpp
+    embedded/yaml-cpp/parser.cpp
+    embedded/yaml-cpp/regex.cpp
+    embedded/yaml-cpp/scanner.cpp
+    embedded/yaml-cpp/scanscalar.cpp
+    embedded/yaml-cpp/scantag.cpp
+    embedded/yaml-cpp/scantoken.cpp
+    embedded/yaml-cpp/simplekey.cpp
+    embedded/yaml-cpp/singledocparser.cpp
+    embedded/yaml-cpp/stream.cpp
+    embedded/yaml-cpp/tag.cpp)
 
 SET(CHUCHO_SOURCES
     cerr_writer.cpp
@@ -109,7 +137,6 @@ SET(CHUCHO_SOURCES
     time_file_roller.cpp
     time_file_roller_factory.cpp
     time_file_roller_memento.cpp
-    trex.c
     utf8_validator.cpp
     writer.cpp
     writer_factory.cpp
@@ -150,17 +177,16 @@ SET(CHUCHO_SOURCES
     include/chucho/status_reporter.hpp
     include/chucho/time_file_roller_factory.hpp
     include/chucho/time_file_roller_memento.hpp
-    trex.h
     include/chucho/utf8_validator.hpp
     include/chucho/yaml_configurator.hpp
     ${CHUCHO_PLATFORM_SOURCES}
+    ${CHUCHO_EMBEDDED_SOURCES}
     ${CHUCHO_PUBLIC_HEADERS})
 
-SET(CHUCHO_EXTERNAL_DEPS yaml-cpp-external utf8-cpp-external)
+SET(CHUCHO_EXTERNAL_DEPS utf8-cpp-external)
 
 IF(ENABLE_SHARED)
     ADD_LIBRARY(chucho SHARED ${CHUCHO_SOURCES})
-    TARGET_LINK_LIBRARIES(chucho yaml-cpp)
     ADD_DEPENDENCIES(chucho ${CHUCHO_EXTERNAL_DEPS})
     SET_TARGET_PROPERTIES(chucho PROPERTIES
                           COMPILE_FLAGS "${CHUCHO_CXX_SO_FLAGS}"
@@ -186,9 +212,6 @@ ELSE()
     INSTALL(TARGETS chucho
             ARCHIVE DESTINATION lib
             PUBLIC_HEADER DESTINATION include/chucho)
-    GET_TARGET_PROPERTY(CHUCHO_YAML_CPP_LOCATION yaml-cpp IMPORTED_LOCATION)
-    INSTALL(FILES "${CHUCHO_YAML_CPP_LOCATION}"
-            DESTINATION lib)
 ENDIF()
 
 ADD_SUBDIRECTORY(test)

@@ -5,6 +5,7 @@
 #error "This header is private"
 #endif
 
+#include <chucho/export.hpp>
 #include <memory>
 #include <string>
 #include <iterator>
@@ -18,7 +19,7 @@ namespace chucho
 namespace regex
 {
 
-struct expression
+struct CHUCHO_EXPORT expression
 {
 public:
     expression(const std::string& re);
@@ -30,7 +31,7 @@ public:
     TRex* trex_;
 };
 
-class sub_match
+class CHUCHO_EXPORT sub_match
 {
 public:
     sub_match(int begin, std::size_t length);
@@ -43,7 +44,7 @@ private:
     std::size_t length_;
 };
 
-class match
+class CHUCHO_EXPORT match
 {
 public:
     const sub_match& operator[] (unsigned idx) const;
@@ -56,7 +57,7 @@ private:
     std::vector<sub_match> subs_;
 };
 
-class iterator : public std::iterator<std::forward_iterator_tag, match>
+class CHUCHO_EXPORT iterator : public std::iterator<std::forward_iterator_tag, match>
 {
 public:
     iterator();
@@ -75,8 +76,8 @@ private:
     match match_;
 };
 
-std::string replace(const std::string& text, expression& re, const std::string& rep);
-bool search(const std::string& text, expression& re);
+CHUCHO_EXPORT std::string replace(const std::string& text, expression& re, const std::string& rep);
+CHUCHO_EXPORT bool search(const std::string& text, expression& re);
 
 inline sub_match::sub_match(int begin, std::size_t length)
     : begin_(begin),
