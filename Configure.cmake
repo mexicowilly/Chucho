@@ -191,7 +191,7 @@ IF(CHUCHO_WINDOWS)
                              COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/gtest_main.lib <INSTALL_DIR>/lib
                              COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/gtest_main.pdb <INSTALL_DIR>/lib
                              DEPENDEES install-headers)
-ELSE(CHUCHO_WINDOWS)
+ELSE()
     ExternalProject_Add_Step(gtest-external
                              install-libs
                              COMMAND "${CMAKE_COMMAND}" -E make_directory <INSTALL_DIR>/lib
