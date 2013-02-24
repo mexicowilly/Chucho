@@ -22,6 +22,12 @@ INCLUDE(ExternalProject)
 # static and shared
 OPTION(ENABLE_SHARED "Whether to build a shared object" FALSE)
 
+# framework or not
+OPTION(ENABLE_FRAMEWORK "Whether to build as a framework on Macintosh" TRUE)
+IF(ENABLE_FRAMEWORK)
+    SET(CHUCHO_NEED_TO_USE_THE_FRAMEWORK_VARIABLE_OR_CMAKE_COMPLAINS ${ENABLE_FRAMEWORK})
+ENDIF()
+
 # Set consistent platform names
 IF(CMAKE_SYSTEM_NAME STREQUAL Windows)
     SET(CHUCHO_WINDOWS TRUE)
