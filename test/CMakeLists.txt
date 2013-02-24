@@ -18,6 +18,7 @@ ADD_DEFINITIONS(-DGTEST_HAS_TR1_TUPLE=0 -Dchucho_EXPORTS)
 INCLUDE_DIRECTORIES("${CHUCHO_EXTERNAL_PREFIX}/include")
 
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
+               configuration_test.cpp
                diagnostic_context_test.cpp
                file_test.cpp
                file_writer_test.cpp

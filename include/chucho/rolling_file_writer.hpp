@@ -25,12 +25,6 @@ namespace chucho
 {
 
 /**
- * @defgroup rolling Rolling Files
- * Classes that roll files, write to rolled files, and determine 
- * when files should roll. 
- */
-
-/**
  * @class rolling_file_writer rolling_file_writer.hpp chucho/rolling_file_writer.hpp 
  * A @ref writer that writes to files and rolls them. A 
  * rolling_file_writer does its work with the help of a couple 
@@ -52,10 +46,10 @@ namespace chucho
  *  
  * The rolling_file_writer may be constructed either with or 
  * without an active file name. Without an active file name, the 
- * active name becomes the current name becomes the result of 
- * calling the @ref file_roller::get_active_file_name() method. 
- * If the rolling_file_writer is constructed with its own active 
- * file name, then that file is always the one that is currently 
+ * active name becomes the result of calling the
+ * @ref file_roller::get_active_file_name() method. If the 
+ * rolling_file_writer is constructed with its own active file 
+ * name, then that file is always the one that is currently 
  * being written, and the rolled files get their names from the 
  * @ref file_roller. 
  *  

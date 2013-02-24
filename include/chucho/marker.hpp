@@ -34,6 +34,8 @@ namespace chucho
  * differentiating log messages that originate from the same 
  * location, or for any other situation where distinguishing log 
  * messages is important. 
+ *  
+ * @ingroup miscellaneous 
  */
 class CHUCHO_EXPORT marker
 {

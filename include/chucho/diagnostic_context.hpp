@@ -30,6 +30,8 @@ namespace chucho
  * pairs. The pattern_formatter supports accepting a 
  * diagnostic_context key, which will be inserted into the 
  * message as the key's value. 
+ *  
+ * @ingroup miscellaneous 
  */
 class CHUCHO_EXPORT diagnostic_context
 {

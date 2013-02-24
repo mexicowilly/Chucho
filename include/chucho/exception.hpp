@@ -27,6 +27,8 @@ namespace chucho
 /**
  * @class exception exception.hpp chucho/exception.hpp
  * Chucho exceptions.
+ *  
+ * @ingroup miscellaneous 
  */
 class CHUCHO_EXPORT exception : public std::exception
 {

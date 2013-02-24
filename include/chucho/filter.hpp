@@ -25,12 +25,6 @@ namespace chucho
 {
 
 /**
- * @defgroup filters 
- * Filters are attached to @ref writers, and they can be used to 
- * refine log filtering beyond the basic level check. 
- */
-
-/**
  * @class filter filter.hpp chucho/filter.hpp 
  * Conditionally filter an event. A writer may have a set of 
  * filters that provide finer-grained control of log output. 

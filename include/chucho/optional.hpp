@@ -27,6 +27,8 @@ namespace chucho
  * @class optional optional.hpp chucho/optional.hpp
  * An object that might or might not be there. This is used as a
  * helper during configuration of chucho. 
+ *  
+ * @ingroup miscellaneous 
  */
 template <typename type>
 class CHUCHO_EXPORT optional

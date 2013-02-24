@@ -40,7 +40,13 @@ namespace chucho
  *     <tr><td>ERROR</td><td>40000</td></tr>
  *     <tr><td>FATAL</td><td>50000</td></tr>
  *     <tr><td>OFF</td><td>n/a</td></tr>
- * </table>
+ * </table> 
+ *  
+ * You may create custom levels with subclasses of level, and 
+ * you may insert your custom level anywhere you wish in the 
+ * level hierarchy by setting its value. 
+ *  
+ * @ingroup levels 
  */
 class CHUCHO_EXPORT level
 {

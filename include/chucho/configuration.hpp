@@ -24,12 +24,6 @@ namespace chucho
 {
 
 /**
- * @defgroup configuration 
- * Classes and namespaces that involve the configuration of 
- * chucho. 
- */
-
-/**
  * The configuration of chucho. This namespace is found in the 
  * file <chucho/configuration.hpp>. 
  *  
@@ -103,9 +97,14 @@ CHUCHO_EXPORT style get_style();
  * file, then ./chucho.yaml will be searched. If that file does 
  * not exist, then, if default configuration is allowed, then it 
  * will be invoked. Otherwise, nothing happens.
+ *
+ * Calling this function will only actually perform 
+ * configuration if the @ref style has been set to MANUAL. 
+ * Otherwise, nothing happens. 
  * 
  * @sa @ref set_file_name() 
  * @sa @ref set_allow_default()
+ * @sa @ref set_style
  */
 CHUCHO_EXPORT void perform();
 /**

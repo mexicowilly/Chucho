@@ -35,6 +35,8 @@ class marker;
  * A log event. You don't need to worry about this. It is used 
  * internally, but required by classes that have a public 
  * interface. 
+ *  
+ * @ingroup miscellaneous 
  */
 class CHUCHO_EXPORT event
 {

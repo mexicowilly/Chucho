@@ -26,12 +26,6 @@
 namespace chucho
 {
 
-/**
- * @defgroup status 
- * Classes that facilitate the status reporting system of 
- * chucho. 
- */
-
 /** 
  * @class status status.hpp chucho/status.hpp 
  *

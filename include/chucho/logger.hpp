@@ -24,11 +24,6 @@ namespace chucho
 {
 
 /**
- * @defgroup loggers
- * The logger class and macros for writing filtered log events. 
- */
-
-/**
  * @class logger logger.hpp chucho/logger.hpp
  * A logger writes stuff when someone wants to log something. 
  * There is a hierarchy of loggers, which is to say that loggers 
