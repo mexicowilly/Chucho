@@ -20,7 +20,7 @@
  */
 
 /**
- * @mainpage 
+ * @mainpage API
  *  
  * @image html itzcuintli.png "Chucho"
  *  
