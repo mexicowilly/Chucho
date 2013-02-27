@@ -26,7 +26,7 @@
  *  
  * @section Welcome 
  * Chucho is a logging framework based on the popular Java 
- * library <a href="http://logback.qos.ch/" 
+ * library, <a href="http://logback.qos.ch/" 
  * target="_blank">Logback</a>. Chucho makes it easy to add 
  * logging to an application with, aside from the log statements 
  * themselves, very little extra code having to be written. In 
