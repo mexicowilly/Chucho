@@ -32,6 +32,12 @@ namespace chucho
  * reports status to the status_manager. It keeps a limited 
  * cache of status messages, which can be retrieved for 
  * examination. 
+ *  
+ * The status_manager by default has a @ref status_observer that 
+ * will print any @ref status of @ref status::level "WARNING" or 
+ * @ref status::level "ERROR" to std::cout. If, however, any 
+ * other observer is added, then this default observer will be 
+ * removed. 
  * 
  * @ingroup status
  */

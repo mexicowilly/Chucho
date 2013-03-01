@@ -16,6 +16,7 @@
 
 #include <chucho/status_manager.hpp>
 #include <algorithm>
+#include <iostream>
 
 namespace
 {
@@ -28,6 +29,18 @@ struct level_less
     }
 };
 
+class warn_error_status_observer : public chucho::status_observer
+{
+public:
+    virtual void status_reported(const chucho::status& st) override;
+};
+
+void warn_error_status_observer::status_reported(const chucho::status& st)
+{
+    if (st.get_level() > chucho::status::level::INFO)
+        std::cout << st << std::endl;
+}
+
 }
 
 namespace chucho
@@ -37,6 +50,7 @@ status_manager::status_manager()
     : count_(0),
       level_(status::level::INFO)
 {
+    add(std::make_shared<warn_error_status_observer>());
 }
 
 void status_manager::add(const status& st)
@@ -63,6 +77,11 @@ void status_manager::add(const status& st)
 void status_manager::add(std::shared_ptr<status_observer> obs)
 {
     std::lock_guard<std::mutex> lg(observer_guard_);
+    if (observers_.size() == 1 &&
+        std::dynamic_pointer_cast<warn_error_status_observer>(*observers_.begin()))
+    {
+        observers_.clear();
+    }
     observers_.insert(obs);
 }
 
