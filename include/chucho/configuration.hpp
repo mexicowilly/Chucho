@@ -67,9 +67,22 @@ enum class style
  * configuration. The default configuration conists of a @ref 
  * cout_writer with a basic message format.
  * 
- * @return whether default configuration is allowed
+ * @return whether default configuration is allowed, which is 
+ *         true by default
  */
 CHUCHO_EXPORT bool allow_default();
+/**
+ * Whether the environment variable CHUCHO_CONFIG can be used to 
+ * retrieve the name of the configuration file. If this is true, 
+ * then the first place to look for the name of the 
+ * configuration file will be the value of the environment 
+ * variable CHUCHO_CONFIG. 
+ * 
+ * @return whether the environment can be used as a source for 
+ *         the name of the configuration file, which is true by
+ *         default
+ */
+CHUCHO_EXPORT bool allow_environment_variable();
 /**
  * Return the configuration file name. If the function @ref 
  * set_file_name has not been called, then first the value of 
@@ -116,6 +129,17 @@ CHUCHO_EXPORT void perform();
  * @param allow whether to allow default configuration
  */
 CHUCHO_EXPORT void set_allow_default(bool allow);
+/**
+ * Set whether the environment variable CHUCHO_CONFIG can be 
+ * used to retrieve the name of the configuration file. If this 
+ * value is true, then the first place to look for the name of 
+ * the configuration file will be the value of the environment 
+ * variable CHUCHO_CONFIG. 
+ * 
+ * @param allow whether to allow searching the environment for 
+ *              the name of the configuration file
+ */
+CHUCHO_EXPORT void set_allow_environment_variable(bool allow);
 /**
  * Set the configuration file name. The configuration file name 
  * will be used at configuration time to load chucho's 

@@ -19,6 +19,7 @@
 #include <chucho/configuration.hpp>
 #include <map>
 #include <stdexcept>
+#include <atomic>
 
 namespace
 {
@@ -48,7 +49,7 @@ namespace chucho
 {
 
 std::shared_ptr<chucho::logger> root_logger;
-bool automatically_configuring = false;
+std::atomic<bool> automatically_configuring(false);
 
 logger::logger(const std::string& name, std::shared_ptr<level> lvl)
     : name_(name),
@@ -95,7 +96,8 @@ void logger::add_writer(std::shared_ptr<writer> wrt)
 
 std::shared_ptr<logger> logger::get(const std::string& name)
 {
-    std::call_once(logger_init_once, initialize);
+    if (!automatically_configuring)
+        std::call_once(logger_init_once, initialize);
     return get_impl(name);
 }
 
@@ -161,9 +163,9 @@ void logger::initialize()
     all_loggers[root_logger->get_name()] = root_logger;
     if (configuration::get_style() == configuration::style::AUTOMATIC)
     {
-        automatically_configuring = true;
+        automatically_configuring.store(true);
         configuration::perform();
-        automatically_configuring = false;
+        automatically_configuring.store(false);
     }
 }
 

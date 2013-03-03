@@ -87,20 +87,9 @@ void yaml_configurator::configure(std::istream& in)
                         }
                         else
                         {
-                            if (dynamic_cast<logger_factory*>(found->second.get()) == 0)
-                            {
-                                if (!second.IsAliased())
-                                {
-                                    report_error("The top-level type " + type +
-                                        " is not referenced elsewhere in configuration, so it is ignored");
-                                }
-                            }
-                            else
-                            {
-                                std::shared_ptr<memento> mnto = found->second->create_memento(*this);
-                                handle(type, second, mnto);
-                                found->second->create_configurable(mnto);
-                            }
+                            std::shared_ptr<memento> mnto = found->second->create_memento(*this);
+                            handle(type, second, mnto);
+                            found->second->create_configurable(mnto);
                         }
                     }
                 }
@@ -145,7 +134,7 @@ std::map<std::string, std::string> yaml_configurator::extract_variables(const YA
             {
                 throw exception(std::string("Invalid map of variable key to value: ") + e.what());
             }
-            catch (exception& e2)
+            catch (exception&)
             {
                 std::throw_with_nested(yaml_location_exception(*i));
             }
@@ -200,7 +189,7 @@ void yaml_configurator::handle(const std::string& key,
                             // It already has location information
                             throw;
                         }
-                        catch (std::exception& e)
+                        catch (std::exception&)
                         {
                             std::throw_with_nested(yaml_location_exception(second));
                         }
@@ -209,12 +198,12 @@ void yaml_configurator::handle(const std::string& key,
             }
         }
     }
-    catch (yaml_location_exception& yle)
+    catch (yaml_location_exception&)
     {
         // It already has location information
         throw;
     }
-    catch (std::exception& se)
+    catch (std::exception&)
     {
         std::throw_with_nested(yaml_location_exception(n));
     }

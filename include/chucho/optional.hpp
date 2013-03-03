@@ -187,7 +187,7 @@ inline type& optional<type>::operator* ()
 }
 
 template <typename type>
-const type& optional<type>::operator* () const
+inline const type& optional<type>::operator* () const
 {
     return reinterpret_cast<const type&>(data_);
 }

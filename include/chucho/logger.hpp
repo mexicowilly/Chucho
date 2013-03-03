@@ -38,7 +38,7 @@ namespace chucho
  * ancestor in the hierarchy of "one.two.go", which is the 
  * unnamed root logger, so really there are four.
  *  
- * A loggers ancestors play an important role in how chucho 
+ * A logger's ancestors play an important role in how chucho 
  * functions. For example, not all loggers have explicitly set 
  * levels. A log level is one of the primary determining factors 
  * into whether a log event gets written or not. If a logger 

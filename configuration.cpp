@@ -64,6 +64,7 @@ public:
 chucho::configuration::style sty = chucho::configuration::style::AUTOMATIC;
 std::string file_name(std::string(1, '.') + chucho::file::dir_sep + std::string("chucho.yaml"));
 bool allow_default_config = true;
+bool allow_environment_var = true;
 
 void set_default_config()
 {
@@ -90,6 +91,11 @@ namespace configuration
 bool allow_default()
 {
     return allow_default_config;
+}
+
+bool allow_environment_variable()
+{
+    return allow_environment_var;
 }
 
 const std::string& get_file_name()
@@ -121,10 +127,13 @@ void perform()
     }
     configurator::initialize();
     std::string fn;
-    char* ev = std::getenv("CHUCHO_CONFIG");
-    if (ev != nullptr)
-        fn = ev;
-    else
+    if (allow_environment_var)
+    {
+        char* ev = std::getenv("CHUCHO_CONFIG");
+        if (ev != nullptr)
+            fn = ev;
+    }
+    if (fn.empty())
         fn = file_name;
     if (file::exists(fn))
     {
@@ -161,6 +170,11 @@ void perform()
 void set_allow_default(bool allow)
 {
     allow_default_config = allow;
+}
+
+void set_allow_environment_variable(bool allow)
+{
+    allow_environment_var = allow;
 }
 
 void set_file_name(const std::string& name)
