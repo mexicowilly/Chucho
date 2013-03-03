@@ -23,6 +23,7 @@ INCLUDE_DIRECTORIES(include embedded/include)
 
 SET(CHUCHO_VERSION 1.1)
 SET(CHUCHO_SO_VERSION 1)
+SET(CHUCHO_DIST_VERSION 1.1-try-1)
 
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
@@ -98,6 +99,11 @@ SET(CHUCHO_EMBEDDED_SOURCES
     embedded/yaml-cpp/singledocparser.cpp
     embedded/yaml-cpp/stream.cpp
     embedded/yaml-cpp/tag.cpp)
+
+IF(CMAKE_C_COMPILER_ID STREQUAL Clang)
+    SET_SOURCE_FILES_PROPERTIES(embedded/trex/trex.c PROPERTIES
+                                COMPILE_FLAGS "-Wno-logical-op-parentheses -Wno-unused-value")
+ENDIF()
 
 SET(CHUCHO_SOURCES
     cerr_writer.cpp
@@ -199,11 +205,8 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_EMBEDDED_SOURCES}
     ${CHUCHO_PUBLIC_HEADERS})
 
-SET(CHUCHO_EXTERNAL_DEPS utf8-cpp-external)
-
 IF(ENABLE_SHARED)
     ADD_LIBRARY(chucho SHARED ${CHUCHO_SOURCES})
-    ADD_DEPENDENCIES(chucho ${CHUCHO_EXTERNAL_DEPS})
     SET_TARGET_PROPERTIES(chucho PROPERTIES
                           COMPILE_FLAGS "${CHUCHO_CXX_SO_FLAGS}"
                           VERSION ${CHUCHO_VERSION}
@@ -221,7 +224,6 @@ IF(ENABLE_SHARED)
             PUBLIC_HEADER DESTINATION include/chucho)
 ELSE()
     ADD_LIBRARY(chucho STATIC ${CHUCHO_SOURCES})
-    ADD_DEPENDENCIES(chucho ${CHUCHO_EXTERNAL_DEPS})
     SET_TARGET_PROPERTIES(chucho PROPERTIES
                           PUBLIC_HEADER "${CHUCHO_PUBLIC_HEADERS}")
     ADD_DEFINITIONS(-Dchucho_EXPORTS)
@@ -246,3 +248,32 @@ ELSE()
 	ADD_CUSTOM_TARGET(doc
 					  COMMAND "${CMAKE_COMMAND}" -E echo "Doxygen was not found on this system, so the documentation cannot be generated")
 ENDIF()
+
+# Distro
+FILE(GLOB_RECURSE CHUCHO_SOURCES RELATIVE "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/*")
+FILE(RELATIVE_PATH CHUCHO_REL_BINARY_DIR "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
+FOREACH(SRC ${CHUCHO_SOURCES})
+    IF(SRC MATCHES "^${CHUCHO_REL_BINARY_DIR}" OR SRC MATCHES ".git" OR SRC MATCHES ".DS_Store")
+        LIST(APPEND CHUCHO_TO_REMOVE "${SRC}")
+    ENDIF()
+ENDFOREACH()
+LIST(REMOVE_ITEM CHUCHO_SOURCES ${CHUCHO_TO_REMOVE})
+SET(CHUCHO_DIST_NAME_BASE "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${CHUCHO_DIST_VERSION}")
+FOREACH(SRC ${CHUCHO_SOURCES})
+    SET(CHUCHO_SRC_OUT "${CHUCHO_DIST_NAME_BASE}/${SRC}")
+    LIST(APPEND CHUCHO_DIST_OUTPUT "${CHUCHO_SRC_OUT}")
+    IF(IS_DIRECTORY "${SRC}")
+#        ADD_CUSTOM_COMMAND(OUTPUT "${CHUCHO_SRC_OUT}"
+#                           COMMAND "${CMAKE_COMMAND}" -E make_directory "${SRC}"
+#                           DEPENDS "${SRC}"
+#                           WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+    ELSE()
+        ADD_CUSTOM_COMMAND(OUTPUT "${CHUCHO_SRC_OUT}"
+                           COMMAND "${CMAKE_COMMAND}" -E copy "${SRC}" "${CHUCHO_SRC_OUT}"
+                           DEPENDS "${SRC}"
+                           WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+    ENDIF()
+ENDFOREACH()
+ADD_CUSTOM_TARGET(dist
+                  COMMAND "${CMAKE_COMMAND}" -E tar czvf "${CHUCHO_DIST_NAME_BASE}.tar.gz" "${CHUCHO_DIST_NAME_BASE}"
+                  DEPENDS ${CHUCHO_DIST_OUTPUT})
