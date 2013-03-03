@@ -168,10 +168,11 @@ level::~level()
 std::shared_ptr<level> level::from_text(const std::string& text)
 {
     std::string up;
+    std::locale c_loc("C");
     std::transform(text.begin(),
                    text.end(),
                    std::back_inserter(up),
-                   (int(*)(int))std::toupper);
+                   [&] (char c) { return std::toupper(c, c_loc); });
     std::vector<std::shared_ptr<level>> lvls =
     {
         TRACE,

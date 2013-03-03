@@ -107,7 +107,7 @@ protected:
      * @param value the text to case fold 
      * @return the lowercase version of the text
      */
-    std::string to_lower(const std::string& value);
+    std::string to_lower(const std::string& value) const;
 
     /**
      * The @ref configurator that is perform configuration.

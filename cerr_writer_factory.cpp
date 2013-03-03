@@ -18,6 +18,7 @@
 #include <chucho/cerr_writer_memento.hpp>
 #include <chucho/cerr_writer.hpp>
 #include <chucho/demangle.hpp>
+#include <chucho/exception.hpp>
 #include <assert.h>
 
 namespace chucho
@@ -32,6 +33,8 @@ std::shared_ptr<configurable> cerr_writer_factory::create_configurable(std::shar
 {
     auto cwm = std::dynamic_pointer_cast<cerr_writer_memento>(mnto);
     assert(cwm);
+    if (!cwm->get_formatter())
+        throw exception("cerr_writer_factory: The writer's formatter is not set");
     std::shared_ptr<configurable> cnf(new cerr_writer(cwm->get_formatter()));
     set_filters(cnf, cwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));

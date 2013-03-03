@@ -38,6 +38,8 @@ public:
     const optional<filter::result>& get_on_mismatch() const;
 
 private:
+    filter::result text_to_result(const std::string& text) const;
+
     std::shared_ptr<level> level_;
     optional<filter::result> on_match_;
     optional<filter::result> on_mismatch_;

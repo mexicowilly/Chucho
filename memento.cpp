@@ -52,13 +52,13 @@ void memento::handle(std::shared_ptr<configurable> cnf)
         demangle::get_demangled_name(typeid(*cnf)));
 }
 
-std::string memento::to_lower(const std::string& value)
+std::string memento::to_lower(const std::string& value) const
 {
     std::string low;
     std::transform(value.begin(),
                    value.end(),
                    std::back_inserter(low),
-                   (int(*)(int))std::tolower);
+                   [] (char c) { return std::tolower(c); });
     return low;
 }
 
