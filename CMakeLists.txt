@@ -262,17 +262,10 @@ SET(CHUCHO_DIST_NAME_BASE "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${CHUCHO_DI
 FOREACH(SRC ${CHUCHO_SOURCES})
     SET(CHUCHO_SRC_OUT "${CHUCHO_DIST_NAME_BASE}/${SRC}")
     LIST(APPEND CHUCHO_DIST_OUTPUT "${CHUCHO_SRC_OUT}")
-    IF(IS_DIRECTORY "${SRC}")
-#        ADD_CUSTOM_COMMAND(OUTPUT "${CHUCHO_SRC_OUT}"
-#                           COMMAND "${CMAKE_COMMAND}" -E make_directory "${SRC}"
-#                           DEPENDS "${SRC}"
-#                           WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-    ELSE()
-        ADD_CUSTOM_COMMAND(OUTPUT "${CHUCHO_SRC_OUT}"
-                           COMMAND "${CMAKE_COMMAND}" -E copy "${SRC}" "${CHUCHO_SRC_OUT}"
-                           DEPENDS "${SRC}"
-                           WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-    ENDIF()
+    ADD_CUSTOM_COMMAND(OUTPUT "${CHUCHO_SRC_OUT}"
+                       COMMAND "${CMAKE_COMMAND}" -E copy "${SRC}" "${CHUCHO_SRC_OUT}"
+                       DEPENDS "${SRC}"
+                       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 ENDFOREACH()
 ADD_CUSTOM_TARGET(dist
                   COMMAND "${CMAKE_COMMAND}" -E tar czvf "${CHUCHO_DIST_NAME_BASE}.tar.gz" "${CHUCHO_DIST_NAME_BASE}"
