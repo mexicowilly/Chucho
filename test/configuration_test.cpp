@@ -20,7 +20,6 @@ public:
         }
         catch (std::exception&)
         {
-            FAIL();
         }
     }
 

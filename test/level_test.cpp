@@ -28,63 +28,63 @@ TEST(level_test, compare)
     auto off = chucho::level::OFF;
 
     // trace
-    EXPECT_TRUE(trace == trace);
-    EXPECT_TRUE(trace <= trace);
-    EXPECT_TRUE(trace >= trace);
-    EXPECT_TRUE(trace < debug);
-    EXPECT_TRUE(trace <= debug);
+    EXPECT_TRUE(*trace == *trace);
+    EXPECT_TRUE(*trace <= *trace);
+    EXPECT_TRUE(*trace >= *trace);
+    EXPECT_TRUE(*trace < *debug);
+    EXPECT_TRUE(*trace <= *debug);
 
     // debug
-    EXPECT_TRUE(debug == debug);
-    EXPECT_TRUE(debug <= debug);
-    EXPECT_TRUE(debug >= debug);
-    EXPECT_TRUE(debug > trace);
-    EXPECT_TRUE(debug >= trace);
-    EXPECT_TRUE(debug < info);
-    EXPECT_TRUE(debug <= info);
+    EXPECT_TRUE(*debug == *debug);
+    EXPECT_TRUE(*debug <= *debug);
+    EXPECT_TRUE(*debug >= *debug);
+    EXPECT_TRUE(*debug > *trace);
+    EXPECT_TRUE(*debug >= *trace);
+    EXPECT_TRUE(*debug < *info);
+    EXPECT_TRUE(*debug <= *info);
 
     // info
-    EXPECT_TRUE(info == info);
-    EXPECT_TRUE(info <= info);
-    EXPECT_TRUE(info >= info);
-    EXPECT_TRUE(info > debug);
-    EXPECT_TRUE(info >= debug);
-    EXPECT_TRUE(info < warn);
-    EXPECT_TRUE(info <= warn);
+    EXPECT_TRUE(*info == *info);
+    EXPECT_TRUE(*info <= *info);
+    EXPECT_TRUE(*info >= *info);
+    EXPECT_TRUE(*info > *debug);
+    EXPECT_TRUE(*info >= *debug);
+    EXPECT_TRUE(*info < *warn);
+    EXPECT_TRUE(*info <= *warn);
 
     // warn
-    EXPECT_TRUE(warn == warn);
-    EXPECT_TRUE(warn <= warn);
-    EXPECT_TRUE(warn >= warn);
-    EXPECT_TRUE(warn > info);
-    EXPECT_TRUE(warn >= info);
-    EXPECT_TRUE(warn < error);
-    EXPECT_TRUE(warn <= error);
+    EXPECT_TRUE(*warn == *warn);
+    EXPECT_TRUE(*warn <= *warn);
+    EXPECT_TRUE(*warn >= *warn);
+    EXPECT_TRUE(*warn > *info);
+    EXPECT_TRUE(*warn >= *info);
+    EXPECT_TRUE(*warn < *error);
+    EXPECT_TRUE(*warn <= *error);
 
     // error
-    EXPECT_TRUE(error == error);
-    EXPECT_TRUE(error <= error);
-    EXPECT_TRUE(error >= error);
-    EXPECT_TRUE(error > warn);
-    EXPECT_TRUE(error >= warn);
-    EXPECT_TRUE(error < fatal);
-    EXPECT_TRUE(error <= fatal);
+    EXPECT_TRUE(*error == *error);
+    EXPECT_TRUE(*error <= *error);
+    EXPECT_TRUE(*error >= *error);
+    EXPECT_TRUE(*error > *warn);
+    EXPECT_TRUE(*error >= *warn);
+    EXPECT_TRUE(*error < *fatal);
+    EXPECT_TRUE(*error <= *fatal);
 
     // fatal
-    EXPECT_TRUE(fatal == fatal);
-    EXPECT_TRUE(fatal <= fatal);
-    EXPECT_TRUE(fatal >= fatal);
-    EXPECT_TRUE(fatal > error);
-    EXPECT_TRUE(fatal >= error);
-    EXPECT_TRUE(fatal < off);
-    EXPECT_TRUE(fatal <= off);
+    EXPECT_TRUE(*fatal == *fatal);
+    EXPECT_TRUE(*fatal <= *fatal);
+    EXPECT_TRUE(*fatal >= *fatal);
+    EXPECT_TRUE(*fatal > *error);
+    EXPECT_TRUE(*fatal >= *error);
+    EXPECT_TRUE(*fatal < *off);
+    EXPECT_TRUE(*fatal <= *off);
 
     // off
-    EXPECT_TRUE(off == off);
-    EXPECT_TRUE(off <= off);
-    EXPECT_TRUE(off >= off);
-    EXPECT_TRUE(off > fatal);
-    EXPECT_TRUE(off >= fatal);
+    EXPECT_TRUE(*off == *off);
+    EXPECT_TRUE(*off <= *off);
+    EXPECT_TRUE(*off >= *off);
+    EXPECT_TRUE(*off > *fatal);
+    EXPECT_TRUE(*off >= *fatal);
 }
 
 TEST(level_test, name)

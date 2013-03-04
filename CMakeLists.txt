@@ -34,6 +34,11 @@ IF(CHUCHO_POSIX)
         platform/posix/pattern_formatter_posix.cpp)
 ENDIF()
 
+IF(CMAKE_COMPILER_IS_GNUCXX)
+    SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
+                                COMPILE_FLAGS "-Wno-unused-result")
+ENDIF()
+
 SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/cerr_writer.hpp
     include/chucho/configurable.hpp
@@ -103,6 +108,14 @@ SET(CHUCHO_EMBEDDED_SOURCES
 IF(CMAKE_C_COMPILER_ID STREQUAL Clang)
     SET_SOURCE_FILES_PROPERTIES(embedded/trex/trex.c PROPERTIES
                                 COMPILE_FLAGS "-Wno-logical-op-parentheses -Wno-unused-value")
+ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
+    SET_SOURCE_FILES_PROPERTIES(embedded/yaml-cpp/emitter.cpp
+                                embedded/yaml-cpp/emitterstate.cpp
+                                embedded/yaml-cpp/iterator.cpp
+                                embedded/yaml-cpp/node.cpp
+                                embedded/yaml-cpp/scanner.cpp
+                                PROPERTIES
+                                COMPILE_FLAGS "-Wno-deprecated-declarations")
 ENDIF()
 
 SET(CHUCHO_SOURCES
