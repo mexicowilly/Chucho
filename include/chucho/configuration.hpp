@@ -79,6 +79,14 @@ CHUCHO_EXPORT bool allow_default();
  */
 CHUCHO_EXPORT bool allow_environment_variable();
 /**
+ * Return the fallback configuration that will be used if no 
+ * configuration file is found. By default this fallback is 
+ * empty. 
+ *  
+ * @return the fallback configuration 
+ */
+CHUCHO_EXPORT const std::string& get_fallback();
+/**
  * Return the configuration file name. If the function @ref 
  * set_file_name has not been called, then first the value of 
  * the environment varialbe CHUCHO_CONFIG is checked. If that 
@@ -106,6 +114,7 @@ void perform();
  * default configuration. The default configuration conists of a 
  * @ref cout_writer with a basic message format. 
  * 
+ * @sa set_fallback
  * @param allow whether to allow default configuration
  */
 CHUCHO_EXPORT void set_allow_default(bool allow);
@@ -120,6 +129,16 @@ CHUCHO_EXPORT void set_allow_default(bool allow);
  *              the name of the configuration file
  */
 CHUCHO_EXPORT void set_allow_environment_variable(bool allow);
+/**
+ * Set the fallback configuration. The fallback configuration 
+ * will be used if no config file is found. By default there is 
+ * no fallback configuration. 
+ *  
+ * @sa set_allow_default 
+ * @pre The config text must be valid UTF-8 YAML
+ * @param config the fallback configuration
+ */
+CHUCHO_EXPORT void set_fallback(const std::string& config);
 /**
  * Set the configuration file name. The configuration file name 
  * will be used at configuration time to load chucho's 
