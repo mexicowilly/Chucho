@@ -29,7 +29,6 @@
 namespace chucho
 {
 
-extern bool automatically_configuring;
 extern std::shared_ptr<chucho::logger> root_logger;
 
 }
@@ -116,14 +115,6 @@ void perform()
     {
         report.warning("Configuration will not be performed because it has been turned off");
         return;
-    }
-    else if (sty == style::AUTOMATIC)
-    {
-        if (!automatically_configuring)
-        {
-            report.warning("Configuration will not be performed because it has been set to automatic");
-            return;
-        }
     }
     configurator::initialize();
     std::string fn;

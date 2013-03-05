@@ -49,11 +49,6 @@ enum class style
      */
     AUTOMATIC,
     /**
-     * Configure chucho at the user's discretion. This would be 
-     * accomplished by invoking the @ref perform() method. 
-     */
-    MANUAL,
-    /**
      * Disable configuration. Using this option would imply that all 
      * chucho loggers would be created and set up using the chucho 
      * API without any configuration file.
@@ -100,26 +95,11 @@ CHUCHO_EXPORT const std::string& get_file_name();
  * @return the style
  */
 CHUCHO_EXPORT style get_style();
-/**
- * Perform configuration. This will try and find the 
- * configuration file and load it. The environment variable 
- * CHUCHO_CONFIG will always take precedence in terms of 
- * identifying the configuration file, and if that environment 
- * variable is not set, then the file name used in @ref 
- * set_file_name() will be considered. In the absense of that 
- * file, then ./chucho.yaml will be searched. If that file does 
- * not exist, then, if default configuration is allowed, then it 
- * will be invoked. Otherwise, nothing happens.
- *
- * Calling this function will only actually perform 
- * configuration if the @ref style has been set to MANUAL. 
- * Otherwise, nothing happens. 
- * 
- * @sa @ref set_file_name() 
- * @sa @ref set_allow_default()
- * @sa @ref set_style
- */
-CHUCHO_EXPORT void perform();
+
+#if !defined(CHUCHO_DONT_DOCUMENT)
+void perform();
+#endif
+
 /**
  * Set whether the default configuration is allowed. In the 
  * absence of a configuration file, chucho can establish a 

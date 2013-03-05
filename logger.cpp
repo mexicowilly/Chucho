@@ -16,7 +16,6 @@
 
 #include <chucho/logger.hpp>
 #include <chucho/configurator.hpp>
-#include <chucho/configuration.hpp>
 #include <map>
 #include <stdexcept>
 #include <atomic>
@@ -26,7 +25,6 @@ namespace
 
 std::map<std::string, std::shared_ptr<chucho::logger>> all_loggers;
 std::recursive_mutex loggers_guard;
-std::once_flag logger_init_once;
 
 std::vector<std::string> split(const std::string& name)
 {
@@ -49,7 +47,7 @@ namespace chucho
 {
 
 std::shared_ptr<chucho::logger> root_logger;
-std::atomic<bool> automatically_configuring(false);
+std::atomic<bool> is_initialized(false);
 
 logger::logger(const std::string& name, std::shared_ptr<level> lvl)
     : name_(name),
@@ -96,8 +94,10 @@ void logger::add_writer(std::shared_ptr<writer> wrt)
 
 std::shared_ptr<logger> logger::get(const std::string& name)
 {
-    if (!automatically_configuring)
-        std::call_once(logger_init_once, initialize);
+    // std::call_once does not remove the need for the atomic bool,
+    // so we just use that and roll our own call_once.
+    if (!is_initialized)
+        initialize();
     return get_impl(name);
 }
 
@@ -157,16 +157,15 @@ std::vector<std::shared_ptr<writer>> logger::get_writers()
 void logger::initialize()
 {
     std::lock_guard<std::recursive_mutex> lg(loggers_guard);
+    // When loggers are created during configuration, this variable
+    // must be true, so that we don't recurse the initialization.
+    is_initialized.store(true);
     // Getting the level from text like this ensures that the static
     // level objects are initialized in time.
     root_logger.reset(new logger("", level::from_text("info")));
     all_loggers[root_logger->get_name()] = root_logger;
     if (configuration::get_style() == configuration::style::AUTOMATIC)
-    {
-        automatically_configuring.store(true);
         configuration::perform();
-        automatically_configuring.store(false);
-    }
 }
 
 void logger::remove_unused_loggers()
