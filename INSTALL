@@ -1,0 +1,34 @@
+Chucho Installation
+===================
+
+Prerequisites
+=============
+    Chucho requires that CMake version 2.8 or later be installed. You
+may download CMake from http://www.cmake.org.
+
+    At present Chucho is only known to work with compilers clang 4.2.1
+and later and g++ 4.7 and later.
+
+Build
+=====
+    Chucho can be built with the following commands, run from the source
+directory:
+
+    $ cmake .
+    $ make
+    $ make install
+
+    Here are some interesting options for CMake that can affect the
+build. You set these with the command-line switch -D, as in
+-DCMAKE_INSTALL_PREFIX=/my/special/location.
+
+    * ENABLE_SHARED: (ON or OFF) Whether you prefer to have a shared
+      object over a static library. The default is OFF.   
+    * ENABLE_FRAMEWORK: (ON or OFF) Whether you prefer to have a
+      framework on the Macintosh operating system. If you choose to
+      build a framework, then it will be installed to
+      /Library/Frameworks. Otherwise, the library will be installed to
+      the location of CMAKE_INSTALL_PREFIX. The default is ON.
+    * CMAKE_INSTALL_PREFIX: (A directory) If you would like to install
+      Chucho to a particular location, you may set it here. The default
+      is /usr/local.
