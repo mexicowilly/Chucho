@@ -13,7 +13,11 @@ TEST(utf8_validator, invalid)
         "\xf5",
         "\xc1\x7f",
         "\xe9\x80\xff",
-        "\xf1\xa9\xc0\x80"
+        "\xf1\xa9\xc0\x80",
+        "\xc2",
+        "\xea\x80",
+        "\xf2\x80",
+        "\xf3\xa0\xb0"
     };
     for (const std::string& s : v)
     {
