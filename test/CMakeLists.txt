@@ -34,6 +34,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                regex_test.cpp
                rolling_file_writer_test.cpp
                size_file_roll_trigger_test.cpp
+               utf8_validator_test.cpp
                yaml_configurator_test.cpp)
 TARGET_LINK_LIBRARIES(unit-test chucho gtest ${CHUCHO_THREAD_LIB})
 ADD_DEPENDENCIES(unit-test gtest-external)
