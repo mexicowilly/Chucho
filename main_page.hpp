@@ -33,13 +33,19 @@
  * most cases you would just need to set the name of the Chucho 
  * configuration file, and you would be ready to go. 
  *  
+ * This is the documentation of the Chucho API. For access to 
+ * releases, documentation, tickets and source code, please 
+ * visit the <a href="https://www.assembla.com/spaces/chucho" 
+ * target="_blank">project 
+ * site</a>. 
+ *  
  * Chucho uses the same architecture as <a 
  * href="http://logback.qos.ch/" 
  * target="_blank">Logback</a>, which involes loggers, writers, 
  * formatters and other elements. For more information on the 
  * design and use of Chucho, please visit the <a 
  * href="https://www.assembla.com/spaces/chucho/wiki" 
- * target="_blank">user manual</a>, which I haven't written yet.
+ * target="_blank">user manual</a>, which is under construction.
  *  
  * @copyright &copy; 2013 Will Mason 
  */
