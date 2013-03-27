@@ -16,6 +16,7 @@
 
 #include <chucho/logger.hpp>
 #include <chucho/configurator.hpp>
+#include <chucho/configuration.hpp>
 #include <map>
 #include <stdexcept>
 #include <atomic>

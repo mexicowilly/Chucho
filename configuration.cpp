@@ -60,12 +60,6 @@ public:
     }
 };
 
-chucho::configuration::style sty = chucho::configuration::style::AUTOMATIC;
-std::string file_name(std::string(1, '.') + chucho::file::dir_sep + std::string("chucho.yaml"));
-bool allow_default_config = true;
-bool allow_environment_var = true;
-std::string fallback;
-
 void set_default_config()
 {
     if (chucho::root_logger->get_writers().empty())
@@ -82,39 +76,17 @@ void set_default_config()
 namespace chucho
 {
 
-namespace configuration
-{
+configuration::style configuration::style_ = style::AUTOMATIC;
+std::string configuration::file_name_(std::string(1, '.') + chucho::file::dir_sep + std::string("chucho.yaml"));
+bool configuration::allow_default_config_ = true;
+std::string configuration::fallback_;
+std::string configuration::environment_variable_("CHUCHO_CONFIG");
 
-bool allow_default()
-{
-    return allow_default_config;
-}
-
-bool allow_environment_variable()
-{
-    return allow_environment_var;
-}
-
-const std::string& get_fallback()
-{
-    return fallback;
-}
-
-const std::string& get_file_name()
-{
-    return file_name;
-}
-
-style get_style()
-{
-    return sty;
-}
-
-void perform()
+void configuration::perform()
 {
     reporter report;
 
-    if (sty == style::OFF)
+    if (style_ == style::OFF)
     {
         report.warning("Configuration will not be performed because it has been turned off");
         return;
@@ -122,16 +94,16 @@ void perform()
     configurator::initialize();
     bool got_config = false;
     std::string fn;
-    if (allow_environment_var)
+    if (!environment_variable_.empty())
     {
-        char* ev = std::getenv("CHUCHO_CONFIG");
+        char* ev = std::getenv(environment_variable_.c_str());
         if (ev != nullptr)
             fn = ev;
     }
     if (fn.empty())
-        fn = file_name;
+        fn = file_name_;
     yaml_configurator yam;
-    if (file::exists(fn))
+    if (!fn.empty() && file::exists(fn))
     {
         std::ifstream val_in(fn.c_str());
         if (val_in.is_open())
@@ -159,12 +131,12 @@ void perform()
     {
         report.warning("The file " + fn + " does not exist");
     }
-    if (!got_config && !fallback.empty())
+    if (!got_config && !fallback_.empty())
     {
         try
         {
             // this is already validated UTF-8
-            std::istringstream fb_in(fallback);
+            std::istringstream fb_in(fallback_);
             yam.configure(fb_in);
             got_config = true;
             report.info("Using the fallback configuration");
@@ -174,40 +146,18 @@ void perform()
             report.error("Error setting fallback configuration: " + exception::nested_whats(e));
         }
     }
-    if (!got_config && allow_default_config)
+    if (!got_config && allow_default_config_)
     {
         set_default_config();
         report.info("Using the default configuration");
     }
 }
 
-void set_allow_default(bool allow)
-{
-    allow_default_config = allow;
-}
-
-void set_allow_environment_variable(bool allow)
-{
-    allow_environment_var = allow;
-}
-
-void set_fallback(const std::string& config)
+void configuration::set_fallback(const std::string& config)
 {
     std::istringstream stream(config);
     utf8::validate(stream);
-    fallback = config;
-}
-
-void set_file_name(const std::string& name)
-{
-    file_name = name;
-}
-
-void set_style(style stl)
-{
-    sty = stl;
-}
-
+    fallback_ = config;
 }
 
 }

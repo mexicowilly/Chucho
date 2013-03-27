@@ -18,7 +18,6 @@
 #define CHUCHO_CONFIGURATOR_HPP__
 
 #include <chucho/status_reporter.hpp>
-#include <chucho/configuration.hpp>
 #include <map>
 
 namespace chucho
@@ -78,10 +77,10 @@ public:
 
 protected:
     /**
-     * The @ref configuration::perform() method must be able to call 
-     * some protected and private members of this class. 
+     * The configuration class must be able to call some protected 
+     * and private members of this class. 
      */
-    friend void configuration::perform();
+    friend class configuration;
 
     /**
      * Return all known factories. Subclasses will call this method 

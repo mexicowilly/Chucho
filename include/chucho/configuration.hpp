@@ -24,136 +24,208 @@ namespace chucho
 {
 
 /**
- * The configuration of chucho. This namespace is found in the 
- * file <chucho/configuration.hpp>. 
- *  
+ * @class configuration configuration.hpp chucho/configuration.hpp 
  * Configuration normally happens automatically when the first
  * @ref logger is requested. However, this is controllable using 
  * the configuratrion style and the @ref allow_default() method.
  * Since, configuration wants to happen using a configuration 
  * file, you may set the file name here. 
  *  
+ * When automatic configuration is allowed (the default), then 
+ * the following procedure is undertaken in order to find and 
+ * load a valid configuration: 
+ *     -# If @ref get_environment_variable is not empty, then
+ *      check the environment variable for the name of a valid
+ *      configuration file. If
+ *      @ref set_environment_variable is
+ *      not called, then the default value is CHUCHO_CONFIG. If
+ *      the variable's value is the name of a valid
+ *      configuration file, then we're done.
+ *     -# Check for a configuration file named by @ref
+ *      get_file_name. The default file name is ./chucho.yaml.
+ *      If @ref get_file_name is empty, then file configuration
+ *      is disabled. If the named file is a valid configuration
+ *      file, then we're done.
+ *     -# If @ref set_fallback has been called, then try to load
+ *      the fallback configuration. If this configuration can be
+ *      loaded, then we're done.
+ *     -# If @ref allow_default is true, then load the default
+ *      configuration. The default configuration sets one writer
+ *      on the root logger that writes to stdout. Its formatter
+ *      uses the pattern <tt>%%d{%%H:%%M:%%S.%%q} %-5p %.36c -
+ *      %%m%%n</tt>.
+ *  
  * @ingroup configuration 
  */
-namespace configuration
+class CHUCHO_EXPORT configuration
 {
+public:
+    /**
+     * The style of configuration. AUTOMATIC is the default, which 
+     * occurs the first time a @ref logger is requested.
+     */
+    enum class style
+    {
+        /**
+         * Configure chucho the first time a @ref logger is requested.
+         */
+        AUTOMATIC,
+        /**
+         * Disable configuration. Using this option would imply that all 
+         * chucho loggers would be created and set up using the chucho 
+         * API without any configuration file.
+         */
+        OFF
+    };
 
-/**
- * The style of configuration. AUTOMATIC is the default, which 
- * occurs the first time a @ref logger is requested.
- */
-enum class style
-{
     /**
-     * Configure chucho the first time a @ref logger is requested.
+     * Whether the default configuration is allowed. In the absence 
+     * of a configuration file, chucho can establish a default 
+     * configuration. The default configuration conists of a @ref 
+     * cout_writer with a basic message format.
+     * 
+     * @return whether default configuration is allowed, which is 
+     *         true by default
      */
-    AUTOMATIC,
+    static bool allow_default();
     /**
-     * Disable configuration. Using this option would imply that all 
-     * chucho loggers would be created and set up using the chucho 
-     * API without any configuration file.
+     * Return the name of the environment variable that is used to 
+     * retrieve a configuration file. The default value is 
+     * CHUCHO_CONFIG. 
+     * 
+     * @return the name of the environment variable
+     * @sa set_environment_variable 
      */
-    OFF
+    static const std::string& get_environment_variable();
+    /**
+     * Return the fallback configuration that will be used if no 
+     * configuration file is found. By default this fallback is 
+     * empty. 
+     *  
+     * @return the fallback configuration 
+     * @sa set_fallback
+     */
+    static const std::string& get_fallback();
+    /**
+     * Return the configuration file name. If the function @ref 
+     * set_file_name has not been called, then the default value of 
+     * ./chucho.yaml is returned. 
+     * 
+     * @return the configuration file name
+     */
+    static const std::string& get_file_name();
+    /**
+     * Return the configuration style. AUTOMATIC is the default 
+     * style. 
+     * 
+     * @return the style
+     */
+    static style get_style();
+
+    /**
+     * Set whether the default configuration is allowed. In the 
+     * absence of a configuration file, chucho can establish a 
+     * default configuration. The default configuration conists of a 
+     * @ref cout_writer with a basic message format. 
+     * 
+     * @param allow whether to allow default configuration
+     * @sa allow_default 
+     */
+    static void set_allow_default(bool allow);
+    /**
+     * Set the environment variable that will be used to find the 
+     * configuration file. If this method is not called, then the
+     * default variable name is CHUCHO_CONFIG. 
+     *  
+     * If var is empty, then checking the environment is disabled.
+     * 
+     * @param var the environment variable that should be used to 
+     *            look up the name of the configuration file
+     * @sa get_environment_variable 
+     */
+    static void set_environment_variable(const std::string& var);
+    /**
+     * Set the fallback configuration. The fallback configuration 
+     * will be used if no config file is found. By default there is 
+     * no fallback configuration. 
+     *  
+     * @pre The config text must be valid UTF-8 YAML
+     * @param config the fallback configuration
+     */
+    static void set_fallback(const std::string& config);
+    /**
+     * Set the configuration file name. The configuration file name 
+     * will be used at configuration time to load chucho's 
+     * configuration. 
+     *  
+     * If name is empty, then checking a named file is disabled. 
+     * 
+     * @param name the file name
+     */
+    static void set_file_name(const std::string& name);
+    /**
+     * Set the configuration style.
+     * 
+     * @param stl the style
+     */
+    static void set_style(style stl);
+
+protected:
+    friend class logger;
+
+private:
+    static void perform();
+
+    static style style_;
+    static std::string file_name_;
+    static bool allow_default_config_;
+    static std::string fallback_;
+    static std::string environment_variable_;
 };
 
-/**
- * Whether the default configuration is allowed. In the absence 
- * of a configuration file, chucho can establish a default 
- * configuration. The default configuration conists of a @ref 
- * cout_writer with a basic message format.
- * 
- * @return whether default configuration is allowed, which is 
- *         true by default
- */
-CHUCHO_EXPORT bool allow_default();
-/**
- * Whether the environment variable CHUCHO_CONFIG can be used to 
- * retrieve the name of the configuration file. If this is true, 
- * then the first place to look for the name of the 
- * configuration file will be the value of the environment 
- * variable CHUCHO_CONFIG. 
- * 
- * @return whether the environment can be used as a source for 
- *         the name of the configuration file, which is true by
- *         default
- */
-CHUCHO_EXPORT bool allow_environment_variable();
-/**
- * Return the fallback configuration that will be used if no 
- * configuration file is found. By default this fallback is 
- * empty. 
- *  
- * @return the fallback configuration 
- */
-CHUCHO_EXPORT const std::string& get_fallback();
-/**
- * Return the configuration file name. If the function @ref 
- * set_file_name has not been called, then first the value of 
- * the environment varialbe CHUCHO_CONFIG is checked. If that 
- * value does exist, then it is used as the file name, otherwise 
- * chucho falls back to ./chucho.yaml. 
- * 
- * @return the configuration file name
- */
-CHUCHO_EXPORT const std::string& get_file_name();
-/**
- * Return the configuration style. AUTOMATIC is the default 
- * style. 
- * 
- * @return the style
- */
-CHUCHO_EXPORT style get_style();
+inline bool configuration::allow_default()
+{
+    return allow_default_config_;
+}
 
-#if !defined(CHUCHO_DONT_DOCUMENT)
-void perform();
-#endif
+inline const std::string& configuration::get_environment_variable()
+{
+    return environment_variable_;
+}
 
-/**
- * Set whether the default configuration is allowed. In the 
- * absence of a configuration file, chucho can establish a 
- * default configuration. The default configuration conists of a 
- * @ref cout_writer with a basic message format. 
- * 
- * @sa set_fallback
- * @param allow whether to allow default configuration
- */
-CHUCHO_EXPORT void set_allow_default(bool allow);
-/**
- * Set whether the environment variable CHUCHO_CONFIG can be 
- * used to retrieve the name of the configuration file. If this 
- * value is true, then the first place to look for the name of 
- * the configuration file will be the value of the environment 
- * variable CHUCHO_CONFIG. 
- * 
- * @param allow whether to allow searching the environment for 
- *              the name of the configuration file
- */
-CHUCHO_EXPORT void set_allow_environment_variable(bool allow);
-/**
- * Set the fallback configuration. The fallback configuration 
- * will be used if no config file is found. By default there is 
- * no fallback configuration. 
- *  
- * @sa set_allow_default 
- * @pre The config text must be valid UTF-8 YAML
- * @param config the fallback configuration
- */
-CHUCHO_EXPORT void set_fallback(const std::string& config);
-/**
- * Set the configuration file name. The configuration file name 
- * will be used at configuration time to load chucho's 
- * configuration. 
- * 
- * @param name the file name
- */
-CHUCHO_EXPORT void set_file_name(const std::string& name);
-/**
- * Set the configuration style.
- * 
- * @param stl the style
- */
-CHUCHO_EXPORT void set_style(style stl);
+inline const std::string& configuration::get_fallback()
+{
+    return fallback_;
+}
 
+inline const std::string& configuration::get_file_name()
+{
+    return file_name_;
+}
+
+inline configuration::style configuration::get_style()
+{
+    return style_;
+}
+
+inline void configuration::set_allow_default(bool allow)
+{
+    allow_default_config_ = allow;
+}
+
+inline void configuration::set_environment_variable(const std::string& var)
+{
+    environment_variable_ = var;
+}
+
+inline void configuration::set_file_name(const std::string& name)
+{
+    file_name_ = name;
+}
+
+inline void configuration::set_style(style stl)
+{
+    style_ = stl;
 }
 
 }

@@ -37,7 +37,6 @@ namespace regex
 
 struct CHUCHO_EXPORT expression
 {
-public:
     expression(const std::string& re);
     expression(const expression& ex) = delete;
     ~expression();
