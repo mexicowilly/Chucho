@@ -22,11 +22,9 @@
 #include <chucho/marker.hpp>
 #include <chucho/diagnostic_context.hpp>
 #include <chucho/calendar.hpp>
+#include <chucho/host.hpp>
 #include <sstream>
 #include <thread>
-#if !defined(_WIN32)
-#include <sys/utsname.h>
-#endif
 
 namespace
 {
@@ -120,14 +118,14 @@ TEST_F(pattern_formatter_test, pid)
 
 TEST_F(pattern_formatter_test, base_host)
 {
-    #if defined(_WIN32)
-    #else
-    struct utsname info;
-    uname(&info);
-    std::string h(info.nodename);
-    #endif
     chucho::pattern_formatter f("%h");
-    EXPECT_EQ(h, f.format(evt_));
+    EXPECT_EQ(chucho::host::get_base_name(), f.format(evt_));
+}
+
+TEST_F(pattern_formatter_test, full_host)
+{
+    chucho::pattern_formatter f("%H");
+    EXPECT_EQ(chucho::host::get_full_name(), f.format(evt_));
 }
 
 TEST_F(pattern_formatter_test, thread)

@@ -105,7 +105,10 @@ namespace chucho
  *         <td>The fully qualified name of the file from which
  *         the log @ref event originated.</td></tr>
  *     <tr><td>h</td>
- *         <td>The name of the host.</td></tr>
+ *         <td>The base name of the host.</td></tr>
+ *     <tr><td>H</td>
+ *         <td>The fully qualified domain name of the
+ *         host.</td></tr>
  *     <tr><td>i</td>
  *         <td>The process identifier (pid) of the current
  *         process.</td></tr>
@@ -256,6 +259,18 @@ private:
     {
     public:
         base_host_piece(const format_params& params);
+
+    protected:
+        virtual std::string get_text_impl(const event& evt) const override;
+
+    private:
+        std::string name_;
+    };
+
+    class CHUCHO_NO_EXPORT full_host_piece : public piece
+    {
+    public:
+        full_host_piece(const format_params& params);
 
     protected:
         virtual std::string get_text_impl(const event& evt) const override;

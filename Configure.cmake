@@ -102,9 +102,9 @@ IF(CHUCHO_POSIX)
     ENDIF()
 
     # resource usage
-    CHECK_CXX_SYMBOL_EXISTS(getrusage sys/resource.h CHUCHO_HAVE_GETRUSAGE)
-    IF(NOT CHUCHO_HAVE_GETRUSAGE)
-        MESSAGE(FATAL_ERROR "getrusage is required")
+    CHECK_CXX_SYMBOL_EXISTS(clock time.h CHUCHO_HAVE_CLOCK)
+    IF(NOT CHUCHO_HAVE_CLOCK)
+        MESSAGE(FATAL_ERROR "clock is required")
     ENDIF()
 
     # getpid
@@ -162,6 +162,16 @@ IF(CHUCHO_POSIX)
             MESSAGE(FATAL_ERROR "can't build a program with threads at all")
         ENDIF()
         SET(CHUCHO_THREAD_LIB pthread CACHE STRING "The threading library")
+    ENDIF()
+
+    # getaddrinfo/freeaddrinfo
+    CHECK_CXX_SYMBOL_EXISTS(getaddrinfo netdb.h CHUCHO_HAVE_GETADDRINFO)
+    IF(NOT CHUCHO_HAVE_GETADDRINFO)
+        MESSAGE(FATAL_ERROR "getaddrinfo is required")
+    ENDIF()
+    CHECK_CXX_SYMBOL_EXISTS(freeaddrinfo netdb.h CHUCHO_HAVE_FREEADDRINFO)
+    IF(NOT CHUCHO_HAVE_FREEADDRINFO)
+        MESSAGE(FATAL_ERROR "freeaddrinfo is required")
     ENDIF()
 ENDIF()
 

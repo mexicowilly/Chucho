@@ -24,6 +24,7 @@
 #include <chucho/diagnostic_context.hpp>
 #include <chucho/line_ending.hpp>
 #include <chucho/printf_util.hpp>
+#include <chucho/host.hpp>
 #include <limits>
 #include <sstream>
 #include <array>
@@ -102,6 +103,9 @@ std::shared_ptr<pattern_formatter::piece> pattern_formatter::create_piece(std::s
         break;
     case 'h':
         result.reset(new base_host_piece(params));
+        break;
+    case 'H':
+        result.reset(new full_host_piece(params));
         break;
     case 'i':
         result.reset(new pid_piece(params));
@@ -427,7 +431,24 @@ void pattern_formatter::local_date_time_piece::to_calendar(time_t t, struct std:
     cal = calendar::get_local(t);
 }
 
+pattern_formatter::base_host_piece::base_host_piece(const format_params& params)
+    : piece(params),
+      name_(host::get_base_name())
+{
+}
+
 std::string pattern_formatter::base_host_piece::get_text_impl(const event& evt) const
+{
+    return name_;
+}
+
+pattern_formatter::full_host_piece::full_host_piece(const format_params& params)
+    : piece(params),
+      name_(host::get_full_name())
+{
+}
+
+std::string pattern_formatter::full_host_piece::get_text_impl(const event& evt) const
 {
     return name_;
 }

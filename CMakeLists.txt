@@ -30,6 +30,7 @@ IF(CHUCHO_POSIX)
         platform/posix/calendar_posix.cpp
         platform/posix/diagnostic_context_posix.cpp
         platform/posix/file_posix.cpp
+        platform/posix/host_posix.cpp
         platform/posix/line_ending_posix.cpp
         platform/posix/pattern_formatter_posix.cpp)
 ENDIF()
@@ -188,6 +189,7 @@ SET(CHUCHO_SOURCES
     include/chucho/exception.hpp
     include/chucho/file.hpp
     include/chucho/file_exception.hpp
+    include/chucho/host.hpp
     include/chucho/level_filter_factory.hpp
     include/chucho/level_filter_memento.hpp
     include/chucho/level_threshold_filter_factory.hpp

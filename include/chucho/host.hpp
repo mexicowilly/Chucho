@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2013 Will Mason
  * 
@@ -14,25 +15,27 @@
  *    limitations under the License.
  */
 
-#include <chucho/pattern_formatter.hpp>
-#include <time.h>
-#include <unistd.h>
+#if !defined(CHUCHO_HOST_HPP__)
+#define CHUCHO_HOST_HPP__
+
+#if !defined(chucho_EXPORTS)
+#error "This header is private"
+#endif
+
+#include <chucho/export.hpp>
+#include <string>
 
 namespace chucho
 {
 
-std::string pattern_formatter::milliseconds_since_start_piece::get_text_impl(const event& evt) const
+namespace host
 {
-    clock_t clocks = clock();
-    std::string result;
-    if (clocks != -1)
-        result = std::to_string(clocks / (CLOCKS_PER_SEC / 1000));
-    return result;
-}
 
-std::string pattern_formatter::pid_piece::get_text_impl(const event& evt) const
-{
-    return std::to_string(getpid());
+CHUCHO_EXPORT std::string get_base_name();
+CHUCHO_EXPORT std::string get_full_name();
+
 }
 
 }
+
+#endif
