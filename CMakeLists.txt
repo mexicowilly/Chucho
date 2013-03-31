@@ -49,6 +49,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/console_writer.hpp
     include/chucho/cout_writer.hpp
     include/chucho/diagnostic_context.hpp
+    include/chucho/duplicate_message_filter.hpp
     include/chucho/event.hpp
     include/chucho/exception.hpp
     include/chucho/export.hpp
@@ -132,6 +133,9 @@ SET(CHUCHO_SOURCES
     cout_writer_factory.cpp
     cout_writer_memento.cpp
     demangle.cpp
+    duplicate_message_filter.cpp
+    duplicate_message_filter_factory.cpp
+    duplicate_message_filter_memento.cpp
     event.cpp
     exception.cpp
     file_exception.cpp
@@ -186,6 +190,8 @@ SET(CHUCHO_SOURCES
     include/chucho/cout_writer_factory.hpp
     include/chucho/cout_writer_memento.hpp
     include/chucho/demangle.hpp
+    include/chucho/duplicate_message_filter_factory.hpp
+    include/chucho/duplicate_message_filter_memento.hpp
     include/chucho/exception.hpp
     include/chucho/file.hpp
     include/chucho/file_exception.hpp

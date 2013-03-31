@@ -27,6 +27,7 @@
 #include <chucho/rolling_file_writer_factory.hpp>
 #include <chucho/size_file_roll_trigger_factory.hpp>
 #include <chucho/time_file_roller_factory.hpp>
+#include <chucho/duplicate_message_filter_factory.hpp>
 #include <chucho/regex.hpp>
 #include <cstring>
 
@@ -51,6 +52,8 @@ void configurator::initialize()
     add_configurable_factory("chucho::cerr_writer", fact);
     fact.reset(new cout_writer_factory());
     add_configurable_factory("chucho::cout_writer", fact);
+    fact.reset(new duplicate_message_filter_factory());
+    add_configurable_factory("chucho::duplicate_message_filter", fact);
     fact.reset(new file_writer_factory());
     add_configurable_factory("chucho::file_writer", fact);
     fact.reset(new level_filter_factory());

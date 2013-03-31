@@ -27,6 +27,7 @@
 #include <chucho/numbered_file_roller.hpp>
 #include <chucho/size_file_roll_trigger.hpp>
 #include <chucho/time_file_roller.hpp>
+#include <chucho/duplicate_message_filter.hpp>
 #include <sstream>
 #if defined(_WIN32)
 #include <windows.h>
@@ -95,6 +96,21 @@ TEST_F(yaml_configurator, cout_writer)
     auto wrts = chucho::logger::get("will")->get_writers();
     ASSERT_EQ(1, wrts.size());
     EXPECT_EQ(typeid(chucho::cout_writer), typeid(*wrts[0]));
+}
+
+TEST_F(yaml_configurator, duplicate_message_filter)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::cout_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m%n'\n"
+              "        chucho::duplicate_message_filter");
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    auto flts = wrts[0]->get_filters();
+    ASSERT_EQ(1, flts.size());
+    ASSERT_EQ(typeid(chucho::duplicate_message_filter), typeid(*flts[0]));
 }
 
 TEST_F(yaml_configurator, file_writer)

@@ -35,14 +35,14 @@ namespace chucho
  * functions, pattern_formatter does not take immediate input in 
  * order to convert a conversion specification to text, but 
  * rather takes information from the @ref event or from the host 
- * operation system. 
+ * operating system. 
  *  
  * Just as with printf(), the conversion specifications of 
  * pattern_formatter accept modifiers that determine things like 
  * justification and field width. 
  *  
  * A conversion specification always starts with the percent 
- * sign ('%%'). This character my be followed by: 
+ * sign ('%%'). This character may be followed by: 
  * - An optional minus sign ('-'). If this field is provided, 
  *   then justification of the text will be to the left.
  *   Otherwise, it will be to the right.

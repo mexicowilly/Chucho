@@ -147,6 +147,7 @@ void yaml_configurator::handle(const std::string& key,
                                const YAML::Node& n,
                                std::shared_ptr<memento> mnto)
 {
+    std::string val;
     try
     {
         if (n.Type() == YAML::NodeType::Scalar)
@@ -157,10 +158,20 @@ void yaml_configurator::handle(const std::string& key,
         {
             for (YAML::Iterator i = n.begin(); i != n.end(); i++)
             {
-                if (n.Type() == YAML::NodeType::Sequence &&
-                    i->Type() != YAML::NodeType::Map)
+                if (n.Type() == YAML::NodeType::Sequence)
                 {
-                    throw exception("Only sequences of maps are supported in this configuration");
+                    if (i->Type() == YAML::NodeType::Scalar)
+                    {
+                        val = resolve_variables(i->to<std::string>());
+                        auto found = get_factories().find(val);
+                        if (found == get_factories().end())
+                            throw exception("The type " + val + " has no registered factory");
+                        else
+                            mnto->handle(found->second->create_configurable(found->second->create_memento(*this)));
+                        continue;
+                    }
+                    if (i->Type() != YAML::NodeType::Map)
+                        throw exception("Only sequences of maps or scalars are supported in this configuration");
                 }
                 const YAML::Node& first = (n.Type() == YAML::NodeType::Sequence) ? i->begin().first() : i.first();
                 const YAML::Node& second = (n.Type() == YAML::NodeType::Sequence) ? i->begin().second() : i.second();
@@ -170,18 +181,18 @@ void yaml_configurator::handle(const std::string& key,
                 }
                 else
                 {
-                    std::string key = resolve_variables(first.to<std::string>());
-                    auto found = get_factories().find(key);
+                    val = resolve_variables(first.to<std::string>());
+                    auto found = get_factories().find(val);
                     if (found == get_factories().end())
                     {
-                        handle(key, second, mnto);
+                        handle(val, second, mnto);
                     }
                     else
                     {
                         try
                         {
                             std::shared_ptr<memento> sub = found->second->create_memento(*this);
-                            handle(key, second, sub);
+                            handle(val, second, sub);
                             mnto->handle(found->second->create_configurable(sub));
                         }
                         catch (yaml_location_exception&)
