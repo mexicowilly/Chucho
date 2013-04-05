@@ -27,6 +27,7 @@ class trace : public chucho::level
 {
 public:
     virtual const char* get_name() const override;
+    virtual chucho::syslog::severity get_syslog_severity() const override;
     virtual int get_value() const override;
 };
 
@@ -34,6 +35,7 @@ class debug : public chucho::level
 {
 public:
     virtual const char* get_name() const override;
+    virtual chucho::syslog::severity get_syslog_severity() const override;
     virtual int get_value() const override;
 };
 
@@ -41,6 +43,7 @@ class info : public chucho::level
 {
 public:
     virtual const char* get_name() const override;
+    virtual chucho::syslog::severity get_syslog_severity() const override;
     virtual int get_value() const override;
 };
 
@@ -48,6 +51,7 @@ class warn : public chucho::level
 {
 public:
     virtual const char* get_name() const override;
+    virtual chucho::syslog::severity get_syslog_severity() const override;
     virtual int get_value() const override;
 };
 
@@ -55,6 +59,7 @@ class error : public chucho::level
 {
 public:
     virtual const char* get_name() const override;
+    virtual chucho::syslog::severity get_syslog_severity() const override;
     virtual int get_value() const override;
 };
 
@@ -62,6 +67,7 @@ class fatal : public chucho::level
 {
 public:
     virtual const char* get_name() const override;
+    virtual chucho::syslog::severity get_syslog_severity() const override;
     virtual int get_value() const override;
 };
 
@@ -69,12 +75,18 @@ class off : public chucho::level
 {
 public:
     virtual const char* get_name() const override;
+    virtual chucho::syslog::severity get_syslog_severity() const override;
     virtual int get_value() const override;
 };
 
 const char* trace::get_name() const
 {
     return "TRACE";
+}
+
+chucho::syslog::severity trace::get_syslog_severity() const
+{
+    return chucho::syslog::severity::DEBUG;
 }
 
 int trace::get_value() const
@@ -87,6 +99,11 @@ const char* debug::get_name() const
     return "DEBUG";
 }
 
+chucho::syslog::severity debug::get_syslog_severity() const
+{
+    return chucho::syslog::severity::DEBUG;
+}
+
 int debug::get_value() const
 {
     return 10000;
@@ -97,9 +114,19 @@ const char* info::get_name() const
     return "INFO";
 }
 
+chucho::syslog::severity info::get_syslog_severity() const
+{
+    return chucho::syslog::severity::INFORMATIONAL;
+}
+
 int info::get_value() const
 {
     return 20000;
+}
+
+chucho::syslog::severity warn::get_syslog_severity() const
+{
+    return chucho::syslog::severity::WARNING;
 }
 
 const char* warn::get_name() const
@@ -117,6 +144,11 @@ const char* error::get_name() const
     return "ERROR";
 }
 
+chucho::syslog::severity error::get_syslog_severity() const
+{
+    return chucho::syslog::severity::ERROR;
+}
+
 int error::get_value() const
 {
     return 40000;
@@ -127,6 +159,11 @@ const char* fatal::get_name() const
     return "FATAL";
 }
 
+chucho::syslog::severity fatal::get_syslog_severity() const
+{
+    return chucho::syslog::severity::EMERGENCY;
+}
+
 int fatal::get_value() const
 {
     return 50000;
@@ -135,6 +172,11 @@ int fatal::get_value() const
 const char* off::get_name() const
 {
     return "OFF";
+}
+
+chucho::syslog::severity off::get_syslog_severity() const
+{
+    return chucho::syslog::severity::EMERGENCY;
 }
 
 int off::get_value() const

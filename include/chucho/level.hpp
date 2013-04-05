@@ -18,6 +18,7 @@
 #define CHUCHO_LEVEL_HPP__
 
 #include <chucho/export.hpp>
+#include <chucho/syslog_constants.hpp>
 #include <ostream>
 #include <memory>
 
@@ -161,6 +162,7 @@ public:
      * @return the name
      */
     virtual const char* get_name() const = 0;
+    virtual syslog::severity get_syslog_severity() const = 0;
     /**
      * Return the value of the level.
      * 

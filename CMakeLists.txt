@@ -32,7 +32,8 @@ IF(CHUCHO_POSIX)
         platform/posix/file_posix.cpp
         platform/posix/host_posix.cpp
         platform/posix/line_ending_posix.cpp
-        platform/posix/pattern_formatter_posix.cpp)
+        platform/posix/pattern_formatter_posix.cpp
+        platform/posix/syslog_writer_posix.cpp)
 ENDIF()
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
@@ -74,6 +75,8 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/status_manager.hpp
     include/chucho/status_observer.hpp
     include/chucho/status_reporter.hpp
+    include/chucho/syslog_constants.hpp
+    include/chucho/syslog_writer.hpp
     include/chucho/time_file_roller.hpp
     include/chucho/writer.hpp
     include/chucho/writer_factory.hpp
@@ -124,6 +127,7 @@ SET(CHUCHO_SOURCES
     cerr_writer.cpp
     cerr_writer_factory.cpp
     cerr_writer_memento.cpp
+    clock_util.cpp
     configurable.cpp
     configurable_factory.cpp
     configuration.cpp
@@ -173,7 +177,7 @@ SET(CHUCHO_SOURCES
     status_manager.cpp
     status_observer.cpp
     status_reporter.cpp
-    clock_util.cpp
+    syslog_writer.cpp
     time_file_roller.cpp
     time_file_roller_factory.cpp
     time_file_roller_memento.cpp
