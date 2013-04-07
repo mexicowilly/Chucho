@@ -124,6 +124,7 @@ private:
 
     std::vector<std::shared_ptr<filter>> filters_;
     std::mutex guard_;
+    bool i_am_writing_;
 };
 
 }

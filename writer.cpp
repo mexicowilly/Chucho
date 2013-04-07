@@ -16,21 +16,14 @@
 
 #include <chucho/writer.hpp>
 #include <chucho/exception.hpp>
-#include <atomic>
 #include <stdexcept>
-
-namespace
-{
-
-std::atomic<bool> write_same_thread_guard(false);
-
-}
 
 namespace chucho
 {
 
 writer::writer(std::shared_ptr<formatter> fmt)
-    : formatter_(fmt)
+    : formatter_(fmt),
+      i_am_writing_(false)
 {
     if (!formatter_)
         throw std::invalid_argument("The formatter cannot be a nullptr");
@@ -69,13 +62,16 @@ bool writer::permits(const event& evt)
 
 void writer::write(const event& evt)
 {
-    if (!write_same_thread_guard)
+    // Prevent writing more than once in same thread
+    if (!i_am_writing_)
     {
-        write_same_thread_guard.store(true);
+        i_am_writing_ = true;
         struct sentry
         {
-            ~sentry() { write_same_thread_guard.store(false); }
-        } s;
+            sentry(bool& i_am_writing) : i_am_writing_(i_am_writing) { }
+            ~sentry() { i_am_writing_ = false; }
+            bool& i_am_writing_;
+        } s(i_am_writing_);
         std::lock_guard<std::mutex> lg(guard_);
         try
         {
