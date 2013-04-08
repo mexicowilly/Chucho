@@ -34,6 +34,7 @@ public:
     sink_writer();
 
     void verify(const std::vector<std::string>& expected);
+    void verify(std::size_t size);
 
 protected:
     virtual void write_impl(const chucho::event& evt) override;
@@ -54,26 +55,32 @@ void sink_writer::verify(const std::vector<std::string>& expected)
         EXPECT_EQ(expected[i], messages_[i]);
 }
 
+void sink_writer::verify(std::size_t size)
+{
+    EXPECT_EQ(size, messages_.size());
+}
+
 void sink_writer::write_impl(const chucho::event& evt)
 {
     messages_.push_back(evt.get_message());
 }
 
-void thread_main()
+void thread_main(std::shared_ptr<sink_writer> wrt = std::shared_ptr<sink_writer>())
 {
     std::ostringstream stream;
-    stream << std::this_thread::get_id();
+    stream << "multithread." << std::this_thread::get_id();
     auto lg = chucho::logger::get(stream.str());
     logger_created_condition.notify_one();
-    auto wrt = std::make_shared<sink_writer>();
-    lg->add_writer(wrt);
+    if (wrt)
+        lg->add_writer(wrt);
     std::vector<std::string> expected;
     for (std::size_t i = 0; i < 10000; i++)
     {
         expected.push_back(std::to_string(i));
         CHUCHO_INFO(lg, i);
     }
-    wrt->verify(expected);
+    if (wrt)
+        wrt->verify(expected);
 }
 
 }
@@ -83,10 +90,26 @@ TEST(multithread, logs)
     std::vector<std::thread> threads;
     std::unique_lock<std::mutex> ul(logger_created_mutex);
     for (std::size_t i = 0; i < 5; i++) {
-        threads.emplace(threads.end(), thread_main);
+        threads.emplace(threads.end(), thread_main, std::make_shared<sink_writer>());
         logger_created_condition.wait(ul);
     }
     ul.unlock();
     for (std::thread& t : threads)
         t.join();
+}
+
+TEST(multithread, shared_writer)
+{
+    auto wrt = std::make_shared<sink_writer>();
+    chucho::logger::get("multithread")->add_writer(wrt);
+    std::vector<std::thread> threads;
+    std::unique_lock<std::mutex> ul(logger_created_mutex);
+    for (std::size_t i = 0; i < 5; i++) {
+        threads.emplace(threads.end(), thread_main, std::make_shared<sink_writer>());
+        logger_created_condition.wait(ul);
+    }
+    ul.unlock();
+    for (std::thread& t : threads)
+        t.join();
+    wrt->verify(50000);
 }

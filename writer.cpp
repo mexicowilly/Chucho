@@ -31,19 +31,19 @@ writer::writer(std::shared_ptr<formatter> fmt)
 
 void writer::add_filter(std::shared_ptr<filter> flt)
 {
-    std::lock_guard<std::mutex> lg(guard_);
+    std::lock_guard<std::recursive_mutex> lg(guard_);
     filters_.push_back(flt);
 }
 
 void writer::clear_filters()
 {
-    std::lock_guard<std::mutex> lg(guard_);
+    std::lock_guard<std::recursive_mutex> lg(guard_);
     filters_.clear();
 }
 
 std::vector<std::shared_ptr<filter>> writer::get_filters()
 {
-    std::lock_guard<std::mutex> lg(guard_);
+    std::lock_guard<std::recursive_mutex> lg(guard_);
     return filters_;
 }
 
@@ -62,6 +62,7 @@ bool writer::permits(const event& evt)
 
 void writer::write(const event& evt)
 {
+    std::lock_guard<std::recursive_mutex> lg(guard_);
     // Prevent writing more than once in same thread
     if (!i_am_writing_)
     {
@@ -72,7 +73,6 @@ void writer::write(const event& evt)
             ~sentry() { i_am_writing_ = false; }
             bool& i_am_writing_;
         } s(i_am_writing_);
-        std::lock_guard<std::mutex> lg(guard_);
         try
         {
             if (formatter_ && permits(evt))

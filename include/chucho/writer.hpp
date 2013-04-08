@@ -123,7 +123,7 @@ private:
     CHUCHO_NO_EXPORT bool permits(const event& evt);
 
     std::vector<std::shared_ptr<filter>> filters_;
-    std::mutex guard_;
+    std::recursive_mutex guard_;
     bool i_am_writing_;
 };
 
