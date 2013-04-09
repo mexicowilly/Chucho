@@ -25,9 +25,6 @@
 namespace
 {
 
-std::condition_variable logger_created_condition;
-std::mutex logger_created_mutex;
-
 class sink_writer : public chucho::writer
 {
 public:
@@ -70,7 +67,6 @@ void thread_main(std::shared_ptr<sink_writer> wrt)
     std::ostringstream stream;
     stream << "multithread." << std::this_thread::get_id();
     auto lg = chucho::logger::get(stream.str());
-    logger_created_condition.notify_one();
     if (wrt)
         lg->add_writer(wrt);
     std::vector<std::string> expected;
@@ -89,12 +85,8 @@ TEST(multithread, logs)
 {
     chucho::logger::remove_unused_loggers();
     std::vector<std::thread> threads;
-    std::unique_lock<std::mutex> ul(logger_created_mutex);
-    for (std::size_t i = 0; i < 5; i++) {
+    for (std::size_t i = 0; i < 5; i++)
         threads.emplace(threads.end(), thread_main, std::make_shared<sink_writer>());
-        logger_created_condition.wait(ul);
-    }
-    ul.unlock();
     for (std::thread& t : threads)
         t.join();
 }
@@ -105,12 +97,8 @@ TEST(multithread, shared_writer)
     auto wrt = std::make_shared<sink_writer>();
     chucho::logger::get("multithread")->add_writer(wrt);
     std::vector<std::thread> threads;
-    std::unique_lock<std::mutex> ul(logger_created_mutex);
-    for (std::size_t i = 0; i < 5; i++) {
+    for (std::size_t i = 0; i < 5; i++)
         threads.emplace(threads.end(), thread_main, std::shared_ptr<sink_writer>());
-        logger_created_condition.wait(ul);
-    }
-    ul.unlock();
     for (std::thread& t : threads)
         t.join();
     wrt->verify(50000);
