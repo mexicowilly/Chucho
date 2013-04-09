@@ -65,7 +65,7 @@ void sink_writer::write_impl(const chucho::event& evt)
     messages_.push_back(evt.get_message());
 }
 
-void thread_main(std::shared_ptr<sink_writer> wrt = std::shared_ptr<sink_writer>())
+void thread_main(std::shared_ptr<sink_writer> wrt)
 {
     std::ostringstream stream;
     stream << "multithread." << std::this_thread::get_id();
@@ -87,6 +87,7 @@ void thread_main(std::shared_ptr<sink_writer> wrt = std::shared_ptr<sink_writer>
 
 TEST(multithread, logs)
 {
+    chucho::logger::remove_unused_loggers();
     std::vector<std::thread> threads;
     std::unique_lock<std::mutex> ul(logger_created_mutex);
     for (std::size_t i = 0; i < 5; i++) {
@@ -100,12 +101,13 @@ TEST(multithread, logs)
 
 TEST(multithread, shared_writer)
 {
+    chucho::logger::remove_unused_loggers();
     auto wrt = std::make_shared<sink_writer>();
     chucho::logger::get("multithread")->add_writer(wrt);
     std::vector<std::thread> threads;
     std::unique_lock<std::mutex> ul(logger_created_mutex);
     for (std::size_t i = 0; i < 5; i++) {
-        threads.emplace(threads.end(), thread_main, std::make_shared<sink_writer>());
+        threads.emplace(threads.end(), thread_main, std::shared_ptr<sink_writer>());
         logger_created_condition.wait(ul);
     }
     ul.unlock();
