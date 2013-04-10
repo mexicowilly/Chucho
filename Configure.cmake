@@ -164,7 +164,7 @@ IF(CHUCHO_POSIX)
         SET(CHUCHO_THREAD_LIB pthread CACHE STRING "The threading library")
     ENDIF()
 
-    # getaddrinfo/freeaddrinfo
+    # getaddrinfo/freeaddrinfo/gai_strerror
     CHECK_CXX_SYMBOL_EXISTS(getaddrinfo netdb.h CHUCHO_HAVE_GETADDRINFO)
     IF(NOT CHUCHO_HAVE_GETADDRINFO)
         MESSAGE(FATAL_ERROR "getaddrinfo is required")
@@ -172,6 +172,28 @@ IF(CHUCHO_POSIX)
     CHECK_CXX_SYMBOL_EXISTS(freeaddrinfo netdb.h CHUCHO_HAVE_FREEADDRINFO)
     IF(NOT CHUCHO_HAVE_FREEADDRINFO)
         MESSAGE(FATAL_ERROR "freeaddrinfo is required")
+    ENDIF()
+    CHECK_CXX_SYMBOL_EXISTS(gai_strerror netdb.h CHUCHO_HAVE_GAI_STRERROR)
+    IF(NOT CHUCHO_HAVE_GAI_STRERROR)
+        MESSAGE(FATAL_ERROR "gai_strerror is required")
+    ENDIF()
+
+    # syslog
+    CHECK_CXX_SYMBOL_EXISTS(syslog syslog.h CHUCHO_HAVE_SYSLOG)
+    IF(NOT CHUCHO_HAVE_SYSLOG)
+        MESSSAGE(FATAL_ERROR "syslog is required")
+    ENDIF()
+
+    # socket
+    CHECK_CXX_SYMBOL_EXISTS(socket sys/socket.h CHUCHO_HAVE_SOCKET)
+    IF(NOT CHUCHO_HAVE_SOCKET)
+        MESSAGE(FATAL_ERROR "socket is required")
+    ENDIF()
+
+    # sendto
+    CHECK_CXX_SYMBOL_EXISTS(sendto sys/socket.h CHUCHO_HAVE_SENDTO)
+    IF(NOT CHUCHO_HAVE_SENDTO)
+        MESSAGE(FATAL_ERROR "sendto is required")
     ENDIF()
 ENDIF()
 
