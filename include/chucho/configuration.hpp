@@ -55,6 +55,9 @@ namespace chucho
  *      uses the pattern <tt>%%d{%%H:%%M:%%S.%%q} %-5p %.36c -
  *      %%m%%n</tt>.
  *  
+ * @note The methods in the configuration class are not thread 
+ *       safe.
+ *  
  * @ingroup configuration 
  */
 class CHUCHO_EXPORT configuration
