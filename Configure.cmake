@@ -17,6 +17,7 @@
 INCLUDE(CheckCXXCompilerFlag)
 INCLUDE(CheckCXXSymbolExists)
 INCLUDE(CheckCXXSourceRuns)
+INCLUDE(CheckIncludeFileCXX)
 INCLUDE(ExternalProject)
 
 # static and shared
@@ -95,6 +96,15 @@ SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 SET(CMAKE_INSTALL_RPATH_USE_LINK_RPATH FALSE)
 
 IF(CHUCHO_POSIX)
+    # headers
+    FOREACH(HEAD fts.h netdb.h pthread.h stdio.h stdlib.h sys/socket.h sys/stat.h sys/utsname.h syslog.h time.h unistd.h)
+        STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME "CHUCHO_HAVE_${HEAD}")
+        CHECK_INCLUDE_FILE_CXX(${HEAD} ${CHUCHO_HEAD_VAR_NAME})
+        IF(NOT ${CHUCHO_HEAD_VAR_NAME})
+            MESSAGE(FATAL_ERROR "The header ${HEAD} is required")
+        ENDIF()
+    ENDFOREACH()
+
     # host name functions
     CHECK_CXX_SYMBOL_EXISTS(uname sys/utsname.h CHUCHO_HAVE_UNAME)
     IF(NOT CHUCHO_HAVE_UNAME)
@@ -119,12 +129,12 @@ IF(CHUCHO_POSIX)
         MESSAGE(FATAL_ERROR "stat is required")
     ENDIF()
 
-    # gmtime/localtime
-    FOREACH(SYM gmtime localtime)
-        CHECK_CXX_SYMBOL_EXISTS(${SYM}_r time.h CHUCHO_HAVE_${SYM}_R)
-        IF(CHUCHO_HAVE_${SYM}_R)
-            STRING(TOUPPER ${SYM} CHUCHO_UPPER_SYM)
-            ADD_DEFINITIONS(-DCHUCHO_HAVE_${CHUCHO_UPPER_SYM}_R)
+    # gmtime_r/localtime_r
+    FOREACH(SYM gmtime_r localtime_r)
+        CHECK_CXX_SYMBOL_EXISTS(${SYM} time.h CHUCHO_HAVE_${SYM})
+        IF(CHUCHO_HAVE_${SYM})
+            STRING(TOUPPER ${SYM} CHUCHO_UPPER_${SYM})
+            ADD_DEFINITIONS(-DCHUCHO_HAVE_${CHUCHO_UPPER_${SYM}})
         ENDIF()
     ENDFOREACH()
 
@@ -165,18 +175,12 @@ IF(CHUCHO_POSIX)
     ENDIF()
 
     # getaddrinfo/freeaddrinfo/gai_strerror
-    CHECK_CXX_SYMBOL_EXISTS(getaddrinfo netdb.h CHUCHO_HAVE_GETADDRINFO)
-    IF(NOT CHUCHO_HAVE_GETADDRINFO)
-        MESSAGE(FATAL_ERROR "getaddrinfo is required")
-    ENDIF()
-    CHECK_CXX_SYMBOL_EXISTS(freeaddrinfo netdb.h CHUCHO_HAVE_FREEADDRINFO)
-    IF(NOT CHUCHO_HAVE_FREEADDRINFO)
-        MESSAGE(FATAL_ERROR "freeaddrinfo is required")
-    ENDIF()
-    CHECK_CXX_SYMBOL_EXISTS(gai_strerror netdb.h CHUCHO_HAVE_GAI_STRERROR)
-    IF(NOT CHUCHO_HAVE_GAI_STRERROR)
-        MESSAGE(FATAL_ERROR "gai_strerror is required")
-    ENDIF()
+    FOREACH(SYM getaddrinfo freeaddrinfo gai_strerror)
+        CHECK_CXX_SYMBOL_EXISTS(${SYM} netdb.h CHUCHO_HAVE_${SYM})
+        IF(NOT CHUCHO_HAVE_${SYM})
+            MESSAGE(FATAL_ERROR "${SYM} is required")
+        ENDIF()
+    ENDFOREACH()
 
     # syslog
     CHECK_CXX_SYMBOL_EXISTS(syslog syslog.h CHUCHO_HAVE_SYSLOG)
@@ -184,17 +188,13 @@ IF(CHUCHO_POSIX)
         MESSSAGE(FATAL_ERROR "syslog is required")
     ENDIF()
 
-    # socket
-    CHECK_CXX_SYMBOL_EXISTS(socket sys/socket.h CHUCHO_HAVE_SOCKET)
-    IF(NOT CHUCHO_HAVE_SOCKET)
-        MESSAGE(FATAL_ERROR "socket is required")
-    ENDIF()
-
-    # sendto
-    CHECK_CXX_SYMBOL_EXISTS(sendto sys/socket.h CHUCHO_HAVE_SENDTO)
-    IF(NOT CHUCHO_HAVE_SENDTO)
-        MESSAGE(FATAL_ERROR "sendto is required")
-    ENDIF()
+    # socket/sendto
+    FOREACH(SYM socket sendto)
+        CHECK_CXX_SYMBOL_EXISTS(${SYM} sys/socket.h CHUCHO_HAVE_${SYM})
+        IF(NOT CHUCHO_HAVE_${SYM})
+            MESSAGE(FATAL_ERROR "${SYM} is required")
+        ENDIF()
+    ENDFOREACH()
 ENDIF()
 
 #

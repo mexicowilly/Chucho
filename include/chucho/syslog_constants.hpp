@@ -25,7 +25,7 @@ namespace chucho
 namespace syslog
 {
 
-static const std::uint16_t DEFAULT_PORT = 514;
+const std::uint16_t DEFAULT_PORT = 514;
 
 enum class facility
 {

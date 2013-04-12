@@ -79,7 +79,7 @@ struct std::tm get_local(std::time_t t)
     return *::localtime_r(&t, &cal);
     #else
     std::lock_guard<std::mutex> lg(calendar_guard);
-    return *std::localtime(t);
+    return *std::localtime(&t);
     #endif
 }
 
@@ -90,7 +90,7 @@ struct std::tm get_utc(std::time_t t)
     return *::gmtime_r(&t, &cal);
     #else
     std::lock_guard<std::mutex> lg(calendar_guard);
-    return *std::gmtime(t);
+    return *std::gmtime(&t);
     #endif
 }
 

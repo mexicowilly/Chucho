@@ -108,7 +108,7 @@ remote_syslog_transport_handle::remote_syslog_transport_handle(const std::string
     int rc = getaddrinfo(host.c_str(), "syslog", nullptr, &info);
     if (rc != 0)
         throw chucho::exception("Could not resolve address of " + host + ": " + gai_strerror(rc));
-    assert(ai_addrlen == sizeof(address_));
+    assert(info->ai_addrlen == sizeof(address_));
     std::memcpy(&address_, info->ai_addr, sizeof(address_));
     address_.sin_port = port;
     freeaddrinfo(info);

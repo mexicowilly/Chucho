@@ -36,7 +36,6 @@
 #define CHUCHO_FUNCTION_NAME __FUNCTION__
 #endif
 
-
 #define CHUCHO_LOG(lvl, lg, fl, ln, fnc, msg) \
     do \
     { \
