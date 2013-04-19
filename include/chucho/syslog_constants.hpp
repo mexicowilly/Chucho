@@ -25,8 +25,6 @@ namespace chucho
 namespace syslog
 {
 
-const std::uint16_t DEFAULT_PORT = 514;
-
 enum class facility
 {
     KERN        = 0 * 8,

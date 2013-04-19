@@ -48,4 +48,10 @@ ADD_EXECUTABLE(rolling-file-test EXCLUDE_FROM_ALL
                harness.cpp
                time_rolling_file_test.cpp)
 TARGET_LINK_LIBRARIES(rolling-file-test chucho gtest)
-ADD_DEPENDENCIES(unit-test gtest-external)
+ADD_DEPENDENCIES(rolling-file-test gtest-external)
+
+ADD_EXECUTABLE(syslog-writer-test EXCLUDE_FROM_ALL
+               harness.cpp
+               syslog_writer_test.cpp)
+TARGET_LINK_LIBRARIES(syslog-writer-test chucho gtest)
+ADD_DEPENDENCIES(syslog-writer-test gtest-external)

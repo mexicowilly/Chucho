@@ -25,28 +25,28 @@ syslog_writer::syslog_writer(std::shared_ptr<formatter> fmt,
     : writer(fmt),
       facility_(fcl)
 {
+    set_status_origin("syslog_writer");
 }
 
 syslog_writer::syslog_writer(std::shared_ptr<formatter> fmt,
                              syslog::facility fcl,
-                             const std::string& host,
-                             std::uint16_t port,
-                             const std::string& app_name)
+                             const std::string& host)
     : writer(fmt),
-      transport_(host, port),
-      facility_(fcl),
-      app_name_(app_name)
+      transport_(host),
+      facility_(fcl)
 {
+    set_status_origin("syslog_writer");
 }
 
 void syslog_writer::write_impl(const event& evt)
 {
     syslog::severity sev = evt.get_level()->get_syslog_severity();
-    transport_.send(facility_, sev, transport_.format(facility_,
-                                                      sev,
-                                                      evt.get_time(),
-                                                      app_name_,
-                                                      formatter_->format(evt)));
+    std::string msg = transport_.format(facility_,
+                                        sev,
+                                        evt.get_time(),
+                                        formatter_->format(evt));
+    report_info("Sending message: " + msg);
+    transport_.send(facility_, sev, msg);
 }
 
 }

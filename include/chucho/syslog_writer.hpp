@@ -33,9 +33,7 @@ public:
                   syslog::facility fcl);
     syslog_writer(std::shared_ptr<formatter> fmt,
                   syslog::facility fcl,
-                  const std::string& host,
-                  std::uint16_t port = syslog::DEFAULT_PORT,
-                  const std::string& app_name = "");
+                  const std::string& host);
 
 protected:
     virtual void write_impl(const event& evt) override;
@@ -45,13 +43,12 @@ private:
     {
     public:
         transport();
-        transport(const std::string& host, std::uint16_t port);
+        transport(const std::string& host);
         ~transport();
 
         std::string format(syslog::facility fcl,
                            syslog::severity sev,
                            const event::time_type& when,
-                           const std::string& app_name,
                            const std::string& message);
         void send(syslog::facility fcl,
                   syslog::severity sev,
@@ -68,7 +65,6 @@ private:
 
     transport transport_;
     syslog::facility facility_;
-    std::string app_name_;
 };
 
 }

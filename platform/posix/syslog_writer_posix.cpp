@@ -26,6 +26,9 @@
 #include <unistd.h>
 #include <syslog.h>
 #include <sstream>
+#include <cstdint>
+#include <vector>
+#include <array>
 
 namespace chucho
 {
@@ -38,7 +41,6 @@ public:
     virtual std::string format(syslog::facility fcl,
                                syslog::severity sev,
                                const event::time_type& when,
-                               const std::string& app_name,
                                const std::string& message) = 0;
     virtual void send(syslog::facility fcl,
                       syslog::severity sev,
@@ -50,13 +52,27 @@ public:
 namespace
 {
 
+std::string formatTime(const chucho::event::time_type& when)
+{
+    static std::array<std::string, 12> english_months =
+    {
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    };
+    static std::string pattern(" %e %H:%M:%S");
+
+    struct std::tm cal = chucho::calendar::get_local(std::chrono::system_clock::to_time_t(when));
+    std::string result = english_months[cal.tm_mon];
+    result += chucho::calendar::format(cal, pattern);
+    return result;
+}
+
 class local_syslog_transport_handle : public chucho::syslog_transport_handle
 {
 public:
     virtual std::string format(chucho::syslog::facility fcl,
                                chucho::syslog::severity sev,
                                const chucho::event::time_type& when,
-                               const std::string& app_name,
                                const std::string& message) override;
     virtual void send(chucho::syslog::facility fcl,
                       chucho::syslog::severity sev,
@@ -66,13 +82,12 @@ public:
 class remote_syslog_transport_handle : public chucho::syslog_transport_handle
 {
 public:
-    remote_syslog_transport_handle(const std::string& host, std::uint16_t port);
+    remote_syslog_transport_handle(const std::string& host);
     ~remote_syslog_transport_handle();
 
     virtual std::string format(chucho::syslog::facility fcl,
                                chucho::syslog::severity sev,
                                const chucho::event::time_type& when,
-                               const std::string& app_name,
                                const std::string& message) override;
     virtual void send(chucho::syslog::facility fcl,
                       chucho::syslog::severity sev,
@@ -81,14 +96,13 @@ public:
 private:
     std::string get_timestamp();
 
-    struct sockaddr_in address_;
     int socket_;
+    std::vector<std::uint8_t> address_;
 };
 
 std::string local_syslog_transport_handle::format(chucho::syslog::facility fcl,
                                                   chucho::syslog::severity sev,
                                                   const chucho::event::time_type& when,
-                                                  const std::string& app_name,
                                                   const std::string& message)
 {
     return message;
@@ -101,18 +115,17 @@ void local_syslog_transport_handle::send(chucho::syslog::facility fcl,
     syslog(static_cast<int>(fcl) | static_cast<int>(sev), "%s", message.c_str());
 }
 
-remote_syslog_transport_handle::remote_syslog_transport_handle(const std::string& host, std::uint16_t port)
+remote_syslog_transport_handle::remote_syslog_transport_handle(const std::string& host)
     : socket_(-1)
 {
     struct addrinfo* info;
     int rc = getaddrinfo(host.c_str(), "syslog", nullptr, &info);
     if (rc != 0)
         throw chucho::exception("Could not resolve address of " + host + ": " + gai_strerror(rc));
-    assert(info->ai_addrlen == sizeof(address_));
-    std::memcpy(&address_, info->ai_addr, sizeof(address_));
-    address_.sin_port = port;
-    freeaddrinfo(info);
+    address_.resize(info->ai_addrlen);
+    std::memcpy(&address_[0], info->ai_addr, info->ai_addrlen);
     socket_ = socket(info->ai_family, info->ai_socktype, info->ai_protocol);
+    freeaddrinfo(info);
     if (socket_ == -1)
         throw chucho::exception(std::string("Could not create socket: ") + strerror(errno));
 }
@@ -125,14 +138,11 @@ remote_syslog_transport_handle::~remote_syslog_transport_handle()
 std::string remote_syslog_transport_handle::format(chucho::syslog::facility fcl,
                                                    chucho::syslog::severity sev,
                                                    const chucho::event::time_type& when,
-                                                   const std::string& app_name,
                                                    const std::string& message)
 {
     std::ostringstream stream;
-    stream << '<' << (static_cast<int>(fcl) | static_cast<int>(sev)) << ">1 " <<
-        chucho::calendar::format(chucho::calendar::get_utc(std::chrono::system_clock::to_time_t(when)), "%Y-%m-%dT%H:%M:%SZ") <<
-        ' ' << chucho::host::get_full_name() << ' ' << (app_name.empty() ? "-" : app_name) <<
-        ' ' << getpid() << " - - " << message;
+    stream << '<' << (static_cast<int>(fcl) | static_cast<int>(sev)) << '>' <<
+        formatTime(when) << ' ' << chucho::host::get_base_name() << ' ' << message;
     return stream.str();
 }
 
@@ -145,8 +155,8 @@ void remote_syslog_transport_handle::send(chucho::syslog::facility fcl,
                message.data(),
                message.length(),
                0,
-               reinterpret_cast<struct sockaddr*>(&address_),
-               sizeof(address_)) == -1)
+               reinterpret_cast<struct sockaddr*>(&address_[0]),
+               address_.size()) == -1)
     {
         throw chucho::exception(std::string("Unable to send syslog data: ") + strerror(errno));
     }
@@ -162,8 +172,8 @@ syslog_writer::transport::transport()
 {
 }
 
-syslog_writer::transport::transport(const std::string& host, std::uint16_t port)
-    : handle_(new remote_syslog_transport_handle(host, port))
+syslog_writer::transport::transport(const std::string& host)
+    : handle_(new remote_syslog_transport_handle(host))
 {
 }
 
@@ -175,10 +185,9 @@ syslog_writer::transport::~transport()
 std::string syslog_writer::transport::format(syslog::facility fcl,
                                              syslog::severity sev,
                                              const chucho::event::time_type& when,
-                                             const std::string& app_name,
                                              const std::string& message)
 {
-    return handle_->format(fcl, sev, when, app_name, message);
+    return handle_->format(fcl, sev, when, message);
 }
 
 void syslog_writer::transport::send(syslog::facility fcl, syslog::severity sev, const std::string& message)
