@@ -178,6 +178,8 @@ SET(CHUCHO_SOURCES
     status_observer.cpp
     status_reporter.cpp
     syslog_writer.cpp
+    syslog_writer_factory.cpp
+    syslog_writer_memento.cpp
     time_file_roller.cpp
     time_file_roller_factory.cpp
     time_file_roller_memento.cpp
@@ -222,6 +224,8 @@ SET(CHUCHO_SOURCES
     include/chucho/status_manager.hpp
     include/chucho/status_observer.hpp
     include/chucho/status_reporter.hpp
+    include/chucho/syslog_writer_factory.hpp
+    include/chucho/syslog_writer_memento.hpp
     include/chucho/time_file_roller_factory.hpp
     include/chucho/time_file_roller_memento.hpp
     include/chucho/utf8_validator.hpp

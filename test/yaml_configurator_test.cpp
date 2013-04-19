@@ -28,6 +28,7 @@
 #include <chucho/size_file_roll_trigger.hpp>
 #include <chucho/time_file_roller.hpp>
 #include <chucho/duplicate_message_filter.hpp>
+#include <chucho/syslog_writer.hpp>
 #include <sstream>
 #if defined(_WIN32)
 #include <windows.h>
@@ -350,6 +351,85 @@ TEST_F(yaml_configurator, size_file_roll_trigger)
         auto strg = std::static_pointer_cast<chucho::size_file_roll_trigger>(trg);
         ASSERT_TRUE(static_cast<bool>(strg));
         EXPECT_EQ(item.second, strg->get_max_size());
+    }
+}
+
+TEST_F(yaml_configurator, syslog_writer)
+{
+    configure("chucho::logger:\n"
+              "    - name: will\n"
+              "    - chucho::syslog_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            - pattern: '%m%n'\n"
+              "        - facility: LOCAL0\n"
+              "        - host_name: localhost");
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    EXPECT_EQ(typeid(chucho::syslog_writer), typeid(*wrts[0]));
+    auto wrt = std::static_pointer_cast<chucho::syslog_writer>(wrts[0]);
+    EXPECT_EQ(chucho::syslog::facility::LOCAL0, wrt->get_facility());
+    EXPECT_EQ(std::string("localhost"), wrt->get_host_name());
+}
+
+TEST_F(yaml_configurator, syslog_writer_facility)
+{
+    std::string tmpl("chucho::logger:\n"
+                     "    - name: will\n"
+                     "    - chucho::syslog_writer:\n"
+                     "        - chucho::pattern_formatter:\n"
+                     "            - pattern: '%m%n'\n"
+                     "        - facility: FCL");
+    std::size_t pos = tmpl.find("FCL");
+    std::vector<std::string> bad =
+    {
+        "kernel",
+        "my dog has fleas",
+        ""
+    };
+    for (auto item : bad)
+    {
+        chucho::logger::remove_unused_loggers();
+        chucho::status_manager::get()->clear();
+        std::string rep = tmpl;
+        rep.replace(pos, 3, item);
+        configure(rep.c_str());
+        EXPECT_EQ(chucho::status::level::ERROR, chucho::status_manager::get()->get_level());
+    }
+    std::map<std::string, chucho::syslog::facility> good =
+    {
+        { "kern", chucho::syslog::facility::KERN },
+        { "USER", chucho::syslog::facility::USER },
+        { "mAiL", chucho::syslog::facility::MAIL },
+        { "Daemon", chucho::syslog::facility::DAEMON },
+        { "autH", chucho::syslog::facility::AUTH },
+        { "SYsLog", chucho::syslog::facility::SYSLOG },
+        { "LPR", chucho::syslog::facility::LPR },
+        { "nEws", chucho::syslog::facility::NEWS },
+        { "uucp", chucho::syslog::facility::UUCP },
+        { "CrOn", chucho::syslog::facility::CRON },
+        { "AuTHpriv", chucho::syslog::facility::AUTHPRIV },
+        { "fTp", chucho::syslog::facility::FTP },
+        { "local0", chucho::syslog::facility::LOCAL0 },
+        { "LoCal1", chucho::syslog::facility::LOCAL1 },
+        { "LOCAL2", chucho::syslog::facility::LOCAL2 },
+        { "lOcal3", chucho::syslog::facility::LOCAL3 },
+        { "Local4", chucho::syslog::facility::LOCAL4 },
+        { "loCAl5", chucho::syslog::facility::LOCAL5 },
+        { "loCal6", chucho::syslog::facility::LOCAL6 },
+        { "LoCal7", chucho::syslog::facility::LOCAL7 }
+    };
+    for (auto item : good)
+    {
+        chucho::logger::remove_unused_loggers();
+        chucho::status_manager::get()->clear();
+        std::string rep = tmpl;
+        rep.replace(pos, 3, item.first);
+        configure(rep.c_str());
+        auto wrts = chucho::logger::get("will")->get_writers();
+        ASSERT_EQ(1, wrts.size());
+        EXPECT_EQ(typeid(chucho::syslog_writer), typeid(*wrts[0]));
+        auto wrt = std::static_pointer_cast<chucho::syslog_writer>(wrts[0]);
+        EXPECT_EQ(item.second, wrt->get_facility());
     }
 }
 

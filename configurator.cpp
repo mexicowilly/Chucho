@@ -19,6 +19,7 @@
 #include <chucho/cerr_writer_factory.hpp>
 #include <chucho/cout_writer_factory.hpp>
 #include <chucho/file_writer_factory.hpp>
+#include <chucho/syslog_writer_factory.hpp>
 #include <chucho/level_filter_factory.hpp>
 #include <chucho/level_threshold_filter_factory.hpp>
 #include <chucho/logger_factory.hpp>
@@ -72,6 +73,8 @@ void configurator::initialize()
     add_configurable_factory("chucho::size_file_roll_trigger", fact);
     fact.reset(new time_file_roller_factory());
     add_configurable_factory("chucho::time_file_roller", fact);
+    fact.reset(new syslog_writer_factory());
+    add_configurable_factory("chucho::syslog_writer", fact);
 }
 
 std::string configurator::resolve_variables(const std::string& val)

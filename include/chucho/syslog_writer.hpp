@@ -35,6 +35,9 @@ public:
                   syslog::facility fcl,
                   const std::string& host);
 
+    syslog::facility get_facility() const;
+    const std::string& get_host_name() const;
+
 protected:
     virtual void write_impl(const event& evt) override;
 
@@ -65,7 +68,18 @@ private:
 
     transport transport_;
     syslog::facility facility_;
+    std::string host_name_;
 };
+
+inline syslog::facility syslog_writer::get_facility() const
+{
+    return facility_;
+}
+
+inline const std::string& syslog_writer::get_host_name() const
+{
+    return host_name_;
+}
 
 }
 
