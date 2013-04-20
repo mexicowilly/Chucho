@@ -87,6 +87,32 @@ TEST(level_test, compare)
     EXPECT_TRUE(*off >= *fatal);
 }
 
+TEST(level_test, custom)
+{
+    class scary_level : public chucho::level
+    {
+    public:
+        virtual const char* get_name() const override
+        {
+            return "SCARY";
+        }
+        virtual chucho::syslog::severity get_syslog_severity() const override
+        {
+            return chucho::syslog::severity::INFORMATIONAL;
+        }
+        virtual int get_value() const override
+        {
+            return 100000;
+        }
+    };
+    std::shared_ptr<chucho::level> scary(new scary_level());
+    chucho::level::add(scary);
+    auto gotten = chucho::level::from_text("sCarY");
+    EXPECT_STREQ("SCARY", gotten->get_name());
+    EXPECT_EQ(chucho::syslog::severity::INFORMATIONAL, gotten->get_syslog_severity());
+    EXPECT_EQ(100000, gotten->get_value());
+};
+
 TEST(level_test, name)
 {
     EXPECT_STREQ("TRACE", chucho::level::TRACE->get_name());

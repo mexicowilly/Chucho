@@ -17,7 +17,7 @@
 #include <chucho/level.hpp>
 #include <chucho/exception.hpp>
 #include <limits>
-#include <vector>
+#include <set>
 #include <algorithm>
 
 namespace
@@ -184,6 +184,41 @@ int off::get_value() const
     return std::numeric_limits<int>::max();
 }
 
+std::string to_upper(const std::string& text)
+{
+    std::string up;
+    std::locale c_loc("C");
+    std::transform(text.begin(),
+                   text.end(),
+                   std::back_inserter(up),
+                   [&] (char c) { return std::toupper(c, c_loc); });
+    return up;
+}
+
+bool shared_level_name_less(std::shared_ptr<chucho::level> l1,
+                            std::shared_ptr<chucho::level> l2)
+{
+    std::string up1 = to_upper(l1->get_name());
+    std::string up2 = to_upper(l2->get_name());
+    return up1 < up2;
+}
+
+std::once_flag lvls_once;
+std::mutex lvls_guard;
+std::set<std::shared_ptr<chucho::level>, std::function<bool(std::shared_ptr<chucho::level>, std::shared_ptr<chucho::level>)>>
+    lvls(shared_level_name_less);
+
+void initialize_lvls()
+{
+    lvls.insert(chucho::level::TRACE);
+    lvls.insert(chucho::level::DEBUG);
+    lvls.insert(chucho::level::INFO);
+    lvls.insert(chucho::level::WARN);
+    lvls.insert(chucho::level::ERROR);
+    lvls.insert(chucho::level::FATAL);
+    lvls.insert(chucho::level::OFF);
+}
+
 }
 
 namespace chucho
@@ -207,30 +242,24 @@ level::~level()
 {
 }
 
+bool level::add(std::shared_ptr<level> lvl)
+{
+    std::lock_guard<std::mutex> guard(lvls_guard);
+    std::call_once(lvls_once, initialize_lvls);
+    return lvls.insert(lvl).second;
+}
+
 std::shared_ptr<level> level::from_text(const std::string& text)
 {
-    std::string up;
-    std::locale c_loc("C");
-    std::transform(text.begin(),
-                   text.end(),
-                   std::back_inserter(up),
-                   [&] (char c) { return std::toupper(c, c_loc); });
-    std::vector<std::shared_ptr<level>> lvls =
-    {
-        TRACE,
-        DEBUG,
-        INFO,
-        WARN,
-        ERROR,
-        FATAL,
-        OFF
-    };
-    for (std::shared_ptr<level> lvl : lvls)
-    {
-        if (up == lvl->get_name())
-            return lvl;
-    }
-    throw exception("The text " + text + " does not describe a valid log level");
+    std::lock_guard<std::mutex> guard(lvls_guard);
+    std::call_once(lvls_once, initialize_lvls);
+    std::string up = to_upper(text);
+    auto found = std::find_if(lvls.begin(),
+                              lvls.end(),
+                              [&] (std::shared_ptr<level> lvl) { return to_upper(lvl->get_name()) == up; });
+    if (found == lvls.end())
+        throw exception("The text " + text + " does not describe a valid log level");
+    return *found;
 }
 
 }

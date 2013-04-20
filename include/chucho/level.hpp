@@ -92,6 +92,19 @@ public:
      * @throw exception if the text cannot be converted to a level
      */
     static std::shared_ptr<level> from_text(const std::string& text);
+    /**
+     * Add a custom level. This allows the @ref from_text method to 
+     * return a custom level. This is primarily used for allowing 
+     * custom levels to appear in configuration files. If you call 
+     * this method before configuration happens, then your custom 
+     * level will be able to be resolved by the configurator. 
+     * 
+     * @param lvl the level to add
+     * @return bool true if the level was successfully added, or 
+     *         false if a level with the same name already exists.
+     *         Comparison is done case-insensitively.
+     */
+    static bool add(std::shared_ptr<level> lvl);
 
     /**
      * @name Destructor
