@@ -169,7 +169,7 @@ public:
      * @return the severity
      */
     virtual syslog::severity get_syslog_severity() const = 0;
-     */** 
+     /** 
      * Return the value of the level.
      * 
      * @return the value
