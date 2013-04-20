@@ -162,8 +162,14 @@ public:
      * @return the name
      */
     virtual const char* get_name() const = 0;
-    virtual syslog::severity get_syslog_severity() const = 0;
     /**
+     * Return the syslog severity that is associated with this log
+     * level.
+     * 
+     * @return the severity
+     */
+    virtual syslog::severity get_syslog_severity() const = 0;
+     */** 
      * Return the value of the level.
      * 
      * @return the value

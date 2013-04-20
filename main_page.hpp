@@ -52,8 +52,7 @@
 
 /**
  * @defgroup configuration 
- * Classes and namespaces that involve the configuration of 
- * chucho. 
+ * Classes that involve the configuration of chucho. 
  */
 
 /**
@@ -96,7 +95,11 @@
  */
 
 /**
+ * @defgroup syslog 
+ * Classes and enumerations related to writing to syslog. 
+ */
+
+/**
  * @defgroup writers 
  * Writers write log events to destinations. 
  */
-

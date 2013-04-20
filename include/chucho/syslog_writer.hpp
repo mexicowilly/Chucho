@@ -19,23 +19,65 @@
 
 #include <chucho/writer.hpp>
 #include <chucho/optional.hpp>
-#include <chucho/syslog_constants.hpp>
 
 namespace chucho
 {
 
 class syslog_transport_handle;
 
+/**
+ * @class syslog_writer syslog_writer.hpp chucho/syslog_writer.hpp
+ * A @ref writer that writes to syslog. If a syslog_writer is 
+ * given a host name, then it will use UDP to write to the 
+ * syslog. Otherwise, if the platform supports it, then the 
+ * writer will use the native syslog interface and allow the 
+ * system to handle the IPC. 
+ * 
+ * @ingroup writers syslog
+ */
 class CHUCHO_EXPORT syslog_writer : public writer
 {
 public:
+    /**
+     * @name Constructors
+     */
+    //@{
+    /**
+     * Construct a syslog_writer. If this constructor is used, then 
+     * the messages will be written to the local host using the 
+     * syslog interface, which allows the system to manage the IPC. 
+     * UDP over a socket is not used in this case. 
+     * 
+     * @param fmt the formatter
+     * @param fcl the syslog facility
+     */
     syslog_writer(std::shared_ptr<formatter> fmt,
                   syslog::facility fcl);
+    /**
+     * Construct a syslog_writer. When this constructor is used, 
+     * then syslog messages are sent over a UDP socket. 
+     * 
+     * @param fmt the formatter
+     * @param fcl the syslog facility
+     * @param host the syslog host
+     */
     syslog_writer(std::shared_ptr<formatter> fmt,
                   syslog::facility fcl,
                   const std::string& host);
+    //@}
 
+    /**
+     * Return the syslog facility.
+     * 
+     * @return the facility
+     */
     syslog::facility get_facility() const;
+    /**
+     * Return the host name. This text will be empty if no host name 
+     * was provided in the contructor. 
+     * 
+     * @return the syslog host name
+     */
     const std::string& get_host_name() const;
 
 protected:

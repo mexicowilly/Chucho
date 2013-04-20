@@ -17,49 +17,61 @@
 #if !defined(CHUCHO_SYSLOG_CONSTANTS_HPP__)
 #define CHUCHO_SYSLOG_CONSTANTS_HPP__
 
-#include <cstdint>
-
 namespace chucho
 {
 
 namespace syslog
 {
 
+/**
+ * @addtogroup syslog
+ */
+//@{
+
+/**
+ * All standard syslog facilities. Defined in the file
+ * <chucho/syslog_constants.hpp>. 
+ */
 enum class facility
 {
-    KERN        = 0 * 8,
-    USER        = 1 * 8,
-    MAIL        = 2 * 8,
-    DAEMON      = 3 * 8,
-    AUTH        = 4 * 8,
-    SYSLOG      = 5 * 8,
-    LPR         = 6 * 8,
-    NEWS        = 7 * 8,
-    UUCP        = 8 * 8,
-    CRON        = 9 * 8,
-    AUTHPRIV    = 10 * 8,
-    FTP         = 11 * 8,
-    LOCAL0      = 16 * 8,
-    LOCAL1      = 17 * 8,
-    LOCAL2      = 18 * 8,
-    LOCAL3      = 19 * 8,
-    LOCAL4      = 20 * 8,
-    LOCAL5      = 21 * 8,
-    LOCAL6      = 22 * 8,
-    LOCAL7      = 23 * 8
+    KERN        = 0 * 8, /**< Kernel messages */
+    USER        = 1 * 8, /**< User-level messages */
+    MAIL        = 2 * 8, /**< Mail system */
+    DAEMON      = 3 * 8, /**< System daemons */
+    AUTH        = 4 * 8, /**< Security/authorization messages */
+    SYSLOG      = 5 * 8, /**< Message generated interally by syslogd */
+    LPR         = 6 * 8, /**< Line printer subsystem */
+    NEWS        = 7 * 8, /**< Network news subsystem */
+    UUCP        = 8 * 8, /**< UUCP subsystem */
+    CRON        = 9 * 8, /**< Clock/scheduling daemon */
+    AUTHPRIV    = 10 * 8, /**< Security/authorization messages */
+    FTP         = 11 * 8, /**< FTP daemon */
+    LOCAL0      = 16 * 8, /**< Local use 0 */
+    LOCAL1      = 17 * 8, /**< Local use 1 */
+    LOCAL2      = 18 * 8, /**< Local use 2 */
+    LOCAL3      = 19 * 8, /**< Local use 3 */
+    LOCAL4      = 20 * 8, /**< Local use 4 */
+    LOCAL5      = 21 * 8, /**< Local use 5 */
+    LOCAL6      = 22 * 8, /**< Local use 6 */
+    LOCAL7      = 23 * 8 /**< Local use 7 */
 };
 
+/**
+ * All standard syslog severities. Defined in the file 
+ * <chucho/syslog_constants.hpp>.
+ */
 enum class severity
 {
-    EMERGENCY,
-    ALERT,
-    CRITICAL,
-    ERROR,
-    WARNING,
-    NOTICE,
-    INFORMATIONAL,
-    DEBUG
+    EMERGENCY, /**< The system is unusable */
+    ALERT, /**< Action must be taken immediately */
+    CRITICAL, /**< Critical conditions */
+    ERROR, /**< Error conditions */
+    WARNING, /**< Warning conditions */
+    NOTICE, /**< Normal but significant conditions */
+    INFORMATIONAL, /**< Information messages */
+    DEBUG /**< Debug-level messages */
 };
+//@}
 
 }
 

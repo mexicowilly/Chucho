@@ -23,7 +23,7 @@ namespace chucho
 {
 
 /**
- * @class duplicate_message_filter duplicate_mesage_filter.hpp chucho/duplicate_message_filter.hpp 
+ * @class duplicate_message_filter duplicate_message_filter.hpp chucho/duplicate_message_filter.hpp 
  * A filter for removing duplicate messages. The message of an 
  * event is examined to see if it matches the last message 
  * written. If it does, then the event is denied. Once a new 
