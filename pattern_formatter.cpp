@@ -432,25 +432,23 @@ void pattern_formatter::local_date_time_piece::to_calendar(time_t t, struct std:
 }
 
 pattern_formatter::base_host_piece::base_host_piece(const format_params& params)
-    : piece(params),
-      name_(host::get_base_name())
+    : piece(params)
 {
 }
 
 std::string pattern_formatter::base_host_piece::get_text_impl(const event& evt) const
 {
-    return name_;
+    return host::get_base_name();
 }
 
 pattern_formatter::full_host_piece::full_host_piece(const format_params& params)
-    : piece(params),
-      name_(host::get_full_name())
+    : piece(params)
 {
 }
 
 std::string pattern_formatter::full_host_piece::get_text_impl(const event& evt) const
 {
-    return name_;
+    return host::get_full_name();
 }
 
 pattern_formatter::line_number_piece::line_number_piece(const format_params& params)

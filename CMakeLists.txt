@@ -147,6 +147,7 @@ SET(CHUCHO_SOURCES
     file_writer.cpp
     file_writer_factory.cpp
     file_writer_memento.cpp
+    host.cpp
     level.cpp
     level_filter.cpp
     level_filter_factory.cpp

@@ -6,19 +6,17 @@
 namespace chucho
 {
 
-namespace host
-{
-
-std::string get_base_name()
+void host::get_base_impl()
 {
     struct utsname info;
     uname(&info);
-    return info.nodename;
+    base_ = info.nodename;
 }
 
-std::string get_full_name()
+void host::get_full_impl()
 {
-    std::string result = get_base_name();
+    get_base_impl();
+    std::string result = base_;
     struct addrinfo hints;
     std::memset(&hints, 0, sizeof(hints));
     hints.ai_family = PF_UNSPEC;
@@ -29,9 +27,7 @@ std::string get_full_name()
         result = info->ai_canonname;
         freeaddrinfo(info);
     }
-    return result;
-}
-
+    full_ = result;
 }
 
 }

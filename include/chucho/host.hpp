@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2013 Will Mason
  * 
@@ -28,13 +27,19 @@
 namespace chucho
 {
 
-namespace host
+class CHUCHO_EXPORT host
 {
+public:
+    static const std::string& get_base_name();
+    static const std::string& get_full_name();
 
-CHUCHO_EXPORT std::string get_base_name();
-CHUCHO_EXPORT std::string get_full_name();
+private:
+    CHUCHO_NO_EXPORT static void get_base_impl();
+    CHUCHO_NO_EXPORT static void get_full_impl();
 
-}
+    static std::string base_;
+    static std::string full_;
+};
 
 }
 

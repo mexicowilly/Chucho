@@ -262,9 +262,6 @@ private:
 
     protected:
         virtual std::string get_text_impl(const event& evt) const override;
-
-    private:
-        std::string name_;
     };
 
     class CHUCHO_NO_EXPORT full_host_piece : public piece
@@ -274,9 +271,6 @@ private:
 
     protected:
         virtual std::string get_text_impl(const event& evt) const override;
-
-    private:
-        std::string name_;
     };
 
     class CHUCHO_NO_EXPORT line_number_piece : public piece
