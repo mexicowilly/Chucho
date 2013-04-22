@@ -88,7 +88,7 @@ void configuration::perform()
 
     if (style_ == style::OFF)
     {
-        report.warning("Configuration will not be performed because it has been turned off");
+        report.info("Configuration will not be performed because it has been turned off");
         return;
     }
     configurator::initialize();
@@ -118,6 +118,7 @@ void configuration::perform()
             }
             catch (std::exception& e)
             {
+                logger::remove_unused_loggers();
                 report.error("Error reading " + fn +
                     ": " + exception::nested_whats(e));
             }
@@ -143,6 +144,7 @@ void configuration::perform()
         }
         catch (std::exception& e)
         {
+            logger::remove_unused_loggers();
             report.error("Error setting fallback configuration: " + exception::nested_whats(e));
         }
     }
