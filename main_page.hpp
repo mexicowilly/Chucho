@@ -52,8 +52,7 @@
 
 /**
  * @defgroup configuration 
- * Classes and namespaces that involve the configuration of 
- * chucho. 
+ * Classes that involve the configuration of chucho. 
  */
 
 /**
