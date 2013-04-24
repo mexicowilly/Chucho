@@ -21,6 +21,7 @@
 #error "This header is private"
 #endif
 
+#include <chucho/export.hpp>
 #include <istream>
 
 namespace chucho
@@ -29,7 +30,7 @@ namespace chucho
 namespace utf8
 {
 
-void validate(std::istream& stream);
+CHUCHO_EXPORT void validate(std::istream& stream);
 
 }
 

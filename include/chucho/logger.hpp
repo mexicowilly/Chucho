@@ -54,6 +54,8 @@ namespace chucho
  * the writers of their ancestors, but they don't have to if 
  * they don't want to. 
  *  
+ * @sa log.hpp for macros used in log event filtering 
+ *  
  * @ingroup loggers
  */
 class CHUCHO_EXPORT logger : public std::enable_shared_from_this<logger>,

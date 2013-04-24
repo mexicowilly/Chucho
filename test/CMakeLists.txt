@@ -30,6 +30,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                logger_test.cpp
                log_macro_test.cpp
                marker_test.cpp
+               multithread_test.cpp
                optional_test.cpp
                pattern_formatter_test.cpp
                regex_test.cpp

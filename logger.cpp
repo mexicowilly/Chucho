@@ -95,6 +95,7 @@ void logger::add_writer(std::shared_ptr<writer> wrt)
 
 std::shared_ptr<logger> logger::get(const std::string& name)
 {
+    std::lock_guard<std::recursive_mutex> lg(loggers_guard);
     // std::call_once does not remove the need for the atomic bool,
     // so we just use that and roll our own call_once.
     if (!is_initialized)
