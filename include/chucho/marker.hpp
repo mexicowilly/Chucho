@@ -141,6 +141,15 @@ private:
     std::set<marker> children_;
 };
 
+/**
+ * Write a marker to a stream. The entire contained hierarchy of 
+ * markers is written, with children enclosed in square braces. 
+ * 
+ * @relates marker
+ * @param stream the stream
+ * @param mark the marker to write
+ * @return the stream
+ */
 CHUCHO_EXPORT std::ostream& operator<< (std::ostream& stream, const marker& mark);
 
 inline bool marker::operator== (const marker& mark) const

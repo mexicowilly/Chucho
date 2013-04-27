@@ -21,7 +21,7 @@ INCLUDE(Configure.cmake)
 
 INCLUDE_DIRECTORIES(include embedded/include)
 
-SET(CHUCHO_VERSION 1.1)
+SET(CHUCHO_VERSION 1.2)
 SET(CHUCHO_SO_VERSION 1)
 # This is used for release candidate distros
 # SET(CHUCHO_DIST_VERSION "")

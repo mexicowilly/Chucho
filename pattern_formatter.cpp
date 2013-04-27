@@ -543,7 +543,7 @@ std::string pattern_formatter::marker_piece::get_text_impl(const event& evt) con
 {
     std::ostringstream stream;
     if (evt.get_marker())
-        stream << evt.get_marker()->get_name();
+        stream << *evt.get_marker();
     return stream.str();
 }
 
