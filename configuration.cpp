@@ -18,7 +18,7 @@
 #include <chucho/file.hpp>
 #include <chucho/status_reporter.hpp>
 #include <chucho/yaml_configurator.hpp>
-#include <chucho/utf8_validator.hpp>
+#include <chucho/utf8.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/cout_writer.hpp>
 #include <chucho/pattern_formatter.hpp>
@@ -81,6 +81,7 @@ std::string configuration::file_name_(std::string(1, '.') + chucho::file::dir_se
 bool configuration::allow_default_config_ = true;
 std::string configuration::fallback_;
 std::string configuration::environment_variable_("CHUCHO_CONFIG");
+configuration::unknown_handler_type configuration::unknown_handler_;
 
 void configuration::perform()
 {

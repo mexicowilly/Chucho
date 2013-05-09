@@ -34,6 +34,8 @@ IF(CHUCHO_POSIX)
         platform/posix/host_posix.cpp
         platform/posix/line_ending_posix.cpp
         platform/posix/pattern_formatter_posix.cpp
+        platform/posix/socket_connector_posix.cpp
+        platform/posix/socket_exception_posix.cpp
         platform/posix/syslog_writer_posix.cpp)
 ENDIF()
 
@@ -70,6 +72,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/numbered_file_roller.hpp
 	include/chucho/optional.hpp
     include/chucho/pattern_formatter.hpp
+    include/chucho/remote_writer.hpp
     include/chucho/rolling_file_writer.hpp
     include/chucho/size_file_roll_trigger.hpp
     include/chucho/status.hpp
@@ -81,7 +84,8 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/time_file_roller.hpp
     include/chucho/writer.hpp
     include/chucho/writer_factory.hpp
-    include/chucho/writer_memento.hpp)
+    include/chucho/writer_memento.hpp
+    include/chucho/yaml_formatter.hpp)
 
 SET(CHUCHO_EMBEDDED_SOURCES
     embedded/trex/trex.c
@@ -169,6 +173,7 @@ SET(CHUCHO_SOURCES
     pattern_formatter_memento.cpp
     regex.cpp
     regex_exception.cpp
+    remote_writer.cpp
     rolling_file_writer.cpp
     rolling_file_writer_factory.cpp
     rolling_file_writer_memento.cpp
@@ -185,11 +190,12 @@ SET(CHUCHO_SOURCES
     time_file_roller.cpp
     time_file_roller_factory.cpp
     time_file_roller_memento.cpp
-    utf8_validator.cpp
+    utf8.cpp
     writer.cpp
     writer_factory.cpp
     writer_memento.cpp
     yaml_configurator.cpp
+    yaml_formatter.cpp
     include/chucho/calendar.hpp
     include/chucho/cerr_writer_factory.hpp
     include/chucho/cerr_writer_memento.hpp
@@ -222,6 +228,8 @@ SET(CHUCHO_SOURCES
     include/chucho/rolling_file_writer_memento.hpp
     include/chucho/size_file_roll_trigger_factory.hpp
     include/chucho/size_file_roll_trigger_memento.hpp
+    include/chucho/socket_connector.hpp
+    include/chucho/socket_exception.hpp
     include/chucho/status.hpp
     include/chucho/status_manager.hpp
     include/chucho/status_observer.hpp
@@ -230,7 +238,7 @@ SET(CHUCHO_SOURCES
     include/chucho/syslog_writer_memento.hpp
     include/chucho/time_file_roller_factory.hpp
     include/chucho/time_file_roller_memento.hpp
-    include/chucho/utf8_validator.hpp
+    include/chucho/utf8.hpp
     include/chucho/yaml_configurator.hpp
     ${CHUCHO_PLATFORM_SOURCES}
     ${CHUCHO_EMBEDDED_SOURCES}
@@ -264,6 +272,7 @@ ELSE()
 ENDIF()
 
 ADD_SUBDIRECTORY(test)
+ADD_SUBDIRECTORY(log-server)
 
 # Documentation
 IF(DOXYGEN_FOUND)

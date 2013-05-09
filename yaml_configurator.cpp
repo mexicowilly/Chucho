@@ -17,6 +17,7 @@
 #include <chucho/yaml_configurator.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/logger_factory.hpp>
+#include <chucho/configuration.hpp>
 
 namespace
 {
@@ -83,7 +84,11 @@ void yaml_configurator::configure(std::istream& in)
                         auto found = get_factories().find(type);
                         if (found == get_factories().end())
                         {
-                            throw exception("The type " + type + " has no registered factory");
+                            if (configuration::get_unknown_handler() &&
+                                second.Type() == YAML::NodeType::Scalar)
+                            {
+                                configuration::get_unknown_handler()(type, second.to<std::string>());
+                            }
                         }
                         else
                         {

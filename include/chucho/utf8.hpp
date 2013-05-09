@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_UTF8_VALIDATOR_HPP__)
-#define CHUCHO_UTF8_VALIDATOR_HPP__
+#if !defined(CHUCHO_UTF8_HPP__)
+#define CHUCHO_UTF8_HPP__
 
 #if !defined(chucho_EXPORTS)
 #error "This header is private"
@@ -30,6 +30,7 @@ namespace chucho
 namespace utf8
 {
 
+CHUCHO_EXPORT std::string escape_invalid(const std::string& text);
 CHUCHO_EXPORT void validate(std::istream& stream);
 
 }

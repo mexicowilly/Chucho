@@ -67,7 +67,7 @@ void create_directories(const std::string& name)
 
 void create_directory(const std::string& name)
 {
-    if (::mkdir(name.c_str(), 0755) != 0)
+    if (mkdir(name.c_str(), 0755) != 0)
         throw file_exception("Could not create directory " + name + ": " + std::string(std::strerror(errno)));
 }
 

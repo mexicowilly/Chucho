@@ -19,6 +19,7 @@
 
 #include <chucho/export.hpp>
 #include <string>
+#include <functional>
 
 namespace chucho
 {
@@ -63,6 +64,8 @@ namespace chucho
 class CHUCHO_EXPORT configuration
 {
 public:
+    typedef std::function<void(const std::string&, const std::string&)> unknown_handler_type;
+
     /**
      * The style of configuration. AUTOMATIC is the default, which 
      * occurs the first time a @ref logger is requested.
@@ -124,7 +127,7 @@ public:
      * @return the style
      */
     static style get_style();
-
+    static unknown_handler_type get_unknown_handler();
     /**
      * Set whether the default configuration is allowed. In the 
      * absence of a configuration file, chucho can establish a 
@@ -172,6 +175,7 @@ public:
      * @param stl the style
      */
     static void set_style(style stl);
+    static void set_unknown_handler(unknown_handler_type hndl);
 
 protected:
     friend class logger;
@@ -184,6 +188,7 @@ private:
     static bool allow_default_config_;
     static std::string fallback_;
     static std::string environment_variable_;
+    static unknown_handler_type unknown_handler_;
 };
 
 inline bool configuration::allow_default()
@@ -211,6 +216,11 @@ inline configuration::style configuration::get_style()
     return style_;
 }
 
+inline configuration::unknown_handler_type configuration::get_unknown_handler()
+{
+    return unknown_handler_;
+}
+
 inline void configuration::set_allow_default(bool allow)
 {
     allow_default_config_ = allow;
@@ -229,6 +239,11 @@ inline void configuration::set_file_name(const std::string& name)
 inline void configuration::set_style(style stl)
 {
     style_ = stl;
+}
+
+inline void configuration::set_unknown_handler(unknown_handler_type hndl)
+{
+    unknown_handler_ = hndl;
 }
 
 }

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <chucho/utf8_validator.hpp>
+#include <chucho/utf8.hpp>
 #include <chucho/exception.hpp>
 #include <vector>
 #include <iostream>

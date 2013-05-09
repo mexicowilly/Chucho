@@ -97,13 +97,18 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_RPATH FALSE)
 
 IF(CHUCHO_POSIX)
     # headers
-    FOREACH(HEAD fts.h netdb.h pthread.h stdio.h stdlib.h sys/socket.h sys/stat.h sys/utsname.h syslog.h time.h unistd.h)
-        STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME "CHUCHO_HAVE_${HEAD}")
+    FOREACH(HEAD arpa/inet.h errno.h fts.h limits.h netdb.h poll.h pthread.h pwd.h stdio.h stdlib.h
+                 sys/socket.h sys/stat.h sys/utsname.h syslog.h time.h unistd.h)
+        STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
+        STRING(REPLACE / _ CHUCHO_HEAD_VAR_NAME ${CHUCHO_HEAD_VAR_NAME})
+        STRING(TOUPPER ${CHUCHO_HEAD_VAR_NAME} CHUCHO_HEAD_VAR_NAME)
         CHECK_INCLUDE_FILE_CXX(${HEAD} ${CHUCHO_HEAD_VAR_NAME})
         IF(NOT ${CHUCHO_HEAD_VAR_NAME})
             MESSAGE(FATAL_ERROR "The header ${HEAD} is required")
         ENDIF()
     ENDFOREACH()
+    # We need to know this in the source
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_ARPA_INET_H)
 
     # host name functions
     CHECK_CXX_SYMBOL_EXISTS(uname sys/utsname.h CHUCHO_HAVE_UNAME)
@@ -117,17 +122,21 @@ IF(CHUCHO_POSIX)
         MESSAGE(FATAL_ERROR "clock is required")
     ENDIF()
 
-    # getpid
-    CHECK_CXX_SYMBOL_EXISTS(getpid unistd.h CHUCHO_HAVE_GETPID)
-    IF(NOT CHUCHO_HAVE_GETPID)
-        MESSAGE(FATAL_ERROR "getpid is required")
-    ENDIF()
+    # getpid/access/getuid
+    FOREACH(SYM getpid access getuid)
+        CHECK_CXX_SYMBOL_EXISTS(${SYM} unistd.h CHUCHO_HAVE_${SYM})
+        IF(NOT CHUCHO_HAVE_${SYM})
+            MESSAGE(FATAL_ERROR "${SYM} is required")
+        ENDIF()
+    ENDFOREACH()
 
-    # stat
-    CHECK_CXX_SYMBOL_EXISTS(stat sys/stat.h CHUCHO_HAVE_STAT)
-    IF(NOT CHUCHO_HAVE_STAT)
-        MESSAGE(FATAL_ERROR "stat is required")
-    ENDIF()
+    # stat/mkdir
+    FOREACH(SYM stat mkdir)
+        CHECK_CXX_SYMBOL_EXISTS(${SYM} sys/stat.h CHUCHO_HAVE_${SYM})
+        IF(NOT CHUCHO_HAVE_${SYM})
+            MESSAGE(FATAL_ERROR "${SYM} is required")
+        ENDIF()
+    ENDFOREACH()
 
     # gmtime_r/localtime_r
     FOREACH(SYM gmtime_r localtime_r)
@@ -174,8 +183,8 @@ IF(CHUCHO_POSIX)
         SET(CHUCHO_THREAD_LIB pthread CACHE STRING "The threading library")
     ENDIF()
 
-    # getaddrinfo/freeaddrinfo/gai_strerror
-    FOREACH(SYM getaddrinfo freeaddrinfo gai_strerror)
+    # getaddrinfo/freeaddrinfo/gai_strerror/getnameinfo
+    FOREACH(SYM getaddrinfo freeaddrinfo gai_strerror getnameinfo)
         CHECK_CXX_SYMBOL_EXISTS(${SYM} netdb.h CHUCHO_HAVE_${SYM})
         IF(NOT CHUCHO_HAVE_${SYM})
             MESSAGE(FATAL_ERROR "${SYM} is required")
@@ -188,13 +197,25 @@ IF(CHUCHO_POSIX)
         MESSSAGE(FATAL_ERROR "syslog is required")
     ENDIF()
 
-    # socket/sendto
-    FOREACH(SYM socket sendto)
+    # socket/sendto/connect/shutdown/send/recv/bind/listen
+    FOREACH(SYM socket sendto connect shutdown send recv bind listen accept)
         CHECK_CXX_SYMBOL_EXISTS(${SYM} sys/socket.h CHUCHO_HAVE_${SYM})
         IF(NOT CHUCHO_HAVE_${SYM})
             MESSAGE(FATAL_ERROR "${SYM} is required")
         ENDIF()
     ENDFOREACH()
+
+    # poll
+    CHECK_CXX_SYMBOL_EXISTS(poll poll.h CHUCHO_HAVE_POLL)
+    IF(NOT CHUCHO_HAVE_POLL)
+        MESSAGE(FATAL_ERROR "poll is required")
+    ENDIF()
+
+    # getpwuid
+    CHECK_CXX_SYMBOL_EXISTS(getpwuid pwd.h CHUCHO_HAVE_GETPWUID)
+    IF(NOT CHUCHO_HAVE_GETPWUID)
+        MESSAGE(FATAL_ERROR "getpwuid is required")
+    ENDIF()
 ENDIF()
 
 #

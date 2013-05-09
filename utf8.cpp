@@ -14,17 +14,28 @@
  *    limitations under the License.
  */
 
-#include <chucho/utf8_validator.hpp>
+#include <chucho/utf8.hpp>
 #include <chucho/exception.hpp>
 #include <string>
+#include <sstream>
+#include <iomanip>
 
 namespace
 {
 
-std::string::size_type find_invalid(const std::string& utf8)
+
+std::string escape(char c)
+{
+    std::ostringstream stream;
+    stream << "\\x" << std::hex << std::setfill('0') <<
+        std::setw(2) << static_cast<int>(c);
+    return stream.str();
+}
+
+std::string::size_type find_invalid(const std::string& utf8, std::string::size_type pos = 0)
 {
     unsigned char ch;
-    std::string::size_type i = 0;
+    std::string::size_type i = pos;
     std::string::size_type j;
     std::string::size_type end;
     std::size_t trailing;
@@ -73,6 +84,30 @@ namespace chucho
 
 namespace utf8
 {
+
+std::string escape_invalid(const std::string& text)
+{
+    auto invalid = find_invalid(text);
+    if (invalid == std::string::npos)
+    {
+        return text;
+    }
+    else
+    {
+        std::string::size_type prev = 0;
+        std::string result;
+        while (invalid != std::string::npos)
+        {
+            result.append(text.substr(prev, invalid - prev));
+            result.append(escape(text[invalid]));
+            prev = invalid + 1;
+            invalid = find_invalid(text, prev);
+        }
+        if (prev < text.length())
+            result.append(text.substr(prev));
+        return result;
+    }
+}
 
 void validate(std::istream& stream)
 {
