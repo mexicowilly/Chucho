@@ -18,6 +18,7 @@
 #define CHUCHO_VASSALS_HPP__
 
 #include "socket_reader.hpp"
+#include <chucho/logger.hpp>
 #include <thread>
 #include <vector>
 #include <queue>
@@ -48,6 +49,7 @@ private:
     std::condition_variable condition_;
     bool stop_;
     std::function<void(std::shared_ptr<socket_reader>)> processor_;
+    std::shared_ptr<chucho::logger> logger_;
 };
 
 }

@@ -19,6 +19,7 @@ INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}")
 IF(CHUCHO_POSIX)
     SET(CHUCHOD_PLATFORM_SOURCES
         platform/posix/log_posix.cpp
+        platform/posix/signal_handler_posix.cpp
         platform/posix/socket_reader_posix.cpp
         platform/posix/socket_listener_posix.cpp)
 ENDIF()
@@ -33,6 +34,7 @@ ADD_EXECUTABLE(chuchod
                main.cpp
                properties.cpp
                properties.hpp
+               signal_handler.hpp
                socket_listener.hpp
                socket_reader.cpp
                socket_reader.hpp

@@ -84,11 +84,14 @@ void yaml_configurator::configure(std::istream& in)
                         auto found = get_factories().find(type);
                         if (found == get_factories().end())
                         {
+                            bool resolved = false;
                             if (configuration::get_unknown_handler() &&
                                 second.Type() == YAML::NodeType::Scalar)
                             {
-                                configuration::get_unknown_handler()(type, second.to<std::string>());
+                                resolved = configuration::get_unknown_handler()(type, second.to<std::string>());
                             }
+                            if (!resolved)
+                                report_warning("Found unknown configuration element \"" + type + "\"");
                         }
                         else
                         {

@@ -16,6 +16,7 @@
 
 #include "log.hpp"
 #include "suzerain.hpp"
+#include "signal_handler.hpp"
 
 using namespace chucho::server;
 
@@ -23,6 +24,9 @@ int main()
 {
     properties props;
     log::configure(props);
+    signal_handler::install();
     suzerain lord;
     lord.run(props);
+    CHUCHO_INFO(chucho::logger::get("chuchod"), "chuchod is shutting down");
+    return 0;
 }

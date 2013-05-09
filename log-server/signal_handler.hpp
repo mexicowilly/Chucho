@@ -14,11 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_PROPERTIES_HPP__)
-#define CHUCHO_PROPERTIES_HPP__
-
-#include <string>
-#include <cstdint>
+#if !defined(CHUCHO_SIGNAL_HANDLER_HPP__)
+#define CHUCHO_SIGNAL_HANDLER_HPP__
 
 namespace chucho
 {
@@ -26,29 +23,11 @@ namespace chucho
 namespace server
 {
 
-class properties
+namespace signal_handler
 {
-public:
-    properties();
 
-    bool handle_config_value(const std::string& key, const std::string& value);
+void install();
 
-    std::uint16_t port() const;
-    std::size_t vassal_count() const;
-
-private:
-    std::size_t vassal_count_;
-    std::uint16_t port_;
-};
-
-inline std::uint16_t properties::port() const
-{
-    return port_;
-}
-
-inline std::size_t properties::vassal_count() const
-{
-    return vassal_count_;
 }
 
 }

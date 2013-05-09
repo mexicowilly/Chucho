@@ -97,8 +97,8 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_RPATH FALSE)
 
 IF(CHUCHO_POSIX)
     # headers
-    FOREACH(HEAD arpa/inet.h errno.h fts.h limits.h netdb.h poll.h pthread.h pwd.h stdio.h stdlib.h
-                 sys/socket.h sys/stat.h sys/utsname.h syslog.h time.h unistd.h)
+    FOREACH(HEAD arpa/inet.h errno.h fts.h limits.h netdb.h poll.h pthread.h pwd.h signal.h
+                 stdio.h stdlib.h sys/socket.h sys/stat.h sys/utsname.h syslog.h time.h unistd.h)
         STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
         STRING(REPLACE / _ CHUCHO_HEAD_VAR_NAME ${CHUCHO_HEAD_VAR_NAME})
         STRING(TOUPPER ${CHUCHO_HEAD_VAR_NAME} CHUCHO_HEAD_VAR_NAME)
@@ -215,6 +215,18 @@ IF(CHUCHO_POSIX)
     CHECK_CXX_SYMBOL_EXISTS(getpwuid pwd.h CHUCHO_HAVE_GETPWUID)
     IF(NOT CHUCHO_HAVE_GETPWUID)
         MESSAGE(FATAL_ERROR "getpwuid is required")
+    ENDIF()
+
+    # signal stuff
+    FOREACH(SYM raise sigemptyset sigaddset sigwait sigaction)
+        CHECK_CXX_SYMBOL_EXISTS(${SYM} signal.h CHUCHO_HAVE_${SYM})
+        IF(NOT CHUCHO_HAVE_${SYM})
+            MESSAGE(FATAL_ERROR "${SYM} is required")
+        ENDIF()
+    ENDFOREACH()
+    CHECK_CXX_SYMBOL_EXISTS(pthread_sigmask pthread.h CHUCHO_HAVE_PTHREAD_SIGMASK)
+    IF(NOT CHUCHO_HAVE_PTHREAD_SIGMASK)
+        MESSAGE(FATAL_ERROR "pthread_sigmask is required")
     ENDIF()
 ENDIF()
 

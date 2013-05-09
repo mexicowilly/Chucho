@@ -39,7 +39,7 @@ void log::configure(properties& props)
                                         "        - chucho::formatter:\n"
                                         "            - chucho::pattern_formatter:\n"
                                         "                - pattern: '%d{%Y/%m/%d %H:%M:%S.%q} %c %-5p %m%n'\n"
-                                        "        - chucho::numbered_flie_roller:\n"
+                                        "        - chucho::numbered_file_roller:\n"
                                         "            - max_index: 1\n"
                                         "        - chucho::size_file_roll_trigger:\n"
                                         "            - max_size: 10m\n");

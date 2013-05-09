@@ -29,8 +29,9 @@ properties::properties()
 {
 }
 
-void properties::handle_config_value(const std::string& key, const std::string& value)
+bool properties::handle_config_value(const std::string& key, const std::string& value)
 {
+    bool resolved = true;
     if (key == "worker_threads")
     {
         try
@@ -57,6 +58,11 @@ void properties::handle_config_value(const std::string& key, const std::string& 
             // to help
         }
     }
+    else
+    {
+        resolved = false;
+    }
+    return resolved;
 }
 
 }

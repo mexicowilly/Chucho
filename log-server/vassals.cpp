@@ -15,6 +15,7 @@
  */
 
 #include "vassals.hpp"
+#include <chucho/log.hpp>
 
 namespace chucho
 {
@@ -24,10 +25,12 @@ namespace server
 
 vassals::vassals(std::size_t count, std::function<void(std::shared_ptr<socket_reader>)> processor)
     : stop_(false),
-      processor_(processor)
+      processor_(processor),
+      logger_(chucho::logger::get("chuchod.vassals"))
 {
     for (std::size_t i = 0; i < count; i++)
         vassals_.emplace_back(std::bind(&vassals::work, this));
+    CHUCHO_INFO(logger_, "Started " << count << " worker threads");
 }
 
 vassals::~vassals()
@@ -38,6 +41,7 @@ vassals::~vassals()
     condition_.notify_all();
     for (std::thread& t : vassals_)
         t.join();
+    CHUCHO_INFO(logger_, "Joined " << vassals_.size() << " worker threads");
 }
 
 void vassals::submit(std::shared_ptr<socket_reader> reader)
