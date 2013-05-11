@@ -19,12 +19,13 @@
 #include <vector>
 #include <array>
 #include <cstring>
+#include <cerrno>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <errno.h>
 #include <fts.h>
-#include <stdlib.h>
 #include <limits.h>
+// Needed for realpath, which is not in <cstdlib>
+#include <stdlib.h>
 
 namespace chucho
 {
@@ -101,7 +102,7 @@ bool is_fully_qualified(const std::string& name)
 
 void remove(const std::string& name)
 {
-    if (access(name.c_str(), F_OK) == 0 && ::remove(name.c_str()) != 0)
+    if (access(name.c_str(), F_OK) == 0 && std::remove(name.c_str()) != 0)
         throw file_exception("Unable to remove " + name + ": " + std::strerror(errno));
 }
 
@@ -117,7 +118,7 @@ void remove_all(const std::string& name)
     }
     if (!(stat_buf.st_mode & S_IFDIR))
     {
-        if (::remove(name.c_str()) != 0)
+        if (std::remove(name.c_str()) != 0)
         {
             int this_err = errno;
             throw file_exception("Could not remove \"" + name + "\"" + std::strerror(this_err));
@@ -140,7 +141,7 @@ void remove_all(const std::string& name)
     {
         if (ent->fts_info & (FTS_DP | FTS_F | FTS_SL))
         {
-            if (::remove(ent->fts_accpath) != 0)
+            if (std::remove(ent->fts_accpath) != 0)
             {
                 int this_err = errno;
                 realpath(ent->fts_accpath, path_buf.data());

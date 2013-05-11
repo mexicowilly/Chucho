@@ -16,12 +16,23 @@
 
 #include "properties.hpp"
 #include <chucho/remote_writer.hpp>
+#include <chucho/logger.hpp>
 
 namespace chucho
 {
 
 namespace server
 {
+
+std::ostream& operator<< (std::ostream& stream, properties& props)
+{
+    stream << "Properties:\n";
+    stream << "  - version: " << CHUCHO_VERSION << '\n';
+    stream << "  - port: " << props.port() << '\n';
+    stream << "  - worker_threads: " << props.vassal_count() << '\n';
+    stream << "  - log level: " << *chucho::logger::get("chuchod")->get_level();
+    return stream;
+}
 
 properties::properties()
     : vassal_count_(3),

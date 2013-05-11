@@ -246,7 +246,7 @@ void pattern_formatter::parse(const std::string& pattern)
             case parser_state::MIN:
                 if (*i >= '0' && *i <= '9')
                 {
-                    text = *i;
+                    text += *i;
                 }
                 else
                 {

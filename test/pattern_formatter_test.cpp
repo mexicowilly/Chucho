@@ -178,8 +178,8 @@ TEST_F(pattern_formatter_test, format_params)
 {
     chucho::pattern_formatter f("%5m");
     EXPECT_STREQ("   hi", f.format(evt_).c_str());
-    f = chucho::pattern_formatter("%-5m");
-    EXPECT_STREQ("hi   ", f.format(evt_).c_str());
+    f = chucho::pattern_formatter("%-17m");
+    EXPECT_STREQ("hi               ", f.format(evt_).c_str());
     f = chucho::pattern_formatter("%.1m");
     EXPECT_STREQ("i", f.format(evt_).c_str());
     f = chucho::pattern_formatter("%5.1m");

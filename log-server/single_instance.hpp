@@ -14,14 +14,24 @@
  *    limitations under the License.
  */
 
-#include <chucho/socket_exception.hpp>
+#if !defined(CHUCHO_SINGLE_INSTANCE_HPP__)
+#define CHUCHO_SINGLE_INSTANCE_HPP__
 
 namespace chucho
 {
 
-socket_exception::socket_exception(const std::string& msg, int sys_error)
-    : exception(msg + ": (" + std::to_string(sys_error) + ") " + std::strerror(sys_error))
+namespace server
 {
+
+namespace single_instance
+{
+
+void ensure();
+
 }
 
 }
+
+}
+
+#endif

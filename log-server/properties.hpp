@@ -19,6 +19,7 @@
 
 #include <string>
 #include <cstdint>
+#include <ostream>
 
 namespace chucho
 {
@@ -40,6 +41,8 @@ private:
     std::size_t vassal_count_;
     std::uint16_t port_;
 };
+
+std::ostream& operator<< (std::ostream& stream, properties& props);
 
 inline std::uint16_t properties::port() const
 {

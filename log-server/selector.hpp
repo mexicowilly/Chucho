@@ -14,14 +14,14 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_SUZERAIN_HPP__)
-#define CHUCHO_SUZERAIN_HPP__
+#if !defined(CHUCHO_SELECTOR_HPP__)
+#define CHUCHO_SELECTOR_HPP__
 
 #include "socket_reader.hpp"
-#include "properties.hpp"
-#include "vassals.hpp"
-#include "selector.hpp"
-#include <chucho/logger.hpp>
+#include <chucho/log.hpp>
+#include <thread>
+#include <map>
+#include <atomic>
 
 namespace chucho
 {
@@ -29,24 +29,25 @@ namespace chucho
 namespace server
 {
 
-class suzerain
+class selector
 {
 public:
-    suzerain(const properties& props);
-    suzerain(const suzerain&) = delete;
+    selector(std::function<void(std::shared_ptr<socket_reader>)> was_selected);
+    ~selector();
 
-    suzerain& operator= (const suzerain&) = delete;
-
-    void run();
+    void add(std::shared_ptr<socket_reader> reader);
+    void remove(std::shared_ptr<socket_reader> reader);
 
 private:
-    void process_events(std::shared_ptr<socket_reader> reader);
-    void was_selected(std::shared_ptr<socket_reader> reader);
+    void main();
 
     std::shared_ptr<chucho::logger> logger_;
-    vassals vassals_;
-    selector selector_;
-    properties props_;
+    std::mutex guard_;
+    std::condition_variable condition_;
+    std::map<int, std::shared_ptr<socket_reader>> readers_;
+    bool stop_;
+    std::function<void(std::shared_ptr<socket_reader>)> was_selected_;
+    std::thread thread_;
 };
 
 }

@@ -18,10 +18,10 @@
 #include "eof_exception.hpp"
 #include "is_shut_down.hpp"
 #include <chucho/socket_exception.hpp>
+#include <cerrno>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <poll.h>
-#include <errno.h>
 
 namespace chucho
 {

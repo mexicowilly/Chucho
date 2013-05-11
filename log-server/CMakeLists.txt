@@ -15,16 +15,21 @@
 #
 
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}")
+ADD_DEFINITIONS(-DCHUCHO_VERSION=${CHUCHO_VERSION})
 
 IF(CHUCHO_POSIX)
     SET(CHUCHOD_PLATFORM_SOURCES
+        platform/posix/daemon_posix.cpp
         platform/posix/log_posix.cpp
+        platform/posix/selector_posix.cpp
         platform/posix/signal_handler_posix.cpp
+        platform/posix/single_instance_posix.cpp
         platform/posix/socket_reader_posix.cpp
         platform/posix/socket_listener_posix.cpp)
 ENDIF()
 
 ADD_EXECUTABLE(chuchod
+               daemon.hpp
                eof_exception.cpp
                eof_exception.hpp
                is_shut_down.cpp
@@ -34,7 +39,10 @@ ADD_EXECUTABLE(chuchod
                main.cpp
                properties.cpp
                properties.hpp
+               selector.cpp
+               selector.hpp
                signal_handler.hpp
+               single_instance.hpp
                socket_listener.hpp
                socket_reader.cpp
                socket_reader.hpp

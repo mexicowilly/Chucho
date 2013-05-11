@@ -18,8 +18,8 @@
 #include "eof_exception.hpp"
 #include "is_shut_down.hpp"
 #include <chucho/socket_exception.hpp>
+#include <cerrno>
 #include <sys/socket.h>
-#include <errno.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <poll.h>

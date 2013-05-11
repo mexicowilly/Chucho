@@ -15,7 +15,6 @@
  */
 
 #include "suzerain.hpp"
-#include "vassals.hpp"
 #include "socket_listener.hpp"
 #include "is_shut_down.hpp"
 #include "eof_exception.hpp"
@@ -168,13 +167,17 @@ namespace chucho
 namespace server
 {
 
-suzerain::suzerain()
-    : logger_(chucho::logger::get("chuchod.suzerain"))
+suzerain::suzerain(const properties& props)
+    : logger_(chucho::logger::get("chuchod.suzerain")),
+      vassals_(props.vassal_count(), std::bind(&suzerain::process_events, this, std::placeholders::_1)),
+      selector_(std::bind(&suzerain::was_selected, this, std::placeholders::_1)),
+      props_(props)
 {
 }
 
 void suzerain::process_events(std::shared_ptr<socket_reader> reader)
 {
+    std::size_t event_count = 0;
     try
     {
         std::uint32_t size;
@@ -206,6 +209,7 @@ void suzerain::process_events(std::shared_ptr<socket_reader> reader)
                     std::shared_ptr<chucho::logger> lgr(wevt.get_event().get_logger());
                     if (lgr->permits(wevt.get_event().get_level()))
                         lgr->write(wevt.get_event());
+                    event_count++;
                 }
             }
         }
@@ -214,16 +218,16 @@ void suzerain::process_events(std::shared_ptr<socket_reader> reader)
     {
         CHUCHO_ERROR(logger_, std::string("Error processing events: ") + e.what());
     }
+    CHUCHO_DEBUG(logger_, "Processed " << event_count << " events");
+    selector_.add(reader);
 }
 
-void suzerain::run(const properties& props)
+void suzerain::run()
 {
-    vassals vsls(props.vassal_count(),
-                 std::bind(&suzerain::process_events, this, std::placeholders::_1));
     std::unique_ptr<socket_listener> lstn;
     try
     {
-        lstn.reset(new socket_listener(props.port()));
+        lstn.reset(new socket_listener(props_.port()));
     }
     catch (std::exception& e)
     {
@@ -232,12 +236,12 @@ void suzerain::run(const properties& props)
     }
     try
     {
-        CHUCHO_INFO(logger_, "chuchod has started");
+        CHUCHO_INFO(logger_, "chuchod will listen on port " << props_.port());
         while (!is_shut_down)
         {
             std::shared_ptr<socket_reader> reader = lstn->accept();
-            vsls.submit(reader);
-            CHUCHO_DEBUG(logger_, "Accepted new connection from " << reader->get_host());
+            selector_.add(reader);
+            CHUCHO_INFO(logger_, "Accepted new connection from " << reader->get_host());
         }
         CHUCHO_INFO_STR(logger_, "The listener has been shut down");
     }
@@ -254,6 +258,12 @@ void suzerain::run(const properties& props)
         CHUCHO_ERROR(logger_, "An unexpected exception has occurred: " << e.what());
 
     }
+}
+
+void suzerain::was_selected(std::shared_ptr<socket_reader> reader)
+{
+    vassals_.submit(reader);
+    CHUCHO_DEBUG(logger_, "Submitted " << reader->get_host() << " for work");
 }
 
 }

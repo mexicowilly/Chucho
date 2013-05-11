@@ -34,6 +34,7 @@ public:
     ~socket_reader();
 
     const std::string& get_host() const;
+    int get_socket() const;
     void read(std::uint8_t* dest, std::size_t count);
 
 private:
@@ -46,6 +47,11 @@ private:
 inline const std::string& socket_reader::get_host() const
 {
     return host_;
+}
+
+inline int socket_reader::get_socket() const
+{
+    return socket_;
 }
 
 }

@@ -97,8 +97,8 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_RPATH FALSE)
 
 IF(CHUCHO_POSIX)
     # headers
-    FOREACH(HEAD arpa/inet.h errno.h fts.h limits.h netdb.h poll.h pthread.h pwd.h signal.h
-                 stdio.h stdlib.h sys/socket.h sys/stat.h sys/utsname.h syslog.h time.h unistd.h)
+    FOREACH(HEAD arpa/inet.h fcntl.h fts.h limits.h netdb.h poll.h pthread.h pwd.h signal.h
+                 sys/socket.h sys/stat.h sys/utsname.h syslog.h time.h unistd.h)
         STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
         STRING(REPLACE / _ CHUCHO_HEAD_VAR_NAME ${CHUCHO_HEAD_VAR_NAME})
         STRING(TOUPPER ${CHUCHO_HEAD_VAR_NAME} CHUCHO_HEAD_VAR_NAME)
@@ -122,8 +122,8 @@ IF(CHUCHO_POSIX)
         MESSAGE(FATAL_ERROR "clock is required")
     ENDIF()
 
-    # getpid/access/getuid
-    FOREACH(SYM getpid access getuid)
+    # getpid/access/getuid/fork/close/setsid/dup2/chdir/_exit
+    FOREACH(SYM getpid access getuid fork close setsid dup2 chdir _exit)
         CHECK_CXX_SYMBOL_EXISTS(${SYM} unistd.h CHUCHO_HAVE_${SYM})
         IF(NOT CHUCHO_HAVE_${SYM})
             MESSAGE(FATAL_ERROR "${SYM} is required")
@@ -154,12 +154,6 @@ IF(CHUCHO_POSIX)
             MESSAGE(FATAL_ERROR "FTS functions are required")
         ENDIF()
     ENDFOREACH()
-
-    # remove
-    CHECK_CXX_SYMBOL_EXISTS(remove stdio.h CHUCHO_HAVE_REMOVE)
-    IF(NOT CHUCHO_HAVE_REMOVE)
-        MESSAGE(FATAL_ERROR "remove is required")
-    ENDIF()
 
     # realpath
     CHECK_CXX_SYMBOL_EXISTS(realpath stdlib.h CHUCHO_HAVE_REALPATH)
@@ -218,7 +212,7 @@ IF(CHUCHO_POSIX)
     ENDIF()
 
     # signal stuff
-    FOREACH(SYM raise sigemptyset sigaddset sigwait sigaction)
+    FOREACH(SYM raise sigemptyset sigaddset sigwait sigaction kill)
         CHECK_CXX_SYMBOL_EXISTS(${SYM} signal.h CHUCHO_HAVE_${SYM})
         IF(NOT CHUCHO_HAVE_${SYM})
             MESSAGE(FATAL_ERROR "${SYM} is required")
@@ -227,6 +221,12 @@ IF(CHUCHO_POSIX)
     CHECK_CXX_SYMBOL_EXISTS(pthread_sigmask pthread.h CHUCHO_HAVE_PTHREAD_SIGMASK)
     IF(NOT CHUCHO_HAVE_PTHREAD_SIGMASK)
         MESSAGE(FATAL_ERROR "pthread_sigmask is required")
+    ENDIF()
+
+    # open
+    CHECK_CXX_SYMBOL_EXISTS(open fcntl.h CHUCHO_HAVE_OPEN)
+    IF(NOT CHUCHO_HAVE_OPEN)
+        MESSAGE(FATAL_ERROR "open is required")
     ENDIF()
 ENDIF()
 

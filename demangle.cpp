@@ -17,7 +17,7 @@
 #include <chucho/demangle.hpp>
 #if defined(__clang__) || defined(__GNUC__)
 #include <cxxabi.h>
-#include <stdlib.h>
+#include <cstdlib>
 #endif
 
 namespace chucho
@@ -34,7 +34,7 @@ std::string get_demangled_name(const std::type_info& info)
     if (status != 0)
         return info.name();
     std::string result(demangled);
-    free(demangled);
+    std::free(demangled);
     return result;
 #else
     return info.name();

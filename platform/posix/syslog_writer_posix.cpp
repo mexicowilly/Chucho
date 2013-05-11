@@ -22,13 +22,13 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <assert.h>
-#include <errno.h>
 #include <unistd.h>
 #include <syslog.h>
 #include <sstream>
 #include <cstdint>
 #include <vector>
 #include <array>
+#include <cerrno>
 
 namespace chucho
 {
@@ -127,7 +127,7 @@ remote_syslog_transport_handle::remote_syslog_transport_handle(const std::string
     socket_ = socket(info->ai_family, info->ai_socktype, info->ai_protocol);
     freeaddrinfo(info);
     if (socket_ == -1)
-        throw chucho::exception(std::string("Could not create socket: ") + strerror(errno));
+        throw chucho::exception(std::string("Could not create socket: ") + std::strerror(errno));
 }
 
 remote_syslog_transport_handle::~remote_syslog_transport_handle()
@@ -158,7 +158,7 @@ void remote_syslog_transport_handle::send(chucho::syslog::facility fcl,
                reinterpret_cast<struct sockaddr*>(&address_[0]),
                address_.size()) == -1)
     {
-        throw chucho::exception(std::string("Unable to send syslog data: ") + strerror(errno));
+        throw chucho::exception(std::string("Unable to send syslog data: ") + std::strerror(errno));
     }
 }
 
