@@ -34,15 +34,22 @@ public:
 
     bool handle_config_value(const std::string& key, const std::string& value);
 
+    bool console_mode() const;
     std::uint16_t port() const;
     std::size_t vassal_count() const;
 
 private:
     std::size_t vassal_count_;
     std::uint16_t port_;
+    bool console_mode_;
 };
 
 std::ostream& operator<< (std::ostream& stream, properties& props);
+
+inline bool properties::console_mode() const
+{
+    return console_mode_;
+}
 
 inline std::uint16_t properties::port() const
 {

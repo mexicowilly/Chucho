@@ -18,7 +18,7 @@
 #define CHUCHO_SOCKET_LISTENER_HPP__
 
 #include "socket_reader.hpp"
-#include <memory>
+#include <chucho/logger.hpp>
 
 namespace chucho
 {
@@ -39,6 +39,7 @@ public:
 
 private:
     int socket_;
+    std::shared_ptr<chucho::logger> logger_;
 };
 
 }

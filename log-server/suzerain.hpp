@@ -44,8 +44,8 @@ private:
     void was_selected(std::shared_ptr<socket_reader> reader);
 
     std::shared_ptr<chucho::logger> logger_;
-    vassals vassals_;
-    selector selector_;
+    std::unique_ptr<vassals> vassals_;
+    std::unique_ptr<selector> selector_;
     properties props_;
 };
 

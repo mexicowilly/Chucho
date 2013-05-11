@@ -16,8 +16,7 @@
 
 #include "log.hpp"
 #include "suzerain.hpp"
-#include "signal_handler.hpp"
-#include "single_instance.hpp"
+#include "daemon.hpp"
 #include <cstdlib>
 
 using namespace chucho::server;
@@ -26,13 +25,14 @@ int main()
 {
     properties props;
     log::configure(props);
-    single_instance::ensure();
-    signal_handler::install();
     suzerain lord(props);
     std::shared_ptr<chucho::logger> lgr(chucho::logger::get("chuchod"));
     CHUCHO_INFO_STR(lgr, "chuchod has started");
     CHUCHO_INFO(lgr, props);
-    lord.run();
+    if (props.console_mode())
+        lord.run();
+    else
+        daemon::possess(std::bind(&suzerain::run, std::ref(lord)));
     CHUCHO_INFO(lgr, "chuchod is shutting down");
     return EXIT_SUCCESS;
 }

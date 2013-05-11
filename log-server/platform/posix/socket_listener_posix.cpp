@@ -18,6 +18,7 @@
 #include "eof_exception.hpp"
 #include "is_shut_down.hpp"
 #include <chucho/socket_exception.hpp>
+#include <chucho/log.hpp>
 #include <cerrno>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -32,7 +33,8 @@ namespace server
 {
 
 socket_listener::socket_listener(std::uint16_t port)
-    : socket_(socket(AF_INET, SOCK_STREAM, IPPROTO_TCP))
+    : socket_(socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)),
+      logger_(chucho::logger::get("chuchod.socket_listener"))
 {
     if (socket_ == -1)
         throw chucho::socket_exception("Error creating socket", errno);
@@ -74,7 +76,7 @@ std::shared_ptr<socket_reader> socket_listener::accept()
     int rc;
     do
     {
-        rc = poll(&pfd, 1, 250);
+        rc = poll(&pfd, 1, 500);
         if (is_shut_down)
             throw shutdown_exception();
         if (rc > 0)
@@ -101,7 +103,9 @@ std::shared_ptr<socket_reader> socket_listener::accept()
             return std::make_shared<socket_reader>(sock, host_name);
         }
     } while (rc == 0);
-    return std::shared_ptr<socket_reader>();
+    int err = errno;
+    CHUCHO_ERROR(logger_, "Polling the socket has been halted: " << std::strerror(err));
+    throw eof_exception();
 }
 
 }

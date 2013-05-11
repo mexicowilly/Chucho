@@ -18,6 +18,8 @@
 #include "socket_listener.hpp"
 #include "is_shut_down.hpp"
 #include "eof_exception.hpp"
+#include "single_instance.hpp"
+#include "signal_handler.hpp"
 #include <chucho/log.hpp>
 #include <chucho/event.hpp>
 #include <chucho/optional.hpp>
@@ -169,8 +171,6 @@ namespace server
 
 suzerain::suzerain(const properties& props)
     : logger_(chucho::logger::get("chuchod.suzerain")),
-      vassals_(props.vassal_count(), std::bind(&suzerain::process_events, this, std::placeholders::_1)),
-      selector_(std::bind(&suzerain::was_selected, this, std::placeholders::_1)),
       props_(props)
 {
 }
@@ -219,11 +219,16 @@ void suzerain::process_events(std::shared_ptr<socket_reader> reader)
         CHUCHO_ERROR(logger_, std::string("Error processing events: ") + e.what());
     }
     CHUCHO_DEBUG(logger_, "Processed " << event_count << " events");
-    selector_.add(reader);
+    selector_->add(reader);
 }
 
 void suzerain::run()
 {
+    single_instance::ensure();
+    signal_handler::install();
+    vassals_.reset(new vassals(props_.vassal_count(),
+                               std::bind(&suzerain::process_events, this, std::placeholders::_1)));
+    selector_.reset(new selector(std::bind(&suzerain::was_selected, this, std::placeholders::_1)));
     std::unique_ptr<socket_listener> lstn;
     try
     {
@@ -240,7 +245,7 @@ void suzerain::run()
         while (!is_shut_down)
         {
             std::shared_ptr<socket_reader> reader = lstn->accept();
-            selector_.add(reader);
+            selector_->add(reader);
             CHUCHO_INFO(logger_, "Accepted new connection from " << reader->get_host());
         }
         CHUCHO_INFO_STR(logger_, "The listener has been shut down");
@@ -258,11 +263,13 @@ void suzerain::run()
         CHUCHO_ERROR(logger_, "An unexpected exception has occurred: " << e.what());
 
     }
+    selector_.reset();
+    vassals_.reset();
 }
 
 void suzerain::was_selected(std::shared_ptr<socket_reader> reader)
 {
-    vassals_.submit(reader);
+    vassals_->submit(reader);
     CHUCHO_DEBUG(logger_, "Submitted " << reader->get_host() << " for work");
 }
 

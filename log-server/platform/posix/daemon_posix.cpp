@@ -15,6 +15,7 @@
  */
 
 #include "daemon.hpp"
+#include <chucho/log.hpp>
 #include <stdexcept>
 #include <string>
 #include <cstdlib>
@@ -38,7 +39,8 @@ void possess(std::function<void()> func)
     if (pid == -1)
     {
         int err = errno;
-        throw std::runtime_error(std::string("Unable to fork: ") + std::strerror(err));
+        CHUCHO_FATAL(chucho::logger::get("chuchod"), "Unable to fork: " << std::strerror(err));
+        std::exit(EXIT_FAILURE);
     }
     else if (pid != 0)
     {

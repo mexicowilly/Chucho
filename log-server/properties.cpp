@@ -17,6 +17,7 @@
 #include "properties.hpp"
 #include <chucho/remote_writer.hpp>
 #include <chucho/logger.hpp>
+#include <sstream>
 
 namespace chucho
 {
@@ -27,16 +28,18 @@ namespace server
 std::ostream& operator<< (std::ostream& stream, properties& props)
 {
     stream << "Properties:\n";
-    stream << "  - version: " << CHUCHO_VERSION << '\n';
+    stream << "  - console_mode: " << std::boolalpha << props.console_mode() << '\n';
+    stream << "  - log level: " << *chucho::logger::get("chuchod")->get_level() << '\n';
     stream << "  - port: " << props.port() << '\n';
-    stream << "  - worker_threads: " << props.vassal_count() << '\n';
-    stream << "  - log level: " << *chucho::logger::get("chuchod")->get_level();
+    stream << "  - version: " << CHUCHO_VERSION << '\n';
+    stream << "  - worker_threads: " << props.vassal_count();
     return stream;
 }
 
 properties::properties()
     : vassal_count_(3),
-      port_(chucho::remote_writer::DEFAULT_PORT)
+      port_(chucho::remote_writer::DEFAULT_PORT),
+      console_mode_(false)
 {
 }
 
@@ -68,6 +71,11 @@ bool properties::handle_config_value(const std::string& key, const std::string& 
             // and if we're running as a daemon, then printing to stdout isn't going
             // to help
         }
+    }
+    else if (key == "console_mode")
+    {
+        std::istringstream stream(value);
+        stream >> std::boolalpha >> console_mode_;
     }
     else
     {
