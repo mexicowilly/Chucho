@@ -56,3 +56,7 @@ ADD_EXECUTABLE(syslog-writer-test EXCLUDE_FROM_ALL
                syslog_writer_test.cpp)
 TARGET_LINK_LIBRARIES(syslog-writer-test chucho gtest)
 ADD_DEPENDENCIES(syslog-writer-test gtest-external)
+
+ADD_EXECUTABLE(remote-writer-test EXCLUDE_FROM_ALL
+               remote_writer_test.cpp)
+TARGET_LINK_LIBRARIES(remote-writer-test chucho)

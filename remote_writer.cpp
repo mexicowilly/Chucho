@@ -40,7 +40,8 @@ remote_writer::remote_writer(const std::string& host,
       host_(host),
       port_(port),
       is_thread_interrupted_(false),
-      unsent_cache_size_(unsent_cache_size)
+      unsent_cache_size_(unsent_cache_size),
+      is_thread_running_(false)
 {
     set_status_origin("remote_writer");
     if (host.empty())
@@ -62,7 +63,7 @@ remote_writer::remote_writer(const std::string& host,
 
 remote_writer::~remote_writer()
 {
-    if (connector_thread_.joinable())
+    if (is_thread_running_)
     {
         is_thread_interrupted_ = true;
         connector_thread_.join();
@@ -71,6 +72,13 @@ remote_writer::~remote_writer()
 
 void remote_writer::retry_until_connected()
 {
+    is_thread_running_ = true;
+    struct sentry
+    {
+        sentry(std::atomic<bool>& is_it) : is_it_(is_it) { }
+        ~sentry() { is_it_ = false; }
+        std::atomic<bool>& is_it_;
+    } sntry(is_thread_running_);
     while (!is_thread_interrupted_)
     {
         std::chrono::steady_clock::time_point wake_time =
@@ -101,7 +109,7 @@ void remote_writer::retry_until_connected()
 
 void remote_writer::write_impl(const event& evt)
 {
-    if (connector_thread_.joinable())
+    if (is_thread_running_)
     {
         unsent_events_.push_back(evt);
         if (unsent_events_.size() > unsent_cache_size_)
@@ -125,7 +133,7 @@ void remote_writer::write_impl(const event& evt)
                 }
             }
             yaml.append(formatter_->format(evt));
-            size = htonl(yaml.length());
+            size = htonl(yaml.length() - sizeof(std::uint32_t));
             std::memcpy(const_cast<char*>(yaml.data()), &size, sizeof(std::uint32_t));
             connector_->write(reinterpret_cast<const std::uint8_t*>(yaml.data()), yaml.length());
             unsent_events_.clear();

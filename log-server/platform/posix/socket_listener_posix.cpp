@@ -33,22 +33,50 @@ namespace server
 {
 
 socket_listener::socket_listener(std::uint16_t port)
-    : socket_(socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)),
+    : socket_(-1),
       logger_(chucho::logger::get("chuchod.socket_listener"))
 {
-    if (socket_ == -1)
-        throw chucho::socket_exception("Error creating socket", errno);
-    struct sockaddr_in addr;
-    std::memset(&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    addr.sin_port = htons(port);
-    if (bind(socket_, reinterpret_cast<struct sockaddr*>(&addr), sizeof(addr)) == -1)
+    struct addrinfo hints;
+    std::memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
+    struct addrinfo* addrs;
+    if (getaddrinfo(nullptr, std::to_string(port).c_str(), &hints, &addrs) != 0)
+        throw chucho::socket_exception("Unable to get address information", errno);
+    struct sentry
     {
-        int err = errno;
-        close(socket_);
-        throw chucho::socket_exception("Unable to bind to local address", err);
+        sentry(addrinfo* addrs) : addrs_(addrs) { }
+        ~sentry() { freeaddrinfo(addrs_); }
+        addrinfo* addrs_;
+    } sntry(addrs);
+    struct addrinfo* cur;
+    for (cur = addrs; cur != nullptr; cur = cur->ai_next)
+    {
+        socket_ = socket(cur->ai_family, cur->ai_socktype, cur->ai_protocol);
+        if (socket_ == -1)
+        {
+            int err = errno;
+            CHUCHO_INFO(logger_, std::string("Could not create socket: ") + std::strerror(err));
+            continue;
+        }
+        int yes = 1;
+        if (setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1)
+        {
+            int err = errno;
+            CHUCHO_INFO(logger_, std::string("Error setting socket options: ") + std::strerror(err));
+            continue;
+        }
+        if (bind(socket_, cur->ai_addr, cur->ai_addrlen) == -1)
+        {
+            int err = errno;
+            CHUCHO_INFO(logger_, std::string("Could not bind to local address: ") + std::strerror(err));
+            continue;
+        }
+        break;
     }
+    if (cur == nullptr)
+        throw chucho::exception("No listening sockets could be created");
     if (listen(socket_, SOMAXCONN) == -1)
     {
         int err = errno;

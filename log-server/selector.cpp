@@ -32,7 +32,9 @@ selector::selector(std::function<void(std::shared_ptr<socket_reader>)> was_selec
 
 selector::~selector()
 {
+    guard_.lock();
     stop_ = true;
+    guard_.unlock();
     condition_.notify_all();
     thread_.join();
     CHUCHO_INFO_STR(logger_, "Joined the selector thread");
@@ -42,12 +44,14 @@ void selector::add(std::shared_ptr<socket_reader> reader)
 {
     std::lock_guard<std::mutex> lg(guard_);
     readers_[reader->get_socket()] = reader;
+    condition_.notify_one();
 }
 
 void selector::remove(std::shared_ptr<socket_reader> reader)
 {
     std::lock_guard<std::mutex> lg(guard_);
     readers_.erase(reader->get_socket());
+    condition_.notify_one();
 }
 
 }

@@ -77,12 +77,14 @@ namespace chucho
  *         <td>The time format specification is used to format
  *         the UTC time of the @ref event. The specification
  *         must be one that is compatible with the function
- *         std::put_time(), which is very similar to the
- *         specifications used by the C function strftime(). A
- *         key difference is that the token "%q" may be used to
- *         insert the number of milliseconds. This is added due
- *         to the fact that std::put_time() does not support
- *         milliseconds.
+ *         <a
+ *         href="http://en.cppreference.com/w/cpp/io/manip/put_time">std::put_time()</a>,
+ *         which is very similar to the specifications used by
+ *         the C function strftime(). A key difference is that
+ *         the token "%q" may be used to insert the number of
+ *         milliseconds. This is added due to the fact that <a
+ *         href="http://en.cppreference.com/w/cpp/io/manip/put_time">std::put_time()</a>
+ *         does not support milliseconds.
  *  
  *         If the spec argument is omitted, then a
  *         default of "%Y-%m-%d %H:%M:%S" will be
@@ -91,12 +93,15 @@ namespace chucho
  *         <td>The time format specification is used to format
  *         the local time of the @ref event. The specification
  *         must be one that is compatible with the function
- *         std::put_time(), which is very similar to the
- *         specifications used by the C function strftime(). A
- *         key difference is that the token "%q" may be used to
- *         insert the number of milliseconds. This is added due
- *         to the fact that std::put_time() does not support
- *         milliseconds.
+ *         <a
+ *         href="http://en.cppreference.com/w/cpp/io/manip/put_time">std::put_time()</a>,
+ *         which is very similar to the specifications used by
+ *         the C function strftime(). A key difference is that
+ *         the token "%q" may be used to insert the number of
+ *         milliseconds. This is added due to the fact that
+ *         <a
+ *         href="http://en.cppreference.com/w/cpp/io/manip/put_time">std::put_time()</a>
+ *         does not support milliseconds.
  *  
  *         If the spec argument is omitted, then a
  *         default of "%Y-%m-%d %H:%M:%S" will be

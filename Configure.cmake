@@ -212,7 +212,7 @@ IF(CHUCHO_POSIX)
     ENDIF()
 
     # signal stuff
-    FOREACH(SYM raise sigemptyset sigaddset sigwait sigaction kill)
+    FOREACH(SYM raise sigemptyset sigaddset sigwait sigaction kill sigpending sigismember)
         CHECK_CXX_SYMBOL_EXISTS(${SYM} signal.h CHUCHO_HAVE_${SYM})
         IF(NOT CHUCHO_HAVE_${SYM})
             MESSAGE(FATAL_ERROR "${SYM} is required")

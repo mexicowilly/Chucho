@@ -58,9 +58,10 @@ void selector::main()
                     }
                     else
                     {
+                        std::string peer(found->second->get_host());
                         was_selected_(found->second);
                         readers_.erase(found);
-                        CHUCHO_DEBUG(logger_, "Connection for socket " << fd.fd <<
+                        CHUCHO_DEBUG(logger_, "Connection for peer " << peer <<
                             " was selected for input and removed from the selector");
                     }
                     guard_.unlock();

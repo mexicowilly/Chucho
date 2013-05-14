@@ -185,6 +185,7 @@ void suzerain::process_events(std::shared_ptr<socket_reader> reader)
         size = ntohl(size);
         std::string yaml(size, 0);
         reader->read(reinterpret_cast<std::uint8_t*>(const_cast<char*>(yaml.data())), size);
+        CHUCHO_INFO(logger_, yaml);
         std::istringstream stream(yaml);
         yaml.clear();
         yaml.shrink_to_fit();
@@ -213,6 +214,11 @@ void suzerain::process_events(std::shared_ptr<socket_reader> reader)
                 }
             }
         }
+    }
+    catch (eof_exception&)
+    {
+        CHUCHO_INFO(logger_, "The connection on socket " << reader->get_host() << " was disconnected by the peer");
+        return;
     }
     catch (std::exception& e)
     {

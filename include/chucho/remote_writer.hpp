@@ -56,6 +56,7 @@ private:
     std::thread connector_thread_;
     std::deque<event> unsent_events_;
     std::size_t unsent_cache_size_;
+    std::atomic<bool> is_thread_running_;
 };
 
 }
