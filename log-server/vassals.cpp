@@ -64,7 +64,7 @@ void vassals::work()
         std::shared_ptr<socket_reader> reader = readers_.front();
         readers_.pop();
         ul.unlock();
-        CHUCHO_DEBUG(logger_, "Processing " << reader->get_host());
+        CHUCHO_DEBUG(logger_, "Processing " << reader->get_full_host());
         processor_(reader);
     }
 }

@@ -91,12 +91,24 @@ public:
           const char* const function_name,
           const std::string& mark);
 
+    event(std::shared_ptr<logger> lgr,
+          std::shared_ptr<level> lvl,
+          const std::string& msg,
+          const char* const file_name,
+          unsigned line_number,
+          const char* const function_name,
+          const std::string& base_host_name,
+          const std::string& full_host_name,
+          const optional<marker>& mark);
+
+    const optional<std::string>& get_base_host_name() const;
     /**
      * Return the file name.
      * 
      * @return the file name
      */
     const char* get_file_name() const;
+    const optional<std::string>& get_full_host_name() const;
     /**
      * Return the function name.
      * 
@@ -149,11 +161,23 @@ private:
     unsigned line_number_;
     const char* function_name_;
     optional<marker> marker_;
+    optional<std::string> base_host_name_;
+    optional<std::string> full_host_name_;
 };
+
+inline const optional<std::string>& event::get_base_host_name() const
+{
+    return base_host_name_;
+}
 
 inline const char* event::get_file_name() const
 {
     return file_name_;
+}
+
+inline const optional<std::string>& event::get_full_host_name() const
+{
+    return full_host_name_;
 }
 
 inline const char* event::get_function_name() const

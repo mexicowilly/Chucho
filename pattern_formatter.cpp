@@ -438,7 +438,7 @@ pattern_formatter::base_host_piece::base_host_piece(const format_params& params)
 
 std::string pattern_formatter::base_host_piece::get_text_impl(const event& evt) const
 {
-    return host::get_base_name();
+    return evt.get_base_host_name() ? *evt.get_base_host_name() : host::get_base_name();
 }
 
 pattern_formatter::full_host_piece::full_host_piece(const format_params& params)
@@ -448,7 +448,7 @@ pattern_formatter::full_host_piece::full_host_piece(const format_params& params)
 
 std::string pattern_formatter::full_host_piece::get_text_impl(const event& evt) const
 {
-    return host::get_full_name();
+    return evt.get_full_host_name() ? *evt.get_full_host_name() : host::get_full_name();
 }
 
 pattern_formatter::line_number_piece::line_number_piece(const format_params& params)

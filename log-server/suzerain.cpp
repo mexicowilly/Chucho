@@ -89,7 +89,8 @@ chucho::marker reconstruct_marker(const std::string& text)
 class wire_event
 {
 public:
-    wire_event(const YAML::Node& node);
+    wire_event(const YAML::Node& node,
+               std::shared_ptr<chucho::server::socket_reader> reader);
     wire_event(const wire_event&) = delete;
 
     wire_event& operator= (const wire_event&) = delete;
@@ -104,7 +105,8 @@ private:
     unsigned version_;
 };
 
-wire_event::wire_event(const YAML::Node& node)
+wire_event::wire_event(const YAML::Node& node,
+                       std::shared_ptr<chucho::server::socket_reader> reader)
 {
     const YAML::Node* val = node.FindValue("version");
     if (val == nullptr)
@@ -148,6 +150,8 @@ wire_event::wire_event(const YAML::Node& node)
                                    file_name_storage_.c_str(),
                                    line,
                                    function_name_storage_.c_str(),
+                                   reader->get_base_host(),
+                                   reader->get_full_host(),
                                    mark));
 }
 
@@ -206,7 +210,7 @@ void suzerain::process_events(std::shared_ptr<socket_reader> reader)
                 }
                 if (itor->begin().first().to<std::string>() == "event")
                 {
-                    wire_event wevt(itor->begin().second());
+                    wire_event wevt(itor->begin().second(), reader);
                     std::shared_ptr<chucho::logger> lgr(wevt.get_event().get_logger());
                     if (lgr->permits(wevt.get_event().get_level()))
                         lgr->write(wevt.get_event());
@@ -217,7 +221,7 @@ void suzerain::process_events(std::shared_ptr<socket_reader> reader)
     }
     catch (eof_exception&)
     {
-        CHUCHO_INFO(logger_, "The connection on socket " << reader->get_host() << " was disconnected by the peer");
+        CHUCHO_INFO(logger_, "The connection on socket " << reader->get_full_host() << " was disconnected by the peer");
         return;
     }
     catch (std::exception& e)
@@ -252,7 +256,7 @@ void suzerain::run()
         {
             std::shared_ptr<socket_reader> reader = lstn->accept();
             selector_->add(reader);
-            CHUCHO_INFO(logger_, "Accepted new connection from " << reader->get_host());
+            CHUCHO_INFO(logger_, "Accepted new connection from " << reader->get_full_host());
         }
         CHUCHO_INFO_STR(logger_, "The listener has been shut down");
     }
@@ -271,12 +275,13 @@ void suzerain::run()
     }
     selector_.reset();
     vassals_.reset();
+    single_instance::release();
 }
 
 void suzerain::was_selected(std::shared_ptr<socket_reader> reader)
 {
     vassals_->submit(reader);
-    CHUCHO_DEBUG(logger_, "Submitted " << reader->get_host() << " for work");
+    CHUCHO_DEBUG(logger_, "Submitted " << reader->get_full_host() << " for work");
 }
 
 }

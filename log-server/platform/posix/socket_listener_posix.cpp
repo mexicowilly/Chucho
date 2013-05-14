@@ -128,7 +128,15 @@ std::shared_ptr<socket_reader> socket_listener::accept()
             {
                 host_name[0] = 0;
             }
-            return std::make_shared<socket_reader>(sock, host_name);
+            std::string full_host(host_name);
+            if (getnameinfo(reinterpret_cast<struct sockaddr*>(&addr), length,
+                            host_name, NI_MAXHOST,
+                            nullptr, 0,
+                            NI_NOFQDN) != 0)
+            {
+                host_name[0] = 0;
+            }
+            return std::make_shared<socket_reader>(sock, host_name, full_host);
         }
     } while (rc == 0);
     int err = errno;

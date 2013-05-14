@@ -58,7 +58,7 @@ void selector::main()
                     }
                     else
                     {
-                        std::string peer(found->second->get_host());
+                        std::string peer(found->second->get_full_host());
                         was_selected_(found->second);
                         readers_.erase(found);
                         CHUCHO_DEBUG(logger_, "Connection for peer " << peer <<

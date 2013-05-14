@@ -22,9 +22,12 @@ namespace chucho
 namespace server
 {
 
-socket_reader::socket_reader(int sock, const std::string& host)
+socket_reader::socket_reader(int sock,
+                             const std::string& base_host,
+                             const std::string& full_host)
     : socket_(sock),
-      host_(host)
+      base_host_(base_host),
+      full_host_(full_host)
 {
 }
 

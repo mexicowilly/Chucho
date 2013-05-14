@@ -27,6 +27,7 @@ namespace single_instance
 {
 
 void ensure();
+void release();
 
 }
 

@@ -100,15 +100,13 @@ void socket_connector::write(const std::uint8_t* buf, std::size_t length)
             sigset_t blocked;
             sigset_t pending;
             sigset_t pipe_only;
+            sigemptyset(&blocked);
             sigemptyset(&pipe_only);
             sigaddset(&pipe_only, SIGPIPE);
             sigemptyset(&pending);
             sigpending(&pending);
             if (!sigismember(&pending, SIGPIPE))
-            {
-                sigemptyset(&blocked);
                 pthread_sigmask(SIG_BLOCK, &pipe_only, &blocked);
-            }
             #endif
             ssize_t sent = send(socket_, buf + length - remaining, remaining, MSG_NOSIGNAL);
             #if defined(CHUCHO_MANUAL_SUPPRESS_SIGPIPE)

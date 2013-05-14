@@ -30,10 +30,13 @@ namespace server
 class socket_reader
 {
 public:
-    socket_reader(int sock, const std::string& host);
+    socket_reader(int sock,
+                  const std::string& base_host,
+                  const std::string& full_host);
     ~socket_reader();
 
-    const std::string& get_host() const;
+    const std::string& get_base_host() const;
+    const std::string& get_full_host() const;
     int get_socket() const;
     void read(std::uint8_t* dest, std::size_t count);
 
@@ -41,12 +44,18 @@ private:
     std::size_t read_impl(std::uint8_t* dest, std::size_t count);
 
     int socket_;
-    std::string host_;
+    std::string base_host_;
+    std::string full_host_;
 };
 
-inline const std::string& socket_reader::get_host() const
+inline const std::string& socket_reader::get_base_host() const
 {
-    return host_;
+    return base_host_;
+}
+
+inline const std::string& socket_reader::get_full_host() const
+{
+    return full_host_;
 }
 
 inline int socket_reader::get_socket() const

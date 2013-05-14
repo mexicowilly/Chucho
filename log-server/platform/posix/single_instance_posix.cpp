@@ -19,6 +19,7 @@
 #include <fstream>
 #include <signal.h>
 #include <cerrno>
+#include <cstdio>
 #include <unistd.h>
 
 namespace
@@ -78,6 +79,11 @@ void ensure()
             PID_FILE_NAME << ": " << std::strerror(err));
         std::exit(EXIT_FAILURE);
     }
+}
+
+void release()
+{
+    std::remove(PID_FILE_NAME);
 }
 
 }
