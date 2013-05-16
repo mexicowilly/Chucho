@@ -16,6 +16,7 @@
 
 #include <chucho/log.hpp>
 #include <chucho/remote_writer.hpp>
+#include <chucho/configuration.hpp>
 #include <iostream>
 #include <cstdlib>
 #include <thread>
@@ -52,7 +53,7 @@ options get_options(int argc, char* argv[])
             }
             opts.log_name = argv[i];
         }
-        else if (cur == "-s" || cur == "--messages_per_second")
+        else if (cur == "-v" || cur == "--messages_per_second")
         {
             if (++i == argc)
             {
@@ -105,6 +106,7 @@ std::string next_message()
 
 int main(int argc, char* argv[])
 {
+    chucho::configuration::set_style(chucho::configuration::style::OFF);
     options opts = get_options(argc, argv);
     std::shared_ptr<chucho::logger> lgr(chucho::logger::get(opts.log_name));
     lgr->add_writer(std::make_shared<chucho::remote_writer>(opts.host_name));
@@ -113,7 +115,9 @@ int main(int argc, char* argv[])
         std::chrono::minutes(opts.total_minutes);
     while (std::chrono::steady_clock::now() < end)
     {
-        CHUCHO_INFO(lgr, next_message());
+        std::string msg(next_message());
+        CHUCHO_INFO(lgr, msg);
+        std::cout << msg << std::endl;
         std::this_thread::sleep_for(pause);
     }
     return EXIT_SUCCESS;
