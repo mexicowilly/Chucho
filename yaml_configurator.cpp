@@ -49,74 +49,66 @@ yaml_configurator::yaml_configurator()
 
 void yaml_configurator::configure(std::istream& in)
 {
-    try
+    YAML::Parser prs(in);
+    YAML::Node doc;
+    while (prs.GetNextDocument(doc))
     {
-        YAML::Parser prs(in);
-        YAML::Node doc;
-        while (prs.GetNextDocument(doc))
+        for (YAML::Iterator i = doc.begin(); i != doc.end(); i++)
         {
-            for (YAML::Iterator i = doc.begin(); i != doc.end(); i++)
+            bool is_map = false;
+            try
             {
-                bool is_map = false;
-                try
+                // If the iterator can be dereferenced, then it's not is not a map. But the
+                // dereferenced node must claim to be a map. Yeah, it took me a while to
+                // figure this out...
+                if (i->Type() != YAML::NodeType::Map)
+                    throw exception("The YAML configuration only supports maps or sequences of maps at the top level");
+            }
+            catch (YAML::Exception&)
+            {
+                is_map = true;
+            }
+            const YAML::Node& first = is_map ? i.first() : i->begin().first();
+            const YAML::Node& second = is_map ? i.second() : i->begin().second();
+            try
+            {
+                std::string type = resolve_variables(first.to<std::string>());
+                if (type == "variables")
                 {
-                    // If the iterator can be dereferenced, then it's not is not a map. But the
-                    // dereferenced node must claim to be a map. Yeah, it took me a while to
-                    // figure this out...
-                    if (i->Type() != YAML::NodeType::Map)
-                        throw exception("The YAML configuration only supports maps or sequences of maps at the top level");
+                    add_variables(extract_variables(second));
                 }
-                catch (YAML::Exception&)
+                else
                 {
-                    is_map = true;
-                }
-                const YAML::Node& first = is_map ? i.first() : i->begin().first();
-                const YAML::Node& second = is_map ? i.second() : i->begin().second();
-                try
-                {
-                    std::string type = resolve_variables(first.to<std::string>());
-                    if (type == "variables")
+                    auto found = get_factories().find(type);
+                    if (found == get_factories().end())
                     {
-                        add_variables(extract_variables(second));
+                        bool resolved = false;
+                        if (configuration::get_unknown_handler() &&
+                            second.Type() == YAML::NodeType::Scalar)
+                        {
+                            resolved = configuration::get_unknown_handler()(type, second.to<std::string>());
+                        }
+                        if (!resolved)
+                            report_warning("Found unknown configuration element \"" + type + "\"");
                     }
                     else
                     {
-                        auto found = get_factories().find(type);
-                        if (found == get_factories().end())
-                        {
-                            bool resolved = false;
-                            if (configuration::get_unknown_handler() &&
-                                second.Type() == YAML::NodeType::Scalar)
-                            {
-                                resolved = configuration::get_unknown_handler()(type, second.to<std::string>());
-                            }
-                            if (!resolved)
-                                report_warning("Found unknown configuration element \"" + type + "\"");
-                        }
-                        else
-                        {
-                            std::shared_ptr<memento> mnto = found->second->create_memento(*this);
-                            handle(type, second, mnto);
-                            found->second->create_configurable(mnto);
-                        }
+                        std::shared_ptr<memento> mnto = found->second->create_memento(*this);
+                        handle(type, second, mnto);
+                        found->second->create_configurable(mnto);
                     }
                 }
-                catch (yaml_location_exception& yle)
-                {
-                    // it already has the location information
-                    throw;
-                }
-                catch (std::exception& se)
-                {
-                    std::throw_with_nested(yaml_location_exception(first));
-                }
+            }
+            catch (yaml_location_exception& yle)
+            {
+                // it already has the location information
+                throw;
+            }
+            catch (std::exception& se)
+            {
+                std::throw_with_nested(yaml_location_exception(first));
             }
         }
-    }
-    catch (std::exception& e)
-    {
-        report_error("Error parsing the YAML configuration");
-        report_error(exception::nested_whats(e));
     }
 }
 

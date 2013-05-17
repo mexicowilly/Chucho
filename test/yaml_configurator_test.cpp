@@ -29,6 +29,7 @@
 #include <chucho/time_file_roller.hpp>
 #include <chucho/duplicate_message_filter.hpp>
 #include <chucho/syslog_writer.hpp>
+#include <chucho/exception.hpp>
 #include <sstream>
 #if defined(_WIN32)
 #include <windows.h>
@@ -158,8 +159,7 @@ TEST_F(yaml_configurator, level_filter)
         chucho::status_manager::get()->clear();
         std::string rep = tmpl;
         rep.replace(pos, 6, item);
-        configure(rep.c_str());
-        EXPECT_EQ(chucho::status::level::ERROR, chucho::status_manager::get()->get_level());
+        EXPECT_ANY_THROW(configure(rep.c_str()));
     }
     chucho::status_manager::get()->clear();
     std::map<std::string, chucho::filter::result> good =
@@ -247,38 +247,38 @@ TEST_F(yaml_configurator, multiple_writer)
 
 TEST_F(yaml_configurator, rolling_file_writer)
 {
-    configure("chucho::logger:\n"
-              "    name: will\n"
-              "    chucho::rolling_file_writer:\n"
-              "        chucho::pattern_formatter:\n"
-              "            pattern: '%m%n'\n"
-              "        chucho::numbered_file_roller:\n"
-              "            min_index: 3\n"
-              "            max_index: 5\n"
-              "        chucho::size_file_roll_trigger:\n"
-              "            max_size: 5000\n"
-              "        file_name: what.log\n"
-              "        on_start: TruNCAte\n"
-              "        flush: false");
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
-    auto fwrt = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(fwrt));
-    EXPECT_EQ(std::string("what.log"), fwrt->get_file_name());
-    EXPECT_EQ(chucho::file_writer::on_start::TRUNCATE, fwrt->get_on_start());
-    EXPECT_FALSE(fwrt->get_flush());
-    auto rlr = fwrt->get_file_roller();
-    ASSERT_EQ(typeid(chucho::numbered_file_roller), typeid(*rlr));
-    auto nrlr = std::static_pointer_cast<chucho::numbered_file_roller>(rlr);
-    ASSERT_TRUE(static_cast<bool>(nrlr));
-    EXPECT_EQ(3, nrlr->get_min_index());
-    EXPECT_EQ(5, nrlr->get_max_index());
-    auto trg = fwrt->get_file_roll_trigger();
-    ASSERT_EQ(typeid(chucho::size_file_roll_trigger), typeid(*trg));
-    auto strg = std::static_pointer_cast<chucho::size_file_roll_trigger>(trg);
-    ASSERT_TRUE(static_cast<bool>(strg));
-    EXPECT_EQ(5000, strg->get_max_size());
+        configure("chucho::logger:\n"
+                  "    name: will\n"
+                  "    chucho::rolling_file_writer:\n"
+                  "        chucho::pattern_formatter:\n"
+                  "            pattern: '%m%n'\n"
+                  "        chucho::numbered_file_roller:\n"
+                  "            min_index: 3\n"
+                  "            max_index: 5\n"
+                  "        chucho::size_file_roll_trigger:\n"
+                  "            max_size: 5000\n"
+                  "        file_name: what.log\n"
+                  "        on_start: TruNCAte\n"
+                  "        flush: false");
+        auto wrts = chucho::logger::get("will")->get_writers();
+        ASSERT_EQ(1, wrts.size());
+        ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
+        auto fwrt = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
+        ASSERT_TRUE(static_cast<bool>(fwrt));
+        EXPECT_EQ(std::string("what.log"), fwrt->get_file_name());
+        EXPECT_EQ(chucho::file_writer::on_start::TRUNCATE, fwrt->get_on_start());
+        EXPECT_FALSE(fwrt->get_flush());
+        auto rlr = fwrt->get_file_roller();
+        ASSERT_EQ(typeid(chucho::numbered_file_roller), typeid(*rlr));
+        auto nrlr = std::static_pointer_cast<chucho::numbered_file_roller>(rlr);
+        ASSERT_TRUE(static_cast<bool>(nrlr));
+        EXPECT_EQ(3, nrlr->get_min_index());
+        EXPECT_EQ(5, nrlr->get_max_index());
+        auto trg = fwrt->get_file_roll_trigger();
+        ASSERT_EQ(typeid(chucho::size_file_roll_trigger), typeid(*trg));
+        auto strg = std::static_pointer_cast<chucho::size_file_roll_trigger>(trg);
+        ASSERT_TRUE(static_cast<bool>(strg));
+        EXPECT_EQ(5000, strg->get_max_size());
 }
 
 TEST_F(yaml_configurator, size_file_roll_trigger)
@@ -308,11 +308,10 @@ TEST_F(yaml_configurator, size_file_roll_trigger)
         chucho::status_manager::get()->clear();
         std::string rep = tmpl;
         rep.replace(pos, 4, item);
-        configure(rep.c_str());
-        EXPECT_EQ(chucho::status::level::ERROR, chucho::status_manager::get()->get_level());
+        EXPECT_ANY_THROW(configure(rep.c_str()));
     }
     chucho::status_manager::get()->clear();
-    std::map<std::string, unsigned long long> good =
+    std::map<std::string, std::uintmax_t> good =
     {
         { "5000", 5000 },
         { "5001b", 5001 },
@@ -392,8 +391,7 @@ TEST_F(yaml_configurator, syslog_writer_facility)
         chucho::status_manager::get()->clear();
         std::string rep = tmpl;
         rep.replace(pos, 3, item);
-        configure(rep.c_str());
-        EXPECT_EQ(chucho::status::level::ERROR, chucho::status_manager::get()->get_level());
+        EXPECT_ANY_THROW(configure(rep.c_str()));
     }
     std::map<std::string, chucho::syslog::facility> good =
     {

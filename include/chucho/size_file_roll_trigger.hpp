@@ -15,6 +15,7 @@
  */
 
 #include <chucho/file_roll_trigger.hpp>
+#include <cstdint>
 
 namespace chucho
 {
@@ -39,7 +40,7 @@ public:
      * @param max_size the maximum size that a file can reach before 
      *                 rolling
      */
-    size_file_roll_trigger(unsigned long long max_size);
+    size_file_roll_trigger(std::uintmax_t max_size);
     //@}
 
     /**
@@ -47,7 +48,7 @@ public:
      * 
      * @return this trigger's maximum size
      */
-    unsigned long long get_max_size() const;
+    std::uintmax_t get_max_size() const;
     /**
      * If the size of active_file is greater than this trigger's 
      * maximum size, then this trigger fires. 
@@ -59,10 +60,10 @@ public:
     virtual bool is_triggered(const std::string& active_file, const event& e) override;
 
 private:
-    unsigned long long max_size_;
+    std::uintmax_t max_size_;
 };
 
-inline unsigned long long size_file_roll_trigger::get_max_size() const
+inline std::uintmax_t size_file_roll_trigger::get_max_size() const
 {
     return max_size_;
 }

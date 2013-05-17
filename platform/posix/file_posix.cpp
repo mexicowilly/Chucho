@@ -152,7 +152,7 @@ void remove_all(const std::string& name)
     }
 }
 
-unsigned long long size(const std::string& name)
+std::uintmax_t size(const std::string& name)
 {
     struct stat info;
     if (stat(name.c_str(), &info) != 0)

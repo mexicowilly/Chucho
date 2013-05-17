@@ -32,15 +32,15 @@ class size_file_roll_trigger_memento : public memento
 public:
     size_file_roll_trigger_memento(const configurator& cfg);
 
-    const optional<unsigned long long>& get_max_size() const;
+    const optional<std::uintmax_t>& get_max_size() const;
 
 private:
     void parse(const std::string& spec);
 
-    optional<unsigned long long> max_size_;
+    optional<std::uintmax_t> max_size_;
 };
 
-inline const optional<unsigned long long>& size_file_roll_trigger_memento::get_max_size() const
+inline const optional<std::uintmax_t>& size_file_roll_trigger_memento::get_max_size() const
 {
     return max_size_;
 }

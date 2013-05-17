@@ -35,7 +35,7 @@ void size_file_roll_trigger_memento::parse(const std::string& spec)
     if (spec.empty() || !std::isdigit(spec[0]))
         throw exception(get_status_origin() + ": The size specification must start with a digit");
     std::istringstream stream(spec);
-    unsigned long long tmp;
+    std::uintmax_t tmp;
     stream >> tmp;
     std::string suffix;
     stream >> suffix;

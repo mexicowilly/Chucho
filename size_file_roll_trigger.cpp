@@ -20,7 +20,7 @@
 namespace chucho
 {
 
-size_file_roll_trigger::size_file_roll_trigger(unsigned long long max_size)
+size_file_roll_trigger::size_file_roll_trigger(std::uintmax_t max_size)
     : max_size_(max_size)
 {
     set_status_origin("size_file_roll_trigger");

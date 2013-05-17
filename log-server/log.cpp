@@ -26,7 +26,7 @@ namespace server
 void log::configure(properties& props)
 {
     chucho::configuration::set_unknown_handler(std::bind(&properties::handle_config_value,
-                                                         props,
+                                                         std::ref(props),
                                                          std::placeholders::_1,
                                                          std::placeholders::_2));
     chucho::configuration::set_file_name(get_config_file_name());
