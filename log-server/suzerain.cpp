@@ -176,7 +176,29 @@ namespace server
 suzerain::suzerain(const properties& props)
     : logger_(chucho::logger::get("chuchod.suzerain")),
       props_(props)
+      #if defined(CHUCHOD_VELOCITY)
+      ,
+      first_seen_(std::chrono::steady_clock::time_point::min()),
+      last_processed_(std::chrono::steady_clock::time_point::min()),
+      total_event_count_(0)
+      #endif
 {
+}
+
+suzerain::~suzerain()
+{
+    #if defined(CHUCHOD_VELOCITY)
+    if (total_event_count_ > 0)
+    {
+        auto seconds = std::chrono::duration_cast<std::chrono::seconds>(last_processed_ - first_seen_).count();
+        CHUCHO_INFO(logger_, "Saw " << total_event_count_ << " events in " << seconds << " seconds");
+        CHUCHO_INFO(logger_, "Velocity " << total_event_count_ / seconds << " events per second");
+    }
+    else
+    {
+        CHUCHO_INFO_STR(logger_, "No events were seen");
+    }
+    #endif
 }
 
 void suzerain::process_events(std::shared_ptr<socket_reader> reader)
@@ -189,7 +211,7 @@ void suzerain::process_events(std::shared_ptr<socket_reader> reader)
         size = ntohl(size);
         std::string yaml(size, 0);
         reader->read(reinterpret_cast<std::uint8_t*>(const_cast<char*>(yaml.data())), size);
-        CHUCHO_INFO(logger_, yaml);
+        //CHUCHO_INFO(logger_, yaml);
         std::istringstream stream(yaml);
         yaml.clear();
         yaml.shrink_to_fit();
@@ -229,6 +251,12 @@ void suzerain::process_events(std::shared_ptr<socket_reader> reader)
         CHUCHO_ERROR(logger_, std::string("Error processing events: ") + e.what());
     }
     CHUCHO_DEBUG(logger_, "Processed " << event_count << " events");
+    #if defined(CHUCHOD_VELOCITY)
+    velocity_guard_.lock();
+    last_processed_ = std::chrono::steady_clock::now();
+    total_event_count_ += event_count;
+    velocity_guard_.unlock();
+    #endif
     selector_->add(reader);
 }
 
@@ -280,6 +308,12 @@ void suzerain::run()
 
 void suzerain::was_selected(std::shared_ptr<socket_reader> reader)
 {
+    #if defined(CHUCHOD_VELOCITY)
+    velocity_guard_.lock();
+    if (first_seen_ == std::chrono::steady_clock::time_point::min())
+        first_seen_ = std::chrono::steady_clock::now();
+    velocity_guard_.unlock();
+    #endif
     vassals_->submit(reader);
     CHUCHO_DEBUG(logger_, "Submitted " << reader->get_full_host() << " for work");
 }

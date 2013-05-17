@@ -22,6 +22,10 @@
 #include "vassals.hpp"
 #include "selector.hpp"
 #include <chucho/logger.hpp>
+#if defined(CHUCHOD_VELOCITY)
+#include <chrono>
+#include <cstdint>
+#endif
 
 namespace chucho
 {
@@ -34,6 +38,7 @@ class suzerain
 public:
     suzerain(const properties& props);
     suzerain(const suzerain&) = delete;
+    ~suzerain();
 
     suzerain& operator= (const suzerain&) = delete;
 
@@ -47,6 +52,12 @@ private:
     std::unique_ptr<vassals> vassals_;
     std::unique_ptr<selector> selector_;
     properties props_;
+    #if defined(CHUCHOD_VELOCITY)
+    std::chrono::steady_clock::time_point first_seen_;
+    std::chrono::steady_clock::time_point last_processed_;
+    std::mutex velocity_guard_;
+    std::uintmax_t total_event_count_;
+    #endif
 };
 
 }

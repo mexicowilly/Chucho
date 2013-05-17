@@ -186,8 +186,9 @@ int off::get_value() const
 
 std::string to_upper(const std::string& text)
 {
+    static std::locale c_loc("C");
+
     std::string up;
-    std::locale c_loc("C");
     std::transform(text.begin(),
                    text.end(),
                    std::back_inserter(up),
