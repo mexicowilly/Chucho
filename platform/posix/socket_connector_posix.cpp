@@ -41,6 +41,55 @@
 namespace
 {
 
+#if defined(CHUCHO_MANUAL_SUPPRESS_SIGPIPE)
+
+class sigpipe_suppressor
+{
+public:
+    sigpipe_suppressor();
+    ~sigpipe_suppressor();
+
+private:
+    sigset_t blocked_;
+    sigset_t pending_;
+    sigset_t pipe_only_;
+};
+
+sigpipe_suppressor::sigpipe_suppressor()
+{
+    sigemptyset(&blocked_);
+    sigemptyset(&pipe_only_);
+    sigaddset(&pipe_only_, SIGPIPE);
+    sigemptyset(&pending_);
+    sigpending(&pending_);
+    if (!sigismember(&pending_, SIGPIPE))
+        pthread_sigmask(SIG_BLOCK, &pipe_only_, &blocked_);
+}
+
+sigpipe_suppressor::~sigpipe_suppressor()
+{
+    if (!sigismember(&pending_, SIGPIPE))
+    {
+        sigemptyset(&pending_);
+        sigpending(&pending_);
+        if (sigismember(&pending_, SIGPIPE))
+        {
+            int sig;
+            sigwait(&pipe_only_, &sig);
+        }
+        if (!sigismember(&blocked_, SIGPIPE))
+            pthread_sigmask(SIG_UNBLOCK, &pipe_only_, nullptr);
+    }
+}
+
+#else
+
+class sigpipe_suppressor
+{
+};
+
+#endif
+
 
 }
 
@@ -149,36 +198,11 @@ void socket_connector::write(const std::uint8_t* buf, std::size_t length)
 {
     if (socket_ != -1)
     {
+        sigpipe_suppressor();
         std::size_t remaining = length;
         while (remaining > 0)
         {
-            #if defined(CHUCHO_MANUAL_SUPPRESS_SIGPIPE)
-            sigset_t blocked;
-            sigset_t pending;
-            sigset_t pipe_only;
-            sigemptyset(&blocked);
-            sigemptyset(&pipe_only);
-            sigaddset(&pipe_only, SIGPIPE);
-            sigemptyset(&pending);
-            sigpending(&pending);
-            if (!sigismember(&pending, SIGPIPE))
-                pthread_sigmask(SIG_BLOCK, &pipe_only, &blocked);
-            #endif
             ssize_t sent = send(socket_, buf + length - remaining, remaining, MSG_NOSIGNAL);
-            #if defined(CHUCHO_MANUAL_SUPPRESS_SIGPIPE)
-            if (!sigismember(&pending, SIGPIPE))
-            {
-                sigemptyset(&pending);
-                sigpending(&pending);
-                if (sigismember(&pending, SIGPIPE))
-                {
-                    int sig;
-                    sigwait(&pipe_only, &sig);
-                }
-                if (!sigismember(&blocked, SIGPIPE))
-                    pthread_sigmask(SIG_UNBLOCK, &pipe_only, nullptr);
-            }
-            #endif
             if (sent == -1)
                 throw socket_exception("Error sending data over socket", errno);
             remaining -= sent;
