@@ -223,11 +223,13 @@ IF(CHUCHO_POSIX)
         MESSAGE(FATAL_ERROR "pthread_sigmask is required")
     ENDIF()
 
-    # open
-    CHECK_CXX_SYMBOL_EXISTS(open fcntl.h CHUCHO_HAVE_OPEN)
-    IF(NOT CHUCHO_HAVE_OPEN)
-        MESSAGE(FATAL_ERROR "open is required")
-    ENDIF()
+    # open/fcntl
+    FOREACH(SYM open fcntl)
+        CHECK_CXX_SYMBOL_EXISTS(${SYM} fcntl.h CHUCHO_HAVE_${SYM})
+        IF(NOT CHUCHO_HAVE_${SYM})
+            MESSAGE(FATAL_ERROR "${SYM} is required")
+        ENDIF()
+    ENDFOREACH()
 ENDIF()
 
 #

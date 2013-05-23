@@ -174,6 +174,8 @@ SET(CHUCHO_SOURCES
     regex.cpp
     regex_exception.cpp
     remote_writer.cpp
+    remote_writer_factory.cpp
+    remote_writer_memento.cpp
     rolling_file_writer.cpp
     rolling_file_writer_factory.cpp
     rolling_file_writer_memento.cpp
@@ -224,6 +226,8 @@ SET(CHUCHO_SOURCES
     include/chucho/printf_util.hpp
     include/chucho/regex.hpp
     include/chucho/regex_exception.hpp
+    include/chucho/remote_writer_factory.hpp
+    include/chucho/remote_writer_memento.hpp
     include/chucho/rolling_file_writer_factory.hpp
     include/chucho/rolling_file_writer_memento.hpp
     include/chucho/size_file_roll_trigger_factory.hpp

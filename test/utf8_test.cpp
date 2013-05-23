@@ -5,7 +5,27 @@
 #include <iostream>
 #include <sstream>
 
-TEST(utf8_validator, invalid)
+TEST(utf8, escape)
+{
+    std::vector<std::pair<std::string, std::string>> v =
+    {
+        { "wi\x80ll", "wi\\x80ll" },
+        { "wi\x80\x81\x82ll", "wi\\x80\\x81\\x82ll" },
+        { "wi\xf5ll", "wi\\xf5ll" },
+        { "wi\xc5ll", "wi\\xc5ll" },
+        { "wi\xe0ll", "wi\\xe0ll" },
+        { "wi\xe0\x80ll", "wi\\xe0\\x80ll" },
+        { "wi\xf0ll", "wi\\xf0ll" },
+        { "wi\xf1\x81ll", "wi\\xf1\\x81ll" },
+        { "wi\xf2\x82\x83ll", "wi\\xf2\\x82\\x83ll" },
+        { "\xf3will", "\\xf3will" },
+        { "will\x8f", "will\\x8f" }
+    };
+    for (auto p : v)
+        EXPECT_EQ(p.second, chucho::utf8::escape_invalid(p.first));
+}
+
+TEST(utf8, invalid)
 {
     std::vector<std::string> v =
     {
@@ -27,7 +47,7 @@ TEST(utf8_validator, invalid)
     }
 }
 
-TEST(utf8_validator, valid)
+TEST(utf8, valid)
 {
     std::vector<std::string> v =
     {

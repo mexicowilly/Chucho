@@ -19,9 +19,6 @@
 
 #include <chucho/writer.hpp>
 #include <cstdint>
-#include <chrono>
-#include <atomic>
-#include <thread>
 #include <queue>
 
 namespace chucho
@@ -32,15 +29,18 @@ class socket_connector;
 class CHUCHO_EXPORT remote_writer : public writer
 {
 public:
-    static const std::uint16_t DEFAULT_PORT = 32123;
+    static const std::uint16_t DEFAULT_PORT;
+    static const std::size_t DEFAULT_UNSENT_CACHE_MAX;
 
     remote_writer(const std::string& host,
-                  std::uint16_t port = DEFAULT_PORT);
-    remote_writer(const std::string& host,
-                  std::uint16_t port,
-                  const std::chrono::seconds& connect_interval,
-                  std::size_t unsent_cache_size);
+                  std::uint16_t port = DEFAULT_PORT,
+                  std::size_t unsent_cache_max = DEFAULT_UNSENT_CACHE_MAX);
     ~remote_writer();
+
+    const std::string& get_host() const;
+    std::uint16_t get_port() const;
+    std::size_t get_unsent_cache_max() const;
+    std::size_t get_unsent_cache_size() const;
 
 protected:
     virtual void write_impl(const event& evt) override;
@@ -49,15 +49,31 @@ private:
     void retry_until_connected();
 
     std::unique_ptr<socket_connector> connector_;
-    std::chrono::seconds connect_interval_;
     std::string host_;
     std::uint16_t port_;
-    std::atomic<bool> is_thread_interrupted_;
-    std::thread connector_thread_;
     std::deque<event> unsent_events_;
-    std::size_t unsent_cache_size_;
-    std::atomic<bool> is_thread_running_;
+    std::size_t unsent_cache_max_;
 };
+
+inline const std::string& remote_writer::get_host() const
+{
+    return host_;
+}
+
+inline std::uint16_t remote_writer::get_port() const
+{
+    return port_;
+}
+
+inline std::size_t remote_writer::get_unsent_cache_max() const
+{
+    return unsent_cache_max_;
+}
+
+inline std::size_t remote_writer::get_unsent_cache_size() const
+{
+    return unsent_events_.size();
+}
 
 }
 

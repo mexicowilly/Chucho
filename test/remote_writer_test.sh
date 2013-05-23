@@ -21,7 +21,12 @@ COUNT=1
 ARGS=`getopt c:h:m:p:v: $*`
 echo $ARGS
 if [ $? != 0 ] ; then
-# usage
+    echo "Accepted arguments:"
+    echo "    -c arg : The number of clients to run"
+    echo "    -h arg : The host to which to connect"
+    echo "    -m arg : The number of minutes to run"
+    echo "    -p arg : The client program"
+    echo "    -v arg : The number of messages per second to write"
     exit 1
 fi
 set -- $ARGS

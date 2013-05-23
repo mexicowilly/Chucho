@@ -25,97 +25,35 @@
 namespace chucho
 {
 
-remote_writer::remote_writer(const std::string& host,
-                             std::uint16_t port)
-    : remote_writer(host, port, std::chrono::seconds(30), 1000)
-{
-}
+const std::uint16_t remote_writer::DEFAULT_PORT(32123);
+const std::size_t remote_writer::DEFAULT_UNSENT_CACHE_MAX(1000);
 
 remote_writer::remote_writer(const std::string& host,
                              std::uint16_t port,
-                             const std::chrono::seconds& connect_interval,
-                             std::size_t unsent_cache_size)
+                             std::size_t unsent_cache_max)
     : writer(std::make_shared<yaml_formatter>()),
-      connect_interval_(connect_interval),
       host_(host),
       port_(port),
-      is_thread_interrupted_(false),
-      unsent_cache_size_(unsent_cache_size),
-      is_thread_running_(false)
+      unsent_cache_max_(unsent_cache_max)
 {
     set_status_origin("remote_writer");
     if (host.empty())
         throw exception("The host name cannot be empty");
     if (port == 0)
         throw exception("The port cannot be zero");
-    try
-    {
-        connector_.reset(new socket_connector(host, port));
-    }
-    catch (exception& e)
-    {
-        report_info("Could not connect to log server " + host_ + ":" +
-            std::to_string(port_) + ": " + e.what());
-        connector_thread_ = std::move(
-           std::thread(&remote_writer::retry_until_connected, this));
-    }
+    connector_.reset(new socket_connector(host, port));
 }
 
+// If I don't put this empty destructor here, then the connector_
+// object causes remote_writer to fail to build, since the
+// socket_connector type is undefined.
 remote_writer::~remote_writer()
 {
-    if (is_thread_running_)
-    {
-        is_thread_interrupted_ = true;
-        connector_thread_.join();
-    }
-}
-
-void remote_writer::retry_until_connected()
-{
-    is_thread_running_ = true;
-    struct sentry
-    {
-        sentry(std::atomic<bool>& is_it) : is_it_(is_it) { }
-        ~sentry() { is_it_ = false; }
-        std::atomic<bool>& is_it_;
-    } sntry(is_thread_running_);
-    while (!is_thread_interrupted_)
-    {
-        std::chrono::steady_clock::time_point wake_time =
-            std::chrono::steady_clock::now() + connect_interval_;
-        while (std::chrono::steady_clock::now() < wake_time)
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
-            if (is_thread_interrupted_)
-            {
-                report_info("The connector thread has been interrupted.");
-                return;
-            }
-        }
-        report_info("Attempting connection to " + host_ + ":" + std::to_string(port_));
-        try
-        {
-            connector_.reset(new socket_connector(host_, port_));
-            report_info("Connection established. Exiting connector thread.");
-            return;
-        }
-        catch (exception& e)
-        {
-            report_info(std::string("Connection failed: ") + e.what());
-        }
-    }
-    report_info("The connector thread has been interrupted.");
 }
 
 void remote_writer::write_impl(const event& evt)
 {
-    if (is_thread_running_)
-    {
-        unsent_events_.push_back(evt);
-        if (unsent_events_.size() > unsent_cache_size_)
-            unsent_events_.pop_front();
-    }
-    else
+    if (connector_->can_write())
     {
         try
         {
@@ -126,7 +64,7 @@ void remote_writer::write_impl(const event& evt)
                 yaml.append(formatter_->format(e));
                 if (yaml.length() > 1024 * 1024)
                 {
-                    size = htonl(yaml.length());
+                    size = htonl(yaml.length() - sizeof(std::uint32_t));
                     std::memcpy(const_cast<char*>(yaml.data()), &size, sizeof(std::uint32_t));
                     connector_->write(reinterpret_cast<const std::uint8_t*>(yaml.data()), yaml.length());
                     yaml = std::string(sizeof(std::uint32_t), 0);
@@ -136,6 +74,8 @@ void remote_writer::write_impl(const event& evt)
             size = htonl(yaml.length() - sizeof(std::uint32_t));
             std::memcpy(const_cast<char*>(yaml.data()), &size, sizeof(std::uint32_t));
             connector_->write(reinterpret_cast<const std::uint8_t*>(yaml.data()), yaml.length());
+            if (!unsent_events_.empty())
+                report_info(std::to_string(unsent_events_.size()) + " cached events were sent");
             unsent_events_.clear();
         }
         catch (exception& e)
@@ -143,8 +83,15 @@ void remote_writer::write_impl(const event& evt)
             report_warning("There was a problem with the connection to " +
                 host_ + ':' + std::to_string(port_) + ": " + e.what());
             unsent_events_.push_back(evt);
-            connector_thread_ = std::move(std::thread(&remote_writer::retry_until_connected, this));
         }
+    }
+    else
+    {
+        if (unsent_events_.size() == 0)
+            report_info("The connection has been lost, so as many as " + std::to_string(unsent_cache_max_) + " events will be cached");
+        unsent_events_.push_back(evt);
+        if (unsent_events_.size() > unsent_cache_max_)
+            unsent_events_.pop_front();
     }
 }
 

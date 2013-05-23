@@ -17,6 +17,7 @@
 #include <chucho/logger.hpp>
 #include <chucho/configurator.hpp>
 #include <chucho/configuration.hpp>
+#include <chucho/status_manager.hpp>
 #include <map>
 #include <stdexcept>
 #include <atomic>
@@ -24,6 +25,12 @@
 namespace
 {
 
+// We must ensure that the statically allocated status_manager outlives
+// any shared pointers held in the statically allocated all_loggers
+// collection. If we don't keep this status_manager instance here, then
+// any component that tries to use the status_manager in its destructor
+// causes std::terminate to be called.
+auto sm = chucho::status_manager::get();
 std::map<std::string, std::shared_ptr<chucho::logger>> all_loggers;
 std::recursive_mutex loggers_guard;
 

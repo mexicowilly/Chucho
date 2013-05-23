@@ -21,6 +21,9 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <signal.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <poll.h>
 
 // Some operating systems allow you to suppress SIGPIPE on a socket
 // with SO_NOSIGPIPE. Others allow you to suppress it when sending
@@ -35,20 +38,76 @@
 #define MSG_NOSIGNAL 0
 #endif
 
+namespace
+{
+
+
+}
+
 namespace chucho
 {
 
 socket_connector::socket_connector(const std::string& host, std::uint16_t port)
+    : socket_(-1),
+      host_(host),
+      port_(port),
+      is_blocking_mode_(true)
 {
-    std::string ptext(std::to_string(port));
+    set_status_origin("socket_connector");
+    open_socket();
+}
+
+socket_connector::~socket_connector()
+{
+    if (socket_ != -1)
+    {
+        shutdown(socket_, SHUT_RDWR);
+        close(socket_);
+    }
+}
+
+bool socket_connector::can_write()
+{
+    bool result = false;
+    struct pollfd pfd;
+    pfd.fd = socket_;
+    pfd.events = POLLOUT;
+    pfd.revents = 0;
+    int num = poll(&pfd, 1, 0);
+    if (num > 0)
+    {
+        if (pfd.revents & (POLLERR | POLLHUP | POLLNVAL))
+        {
+            report_info("The connection to " + host_ + ":" + std::to_string(port_) + " was lost. Reconnecting...");
+            open_socket();
+        }
+        else
+        {
+            if (!is_blocking_mode_)
+            {
+                int flags = fcntl(socket_, F_GETFL);
+                fcntl(socket_, F_SETFL, (flags & ~O_NONBLOCK));
+                is_blocking_mode_ = true;
+                report_info("The connection to " + host_ + ":" + std::to_string(port_) + " was established");
+            }
+            result = true;
+        }
+    }
+    return result;
+}
+
+void socket_connector::open_socket()
+{
+    if (socket_ != -1)
+        close(socket_);
     struct addrinfo hints;
     std::memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
     struct addrinfo* addrs;
-    int rc = getaddrinfo(host.c_str(), ptext.c_str(), &hints, &addrs);
+    int rc = getaddrinfo(host_.c_str(), std::to_string(port_).c_str(), &hints, &addrs);
     if (rc != 0)
-        throw exception("Could not resolve address of " + host + ": " + gai_strerror(rc));
+        throw exception("Could not resolve address of " + host_ + ": " + gai_strerror(rc));
     struct sentry
     {
         sentry(addrinfo* addrs) : addrs_(addrs) { }
@@ -64,29 +123,26 @@ socket_connector::socket_connector(const std::string& host, std::uint16_t port)
             int yes = 1;
             setsockopt(socket_, SOL_SOCKET, SO_NOSIGPIPE, &yes, sizeof(yes));
             #endif
-            if (connect(socket_, addrs->ai_addr, addrs->ai_addrlen) == 0)
+            fcntl(socket_, F_SETFL, O_NONBLOCK);
+            if (connect(socket_, addrs->ai_addr, addrs->ai_addrlen) == 0 ||
+                errno == EINPROGRESS)
+            {
+                is_blocking_mode_ = false;
                 return;
+            }
+            close(socket_);
         }
         addrs = addrs->ai_next;
     } while (addrs != nullptr);
-    if (socket_  != -1)
+    if (socket_ != -1)
         close(socket_);
     int err = errno;
     std::string msg;
     if (socket_ == -1)
         msg = "Could not create socket";
     else
-        msg = "Could not connect to " + host;
+        msg = "Could not connect to " + host_;
     throw socket_exception(msg, err);
-}
-
-socket_connector::~socket_connector()
-{
-    if (socket_ != -1)
-    {
-        shutdown(socket_, SHUT_RDWR);
-        close(socket_);
-    }
 }
 
 void socket_connector::write(const std::uint8_t* buf, std::size_t length)

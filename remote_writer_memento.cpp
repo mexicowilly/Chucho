@@ -14,39 +14,18 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_SOCKET_CONNECTOR_HPP__)
-#define CHUCHO_SOCKET_CONNECTOR_HPP__
-
-#if !defined(chucho_EXPORTS)
-#error "This header is private"
-#endif
-
-#include <chucho/status_reporter.hpp>
-#include <string>
-#include <cstdint>
-#include <vector>
+#include <chucho/remote_writer_memento.hpp>
 
 namespace chucho
 {
 
-class socket_connector : public status_reporter
+remote_writer_memento::remote_writer_memento(const configurator& cfg)
+    : writer_memento(cfg)
 {
-public:
-    socket_connector(const std::string& host, std::uint16_t port);
-    ~socket_connector();
-
-    bool can_write();
-    void write(const std::uint8_t* buf, std::size_t length);
-
-private:
-    void open_socket();
-
-    int socket_;
-    std::string host_;
-    std::uint16_t port_;
-    bool is_blocking_mode_;
-};
-
+    set_status_origin("remote_writer_memento");
+    set_handler("host", [this] (const std::string& name) { host_ = name; });
+    set_handler("port", [this] (const std::string& port) { port_ = std::stoul(port); });
+    set_handler("unsent_cache_max", [this] (const std::string& sz) { unsent_cache_max_ = stoull(sz); });
 }
 
-#endif
+}

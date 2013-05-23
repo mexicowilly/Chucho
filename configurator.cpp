@@ -29,6 +29,7 @@
 #include <chucho/size_file_roll_trigger_factory.hpp>
 #include <chucho/time_file_roller_factory.hpp>
 #include <chucho/duplicate_message_filter_factory.hpp>
+#include <chucho/remote_writer_factory.hpp>
 #include <chucho/regex.hpp>
 #include <cstring>
 
@@ -75,6 +76,8 @@ void configurator::initialize()
     add_configurable_factory("chucho::time_file_roller", fact);
     fact.reset(new syslog_writer_factory());
     add_configurable_factory("chucho::syslog_writer", fact);
+    fact.reset(new remote_writer_factory());
+    add_configurable_factory("chucho::remote_writer", fact);
 }
 
 std::string configurator::resolve_variables(const std::string& val)

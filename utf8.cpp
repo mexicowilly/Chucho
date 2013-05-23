@@ -28,7 +28,7 @@ std::string escape(char c)
 {
     std::ostringstream stream;
     stream << "\\x" << std::hex << std::setfill('0') <<
-        std::setw(2) << static_cast<int>(c);
+        std::setw(2) << (static_cast<unsigned>(c) & 0xff);
     return stream.str();
 }
 

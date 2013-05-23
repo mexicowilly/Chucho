@@ -29,6 +29,7 @@
 #include <chucho/time_file_roller.hpp>
 #include <chucho/duplicate_message_filter.hpp>
 #include <chucho/syslog_writer.hpp>
+#include <chucho/remote_writer.hpp>
 #include <chucho/exception.hpp>
 #include <sstream>
 #if defined(_WIN32)
@@ -243,6 +244,48 @@ TEST_F(yaml_configurator, multiple_writer)
     fwrt = std::static_pointer_cast<chucho::file_writer>(wrts[1]);
     ASSERT_TRUE(static_cast<bool>(fwrt));
     EXPECT_EQ(std::string("two.log"), fwrt->get_file_name());
+}
+
+TEST_F(yaml_configurator, remote_writer)
+{
+    configure("- chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::remote_writer:\n"
+              "        host: motherboy\n"
+              "- chucho::logger:\n"
+              "    - name: will2\n"
+              "    - chucho::remote_writer:\n"
+              "        - host: motherboy\n"
+              "        - port: 19567\n"
+              "- chucho::logger:\n"
+              "    - name: will3\n"
+              "    - chucho::remote_writer:\n"
+              "        - host: motherboy\n"
+              "        - unsent_cache_max: 750");
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::remote_writer), typeid(*wrts[0]));
+    auto rw = std::static_pointer_cast<chucho::remote_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(rw));
+    EXPECT_EQ(std::string("motherboy"), rw->get_host());
+    EXPECT_EQ(chucho::remote_writer::DEFAULT_PORT, rw->get_port());
+    EXPECT_EQ(chucho::remote_writer::DEFAULT_UNSENT_CACHE_MAX, rw->get_unsent_cache_max());
+    wrts = chucho::logger::get("will2")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::remote_writer), typeid(*wrts[0]));
+    rw = std::static_pointer_cast<chucho::remote_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(rw));
+    EXPECT_EQ(std::string("motherboy"), rw->get_host());
+    EXPECT_EQ(19567, rw->get_port());
+    EXPECT_EQ(chucho::remote_writer::DEFAULT_UNSENT_CACHE_MAX, rw->get_unsent_cache_max());
+    wrts = chucho::logger::get("will3")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::remote_writer), typeid(*wrts[0]));
+    rw = std::static_pointer_cast<chucho::remote_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(rw));
+    EXPECT_EQ(std::string("motherboy"), rw->get_host());
+    EXPECT_EQ(chucho::remote_writer::DEFAULT_PORT, rw->get_port());
+    EXPECT_EQ(750, rw->get_unsent_cache_max());
 }
 
 TEST_F(yaml_configurator, rolling_file_writer)

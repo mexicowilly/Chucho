@@ -14,37 +14,25 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_SOCKET_CONNECTOR_HPP__)
-#define CHUCHO_SOCKET_CONNECTOR_HPP__
+#if !defined(CHUCHO_REMOTE_WRITER_FACTORY_HPP__)
+#define CHUCHO_REMOTE_WRITER_FACTORY_HPP__
 
 #if !defined(chucho_EXPORTS)
 #error "This header is private"
 #endif
 
-#include <chucho/status_reporter.hpp>
-#include <string>
-#include <cstdint>
-#include <vector>
+#include <chucho/writer_factory.hpp>
 
 namespace chucho
 {
 
-class socket_connector : public status_reporter
+class remote_writer_factory : public writer_factory
 {
 public:
-    socket_connector(const std::string& host, std::uint16_t port);
-    ~socket_connector();
+    remote_writer_factory();
 
-    bool can_write();
-    void write(const std::uint8_t* buf, std::size_t length);
-
-private:
-    void open_socket();
-
-    int socket_;
-    std::string host_;
-    std::uint16_t port_;
-    bool is_blocking_mode_;
+    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
+    virtual std::shared_ptr<memento> create_memento(const configurator& cfg) override;
 };
 
 }
