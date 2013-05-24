@@ -15,6 +15,7 @@
  */
 
 #include "vassals.hpp"
+#include "is_shut_down.hpp"
 #include <chucho/log.hpp>
 
 namespace chucho
@@ -24,8 +25,7 @@ namespace server
 {
 
 vassals::vassals(std::size_t count, std::function<void(std::shared_ptr<socket_reader>)> processor)
-    : stop_(false),
-      processor_(processor),
+    : processor_(processor),
       logger_(chucho::logger::get("chuchod.vassals"))
 {
     for (std::size_t i = 0; i < count; i++)
@@ -35,9 +35,6 @@ vassals::vassals(std::size_t count, std::function<void(std::shared_ptr<socket_re
 
 vassals::~vassals()
 {
-    guard_.lock();
-    stop_ = true;
-    guard_.unlock();
     condition_.notify_all();
     for (std::thread& t : vassals_)
         t.join();
@@ -54,12 +51,16 @@ void vassals::submit(std::shared_ptr<socket_reader> reader)
 
 void vassals::work()
 {
-    while (true)
+    while (!is_shut_down)
     {
         std::unique_lock<std::mutex> ul(guard_);
-        while (!stop_ && readers_.empty())
+        while (readers_.empty())
+        {
+            if (is_shut_down)
+                return;
             condition_.wait(ul);
-        if (stop_)
+        }
+        if (is_shut_down)
             break;
         std::shared_ptr<socket_reader> reader = readers_.front();
         readers_.pop();

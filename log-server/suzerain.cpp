@@ -279,7 +279,6 @@ void suzerain::run()
     }
     try
     {
-        CHUCHO_INFO(logger_, "chuchod will listen on port " << props_.port());
         while (!is_shut_down)
         {
             std::shared_ptr<socket_reader> reader = lstn->accept();

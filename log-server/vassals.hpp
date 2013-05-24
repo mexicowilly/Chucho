@@ -47,7 +47,6 @@ private:
     std::queue<std::shared_ptr<socket_reader>> readers_;
     std::mutex guard_;
     std::condition_variable condition_;
-    bool stop_;
     std::function<void(std::shared_ptr<socket_reader>)> processor_;
     std::shared_ptr<chucho::logger> logger_;
 };
