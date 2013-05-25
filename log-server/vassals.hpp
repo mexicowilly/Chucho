@@ -38,6 +38,7 @@ public:
 
     vassals& operator= (const vassals&) = delete;
 
+    void stop();
     void submit(std::shared_ptr<socket_reader> reader);
 
 private:

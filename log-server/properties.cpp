@@ -28,11 +28,11 @@ namespace server
 std::ostream& operator<< (std::ostream& stream, properties& props)
 {
     stream << "Properties:\n";
-    stream << "  - console_mode: " << std::boolalpha << props.console_mode() << '\n';
+    stream << "  - console mode: " << std::boolalpha << props.console_mode() << '\n';
     stream << "  - log level: " << *chucho::logger::get("chuchod")->get_level() << '\n';
     stream << "  - port: " << props.port() << '\n';
     stream << "  - version: " << CHUCHO_VERSION << '\n';
-    stream << "  - worker_threads: " << props.vassal_count();
+    stream << "  - worker threads: " << props.vassal_count();
     return stream;
 }
 

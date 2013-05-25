@@ -35,10 +35,19 @@ vassals::vassals(std::size_t count, std::function<void(std::shared_ptr<socket_re
 
 vassals::~vassals()
 {
-    condition_.notify_all();
-    for (std::thread& t : vassals_)
-        t.join();
-    CHUCHO_INFO(logger_, "Joined " << vassals_.size() << " worker threads");
+    stop();
+}
+
+void vassals::stop()
+{
+    if (!vassals_.empty())
+    {
+        condition_.notify_all();
+        for (std::thread& t : vassals_)
+            t.join();
+        vassals_.clear();
+        CHUCHO_INFO(logger_, "Joined " << vassals_.size() << " worker threads");
+    }
 }
 
 void vassals::submit(std::shared_ptr<socket_reader> reader)

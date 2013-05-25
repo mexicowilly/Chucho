@@ -300,6 +300,14 @@ void suzerain::run()
         CHUCHO_ERROR(logger_, "An unexpected exception has occurred: " << e.what());
 
     }
+    // Defect #86.
+    // Order is important here. When selector has a hit, then it passes a reader
+    // to the vassals for processing. When a vassal is done processing then it
+    // passes the reader back to selector. They are interlocking depenendcies.
+    // The fix is to stop the vasslas without destroying the object, then to destroy
+    // the selector, then to destory the vassals. This cleanly stops the
+    // dependency chain.
+    vassals_->stop();
     selector_.reset();
     vassals_.reset();
     single_instance::release();
