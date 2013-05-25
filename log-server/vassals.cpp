@@ -45,8 +45,9 @@ void vassals::stop()
         condition_.notify_all();
         for (std::thread& t : vassals_)
             t.join();
+        std::size_t thread_count = vassals_.size();
         vassals_.clear();
-        CHUCHO_INFO(logger_, "Joined " << vassals_.size() << " worker threads");
+        CHUCHO_INFO(logger_, "Joined " << thread_count << " worker threads");
     }
 }
 
