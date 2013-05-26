@@ -56,6 +56,13 @@ namespace chucho
  *      uses the pattern <tt>%%d{%%H:%%M:%%S.%%q} %-5p %.36c -
  *      %%m%%n</tt>.
  *  
+ * When an unknown element is encountered during configuration 
+ * processing, and if the element can be understood as a 
+ * key-value pair, then a callback may be used for the 
+ * application to process the element. This allows Chucho and 
+ * application configuration data to appear in the same file 
+ * side by side.
+ *  
  * @note The methods in the configuration class are not thread 
  *       safe.
  *  
@@ -64,6 +71,10 @@ namespace chucho
 class CHUCHO_EXPORT configuration
 {
 public:
+    /**
+     * The signature required for a function to handle unknown 
+     * configuration key-value pairs. 
+     */
     typedef std::function<bool(const std::string&, const std::string&)> unknown_handler_type;
 
     /**
@@ -127,6 +138,15 @@ public:
      * @return the style
      */
     static style get_style();
+    /**
+     * Return the unknown element handler. The unknown element 
+     * handler is a callback that the application may set to process 
+     * elements in the configuration that Chucho itself does not 
+     * understand. This allows the application to use the Chucho 
+     * configuration for its own configurable elements. 
+     * 
+     * @return the function to handle unknown elements
+     */
     static unknown_handler_type get_unknown_handler();
     /**
      * Set whether the default configuration is allowed. In the 
@@ -175,6 +195,15 @@ public:
      * @param stl the style
      */
     static void set_style(style stl);
+    /**
+     * Set the unknown element handler. The unknown element 
+     * handler is a callback that the application may set to process 
+     * elements in the configuration that Chucho itself does not 
+     * understand. This allows the application to use the Chucho 
+     * configuration for its own configurable elements. 
+     * 
+     * @param hndl the unknown element handler
+     */
     static void set_unknown_handler(unknown_handler_type hndl);
 
 protected:

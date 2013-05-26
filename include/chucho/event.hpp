@@ -91,6 +91,27 @@ public:
           const char* const function_name,
           const std::string& mark);
 
+    /**
+     * Construct an event. The host name parameters are what set 
+     * this constructor apart from the others. This constructor is 
+     * used by the remote logging server to store the name of the 
+     * host from which the event came. It is not used when logging 
+     * is done locally. 
+     * 
+     * @param lgr the logger
+     * @param lvl the level
+     * @param msg the message, which has already been formatted
+     * @param file_name the file name of in which the event occurred 
+     * @param line_number the line number in which the event 
+     *                    occurred
+     * @param function_name the function name in which the event 
+     *                      occured
+     * @param base_host_name the base name of the host from which 
+     *                       this event came
+     * @param full_host_name the full name of the host from which 
+     *                       this event came
+     * @param mark the marker associated with the event
+     */
     event(std::shared_ptr<logger> lgr,
           std::shared_ptr<level> lvl,
           const std::string& msg,
@@ -101,6 +122,13 @@ public:
           const std::string& full_host_name,
           const optional<marker>& mark);
 
+    /**
+     * Return the base name of the host from which this event came. 
+     * If the event is a local event, then the host name will not be 
+     * set. 
+     * 
+     * @return the base host name
+     */
     const optional<std::string>& get_base_host_name() const;
     /**
      * Return the file name.
@@ -108,6 +136,13 @@ public:
      * @return the file name
      */
     const char* get_file_name() const;
+    /**
+     * Return the full name of the host from which this event came. 
+     * If the event is a local event, then the host name will not be
+     * set. 
+     * 
+     * @return the full host name
+     */
     const optional<std::string>& get_full_host_name() const;
     /**
      * Return the function name.

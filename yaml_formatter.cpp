@@ -18,10 +18,30 @@
 #include <chucho/utf8.hpp>
 #include <chucho/logger.hpp>
 #include <chucho/marker.hpp>
+#include <chucho/regex.hpp>
 #include <sstream>
 
 namespace
 {
+
+std::string to_yaml_double_quoted(const std::string& msg)
+{
+    std::string result(1, '"');
+    auto last_pos = 0;
+    auto pos = msg.find_first_of("\\\"");
+    while (pos != std::string::npos)
+    {
+        result.append(msg, last_pos, pos - last_pos);
+        result.append(1, '\\');
+        result.append(1, msg[pos++]);
+        last_pos = pos;
+        pos = msg.find_first_of("\\\"", last_pos);
+    }
+    if (last_pos < msg.length())
+        result.append(msg, last_pos, msg.length() - last_pos);
+    result.append(1, '"');
+    return result;
+}
 
 std::string to_yaml_literal(const std::string& msg, std::size_t indentation = 8)
 {
@@ -48,6 +68,8 @@ std::string to_yaml_literal(const std::string& msg, std::size_t indentation = 8)
 namespace chucho
 {
 
+const unsigned yaml_formatter::VERSION(1);
+
 std::string yaml_formatter::format(const event& evt)
 {
     static std::locale c_locale("C");
@@ -55,25 +77,27 @@ std::string yaml_formatter::format(const event& evt)
     std::ostringstream stream;
     stream.imbue(c_locale);
     stream << "- event:\n";
-    stream << "    version: 1\n";
+    stream << "    version: " << VERSION << '\n';
     stream << "    milliseconds_since_epoch: " <<
         std::chrono::duration_cast<std::chrono::milliseconds>(evt.get_time().time_since_epoch()).count() << '\n';
-    stream << "    file_name: " + utf8::escape_invalid(evt.get_file_name()) + '\n';
+    stream << "    file_name: \"" << utf8::escape_invalid(evt.get_file_name()) << "\"\n";
     stream << "    line_number: " << evt.get_line_number() << '\n';
-    stream << "    function_name: " << evt.get_function_name() << '\n';
-    stream << "    logger: " << utf8::escape_invalid(evt.get_logger()->get_name()) << '\n';
-    stream << "    level: " << *evt.get_level() << '\n';
+    stream << "    function_name: \"" << evt.get_function_name() << "\"\n";
+    stream << "    logger: \"" << utf8::escape_invalid(evt.get_logger()->get_name()) << "\"\n";
+    stream << "    level: \"" << *evt.get_level() << "\"\n";
     if (evt.get_marker())
     {
         std::ostringstream mstream;
         mstream << *evt.get_marker();
         stream << "    marker: " << utf8::escape_invalid(mstream.str()) << '\n';
     }
+    stream << "    message: ";
     std::string msg = utf8::escape_invalid(evt.get_message());
-    std::size_t nl_count = std::count(msg.begin(), msg.end(), '\n');
-    if (nl_count > 1 || (nl_count == 1 && msg[msg.length() - 1] != '\n'))
-        msg = to_yaml_literal(msg);
-    stream << "    message: " << msg << '\n';
+    if (msg.find('\n') == std::string::npos)
+        stream << to_yaml_double_quoted(msg);
+    else
+        stream << to_yaml_literal(msg);
+    stream << '\n';
     return stream.str();
 }
 

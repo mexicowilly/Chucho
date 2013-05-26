@@ -211,7 +211,7 @@ void suzerain::process_events(std::shared_ptr<socket_reader> reader)
         size = ntohl(size);
         std::string yaml(size, 0);
         reader->read(reinterpret_cast<std::uint8_t*>(const_cast<char*>(yaml.data())), size);
-        //CHUCHO_INFO(logger_, yaml);
+        CHUCHO_INFO(logger_, yaml);
         std::istringstream stream(yaml);
         yaml.clear();
         yaml.shrink_to_fit();
