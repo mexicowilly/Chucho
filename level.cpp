@@ -19,6 +19,7 @@
 #include <limits>
 #include <set>
 #include <algorithm>
+#include <mutex>
 
 namespace
 {

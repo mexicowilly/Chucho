@@ -26,6 +26,7 @@
 #include <syslog.h>
 #include <sstream>
 #include <cstdint>
+#include <cstring>
 #include <vector>
 #include <array>
 #include <cerrno>

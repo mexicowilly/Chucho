@@ -19,6 +19,7 @@
 
 #include "socket_reader.hpp"
 #include <chucho/log.hpp>
+#include <condition_variable>
 #include <thread>
 #include <map>
 #include <atomic>

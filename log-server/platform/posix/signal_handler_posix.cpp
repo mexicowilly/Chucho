@@ -21,11 +21,13 @@
 #include <array>
 #include <map>
 #include <thread>
+#include <cstring>
+#include <algorithm>
 
 namespace
 {
 
-std::array<int, 11> ASYNC =
+const std::array<int, 11> ASYNC =
 {
     SIGHUP,
     SIGINT,
@@ -40,7 +42,7 @@ std::array<int, 11> ASYNC =
     SIGXFSZ
 };
 
-std::array<int, 6> DEADLY_ASYNC =
+const std::array<int, 6> DEADLY_ASYNC =
 {
     SIGINT,
     SIGQUIT,
@@ -50,7 +52,7 @@ std::array<int, 6> DEADLY_ASYNC =
     SIGXFSZ
 };
 
-std::array<int, 7> SYNC =
+const std::array<int, 7> SYNC =
 {
     SIGILL,
     SIGABRT,
@@ -141,7 +143,7 @@ void install()
     std::thread wait(sigwait_main);
     wait.detach();
     struct sigaction action;
-    memset(&action, 0, sizeof(action));
+    std::memset(&action, 0, sizeof(action));
     sigemptyset(&action.sa_mask);
     action.sa_handler = abort_handler;
     action.sa_flags = SA_RESETHAND;

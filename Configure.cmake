@@ -212,16 +212,12 @@ IF(CHUCHO_POSIX)
     ENDIF()
 
     # signal stuff
-    FOREACH(SYM raise sigemptyset sigaddset sigwait sigaction kill sigpending sigismember)
+    FOREACH(SYM raise sigemptyset sigaddset sigwait sigaction kill sigpending sigismember pthread_sigmask)
         CHECK_CXX_SYMBOL_EXISTS(${SYM} signal.h CHUCHO_HAVE_${SYM})
         IF(NOT CHUCHO_HAVE_${SYM})
             MESSAGE(FATAL_ERROR "${SYM} is required")
         ENDIF()
     ENDFOREACH()
-    CHECK_CXX_SYMBOL_EXISTS(pthread_sigmask pthread.h CHUCHO_HAVE_PTHREAD_SIGMASK)
-    IF(NOT CHUCHO_HAVE_PTHREAD_SIGMASK)
-        MESSAGE(FATAL_ERROR "pthread_sigmask is required")
-    ENDIF()
 
     # open/fcntl
     FOREACH(SYM open fcntl)

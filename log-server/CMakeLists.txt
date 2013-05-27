@@ -54,4 +54,4 @@ ADD_EXECUTABLE(chuchod
                vassals.cpp
                vassals.hpp
                ${CHUCHOD_PLATFORM_SOURCES})
-TARGET_LINK_LIBRARIES(chuchod chucho)
+TARGET_LINK_LIBRARIES(chuchod chucho ${CHUCHO_THREAD_LIB})

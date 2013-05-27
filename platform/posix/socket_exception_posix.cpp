@@ -15,6 +15,7 @@
  */
 
 #include <chucho/socket_exception.hpp>
+#include <cstring>
 
 namespace chucho
 {

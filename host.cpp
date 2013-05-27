@@ -16,7 +16,7 @@
 
 #include <chucho/host.hpp>
 #include <chrono>
-#include <thread>
+#include <mutex>
 
 namespace
 {

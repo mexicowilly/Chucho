@@ -20,6 +20,7 @@
 #include <signal.h>
 #include <cerrno>
 #include <cstdio>
+#include <cstring>
 #include <unistd.h>
 
 namespace

@@ -20,6 +20,7 @@
 #include <chucho/socket_exception.hpp>
 #include <chucho/log.hpp>
 #include <cerrno>
+#include <cstring>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>

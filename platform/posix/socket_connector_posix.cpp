@@ -17,6 +17,7 @@
 #include <chucho/socket_connector.hpp>
 #include <chucho/socket_exception.hpp>
 #include <cerrno>
+#include <cstring>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <unistd.h>

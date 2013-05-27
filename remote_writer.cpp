@@ -21,6 +21,7 @@
 #if defined(CHUCHO_HAVE_ARPA_INET_H)
 #include <arpa/inet.h>
 #endif
+#include <cstring>
 
 namespace chucho
 {

@@ -19,6 +19,7 @@
 
 #include "socket_reader.hpp"
 #include <chucho/logger.hpp>
+#include <condition_variable>
 #include <thread>
 #include <vector>
 #include <queue>
