@@ -30,9 +30,10 @@ syslog_writer::syslog_writer(std::shared_ptr<formatter> fmt,
 
 syslog_writer::syslog_writer(std::shared_ptr<formatter> fmt,
                              syslog::facility fcl,
-                             const std::string& host)
+                             const std::string& host,
+                             std::uint16_t port)
     : writer(fmt),
-      transport_(host),
+      transport_(host, port),
       facility_(fcl),
       host_name_(host)
 {

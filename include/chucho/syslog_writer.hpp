@@ -59,11 +59,13 @@ public:
      * 
      * @param fmt the formatter
      * @param fcl the syslog facility
-     * @param host the syslog host
+     * @param host the syslog host 
+     * @param port the port on which syslogd is listening 
      */
     syslog_writer(std::shared_ptr<formatter> fmt,
                   syslog::facility fcl,
-                  const std::string& host);
+                  const std::string& host,
+                  std::uint16_t port = syslog::DEFAULT_PORT);
     //@}
 
     /**
@@ -88,7 +90,7 @@ private:
     {
     public:
         transport();
-        transport(const std::string& host);
+        transport(const std::string& host, std::uint16_t port);
         ~transport();
 
         std::string format(syslog::facility fcl,

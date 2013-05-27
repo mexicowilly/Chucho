@@ -186,6 +186,7 @@ SET(CHUCHO_SOURCES
     status_manager.cpp
     status_observer.cpp
     status_reporter.cpp
+    syslog_constants.cpp
     syslog_writer.cpp
     syslog_writer_factory.cpp
     syslog_writer_memento.cpp

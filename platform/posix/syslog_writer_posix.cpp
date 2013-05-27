@@ -82,7 +82,7 @@ public:
 class remote_syslog_transport_handle : public chucho::syslog_transport_handle
 {
 public:
-    remote_syslog_transport_handle(const std::string& host);
+    remote_syslog_transport_handle(const std::string& host, std::uint16_t port);
     ~remote_syslog_transport_handle();
 
     virtual std::string format(chucho::syslog::facility fcl,
@@ -115,11 +115,11 @@ void local_syslog_transport_handle::send(chucho::syslog::facility fcl,
     syslog(static_cast<int>(fcl) | static_cast<int>(sev), "%s", message.c_str());
 }
 
-remote_syslog_transport_handle::remote_syslog_transport_handle(const std::string& host)
+remote_syslog_transport_handle::remote_syslog_transport_handle(const std::string& host, std::uint16_t port)
     : socket_(-1)
 {
     struct addrinfo* info;
-    int rc = getaddrinfo(host.c_str(), "syslog", nullptr, &info);
+    int rc = getaddrinfo(host.c_str(), std::to_string(port).c_str(), nullptr, &info);
     if (rc != 0)
         throw chucho::exception("Could not resolve address of " + host + ": " + gai_strerror(rc));
     address_.resize(info->ai_addrlen);
@@ -172,8 +172,8 @@ syslog_writer::transport::transport()
 {
 }
 
-syslog_writer::transport::transport(const std::string& host)
-    : handle_(new remote_syslog_transport_handle(host))
+syslog_writer::transport::transport(const std::string& host, std::uint16_t port)
+    : handle_(new remote_syslog_transport_handle(host, port))
 {
 }
 
