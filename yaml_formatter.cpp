@@ -24,43 +24,28 @@
 namespace
 {
 
-std::string to_yaml_double_quoted(const std::string& msg)
+void to_yaml_literal(const std::string& msg, std::ostream& stream)
 {
-    std::string result(1, '"');
-    auto last_pos = 0;
-    auto pos = msg.find_first_of("\\\"");
-    while (pos != std::string::npos)
-    {
-        result.append(msg, last_pos, pos - last_pos);
-        result.append(1, '\\');
-        result.append(1, msg[pos++]);
-        last_pos = pos;
-        pos = msg.find_first_of("\\\"", last_pos);
-    }
-    if (last_pos < msg.length())
-        result.append(msg, last_pos, msg.length() - last_pos);
-    result.append(1, '"');
-    return result;
-}
+    static const char* INDENTATION = "        ";
 
-std::string to_yaml_literal(const std::string& msg, std::size_t indentation = 8)
-{
-    std::string result("|\n");
+    stream << "|\n";
     auto last_pos = msg.find_first_not_of(' ');
     auto pos = msg.find('\n', last_pos);
     while (pos != std::string::npos)
     {
-        result.append(indentation, ' ');
-        result.append(msg, last_pos, pos - last_pos + 1);
+        stream << INDENTATION;
+        stream << msg.substr(last_pos, pos - last_pos + 1);
         last_pos = pos + 1;
         pos = msg.find('\n', last_pos);
     }
     if (last_pos < msg.length())
     {
-        result.append(indentation, ' ');
-        result.append(msg, last_pos, msg.length() - last_pos);
+        stream << INDENTATION;
+        if (last_pos == 0)
+            stream << msg;
+        else
+            stream << msg.substr(last_pos, msg.length() - last_pos);
     }
-    return result;
 }
 
 }
@@ -92,11 +77,7 @@ std::string yaml_formatter::format(const event& evt)
         stream << "    marker: " << utf8::escape_invalid(mstream.str()) << '\n';
     }
     stream << "    message: ";
-    std::string msg = utf8::escape_invalid(evt.get_message());
-    if (msg.find('\n') == std::string::npos)
-        stream << to_yaml_double_quoted(msg);
-    else
-        stream << to_yaml_literal(msg);
+    to_yaml_literal(utf8::escape_invalid(evt.get_message()), stream);
     stream << '\n';
     return stream.str();
 }

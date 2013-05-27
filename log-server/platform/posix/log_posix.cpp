@@ -81,7 +81,7 @@ std::string log::get_file_name()
     }
     else
     {
-        if (cand[cand.length() - 1] != '/')
+        if (cand.back() != '/')
             cand += '/';
         cand += "chuchod.log";
     }

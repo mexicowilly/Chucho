@@ -144,9 +144,18 @@ wire_event::wire_event(const YAML::Node& node,
     val = node.FindValue("message");
     if (val == nullptr)
         throw chucho::exception("The event is missing message");
+    std::string msg(val->to<std::string>());
+    // If the message comes in with YAML literal syntax ('|'), then it might
+    // have a trailing newline (if there is more than one event in the YAML).
+    if (!msg.empty() && msg.back() == '\n')
+    {
+        msg.pop_back();
+        if (!msg.empty() && msg.back() == '\r')
+            msg.pop_back();
+    }
     event_.reset(new chucho::event(log,
                                    lvl,
-                                   val->to<std::string>(),
+                                   msg,
                                    file_name_storage_.c_str(),
                                    line,
                                    function_name_storage_.c_str(),
@@ -305,7 +314,7 @@ void suzerain::run()
     // to the vassals for processing. When a vassal is done processing then it
     // passes the reader back to selector. They are interlocking depenendcies.
     // The fix is to stop the vasslas without destroying the object, then to destroy
-    // the selector, then to destory the vassals. This cleanly stops the
+    // the selector, then to destory the vassals. This cleanly breaks the
     // dependency chain.
     vassals_->stop();
     selector_.reset();
