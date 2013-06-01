@@ -15,7 +15,6 @@
  */
 
 #include "vassals.hpp"
-#include "is_shut_down.hpp"
 #include <chucho/log.hpp>
 
 namespace chucho
@@ -26,11 +25,11 @@ namespace server
 
 vassals::vassals(std::size_t count, std::function<void(std::shared_ptr<socket_reader>)> processor)
     : processor_(processor),
-      logger_(chucho::logger::get("chuchod.vassals"))
+      logger_(chucho::logger::get("chuchod.vassals")),
+      count_(count),
+      stop_(false)
 {
-    for (std::size_t i = 0; i < count; i++)
-        vassals_.emplace_back(std::bind(&vassals::work, this));
-    CHUCHO_INFO(logger_, "Started " << count << " worker threads");
+    start();
 }
 
 vassals::~vassals()
@@ -38,16 +37,28 @@ vassals::~vassals()
     stop();
 }
 
+void vassals::start()
+{
+    if (vassals_.empty())
+    {
+        for (std::size_t i = 0; i < count_; i++)
+            vassals_.emplace_back(std::bind(&vassals::work, this));
+        CHUCHO_INFO(logger_, "Started " << count_ << " worker threads");
+    }
+}
+
 void vassals::stop()
 {
     if (!vassals_.empty())
     {
+        guard_.lock();
+        stop_ = true;
         condition_.notify_all();
+        guard_.unlock();
         for (std::thread& t : vassals_)
             t.join();
-        std::size_t thread_count = vassals_.size();
         vassals_.clear();
-        CHUCHO_INFO(logger_, "Joined " << thread_count << " worker threads");
+        CHUCHO_INFO(logger_, "Joined " << count_ << " worker threads");
     }
 }
 
@@ -61,16 +72,16 @@ void vassals::submit(std::shared_ptr<socket_reader> reader)
 
 void vassals::work()
 {
-    while (!is_shut_down)
+    while (true)
     {
         std::unique_lock<std::mutex> ul(guard_);
         while (readers_.empty())
         {
-            if (is_shut_down)
+            if (stop_)
                 return;
             condition_.wait(ul);
         }
-        if (is_shut_down)
+        if (stop_)
             break;
         std::shared_ptr<socket_reader> reader = readers_.front();
         readers_.pop();

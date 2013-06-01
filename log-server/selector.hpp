@@ -38,6 +38,8 @@ public:
 
     void add(std::shared_ptr<socket_reader> reader);
     void remove(std::shared_ptr<socket_reader> reader);
+    void start();
+    void stop();
 
 private:
     void main();

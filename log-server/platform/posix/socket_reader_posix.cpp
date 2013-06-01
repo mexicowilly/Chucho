@@ -16,7 +16,6 @@
 
 #include "socket_reader.hpp"
 #include "eof_exception.hpp"
-#include "is_shut_down.hpp"
 #include <chucho/socket_exception.hpp>
 #include <cerrno>
 #include <sys/socket.h>
@@ -46,8 +45,6 @@ std::size_t socket_reader::read_impl(std::uint8_t* dest, std::size_t count)
     do
     {
         rc = poll(&pfd, 1, 250);
-        if (is_shut_down)
-            throw shutdown_exception();
         if (rc > 0)
         {
             if (pfd.revents & (POLLHUP | POLLERR | POLLNVAL))

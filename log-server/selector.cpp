@@ -24,20 +24,15 @@ namespace server
 
 selector::selector(std::function<void(std::shared_ptr<socket_reader>)> was_selected)
     : logger_(chucho::logger::get("chuchod.selector")),
-      stop_(false),
-      was_selected_(was_selected),
-      thread_(std::bind(&selector::main, this))
+      stop_(true),
+      was_selected_(was_selected)
 {
+    start();
 }
 
 selector::~selector()
 {
-    guard_.lock();
-    stop_ = true;
-    guard_.unlock();
-    condition_.notify_all();
-    thread_.join();
-    CHUCHO_INFO_STR(logger_, "Joined the selector thread");
+    stop();
 }
 
 void selector::add(std::shared_ptr<socket_reader> reader)
@@ -52,6 +47,29 @@ void selector::remove(std::shared_ptr<socket_reader> reader)
     std::lock_guard<std::mutex> lg(guard_);
     readers_.erase(reader->get_socket());
     condition_.notify_one();
+}
+
+void selector::start()
+{
+    std::lock_guard<std::mutex> lg(guard_);
+    if (stop_)
+    {
+        stop_ = false;
+        thread_ = std::move(std::thread(std::bind(&selector::main, this)));
+    }
+}
+
+void selector::stop()
+{
+    std::unique_lock<std::mutex> ul(guard_);
+    if (!stop_)
+    {
+        stop_ = true;
+        ul.unlock();
+        condition_.notify_all();
+        thread_.join();
+        CHUCHO_INFO_STR(logger_, "Joined the selector thread");
+    }
 }
 
 }
