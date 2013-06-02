@@ -170,9 +170,15 @@ void configuration::perform()
     if (!fn.empty())
     {
         if (file::exists(fn))
+        {
             got_config = configure_from_yaml_file(fn, report);
+            if (got_config)
+                last_good_file_name = fn;
+        }
         else
+        {
             report.warning("The file " + fn + " does not exist");
+        }
     }
     if (!got_config && !fallback_.empty())
     {

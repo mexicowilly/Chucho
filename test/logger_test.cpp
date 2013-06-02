@@ -16,6 +16,9 @@
 
 #include <gtest/gtest.h>
 #include <chucho/logger.hpp>
+#include <chucho/pattern_formatter.hpp>
+#include <chucho/cout_writer.hpp>
+#include <chucho/cerr_writer.hpp>
 #include <algorithm>
 
 class log_test : public ::testing::Test
@@ -67,4 +70,41 @@ TEST_F(log_test, levels)
     ASSERT_FALSE(static_cast<bool>(two->get_level()));
     EXPECT_EQ(chucho::level::INFO, root->get_effective_level());
     ASSERT_TRUE(static_cast<bool>(root->get_level()));
+}
+
+TEST_F(log_test, remove_writers)
+{
+    auto lgr = chucho::logger::get("remove_writers");
+    std::shared_ptr<chucho::formatter> fmt = std::make_shared<chucho::pattern_formatter>("%m%n");
+    std::shared_ptr<chucho::writer> out = std::make_shared<chucho::cout_writer>(fmt);
+    std::shared_ptr<chucho::writer> err = std::make_shared<chucho::cerr_writer>(fmt);
+    lgr->add_writer(out);
+    lgr->add_writer(err);
+    auto wrts = lgr->get_writers();
+    EXPECT_EQ(2, wrts.size());
+    lgr->remove_writer(out);
+    wrts = lgr->get_writers();
+    EXPECT_EQ(1, wrts.size());
+    EXPECT_STREQ(typeid(chucho::cerr_writer).name(), typeid(*wrts[0]).name());
+    lgr->add_writer(out);
+    wrts = lgr->get_writers();
+    EXPECT_EQ(2, wrts.size());
+    lgr->remove_all_writers();
+    EXPECT_TRUE(lgr->get_writers().empty());
+}
+
+TEST_F(log_test, reset)
+{
+    auto lgr = chucho::logger::get("reset");
+    std::shared_ptr<chucho::formatter> fmt = std::make_shared<chucho::pattern_formatter>("%m%n");
+    lgr->add_writer(std::make_shared<chucho::cout_writer>(fmt));
+    lgr->set_level(chucho::level::WARN);
+    lgr->set_writes_to_ancestors(false);
+    EXPECT_EQ(1, lgr->get_writers().size());
+    EXPECT_EQ(chucho::level::WARN, lgr->get_level());
+    EXPECT_FALSE(lgr->writes_to_ancestors());
+    lgr->reset();
+    EXPECT_TRUE(lgr->get_writers().empty());
+    EXPECT_FALSE(static_cast<bool>(lgr->get_level()));
+    EXPECT_TRUE(lgr->writes_to_ancestors());
 }
