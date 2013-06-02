@@ -76,9 +76,8 @@ public:
     static std::shared_ptr<logger> get(const std::string& name);
     /**
      * Return all existing loggers. This returns all existing 
-     * loggers that are currently in use. Any loggers that have been 
-     * created but are no longer in use are not included. 
-     * 
+     * loggers, even ones that are not currently in use.
+     *  
      * @return loggers in use
      */
     static std::vector<std::shared_ptr<logger>> get_existing_loggers();
@@ -162,7 +161,26 @@ public:
      * @param lvl the level to test
      * @return true if the level would be permitted by this logger
      */
-    bool permits(std::shared_ptr<level> lvl) const;
+    bool permits(std::shared_ptr<level> lvl);
+    /**
+     * Remove all writers from this logger.
+     */
+    void remove_all_writers();
+    /**
+     * Remove a specific writer from this logger.
+     * 
+     * @param wrt the writer to remove
+     */
+    void remove_writer(std::shared_ptr<writer> wrt);
+    /**
+     * Reset this logger to default settings. This method removes a 
+     * set level, removes all writers, and sets 
+     * writes_to_ancestors() to true. 
+     *  
+     * @note This method is used in configuration::reconfigure, and 
+     *       is probably not generally useful.
+     */
+    void reset();
     /**
      * Set the level of this logger. To unset the level, you would 
      * pass an uninitialized std::shared_ptr as lvl. 
@@ -198,7 +216,7 @@ public:
      * 
      * @return true if this logger writes to its ancestors
      */
-    bool writes_to_ancestors() const;
+    bool writes_to_ancestors();
 
 private:
     static CHUCHO_NO_EXPORT std::shared_ptr<logger> get_impl(const std::string& name);
@@ -210,28 +228,13 @@ private:
     std::string name_;
     std::shared_ptr<level> level_;
     std::vector<std::shared_ptr<writer>> writers_;
-    std::mutex writers_guard_;
+    std::recursive_mutex guard_;
     bool writes_to_ancestors_;
 };
 
 inline const std::string& logger::get_name() const
 {
     return name_;
-}
-
-inline bool logger::permits(std::shared_ptr<level> lvl) const
-{
-    return *lvl >= *get_effective_level();
-}
-
-inline void logger::set_writes_to_ancestors(bool val)
-{
-    writes_to_ancestors_ = val;
-}
-
-inline bool logger::writes_to_ancestors() const
-{
-    return writes_to_ancestors_;
 }
 
 }

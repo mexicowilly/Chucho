@@ -96,7 +96,7 @@ void logger::add_writer(std::shared_ptr<writer> wrt)
 {
     if (!wrt)
         throw std::invalid_argument("The writer cannot be an uninitialized std::shared_ptr");
-    std::lock_guard<std::mutex> lg(writers_guard_);
+    std::lock_guard<std::recursive_mutex> lg(guard_);
     writers_.push_back(wrt);
 }
 
@@ -114,28 +114,18 @@ std::shared_ptr<level> logger::get_effective_level() const
 {
     std::lock_guard<std::recursive_mutex> lg(loggers_guard);
     auto lgr = shared_from_this();
-    while (!lgr->level_)
+    while (!lgr->level_ && lgr->parent_)
         lgr = lgr->parent_;
-    return lgr->level_;
+    // Some idiot could have set no level on the root logger
+    return lgr->level_ ? lgr->level_ : level::OFF;
 }
 
 std::vector<std::shared_ptr<logger>> logger::get_existing_loggers()
 {
     std::vector<std::shared_ptr<logger>> result;
     std::lock_guard<std::recursive_mutex> lg(loggers_guard);
-    auto itor = all_loggers.begin();
-    while (itor != all_loggers.end())
-    {
-        if (itor->second.unique())
-        {
-            all_loggers.erase(itor++);
-        }
-        else
-        {
-            result.push_back(itor->second);
-            ++itor;
-        }
-    }
+    for (const std::map<std::string, std::shared_ptr<logger>>::value_type& i : all_loggers)
+        result.push_back(i.second);
     return result;
 }
 
@@ -159,7 +149,7 @@ std::shared_ptr<logger> logger::get_impl(const std::string& name)
 
 std::vector<std::shared_ptr<writer>> logger::get_writers()
 {
-    std::lock_guard<std::mutex> lg(writers_guard_);
+    std::lock_guard<std::recursive_mutex> lg(guard_);
     return writers_;
 }
 
@@ -168,13 +158,25 @@ void logger::initialize()
     std::lock_guard<std::recursive_mutex> lg(loggers_guard);
     // When loggers are created during configuration, this variable
     // must be true, so that we don't recurse the initialization.
-    is_initialized.store(true);
+    is_initialized = true;
     // Getting the level from text like this ensures that the static
     // level objects are initialized in time.
     root_logger.reset(new logger("", level::from_text("info")));
     all_loggers[root_logger->get_name()] = root_logger;
     if (configuration::get_style() == configuration::style::AUTOMATIC)
         configuration::perform();
+}
+
+bool logger::permits(std::shared_ptr<level> lvl)
+{
+    std::lock_guard<std::recursive_mutex> lg(guard_);
+    return *lvl >= *get_effective_level();
+}
+
+void logger::remove_all_writers()
+{
+    std::lock_guard<std::recursive_mutex> lg(guard_);
+    writers_.clear();
 }
 
 void logger::remove_unused_loggers()
@@ -190,20 +192,48 @@ void logger::remove_unused_loggers()
     }
 }
 
+void logger::remove_writer(std::shared_ptr<writer> wrt)
+{
+    std::lock_guard<std::recursive_mutex> lg(guard_);
+    auto found = std::find(writers_.begin(), writers_.end(), wrt);
+    if (found != writers_.end())
+        writers_.erase(found);
+}
+
+void logger::reset()
+{
+    std::lock_guard<std::recursive_mutex> lg(guard_);
+    writers_.clear();
+    level_.reset();
+    writes_to_ancestors_ = true;
+}
+
 void logger::set_level(std::shared_ptr<level> lvl)
 {
-    std::lock_guard<std::recursive_mutex> lg(loggers_guard);
+    std::lock_guard<std::recursive_mutex> lg(guard_);
     level_ = lvl;
+}
+
+void logger::set_writes_to_ancestors(bool val)
+{
+    std::lock_guard<std::recursive_mutex> lg(guard_);
+    writes_to_ancestors_ = val;
 }
 
 void logger::write(const event& evt)
 {
-    std::unique_lock<std::mutex> ul(writers_guard_);
+    std::unique_lock<std::recursive_mutex> ul(guard_);
     for (std::shared_ptr<writer> w : writers_)
         w->write(evt);
     ul.unlock();
     if (parent_ && writes_to_ancestors_)
         parent_->write(evt);
+}
+
+bool logger::writes_to_ancestors()
+{
+    std::lock_guard<std::recursive_mutex> lg(guard_);
+    return writes_to_ancestors_;
 }
 
 }

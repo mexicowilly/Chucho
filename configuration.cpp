@@ -25,6 +25,7 @@
 #include <chucho/logger.hpp>
 #include <cstdlib>
 #include <fstream>
+#include <assert.h>
 
 namespace chucho
 {
@@ -35,6 +36,41 @@ extern std::shared_ptr<chucho::logger> root_logger;
 
 namespace
 {
+
+std::string last_good_file_name;
+
+// Not to be confused with the logger_memento class that can only be
+// used during configuration. This struct is like a GoF memento in
+// that is stores state for later reuse.
+class logger_state
+{
+public:
+    logger_state(std::shared_ptr<chucho::logger> lgr)
+        : name_(lgr->get_name()),
+          level_(lgr->get_level()),
+          writers_(lgr->get_writers()),
+          writes_to_ancestors_(lgr->writes_to_ancestors())
+    {
+    }
+
+    void restore(std::shared_ptr<chucho::logger> lgr)
+    {
+        assert(lgr->get_name() == name_);
+        lgr->reset();
+        lgr->set_level(level_);
+        std::for_each(writers_.begin(),
+                      writers_.end(),
+                      [&] (std::shared_ptr<chucho::writer> wrt) { lgr->add_writer(wrt); });
+        lgr->set_writes_to_ancestors(writes_to_ancestors_);
+
+    }
+
+private:
+    std::string name_;
+    std::shared_ptr<chucho::level> level_;
+    std::vector<std::shared_ptr<chucho::writer>> writers_;
+    bool writes_to_ancestors_;
+};
 
 class reporter : public chucho::status_reporter
 {
@@ -60,6 +96,33 @@ public:
     }
 };
 
+bool configure_from_yaml_file(const std::string& file_name, reporter& report)
+{
+    std::ifstream val_in(file_name.c_str());
+    if (val_in.is_open())
+    {
+        try
+        {
+            chucho::utf8::validate(val_in);
+            val_in.close();
+            std::ifstream yam_in(file_name.c_str());
+            chucho::yaml_configurator yam;
+            yam.configure(yam_in);
+            return true;
+        }
+        catch (std::exception& e)
+        {
+            report.error("Error reading " + file_name +
+                ": " + chucho::exception::nested_whats(e));
+        }
+    }
+    else
+    {
+        report.warning(file_name + " exists, but I can't open it for reading");
+    }
+    return false;
+}
+
 void set_default_config()
 {
     if (chucho::root_logger->get_writers().empty())
@@ -82,6 +145,7 @@ bool configuration::allow_default_config_ = true;
 std::string configuration::fallback_;
 std::string configuration::environment_variable_("CHUCHO_CONFIG");
 configuration::unknown_handler_type configuration::unknown_handler_;
+extern std::atomic<bool> is_initialized;
 
 void configuration::perform()
 {
@@ -103,40 +167,18 @@ void configuration::perform()
     }
     if (fn.empty())
         fn = file_name_;
-    yaml_configurator yam;
-    if (!fn.empty() && file::exists(fn))
+    if (!fn.empty())
     {
-        std::ifstream val_in(fn.c_str());
-        if (val_in.is_open())
-        {
-            try
-            {
-                utf8::validate(val_in);
-                val_in.close();
-                std::ifstream yam_in(fn.c_str());
-                yam.configure(yam_in);
-                got_config = true;
-            }
-            catch (std::exception& e)
-            {
-                logger::remove_unused_loggers();
-                report.error("Error reading " + fn +
-                    ": " + exception::nested_whats(e));
-            }
-        }
+        if (file::exists(fn))
+            got_config = configure_from_yaml_file(fn, report);
         else
-        {
-            report.warning(fn + " exists, but I can't open it for reading");
-        }
-    }
-    else
-    {
-        report.warning("The file " + fn + " does not exist");
+            report.warning("The file " + fn + " does not exist");
     }
     if (!got_config && !fallback_.empty())
     {
         try
         {
+            yaml_configurator yam;
             // this is already validated UTF-8
             std::istringstream fb_in(fallback_);
             yam.configure(fb_in);
@@ -153,6 +195,41 @@ void configuration::perform()
     {
         set_default_config();
         report.info("Using the default configuration");
+    }
+}
+
+void configuration::reconfigure()
+{
+    if (is_initialized &&
+        style_ == style::AUTOMATIC &&
+        (!last_good_file_name.empty() || !file_name_.empty()))
+    {
+        reporter report;
+        std::string to_try = last_good_file_name.empty() ?
+            file_name_ : last_good_file_name;
+        if (file::exists(to_try))
+        {
+            auto loggers = logger::get_existing_loggers();
+            std::vector<logger_state> states;
+            for (auto lgr : loggers)
+            {
+                states.emplace_back(lgr);
+                lgr->reset();
+            }
+            if (configure_from_yaml_file(to_try, report))
+            {
+                last_good_file_name = to_try;
+            }
+            else
+            {
+                for (unsigned i = 0; i < loggers.size(); i++)
+                    states[i].restore(loggers[i]);
+            }
+        }
+        else
+        {
+            report.warning("The file " + to_try + " does not exist");
+        }
     }
 }
 

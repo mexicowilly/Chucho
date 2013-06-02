@@ -73,7 +73,8 @@ class CHUCHO_EXPORT configuration
 public:
     /**
      * The signature required for a function to handle unknown 
-     * configuration key-value pairs. 
+     * configuration key-value pairs. The first parameter to the 
+     * function is the key and the second is the value. 
      */
     typedef std::function<bool(const std::string&, const std::string&)> unknown_handler_type;
 
@@ -149,6 +150,32 @@ public:
      */
     static unknown_handler_type get_unknown_handler();
     /**
+     * Reconfigure Chucho by reading the last configuration file 
+     * again. The file read may either be the last file that was 
+     * successfully processed by Chucho, or the file named by 
+     * get_file_name(), if there is no record of a successful 
+     * configuration file. This allows a file that didn't exist 
+     * initally to be retried. 
+     *  
+     * The purpose of this method is to allow for the common use 
+     * case of wanting to update the running configuration after the
+     * configuration file has been updated. This occurs commonly in 
+     * servers, which re-read their configuration files upon 
+     * receiving SIGHUP.
+     *  
+     * If the reconfiguration fails for any reason, then the current 
+     * running configuration of Chucho is not affected. 
+     *  
+     * @pre Chucho must have already undergone its initial 
+     *      configuration, which is initiated by requesting the
+     *      first @ref logger.
+     * @note This configuration does not imply the chain of 
+     *       fallbacks that occur in initial configuration. In this
+     *       case only the last file read or the file named by
+     *       get_file_name() is tried.
+     */
+    static void reconfigure();
+    /**
      * Set whether the default configuration is allowed. In the 
      * absence of a configuration file, chucho can establish a 
      * default configuration. The default configuration conists of a 
@@ -177,6 +204,8 @@ public:
      *  
      * @pre The config text must be valid UTF-8 YAML
      * @param config the fallback configuration
+     * @throw exception if the UTF-8 is not valid
+     * @sa get_fallback
      */
     static void set_fallback(const std::string& config);
     /**
@@ -201,6 +230,12 @@ public:
      * elements in the configuration that Chucho itself does not 
      * understand. This allows the application to use the Chucho 
      * configuration for its own configurable elements. 
+     *  
+     * The unknown handler takes two arguments, both of which are 
+     * <tt>const std::string&</tt>. The first is the key and the 
+     * second is the value. The unknown handler will only be called 
+     * if what was found in the configuration can be converted to a 
+     * key-value pair. 
      * 
      * @param hndl the unknown element handler
      */
