@@ -38,23 +38,19 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                utf8_test.cpp
                yaml_configurator_test.cpp)
 TARGET_LINK_LIBRARIES(unit-test chucho gtest ${CHUCHO_THREAD_LIB})
-ADD_DEPENDENCIES(unit-test gtest-external)
 
 ADD_CUSTOM_TARGET(check
-                  COMMAND unit-test
-                  DEPENDS chucho)
+                  COMMAND unit-test)
 
 ADD_EXECUTABLE(rolling-file-test EXCLUDE_FROM_ALL
                harness.cpp
                time_rolling_file_test.cpp)
 TARGET_LINK_LIBRARIES(rolling-file-test chucho gtest)
-ADD_DEPENDENCIES(rolling-file-test gtest-external)
 
 ADD_EXECUTABLE(syslog-writer-test EXCLUDE_FROM_ALL
                harness.cpp
                syslog_writer_test.cpp)
 TARGET_LINK_LIBRARIES(syslog-writer-test chucho gtest)
-ADD_DEPENDENCIES(syslog-writer-test gtest-external)
 
 ADD_EXECUTABLE(remote-writer-test EXCLUDE_FROM_ALL
                remote_writer_test.cpp)

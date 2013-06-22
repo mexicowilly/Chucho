@@ -287,6 +287,7 @@ ELSE()
                              COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/libgtest_main.a <INSTALL_DIR>/lib
                              DEPENDEES install-headers)
     ADD_LIBRARY(gtest STATIC IMPORTED)
+    ADD_DEPENDENCIES(gtest gtest-external)
     SET_TARGET_PROPERTIES(gtest PROPERTIES
                           IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/libgtest.a")
 ENDIF()
