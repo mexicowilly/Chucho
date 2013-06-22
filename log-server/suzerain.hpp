@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_SUZERAIN_HPP__)
 #define CHUCHO_SUZERAIN_HPP__
 
-#include "socket_reader.hpp"
+#include "socket_listener.hpp"
 #include "properties.hpp"
 #include "vassals.hpp"
 #include "selector.hpp"
@@ -36,7 +36,7 @@ namespace server
 class suzerain
 {
 public:
-    suzerain(const properties& props);
+    suzerain(properties& props);
     suzerain(const suzerain&) = delete;
     ~suzerain();
 
@@ -46,12 +46,15 @@ public:
 
 private:
     void process_events(std::shared_ptr<socket_reader> reader);
+    void sighup_handler();
     void was_selected(std::shared_ptr<socket_reader> reader);
 
     std::shared_ptr<chucho::logger> logger_;
     std::unique_ptr<vassals> vassals_;
     std::unique_ptr<selector> selector_;
-    properties props_;
+    std::unique_ptr<socket_listener> listener_;
+    properties& props_;
+    std::mutex listener_guard_;
     #if defined(CHUCHOD_VELOCITY)
     std::chrono::steady_clock::time_point first_seen_;
     std::chrono::steady_clock::time_point last_processed_;

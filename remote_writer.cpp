@@ -88,7 +88,7 @@ void remote_writer::write_impl(const event& evt)
     }
     else
     {
-        if (unsent_events_.size() == 0)
+        if (unsent_events_.empty())
             report_info("The connection has been lost, so as many as " + std::to_string(unsent_cache_max_) + " events will be cached");
         unsent_events_.push_back(evt);
         if (unsent_events_.size() > unsent_cache_max_)

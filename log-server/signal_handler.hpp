@@ -17,6 +17,8 @@
 #if !defined(CHUCHO_SIGNAL_HANDLER_HPP__)
 #define CHUCHO_SIGNAL_HANDLER_HPP__
 
+#include <functional>
+
 namespace chucho
 {
 
@@ -26,7 +28,7 @@ namespace server
 namespace signal_handler
 {
 
-void install();
+void install(std::function<void()> hup_handler);
 
 }
 

@@ -19,6 +19,13 @@
 #include <chucho/logger.hpp>
 #include <sstream>
 
+namespace
+{
+
+const std::size_t DEFAULT_VASSAL_COUNT(3);
+
+}
+
 namespace chucho
 {
 
@@ -29,7 +36,7 @@ std::ostream& operator<< (std::ostream& stream, properties& props)
 {
     stream << "Properties:\n";
     stream << "  - console mode: " << std::boolalpha << props.console_mode() << '\n';
-    stream << "  - log level: " << *chucho::logger::get("chuchod")->get_level() << '\n';
+    stream << "  - chuchod log level: " << *chucho::logger::get("chuchod")->get_level() << '\n';
     stream << "  - port: " << props.port() << '\n';
     stream << "  - version: " << CHUCHO_VERSION << '\n';
     stream << "  - worker threads: " << props.vassal_count();
@@ -37,7 +44,7 @@ std::ostream& operator<< (std::ostream& stream, properties& props)
 }
 
 properties::properties()
-    : vassal_count_(3),
+    : vassal_count_(DEFAULT_VASSAL_COUNT),
       port_(chucho::remote_writer::DEFAULT_PORT),
       console_mode_(false)
 {

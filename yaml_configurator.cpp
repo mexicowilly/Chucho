@@ -53,7 +53,7 @@ void yaml_configurator::configure(std::istream& in)
     YAML::Node doc;
     while (prs.GetNextDocument(doc))
     {
-        for (YAML::Iterator i = doc.begin(); i != doc.end(); i++)
+        for (YAML::Iterator i = doc.begin(); i != doc.end(); ++i)
         {
             bool is_map = false;
             try
@@ -115,7 +115,7 @@ void yaml_configurator::configure(std::istream& in)
 std::map<std::string, std::string> yaml_configurator::extract_variables(const YAML::Node& n)
 {
     std::map<std::string, std::string> result;
-    for (YAML::Iterator i = n.begin(); i != n.end(); i++)
+    for (YAML::Iterator i = n.begin(); i != n.end(); ++i)
     {
         if (n.Type() == YAML::NodeType::Sequence &&
             i->Type() != YAML::NodeType::Map)
@@ -156,7 +156,7 @@ void yaml_configurator::handle(const std::string& key,
         }
         else
         {
-            for (YAML::Iterator i = n.begin(); i != n.end(); i++)
+            for (YAML::Iterator i = n.begin(); i != n.end(); ++i)
             {
                 if (n.Type() == YAML::NodeType::Sequence)
                 {

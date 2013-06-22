@@ -199,7 +199,7 @@ void socket_connector::write(const std::uint8_t* buf, std::size_t length)
 {
     if (socket_ != -1)
     {
-        sigpipe_suppressor();
+        sigpipe_suppressor sup;
         std::size_t remaining = length;
         while (remaining > 0)
         {

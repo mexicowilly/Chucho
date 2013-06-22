@@ -16,7 +16,6 @@
 
 #include <chucho/configuration.hpp>
 #include <chucho/file.hpp>
-#include <chucho/status_reporter.hpp>
 #include <chucho/yaml_configurator.hpp>
 #include <chucho/utf8.hpp>
 #include <chucho/exception.hpp>
@@ -36,8 +35,6 @@ extern std::shared_ptr<chucho::logger> root_logger;
 
 namespace
 {
-
-std::string last_good_file_name;
 
 // Not to be confused with the logger_memento class that can only be
 // used during configuration. This struct is like a GoF memento in
@@ -72,57 +69,6 @@ private:
     bool writes_to_ancestors_;
 };
 
-class reporter : public chucho::status_reporter
-{
-public:
-    reporter()
-    {
-        set_status_origin("configuration");
-    }
-
-    void error(const std::string& message, std::exception_ptr ex = std::exception_ptr()) const
-    {
-        report_error(message, ex);
-    }
-
-    void info(const std::string& message, std::exception_ptr ex = std::exception_ptr()) const
-    {
-        report_info(message, ex);
-    }
-
-    void warning(const std::string& message, std::exception_ptr ex = std::exception_ptr()) const
-    {
-        report_warning(message, ex);
-    }
-};
-
-bool configure_from_yaml_file(const std::string& file_name, reporter& report)
-{
-    std::ifstream val_in(file_name.c_str());
-    if (val_in.is_open())
-    {
-        try
-        {
-            chucho::utf8::validate(val_in);
-            val_in.close();
-            std::ifstream yam_in(file_name.c_str());
-            chucho::yaml_configurator yam;
-            yam.configure(yam_in);
-            return true;
-        }
-        catch (std::exception& e)
-        {
-            report.error("Error reading " + file_name +
-                ": " + chucho::exception::nested_whats(e));
-        }
-    }
-    else
-    {
-        report.warning(file_name + " exists, but I can't open it for reading");
-    }
-    return false;
-}
-
 void set_default_config()
 {
     if (chucho::root_logger->get_writers().empty())
@@ -145,7 +91,36 @@ bool configuration::allow_default_config_ = true;
 std::string configuration::fallback_;
 std::string configuration::environment_variable_("CHUCHO_CONFIG");
 configuration::unknown_handler_type configuration::unknown_handler_;
+std::string configuration::loaded_file_name_;
 extern std::atomic<bool> is_initialized;
+
+bool configuration::configure_from_yaml_file(const std::string& file_name, reporter& report)
+{
+    std::ifstream val_in(file_name.c_str());
+    if (val_in.is_open())
+    {
+        try
+        {
+            chucho::utf8::validate(val_in);
+            val_in.close();
+            std::ifstream yam_in(file_name.c_str());
+            chucho::yaml_configurator yam;
+            yam.configure(yam_in);
+            loaded_file_name_ = file_name;
+            return true;
+        }
+        catch (std::exception& e)
+        {
+            report.error("Error reading " + file_name +
+                ": " + chucho::exception::nested_whats(e));
+        }
+    }
+    else
+    {
+        report.warning(file_name + " exists, but I can't open it for reading");
+    }
+    return false;
+}
 
 void configuration::perform()
 {
@@ -172,8 +147,8 @@ void configuration::perform()
         if (file::exists(fn))
         {
             got_config = configure_from_yaml_file(fn, report);
-            if (got_config)
-                last_good_file_name = fn;
+            if (!got_config)
+                logger::remove_unused_loggers();
         }
         else
         {
@@ -204,15 +179,16 @@ void configuration::perform()
     }
 }
 
-void configuration::reconfigure()
+bool configuration::reconfigure()
 {
+    bool result = false;
     if (is_initialized &&
         style_ == style::AUTOMATIC &&
-        (!last_good_file_name.empty() || !file_name_.empty()))
+        (!loaded_file_name_.empty() || !file_name_.empty()))
     {
         reporter report;
-        std::string to_try = last_good_file_name.empty() ?
-            file_name_ : last_good_file_name;
+        std::string to_try = loaded_file_name_.empty() ?
+            file_name_ : loaded_file_name_;
         if (file::exists(to_try))
         {
             auto loggers = logger::get_existing_loggers();
@@ -224,7 +200,7 @@ void configuration::reconfigure()
             }
             if (configure_from_yaml_file(to_try, report))
             {
-                last_good_file_name = to_try;
+                result = true;
             }
             else
             {
@@ -237,6 +213,7 @@ void configuration::reconfigure()
             report.warning("The file " + to_try + " does not exist");
         }
     }
+    return result;
 }
 
 void configuration::set_fallback(const std::string& config)

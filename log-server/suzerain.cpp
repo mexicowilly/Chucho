@@ -23,6 +23,7 @@
 #include <chucho/log.hpp>
 #include <chucho/event.hpp>
 #include <chucho/optional.hpp>
+#include <chucho/configuration.hpp>
 #include <yaml-cpp/yaml.h>
 #include <sstream>
 #if defined(CHUCHO_HAVE_ARPA_INET_H)
@@ -182,7 +183,7 @@ namespace chucho
 namespace server
 {
 
-suzerain::suzerain(const properties& props)
+suzerain::suzerain(properties& props)
     : logger_(chucho::logger::get("chuchod.suzerain")),
       props_(props)
       #if defined(CHUCHOD_VELOCITY)
@@ -272,42 +273,46 @@ void suzerain::process_events(std::shared_ptr<socket_reader> reader)
 void suzerain::run()
 {
     single_instance::ensure();
-    signal_handler::install();
+    signal_handler::install(std::bind(&suzerain::sighup_handler, this));
     vassals_.reset(new vassals(props_.vassal_count(),
                                std::bind(&suzerain::process_events, this, std::placeholders::_1)));
     selector_.reset(new selector(std::bind(&suzerain::was_selected, this, std::placeholders::_1)));
-    std::unique_ptr<socket_listener> lstn;
     try
     {
-        lstn.reset(new socket_listener(props_.port()));
+        listener_.reset(new socket_listener(props_.port()));
     }
     catch (std::exception& e)
     {
         CHUCHO_ERROR(logger_, "Unable to create a listener socket: " << e.what());
+        is_shut_down = true;
+        single_instance::release();
         return;
     }
     try
     {
         while (!is_shut_down)
         {
-            std::shared_ptr<socket_reader> reader = lstn->accept();
-            selector_->add(reader);
-            CHUCHO_INFO(logger_, "Accepted new connection from " << reader->get_full_host());
+            try
+            {
+                std::shared_ptr<socket_reader> reader = listener_->accept();
+                selector_->add(reader);
+                CHUCHO_INFO(logger_, "Accepted new connection from " << reader->get_full_host());
+            }
+            catch (eof_exception&)
+            {
+                std::lock_guard<std::mutex> lg(listener_guard_);
+                CHUCHO_INFO_STR(logger_, "Resuming connection acceptance");
+            }
         }
         CHUCHO_INFO_STR(logger_, "The listener has been shut down");
     }
-    catch (shutdown_exception& se)
+    catch (shutdown_exception&)
     {
         CHUCHO_INFO_STR(logger_, "The listener has been shut down");
-    }
-    catch (eof_exception&)
-    {
-        CHUCHO_ERROR_STR(logger_, "The listener socket has unexpectedly closed");
     }
     catch (std::exception& e)
     {
         CHUCHO_ERROR(logger_, "An unexpected exception has occurred: " << e.what());
-
     }
     // Defect #86.
     // Order is important here. When selector has a hit, then it passes a reader
@@ -316,10 +321,47 @@ void suzerain::run()
     // The fix is to stop the vasslas without destroying the object, then to destroy
     // the selector, then to destory the vassals. This cleanly breaks the
     // dependency chain.
+    listener_.reset();
     vassals_->stop();
     selector_.reset();
     vassals_.reset();
     single_instance::release();
+}
+
+void suzerain::sighup_handler()
+{
+    properties old_props(props_);
+    vassals_->stop();
+    selector_->stop();
+    if (chucho::configuration::reconfigure())
+    {
+        try
+        {
+            std::lock_guard<std::mutex> lg(listener_guard_);
+            if (old_props.port() != props_.port())
+            {
+                listener_.reset(new socket_listener(props_.port()));
+                CHUCHO_INFO(logger_, "The listener socket has been reset to listen on port " << props_.port());
+            }
+        }
+        catch (std::exception& e)
+        {
+            CHUCHO_ERROR(logger_, "Unable to create a listener socket: " << e.what());
+            is_shut_down = true;
+            return;
+        }
+        if (!chucho::configuration::get_loaded_file_name().empty())
+        {
+            CHUCHO_INFO(logger_, "Reread the configuration from " + chucho::configuration::get_loaded_file_name());
+            CHUCHO_INFO(logger_, props_);
+        }
+    }
+    else
+    {
+        props_ = old_props;
+    }
+    selector_->start();
+    vassals_->start(props_.vassal_count());
 }
 
 void suzerain::was_selected(std::shared_ptr<socket_reader> reader)

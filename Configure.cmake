@@ -242,6 +242,9 @@ ENDIF()
 # doxygen
 FIND_PACKAGE(Doxygen)
 
+# cppcheck
+FIND_PROGRAM(CHUCHO_CPPCHECK cppcheck)
+
 #
 # External projects
 #
@@ -287,4 +290,6 @@ ELSE()
     SET_TARGET_PROPERTIES(gtest PROPERTIES
                           IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/libgtest.a")
 ENDIF()
+SET_TARGET_PROPERTIES(gtest-external PROPERTIES
+                      EXCLUDE_FROM_ALL TRUE)
 ADD_DEPENDENCIES(external gtest-external)

@@ -26,10 +26,9 @@ namespace server
 vassals::vassals(std::size_t count, std::function<void(std::shared_ptr<socket_reader>)> processor)
     : processor_(processor),
       logger_(chucho::logger::get("chuchod.vassals")),
-      count_(count),
       stop_(false)
 {
-    start();
+    start(count);
 }
 
 vassals::~vassals()
@@ -37,13 +36,13 @@ vassals::~vassals()
     stop();
 }
 
-void vassals::start()
+void vassals::start(std::size_t count)
 {
     if (vassals_.empty())
     {
-        for (std::size_t i = 0; i < count_; i++)
+        for (std::size_t i = 0; i < count; i++)
             vassals_.emplace_back(std::bind(&vassals::work, this));
-        CHUCHO_INFO(logger_, "Started " << count_ << " worker threads");
+        CHUCHO_INFO(logger_, "Started " << count << " worker threads");
     }
 }
 
@@ -57,8 +56,8 @@ void vassals::stop()
         guard_.unlock();
         for (std::thread& t : vassals_)
             t.join();
+        CHUCHO_INFO(logger_, "Joined " << vassals_.size() << " worker threads");
         vassals_.clear();
-        CHUCHO_INFO(logger_, "Joined " << count_ << " worker threads");
     }
 }
 

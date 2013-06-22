@@ -45,7 +45,8 @@ expression::~expression()
 }
 
 iterator::iterator()
-    : re_(nullptr)
+    : re_(nullptr),
+      offset_(0)
 {
 }
 

@@ -18,6 +18,7 @@
 #define CHUCHO_CONFIGURATION_HPP__
 
 #include <chucho/export.hpp>
+#include <chucho/status_reporter.hpp>
 #include <string>
 #include <functional>
 
@@ -132,6 +133,7 @@ public:
      * @return the configuration file name
      */
     static const std::string& get_file_name();
+    static const std::string& get_loaded_file_name();
     /**
      * Return the configuration style. AUTOMATIC is the default 
      * style. 
@@ -173,8 +175,10 @@ public:
      *       fallbacks that occur in initial configuration. In this
      *       case only the last file read or the file named by
      *       get_file_name() is tried.
+     * @return true if the configuration was performed successfully,
+     *         false otherwise
      */
-    static void reconfigure();
+    static bool reconfigure();
     /**
      * Set whether the default configuration is allowed. In the 
      * absence of a configuration file, chucho can establish a 
@@ -245,7 +249,18 @@ protected:
     friend class logger;
 
 private:
-    static void perform();
+    class reporter : public chucho::status_reporter
+    {
+    public:
+        reporter();
+
+        void error(const std::string& message, std::exception_ptr ex = std::exception_ptr()) const;
+        void info(const std::string& message, std::exception_ptr ex = std::exception_ptr()) const;
+        void warning(const std::string& message, std::exception_ptr ex = std::exception_ptr()) const;
+    };
+
+    CHUCHO_NO_EXPORT static bool configure_from_yaml_file(const std::string& file_name, reporter& report);
+    CHUCHO_NO_EXPORT static void perform();
 
     static style style_;
     static std::string file_name_;
@@ -253,6 +268,7 @@ private:
     static std::string fallback_;
     static std::string environment_variable_;
     static unknown_handler_type unknown_handler_;
+    static std::string loaded_file_name_;
 };
 
 inline bool configuration::allow_default()
@@ -273,6 +289,11 @@ inline const std::string& configuration::get_fallback()
 inline const std::string& configuration::get_file_name()
 {
     return file_name_;
+}
+
+inline const std::string& configuration::get_loaded_file_name()
+{
+    return loaded_file_name_;
 }
 
 inline configuration::style configuration::get_style()
@@ -308,6 +329,26 @@ inline void configuration::set_style(style stl)
 inline void configuration::set_unknown_handler(unknown_handler_type hndl)
 {
     unknown_handler_ = hndl;
+}
+
+inline configuration::reporter::reporter()
+{
+    set_status_origin("configuration");
+}
+
+inline void configuration::reporter::error(const std::string& message, std::exception_ptr ex) const
+{
+    report_error(message, ex);
+}
+
+inline void configuration::reporter::info(const std::string& message, std::exception_ptr ex) const
+{
+    report_info(message, ex);
+}
+
+inline void configuration::reporter::warning(const std::string& message, std::exception_ptr ex) const
+{
+    report_warning(message, ex);
 }
 
 }

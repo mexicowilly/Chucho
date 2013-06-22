@@ -55,7 +55,7 @@ std::size_t find_time_token(const std::string& str, char tok, std::size_t pos = 
 namespace chucho
 {
 
-time_file_roller::time_file_roller(const std::string file_name_pattern,
+time_file_roller::time_file_roller(const std::string& file_name_pattern,
                                    std::size_t max_history)
     : max_history_(max_history),
       file_name_pattern_(file_name_pattern)

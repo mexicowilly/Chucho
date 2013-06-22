@@ -105,7 +105,7 @@ void abort_handler(int sig)
     raise(sig);
 }
 
-void sigwait_main()
+void sigwait_main(std::function<void()> hup_handler)
 {
     sigset_t signals;
     sigemptyset(&signals);
@@ -118,6 +118,8 @@ void sigwait_main()
         log_signal(rec);
         if (std::find(DEADLY_ASYNC.begin(), DEADLY_ASYNC.end(), rec) != DEADLY_ASYNC.end())
             chucho::server::is_shut_down = true;
+        else if (rec == SIGHUP && hup_handler)
+            hup_handler();
         sigaddset(&signals, rec);
     }
 }
@@ -133,14 +135,14 @@ namespace server
 namespace signal_handler
 {
 
-void install()
+void install(std::function<void()> hup_handler)
 {
     sigset_t blocked;
     sigemptyset(&blocked);
     for (int i : ASYNC)
         sigaddset(&blocked, i);
     pthread_sigmask(SIG_BLOCK, &blocked, 0);
-    std::thread wait(sigwait_main);
+    std::thread wait(sigwait_main, hup_handler);
     wait.detach();
     struct sigaction action;
     std::memset(&action, 0, sizeof(action));

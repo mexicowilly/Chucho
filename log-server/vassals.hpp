@@ -39,7 +39,7 @@ public:
 
     vassals& operator= (const vassals&) = delete;
 
-    void start();
+    void start(std::size_t count);
     void stop();
     void submit(std::shared_ptr<socket_reader> reader);
 
@@ -52,7 +52,6 @@ private:
     std::condition_variable condition_;
     std::function<void(std::shared_ptr<socket_reader>)> processor_;
     std::shared_ptr<chucho::logger> logger_;
-    std::size_t count_;
     bool stop_;
 };
 

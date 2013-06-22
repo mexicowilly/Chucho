@@ -19,6 +19,7 @@
 
 #include "socket_reader.hpp"
 #include <chucho/logger.hpp>
+#include <atomic>
 
 namespace chucho
 {
@@ -40,6 +41,7 @@ public:
 private:
     int socket_;
     std::shared_ptr<chucho::logger> logger_;
+    std::atomic<bool> stop_;
 };
 
 }

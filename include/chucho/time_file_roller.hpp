@@ -78,7 +78,7 @@ public:
      * @param max_history the maximum number of files to be retained 
      *                    in the rolling history
      */
-    time_file_roller(const std::string file_name_pattern,
+    time_file_roller(const std::string& file_name_pattern,
                      std::size_t max_history);
     //@}
 

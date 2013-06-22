@@ -35,7 +35,8 @@ namespace server
 
 socket_listener::socket_listener(std::uint16_t port)
     : socket_(-1),
-      logger_(chucho::logger::get("chuchod.socket_listener"))
+      logger_(chucho::logger::get("chuchod.socket_listener")),
+      stop_(false)
 {
     struct addrinfo hints;
     std::memset(&hints, 0, sizeof(hints));
@@ -88,10 +89,18 @@ socket_listener::socket_listener(std::uint16_t port)
 
 socket_listener::~socket_listener()
 {
-    if (socket_ != -1)
+    // This can throw when the listener is reset during SIGHUP
+    try
     {
-        shutdown(socket_, SHUT_RDWR);
-        close(socket_);
+        if (socket_ != -1)
+        {
+            shutdown(socket_, SHUT_RDWR);
+            close(socket_);
+        }
+    }
+    catch (exception& e)
+    {
+        CHUCHO_ERROR(logger_, "Error shutting down the listener: " << e.what());
     }
 }
 
