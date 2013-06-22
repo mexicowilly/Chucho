@@ -105,6 +105,7 @@ public:
      * @return the status level
      */
     status::level get_level();
+    void print(std::ostream& stream, status::level min_level);
     /**
      * Remove an observer.
      * 

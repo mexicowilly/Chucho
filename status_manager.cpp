@@ -136,6 +136,21 @@ status::level status_manager::get_level()
     return level_;
 }
 
+void status_manager::print(std::ostream& stream, status::level min_level)
+{
+    std::lock_guard<std::mutex> lg(cache_guard_);
+    for (const status& st : head_cache_)
+    {
+        if (st.get_level() >= min_level)
+            stream << st << '\n';
+    }
+    for (const status& st : tail_cache_)
+    {
+        if (st.get_level() >= min_level)
+            stream << st << '\n';
+    }
+}
+
 void status_manager::remove(std::shared_ptr<status_observer> obs)
 {
     std::lock_guard<std::mutex> lg(observer_guard_);
