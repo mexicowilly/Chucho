@@ -133,6 +133,12 @@ public:
      * @return the configuration file name
      */
     static const std::string& get_file_name();
+    /**
+     * Return the name of the last file that was successfully loaded 
+     * for Chucho configuration. 
+     * 
+     * @return the loaded file name
+     */
     static const std::string& get_loaded_file_name();
     /**
      * Return the configuration style. AUTOMATIC is the default 

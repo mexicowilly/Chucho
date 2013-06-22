@@ -105,6 +105,21 @@ public:
      * @return the status level
      */
     status::level get_level();
+    /**
+     * Print the selected status entries to stream. Only entries 
+     * with a level greater than or equal to the indicated minimum 
+     * level will be printed. Each entry is followed by a platform 
+     * appropriate line ending. 
+     *  
+     * For example, to print only errors and warnings to stdout, the
+     * following code could be used. 
+     * @code 
+     * chucho::status_manager::get()->print(std::cout, chucho::status::level::WARNING); 
+     * @endcode 
+     * 
+     * @param stream the stream to which to print the entries
+     * @param min_level the minimum status level to print
+     */
     void print(std::ostream& stream, status::level min_level);
     /**
      * Remove an observer.
