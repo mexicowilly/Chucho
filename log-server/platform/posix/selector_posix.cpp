@@ -41,8 +41,10 @@ void selector::main()
             fds[i].fd = r.second->get_socket();
             fds[i].events = POLLIN;
             fds[i].revents = 0;
+            i++;
         }
         lock.unlock();
+        CHUCHO_DEBUG(logger_, "Polling " << fds.size() << " sockets");
         int num = poll(&fds[0], fds.size(), 500);
         if (num > 0)
         {

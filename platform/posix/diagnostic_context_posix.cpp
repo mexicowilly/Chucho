@@ -82,7 +82,7 @@ void diagnostic_context::clear()
 
 bool diagnostic_context::empty()
 {
-    return get().empty();
+    return get_map().empty();
 }
 
 void diagnostic_context::erase(const std::string& key)

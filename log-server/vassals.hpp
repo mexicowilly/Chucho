@@ -23,6 +23,7 @@
 #include <thread>
 #include <vector>
 #include <queue>
+#include <list>
 
 namespace chucho
 {
@@ -44,15 +45,42 @@ public:
     void submit(std::shared_ptr<socket_reader> reader);
 
 private:
-    void work();
+    class worker_queue : public std::thread
+    {
+    public:
+        worker_queue(std::function<void(std::shared_ptr<socket_reader>)> processor);
+        worker_queue(const worker_queue&) = delete;
 
-    std::vector<std::thread> vassals_;
-    std::queue<std::shared_ptr<socket_reader>> readers_;
-    std::mutex guard_;
-    std::condition_variable condition_;
+        worker_queue& operator= (const worker_queue&) = delete;
+
+        void add(std::shared_ptr<socket_reader> reader);
+        std::list<std::weak_ptr<socket_reader>> remove_all_readers();
+        // returns the number of readers left
+        std::size_t remove_unused_readers();
+        std::size_t get_reader_count();
+        bool is_mine(std::shared_ptr<socket_reader> reader);
+        void stop();
+        void submit_for_reading(std::shared_ptr<socket_reader> reader);
+
+    private:
+        void work();
+
+        std::unique_ptr<std::thread> thread_;
+        std::queue<std::shared_ptr<socket_reader>> readers_with_work_;
+        std::list<std::weak_ptr<socket_reader>> my_readers_;
+        std::mutex guard_;
+        std::condition_variable condition_;
+        std::function<void(std::shared_ptr<socket_reader>)> processor_;
+        std::shared_ptr<chucho::logger> logger_;
+        bool stop_;
+    };
+
+    void redistribute_load();
+
+    std::vector<std::unique_ptr<worker_queue>> vassals_;
     std::function<void(std::shared_ptr<socket_reader>)> processor_;
     std::shared_ptr<chucho::logger> logger_;
-    bool stop_;
+    std::chrono::steady_clock::time_point next_redistribution_;
 };
 
 }
