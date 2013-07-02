@@ -16,6 +16,7 @@
 
 #include <chucho/level.hpp>
 #include <chucho/exception.hpp>
+#include <chucho/garbage_cleaner.hpp>
 #include <limits>
 #include <set>
 #include <algorithm>
@@ -185,40 +186,87 @@ int off::get_value() const
     return std::numeric_limits<int>::max();
 }
 
-std::string to_upper(const std::string& text)
+struct levels
 {
-    static std::locale c_loc("C");
+    class shared_level_name_less
+    {
+    public:
+        shared_level_name_less(levels& l);
 
+        bool operator() (std::shared_ptr<chucho::level> lvl_one,
+                         std::shared_ptr<chucho::level> lvl_two) const;
+
+    private:
+        levels& lvls_;
+    };
+
+    levels();
+
+    std::string to_upper(const std::string& text);
+    
+    std::shared_ptr<chucho::level> TRACE;
+    std::shared_ptr<chucho::level> DEBUG;
+    std::shared_ptr<chucho::level> INFO;
+    std::shared_ptr<chucho::level> WARN;
+    std::shared_ptr<chucho::level> ERROR;
+    std::shared_ptr<chucho::level> FATAL;
+    std::shared_ptr<chucho::level> OFF;
+    std::mutex guard_;
+    std::locale c_loc_;
+    std::set<std::shared_ptr<chucho::level>, shared_level_name_less> all_levels_;
+};
+
+levels::levels()
+    : TRACE(new trace()),
+      DEBUG(new debug()),
+      INFO(new info()),
+      WARN(new warn()),
+      ERROR(new error()),
+      FATAL(new fatal()),
+      OFF(new off()),
+      c_loc_("C"),
+      all_levels_(shared_level_name_less(*this))
+{
+    all_levels_.insert(TRACE);
+    all_levels_.insert(DEBUG);
+    all_levels_.insert(INFO);
+    all_levels_.insert(WARN);
+    all_levels_.insert(ERROR);
+    all_levels_.insert(FATAL);
+    all_levels_.insert(OFF);
+    chucho::garbage_cleaner::get().add([this] () { delete this; });
+}
+
+std::string levels::to_upper(const std::string& text)
+{
     std::string up;
     std::transform(text.begin(),
                    text.end(),
                    std::back_inserter(up),
-                   [&] (char c) { return std::toupper(c, c_loc); });
+                   [this] (char c) { return std::toupper(c, c_loc_); });
     return up;
 }
 
-bool shared_level_name_less(std::shared_ptr<chucho::level> l1,
-                            std::shared_ptr<chucho::level> l2)
+levels::shared_level_name_less::shared_level_name_less(levels& l)
+    : lvls_(l)
 {
-    std::string up1 = to_upper(l1->get_name());
-    std::string up2 = to_upper(l2->get_name());
-    return up1 < up2;
 }
 
-std::once_flag lvls_once;
-std::mutex lvls_guard;
-std::set<std::shared_ptr<chucho::level>, std::function<bool(std::shared_ptr<chucho::level>, std::shared_ptr<chucho::level>)>>
-    lvls(shared_level_name_less);
-
-void initialize_lvls()
+bool levels::shared_level_name_less::operator() (std::shared_ptr<chucho::level> lvl_one,
+                                                 std::shared_ptr<chucho::level> lvl_two) const
 {
-    lvls.insert(chucho::level::TRACE);
-    lvls.insert(chucho::level::DEBUG);
-    lvls.insert(chucho::level::INFO);
-    lvls.insert(chucho::level::WARN);
-    lvls.insert(chucho::level::ERROR);
-    lvls.insert(chucho::level::FATAL);
-    lvls.insert(chucho::level::OFF);
+    return lvls_.to_upper(lvl_one->get_name()) < lvls_.to_upper(lvl_two->get_name());
+}
+
+std::once_flag once;
+
+levels& lvls()
+{
+    // This gets cleaned in finalize()
+    static levels* ls;
+
+    std::call_once(once, [&] () { ls = new levels(); });
+    return *ls;
 }
 
 }
@@ -226,13 +274,40 @@ void initialize_lvls()
 namespace chucho
 {
 
-std::shared_ptr<level> level::TRACE(new trace());
-std::shared_ptr<level> level::DEBUG(new debug());
-std::shared_ptr<level> level::INFO(new info());
-std::shared_ptr<level> level::WARN(new warn());
-std::shared_ptr<level> level::ERROR(new error());
-std::shared_ptr<level> level::FATAL(new fatal());
-std::shared_ptr<level> level::OFF(new off());
+std::shared_ptr<level> level::TRACE()
+{
+    return lvls().TRACE;
+}
+
+std::shared_ptr<level> level::DEBUG()
+{
+    return lvls().DEBUG;
+}
+
+std::shared_ptr<level> level::INFO()
+{
+    return lvls().INFO;
+}
+
+std::shared_ptr<level> level::WARN()
+{
+    return lvls().WARN;
+}
+
+std::shared_ptr<level> level::ERROR()
+{
+    return lvls().ERROR;
+}
+
+std::shared_ptr<level> level::FATAL()
+{
+    return lvls().FATAL;
+}
+
+std::shared_ptr<level> level::OFF()
+{
+    return lvls().OFF;
+}
 
 std::ostream& operator<< (std::ostream& stream, const level& lvl)
 {
@@ -246,20 +321,20 @@ level::~level()
 
 bool level::add(std::shared_ptr<level> lvl)
 {
-    std::lock_guard<std::mutex> guard(lvls_guard);
-    std::call_once(lvls_once, initialize_lvls);
-    return lvls.insert(lvl).second;
+    levels& l(lvls());
+    std::lock_guard<std::mutex> guard(l.guard_);
+    return l.all_levels_.insert(lvl).second;
 }
 
 std::shared_ptr<level> level::from_text(const std::string& text)
 {
-    std::lock_guard<std::mutex> guard(lvls_guard);
-    std::call_once(lvls_once, initialize_lvls);
-    std::string up = to_upper(text);
-    auto found = std::find_if(lvls.begin(),
-                              lvls.end(),
-                              [&] (std::shared_ptr<level> lvl) { return to_upper(lvl->get_name()) == up; });
-    if (found == lvls.end())
+    levels& l(lvls());
+    std::lock_guard<std::mutex> guard(l.guard_);
+    std::string up = l.to_upper(text);
+    auto found = std::find_if(l.all_levels_.begin(),
+                              l.all_levels_.end(),
+                              [&] (std::shared_ptr<level> lvl) { return l.to_upper(lvl->get_name()) == up; });
+    if (found == l.all_levels_.end())
         throw exception("The text " + text + " does not describe a valid log level");
     return *found;
 }

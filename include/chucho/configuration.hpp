@@ -25,6 +25,8 @@
 namespace chucho
 {
 
+class logger;
+
 /**
  * @class configuration configuration.hpp chucho/configuration.hpp 
  * Configuration normally happens automatically when the first
@@ -266,76 +268,8 @@ private:
     };
 
     CHUCHO_NO_EXPORT static bool configure_from_yaml_file(const std::string& file_name, reporter& report);
-    CHUCHO_NO_EXPORT static void perform();
-
-    static style style_;
-    static std::string file_name_;
-    static bool allow_default_config_;
-    static std::string fallback_;
-    static std::string environment_variable_;
-    static unknown_handler_type unknown_handler_;
-    static std::string loaded_file_name_;
+    CHUCHO_NO_EXPORT static void perform(std::shared_ptr<logger> root_logger);
 };
-
-inline bool configuration::allow_default()
-{
-    return allow_default_config_;
-}
-
-inline const std::string& configuration::get_environment_variable()
-{
-    return environment_variable_;
-}
-
-inline const std::string& configuration::get_fallback()
-{
-    return fallback_;
-}
-
-inline const std::string& configuration::get_file_name()
-{
-    return file_name_;
-}
-
-inline const std::string& configuration::get_loaded_file_name()
-{
-    return loaded_file_name_;
-}
-
-inline configuration::style configuration::get_style()
-{
-    return style_;
-}
-
-inline configuration::unknown_handler_type configuration::get_unknown_handler()
-{
-    return unknown_handler_;
-}
-
-inline void configuration::set_allow_default(bool allow)
-{
-    allow_default_config_ = allow;
-}
-
-inline void configuration::set_environment_variable(const std::string& var)
-{
-    environment_variable_ = var;
-}
-
-inline void configuration::set_file_name(const std::string& name)
-{
-    file_name_ = name;
-}
-
-inline void configuration::set_style(style stl)
-{
-    style_ = stl;
-}
-
-inline void configuration::set_unknown_handler(unknown_handler_type hndl)
-{
-    unknown_handler_ = hndl;
-}
 
 inline configuration::reporter::reporter()
 {

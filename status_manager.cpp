@@ -15,6 +15,7 @@
  */
 
 #include <chucho/status_manager.hpp>
+#include <chucho/garbage_cleaner.hpp>
 #include <algorithm>
 #include <iostream>
 
@@ -39,6 +40,30 @@ void warn_error_status_observer::status_reported(const chucho::status& st)
 {
     if (st.get_level() > chucho::status::level::INFO)
         std::cout << st << std::endl;
+}
+
+struct smgr_wrapper
+{
+    smgr_wrapper();
+
+    std::shared_ptr<chucho::status_manager> smgr;
+};
+
+smgr_wrapper::smgr_wrapper()
+    : smgr(new chucho::status_manager())
+{
+    chucho::garbage_cleaner::get().add([this] () { delete this; });
+}
+
+std::once_flag once;
+
+smgr_wrapper& wrap()
+{
+    // This gets cleaned in finalize()
+    static smgr_wrapper* wrp;
+
+    std::call_once(once, [&] () { wrp = new smgr_wrapper(); });
+    return *wrp;
 }
 
 }
@@ -111,9 +136,7 @@ void status_manager::clear()
 
 std::shared_ptr<status_manager> status_manager::get()
 {
-    static std::shared_ptr<status_manager> smgr(new status_manager());
-
-    return smgr;
+    return wrap().smgr;
 }
 
 std::vector<status> status_manager::get_all()

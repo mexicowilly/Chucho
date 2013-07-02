@@ -42,12 +42,12 @@ private:
 
 TEST_F(level_filter_test, evaluate)
 {
-    chucho::level_filter f(chucho::level::ERROR, chucho::filter::result::ACCEPT, chucho::filter::result::DENY);
-    EXPECT_EQ(chucho::filter::result::DENY, f.evaluate(get_event(chucho::level::TRACE)));
-    EXPECT_EQ(chucho::filter::result::DENY, f.evaluate(get_event(chucho::level::DEBUG)));
-    EXPECT_EQ(chucho::filter::result::DENY, f.evaluate(get_event(chucho::level::INFO)));
-    EXPECT_EQ(chucho::filter::result::DENY, f.evaluate(get_event(chucho::level::WARN)));
-    EXPECT_EQ(chucho::filter::result::ACCEPT, f.evaluate(get_event(chucho::level::ERROR)));
-    EXPECT_EQ(chucho::filter::result::DENY, f.evaluate(get_event(chucho::level::FATAL)));
-    EXPECT_EQ(chucho::filter::result::DENY, f.evaluate(get_event(chucho::level::OFF)));
+    chucho::level_filter f(chucho::level::ERROR(), chucho::filter::result::ACCEPT, chucho::filter::result::DENY);
+    EXPECT_EQ(chucho::filter::result::DENY, f.evaluate(get_event(chucho::level::TRACE())));
+    EXPECT_EQ(chucho::filter::result::DENY, f.evaluate(get_event(chucho::level::DEBUG())));
+    EXPECT_EQ(chucho::filter::result::DENY, f.evaluate(get_event(chucho::level::INFO())));
+    EXPECT_EQ(chucho::filter::result::DENY, f.evaluate(get_event(chucho::level::WARN())));
+    EXPECT_EQ(chucho::filter::result::ACCEPT, f.evaluate(get_event(chucho::level::ERROR())));
+    EXPECT_EQ(chucho::filter::result::DENY, f.evaluate(get_event(chucho::level::FATAL())));
+    EXPECT_EQ(chucho::filter::result::DENY, f.evaluate(get_event(chucho::level::OFF())));
 }

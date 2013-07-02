@@ -42,7 +42,7 @@ class pattern_formatter_test : public ::testing::Test
 public:
     pattern_formatter_test()
         : evt_(chucho::logger::get("pattern logger"),
-               chucho::level::INFO,
+               chucho::level::INFO(),
                "hi",
                file_name,
                10,

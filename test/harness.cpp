@@ -17,6 +17,7 @@
 #include <gtest/gtest.h>
 #include <chucho/status_manager.hpp>
 #include <chucho/configuration.hpp>
+#include <chucho/finalize.hpp>
 #include <iostream>
 #include <fstream>
 
@@ -37,6 +38,11 @@ public:
         chucho::configuration::set_allow_default(false);
         observer_.reset(new all_status());
         chucho::status_manager::get()->add(observer_);
+    }
+
+    virtual void TearDown() override
+    {
+        chucho::finalize();
     }
 
 private:

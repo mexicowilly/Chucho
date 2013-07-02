@@ -61,6 +61,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/file_roll_trigger.hpp
     include/chucho/file_writer.hpp
     include/chucho/filter.hpp
+    include/chucho/finalize.hpp
     include/chucho/formatter.hpp
     include/chucho/level.hpp
     include/chucho/level_filter.hpp
@@ -152,6 +153,8 @@ SET(CHUCHO_SOURCES
     file_writer.cpp
     file_writer_factory.cpp
     file_writer_memento.cpp
+    finalize.cpp
+    garbage_cleaner.cpp
     host.cpp
     level.cpp
     level_filter.cpp
@@ -212,6 +215,7 @@ SET(CHUCHO_SOURCES
     include/chucho/exception.hpp
     include/chucho/file.hpp
     include/chucho/file_exception.hpp
+    include/chucho/garbage_cleaner.hpp
     include/chucho/host.hpp
     include/chucho/level_filter_factory.hpp
     include/chucho/level_filter_memento.hpp

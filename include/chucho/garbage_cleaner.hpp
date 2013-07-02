@@ -14,22 +14,33 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_LINE_ENDING_HPP__)
-#define CHUCHO_LINE_ENDING_HPP__
+#if !defined(CHUCHO_GARBAGE_CLEANER_HPP__)
+#define CHUCHO_GARBAGE_CLEANER_HPP__
 
 #if !defined(chucho_EXPORTS)
-#error "This header if private"
+#error "This header is private"
 #endif
+
+#include <functional>
+#include <vector>
 
 namespace chucho
 {
 
-namespace line_ending
+class garbage_cleaner
 {
+public:
+    typedef std::function<void()> cleaner_type;
 
-extern const char* EOL;
+    static garbage_cleaner& get();
 
-}
+    ~garbage_cleaner();
+
+    void add(cleaner_type cln);
+
+private:
+    std::vector<cleaner_type> cleaners_;
+};
 
 }
 

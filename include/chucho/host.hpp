@@ -34,11 +34,8 @@ public:
     static const std::string& get_full_name();
 
 private:
-    CHUCHO_NO_EXPORT static void get_base_impl();
-    CHUCHO_NO_EXPORT static void get_full_impl();
-
-    static std::string base_;
-    static std::string full_;
+    CHUCHO_NO_EXPORT static void get_base_impl(std::string& result);
+    CHUCHO_NO_EXPORT static void get_full_impl(std::string& result);
 };
 
 }

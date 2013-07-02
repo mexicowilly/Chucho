@@ -20,6 +20,7 @@
 #include <chucho/exception.hpp>
 #include <chucho/file_writer.hpp>
 #include <chucho/regex.hpp>
+#include <chucho/garbage_cleaner.hpp>
 #include <algorithm>
 #include <array>
 #include <iomanip>
@@ -28,15 +29,39 @@
 namespace
 {
 
-chucho::regex::expression aux_time_spec_re(" *, *aux *$");
 const std::size_t SECONDS_PER_DAY(86400);
-// Only look for files to delete that are less than 64 days old, in case
-// we don't know when last time we checked was.
-// (This constant is borrowed from logback.)
-const std::chrono::seconds MAX_PAST_SEARCH(64 * SECONDS_PER_DAY);
 // Only look for files to delete that are within 14 * 24 periods old.
 // (This constant is borrowed from logback.)
 const std::size_t MAX_INACTIVE_PERIODS(14 * 24);
+
+struct static_data
+{
+    static_data();
+
+    chucho::regex::expression aux_time_spec_re_;
+    // Only look for files to delete that are less than 64 days old, in case
+    // we don't know when last time we checked was.
+    // (This constant is borrowed from logback.)
+    const std::chrono::seconds MAX_PAST_SEARCH;
+};
+
+static_data::static_data()
+    : aux_time_spec_re_(" *, *aux *$"),
+      MAX_PAST_SEARCH(64 * SECONDS_PER_DAY)
+{
+    chucho::garbage_cleaner::get().add([this] () { delete this; });
+}
+
+std::once_flag once;
+
+static_data& data()
+{
+    // This gets cleaned in finalize()
+    static static_data* dt;
+
+    std::call_once(once, [&] () { dt = new static_data(); });
+    return *dt;
+}
 
 std::size_t find_time_token(const std::string& str, char tok, std::size_t pos = 0)
 {
@@ -188,7 +213,7 @@ std::string time_file_roller::resolve_file_name(const time_type& tm) const
         else
         {
             got_one = true;
-            spec = regex::replace(spec, aux_time_spec_re, std::string());
+            spec = regex::replace(spec, data().aux_time_spec_re_, std::string());
             std::string fmt = calendar::format(cal, spec);
             if (!fmt.empty())
                 result.replace(start, end - start, fmt);
@@ -232,7 +257,7 @@ void time_file_roller::set_period()
         if (spec.empty())
             break;
         pos = end;
-        if (regex::search(spec, aux_time_spec_re))
+        if (regex::search(spec, data().aux_time_spec_re_))
         {
             found_aux = true;
         }
@@ -365,7 +390,7 @@ std::size_t time_file_roller::cleaner::periods_since_last(const time_type& now)
         throw std::invalid_argument("Cannot compute periods since last clean with unknown period type");
     return last_clean_ ?
          periods_elapsed(*last_clean_, now) :
-         std::min(periods_elapsed(now - MAX_PAST_SEARCH, now), MAX_INACTIVE_PERIODS);
+         std::min(periods_elapsed(now - data().MAX_PAST_SEARCH, now), MAX_INACTIVE_PERIODS);
 }
 
 time_file_roller::time_type time_file_roller::cleaner::relative(const time_type& t, int period_offset)

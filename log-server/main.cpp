@@ -17,6 +17,7 @@
 #include "log.hpp"
 #include "suzerain.hpp"
 #include "daemon.hpp"
+#include <chucho/finalize.hpp>
 #include <cstdlib>
 
 using namespace chucho::server;
@@ -34,5 +35,6 @@ int main()
     else
         daemon::possess(std::bind(&suzerain::run, std::ref(lord)));
     CHUCHO_INFO(lgr, "chuchod is shutting down");
+    chucho::finalize();
     return EXIT_SUCCESS;
 }

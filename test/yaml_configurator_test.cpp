@@ -185,7 +185,7 @@ TEST_F(yaml_configurator, level_filter)
         ASSERT_EQ(1, flts.size());
         ASSERT_EQ(typeid(chucho::level_filter), typeid(*flts[0]));
         auto lf = std::static_pointer_cast<chucho::level_filter>(flts[0]);
-        EXPECT_EQ(*chucho::level::INFO, *lf->get_level());
+        EXPECT_EQ(*chucho::level::INFO(), *lf->get_level());
         EXPECT_EQ(chucho::filter::result::NEUTRAL, lf->get_on_match());
         EXPECT_EQ(item.second, lf->get_on_mismatch());
     }
@@ -206,7 +206,7 @@ TEST_F(yaml_configurator, level_threshold_filter)
     ASSERT_EQ(1, flts.size());
     ASSERT_EQ(typeid(chucho::level_threshold_filter), typeid(*flts[0]));
     auto thresh = std::static_pointer_cast<chucho::level_threshold_filter>(flts[0]);
-    EXPECT_EQ(*chucho::level::FATAL, *thresh->get_level());
+    EXPECT_EQ(*chucho::level::FATAL(), *thresh->get_level());
 }
 
 TEST_F(yaml_configurator, logger)
@@ -218,7 +218,7 @@ TEST_F(yaml_configurator, logger)
     std::shared_ptr<chucho::logger> lgr = chucho::logger::get("will");
     EXPECT_EQ(std::string("will"), lgr->get_name());
     ASSERT_TRUE(static_cast<bool>(lgr->get_level()));
-    EXPECT_EQ(*chucho::level::FATAL, *lgr->get_level());
+    EXPECT_EQ(*chucho::level::FATAL(), *lgr->get_level());
     EXPECT_FALSE(lgr->writes_to_ancestors());
 }
 
@@ -286,6 +286,8 @@ TEST_F(yaml_configurator, remote_writer)
     EXPECT_EQ(std::string("motherboy"), rw->get_host());
     EXPECT_EQ(chucho::remote_writer::DEFAULT_PORT, rw->get_port());
     EXPECT_EQ(750, rw->get_unsent_cache_max());
+    // clear the status because we generated some warnings
+    chucho::status_manager::get()->clear();
 }
 
 TEST_F(yaml_configurator, rolling_file_writer)
@@ -514,6 +516,6 @@ TEST_F(yaml_configurator, variables)
     std::shared_ptr<chucho::logger> lgr = chucho::logger::get("will");
     EXPECT_EQ(std::string("will"), lgr->get_name());
     ASSERT_NE(nullptr, lgr->get_level().get());
-    EXPECT_EQ(*chucho::level::FATAL, *lgr->get_level());
+    EXPECT_EQ(*chucho::level::FATAL(), *lgr->get_level());
     EXPECT_FALSE(lgr->writes_to_ancestors());
 }

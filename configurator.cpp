@@ -31,7 +31,23 @@
 #include <chucho/duplicate_message_filter_factory.hpp>
 #include <chucho/remote_writer_factory.hpp>
 #include <chucho/regex.hpp>
+#include <chucho/garbage_cleaner.hpp>
 #include <cstring>
+
+namespace
+{
+
+std::once_flag once;
+// This will be cleaned at finalize()
+std::map<std::string, std::shared_ptr<chucho::configurable_factory>>* factories;
+
+void init_factories()
+{
+    factories = new std::map<std::string, std::shared_ptr<chucho::configurable_factory>>();
+    chucho::garbage_cleaner::get().add([&] () { delete factories; });
+}
+
+}
 
 namespace chucho
 {
@@ -43,9 +59,8 @@ configurator::configurator()
 
 std::map<std::string, std::shared_ptr<configurable_factory>>& configurator::get_factories()
 {
-    static std::map<std::string, std::shared_ptr<configurable_factory>> factories;
-
-    return factories;
+    std::call_once(once, init_factories);
+    return *factories;
 }
 
 void configurator::initialize()

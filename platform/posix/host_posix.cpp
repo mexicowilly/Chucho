@@ -6,28 +6,28 @@
 namespace chucho
 {
 
-void host::get_base_impl()
+void host::get_base_impl(std::string& result)
 {
     struct utsname info;
     uname(&info);
-    base_ = info.nodename;
+    result = info.nodename;
 }
 
-void host::get_full_impl()
+void host::get_full_impl(std::string& result)
 {
-    get_base_impl();
-    std::string result = base_;
+    std::string full;
+    get_base_impl(full);
     struct addrinfo hints;
     std::memset(&hints, 0, sizeof(hints));
     hints.ai_family = PF_UNSPEC;
     hints.ai_flags = AI_CANONNAME;
     struct addrinfo* info;
-    if (getaddrinfo(result.c_str(), nullptr, &hints, &info) == 0)
+    if (getaddrinfo(full.c_str(), nullptr, &hints, &info) == 0)
     {
-        result = info->ai_canonname;
+        full = info->ai_canonname;
         freeaddrinfo(info);
     }
-    full_ = result;
+    result = full;
 }
 
 }

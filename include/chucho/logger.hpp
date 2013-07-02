@@ -139,7 +139,7 @@ public:
     * @sa @ref get_effective_level()
     * @return the level
     */
-    std::shared_ptr<level> get_level() const;
+    std::shared_ptr<level> get_level();
     /**
      * Return the name of this logger. The name includes the full 
      * ancestry, like "one.two.go". 

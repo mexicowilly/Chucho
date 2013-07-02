@@ -53,18 +53,17 @@ public:
 namespace
 {
 
-std::string formatTime(const chucho::event::time_type& when)
+std::string format_time(const chucho::event::time_type& when)
 {
-    static std::array<std::string, 12> english_months =
+    static const char* english_months[] =
     {
         "Jan", "Feb", "Mar", "Apr", "May", "Jun",
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     };
-    static std::string pattern(" %e %H:%M:%S");
 
     struct std::tm cal = chucho::calendar::get_local(std::chrono::system_clock::to_time_t(when));
     std::string result = english_months[cal.tm_mon];
-    result += chucho::calendar::format(cal, pattern);
+    result += chucho::calendar::format(cal, " %e %H:%M:%S");
     return result;
 }
 
@@ -143,7 +142,7 @@ std::string remote_syslog_transport_handle::format(chucho::syslog::facility fcl,
 {
     std::ostringstream stream;
     stream << '<' << (static_cast<int>(fcl) | static_cast<int>(sev)) << '>' <<
-        formatTime(when) << ' ' << chucho::host::get_base_name() << ' ' << message;
+        format_time(when) << ' ' << chucho::host::get_base_name() << ' ' << message;
     return stream.str();
 }
 

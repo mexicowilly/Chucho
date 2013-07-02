@@ -104,7 +104,14 @@ socket_connector::socket_connector(const std::string& host, std::uint16_t port)
       is_blocking_mode_(true)
 {
     set_status_origin("socket_connector");
-    open_socket();
+    try
+    {
+        open_socket();
+    }
+    catch (std::exception&)
+    {
+        report_warning("Unable to open socket", std::current_exception());
+    }
 }
 
 socket_connector::~socket_connector()
@@ -119,6 +126,18 @@ socket_connector::~socket_connector()
 bool socket_connector::can_write()
 {
     bool result = false;
+    if (socket_ == -1)
+    {
+        try
+        {
+            open_socket();
+        }
+        catch (std::exception&)
+        {
+            report_warning("Unable to open socket", std::current_exception());
+            return result;
+        }
+    }
     struct pollfd pfd;
     pfd.fd = socket_;
     pfd.events = POLLOUT;
@@ -149,7 +168,11 @@ bool socket_connector::can_write()
 void socket_connector::open_socket()
 {
     if (socket_ != -1)
+    {
+        shutdown(socket_, SHUT_RDWR);
         close(socket_);
+        socket_ = -1;
+    }
     struct addrinfo hints;
     std::memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_UNSPEC;

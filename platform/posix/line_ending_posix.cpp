@@ -22,7 +22,7 @@ namespace chucho
 namespace line_ending
 {
 
-const std::string EOL("\n");
+const char* EOL = "\n";
 
 }
 

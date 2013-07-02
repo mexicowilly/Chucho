@@ -15,45 +15,69 @@
  */
 
 #include <chucho/host.hpp>
+#include <chucho/garbage_cleaner.hpp>
 #include <chrono>
 #include <mutex>
 
 namespace
 {
 
-const std::chrono::minutes CACHE_DURATION(5);
+struct static_data
+{
+    static_data();
 
-std::chrono::steady_clock::time_point expiration(std::chrono::steady_clock::now());
-std::mutex guard;
+    std::chrono::minutes cache_duration_;
+    std::chrono::steady_clock::time_point expiration_;
+    std::mutex guard_;
+    std::string base_;
+    std::string full_;
+};
+
+static_data::static_data()
+    : cache_duration_(5),
+      expiration_(std::chrono::steady_clock::now())
+{
+    chucho::garbage_cleaner::get().add([this] () { delete this; });
+}
+
+std::once_flag once;
+
+static_data& data()
+{
+    // This gets cleaned in finalize()
+    static static_data* sd;
+
+    std::call_once(once, [&] () { sd = new static_data(); });
+    return *sd;
+}
 
 }
 
 namespace chucho
 {
 
-std::string host::base_;
-std::string host::full_;
-
 const std::string& host::get_base_name()
 {
-    std::lock_guard<std::mutex> lg(guard);
-    if (std::chrono::steady_clock::now() >= expiration)
+    std::lock_guard<std::mutex> lg(data().guard_);
+    static_data& sd(data());
+    if (std::chrono::steady_clock::now() >= sd.expiration_)
     {
-        get_base_impl();
-        expiration += CACHE_DURATION;
+        get_base_impl(sd.base_);
+        sd.expiration_ += sd.cache_duration_;
     }
-    return base_;
+    return sd.base_;
 }
 
 const std::string& host::get_full_name()
 {
-    std::lock_guard<std::mutex> lg(guard);
-    if (std::chrono::steady_clock::now() >= expiration)
+    std::lock_guard<std::mutex> lg(data().guard_);
+    static_data& sd(data());
+    if (std::chrono::steady_clock::now() >= sd.expiration_)
     {
-        get_full_impl();
-        expiration += CACHE_DURATION;
+        get_full_impl(sd.full_);
+        sd.expiration_ += sd.cache_duration_;
     }
-    return full_;
+    return sd.full_;
 }
 
 }

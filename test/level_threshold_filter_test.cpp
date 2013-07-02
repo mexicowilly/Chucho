@@ -37,12 +37,12 @@ private:
 
 TEST_F(level_threshold_filter_test, evaluate)
 {
-    chucho::level_threshold_filter f(chucho::level::INFO);
-    EXPECT_EQ(chucho::filter::result::DENY, f.evaluate(get_event(chucho::level::TRACE)));
-    EXPECT_EQ(chucho::filter::result::DENY, f.evaluate(get_event(chucho::level::DEBUG)));
-    EXPECT_EQ(chucho::filter::result::NEUTRAL, f.evaluate(get_event(chucho::level::INFO)));
-    EXPECT_EQ(chucho::filter::result::NEUTRAL, f.evaluate(get_event(chucho::level::WARN)));
-    EXPECT_EQ(chucho::filter::result::NEUTRAL, f.evaluate(get_event(chucho::level::ERROR)));
-    EXPECT_EQ(chucho::filter::result::NEUTRAL, f.evaluate(get_event(chucho::level::FATAL)));
-    EXPECT_EQ(chucho::filter::result::NEUTRAL, f.evaluate(get_event(chucho::level::OFF)));
+    chucho::level_threshold_filter f(chucho::level::INFO());
+    EXPECT_EQ(chucho::filter::result::DENY, f.evaluate(get_event(chucho::level::TRACE())));
+    EXPECT_EQ(chucho::filter::result::DENY, f.evaluate(get_event(chucho::level::DEBUG())));
+    EXPECT_EQ(chucho::filter::result::NEUTRAL, f.evaluate(get_event(chucho::level::INFO())));
+    EXPECT_EQ(chucho::filter::result::NEUTRAL, f.evaluate(get_event(chucho::level::WARN())));
+    EXPECT_EQ(chucho::filter::result::NEUTRAL, f.evaluate(get_event(chucho::level::ERROR())));
+    EXPECT_EQ(chucho::filter::result::NEUTRAL, f.evaluate(get_event(chucho::level::FATAL())));
+    EXPECT_EQ(chucho::filter::result::NEUTRAL, f.evaluate(get_event(chucho::level::OFF())));
 }

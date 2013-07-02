@@ -15,6 +15,8 @@
  */
 
 #include <chucho/diagnostic_context.hpp>
+#include <chucho/garbage_cleaner.hpp>
+#include <mutex>
 #include <pthread.h>
 
 namespace
@@ -37,15 +39,24 @@ private:
     pthread_key_t key_;
 };
 
-key_manager kmgr;
+std::once_flag once;
+
+key_manager& kmgr()
+{
+    // This will be cleaned at finalize time
+    static key_manager* km;
+
+    std::call_once(once, [&] () { km = new key_manager(); });
+    return *km;
+}
 
 std::map<std::string, std::string>& get_map()
 {
-    void* p = pthread_getspecific(kmgr.get_key());
+    void* p = pthread_getspecific(kmgr().get_key());
     if (p == nullptr)
     {
         p = new std::map<std::string, std::string>();
-        pthread_setspecific(kmgr.get_key(), p);
+        pthread_setspecific(kmgr().get_key(), p);
     }
     return *reinterpret_cast<std::map<std::string, std::string>*>(p);
 }
@@ -53,6 +64,7 @@ std::map<std::string, std::string>& get_map()
 key_manager::key_manager()
 {
     pthread_key_create(&key_, destructor);
+    chucho::garbage_cleaner::get().add([this] () { delete this; });
 }
 
 key_manager::~key_manager()

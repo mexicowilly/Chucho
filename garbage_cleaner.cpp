@@ -14,23 +14,43 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_LINE_ENDING_HPP__)
-#define CHUCHO_LINE_ENDING_HPP__
+#include <chucho/garbage_cleaner.hpp>
+#include <mutex>
 
-#if !defined(chucho_EXPORTS)
-#error "This header if private"
-#endif
+namespace
+{
+
+std::once_flag once;
+// This gets cleaned by finalize();
+chucho::garbage_cleaner* gc;
+
+void init()
+{
+    gc = new chucho::garbage_cleaner();
+}
+
+}
 
 namespace chucho
 {
 
-namespace line_ending
+garbage_cleaner* gc(new garbage_cleaner());
+
+garbage_cleaner::~garbage_cleaner()
 {
+    for (auto cln : cleaners_)
+        cln();
+}
 
-extern const char* EOL;
+void garbage_cleaner::add(cleaner_type cln)
+{
+    cleaners_.push_back(cln);
+}
 
+garbage_cleaner& garbage_cleaner::get()
+{
+    std::call_once(once, init);
+    return *gc;
 }
 
 }
-
-#endif

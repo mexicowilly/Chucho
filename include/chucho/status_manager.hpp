@@ -62,6 +62,7 @@ public:
      */
     static std::shared_ptr<status_manager> get();
 
+    status_manager();
     /**
      * Add a status entry.
      * 
@@ -129,8 +130,6 @@ public:
     void remove(std::shared_ptr<status_observer> obs);
 
 private:
-    status_manager();
-
     /**
      * @pre guard_ must be locked
      */

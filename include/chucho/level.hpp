@@ -55,31 +55,31 @@ public:
     /**
      * Trace level has a value of 0.
      */
-    static std::shared_ptr<level> TRACE;
+    static std::shared_ptr<level> TRACE();
     /**
      * Debug level has a value of 10000.
      */
-    static std::shared_ptr<level> DEBUG;
+    static std::shared_ptr<level> DEBUG();
     /**
      * Info level has a value of 20000.
      */
-    static std::shared_ptr<level> INFO;
+    static std::shared_ptr<level> INFO();
     /**
      * Warn level has a value of 30000.
      */
-    static std::shared_ptr<level> WARN;
+    static std::shared_ptr<level> WARN();
     /**
      * Error level has a value of 40000.
      */
-    static std::shared_ptr<level> ERROR;
+    static std::shared_ptr<level> ERROR();
     /**
      * Fatal level has a value of 50000.
      */
-    static std::shared_ptr<level> FATAL;
+    static std::shared_ptr<level> FATAL();
     /**
      * Off level has a value that is none of your business.
      */
-    static std::shared_ptr<level> OFF;
+    static std::shared_ptr<level> OFF();
 
     /**
      * Figure out a level from its text. A case-insensitive 
