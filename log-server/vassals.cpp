@@ -16,6 +16,7 @@
 
 #include "vassals.hpp"
 #include <chucho/log.hpp>
+#include <algorithm>
 
 namespace
 {

@@ -187,7 +187,7 @@ std::string test::format_file_name(const std::string& pattern)
 {
     struct std::tm cal = chucho::calendar::get_utc(std::time(nullptr));
     std::ostringstream stream;
-    stream << TOP_LEVEL_DIR << std::put_time(&cal, pattern.c_str());
+    stream << TOP_LEVEL_DIR << chucho::calendar::format(cal, pattern);
     return stream.str();
 }
 
@@ -209,7 +209,7 @@ std::vector<std::string>& test::unexpected_file_names()
 void test::write()
 {
     chucho::event evt(chucho::logger::get("time_rolling_file_test"),
-                      chucho::level::INFO,
+                      chucho::level::INFO(),
                       "hello",
                       __FILE__,
                       __LINE__,

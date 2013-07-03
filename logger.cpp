@@ -22,6 +22,7 @@
 #include <map>
 #include <stdexcept>
 #include <atomic>
+#include <algorithm>
 
 namespace
 {

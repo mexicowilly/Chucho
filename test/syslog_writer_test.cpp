@@ -28,7 +28,7 @@ TEST(syslog_wrtier_test, same_host)
                                                        chucho::syslog::facility::LOCAL0);
     auto log = chucho::logger::get("syslog_writer_test");
     log->add_writer(wrt);
-    chucho::event evt(log, chucho::level::ERROR, "chucho syslog_writer test same host", __FILE__, __LINE__, __FUNCTION__);
+    chucho::event evt(log, chucho::level::ERROR(), "chucho syslog_writer test same host", __FILE__, __LINE__, __FUNCTION__);
     wrt->write(evt);
     std::cout << "Check your syslog for an error level message \"chucho syslog_writer test same host\"" << std::endl;
 }
@@ -41,7 +41,7 @@ TEST(syslog_writer_test, remote_host)
                                                        chucho::host::get_full_name());
     auto log = chucho::logger::get("syslog_writer_test");
     log->add_writer(wrt);
-    chucho::event evt(log, chucho::level::ERROR, "chucho syslog_writer test remote host", __FILE__, __LINE__, __FUNCTION__);
+    chucho::event evt(log, chucho::level::ERROR(), "chucho syslog_writer test remote host", __FILE__, __LINE__, __FUNCTION__);
     wrt->write(evt);
     std::cout << "Check your syslog for an error level message \"chucho syslog_writer test remote host\"" << std::endl;
 }
