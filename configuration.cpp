@@ -25,6 +25,7 @@
 #include <chucho/garbage_cleaner.hpp>
 #include <cstdlib>
 #include <fstream>
+#include <algorithm>
 #include <assert.h>
 
 namespace

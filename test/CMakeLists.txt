@@ -45,13 +45,13 @@ ADD_CUSTOM_TARGET(check
 ADD_EXECUTABLE(rolling-file-test EXCLUDE_FROM_ALL
                harness.cpp
                time_rolling_file_test.cpp)
-TARGET_LINK_LIBRARIES(rolling-file-test chucho gtest)
+TARGET_LINK_LIBRARIES(rolling-file-test chucho gtest ${CHUCHO_THREAD_LIB})
 
 ADD_EXECUTABLE(syslog-writer-test EXCLUDE_FROM_ALL
                harness.cpp
                syslog_writer_test.cpp)
-TARGET_LINK_LIBRARIES(syslog-writer-test chucho gtest)
+TARGET_LINK_LIBRARIES(syslog-writer-test chucho gtest ${CHUCHO_THREAD_LIB})
 
 ADD_EXECUTABLE(remote-writer-test EXCLUDE_FROM_ALL
                remote_writer_test.cpp)
-TARGET_LINK_LIBRARIES(remote-writer-test chucho)
+TARGET_LINK_LIBRARIES(remote-writer-test chucho ${CHUCHO_THREAD_LIB})

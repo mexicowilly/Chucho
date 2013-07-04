@@ -33,6 +33,7 @@
 #include <chucho/regex.hpp>
 #include <chucho/garbage_cleaner.hpp>
 #include <cstring>
+#include <mutex>
 
 namespace
 {
