@@ -25,8 +25,8 @@
  */
 
 /**
- * Doxygen won't document finalize unless I document this 
- * namespace. Enjoy. 
+ * Doxygen won't document the finalize function unless I 
+ * document this namespace. Enjoy. 
  */
 namespace chucho
 {
@@ -36,7 +36,10 @@ namespace chucho
  * if you believe your memory leak analysis tools when they tell 
  * you that static objects that live the life of the application 
  * are memory leaks. You should also use this function if you 
- * are using Chucho as a shared object. 
+ * are using Chucho as a shared object or within an enclosing 
+ * shared object. 
+ *  
+ * Included by @p <chucho/finalize.hpp>. 
  *  
  * @note No Chucho APIs may be used after calling this function. 
  *       The result is extremely undefined.

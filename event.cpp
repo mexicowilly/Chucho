@@ -57,6 +57,7 @@ event::event(std::shared_ptr<logger> lgr,
              const char* const function_name,
              const std::string& base_host_name,
              const std::string& full_host_name,
+             const std::string& thread_id,
              const optional<marker>& mark)
     : logger_(lgr),
       level_(lvl),
@@ -65,9 +66,10 @@ event::event(std::shared_ptr<logger> lgr,
       file_name_(file_name),
       line_number_(line_number),
       function_name_(function_name),
+      marker_(mark),
       base_host_name_(base_host_name),
       full_host_name_(full_host_name),
-      marker_(mark)
+      thread_id_(thread_id)
 {
 }
 

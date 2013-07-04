@@ -142,6 +142,10 @@ wire_event::wire_event(const YAML::Node& node,
     chucho::optional<chucho::marker> mark;
     if (val != nullptr)
         mark = reconstruct_marker(val->to<std::string>());
+    val = node.FindValue("thread");
+    if (val == nullptr)
+        throw chucho::exception("The event is missing thread");
+    std::string thr = val->to<std::string>();
     val = node.FindValue("message");
     if (val == nullptr)
         throw chucho::exception("The event is missing message");
@@ -162,6 +166,7 @@ wire_event::wire_event(const YAML::Node& node,
                                    function_name_storage_.c_str(),
                                    reader->get_base_host(),
                                    reader->get_full_host(),
+                                   thr,
                                    mark));
 }
 

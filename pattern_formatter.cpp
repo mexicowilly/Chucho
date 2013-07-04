@@ -529,9 +529,16 @@ pattern_formatter::thread_piece::thread_piece(const format_params& params)
 
 std::string pattern_formatter::thread_piece::get_text_impl(const event& evt) const
 {
-    std::ostringstream stream;
-    stream << std::this_thread::get_id();
-    return stream.str();
+    if (evt.get_thread_id())
+    {
+        return *evt.get_thread_id();
+    }
+    else
+    {
+        std::ostringstream stream;
+        stream << std::this_thread::get_id();
+        return stream.str();
+    }
 }
 
 pattern_formatter::marker_piece::marker_piece(const format_params& params)

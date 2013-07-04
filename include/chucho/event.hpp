@@ -92,11 +92,11 @@ public:
           const std::string& mark);
 
     /**
-     * Construct an event. The host name parameters are what set 
-     * this constructor apart from the others. This constructor is 
-     * used by the remote logging server to store the name of the 
-     * host from which the event came. It is not used when logging 
-     * is done locally. 
+     * Construct an event. The host name and thread ID parameters 
+     * are what set this constructor apart from the others. This 
+     * constructor is used by the remote logging server to store the 
+     * name of the host from which the event came. It is not used 
+     * when logging is done locally. 
      * 
      * @param lgr the logger
      * @param lvl the level
@@ -110,6 +110,9 @@ public:
      *                       this event came
      * @param full_host_name the full name of the host from which 
      *                       this event came
+     * @param thread_id the textual representation of the thread 
+     *                  identifier from which this event came on the
+     *                  remote host
      * @param mark the marker associated with the event
      */
     event(std::shared_ptr<logger> lgr,
@@ -120,6 +123,7 @@ public:
           const char* const function_name,
           const std::string& base_host_name,
           const std::string& full_host_name,
+          const std::string& thread_id,
           const optional<marker>& mark);
 
     /**
@@ -181,6 +185,14 @@ public:
      */
     const std::string& get_message() const;
     /**
+     * Return the thread identifier of this thread on the remote 
+     * host. If the event is a local one, then the thread identifier 
+     * is not set. 
+     * 
+     * @return the thread identifier
+     */
+    const optional<std::string>& get_thread_id() const;
+    /**
      * Return the time that the event was created.
      * 
      * @return the time
@@ -198,6 +210,7 @@ private:
     optional<marker> marker_;
     optional<std::string> base_host_name_;
     optional<std::string> full_host_name_;
+    optional<std::string> thread_id_;
 };
 
 inline const optional<std::string>& event::get_base_host_name() const
@@ -243,6 +256,11 @@ inline const optional<marker>& event::get_marker() const
 inline const std::string& event::get_message() const
 {
     return message_;
+}
+
+inline const optional<std::string>& event::get_thread_id() const
+{
+    return thread_id_;
 }
 
 inline const event::time_type& event::get_time() const
