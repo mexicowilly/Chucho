@@ -27,7 +27,8 @@ struct static_data
     static_data();
 
     std::chrono::minutes cache_duration_;
-    std::chrono::steady_clock::time_point expiration_;
+    std::chrono::steady_clock::time_point base_expiration_;
+    std::chrono::steady_clock::time_point full_expiration_;
     std::mutex guard_;
     std::string base_;
     std::string full_;
@@ -35,7 +36,8 @@ struct static_data
 
 static_data::static_data()
     : cache_duration_(5),
-      expiration_(std::chrono::steady_clock::now())
+      base_expiration_(std::chrono::steady_clock::now()),
+      full_expiration_(std::chrono::steady_clock::now())
 {
     chucho::garbage_cleaner::get().add([this] () { delete this; });
 }
@@ -60,10 +62,10 @@ const std::string& host::get_base_name()
 {
     std::lock_guard<std::mutex> lg(data().guard_);
     static_data& sd(data());
-    if (std::chrono::steady_clock::now() >= sd.expiration_)
+    if (std::chrono::steady_clock::now() >= sd.base_expiration_)
     {
         get_base_impl(sd.base_);
-        sd.expiration_ += sd.cache_duration_;
+        sd.base_expiration_ += sd.cache_duration_;
     }
     return sd.base_;
 }
@@ -72,10 +74,10 @@ const std::string& host::get_full_name()
 {
     std::lock_guard<std::mutex> lg(data().guard_);
     static_data& sd(data());
-    if (std::chrono::steady_clock::now() >= sd.expiration_)
+    if (std::chrono::steady_clock::now() >= sd.full_expiration_)
     {
         get_full_impl(sd.full_);
-        sd.expiration_ += sd.cache_duration_;
+        sd.full_expiration_ += sd.cache_duration_;
     }
     return sd.full_;
 }

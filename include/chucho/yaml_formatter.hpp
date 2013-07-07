@@ -28,9 +28,9 @@ namespace chucho
  * href="http://yaml.org/spec/1.2/spec.html">YAML</a> mapping. 
  * The mapping is a sequence entry named "event" followed by the 
  * following mapped keys: version, milliseconds_since_epoch, 
- * file_name, line_number, function_name, logger, level, marker, 
- * and message. If the event has no marker, then the YAML won't 
- * have that key, either. 
+ * file_name, line_number, function_name, logger, level, marker,
+ * thread identifier, and message. If the event has no marker,
+ * then the YAML won't have that key, either.
  *  
  * The only mapped key that does not correspond to a field in an 
  * event is version. This is used to communicate the version of 
@@ -46,7 +46,9 @@ namespace chucho
      function_name: "int main(int, char **)"
      logger: "client.1"
      level: "INFO"
-     message: "hello"
+     thread: "09347589"
+     message: |
+        hello
 @endverbatim
  *  
  * If the message is not encoded with UTF-8, then any invalid 

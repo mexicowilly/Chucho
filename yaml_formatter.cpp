@@ -77,7 +77,7 @@ std::string yaml_formatter::format(const event& evt)
         mstream << *evt.get_marker();
         stream << "    marker: " << utf8::escape_invalid(mstream.str()) << '\n';
     }
-    stream << "    thread: " << std::this_thread::get_id() << '\n';
+    stream << "    thread: \"" << std::this_thread::get_id() << "\"\n";
     stream << "    message: ";
     to_yaml_literal(utf8::escape_invalid(evt.get_message()), stream);
     stream << '\n';
