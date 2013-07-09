@@ -1,0 +1,68 @@
+#
+# Copyright 2013 Will Mason
+# 
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+# 
+#      http://www.apache.org/licenses/LICENSE-2.0
+# 
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+#####
+# These are mappings you can set in order to change the behavior of chuchod.
+# The default settings are indicated below.
+#
+# Whether chuchod will become a daemon process or not.
+# - console_mode: false
+#
+# Which port will the server listen on.
+# - port: 32123
+#
+# How many worker threads should run.
+# - worker_threads: 3
+#
+#####
+
+#####
+# This represents a possible configuration of the chuchod loggers themselves.
+# All chuchod loggers are descendents of the logger named "chuchod". The
+# configuration shown here is actually installed as the fallback
+# configuration, if no configuration file can be found. Bear in mind that the
+# fallback configuration here has no settings for loggers to which the client
+# programs will be writing.
+#
+# - chucho::logger:
+#     - name: chuchod
+#     - level: info
+#     - chucho::rolling_file_writer:
+#         - file_name: /var/log/chuchod.log
+#         - chucho::pattern_formatter:
+#             - pattern: '%d{%Y/%m/%d %H:%M:%S.%q} %-22c %-5p %h %H %m%n'
+#         - chucho::numbered_file_roller:
+#             - max_index: 1
+#         - chucho::size_file_roll_trigger:
+#             - max_size: 10m
+#
+#####
+
+#####
+# Here you would place configurations for the loggers to which the client
+# programs will write. The one shown here is just a sample I used for
+# testing.
+#
+# - chucho::logger:
+#     - name: client
+#     - level: debug
+#     - chucho::file_writer:
+#         - file_name: '$ENV{HOME}/client.log'
+#         - chucho::pattern_formatter:
+#             - pattern: '%m %c %b %L %M %p %h %H %t%n'
+#
+#####
+

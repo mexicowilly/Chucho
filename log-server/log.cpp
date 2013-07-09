@@ -33,7 +33,7 @@ void log::configure(properties& props)
     chucho::configuration::set_environment_variable("");
     chucho::configuration::set_fallback("- chucho::logger:\n"
                                         "    - name: chuchod\n"
-                                        "    - level: debug\n"
+                                        "    - level: info\n"
                                         "    - chucho::rolling_file_writer:\n"
                                         "        - file_name: " + get_file_name() + "\n"
                                         "        - chucho::pattern_formatter:\n"
