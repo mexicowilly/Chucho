@@ -31,6 +31,7 @@
 #include <chucho/syslog_writer.hpp>
 #include <chucho/remote_writer.hpp>
 #include <chucho/exception.hpp>
+#include <chucho/configuration.hpp>
 #include <sstream>
 #if defined(_WIN32)
 #include <windows.h>
@@ -106,9 +107,9 @@ TEST_F(yaml_configurator, duplicate_message_filter)
     configure("chucho::logger:\n"
               "    name: will\n"
               "    chucho::cout_writer:\n"
-              "        chucho::pattern_formatter:\n"
+              "        - chucho::pattern_formatter:\n"
               "            pattern: '%m%n'\n"
-              "        chucho::duplicate_message_filter");
+              "        - chucho::duplicate_message_filter");
     auto wrts = chucho::logger::get("will")->get_writers();
     ASSERT_EQ(1, wrts.size());
     auto flts = wrts[0]->get_filters();
@@ -500,6 +501,25 @@ TEST_F(yaml_configurator, time_file_roller)
     EXPECT_EQ(trlr, fwrt->get_file_roll_trigger());
 }
 
+TEST_F(yaml_configurator, unknown)
+{
+    std::map<std::string, std::string> unknowns;
+    chucho::configuration::set_unknown_handler(
+        std::bind([&] (std::map<std::string, std::string> u, const std::string& k, const std::string& v) { unknowns[k] = v; return true; },
+        std::ref(unknowns),
+        std::placeholders::_1,
+        std::placeholders::_2));
+    configure("- my_key: my_value\n"
+              "- chucho::logger:\n"
+              "    name: will\n"
+              "- my_second_key: my_second_value");
+    std::shared_ptr<chucho::logger> lgr = chucho::logger::get("will");
+    EXPECT_EQ(std::string("will"), lgr->get_name());
+    EXPECT_EQ(2, unknowns.size());
+    EXPECT_EQ(std::string("my_value"), unknowns["my_key"]);
+    EXPECT_EQ(std::string("my_second_value"), unknowns["my_second_key"]);
+}
+
 TEST_F(yaml_configurator, variables)
 {
     setenv("CHUCHO_WRITES_KEY", "writes_to_ancestors", 1);
@@ -507,8 +527,9 @@ TEST_F(yaml_configurator, variables)
     configure("- variables:\n"
               "    MY_NAME_IS: will\n"
               "    MY_TYPE_IS: logger\n"
-              "    MY_KEY_IS: level\n"
-              "    MY_VALUE_IS: fatal\n"
+              "- variables:\n"
+              "    - MY_KEY_IS: level\n"
+              "    - MY_VALUE_IS: fatal\n"
               "- 'chucho::${MY_TYPE_IS}':\n"
               "    name: '${MY_NAME_IS}'\n"
               "    '${MY_KEY_IS}': '${MY_VALUE_IS}'\n"

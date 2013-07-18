@@ -88,45 +88,24 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/writer_memento.hpp
     include/chucho/yaml_formatter.hpp)
 
+# Update this when you rev libyaml
+SET(CHUCHO_LIBYAML_VERSION_MAJOR 0)
+SET(CHUCHO_LIBYAML_VERSION_MINOR 1)
+SET(CHUCHO_LIBYAML_VERSION_PATCH 4)
+
 SET(CHUCHO_EMBEDDED_SOURCES
     embedded/trex/trex.c
-    embedded/yaml-cpp/aliasmanager.cpp
-    embedded/yaml-cpp/binary.cpp
-    embedded/yaml-cpp/conversion.cpp
-    embedded/yaml-cpp/directives.cpp
-    embedded/yaml-cpp/emitfromevents.cpp
-    embedded/yaml-cpp/emitter.cpp
-    embedded/yaml-cpp/emitterstate.cpp
-    embedded/yaml-cpp/emitterutils.cpp
-    embedded/yaml-cpp/exp.cpp
-    embedded/yaml-cpp/iterator.cpp
-    embedded/yaml-cpp/node.cpp
-    embedded/yaml-cpp/null.cpp
-    embedded/yaml-cpp/nodebuilder.cpp
-    embedded/yaml-cpp/nodeownership.cpp
-    embedded/yaml-cpp/ostream.cpp
-    embedded/yaml-cpp/parser.cpp
-    embedded/yaml-cpp/regex.cpp
-    embedded/yaml-cpp/scanner.cpp
-    embedded/yaml-cpp/scanscalar.cpp
-    embedded/yaml-cpp/scantag.cpp
-    embedded/yaml-cpp/scantoken.cpp
-    embedded/yaml-cpp/simplekey.cpp
-    embedded/yaml-cpp/singledocparser.cpp
-    embedded/yaml-cpp/stream.cpp
-    embedded/yaml-cpp/tag.cpp)
+    embedded/libyaml/api.c
+    embedded/libyaml/loader.c
+    embedded/libyaml/parser.c
+    embedded/libyaml/reader.c
+    embedded/libyaml/scanner.c)
 
+SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/api.c PROPERTIES
+                            COMPILE_DEFINITIONS "YAML_VERSION_MAJOR=${CHUCHO_LIBYAML_VERSION_MAJOR};YAML_VERSION_MINOR=${CHUCHO_LIBYAML_VERSION_MINOR};YAML_VERSION_PATCH=${CHUCHO_LIBYAML_VERSION_PATCH};YAML_VERSION_STRING=\"${CHUCHO_LIB_YAML_VERSION_MAJOR}.${CHUCHO_LIBYAML_VERSION_MINOR}.${CHUCHO_LIBYAML_VERSION_PATCH}\"")
 IF(CMAKE_C_COMPILER_ID STREQUAL Clang)
     SET_SOURCE_FILES_PROPERTIES(embedded/trex/trex.c PROPERTIES
                                 COMPILE_FLAGS "-Wno-logical-op-parentheses -Wno-unused-value")
-ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
-    SET_SOURCE_FILES_PROPERTIES(embedded/yaml-cpp/emitter.cpp
-                                embedded/yaml-cpp/emitterstate.cpp
-                                embedded/yaml-cpp/iterator.cpp
-                                embedded/yaml-cpp/node.cpp
-                                embedded/yaml-cpp/scanner.cpp
-                                PROPERTIES
-                                COMPILE_FLAGS "-Wno-deprecated-declarations")
 ENDIF()
 
 SET(CHUCHO_SOURCES

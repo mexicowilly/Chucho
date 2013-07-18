@@ -22,7 +22,7 @@
 #endif
 
 #include <chucho/configurator.hpp>
-#include <yaml-cpp/yaml.h>
+#include <yaml.h>
 
 namespace chucho
 {
@@ -37,8 +37,12 @@ public:
     virtual void configure(std::istream& in) override;
 
 private:
-    std::map<std::string, std::string> extract_variables(const YAML::Node& n);
-    void handle(const std::string& key, const YAML::Node& n, std::shared_ptr<memento> mnto);
+    void extract_variables(yaml_document_t& doc, const yaml_node_t& node);
+    void handle(yaml_document_t& doc,
+                const yaml_node_t& node,
+                int level,
+                const std::string& key,
+                std::shared_ptr<memento> mnto);
 };
 
 }

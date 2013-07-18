@@ -26,6 +26,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <algorithm>
+#include <sstream>
 #include <assert.h>
 
 namespace
