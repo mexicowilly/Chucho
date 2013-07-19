@@ -88,7 +88,7 @@ const char* trace::get_name() const
 
 chucho::syslog::severity trace::get_syslog_severity() const
 {
-    return chucho::syslog::severity::DEBUG;
+    return chucho::syslog::severity::DEBUG_;
 }
 
 int trace::get_value() const
@@ -103,7 +103,7 @@ const char* debug::get_name() const
 
 chucho::syslog::severity debug::get_syslog_severity() const
 {
-    return chucho::syslog::severity::DEBUG;
+    return chucho::syslog::severity::DEBUG_;
 }
 
 int debug::get_value() const

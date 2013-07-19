@@ -76,7 +76,7 @@ enum class severity
     WARNING, /**< Warning conditions */
     NOTICE, /**< Normal but significant conditions */
     INFORMATIONAL, /**< Information messages */
-    DEBUG /**< Debug-level messages */
+    DEBUG_ /**< Debug-level messages. This constant has a trailing underscore so that it will not clash with a possible macro named DEBUG. */
 };
 //@}
 
