@@ -24,12 +24,13 @@
 #include <chucho/event.hpp>
 #include <chucho/optional.hpp>
 #include <chucho/configuration.hpp>
-#include <yaml-cpp/yaml.h>
+#include <yaml.h>
 #include <sstream>
 #if defined(CHUCHO_HAVE_ARPA_INET_H)
 #include <arpa/inet.h>
 #endif
 #include <chrono>
+#include <bitset>
 
 namespace
 {
@@ -90,7 +91,8 @@ chucho::marker reconstruct_marker(const std::string& text)
 class wire_event
 {
 public:
-    wire_event(const YAML::Node& node,
+    wire_event(yaml_document_t& doc,
+               const yaml_node_t& node,
                std::shared_ptr<chucho::server::socket_reader> reader);
     wire_event(const wire_event&) = delete;
 
@@ -106,67 +108,121 @@ private:
     unsigned version_;
 };
 
-wire_event::wire_event(const YAML::Node& node,
+wire_event::wire_event(yaml_document_t& doc,
+                       const yaml_node_t& node,
                        std::shared_ptr<chucho::server::socket_reader> reader)
 {
-    const YAML::Node* val = node.FindValue("version");
-    if (val == nullptr)
-        throw chucho::exception("The event is missing version");
-    version_ = std::stoul(val->to<std::string>());
-    val = node.FindValue("milliseconds_since_epoch");
-    if (val == nullptr)
-        throw chucho::exception("The event is missing milliseconds_since_epoch");
-    chucho::event::time_type when = chucho::event::clock_type::from_time_t(0) +
-        std::chrono::milliseconds(std::stoull(val->to<std::string>()));
-    val = node.FindValue("file_name");
-    if (val == nullptr)
-        throw chucho::exception("The event is missing file_name");
-    file_name_storage_ = val->to<std::string>();
-    val = node.FindValue("line_number");
-    if (val == nullptr)
-        throw chucho::exception("The event is missing line_number");
-    unsigned line = std::stoul(val->to<std::string>());
-    val = node.FindValue("function_name");
-    if (val == nullptr)
-        throw chucho::exception("The event is missing function_name");
-    function_name_storage_ = val->to<std::string>();
-    val = node.FindValue("logger");
-    if (val == nullptr)
-        throw chucho::exception("The event is missing logger");
-    std::shared_ptr<chucho::logger> log = chucho::logger::get(val->to<std::string>());
-    val = node.FindValue("level");
-    if (val == nullptr)
-        throw chucho::exception("The event is missing level");
-    std::shared_ptr<chucho::level> lvl = chucho::level::from_text(val->to<std::string>());
-    val = node.FindValue("marker");
-    chucho::optional<chucho::marker> mark;
-    if (val != nullptr)
-        mark = reconstruct_marker(val->to<std::string>());
-    val = node.FindValue("thread");
-    if (val == nullptr)
-        throw chucho::exception("The event is missing thread");
-    std::string thr = val->to<std::string>();
-    val = node.FindValue("message");
-    if (val == nullptr)
-        throw chucho::exception("The event is missing message");
-    std::string msg(val->to<std::string>());
-    // If the message comes in with YAML literal syntax ('|'), then it might
-    // have a trailing newline (if there is more than one event in the YAML).
-    if (!msg.empty() && msg.back() == '\n')
+    enum requireds
     {
-        msg.pop_back();
-        if (!msg.empty() && msg.back() == '\r')
-            msg.pop_back();
+        VERSION,
+        MILLISECONDS_SINCE_EPOCH,
+        FILE_NAME,
+        LINE_NUMBER,
+        FUNCTION_NAME,
+        LOGGER,
+        LEVEL,
+        THREAD,
+        MESSAGE,
+        COUNT
+    };
+    std::bitset<COUNT> found;
+    chucho::event::time_type when;
+    const char* file_name;
+    unsigned line_number;
+    const char* function_name;
+    std::shared_ptr<chucho::logger> logger;
+    std::shared_ptr<chucho::level> level;
+    chucho::optional<chucho::marker> mark;
+    const char* thread;
+    std::string msg;
+    for (yaml_node_pair_t* p = node.data.mapping.pairs.start;
+         p < node.data.mapping.pairs.top;
+         p++)
+    {
+        yaml_node_t& key_node(*yaml_document_get_node(&doc, p->key));
+        yaml_node_t& value_node(*yaml_document_get_node(&doc, p->value));
+        if (key_node.type == YAML_SCALAR_NODE && value_node.type == YAML_SCALAR_NODE)
+        {
+            const char* key = reinterpret_cast<char*>(key_node.data.scalar.value);
+            const char* value = reinterpret_cast<char*>(value_node.data.scalar.value);
+            if (std::strcmp(key, "version") == 0)
+            {
+                version_ = std::atoi(value);
+                found.set(VERSION);
+            }
+            else if (std::strcmp(key, "milliseconds_since_epoch") == 0)
+            {
+                when = chucho::event::clock_type::from_time_t(0) +
+                    std::chrono::milliseconds(std::strtoull(value, nullptr, 10));
+                found.set(MILLISECONDS_SINCE_EPOCH);
+            }
+            else if (std::strcmp(key, "file_name") == 0)
+            {
+                file_name = value;
+                found.set(FILE_NAME);
+            }
+            else if (std::strcmp(key, "line_number") == 0)
+            {
+                line_number = std::atoi(value);
+                found.set(LINE_NUMBER);
+            }
+            else if (std::strcmp(key, "function_name") == 0)
+            {
+                function_name = value;
+                found.set(FUNCTION_NAME);
+            }
+            else if (std::strcmp(key, "logger") == 0)
+            {
+                logger = chucho::logger::get(value);
+                found.set(LOGGER);
+            }
+            else if (std::strcmp(key, "level") == 0)
+            {
+                level = chucho::level::from_text(value);
+                found.set(LEVEL);
+            }
+            else if (std::strcmp(key, "marker") == 0)
+            {
+                mark = reconstruct_marker(value);
+            }
+            else if (std::strcmp(key, "thread") == 0)
+            {
+                thread = value;
+                found.set(THREAD);
+            }
+            else if (std::strcmp(key, "message") == 0)
+            {
+                msg = value;
+                // If the message comes in with YAML literal syntax ('|'), then it might
+                // have a trailing newline (if there is more than one event in the YAML).
+                if (!msg.empty() && msg.back() == '\n')
+                {
+                    msg.pop_back();
+                    if (!msg.empty() && msg.back() == '\r')
+                        msg.pop_back();
+                }
+                found.set(MESSAGE);
+            }
+            else
+            {
+                throw chucho::exception(std::string("Unknown key found in YAML event: ") +
+                    key);
+            }
+        }
     }
-    event_.reset(new chucho::event(log,
-                                   lvl,
+    if (!found.all())
+    {
+        // error
+    }
+    event_.reset(new chucho::event(logger,
+                                   level,
                                    msg,
-                                   file_name_storage_.c_str(),
-                                   line,
-                                   function_name_storage_.c_str(),
+                                   file_name,
+                                   line_number,
+                                   function_name,
                                    reader->get_base_host(),
                                    reader->get_full_host(),
-                                   thr,
+                                   thread,
                                    mark));
 }
 
@@ -227,32 +283,55 @@ void suzerain::process_events(std::shared_ptr<socket_reader> reader)
         std::string yaml(size, 0);
         reader->read(reinterpret_cast<std::uint8_t*>(const_cast<char*>(yaml.data())), size);
         CHUCHO_DEBUG(logger_, yaml);
-        std::istringstream stream(yaml);
-        yaml.clear();
-        yaml.shrink_to_fit();
-        YAML::Parser prs(stream);
-        YAML::Node doc;
-        while (prs.GetNextDocument(doc))
+        yaml_parser_t prs;
+        yaml_parser_initialize(&prs);
+        struct prs_sentry
         {
-            for (YAML::Iterator itor = doc.begin(); itor != doc.end(); itor++)
+            prs_sentry(yaml_parser_t& prs) : prs_(prs) { }
+            ~prs_sentry() { yaml_parser_delete(&prs_); }
+            yaml_parser_t& prs_;
+        } ps(prs);
+        yaml_parser_set_input_string(&prs, reinterpret_cast<const yaml_char_t*>(yaml.data()), yaml.length());
+        yaml_document_t doc;
+        while (true)
+        {
+            if (!yaml_parser_load(&prs, &doc))
             {
-                try
+                // error
+            }
+            struct doc_sentry
+            {
+                doc_sentry(yaml_document_t& doc) : doc_(doc) { }
+                ~doc_sentry() { yaml_document_delete(&doc_); }
+                yaml_document_t& doc_;
+            } ds(doc);
+            yaml_node_t* node = yaml_document_get_root_node(&doc);
+            if (node == nullptr)
+                break;
+            if (node->type == YAML_SEQUENCE_NODE)
+            {
+                for (yaml_node_item_t* i = node->data.sequence.items.start;
+                     i < node->data.sequence.items.top;
+                     i++)
                 {
-                    if (itor->Type() != YAML::NodeType::Map)
-                        throw chucho::exception("Malformed YAML was encountered while processing an event: The top-level element is not a map");
+                    yaml_node_t& evt_node(*yaml_document_get_node(&doc, *i));
+                    if (evt_node.type == YAML_MAPPING_NODE)
+                    {
+                        wire_event wevt(doc, evt_node, reader);
+                        std::shared_ptr<chucho::logger> lgr(wevt.get_event().get_logger());
+                        if (lgr->permits(wevt.get_event().get_level()))
+                            lgr->write(wevt.get_event());
+                        event_count++;
+                    }
+                    else
+                    {
+                        // error
+                    }
                 }
-                catch (YAML::Exception& ye)
-                {
-                    throw chucho::exception("Malformed YAML was encountered while processing an event: The top-level element is not part of a sequence");
-                }
-                if (itor->begin().first().to<std::string>() == "event")
-                {
-                    wire_event wevt(itor->begin().second(), reader);
-                    std::shared_ptr<chucho::logger> lgr(wevt.get_event().get_logger());
-                    if (lgr->permits(wevt.get_event().get_level()))
-                        lgr->write(wevt.get_event());
-                    event_count++;
-                }
+            }
+            else
+            {
+                // error
             }
         }
     }
