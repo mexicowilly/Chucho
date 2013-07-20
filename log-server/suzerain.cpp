@@ -31,6 +31,7 @@
 #endif
 #include <chrono>
 #include <bitset>
+#include <cstring>
 
 namespace
 {
@@ -209,10 +210,14 @@ wire_event::wire_event(yaml_document_t& doc,
                     key);
             }
         }
+        else
+        {
+            throw chucho::exception("Invalid node type: key is " + std::to_string(key_node.type) + " and value is " + std::to_string(value_node.type));
+        }
     }
     if (!found.all())
     {
-        // error
+        throw chucho::exception("Not all required keys were found in the event node: " + found.to_string());
     }
     event_.reset(new chucho::event(logger,
                                    level,
@@ -297,7 +302,10 @@ void suzerain::process_events(std::shared_ptr<socket_reader> reader)
         {
             if (!yaml_parser_load(&prs, &doc))
             {
-                // error
+                throw chucho::exception("Error parsing YAML at line " +
+                    std::to_string(prs.problem_mark.line) + ", column " +
+                    std::to_string(prs.problem_mark.column) + ": " +
+                    std::string(prs.problem) + ": " + yaml);
             }
             struct doc_sentry
             {
@@ -317,21 +325,41 @@ void suzerain::process_events(std::shared_ptr<socket_reader> reader)
                     yaml_node_t& evt_node(*yaml_document_get_node(&doc, *i));
                     if (evt_node.type == YAML_MAPPING_NODE)
                     {
-                        wire_event wevt(doc, evt_node, reader);
-                        std::shared_ptr<chucho::logger> lgr(wevt.get_event().get_logger());
-                        if (lgr->permits(wevt.get_event().get_level()))
-                            lgr->write(wevt.get_event());
-                        event_count++;
+                        const yaml_node_t& key =
+                            *yaml_document_get_node(&doc, evt_node.data.mapping.pairs.start->key);
+                        if (key.type == YAML_SCALAR_NODE &&
+                            std::strcmp(reinterpret_cast<const char*>(key.data.scalar.value),
+                                        "event") == 0)
+                        {
+                            const yaml_node_t& maps =
+                                *yaml_document_get_node(&doc, evt_node.data.mapping.pairs.start->value);
+                            if (maps.type == YAML_MAPPING_NODE)
+                            {
+                                wire_event wevt(doc, maps, reader);
+                                std::shared_ptr<chucho::logger> lgr(wevt.get_event().get_logger());
+                                if (lgr->permits(wevt.get_event().get_level()))
+                                    lgr->write(wevt.get_event());
+                                event_count++;
+                            }
+                            else
+                            {
+                                throw chucho::exception("The value of the event mapping must be a mapping");
+                            }
+                        }
+                        else
+                        {
+                            throw chucho::exception("The sequence may only consist of mappings with a key of \"event\"");
+                        }
                     }
                     else
                     {
-                        // error
+                        throw chucho::exception("The event node must be a mapping node");
                     }
                 }
             }
             else
             {
-                // error
+                throw chucho::exception("The YAML events must be expressed as a sequence of event nodes");
             }
         }
     }
