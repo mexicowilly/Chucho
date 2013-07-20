@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_TIME_FILE_ROLLER_FACTORY_HPP__)
 #define CHUCHO_TIME_FILE_ROLLER_FACTORY_HPP__
 
-#if !defined(chucho_EXPORTS)
+#if !defined(CHUCHO_BUILD)
 #error "This header is private"
 #endif
 

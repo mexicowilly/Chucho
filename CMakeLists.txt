@@ -15,11 +15,13 @@
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
-PROJECT(chuhco CXX C)
+PROJECT(CHUCHO CXX C)
 
 INCLUDE(Configure.cmake)
 
-INCLUDE_DIRECTORIES(include embedded/include)
+# Include CMAKE_BINARY_DIR because that's where the generated file
+# export.hpp lives.
+INCLUDE_DIRECTORIES(include embedded/include "${CMAKE_BINARY_DIR}")
 
 SET(CHUCHO_VERSION 1.2)
 SET(CHUCHO_SO_VERSION 1)
@@ -56,7 +58,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/duplicate_message_filter.hpp
     include/chucho/event.hpp
     include/chucho/exception.hpp
-    include/chucho/export.hpp
+    "${CMAKE_BINARY_DIR}/chucho/export.hpp"
     include/chucho/file_roller.hpp
     include/chucho/file_roll_trigger.hpp
     include/chucho/file_writer.hpp
@@ -254,7 +256,6 @@ ELSE()
     ADD_LIBRARY(chucho STATIC ${CHUCHO_SOURCES})
     SET_TARGET_PROPERTIES(chucho PROPERTIES
                           PUBLIC_HEADER "${CHUCHO_PUBLIC_HEADERS}")
-    ADD_DEFINITIONS(-Dchucho_EXPORTS)
     INSTALL(TARGETS chucho
             ARCHIVE DESTINATION lib
             PUBLIC_HEADER DESTINATION include/chucho)
@@ -303,7 +304,8 @@ FOREACH(SRC ${CHUCHO_SOURCES})
     ENDIF()
 ENDFOREACH()
 LIST(REMOVE_ITEM CHUCHO_SOURCES ${CHUCHO_TO_REMOVE})
-SET(CHUCHO_DIST_NAME_BASE "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${CHUCHO_VERSION}")
+STRING(TOLOWER ${CMAKE_PROJECT_NAME} CHUCHO_LOWER_PROJECT_NAME)
+SET(CHUCHO_DIST_NAME_BASE "${CMAKE_BINARY_DIR}/${CHUCHO_LOWER_PROJECT_NAME}-${CHUCHO_VERSION}")
 IF(DEFINED CHUCHO_DIST_VERSION)
     SET(CHUCHO_DIST_NAME_BASE "${CHUCHO_DIST_NAME_BASE}-${CHUCHO_DIST_VERSION}")
 ENDIF()
