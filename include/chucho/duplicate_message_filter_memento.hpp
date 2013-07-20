@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_DUPLICATE_MESSAGE_FILTER_MEMENTO_HPP__)
 #define CHUCHO_DUPLICATE_MESSAGE_FILTER_MEMENTO_HPP__
 
-#if !defined(chucho_EXPORTS)
+#if !defined(CHUCHO_BUILD)
 #error "This header is private"
 #endif
 

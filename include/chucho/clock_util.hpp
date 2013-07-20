@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_CLOCK_UTIL_HPP__)
 #define CHUCHO_CLOCK_UTIL_HPP__
 
-#if !defined(chucho_EXPORTS)
+#if !defined(CHUCHO_BUILD)
 #error "This header is private"
 #endif
 
