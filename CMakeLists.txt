@@ -70,6 +70,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/logger.hpp
     include/chucho/marker.hpp
     include/chucho/memento.hpp
+    include/chucho/non_copyable.hpp
     include/chucho/numbered_file_roller.hpp
 	include/chucho/optional.hpp
     include/chucho/pattern_formatter.hpp

@@ -58,7 +58,8 @@ namespace chucho
  *  
  * @ingroup loggers
  */
-class CHUCHO_EXPORT logger : public std::enable_shared_from_this<logger>,
+class CHUCHO_EXPORT logger : non_copyable,
+                             public std::enable_shared_from_this<logger>,
                              public status_reporter,
                              public configurable
 {
@@ -90,26 +91,6 @@ public:
     * calling this method. 
     */
     static void remove_unused_loggers();
-
-   /**
-    * @name Constructor
-    */
-    //@{
-    /**
-     * Unimplemented copy constructor.
-     */
-    logger(const logger&) = delete;
-    //@}
-
-    /**
-     * @name Operator
-     */
-    //@{
-    /**
-     * Unimplemented assignment operator.
-     */ 
-    logger& operator= (const logger&) = delete;
-    //@}
 
    /**
     * Add a writer. This writer will be written in subsequent event 

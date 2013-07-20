@@ -22,6 +22,7 @@
 #include "vassals.hpp"
 #include "selector.hpp"
 #include <chucho/logger.hpp>
+#include <chucho/non_copyable.hpp>
 #if defined(CHUCHOD_VELOCITY)
 #include <chrono>
 #include <cstdint>
@@ -33,14 +34,11 @@ namespace chucho
 namespace server
 {
 
-class suzerain
+class suzerain : non_copyable
 {
 public:
     suzerain(properties& props);
-    suzerain(const suzerain&) = delete;
     ~suzerain();
-
-    suzerain& operator= (const suzerain&) = delete;
 
     void run();
 

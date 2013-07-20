@@ -14,35 +14,30 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_SOCKET_LISTENER_HPP__)
-#define CHUCHO_SOCKET_LISTENER_HPP__
-
-#include "socket_reader.hpp"
-#include <chucho/logger.hpp>
-#include <chucho/non_copyable.hpp>
-#include <atomic>
+#if !defined(CHUCHO_NON_COPYABLE_HPP__)
+#define CHUCHO_NON_COPYABLE_HPP__
 
 namespace chucho
 {
 
-namespace server
-{
-
-class socket_listener : non_copyable
+/**
+ * @class non_copyable non_copyable.hpp chucho/non_copyable.hpp
+ * An object that cannot be copied. This class is unfortunately 
+ * necessary as long as some compilers refuse to support "= 
+ * delete". Specifically, this class exists in order to support 
+ * Visual Studio 2012. 
+ *  
+ * @ingroup miscellaneous 
+ */
+class non_copyable
 {
 public:
-    socket_listener(std::uint16_t port);
-    ~socket_listener();
-
-    std::shared_ptr<socket_reader> accept();
+    non_copyable() { }
 
 private:
-    int socket_;
-    std::shared_ptr<chucho::logger> logger_;
-    std::atomic<bool> stop_;
+    non_copyable(const non_copyable&);
+    non_copyable& operator= (const non_copyable&);
 };
-
-}
 
 }
 
