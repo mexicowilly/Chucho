@@ -190,7 +190,6 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
         return;
     }
     configurator::initialize();
-    bool got_config = false;
     std::string fn;
     if (!sd.environment_variable_.empty())
     {
