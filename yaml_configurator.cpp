@@ -48,7 +48,7 @@ int istream_reader(void* raw,
     if (!stream->good())
         return 0;
     stream->read(reinterpret_cast<char*>(buf), size);
-    *size_read = stream->gcount();
+    *size_read = static_cast<std::size_t>(stream->gcount());
     return 1;
 }
 
