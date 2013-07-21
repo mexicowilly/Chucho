@@ -16,6 +16,7 @@
 
 #include <chucho/size_file_roll_trigger_memento.hpp>
 #include <chucho/exception.hpp>
+#include <locale>
 #include <cctype>
 #include <sstream>
 #include <algorithm>

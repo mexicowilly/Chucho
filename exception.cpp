@@ -22,6 +22,7 @@ namespace
 
 void nested_what_handler(std::ostream& stream, int level, const std::exception& e)
 {
+#if defined(CHUCHO_HAVE_NESTED_EXCEPTIONS)
     if (level > 1)
         stream << ' ';
     stream << "{ " << level << ": " << e.what() << " }";
@@ -33,6 +34,9 @@ void nested_what_handler(std::ostream& stream, int level, const std::exception& 
     {
         nested_what_handler(stream, level + 1, ne);
     }
+#else
+    stream << e.what();
+#endif
 }
 
 }
@@ -52,7 +56,7 @@ std::string exception::nested_whats(const std::exception& e)
     return stream.str();
 }
 
-const char* exception::what() const noexcept
+const char* exception::what() const CHUCHO_NOEXCEPT
 {
     return message_.c_str();
 }

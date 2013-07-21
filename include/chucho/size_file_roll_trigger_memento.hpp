@@ -23,6 +23,7 @@
 
 #include <chucho/memento.hpp>
 #include <chucho/optional.hpp>
+#include <cstdint>
 
 namespace chucho
 {

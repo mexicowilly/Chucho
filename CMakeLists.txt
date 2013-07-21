@@ -39,6 +39,9 @@ IF(CHUCHO_POSIX)
         platform/posix/socket_connector_posix.cpp
         platform/posix/socket_exception_posix.cpp
         platform/posix/syslog_writer_posix.cpp)
+ELSEIF(CHUCHO_WINDOWS)
+    SET(CHUCHO_PLATFORM_SOURCES
+        platform/windows/calendar_windows.cpp)
 ENDIF()
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
@@ -105,7 +108,13 @@ SET(CHUCHO_EMBEDDED_SOURCES
     embedded/libyaml/scanner.c)
 
 SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/api.c PROPERTIES
-                            COMPILE_DEFINITIONS "YAML_VERSION_MAJOR=${CHUCHO_LIBYAML_VERSION_MAJOR};YAML_VERSION_MINOR=${CHUCHO_LIBYAML_VERSION_MINOR};YAML_VERSION_PATCH=${CHUCHO_LIBYAML_VERSION_PATCH};YAML_VERSION_STRING=\"${CHUCHO_LIB_YAML_VERSION_MAJOR}.${CHUCHO_LIBYAML_VERSION_MINOR}.${CHUCHO_LIBYAML_VERSION_PATCH}\"")
+                            COMPILE_DEFINITIONS "YAML_VERSION_MAJOR=${CHUCHO_LIBYAML_VERSION_MAJOR};YAML_VERSION_MINOR=${CHUCHO_LIBYAML_VERSION_MINOR};YAML_VERSION_PATCH=${CHUCHO_LIBYAML_VERSION_PATCH};YAML_VERSION_STRING=\"${CHUCHO_LIB_YAML_VERSION_MAJOR}.${CHUCHO_LIBYAML_VERSION_MINOR}.${CHUCHO_LIBYAML_VERSION_PATCH}\";YAML_DECLARE_STATIC")
+SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/loader.c
+                            embedded/libyaml/parser.c
+                            embedded/libyaml/reader.c
+                            embedded/libyaml/scanner.c
+                            PROPERTIES
+                            COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
 IF(CMAKE_C_COMPILER_ID STREQUAL Clang)
     SET_SOURCE_FILES_PROPERTIES(embedded/trex/trex.c PROPERTIES
                                 COMPILE_FLAGS "-Wno-logical-op-parentheses -Wno-unused-value")
@@ -210,7 +219,6 @@ SET(CHUCHO_SOURCES
     include/chucho/numbered_file_roller_memento.hpp
     include/chucho/pattern_formatter_factory.hpp
     include/chucho/pattern_formatter_memento.hpp
-    include/chucho/printf_util.hpp
     include/chucho/regex.hpp
     include/chucho/regex_exception.hpp
     include/chucho/remote_writer_factory.hpp

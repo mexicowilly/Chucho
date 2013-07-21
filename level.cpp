@@ -21,6 +21,7 @@
 #include <set>
 #include <algorithm>
 #include <mutex>
+#include <locale>
 
 namespace
 {
