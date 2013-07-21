@@ -15,38 +15,9 @@
  */
 
 #include <chucho/calendar.hpp>
-#include <chucho/garbage_cleaner.hpp>
 #include <sstream>
-#include <mutex>
 #include <iomanip>
-
-namespace
-{
-
-struct static_data
-{
-    static_data();
-
-    std::mutex calendar_guard_;
-};
-
-static_data::static_data()
-{
-    chucho::garbage_cleaner::get().add([this] () { delete this; });
-}
-
-std::once_flag once;
-
-static_data& data()
-{
-    // This will be cleaned in finalize()
-    static static_data* sd;
-
-    std::call_once(once, [&] () { sd = new static_data(); });
-    return *sd;
-}
-
-}
+#include <time.h>
 
 namespace chucho
 {
@@ -63,14 +34,16 @@ std::string format(const struct std::tm& cal, const std::string& pattern)
 
 struct std::tm get_local(std::time_t t)
 {
-    std::lock_guard<std::mutex> lg(data().calendar_guard_);
-    return *std::localtime(&t);
+    struct std::tm result;
+    localtime_s(&result, &t);
+    return result;
 }
 
 struct std::tm get_utc(std::time_t t)
 {
-    std::lock_guard<std::mutex> lg(data().calendar_guard_);
-    return *std::gmtime(&t);
+    struct std::tm result;
+    gmtime_s(&result, &t);
+    return result;
 }
 
 }

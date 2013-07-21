@@ -126,6 +126,11 @@ SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/loader.c
                             embedded/libyaml/scanner.c
                             PROPERTIES
                             COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
+IF(MSVC)
+    # Microsoft doesn't want libyaml to use strdup
+    SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/api.c PROPERTIES
+                                COMPILE_FLAGS /wd4996)
+ENDIF()
 IF(CMAKE_C_COMPILER_ID STREQUAL Clang)
     SET_SOURCE_FILES_PROPERTIES(embedded/trex/trex.c PROPERTIES
                                 COMPILE_FLAGS "-Wno-logical-op-parentheses -Wno-unused-value")
@@ -253,6 +258,13 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_PLATFORM_SOURCES}
     ${CHUCHO_EMBEDDED_SOURCES}
     ${CHUCHO_PUBLIC_HEADERS})
+
+IF(MSVC)
+    # We use std::getenv, and MSC hates it
+    SET_SOURCE_FILES_PROPERTIES(configuration.cpp configurator.cpp
+                                PROPERTIES
+                                COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
+ENDIF()
 
 IF(ENABLE_SHARED)
     ADD_LIBRARY(chucho SHARED ${CHUCHO_SOURCES})

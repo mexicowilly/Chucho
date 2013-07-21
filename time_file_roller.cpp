@@ -379,7 +379,7 @@ std::size_t time_file_roller::cleaner::periods_elapsed(const time_type& first, c
     else
     {
         auto diff = std::chrono::duration_cast<std::chrono::seconds>(last - first);
-        result = diff.count() / static_cast<long long>(roller_.period_);
+        result = static_cast<std::size_t>(diff.count() / static_cast<long long>(roller_.period_));
     }
     return result;
 }
