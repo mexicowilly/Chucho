@@ -23,13 +23,13 @@
 #include <chucho/marker.hpp>
 #include <chucho/diagnostic_context.hpp>
 #include <chucho/line_ending.hpp>
-#include <chucho/printf_util.hpp>
 #include <chucho/host.hpp>
 #include <limits>
 #include <sstream>
-#include <array>
 #include <mutex>
 #include <thread>
+#include <cstdio>
+#include <iomanip>
 
 namespace
 {
@@ -390,13 +390,10 @@ std::string pattern_formatter::date_time_piece::get_text_impl(const event& evt) 
     {
         if (clock_util::system_clock_supports_milliseconds)
         {
-            std::array<char, 4> buf;
-            std::snprintf(buf.data(),
-                          buf.size(),
-                          printf::get_milli_format<std::chrono::milliseconds::rep>().c_str(),
-                          millis.count() % 1000);
+            std::ostringstream stream;
+            stream << std::setw(3) << (millis.count() % 1000);
             for (std::size_t p : milli_positions_)
-                pat.replace(p, 2, buf.data());
+                pat.replace(p, 2, stream.str());
         }
         else
         {

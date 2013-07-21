@@ -25,9 +25,13 @@
 namespace chucho
 {
 
+// TODO: Forward this constructor when Microsoft decides to support that
 numbered_file_roller::numbered_file_roller(int max_index)
-    : numbered_file_roller(1, max_index)
+    : min_index_(1),
+      max_index_(max_index)
 {
+    if (max_index < 1)
+        throw std::invalid_argument("numbered_file_roller: min_index must be less than or equal to max_index");
 }
 
 numbered_file_roller::numbered_file_roller(int min_index, int max_index)
@@ -65,9 +69,15 @@ void numbered_file_roller::roll()
         std::rename(file_writer_->get_file_name().c_str(),
                     get_name(min_index_).c_str());
     }
-    catch (std::exception&)
+    catch (std::exception& e)
     {
-        std::throw_with_nested(exception("Could not roll the file " + file_writer_->get_file_name()));
+#if defined(CHUCHO_HAVE_NESTED_EXCEPTIONS)
+        std::throw_with_nested(exception("Could not roll the file " +
+            file_writer_->get_file_name()));
+#else
+        throw exception(std::string(e.what()) +
+            ": Could not roll the file " + file_writer_->get_file_name());
+#endif
     }
 }
 

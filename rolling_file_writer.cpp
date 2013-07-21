@@ -20,28 +20,27 @@
 namespace chucho
 {
 
+// TODO: Support fowarded constructors when Microsoft supports it
 rolling_file_writer::rolling_file_writer(std::shared_ptr<formatter> fmt,
                                          std::shared_ptr<file_roller> roller,
                                          std::shared_ptr<file_roll_trigger> trigger)
-    : rolling_file_writer(fmt,
-                          file_writer::on_start::APPEND,
-                          true,
-                          roller,
-                          trigger)
+    : file_writer(fmt, file_writer::on_start::APPEND, true),
+      roller_(roller),
+      trigger_(trigger)
 {
+    init();
 }
 
+// TODO: Support fowarded constructors when Microsoft supports it
 rolling_file_writer::rolling_file_writer(std::shared_ptr<formatter> fmt,
                                          const std::string& file_name,
                                          std::shared_ptr<file_roller> roller,
                                          std::shared_ptr<file_roll_trigger> trigger)
-    : rolling_file_writer(fmt,
-                          file_name,
-                          file_writer::on_start::APPEND,
-                          true,
-                          roller,
-                          trigger)
+    : file_writer(fmt, file_name, file_writer::on_start::APPEND, true),
+      roller_(roller),
+      trigger_(trigger)
 {
+    init();
 }
 
 rolling_file_writer::rolling_file_writer(std::shared_ptr<formatter> fmt,

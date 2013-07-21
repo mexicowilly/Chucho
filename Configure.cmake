@@ -87,6 +87,10 @@ ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
     ELSE()
         MESSAGE(FATAL_ERROR "-std=c++11 is required")
     ENDIF()
+ELSEIF(MSVC)
+    IF(MSVC_VERSION LESS 1700)
+        MESSAGE(FATAL_ERROR "Microsoft compiler version 17 or later is required (the compiler that ships with Visual Studio 2012)")
+    ENDIF()
 ENDIF()
 
 # We are building Chucho
@@ -236,6 +240,22 @@ IF(CHUCHO_POSIX)
             MESSAGE(FATAL_ERROR "${SYM} is required")
         ENDIF()
     ENDFOREACH()
+ELSEIF(CHUCHO_WINDOWS)
+    CHECK_INCLUDE_FILE_CXX(windows.h CHUCHO_HAVE_WINDOWS_H)
+    IF(NOT CHUCHO_HAVE_WINDOWS_H)
+        MESSAGE(FATAL_ERROR "windows.h is required")
+    ENDIF()
+    CHECK_INCLUDE_FILE_CXX(winsock2.h CHUCHO_HAVE_WINSOCK2_H)
+    IF(NOT CHUCHO_HAVE_WINSOCK2_H)
+        MESSAGE(FATAL_ERROR "winsock2.h is required")
+    ENDIF()
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_WINSOCK2_H)
+ENDIF()
+
+CHECK_CXX_SOURCE_COMPILES("#include <exception>\nint main() { std::exception e; std::throw_with_nested(e); std::rethrow_if_nested(e); return 0; }"
+                          CHUCHO_HAVE_NESTED_EXCEPTIONS)
+IF(CHUCHO_HAVE_NESTED_EXCEPTIONS)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_NESTED_EXCEPTIONS)
 ENDIF()
 
 #

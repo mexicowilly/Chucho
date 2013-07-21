@@ -18,6 +18,7 @@
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
 #include <algorithm>
+#include <cctype>
 
 namespace chucho
 {

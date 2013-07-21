@@ -45,7 +45,14 @@ event::event(std::shared_ptr<logger> lgr,
              unsigned line_number,
              const char* const function_name,
              const std::string& mark)
-    : event(lgr, lvl, msg, file_name, line_number, function_name, marker(mark))
+    : logger_(lgr),
+      level_(lvl),
+      message_(msg),
+      time_(clock_type::now()),
+      file_name_(file_name),
+      line_number_(line_number),
+      function_name_(function_name),
+      marker_(mark)
 {
 }
 

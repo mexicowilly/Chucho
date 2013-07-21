@@ -23,6 +23,7 @@
 
 #include <chucho/export.hpp>
 #include <string>
+#include <cstdint>
 
 namespace chucho
 {

@@ -20,6 +20,8 @@
 #include <chucho/yaml_formatter.hpp>
 #if defined(CHUCHO_HAVE_ARPA_INET_H)
 #include <arpa/inet.h>
+#elif defined(CHUCHO_HAVE_WINSOCK2_H)
+#include <winsock2.h>
 #endif
 #include <cstring>
 

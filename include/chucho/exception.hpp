@@ -21,6 +21,12 @@
 #include <exception>
 #include <string>
 
+#if defined(_MSC_VER) && (_MSC_VER <= 1700)
+#define CHUCHO_NOEXCEPT throw()
+#else
+#define CHUCHO_NOEXCEPT noexcept
+#endif
+
 namespace chucho
 {
 
@@ -60,7 +66,7 @@ public:
      * 
      * @return the message
      */
-    virtual const char* what() const noexcept override;
+    virtual const char* what() const CHUCHO_NOEXCEPT override;
 
 protected:
     /**
