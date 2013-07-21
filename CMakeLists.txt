@@ -41,7 +41,18 @@ IF(CHUCHO_POSIX)
         platform/posix/syslog_writer_posix.cpp)
 ELSEIF(CHUCHO_WINDOWS)
     SET(CHUCHO_PLATFORM_SOURCES
-        platform/windows/calendar_windows.cpp)
+        platform/windows/calendar_windows.cpp
+        platform/windows/error_util.cpp
+        platform/windows/error_util.hpp
+        platform/windows/file_windows.cpp
+        platform/windows/host_windows.cpp
+        platform/windows/line_ending_windows.cpp
+        platform/windows/pattern_formatter_windows.cpp
+        platform/windows/socket_connector_windows.cpp
+        platform/windows/socket_exception_windows.cpp
+        platform/windows/syslog_writer_windows.cpp
+        platform/windows/winsock_startup.cpp
+        platform/windows/winsock_startup.hpp)
 ENDIF()
 
 IF(CMAKE_COMPILER_IS_GNUCXX)

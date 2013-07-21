@@ -109,6 +109,12 @@ SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 SET(CMAKE_INSTALL_RPATH_USE_LINK_RPATH FALSE)
 
+# stdlib.h is required on all platforms
+CHECK_INCLUDE_FILE_CXX(stdlib.h CHUCHO_HAVE_STDLIB_H)
+IF(NOT CHUCHO_HAVE_STDLIB_H)
+    MESSAGE(FATAL_ERROR "The header stdlib.h is required")
+ENDIF()
+
 IF(CHUCHO_POSIX)
     # headers
     FOREACH(HEAD arpa/inet.h fcntl.h fts.h limits.h netdb.h poll.h pthread.h pwd.h signal.h
@@ -241,15 +247,20 @@ IF(CHUCHO_POSIX)
         ENDIF()
     ENDFOREACH()
 ELSEIF(CHUCHO_WINDOWS)
-    CHECK_INCLUDE_FILE_CXX(windows.h CHUCHO_HAVE_WINDOWS_H)
-    IF(NOT CHUCHO_HAVE_WINDOWS_H)
-        MESSAGE(FATAL_ERROR "windows.h is required")
-    ENDIF()
-    CHECK_INCLUDE_FILE_CXX(winsock2.h CHUCHO_HAVE_WINSOCK2_H)
-    IF(NOT CHUCHO_HAVE_WINSOCK2_H)
-        MESSAGE(FATAL_ERROR "winsock2.h is required")
-    ENDIF()
+    FOREACH(HEAD windows.h winsock2.h io.h process.h ws2tcpip.h)
+        STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
+        STRING(TOUPPER ${CHUCHO_HEAD_VAR_NAME} CHUCHO_HEAD_VAR_NAME)
+        CHECK_INCLUDE_FILE_CXX(${HEAD} ${CHUCHO_HEAD_VAR_NAME})
+        IF(NOT ${CHUCHO_HEAD_VAR_NAME})
+            MESSAGE(FATAL_ERROR "The header ${HEAD} is required")
+        ENDIF()
+    ENDFOREACH()
     ADD_DEFINITIONS(-DCHUCHO_HAVE_WINSOCK2_H)
+    # Shellapi.h has to have windows.h included first
+    CHECK_CXX_SOURCE_COMPILES("#include <windows.h>\n#include <shellapi.h>\nint main() { return 0; }" CHUCHO_HAVE_SHELLAPI_H)
+    IF(NOT CHUCHO_HAVE_SHELLAPI_H)
+        MESSAGE(FATAL_ERROR "shellapi.h is required")
+    ENDIF()
 ENDIF()
 
 CHECK_CXX_SOURCE_COMPILES("#include <exception>\nint main() { std::exception e; std::throw_with_nested(e); std::rethrow_if_nested(e); return 0; }"

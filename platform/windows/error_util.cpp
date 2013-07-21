@@ -14,36 +14,32 @@
  *    limitations under the License.
  */
 
-#include <chucho/host.hpp>
-#include <sys/utsname.h>
-#include <netdb.h>
-#include <cstring>
+#include "error_util.hpp"
 
 namespace chucho
 {
 
-void host::get_base_impl(std::string& result)
+namespace error_util
 {
-    struct utsname info;
-    uname(&info);
-    result = info.nodename;
+
+std::string message(DWORD err)
+{
+    char* msg;
+    if (FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+                       nullptr,
+                       err,
+                       0,
+                       reinterpret_cast<char*>(&msg),
+                       1,
+                       nullptr) == 0)
+    {
+        return std::string();
+    }
+    std::string result(msg);
+    LocalFree(msg);
+    return result;
 }
 
-void host::get_full_impl(std::string& result)
-{
-    std::string full;
-    get_base_impl(full);
-    struct addrinfo hints;
-    std::memset(&hints, 0, sizeof(hints));
-    hints.ai_family = PF_UNSPEC;
-    hints.ai_flags = AI_CANONNAME;
-    struct addrinfo* info;
-    if (getaddrinfo(full.c_str(), nullptr, &hints, &info) == 0)
-    {
-        full = info->ai_canonname;
-        freeaddrinfo(info);
-    }
-    result = full;
 }
 
 }
