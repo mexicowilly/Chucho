@@ -42,6 +42,7 @@ IF(CHUCHO_POSIX)
 ELSEIF(CHUCHO_WINDOWS)
     SET(CHUCHO_PLATFORM_SOURCES
         platform/windows/calendar_windows.cpp
+        platform/windows/diagnostic_context_windows.cpp
         platform/windows/error_util.cpp
         platform/windows/error_util.hpp
         platform/windows/file_windows.cpp
@@ -150,6 +151,7 @@ SET(CHUCHO_SOURCES
     cout_writer_factory.cpp
     cout_writer_memento.cpp
     demangle.cpp
+    diagnostic_context.cpp
     duplicate_message_filter.cpp
     duplicate_message_filter_factory.cpp
     duplicate_message_filter_memento.cpp
