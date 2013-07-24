@@ -25,11 +25,14 @@
 #include <chucho/host.hpp>
 #include <sstream>
 #include <thread>
+#if defined(CHUCHO_WINDOWS)
+#include <process.h>
+#endif
 
 namespace
 {
 
-#if defined(_WIN32)
+#if defined(CHUCHO_WINDOWS)
 const char* file_name = "\\one\\two";
 #else
 const char* file_name = "/one/two";
@@ -107,8 +110,8 @@ TEST_F(pattern_formatter_test, level)
 
 TEST_F(pattern_formatter_test, pid)
 {
-    #if defined(_WIN32)
-    pid_t p = _getpid();
+    #if defined(CHUCHO_WINDOWS)
+    int p = _getpid();
     #else
     pid_t p = getpid();
     #endif
