@@ -1,13 +1,17 @@
 #include <gtest/gtest.h>
 #include <chucho/utf8.hpp>
 #include <chucho/exception.hpp>
-#include <vector>
 #include <iostream>
 #include <sstream>
 
+//
+// If Visual Studio 2012 supported initializer lists, this code
+// would not be hideous.
+//
+
 TEST(utf8, escape)
 {
-    std::vector<std::pair<std::string, std::string>> v =
+    struct { const char* first; const char* second; } v[] =
     {
         { "wi\x80ll", "wi\\x80ll" },
         { "wi\x80\x81\x82ll", "wi\\x80\\x81\\x82ll" },
@@ -19,15 +23,17 @@ TEST(utf8, escape)
         { "wi\xf1\x81ll", "wi\\xf1\\x81ll" },
         { "wi\xf2\x82\x83ll", "wi\\xf2\\x82\\x83ll" },
         { "\xf3will", "\\xf3will" },
-        { "will\x8f", "will\\x8f" }
+        { "will\x8f", "will\\x8f" },
+        { nullptr, nullptr }
     };
-    for (auto p : v)
-        EXPECT_EQ(p.second, chucho::utf8::escape_invalid(p.first));
+    int i = 0;
+    while (v[i].first != nullptr)
+        EXPECT_EQ(v[i].second, chucho::utf8::escape_invalid(v[i++].first));
 }
 
 TEST(utf8, invalid)
 {
-    std::vector<std::string> v =
+    const char* v[] =
     {
         "\x80",
         "\xf5",
@@ -37,19 +43,21 @@ TEST(utf8, invalid)
         "\xc2",
         "\xea\x80",
         "\xf2\x80",
-        "\xf3\xa0\xb0"
+        "\xf3\xa0\xb0",
+        nullptr
     };
-    for (const std::string& s : v)
+    int i = 0;
+    while (v[i] != nullptr)
     {
-        std::cout << "Check " << s << std::endl;
-        std::istringstream stream(s);
+        std::cout << "Check " << v[i] << std::endl;
+        std::istringstream stream(v[i++]);
         EXPECT_THROW(chucho::utf8::validate(stream), chucho::exception);
     }
 }
 
 TEST(utf8, valid)
 {
-    std::vector<std::string> v =
+    const char* v[] =
     {
         "I know you are, but what am I",
         "\xc0\xb0, but what am I",
@@ -57,12 +65,14 @@ TEST(utf8, valid)
         "\xe0\x80\x81, but what am I",
         "I know you are, but \xef\xbe\xbf",
         "\xf0\x80\x81\x82, but what am I",
-        "I know you are, but \xf4\xbd\xbe\xbf"
+        "I know you are, but \xf4\xbd\xbe\xbf",
+        nullptr 
     };
-    for (const std::string& s : v)
+    int i = 0;
+    while (v[i] != nullptr)
     {
-        std::cout << "Check " << s << std::endl;
-        std::istringstream stream(s);
+        std::cout << "Check " << v[i] << std::endl;
+        std::istringstream stream(v[i++]);
         EXPECT_NO_THROW(chucho::utf8::validate(stream));
     }
 }

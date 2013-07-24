@@ -41,6 +41,11 @@ thread_exit_manager::~thread_exit_manager()
     stop_ = true;
     guard_.unlock();
     thread_->join();
+    // This is called in finalize, so Chucho can no longer be used, which
+    // means it is time to clean up all existing diagnostic contexts.
+    std::lock_guard<std::mutex> lg(guard_);
+    for (auto d : diags_)
+        delete d.second;
 }
 
 void thread_exit_manager::add(HANDLE thr, std::map<std::string, std::string>* diag)

@@ -311,6 +311,7 @@ ExternalProject_Add_Step(gtest-external
                          COMMAND "${CMAKE_COMMAND}" -E make_directory <INSTALL_DIR>/include
                          COMMAND "${CMAKE_COMMAND}" -E copy_directory <SOURCE_DIR>/include <INSTALL_DIR>/include
                          DEPENDEES build)
+ADD_LIBRARY(gtest STATIC IMPORTED)
 IF(CHUCHO_WINDOWS)
     ExternalProject_Add_Step(gtest-external
                              install-libs
@@ -320,6 +321,8 @@ IF(CHUCHO_WINDOWS)
                              COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/gtest_main.lib <INSTALL_DIR>/lib
                              COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/gtest_main.pdb <INSTALL_DIR>/lib
                              DEPENDEES install-headers)
+    SET_TARGET_PROPERTIES(gtest PROPERTIES
+                          IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/gtest.lib")
 ELSE()
     ExternalProject_Add_Step(gtest-external
                              install-libs
@@ -327,11 +330,10 @@ ELSE()
                              COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/libgtest.a <INSTALL_DIR>/lib
                              COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/libgtest_main.a <INSTALL_DIR>/lib
                              DEPENDEES install-headers)
-    ADD_LIBRARY(gtest STATIC IMPORTED)
-    ADD_DEPENDENCIES(gtest gtest-external)
     SET_TARGET_PROPERTIES(gtest PROPERTIES
                           IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/libgtest.a")
 ENDIF()
+ADD_DEPENDENCIES(gtest gtest-external)
 SET_TARGET_PROPERTIES(gtest-external PROPERTIES
                       EXCLUDE_FROM_ALL TRUE)
 ADD_DEPENDENCIES(external gtest-external)
