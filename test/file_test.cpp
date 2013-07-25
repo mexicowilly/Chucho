@@ -24,10 +24,11 @@ TEST(file_test, base_name)
     EXPECT_STREQ("three", chucho::file::base_name("/one/two/three/").c_str());
     EXPECT_STREQ("three", chucho::file::base_name("/one/two/three///").c_str());
     EXPECT_STREQ("three", chucho::file::base_name("/one/two/////three///").c_str());
+    EXPECT_STREQ(".", chucho::file::base_name("").c_str());
+#if defined(CHUCHO_POSIX)
     EXPECT_STREQ("/", chucho::file::base_name("/").c_str());
     EXPECT_STREQ("/", chucho::file::base_name("/////").c_str());
-    EXPECT_STREQ(".", chucho::file::base_name("").c_str());
-#if defined(CHUCHO_WINDOWS)
+#elif defined(CHUCHO_WINDOWS)
     EXPECT_STREQ("three", chucho::file::base_name("C:\\one\\two\\three").c_str());
     EXPECT_STREQ("three", chucho::file::base_name("C:\\one\\two\\three\\").c_str());
     EXPECT_STREQ("three", chucho::file::base_name("C:\\one\\two\\three\\\\\\").c_str());
@@ -44,29 +45,30 @@ TEST(file_test, directory_name)
     EXPECT_STREQ("/one/two", chucho::file::directory_name("/one/two/three////").c_str());
     EXPECT_STREQ("/one/two", chucho::file::directory_name("/one/two//////three////").c_str());
     EXPECT_STREQ("/one/two", chucho::file::directory_name("/one/two//////three").c_str());
-    EXPECT_STREQ("/", chucho::file::directory_name("/one").c_str());
-    EXPECT_STREQ("/", chucho::file::directory_name("/one/").c_str());
-    EXPECT_STREQ("/", chucho::file::directory_name("/one////").c_str());
     EXPECT_STREQ("one", chucho::file::directory_name("one/two").c_str());
     EXPECT_STREQ("one", chucho::file::directory_name("one////two///////").c_str());
     EXPECT_STREQ(".", chucho::file::directory_name("").c_str());
-    EXPECT_STREQ("/", chucho::file::directory_name("/").c_str());
-    EXPECT_STREQ("/", chucho::file::directory_name("//////").c_str());
     EXPECT_STREQ(".", chucho::file::directory_name("one").c_str());
-#if defined(CHUCHO_WINDOWS)
-    EXPECT_STREQ("/one/two", chucho::file::directory_name("/one/two/three").c_str());
-    EXPECT_STREQ("/one/two", chucho::file::directory_name("/one/two/three/").c_str());
-    EXPECT_STREQ("/one/two", chucho::file::directory_name("/one/two/three////").c_str());
-    EXPECT_STREQ("/one/two", chucho::file::directory_name("/one/two//////three////").c_str());
-    EXPECT_STREQ("/one/two", chucho::file::directory_name("/one/two//////three").c_str());
+#if defined(CHUCHO_POSIX)
     EXPECT_STREQ("/", chucho::file::directory_name("/one").c_str());
     EXPECT_STREQ("/", chucho::file::directory_name("/one/").c_str());
     EXPECT_STREQ("/", chucho::file::directory_name("/one////").c_str());
-    EXPECT_STREQ("one", chucho::file::directory_name("one/two").c_str());
-    EXPECT_STREQ("one", chucho::file::directory_name("one////two///////").c_str());
-    EXPECT_STREQ(".", chucho::file::directory_name("").c_str());
     EXPECT_STREQ("/", chucho::file::directory_name("/").c_str());
     EXPECT_STREQ("/", chucho::file::directory_name("//////").c_str());
+#elif defined(CHUCHO_WINDOWS)
+    EXPECT_STREQ("C:\\one\\two", chucho::file::directory_name("C:\\one\\two\\three").c_str());
+    EXPECT_STREQ("C:\\one\\two", chucho::file::directory_name("C:\\one\\two\\three\\").c_str());
+    EXPECT_STREQ("C:\\one\\two", chucho::file::directory_name("C:\\one\\two\\three\\\\\\\\").c_str());
+    EXPECT_STREQ("C:\\one\\two", chucho::file::directory_name("C:\\one\\two\\\\\\\\\\\\three\\\\\\\\").c_str());
+    EXPECT_STREQ("C:\\one\\two", chucho::file::directory_name("C:\\one\\two\\\\\\\\\\\\three").c_str());
+    EXPECT_STREQ("C:\\", chucho::file::directory_name("C:\\one").c_str());
+    EXPECT_STREQ("C:\\", chucho::file::directory_name("C:\\one\\").c_str());
+    EXPECT_STREQ("C:\\", chucho::file::directory_name("C:\\one\\\\\\\\").c_str());
+    EXPECT_STREQ("one", chucho::file::directory_name("one\\two").c_str());
+    EXPECT_STREQ("one", chucho::file::directory_name("one\\\\\\\\two\\\\\\\\\\\\\\").c_str());
+    EXPECT_STREQ(".", chucho::file::directory_name("").c_str());
+    EXPECT_STREQ("\\", chucho::file::directory_name("\\").c_str());
+    EXPECT_STREQ("\\", chucho::file::directory_name("\\\\\\\\\\\\").c_str());
 #endif
 }
 

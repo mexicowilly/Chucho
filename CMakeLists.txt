@@ -261,6 +261,8 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_EMBEDDED_SOURCES}
     ${CHUCHO_PUBLIC_HEADERS})
 
+SET_SOURCE_FILES_PROPERTIES(yaml_configurator.cpp PROPERTIES
+                            COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
 IF(MSVC)
     # We use std::getenv, and MSC hates it
     SET_SOURCE_FILES_PROPERTIES(configuration.cpp configurator.cpp

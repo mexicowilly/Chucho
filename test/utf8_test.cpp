@@ -28,7 +28,10 @@ TEST(utf8, escape)
     };
     int i = 0;
     while (v[i].first != nullptr)
-        EXPECT_EQ(v[i].second, chucho::utf8::escape_invalid(v[i++].first));
+    {
+        EXPECT_EQ(v[i].second, chucho::utf8::escape_invalid(v[i].first));
+        i++;
+    }
 }
 
 TEST(utf8, invalid)

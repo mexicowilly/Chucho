@@ -28,12 +28,13 @@ public:
     file_writer_test()
         : file_name_("file_writer_test")
     {
+        chucho::file::remove(file_name_);
         chucho::status_manager::get()->clear();
     }
 
     ~file_writer_test()
     {
-        std::remove(file_name_.c_str());
+        chucho::file::remove(file_name_);
     }
 
     std::shared_ptr<chucho::file_writer> get_writer(chucho::file_writer::on_start start = chucho::file_writer::on_start::APPEND)
@@ -91,9 +92,15 @@ TEST_F(file_writer_test, write)
     std::ifstream stream(file_name_.c_str());
     std::string line;
     std::getline(stream, line);
+    if (!line.empty() && line.back() == '\r')
+        line.pop_back();
     EXPECT_STREQ("hello", line.c_str());
     std::getline(stream, line);
+    if (!line.empty() && line.back() == '\r')
+        line.pop_back();
     EXPECT_STREQ("goodbye", line.c_str());
     std::getline(stream, line);
+    if (!line.empty() && line.back() == '\r')
+        line.pop_back();
     EXPECT_TRUE(stream.eof());
 }

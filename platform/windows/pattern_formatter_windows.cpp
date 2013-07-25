@@ -35,7 +35,7 @@ std::string pattern_formatter::milliseconds_since_start_piece::get_text_impl(con
                         &user))
     {
         FILETIME cur;
-        GetSystemTimePreciseAsFileTime(&cur);
+        GetSystemTimeAsFileTime(&cur);
         ULARGE_INTEGER biggy1;
         biggy1.LowPart = creation.dwLowDateTime;
         biggy1.HighPart = creation.dwHighDateTime;

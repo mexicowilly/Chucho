@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include <memory>
+#include <condition_variable>
 #include <windows.h>
 
 namespace
@@ -25,6 +26,7 @@ private:
     std::unique_ptr<std::thread> thread_;
     std::map<HANDLE, std::map<std::string, std::string>*> diags_;
     std::mutex guard_;
+    std::condition_variable condition_;
     bool stop_;
 };
 
@@ -39,6 +41,7 @@ thread_exit_manager::~thread_exit_manager()
 {
     guard_.lock();
     stop_ = true;
+    condition_.notify_one();
     guard_.unlock();
     thread_->join();
     // This is called in finalize, so Chucho can no longer be used, which
@@ -56,22 +59,26 @@ void thread_exit_manager::add(HANDLE thr, std::map<std::string, std::string>* di
 
 void thread_exit_manager::main()
 {
+    std::vector<HANDLE> thrs;
     while (true)
     {
-        std::vector<HANDLE> thrs;
-        guard_.lock();
+        std::unique_lock<std::mutex> ul(guard_);
+        while (!stop_ && diags_.empty())
+            condition_.wait(ul);
         if (stop_)
             break;
+        thrs.clear();
         for (auto d : diags_)
             thrs.push_back(d.first);
-        guard_.unlock();
+        ul.unlock();
         DWORD rc = WaitForMultipleObjects(thrs.size(), &thrs[0], FALSE, 500);
         if (rc != WAIT_FAILED && rc != WAIT_TIMEOUT)
         {
             HANDLE hnd = thrs[rc - WAIT_OBJECT_0];
-            std::lock_guard<std::mutex> lg(guard_);
+            ul.lock();
             delete diags_[hnd];
             diags_.erase(hnd);
+            ul.unlock();
         }
     }
 }
