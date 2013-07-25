@@ -22,7 +22,7 @@ namespace chucho
 
 void host::get_base_impl(std::string& result)
 {
-    DWORD size;
+    DWORD size = 0;
     GetComputerNameExA(ComputerNameNetBIOS, nullptr, &size);
     std::string tmp(size, 0);
     if (GetComputerNameExA(ComputerNameNetBIOS,
@@ -37,7 +37,7 @@ void host::get_base_impl(std::string& result)
 
 void host::get_full_impl(std::string& result)
 {
-    DWORD size;
+    DWORD size = 0;
     GetComputerNameExA(ComputerNameDnsFullyQualified, nullptr, &size);
     std::string tmp(size, 0);
     if (GetComputerNameExA(ComputerNameDnsFullyQualified,

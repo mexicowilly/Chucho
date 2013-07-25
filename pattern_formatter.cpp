@@ -153,7 +153,7 @@ std::string pattern_formatter::get_argument(std::string::const_iterator& pos,
                                             std::string::const_iterator end)
 {
     std::string result;
-    if (pos != end && *(pos + 1) == '{')
+    if (pos != end && (pos + 1) != end && *(pos + 1) == '{')
     {
         // std::find does not work under g++ 4.7
         auto last = find(++pos, end, '}');

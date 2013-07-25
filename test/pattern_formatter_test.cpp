@@ -23,6 +23,7 @@
 #include <chucho/diagnostic_context.hpp>
 #include <chucho/calendar.hpp>
 #include <chucho/host.hpp>
+#include <chucho/line_ending.hpp>
 #include <sstream>
 #include <thread>
 #if defined(CHUCHO_WINDOWS)
@@ -96,10 +97,8 @@ TEST_F(pattern_formatter_test, function)
 
 TEST_F(pattern_formatter_test, end_of_line)
 {
-    std::ostringstream stream;
-    stream << std::endl;
     chucho::pattern_formatter f("%n");
-    EXPECT_EQ(stream.str(), f.format(evt_).c_str());
+    EXPECT_STREQ(chucho::line_ending::EOL, f.format(evt_).c_str());
 }
 
 TEST_F(pattern_formatter_test, level)

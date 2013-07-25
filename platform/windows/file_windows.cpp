@@ -101,7 +101,7 @@ std::string directory_name(const std::string& name)
     if (slash == std::string::npos)
         return ".";
     end = name.find_last_not_of("/\\", slash);
-    if (end == std::string::npos)
+    if (end == std::string::npos || end < start)
         return drive + "\\";
     return name.substr(0, end + 1);
 }
@@ -120,8 +120,20 @@ bool is_fully_qualified(const std::string& name)
 
 void remove(const std::string& name)
 {
-    if (exists(name) && std::remove(name.c_str()) != 0)
-        throw file_exception("Unable to remove " + name);
+    if (exists(name))
+    {
+        DWORD attrs = GetFileAttributesA(name.c_str());
+        if (attrs & FILE_ATTRIBUTE_DIRECTORY)
+        {
+            if (!RemoveDirectoryA(name.c_str()))
+                throw file_exception("Unable to remove directory " + name);
+        }
+        else
+        {
+            if (!DeleteFileA(name.c_str()))
+                throw file_exception("Unable to remove file " + name);
+        }
+    }
 }
 
 void remove_all(const std::string& name)
