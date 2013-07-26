@@ -32,6 +32,7 @@
 #include <chucho/remote_writer_factory.hpp>
 #include <chucho/regex.hpp>
 #include <chucho/garbage_cleaner.hpp>
+#include <chucho/environment.hpp>
 #include <cstring>
 #include <mutex>
 
@@ -109,11 +110,12 @@ std::string configurator::resolve_variables(const std::string& val)
         const regex::match& m(*itor);
         if (m[1].begin() > 0)
         {
-            char* env = std::getenv(val.substr(m[2].begin(), m[2].length()).c_str());
-            if (env != nullptr)
+            optional<std::string> env = environment::get(
+                val.substr(m[2].begin(), m[2].length()).c_str());
+            if (env)
             {
-                result.replace(m[0].begin() + pos_offset, m[0].length(), env);
-                pos_offset += std::strlen(env) - m[0].length();
+                result.replace(m[0].begin() + pos_offset, m[0].length(), *env);
+                pos_offset += env->length() - m[0].length();
             }
         }
         else

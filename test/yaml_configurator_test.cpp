@@ -33,7 +33,7 @@
 #include <chucho/exception.hpp>
 #include <chucho/configuration.hpp>
 #include <sstream>
-#if defined(_WIN32)
+#if defined(CHUCHO_WINDOWS)
 #include <windows.h>
 #endif
 
@@ -43,7 +43,8 @@ namespace
 void setenv(const char* var, const char* val)
 {
 #if defined(CHUCHO_WINDOWS)
-    SetEnvironmentVariableA(var, val);
+    if (!SetEnvironmentVariableA(var, val))
+        std::cout << "Failed environment: " << GetLastError() << std::endl;
 #else
     ::setenv(var, val, 1);
 #endif

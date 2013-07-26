@@ -72,6 +72,10 @@ void file_writer::write_impl(const event& evt)
             if (flush_)
                 file_.flush();
         }
+        else
+        {
+            report_error("Cannot write to " + file_name_ + " because it is not open");
+        }
     }
     catch (std::ios::failure&)
     {
