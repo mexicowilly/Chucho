@@ -29,6 +29,7 @@ rolling_file_writer::rolling_file_writer(std::shared_ptr<formatter> fmt,
       trigger_(trigger)
 {
     init();
+    open(roller_->get_active_file_name());
 }
 
 // TODO: Support fowarded constructors when Microsoft supports it

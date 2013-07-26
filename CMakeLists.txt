@@ -43,6 +43,7 @@ ELSEIF(CHUCHO_WINDOWS)
     SET(CHUCHO_PLATFORM_SOURCES
         platform/windows/calendar_windows.cpp
         platform/windows/diagnostic_context_windows.cpp
+        platform/windows/environment_windows.cpp
         platform/windows/error_util.cpp
         platform/windows/error_util.hpp
         platform/windows/file_windows.cpp
@@ -221,6 +222,7 @@ SET(CHUCHO_SOURCES
     include/chucho/demangle.hpp
     include/chucho/duplicate_message_filter_factory.hpp
     include/chucho/duplicate_message_filter_memento.hpp
+    include/chucho/environment.hpp
     include/chucho/exception.hpp
     include/chucho/file.hpp
     include/chucho/file_exception.hpp
@@ -263,12 +265,6 @@ SET(CHUCHO_SOURCES
 
 SET_SOURCE_FILES_PROPERTIES(yaml_configurator.cpp PROPERTIES
                             COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
-IF(MSVC)
-    # We use std::getenv, and MSC hates it
-    SET_SOURCE_FILES_PROPERTIES(configuration.cpp configurator.cpp
-                                PROPERTIES
-                                COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
-ENDIF()
 
 IF(ENABLE_SHARED)
     ADD_LIBRARY(chucho SHARED ${CHUCHO_SOURCES})

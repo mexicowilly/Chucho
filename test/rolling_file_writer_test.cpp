@@ -130,7 +130,8 @@ TEST_F(rolling_file_writer_test, time_names)
         EXPECT_EQ(0, chucho::status_manager::get()->get_count());
         fname = get_file_name(get_time(std::string("%") + c));
         EXPECT_TRUE(chucho::file::exists(fname));
-        chucho::file::remove(fname);
+        w.reset();
+        EXPECT_NO_THROW(chucho::file::remove(fname));
     }
     roll.reset(new chucho::time_file_roller(get_file_name("sub1/sub2/%d{%Y,aux}/%d{%m}"), 1));
     w.reset(new chucho::rolling_file_writer(fmt, std::move(roll)));
