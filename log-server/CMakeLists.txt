@@ -37,12 +37,21 @@ IF(CHUCHO_POSIX)
         platform/posix/selector_posix.cpp
         platform/posix/signal_handler_posix.cpp
         platform/posix/single_instance_posix.cpp
-        platform/posix/socket_reader_posix.cpp
-        platform/posix/socket_listener_posix.cpp)
+        platform/posix/socket_life_cycle.cpp
+        platform/posix/socket_listener_posix.cpp
+        platform/posix/socket_reader_posix.cpp)
 ELSEIF(CHUCHO_WINDOWS)
     SET(CHUCHOD_PLATFORM_SOURCES
         platform/windows/daemon_windows.cpp
-        platform/windows/log_windows.cpp)
+        platform/windows/error_message.cpp
+        platform/windows/error_message.hpp
+        platform/windows/log_windows.cpp
+        platform/windows/selector_windows.cpp
+        platform/windows/signal_handler_windows.cpp
+        platform/windows/single_instance_windows.cpp
+        platform/windows/socket_life_cycle.cpp
+        platform/windows/socket_listener_windows.cpp
+        platform/windows/socket_reader_windows.cpp)
 ENDIF()
 
 ADD_EXECUTABLE(chuchod
@@ -60,6 +69,7 @@ ADD_EXECUTABLE(chuchod
                selector.hpp
                signal_handler.hpp
                single_instance.hpp
+               socket_life_cycle.hpp
                socket_listener.hpp
                socket_reader.cpp
                socket_reader.hpp
@@ -68,6 +78,10 @@ ADD_EXECUTABLE(chuchod
                vassals.cpp
                vassals.hpp
                ${CHUCHOD_PLATFORM_SOURCES})
+
+SET_SOURCE_FILES_PROPERTIES(suzerain.cpp PROPERTIES
+                            COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
+
 TARGET_LINK_LIBRARIES(chuchod chucho ${CHUCHO_THREAD_LIB})
 INSTALL(TARGETS chuchod
         RUNTIME DESTINATION bin)

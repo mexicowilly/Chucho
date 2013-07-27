@@ -130,7 +130,8 @@ void socket_connector::open_socket()
             u_long nblock = 1;
             ioctlsocket(socket_, FIONBIO, &nblock);
             int rc = connect(socket_, addrs->ai_addr, addrs->ai_addrlen);
-            if (rc == 0 || WSAGetLastError() == WSAEALREADY)
+            DWORD le = WSAGetLastError();
+            if (rc == 0 || le == WSAEALREADY || le == WSAEWOULDBLOCK)
             {
                 is_blocking_mode_ = false;
                 return;

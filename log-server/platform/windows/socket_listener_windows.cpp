@@ -16,16 +16,11 @@
 
 #include "socket_listener.hpp"
 #include "eof_exception.hpp"
+#include "error_message.hpp"
 #include "is_shut_down.hpp"
-#include <chucho/socket_exception.hpp>
-#include <chucho/log.hpp>
-#include <cerrno>
-#include <cstring>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <poll.h>
-#include <netdb.h>
+#include "log.hpp"
+#include <winsock2.h>
+#include <ws2tcpip.h>
 
 namespace chucho
 {
@@ -34,7 +29,7 @@ namespace server
 {
 
 socket_listener::socket_listener(std::uint16_t port)
-    : socket_(-1),
+    : socket_(INVALID_SOCKET),
       logger_(chucho::logger::get("chuchod.socket_listener")),
       stop_(false)
 {
@@ -45,7 +40,9 @@ socket_listener::socket_listener(std::uint16_t port)
     hints.ai_flags = AI_PASSIVE;
     struct addrinfo* addrs;
     if (getaddrinfo(nullptr, std::to_string(port).c_str(), &hints, &addrs) != 0)
-        throw chucho::socket_exception("Unable to get address information", errno);
+    {
+        throw chucho::exception("Unable to get address information: " + windows::error_message(WSAGetLastError()));
+    }
     struct sentry
     {
         sentry(addrinfo* addrs) : addrs_(addrs) { }
@@ -56,81 +53,70 @@ socket_listener::socket_listener(std::uint16_t port)
     for (cur = addrs; cur != nullptr; cur = cur->ai_next)
     {
         socket_ = socket(cur->ai_family, cur->ai_socktype, cur->ai_protocol);
-        if (socket_ == -1)
+        if (socket_ == INVALID_SOCKET)
         {
-            int err = errno;
-            CHUCHO_INFO(logger_, std::string("Could not create socket: ") + std::strerror(err));
+            CHUCHO_INFO(logger_, std::string("Could not create socket: ") + windows::error_message(WSAGetLastError()));
             continue;
         }
         int yes = 1;
-        if (setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1)
+        if (setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&yes), sizeof(yes)) == SOCKET_ERROR)
         {
-            int err = errno;
-            CHUCHO_INFO(logger_, std::string("Error setting socket options: ") + std::strerror(err));
-            close(socket_);
+            CHUCHO_INFO(logger_, std::string("Error setting socket options: ") + windows::error_message(WSAGetLastError()));
+            closesocket(socket_);
             continue;
         }
-        if (bind(socket_, cur->ai_addr, cur->ai_addrlen) == -1)
+        if (bind(socket_, cur->ai_addr, cur->ai_addrlen) == SOCKET_ERROR)
         {
-            int err = errno;
-            CHUCHO_INFO(logger_, std::string("Could not bind to local address: ") + std::strerror(err));
-            close(socket_);
+            CHUCHO_INFO(logger_, std::string("Could not bind to local address: ") + windows::error_message(WSAGetLastError()));
+            closesocket(socket_);
             continue;
         }
         break;
     }
     if (cur == nullptr)
         throw chucho::exception("No listening sockets could be created");
-    if (listen(socket_, SOMAXCONN) == -1)
+    if (listen(socket_, SOMAXCONN) == SOCKET_ERROR)
     {
-        int err = errno;
-        close(socket_);
-        throw chucho::socket_exception("Unable to listen to local address", err);
+        closesocket(socket_);
+        throw chucho::exception("Unable to listen to local address: " + windows::error_message(WSAGetLastError()));
     }
 }
 
 socket_listener::~socket_listener()
 {
-    // This can throw when the listener is reset during SIGHUP
-    try
+    if (socket_ != INVALID_SOCKET)
     {
-        if (socket_ != -1)
-        {
-            shutdown(socket_, SHUT_RDWR);
-            close(socket_);
-        }
-    }
-    catch (exception& e)
-    {
-        CHUCHO_ERROR(logger_, "Error shutting down the listener: " << e.what());
+        shutdown(socket_, SD_BOTH);
+        closesocket(socket_);
     }
 }
 
 std::shared_ptr<socket_reader> socket_listener::accept()
 {
-    struct pollfd pfd;
-    pfd.fd = socket_;
-    pfd.events = POLLIN;
-    pfd.revents = 0;
-    struct sockaddr_in addr;
+    fd_set sfd;
+    FD_ZERO(&sfd);
+    FD_SET(socket_, &sfd);
     int rc;
+    struct sockaddr_in addr;
+    timeval wait;
+    wait.tv_sec = 0;
+    wait.tv_usec = 500000;
     do
     {
-        rc = poll(&pfd, 1, 500);
+        rc = select(1, &sfd, nullptr, nullptr, &wait);
         if (is_shut_down)
             throw shutdown_exception();
+        if (rc == SOCKET_ERROR)
+        {
+            throw chucho::exception("Unable to poll the socket: " + windows::error_message(WSAGetLastError()));
+        }
         if (rc > 0)
         {
-            if (pfd.revents & (POLLHUP | POLLERR | POLLNVAL))
-                throw eof_exception();
-            socklen_t length = sizeof(addr);
-            int sock = ::accept(pfd.fd, reinterpret_cast<struct sockaddr*>(&addr), &length);
-            if (sock == -1)
+            int length = sizeof(addr);
+            int sock = ::accept(socket_, reinterpret_cast<struct sockaddr*>(&addr), &length);
+            if (sock == INVALID_SOCKET)
             {
-                int err = errno;
-                if (err == EBADF)
-                    throw eof_exception();
-                throw socket_exception("Unable to accept a connection", err);
+                throw chucho::exception("Unable to accept a connection: " + windows::error_message(WSAGetLastError()));
             }
             char host_name[NI_MAXHOST + 1];
             if (getnameinfo(reinterpret_cast<struct sockaddr*>(&addr), length,
@@ -151,8 +137,7 @@ std::shared_ptr<socket_reader> socket_listener::accept()
             return std::make_shared<socket_reader>(sock, host_name, full_host);
         }
     } while (rc == 0);
-    int err = errno;
-    CHUCHO_ERROR(logger_, "Polling the socket has been halted: " << std::strerror(err));
+    CHUCHO_ERROR(logger_, "Polling the socket has been halted");
     throw eof_exception();
 }
 

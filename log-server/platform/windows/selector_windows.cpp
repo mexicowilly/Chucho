@@ -15,8 +15,10 @@
  */
 
 #include "selector.hpp"
-#include <vector>
-#include <poll.h>
+#include "error_message.hpp"
+#include "is_shut_down.hpp"
+#define FD_SETSIZE 10000
+#include <winsock2.h>
 
 namespace chucho
 {
@@ -26,7 +28,9 @@ namespace server
 
 void selector::main()
 {
-    std::vector<struct pollfd> fds;
+    fd_set fds;
+    timeval wait;
+    std::vector<int> socks;
     while (true)
     {
         std::unique_lock<std::mutex> lock(guard_);
@@ -34,29 +38,40 @@ void selector::main()
             condition_.wait(lock);
         if (stop_)
             return;
-        fds.resize(readers_.size());
-        std::size_t i = 0;
+        FD_ZERO(&fds);
+        socks.clear();
         for (const std::pair<int, std::shared_ptr<socket_reader>>& r : readers_)
         {
-            fds[i].fd = r.first;
-            fds[i].events = POLLIN;
-            fds[i].revents = 0;
-            i++;
+            FD_SET(r.first, &fds);
+            socks.push_back(r.first);
         }
         lock.unlock();
-        CHUCHO_DEBUG(logger_, "Polling " << fds.size() << " sockets");
-        int num = poll(&fds[0], fds.size(), 500);
-        if (num > 0)
+        wait.tv_sec = 0;
+        wait.tv_usec = 500000;
+        CHUCHO_DEBUG(logger_, "Polling " << socks.size() << " sockets");
+        int rc = select(readers_.size(), &fds, nullptr, nullptr, &wait);
+        if (rc == SOCKET_ERROR)
         {
-            for (const struct pollfd& fd : fds)
+            DWORD err = WSAGetLastError();
+            if (err != WSAENOTSOCK)
             {
-                if (fd.revents != 0)
+                CHUCHO_FATAL(logger_, "Unrecoverable error occurred in the socket library: " << windows::error_message(err));
+                is_shut_down = true;
+                return;
+            }
+            continue;
+        }
+        if (rc > 0)
+        {
+            for (int sock : socks)
+            {
+                if (FD_ISSET(sock, &fds))
                 {
                     guard_.lock();
-                    auto found = readers_.find(fd.fd);
+                    auto found = readers_.find(sock);
                     if (found == readers_.end())
                     {
-                        CHUCHO_WARN(logger_, "An unknown socket_reader was selected for input, socket " << fd.fd);
+                        CHUCHO_WARN(logger_, "An unknown socket_reader was selected for input, socket " << sock);
                     }
                     else
                     {

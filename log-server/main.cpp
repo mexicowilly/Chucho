@@ -17,24 +17,35 @@
 #include "log.hpp"
 #include "suzerain.hpp"
 #include "daemon.hpp"
+#include "socket_life_cycle.hpp"
 #include <chucho/finalize.hpp>
 #include <cstdlib>
+#include <iostream>
 
 using namespace chucho::server;
 
 int main()
 {
-    properties props;
-    log::configure(props);
-    suzerain lord(props);
-    std::shared_ptr<chucho::logger> lgr(chucho::logger::get("chuchod"));
-    CHUCHO_INFO_STR(lgr, "chuchod has started");
-    CHUCHO_INFO(lgr, props);
-    if (props.console_mode())
-        lord.run();
-    else
-        daemon::possess(std::bind(&suzerain::run, std::ref(lord)));
-    CHUCHO_INFO(lgr, "chuchod is shutting down");
-    chucho::finalize();
+    try
+    {
+        socket_life_cycle slf;
+        properties props;
+        log::configure(props);
+        suzerain lord(props);
+        std::shared_ptr<chucho::logger> lgr(chucho::logger::get("chuchod"));
+        CHUCHO_INFO_STR(lgr, "chuchod has started");
+        CHUCHO_INFO(lgr, props);
+        if (props.console_mode())
+            lord.run();
+        else
+            daemon::possess(std::bind(&suzerain::run, std::ref(lord)));
+        CHUCHO_INFO(lgr, "chuchod is shutting down");
+        chucho::finalize();
+    }
+    catch (std::exception& e)
+    {
+        std::cout << "Error starting up: " << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
     return EXIT_SUCCESS;
 }
