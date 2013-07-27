@@ -209,7 +209,7 @@ std::vector<std::string>& test::unexpected_file_names()
 void test::write()
 {
     chucho::event evt(chucho::logger::get("time_rolling_file_test"),
-                      chucho::level::INFO(),
+                      chucho::level::INFO_(),
                       "hello",
                       __FILE__,
                       __LINE__,

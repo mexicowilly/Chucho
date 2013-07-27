@@ -16,7 +16,6 @@
 
 #include "socket_reader.hpp"
 #include "eof_exception.hpp"
-#include <chucho/socket_exception.hpp>
 #include <cerrno>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -59,7 +58,7 @@ std::size_t socket_reader::read_impl(std::uint8_t* dest, std::size_t count)
                 int err = errno;
                 if (errno == EBADF)
                     throw eof_exception();
-                throw chucho::socket_exception("Unable to read from socket", err);
+                throw chucho::exception(std::string("Unable to read from socket") + std::strerror(err));
             }
             else
             {
