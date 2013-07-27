@@ -70,7 +70,7 @@ bool properties::handle_config_value(const std::string& key, const std::string& 
     {
         try
         {
-            port_ = std::stoul(value);
+            port_ = static_cast<std::uint16_t>(std::stoul(value));
         }
         catch (std::exception&)
         {

@@ -134,7 +134,7 @@ std::shared_ptr<level> logger::get_effective_level() const
     while (!lgr->level_ && lgr->parent_)
         lgr = lgr->parent_;
     // Some idiot could have set no level on the root logger
-    return lgr->level_ ? lgr->level_ : level::OFF();
+    return lgr->level_ ? lgr->level_ : level::OFF_();
 }
 
 std::vector<std::shared_ptr<logger>> logger::get_existing_loggers()
@@ -179,7 +179,7 @@ void logger::initialize()
     // When loggers are created during configuration, this variable
     // must be true, so that we don't recurse the initialization.
     sd.is_initialized_ = true;
-    std::shared_ptr<logger> root(new logger("", level::INFO()));
+    std::shared_ptr<logger> root(new logger("", level::INFO_()));
     sd.all_loggers_[root->get_name()] = root;
     if (configuration::get_style() == configuration::style::AUTOMATIC)
         configuration::perform(root);

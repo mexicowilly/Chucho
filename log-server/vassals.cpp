@@ -57,7 +57,7 @@ void vassals::redistribute_load()
         load_distribution.push_back(cur.size());
         all.insert(all.end(), cur.begin(), cur.end());
     }
-    if (logger_->permits(chucho::level::INFO()))
+    if (logger_->permits(chucho::level::INFO_()))
     {
         std::ostringstream stream;
         stream << "Current load distribution: ";
@@ -72,7 +72,7 @@ void vassals::redistribute_load()
         if (++vindex == vassals_.size())
             vindex = 0;
     }
-    if (logger_->permits(chucho::level::INFO()))
+    if (logger_->permits(chucho::level::INFO_()))
     {
         std::ostringstream stream;
         stream << "Modified load distribution: ";

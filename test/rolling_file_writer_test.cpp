@@ -53,7 +53,7 @@ protected:
 
     chucho::event get_event(const std::string& msg)
     {
-        return chucho::event(logger_, chucho::level::INFO(), msg, __FILE__, __LINE__, __FUNCTION__);
+        return chucho::event(logger_, chucho::level::INFO_(), msg, __FILE__, __LINE__, __FUNCTION__);
     }
 
     std::string get_file_name(const std::string& base)

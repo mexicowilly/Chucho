@@ -20,6 +20,16 @@ IF(CHUCHOD_VELOCITY)
     ADD_DEFINITIONS(-DCHUCHOD_VELOCITY)
 ENDIF()
 
+IF(CHUCHO_WINDOWS)
+    ADD_DEFINITIONS(-DCHUCHO_WINDOWS)
+ELSEIF(CHUCHO_POSIX)
+    ADD_DEFINITIONS(-DCHUCHO_POSIX)
+ENDIF()
+
+GET_DIRECTORY_PROPERTY(CHUCHO_DIR_DEFS COMPILE_DEFINITIONS)
+LIST(REMOVE_ITEM CHUCHO_DIR_DEFS CHUCHO_BUILD)
+SET_DIRECTORY_PROPERTIES(PROPERTIES COMPILE_DEFINITIONS "${CHUCHO_DIR_DEFS}")
+
 IF(CHUCHO_POSIX)
     SET(CHUCHOD_PLATFORM_SOURCES
         platform/posix/daemon_posix.cpp
@@ -29,6 +39,10 @@ IF(CHUCHO_POSIX)
         platform/posix/single_instance_posix.cpp
         platform/posix/socket_reader_posix.cpp
         platform/posix/socket_listener_posix.cpp)
+ELSEIF(CHUCHO_WINDOWS)
+    SET(CHUCHOD_PLATFORM_SOURCES
+        platform/windows/daemon_windows.cpp
+        platform/windows/log_windows.cpp)
 ENDIF()
 
 ADD_EXECUTABLE(chuchod

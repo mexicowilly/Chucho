@@ -132,6 +132,11 @@ IF(MSVC)
     # Microsoft doesn't want libyaml to use strdup
     SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/api.c PROPERTIES
                                 COMPILE_FLAGS /wd4996)
+    # If _DEBUG is defined, which it is by CMake here with Microsoft's
+    # compiler, then trex likes to print all kinds of unhelpful things
+    # to stdout. 
+    SET_SOURCE_FILES_PROPERTIES(embedded/trex/trex.c PROPERTIES
+                                COMPILE_FLAGS /U_DEBUG)
 ENDIF()
 IF(CMAKE_C_COMPILER_ID STREQUAL Clang)
     SET_SOURCE_FILES_PROPERTIES(embedded/trex/trex.c PROPERTIES
