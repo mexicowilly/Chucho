@@ -32,6 +32,7 @@ IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
         platform/posix/calendar_posix.cpp
         platform/posix/diagnostic_context_posix.cpp
+        platform/posix/environment_posix.cpp
         platform/posix/file_posix.cpp
         platform/posix/host_posix.cpp
         platform/posix/line_ending_posix.cpp
