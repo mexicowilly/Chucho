@@ -24,14 +24,18 @@
 #include <chucho/event.hpp>
 #include <chucho/optional.hpp>
 #include <chucho/configuration.hpp>
+#include <chucho/non_copyable.hpp>
 #include <yaml.h>
 #include <sstream>
 #if defined(CHUCHO_HAVE_ARPA_INET_H)
 #include <arpa/inet.h>
+#elif defined(CHUCHO_HAVE_WINSOCK2_H)
+#include <winsock2.h>
 #endif
 #include <chrono>
 #include <bitset>
 #include <cstring>
+#include <stdlib.h>
 
 namespace
 {
@@ -89,15 +93,21 @@ chucho::marker reconstruct_marker(const std::string& text)
     return result;
 }
 
-class wire_event
+std::uint64_t str_to_64(const char* str)
+{
+#if defined(CHUCHO_WINDOWS)
+    return _strtoui64(str, nullptr, 10);
+#else
+    return std::strtoull(str, nullptr, 10);
+#endif
+}
+
+class wire_event : chucho::non_copyable
 {
 public:
     wire_event(yaml_document_t& doc,
                const yaml_node_t& node,
                std::shared_ptr<chucho::server::socket_reader> reader);
-    wire_event(const wire_event&) = delete;
-
-    wire_event& operator= (const wire_event&) = delete;
 
     const chucho::event& get_event() const;
     unsigned get_version() const;
@@ -154,7 +164,7 @@ wire_event::wire_event(yaml_document_t& doc,
             else if (std::strcmp(key, "milliseconds_since_epoch") == 0)
             {
                 when = chucho::event::clock_type::from_time_t(0) +
-                    std::chrono::milliseconds(std::strtoull(value, nullptr, 10));
+                    std::chrono::milliseconds(str_to_64(value));
                 found.set(MILLISECONDS_SINCE_EPOCH);
             }
             else if (std::strcmp(key, "file_name") == 0)
@@ -370,7 +380,7 @@ void suzerain::process_events(std::shared_ptr<socket_reader> reader)
     }
     catch (std::exception& e)
     {
-        CHUCHO_ERROR(logger_, std::string("Error processing events: ") + e.what());
+        CHUCHO_ERROR(logger_, "Error processing events: " << e.what());
     }
     CHUCHO_DEBUG(logger_, "Processed " << event_count << " events");
     #if defined(CHUCHOD_VELOCITY)

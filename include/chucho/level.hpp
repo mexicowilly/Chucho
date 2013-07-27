@@ -45,7 +45,12 @@ namespace chucho
  *  
  * You may create custom levels with subclasses of level, and 
  * you may insert your custom level anywhere you wish in the 
- * level hierarchy by setting its value. 
+ * level hierarchy by setting its value.
+ *
+ * The names of the built-in levels all carry a trailing underscore
+ * in order to avoid conflicts with possibly defined macros.
+ * Specifically, Windows defines a macro called ERROR, and many
+ * people define a macro, DEBUG, when performing a debug build.
  *  
  * @ingroup levels 
  */
@@ -55,31 +60,31 @@ public:
     /**
      * Trace level has a value of 0.
      */
-    static std::shared_ptr<level> TRACE();
+    static std::shared_ptr<level> TRACE_();
     /**
      * Debug level has a value of 10000.
      */
-    static std::shared_ptr<level> DEBUG();
+    static std::shared_ptr<level> DEBUG_();
     /**
      * Info level has a value of 20000.
      */
-    static std::shared_ptr<level> INFO();
+    static std::shared_ptr<level> INFO_();
     /**
      * Warn level has a value of 30000.
      */
-    static std::shared_ptr<level> WARN();
+    static std::shared_ptr<level> WARN_();
     /**
      * Error level has a value of 40000.
      */
-    static std::shared_ptr<level> ERROR();
+    static std::shared_ptr<level> ERROR_();
     /**
      * Fatal level has a value of 50000.
      */
-    static std::shared_ptr<level> FATAL();
+    static std::shared_ptr<level> FATAL_();
     /**
      * Off level has a value that is none of your business.
      */
-    static std::shared_ptr<level> OFF();
+    static std::shared_ptr<level> OFF_();
 
     /**
      * Figure out a level from its text. A case-insensitive 

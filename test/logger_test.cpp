@@ -50,25 +50,25 @@ TEST_F(log_test, existing_loggers)
 TEST_F(log_test, levels)
 {
     std::shared_ptr<chucho::logger> root = chucho::logger::get("");
-    root->set_level(chucho::level::WARN());
-    EXPECT_EQ(chucho::level::WARN(), root->get_effective_level());
+    root->set_level(chucho::level::WARN_());
+    EXPECT_EQ(chucho::level::WARN_(), root->get_effective_level());
     ASSERT_TRUE(static_cast<bool>(root->get_level()));
-    EXPECT_EQ(chucho::level::WARN(), root->get_level());
+    EXPECT_EQ(chucho::level::WARN_(), root->get_level());
     std::shared_ptr<chucho::logger> one = chucho::logger::get("one");
-    EXPECT_EQ(chucho::level::WARN(), one->get_effective_level());
+    EXPECT_EQ(chucho::level::WARN_(), one->get_effective_level());
     ASSERT_FALSE(static_cast<bool>(one->get_level()));
-    root->set_level(chucho::level::INFO());
-    EXPECT_EQ(chucho::level::INFO(), one->get_effective_level());
+    root->set_level(chucho::level::INFO_());
+    EXPECT_EQ(chucho::level::INFO_(), one->get_effective_level());
     ASSERT_FALSE(static_cast<bool>(one->get_level()));
     std::shared_ptr<chucho::logger> two = chucho::logger::get("one.two");
-    EXPECT_EQ(chucho::level::INFO(), two->get_effective_level());
+    EXPECT_EQ(chucho::level::INFO_(), two->get_effective_level());
     ASSERT_FALSE(static_cast<bool>(two->get_level()));
-    one->set_level(chucho::level::WARN());
+    one->set_level(chucho::level::WARN_());
     ASSERT_TRUE(static_cast<bool>(one->get_level()));
-    EXPECT_EQ(chucho::level::WARN(), one->get_level());
-    EXPECT_EQ(chucho::level::WARN(), two->get_effective_level());
+    EXPECT_EQ(chucho::level::WARN_(), one->get_level());
+    EXPECT_EQ(chucho::level::WARN_(), two->get_effective_level());
     ASSERT_FALSE(static_cast<bool>(two->get_level()));
-    EXPECT_EQ(chucho::level::INFO(), root->get_effective_level());
+    EXPECT_EQ(chucho::level::INFO_(), root->get_effective_level());
     ASSERT_TRUE(static_cast<bool>(root->get_level()));
 }
 
@@ -98,10 +98,10 @@ TEST_F(log_test, reset)
     auto lgr = chucho::logger::get("reset");
     std::shared_ptr<chucho::formatter> fmt = std::make_shared<chucho::pattern_formatter>("%m%n");
     lgr->add_writer(std::make_shared<chucho::cout_writer>(fmt));
-    lgr->set_level(chucho::level::WARN());
+    lgr->set_level(chucho::level::WARN_());
     lgr->set_writes_to_ancestors(false);
     EXPECT_EQ(1, lgr->get_writers().size());
-    EXPECT_EQ(chucho::level::WARN(), lgr->get_level());
+    EXPECT_EQ(chucho::level::WARN_(), lgr->get_level());
     EXPECT_FALSE(lgr->writes_to_ancestors());
     lgr->reset();
     EXPECT_TRUE(lgr->get_writers().empty());
