@@ -14,7 +14,7 @@
 #    limitations under the License.
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.10)
 PROJECT(chuhco CXX C)
 
 INCLUDE(Configure.cmake)

@@ -97,7 +97,7 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_RPATH FALSE)
 
 IF(CHUCHO_POSIX)
     # headers
-    FOREACH(HEAD arpa/inet.h fcntl.h fts.h limits.h netdb.h poll.h pthread.h pwd.h signal.h
+    FOREACH(HEAD arpa/inet.h fcntl.h limits.h netdb.h poll.h pthread.h pwd.h signal.h
                  sys/socket.h sys/stat.h sys/utsname.h syslog.h time.h unistd.h)
         STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
         STRING(REPLACE / _ CHUCHO_HEAD_VAR_NAME ${CHUCHO_HEAD_VAR_NAME})
@@ -148,12 +148,45 @@ IF(CHUCHO_POSIX)
     ENDFOREACH()
 
     # fts
-    FOREACH(SYM fts_open fts_read fts_close)
-        CHECK_CXX_SYMBOL_EXISTS(${SYM} fts.h CHUCHO_HAVE_${SYM})
-        IF(NOT CHUCHO_HAVE_${SYM})
-            MESSAGE(FATAL_ERROR "FTS functions are required")
+    CHECK_INCLUDE_FILE_CXX(fts.h CHUCHO_HAVE_FTS_H)
+    IF(CHUCHO_HAVE_FTS_H)
+        FOREACH(SYM fts_open fts_read fts_close)
+            CHECK_CXX_SYMBOL_EXISTS(${SYM} fts.h CHUCHO_HAVE_${SYM})
+            IF(NOT CHUCHO_HAVE_${SYM})
+                SET(CHUCHO_NO_FTS TRUE)
+                ADD_DEFINITIONS(-DCHUCHO_NO_FTS)
+                BREAK()
+            ENDIF()
+        ENDFOREACH()
+    ELSE()
+        SET(CHUCHO_NO_FTS TRUE)
+        ADD_DEFINITIONS(-DCHUCHO_NO_FTS)
+    ENDIF()
+
+    IF(CHUCHO_NO_FTS)
+        CHECK_INCLUDE_FILE_CXX(dirent.h CHUCHO_HAVE_DIRENT_H)
+        IF(NOT CHUCHO_HAVE_DIRENT_H)
+            MESSAGE(FATAL_ERROR "Either fts.h or dirent.h is required")
         ENDIF()
-    ENDFOREACH()
+        # opendir/readdir_r/closedir
+        FOREACH(SYM opendir readdir_r closedir)
+            CHECK_CXX_SYMBOL_EXISTS(${SYM} dirent.h CHUCHO_HAVE_${SYM})
+            IF(NOT CHUCHO_HAVE_${SYM})
+                MESSAGE(FATAL_ERROR "${SYM} is required")
+            ENDIF()
+        ENDFOREACH()
+        CHECK_CXX_SYMBOL_EXISTS(pathconf unistd.h CHUCHO_HAVE_PATHCONF)
+        IF(NOT CHUCHO_HAVE_PATHCONF)
+            MESSAGE(FATAL_ERROR "pathconf is required")
+        ENDIF()
+        # The variable setting is flipped here. So, 1 is success, meaing the
+        # program returned 0 for the exit code.
+        CHECK_CXX_SOURCE_RUNS("#include <dirent.h>\n#include <unistd.h>\nint main() { return sizeof(struct dirent) >= pathconf(\"/\", _PC_NAME_MAX); }"
+                              CHUCHO_DIRENT_NEEDS_NAME)
+        IF(CHUCHO_DIRENT_NEEDS_NAME)
+            ADD_DEFINITIONS(-DCHUCHO_DIRENT_NEEDS_NAME)
+        ENDIF()
+    ENDIF()
 
     # realpath
     CHECK_CXX_SYMBOL_EXISTS(realpath stdlib.h CHUCHO_HAVE_REALPATH)
@@ -178,12 +211,18 @@ IF(CHUCHO_POSIX)
     ENDIF()
 
     # getaddrinfo/freeaddrinfo/gai_strerror/getnameinfo
+    IF(CHUCHO_SOLARIS)
+        SET(CMAKE_REQUIRED_LIBRARIES socket nsl)
+    ENDIF()
     FOREACH(SYM getaddrinfo freeaddrinfo gai_strerror getnameinfo)
         CHECK_CXX_SYMBOL_EXISTS(${SYM} netdb.h CHUCHO_HAVE_${SYM})
         IF(NOT CHUCHO_HAVE_${SYM})
             MESSAGE(FATAL_ERROR "${SYM} is required")
         ENDIF()
     ENDFOREACH()
+    IF(CHUCHO_SOLARIS)
+        UNSET(CMAKE_REQUIRED_LIBRARIES)
+    ENDIF()
 
     # syslog
     CHECK_CXX_SYMBOL_EXISTS(syslog syslog.h CHUCHO_HAVE_SYSLOG)
@@ -192,12 +231,18 @@ IF(CHUCHO_POSIX)
     ENDIF()
 
     # socket/sendto/connect/shutdown/send/recv/bind/listen
+    IF(CHUCHO_SOLARIS)
+        SET(CMAKE_REQUIRED_LIBRARIES socket)
+    ENDIF()
     FOREACH(SYM socket sendto connect shutdown send recv bind listen accept)
         CHECK_CXX_SYMBOL_EXISTS(${SYM} sys/socket.h CHUCHO_HAVE_${SYM})
         IF(NOT CHUCHO_HAVE_${SYM})
             MESSAGE(FATAL_ERROR "${SYM} is required")
         ENDIF()
     ENDFOREACH()
+    IF(CHUCHO_SOLARIS)
+        UNSET(CMAKE_REQUIRED_LIBRARIES)
+    ENDIF()
 
     # poll
     CHECK_CXX_SYMBOL_EXISTS(poll poll.h CHUCHO_HAVE_POLL)

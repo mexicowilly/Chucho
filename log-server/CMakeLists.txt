@@ -55,6 +55,9 @@ ADD_EXECUTABLE(chuchod
                vassals.hpp
                ${CHUCHOD_PLATFORM_SOURCES})
 TARGET_LINK_LIBRARIES(chuchod chucho ${CHUCHO_THREAD_LIB})
+IF(CHUCHO_SOLARIS)
+    TARGET_LINK_LIBRARIES(chuchod socket nsl)
+ENDIF()
 INSTALL(TARGETS chuchod
         RUNTIME DESTINATION bin)
 INSTALL(FILES chuchod.yaml.sample
