@@ -66,18 +66,18 @@ std::string yaml_formatter::format(const event& evt)
     stream << "    version: " << VERSION << '\n';
     stream << "    milliseconds_since_epoch: " <<
         std::chrono::duration_cast<std::chrono::milliseconds>(evt.get_time().time_since_epoch()).count() << '\n';
-    stream << "    file_name: \"" << utf8::escape_invalid(evt.get_file_name()) << "\"\n";
+    stream << "    file_name: '" << utf8::escape_invalid(evt.get_file_name()) << "'\n";
     stream << "    line_number: " << evt.get_line_number() << '\n';
-    stream << "    function_name: \"" << evt.get_function_name() << "\"\n";
-    stream << "    logger: \"" << utf8::escape_invalid(evt.get_logger()->get_name()) << "\"\n";
-    stream << "    level: \"" << *evt.get_level() << "\"\n";
+    stream << "    function_name: '" << evt.get_function_name() << "'\n";
+    stream << "    logger: '" << utf8::escape_invalid(evt.get_logger()->get_name()) << "'\n";
+    stream << "    level: '" << *evt.get_level() << "'\n";
     if (evt.get_marker())
     {
         std::ostringstream mstream;
         mstream << *evt.get_marker();
-        stream << "    marker: " << utf8::escape_invalid(mstream.str()) << '\n';
+        stream << "    marker: '" << utf8::escape_invalid(mstream.str()) << "'\n";
     }
-    stream << "    thread: \"" << std::this_thread::get_id() << "\"\n";
+    stream << "    thread: '" << std::this_thread::get_id() << "'\n";
     stream << "    message: ";
     to_yaml_literal(utf8::escape_invalid(evt.get_message()), stream);
     stream << '\n';
