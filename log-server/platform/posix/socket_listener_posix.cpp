@@ -110,7 +110,7 @@ std::shared_ptr<socket_reader> socket_listener::accept()
     pfd.fd = socket_;
     pfd.events = POLLIN;
     pfd.revents = 0;
-    struct sockaddr_in addr;
+    struct sockaddr_storage addr;
     int rc;
     do
     {
