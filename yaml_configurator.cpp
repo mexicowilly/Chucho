@@ -23,7 +23,7 @@
 namespace
 {
 
-class yaml_location_exception : chucho::exception
+class yaml_location_exception : public chucho::exception
 {
 public:
     yaml_location_exception(const yaml_mark_t mark, const std::string& msg)

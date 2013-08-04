@@ -67,3 +67,6 @@ TARGET_LINK_LIBRARIES(syslog-writer-test chucho gtest ${CHUCHO_THREAD_LIB})
 ADD_EXECUTABLE(remote-writer-test EXCLUDE_FROM_ALL
                remote_writer_test.cpp)
 TARGET_LINK_LIBRARIES(remote-writer-test chucho ${CHUCHO_THREAD_LIB})
+
+ADD_CUSTOM_TARGET(all-test
+                  DEPENDS unit-test rolling-file-test syslog-writer-test remote-writer-test)
