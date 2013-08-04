@@ -94,15 +94,15 @@ socket_listener::~socket_listener()
 std::shared_ptr<socket_reader> socket_listener::accept()
 {
     fd_set sfd;
-    FD_ZERO(&sfd);
-    FD_SET(socket_, &sfd);
     int rc;
-    struct sockaddr_in addr;
+    struct sockaddr_storage addr;
     timeval wait;
     wait.tv_sec = 0;
     wait.tv_usec = 500000;
     do
     {
+        FD_ZERO(&sfd);
+        FD_SET(socket_, &sfd);
         rc = select(1, &sfd, nullptr, nullptr, &wait);
         if (is_shut_down)
             throw shutdown_exception();

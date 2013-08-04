@@ -53,7 +53,11 @@ std::size_t socket_reader::read_impl(std::uint8_t* dest, std::size_t count)
             int rd = recv(socket_, reinterpret_cast<char*>(dest), count, 0);
             if (rd == SOCKET_ERROR)
             {
-                throw chucho::exception("Error reading socket: " + windows::error_message(WSAGetLastError()));
+                DWORD err = WSAGetLastError();
+                if (err == WSAECONNRESET)
+                    throw eof_exception();
+                else
+                    throw chucho::exception("Error reading socket: " + windows::error_message(err));
             }
             else if (rd == 0)
             {

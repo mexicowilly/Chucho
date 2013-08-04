@@ -163,7 +163,10 @@ void socket_connector::write(const std::uint8_t* buf, std::size_t length)
                             remaining,
                             0);
             if (sent == SOCKET_ERROR)
-                throw socket_exception("Error sending data over socket", WSAGetLastError());
+            {
+                open_socket();
+                throw socket_exception("Error sending data over socket. The connection will be reestablished", WSAGetLastError());
+            }
             remaining -= sent;
         }
     }

@@ -39,7 +39,7 @@ std::string error_message(int err)
     {
         return std::string();
     }
-    std::string result(msg);
+    std::string result("(" + std::to_string(err) + ") " + msg);
     LocalFree(msg);
     return result;
 }

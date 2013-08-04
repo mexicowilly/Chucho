@@ -342,13 +342,12 @@ void run(std::shared_ptr<test> tst)
 TEST(time_rolling_file_test, all)
 {
     chucho::file::remove_all("time_rolling_file_test");
-    std::vector<std::shared_ptr<std::thread>> threads =
-    {
-        std::make_shared<std::thread>(run, std::make_shared<minute_test>()),
-        std::make_shared<std::thread>(run, std::make_shared<active_minute_test>()),
-        std::make_shared<std::thread>(run, std::make_shared<hour_test>()),
-        std::make_shared<std::thread>(run, std::make_shared<active_hour_test>())
-    };
+    // No initializer lists in VS 2012
+    std::vector<std::shared_ptr<std::thread>> threads;
+    threads.push_back(std::make_shared<std::thread>(run, std::make_shared<minute_test>()));
+    threads.push_back(std::make_shared<std::thread>(run, std::make_shared<active_minute_test>()));
+    threads.push_back(std::make_shared<std::thread>(run, std::make_shared<hour_test>()));
+    threads.push_back(std::make_shared<std::thread>(run, std::make_shared<active_hour_test>()));
     for (auto thrd : threads)
         thrd->join();
 }
