@@ -16,38 +16,6 @@
 
 #include <chucho/syslog_writer_memento.hpp>
 #include <chucho/exception.hpp>
-#include <map>
-
-namespace
-{
-
-// If you make this static to the set_facility method, then
-// you get SIGABRT when an exception is thrown.
-const std::map<std::string, chucho::syslog::facility> facilities =
-{
-    { "kern", chucho::syslog::facility::KERN },
-    { "user", chucho::syslog::facility::USER },
-    { "mail", chucho::syslog::facility::MAIL },
-    { "daemon", chucho::syslog::facility::DAEMON },
-    { "auth", chucho::syslog::facility::AUTH },
-    { "syslog", chucho::syslog::facility::SYSLOG },
-    { "lpr", chucho::syslog::facility::LPR },
-    { "news", chucho::syslog::facility::NEWS },
-    { "uucp", chucho::syslog::facility::UUCP },
-    { "cron", chucho::syslog::facility::CRON },
-    { "authpriv", chucho::syslog::facility::AUTHPRIV },
-    { "ftp", chucho::syslog::facility::FTP },
-    { "local0", chucho::syslog::facility::LOCAL0 },
-    { "local1", chucho::syslog::facility::LOCAL1 },
-    { "local2", chucho::syslog::facility::LOCAL2 },
-    { "local3", chucho::syslog::facility::LOCAL3 },
-    { "local4", chucho::syslog::facility::LOCAL4 },
-    { "local5", chucho::syslog::facility::LOCAL5 },
-    { "local6", chucho::syslog::facility::LOCAL6 },
-    { "local7", chucho::syslog::facility::LOCAL7 }
-};
-
-}
 
 namespace chucho
 {
@@ -63,10 +31,49 @@ syslog_writer_memento::syslog_writer_memento(const configurator& cfg)
 
 void syslog_writer_memento::set_facility(const std::string& name)
 {
-    auto found = facilities.find(to_lower(name));
-    if (found == facilities.end())
+    auto lname = to_lower(name);
+    if (lname == "kern")
+        facility_ = syslog::facility::KERN;
+    else if (lname == "user")
+        facility_ = syslog::facility::USER;
+    else if (lname == "mail")
+        facility_ = syslog::facility::MAIL;
+    else if (lname == "daemon")
+        facility_ = syslog::facility::DAEMON;
+    else if (lname == "auth")
+        facility_ = syslog::facility::AUTH;
+    else if (lname == "syslog")
+        facility_ = syslog::facility::SYSLOG;
+    else if (lname == "lpr")
+        facility_ = syslog::facility::LPR;
+    else if (lname == "news")
+        facility_ = syslog::facility::NEWS;
+    else if (lname == "uucp")
+        facility_ = syslog::facility::UUCP;
+    else if (lname == "cron")
+        facility_ = syslog::facility::CRON;
+    else if (lname == "authpriv")
+        facility_ = syslog::facility::AUTHPRIV;
+    else if (lname == "ftp")
+        facility_ = syslog::facility::FTP;
+    else if (lname == "local0")
+        facility_ = syslog::facility::LOCAL0;
+    else if (lname == "local1")
+        facility_ = syslog::facility::LOCAL1;
+    else if (lname == "local2")
+        facility_ = syslog::facility::LOCAL2;
+    else if (lname == "local3")
+        facility_ = syslog::facility::LOCAL3;
+    else if (lname == "local4")
+        facility_ = syslog::facility::LOCAL4;
+    else if (lname == "local5")
+        facility_ = syslog::facility::LOCAL5;
+    else if (lname == "local6")
+        facility_ = syslog::facility::LOCAL6;
+    else if (lname == "local7")
+        facility_ = syslog::facility::LOCAL7;
+    else
         throw exception("facility has an invalid value of " + name);
-    facility_ = found->second;
 }
 
 }
