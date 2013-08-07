@@ -21,20 +21,11 @@ namespace
 {
 
 std::once_flag once;
-// This gets cleaned by finalize();
-chucho::garbage_cleaner* gc;
-
-void init()
-{
-    gc = new chucho::garbage_cleaner();
-}
 
 }
 
 namespace chucho
 {
-
-garbage_cleaner* gc(new garbage_cleaner());
 
 garbage_cleaner::~garbage_cleaner()
 {
@@ -49,7 +40,10 @@ void garbage_cleaner::add(cleaner_type cln)
 
 garbage_cleaner& garbage_cleaner::get()
 {
-    std::call_once(once, init);
+    // This gets cleaned by finalize
+    static garbage_cleaner* gc;
+
+    std::call_once(once, [&] () { gc = new garbage_cleaner(); });
     return *gc;
 }
 
