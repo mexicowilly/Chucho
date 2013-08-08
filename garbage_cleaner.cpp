@@ -15,7 +15,6 @@
  */
 
 #include <chucho/garbage_cleaner.hpp>
-#include <mutex>
 
 namespace
 {
@@ -35,6 +34,7 @@ garbage_cleaner::~garbage_cleaner()
 
 void garbage_cleaner::add(cleaner_type cln)
 {
+    std::lock_guard<std::mutex> lg(guard_);
     cleaners_.push_back(cln);
 }
 

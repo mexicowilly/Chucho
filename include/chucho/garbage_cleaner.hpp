@@ -23,6 +23,7 @@
 
 #include <functional>
 #include <vector>
+#include <mutex>
 
 namespace chucho
 {
@@ -40,6 +41,7 @@ public:
 
 private:
     std::vector<cleaner_type> cleaners_;
+    std::mutex guard_;
 };
 
 }
