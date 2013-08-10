@@ -19,7 +19,10 @@
 #include <chucho/pattern_formatter.hpp>
 #include <chucho/logger.hpp>
 #include <chucho/host.hpp>
+#include <chucho/environment.hpp>
 #include <iostream>
+
+#if !defined(CHUCHO_WINDOWS)
 
 TEST(syslog_wrtier_test, same_host)
 {
@@ -33,12 +36,16 @@ TEST(syslog_wrtier_test, same_host)
     std::cout << "Check your syslog for an error level message \"chucho syslog_writer test same host\"" << std::endl;
 }
 
+#endif
+
 TEST(syslog_writer_test, remote_host)
 {
     chucho::logger::remove_unused_loggers();
+    chucho::optional<std::string> env = chucho::environment::get("CHUCHO_SYSLOG_HOST");
+    std::string host = env ? *env : chucho::host::get_full_name();
     auto wrt = std::make_shared<chucho::syslog_writer>(std::make_shared<chucho::pattern_formatter>("%m"),
                                                        chucho::syslog::facility::LOCAL0,
-                                                       chucho::host::get_full_name());
+                                                       host);
     auto log = chucho::logger::get("syslog_writer_test");
     log->add_writer(wrt);
     chucho::event evt(log, chucho::level::ERROR_(), "chucho syslog_writer test remote host", __FILE__, __LINE__, __FUNCTION__);
