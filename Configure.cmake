@@ -27,6 +27,10 @@ OPTION(ENABLE_SHARED "Whether to build a shared object" FALSE)
 OPTION(ENABLE_FRAMEWORK "Whether to build as a framework on Macintosh" TRUE)
 SET(CHUCHO_NEEDS_TO_USE_THE_FRAMEWORK_VARIABLE_OR_CMAKE_COMPLAINS ${ENABLE_FRAMEWORK})
 
+# whether to install chucod as a service or not on platforms that have
+# services.
+OPTION(INSTALL_SERVICE "Whether to install chuchod as a system service" TRUE)
+
 # Set consistent platform names
 IF(CMAKE_SYSTEM_NAME STREQUAL Windows)
     SET(CHUCHO_WINDOWS TRUE)
@@ -52,7 +56,7 @@ ENDIF()
 # Set default build type
 IF(NOT CMAKE_BUILD_TYPE)
     SET(CMAKE_BUILD_TYPE Release CACHE STRING "Build type, one of: Release, Debug, RelWithDebInfo, or MinSizeRel" FORCE)
-ENDIF(NOT CMAKE_BUILD_TYPE)
+ENDIF()
 MESSAGE(STATUS "Build type -- ${CMAKE_BUILD_TYPE}")
 
 # Compiler flags
@@ -258,6 +262,16 @@ ELSEIF(CHUCHO_WINDOWS)
     CHECK_CXX_SOURCE_COMPILES("#include <windows.h>\n#include <shellapi.h>\nint main() { return 0; }" CHUCHO_HAVE_SHELLAPI_H)
     IF(NOT CHUCHO_HAVE_SHELLAPI_H)
         MESSAGE(FATAL_ERROR "shellapi.h is required")
+    ENDIF()
+
+    # sc
+    IF(INSTALL_SERVICE)
+        MESSAGE(STATUS "Looking for sc")
+        FIND_PROGRAM(CHUCHO_SC sc)
+        IF(NOT CHUCHO_SC)
+            MESSAGE(FATAL_ERROR "sc is required in order to install the Chucho service")
+        ENDIF()
+        MESSAGE(STATUS "Looking for sc - ${CHUCHO_SC}")
     ENDIF()
 ENDIF()
 

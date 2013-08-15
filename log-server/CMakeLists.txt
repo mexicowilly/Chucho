@@ -22,6 +22,10 @@ ENDIF()
 
 IF(CHUCHO_WINDOWS)
     ADD_DEFINITIONS(-DCHUCHO_WINDOWS)
+    IF(INSTALL_SERVICE)
+        CONFIGURE_FILE(platform/windows/InstallService.cmake.in
+                       "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
+    ENDIF()
 ELSEIF(CHUCHO_POSIX)
     ADD_DEFINITIONS(-DCHUCHO_POSIX)
 ENDIF()
@@ -87,3 +91,6 @@ INSTALL(TARGETS chuchod
         RUNTIME DESTINATION bin)
 INSTALL(FILES chuchod.yaml.sample
         DESTINATION etc)
+IF(CHUCHO_WINDOWS AND INSTALL_SERVICE)
+    INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
+ENDIF()
