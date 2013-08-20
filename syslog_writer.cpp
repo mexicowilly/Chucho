@@ -47,7 +47,6 @@ void syslog_writer::write_impl(const event& evt)
                                         sev,
                                         evt.get_time(),
                                         formatter_->format(evt));
-    report_info("Sending message: " + msg);
     transport_.send(facility_, sev, msg);
 }
 
