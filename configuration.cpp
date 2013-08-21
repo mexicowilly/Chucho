@@ -23,7 +23,7 @@
 #include <chucho/pattern_formatter.hpp>
 #include <chucho/logger.hpp>
 #include <chucho/garbage_cleaner.hpp>
-#include <cstdlib>
+#include <chucho/environment.hpp>
 #include <fstream>
 #include <algorithm>
 #include <sstream>
@@ -193,9 +193,9 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
     std::string fn;
     if (!sd.environment_variable_.empty())
     {
-        char* ev = std::getenv(sd.environment_variable_.c_str());
-        if (ev != nullptr)
-            fn = ev;
+        auto ev = environment::get(sd.environment_variable_);
+        if (ev)
+            fn = *ev;
     }
     if (fn.empty())
         fn = sd.file_name_;

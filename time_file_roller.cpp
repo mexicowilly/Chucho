@@ -322,7 +322,7 @@ void time_file_roller::set_period()
 
 time_file_roller::cleaner::cleaner(time_file_roller& roller)
     : roller_(roller),
-      oldest_period_offset_(-roller.max_history_ - 1)
+      oldest_period_offset_(-static_cast<int>(roller.max_history_) - 1)
 {
     set_status_origin("time_file_roller::cleaner");
 }
@@ -335,7 +335,7 @@ void time_file_roller::cleaner::clean(const time_type& now, const std::string& a
     std::set<std::string> cleaned;
     int actual_oldest = roller_.file_writer_->get_initial_file_name().empty() ?
         oldest_period_offset_ : oldest_period_offset_ + 1;
-    for (auto i = 0; i < periods; i++)
+    for (std::size_t i = 0; i < periods; i++)
         clean_one(now, actual_oldest - i, cleaned, active_file_name);
     last_clean_ = now;
 }
@@ -379,7 +379,7 @@ std::size_t time_file_roller::cleaner::periods_elapsed(const time_type& first, c
     else
     {
         auto diff = std::chrono::duration_cast<std::chrono::seconds>(last - first);
-        result = diff.count() / static_cast<long long>(roller_.period_);
+        result = static_cast<std::size_t>(diff.count() / static_cast<long long>(roller_.period_));
     }
     return result;
 }

@@ -19,6 +19,7 @@
 
 #include "socket_reader.hpp"
 #include <chucho/logger.hpp>
+#include <chucho/non_copyable.hpp>
 #include <condition_variable>
 #include <thread>
 #include <vector>
@@ -31,27 +32,22 @@ namespace chucho
 namespace server
 {
 
-class vassals
+class vassals : non_copyable
 {
 public:
     vassals(std::size_t count, std::function<void(std::shared_ptr<socket_reader>)> processor);
-    vassals(const vassals&) = delete;
     ~vassals();
-
-    vassals& operator= (const vassals&) = delete;
 
     void start(std::size_t count);
     void stop();
     void submit(std::shared_ptr<socket_reader> reader);
 
 private:
-    class worker_queue : public std::thread
+    class worker_queue : non_copyable,
+                         public std::thread
     {
     public:
         worker_queue(std::function<void(std::shared_ptr<socket_reader>)> processor);
-        worker_queue(const worker_queue&) = delete;
-
-        worker_queue& operator= (const worker_queue&) = delete;
 
         void add(std::shared_ptr<socket_reader> reader);
         std::list<std::weak_ptr<socket_reader>> remove_all_readers();

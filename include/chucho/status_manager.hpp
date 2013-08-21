@@ -48,12 +48,12 @@ public:
      * The maximum size of the head cache. The head cache contains 
      * the first entries written to the cache. 
      */
-    const std::size_t HEAD_CACHE_MAX = 150;
+    static const std::size_t HEAD_CACHE_MAX = 150;
     /**
      * The maximum size of the tail cache. The tail cache contains 
      * the last entries written to the cache. 
      */
-    const std::size_t TAIL_CACHE_MAX = 150;
+    static const std::size_t TAIL_CACHE_MAX = 150;
 
     /**
      * Return the sole instance of the status_manager.

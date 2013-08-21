@@ -15,11 +15,13 @@
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
-PROJECT(chuhco CXX C)
+PROJECT(CHUCHO CXX C)
 
 INCLUDE(Configure.cmake)
 
-INCLUDE_DIRECTORIES(include embedded/include)
+# Include CMAKE_BINARY_DIR because that's where the generated file
+# export.hpp lives.
+INCLUDE_DIRECTORIES(include embedded/include "${CMAKE_BINARY_DIR}")
 
 SET(CHUCHO_VERSION 1.2)
 SET(CHUCHO_SO_VERSION 1)
@@ -30,6 +32,7 @@ IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
         platform/posix/calendar_posix.cpp
         platform/posix/diagnostic_context_posix.cpp
+        platform/posix/environment_posix.cpp
         platform/posix/file_posix.cpp
         platform/posix/host_posix.cpp
         platform/posix/line_ending_posix.cpp
@@ -37,6 +40,22 @@ IF(CHUCHO_POSIX)
         platform/posix/socket_connector_posix.cpp
         platform/posix/socket_exception_posix.cpp
         platform/posix/syslog_writer_posix.cpp)
+ELSEIF(CHUCHO_WINDOWS)
+    SET(CHUCHO_PLATFORM_SOURCES
+        platform/windows/calendar_windows.cpp
+        platform/windows/diagnostic_context_windows.cpp
+        platform/windows/environment_windows.cpp
+        platform/windows/error_util.cpp
+        platform/windows/error_util.hpp
+        platform/windows/file_windows.cpp
+        platform/windows/host_windows.cpp
+        platform/windows/line_ending_windows.cpp
+        platform/windows/pattern_formatter_windows.cpp
+        platform/windows/socket_connector_windows.cpp
+        platform/windows/socket_exception_windows.cpp
+        platform/windows/syslog_writer_windows.cpp
+        platform/windows/winsock_startup.cpp
+        platform/windows/winsock_startup.hpp)
 ENDIF()
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
@@ -56,7 +75,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/duplicate_message_filter.hpp
     include/chucho/event.hpp
     include/chucho/exception.hpp
-    include/chucho/export.hpp
+    "${CMAKE_BINARY_DIR}/chucho/export.hpp"
     include/chucho/file_roller.hpp
     include/chucho/file_roll_trigger.hpp
     include/chucho/file_writer.hpp
@@ -70,6 +89,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/logger.hpp
     include/chucho/marker.hpp
     include/chucho/memento.hpp
+    include/chucho/non_copyable.hpp
     include/chucho/numbered_file_roller.hpp
 	include/chucho/optional.hpp
     include/chucho/pattern_formatter.hpp
@@ -102,7 +122,23 @@ SET(CHUCHO_EMBEDDED_SOURCES
     embedded/libyaml/scanner.c)
 
 SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/api.c PROPERTIES
-                            COMPILE_DEFINITIONS "YAML_VERSION_MAJOR=${CHUCHO_LIBYAML_VERSION_MAJOR};YAML_VERSION_MINOR=${CHUCHO_LIBYAML_VERSION_MINOR};YAML_VERSION_PATCH=${CHUCHO_LIBYAML_VERSION_PATCH};YAML_VERSION_STRING=\"${CHUCHO_LIB_YAML_VERSION_MAJOR}.${CHUCHO_LIBYAML_VERSION_MINOR}.${CHUCHO_LIBYAML_VERSION_PATCH}\"")
+                            COMPILE_DEFINITIONS "YAML_VERSION_MAJOR=${CHUCHO_LIBYAML_VERSION_MAJOR};YAML_VERSION_MINOR=${CHUCHO_LIBYAML_VERSION_MINOR};YAML_VERSION_PATCH=${CHUCHO_LIBYAML_VERSION_PATCH};YAML_VERSION_STRING=\"${CHUCHO_LIB_YAML_VERSION_MAJOR}.${CHUCHO_LIBYAML_VERSION_MINOR}.${CHUCHO_LIBYAML_VERSION_PATCH}\";YAML_DECLARE_STATIC")
+SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/loader.c
+                            embedded/libyaml/parser.c
+                            embedded/libyaml/reader.c
+                            embedded/libyaml/scanner.c
+                            PROPERTIES
+                            COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
+IF(MSVC)
+    # Microsoft doesn't want libyaml to use strdup
+    SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/api.c PROPERTIES
+                                COMPILE_FLAGS /wd4996)
+    # If _DEBUG is defined, which it is by CMake here with Microsoft's
+    # compiler, then trex likes to print all kinds of unhelpful things
+    # to stdout. 
+    SET_SOURCE_FILES_PROPERTIES(embedded/trex/trex.c PROPERTIES
+                                COMPILE_FLAGS /U_DEBUG)
+ENDIF()
 IF(CMAKE_C_COMPILER_ID STREQUAL Clang)
     SET_SOURCE_FILES_PROPERTIES(embedded/trex/trex.c PROPERTIES
                                 COMPILE_FLAGS "-Wno-logical-op-parentheses -Wno-unused-value")
@@ -122,6 +158,7 @@ SET(CHUCHO_SOURCES
     cout_writer_factory.cpp
     cout_writer_memento.cpp
     demangle.cpp
+    diagnostic_context.cpp
     duplicate_message_filter.cpp
     duplicate_message_filter_factory.cpp
     duplicate_message_filter_memento.cpp
@@ -191,6 +228,7 @@ SET(CHUCHO_SOURCES
     include/chucho/demangle.hpp
     include/chucho/duplicate_message_filter_factory.hpp
     include/chucho/duplicate_message_filter_memento.hpp
+    include/chucho/environment.hpp
     include/chucho/exception.hpp
     include/chucho/file.hpp
     include/chucho/file_exception.hpp
@@ -207,7 +245,6 @@ SET(CHUCHO_SOURCES
     include/chucho/numbered_file_roller_memento.hpp
     include/chucho/pattern_formatter_factory.hpp
     include/chucho/pattern_formatter_memento.hpp
-    include/chucho/printf_util.hpp
     include/chucho/regex.hpp
     include/chucho/regex_exception.hpp
     include/chucho/remote_writer_factory.hpp
@@ -232,6 +269,9 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_EMBEDDED_SOURCES}
     ${CHUCHO_PUBLIC_HEADERS})
 
+SET_SOURCE_FILES_PROPERTIES(yaml_configurator.cpp PROPERTIES
+                            COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
+
 IF(ENABLE_SHARED)
     ADD_LIBRARY(chucho SHARED ${CHUCHO_SOURCES})
     SET_TARGET_PROPERTIES(chucho PROPERTIES
@@ -253,10 +293,13 @@ ELSE()
     ADD_LIBRARY(chucho STATIC ${CHUCHO_SOURCES})
     SET_TARGET_PROPERTIES(chucho PROPERTIES
                           PUBLIC_HEADER "${CHUCHO_PUBLIC_HEADERS}")
-    ADD_DEFINITIONS(-Dchucho_EXPORTS)
     INSTALL(TARGETS chucho
             ARCHIVE DESTINATION lib
             PUBLIC_HEADER DESTINATION include/chucho)
+ENDIF()
+
+IF(CHUCHO_WINDOWS)
+    TARGET_LINK_LIBRARIES(chucho ws2_32)
 ENDIF()
 
 ADD_SUBDIRECTORY(test)
@@ -302,7 +345,8 @@ FOREACH(SRC ${CHUCHO_SOURCES})
     ENDIF()
 ENDFOREACH()
 LIST(REMOVE_ITEM CHUCHO_SOURCES ${CHUCHO_TO_REMOVE})
-SET(CHUCHO_DIST_NAME_BASE "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${CHUCHO_VERSION}")
+STRING(TOLOWER ${CMAKE_PROJECT_NAME} CHUCHO_LOWER_PROJECT_NAME)
+SET(CHUCHO_DIST_NAME_BASE "${CMAKE_BINARY_DIR}/${CHUCHO_LOWER_PROJECT_NAME}-${CHUCHO_VERSION}")
 IF(DEFINED CHUCHO_DIST_VERSION)
     SET(CHUCHO_DIST_NAME_BASE "${CHUCHO_DIST_NAME_BASE}-${CHUCHO_DIST_VERSION}")
 ENDIF()

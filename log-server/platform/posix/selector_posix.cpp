@@ -38,7 +38,7 @@ void selector::main()
         std::size_t i = 0;
         for (const std::pair<int, std::shared_ptr<socket_reader>>& r : readers_)
         {
-            fds[i].fd = r.second->get_socket();
+            fds[i].fd = r.first;
             fds[i].events = POLLIN;
             fds[i].revents = 0;
             i++;

@@ -28,12 +28,13 @@ public:
     file_writer_test()
         : file_name_("file_writer_test")
     {
+        chucho::file::remove(file_name_);
         chucho::status_manager::get()->clear();
     }
 
     ~file_writer_test()
     {
-        std::remove(file_name_.c_str());
+        chucho::file::remove(file_name_);
     }
 
     std::shared_ptr<chucho::file_writer> get_writer(chucho::file_writer::on_start start = chucho::file_writer::on_start::APPEND)
@@ -83,17 +84,23 @@ TEST_F(file_writer_test, write)
     auto w = get_writer();
     EXPECT_EQ(0, chucho::status_manager::get()->get_count());
     std::shared_ptr<chucho::logger> log = chucho::logger::get("file_writer_test");
-    chucho::event evt(log, chucho::level::INFO(), "hello", __FILE__, __LINE__, __FUNCTION__);
+    chucho::event evt(log, chucho::level::INFO_(), "hello", __FILE__, __LINE__, __FUNCTION__);
     w->write(evt);
-    evt = chucho::event(log, chucho::level::INFO(), "goodbye", __FILE__, __LINE__, __FUNCTION__);
+    evt = chucho::event(log, chucho::level::INFO_(), "goodbye", __FILE__, __LINE__, __FUNCTION__);
     w->write(evt);
     w.reset();
     std::ifstream stream(file_name_.c_str());
     std::string line;
     std::getline(stream, line);
+    if (!line.empty() && line.back() == '\r')
+        line.pop_back();
     EXPECT_STREQ("hello", line.c_str());
     std::getline(stream, line);
+    if (!line.empty() && line.back() == '\r')
+        line.pop_back();
     EXPECT_STREQ("goodbye", line.c_str());
     std::getline(stream, line);
+    if (!line.empty() && line.back() == '\r')
+        line.pop_back();
     EXPECT_TRUE(stream.eof());
 }

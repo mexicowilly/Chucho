@@ -17,7 +17,6 @@
 #include "socket_listener.hpp"
 #include "eof_exception.hpp"
 #include "is_shut_down.hpp"
-#include <chucho/socket_exception.hpp>
 #include <chucho/log.hpp>
 #include <cerrno>
 #include <cstring>
@@ -45,7 +44,7 @@ socket_listener::socket_listener(std::uint16_t port)
     hints.ai_flags = AI_PASSIVE;
     struct addrinfo* addrs;
     if (getaddrinfo(nullptr, std::to_string(port).c_str(), &hints, &addrs) != 0)
-        throw chucho::socket_exception("Unable to get address information", errno);
+        throw chucho::exception(std::string("Unable to get address information: ") + std::strerror(errno));
     struct sentry
     {
         sentry(addrinfo* addrs) : addrs_(addrs) { }
@@ -67,12 +66,14 @@ socket_listener::socket_listener(std::uint16_t port)
         {
             int err = errno;
             CHUCHO_INFO(logger_, std::string("Error setting socket options: ") + std::strerror(err));
+            close(socket_);
             continue;
         }
         if (bind(socket_, cur->ai_addr, cur->ai_addrlen) == -1)
         {
             int err = errno;
             CHUCHO_INFO(logger_, std::string("Could not bind to local address: ") + std::strerror(err));
+            close(socket_);
             continue;
         }
         break;
@@ -83,7 +84,7 @@ socket_listener::socket_listener(std::uint16_t port)
     {
         int err = errno;
         close(socket_);
-        throw chucho::socket_exception("Unable to listen to local address", err);
+        throw chucho::exception(std::string("Unable to listen to local address") + std::strerror(err));
     }
 }
 
@@ -128,7 +129,7 @@ std::shared_ptr<socket_reader> socket_listener::accept()
                 int err = errno;
                 if (err == EBADF)
                     throw eof_exception();
-                throw socket_exception("Unable to accept a connection", err);
+                throw exception(std::string("Unable to accept a connection") + std::strerror(err));
             }
             char host_name[NI_MAXHOST + 1];
             if (getnameinfo(reinterpret_cast<struct sockaddr*>(&addr), length,

@@ -21,6 +21,7 @@
 #include <set>
 #include <algorithm>
 #include <mutex>
+#include <locale>
 
 namespace
 {
@@ -204,36 +205,36 @@ struct levels
 
     std::string to_upper(const std::string& text);
     
-    std::shared_ptr<chucho::level> TRACE;
-    std::shared_ptr<chucho::level> DEBUG;
-    std::shared_ptr<chucho::level> INFO;
-    std::shared_ptr<chucho::level> WARN;
-    std::shared_ptr<chucho::level> ERROR;
-    std::shared_ptr<chucho::level> FATAL;
-    std::shared_ptr<chucho::level> OFF;
+    std::shared_ptr<chucho::level> TRACE_;
+    std::shared_ptr<chucho::level> DEBUG_;
+    std::shared_ptr<chucho::level> INFO_;
+    std::shared_ptr<chucho::level> WARN_;
+    std::shared_ptr<chucho::level> ERROR_;
+    std::shared_ptr<chucho::level> FATAL_;
+    std::shared_ptr<chucho::level> OFF_;
     std::mutex guard_;
     std::locale c_loc_;
     std::set<std::shared_ptr<chucho::level>, shared_level_name_less> all_levels_;
 };
 
 levels::levels()
-    : TRACE(new trace()),
-      DEBUG(new debug()),
-      INFO(new info()),
-      WARN(new warn()),
-      ERROR(new error()),
-      FATAL(new fatal()),
-      OFF(new off()),
+    : TRACE_(new trace()),
+      DEBUG_(new debug()),
+      INFO_(new info()),
+      WARN_(new warn()),
+      ERROR_(new error()),
+      FATAL_(new fatal()),
+      OFF_(new off()),
       c_loc_("C"),
       all_levels_(shared_level_name_less(*this))
 {
-    all_levels_.insert(TRACE);
-    all_levels_.insert(DEBUG);
-    all_levels_.insert(INFO);
-    all_levels_.insert(WARN);
-    all_levels_.insert(ERROR);
-    all_levels_.insert(FATAL);
-    all_levels_.insert(OFF);
+    all_levels_.insert(TRACE_);
+    all_levels_.insert(DEBUG_);
+    all_levels_.insert(INFO_);
+    all_levels_.insert(WARN_);
+    all_levels_.insert(ERROR_);
+    all_levels_.insert(FATAL_);
+    all_levels_.insert(OFF_);
     chucho::garbage_cleaner::get().add([this] () { delete this; });
 }
 
@@ -274,39 +275,39 @@ levels& lvls()
 namespace chucho
 {
 
-std::shared_ptr<level> level::TRACE()
+std::shared_ptr<level> level::TRACE_()
 {
-    return lvls().TRACE;
+    return lvls().TRACE_;
 }
 
-std::shared_ptr<level> level::DEBUG()
+std::shared_ptr<level> level::DEBUG_()
 {
-    return lvls().DEBUG;
+    return lvls().DEBUG_;
 }
 
-std::shared_ptr<level> level::INFO()
+std::shared_ptr<level> level::INFO_()
 {
-    return lvls().INFO;
+    return lvls().INFO_;
 }
 
-std::shared_ptr<level> level::WARN()
+std::shared_ptr<level> level::WARN_()
 {
-    return lvls().WARN;
+    return lvls().WARN_;
 }
 
-std::shared_ptr<level> level::ERROR()
+std::shared_ptr<level> level::ERROR_()
 {
-    return lvls().ERROR;
+    return lvls().ERROR_;
 }
 
-std::shared_ptr<level> level::FATAL()
+std::shared_ptr<level> level::FATAL_()
 {
-    return lvls().FATAL;
+    return lvls().FATAL_;
 }
 
-std::shared_ptr<level> level::OFF()
+std::shared_ptr<level> level::OFF_()
 {
-    return lvls().OFF;
+    return lvls().OFF_;
 }
 
 std::ostream& operator<< (std::ostream& stream, const level& lvl)

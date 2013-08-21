@@ -1,0 +1,38 @@
+MESSAGE(STATUS "Installing the Chucho service")
+MESSAGE(STATUS "Stopping existing service")
+EXECUTE_PROCESS(COMMAND "${CHUCHO_SC}" stop Chucho
+                RESULT_VARIABLE SC_RESULT)
+IF(NOT SC_RESULT EQUAL 0 AND NOT SC_RESULT EQUAL 1060)
+    MESSAGE(FATAL_ERROR "Could stop the service")
+ENDIF()
+MESSAGE(STATUS "Deleting existing service")
+EXECUTE_PROCESS(COMMAND "${CHUCHO_SC}" delete Chucho
+                RESULT_VARIABLE SC_RESULT)
+IF(NOT SC_RESULT EQUAL 0 AND NOT SC_RESULT EQUAL 1060)
+    MESSAGE(FATAL_ERROR "Could delete the service")
+ENDIF()
+MESSAGE(STATUS "Creating the service")
+EXECUTE_PROCESS(COMMAND "${CHUCHO_SC}" create Chucho binPath= "${CMAKE_INSTALL_PREFIX}/bin/chuchod.exe" start= auto
+                RESULT_VARIABLE SC_RESULT)
+IF(NOT SC_RESULT EQUAL 0)
+    MESSAGE(FATAL_ERROR "Could create the service")
+ENDIF()
+MESSAGE(STATUS "Setting service description")
+EXECUTE_PROCESS(COMMAND "${CHUCHO_SC}" description Chucho "Log server"
+                RESULT_VARIABLE SC_RESULT)
+IF(NOT SC_RESULT EQUAL 0)
+    MESSAGE(FATAL_ERROR "Could set the description")
+ENDIF()
+MESSAGE(STATUS "Setting recovery options")
+EXECUTE_PROCESS(COMMAND "${CHUCHO_SC}" failure Chucho reset= 86400 actions= restart/1000/restart/5000//
+                RESULT_VARIABLE SC_RESULT)
+IF(NOT SC_RESULT EQUAL 0)
+    MESSAGE(FATAL_ERROR "Could set the description")
+ENDIF()
+MESSAGE(STATUS "Starting the service")
+EXECUTE_PROCESS(COMMAND "${CHUCHO_SC}" start Chucho
+                RESULT_VARIABLE SC_RESULT)
+IF(NOT SC_RESULT EQUAL 0)
+    MESSAGE(FATAL_ERROR "Could start the service")
+ENDIF()
+MESSAGE(STATUS "The Chucho service was successfully installed")

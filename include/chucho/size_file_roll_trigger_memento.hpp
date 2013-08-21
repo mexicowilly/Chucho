@@ -17,12 +17,13 @@
 #if !defined(CHUCHO_SIZE_FILE_ROLL_TRIGGER_MEMENTO_HPP__)
 #define CHUCHO_SIZE_FILE_ROLL_TRIGGER_MEMENTO_HPP__
 
-#if !defined(chucho_EXPORTS)
+#if !defined(CHUCHO_BUILD)
 #error "This header is private"
 #endif
 
 #include <chucho/memento.hpp>
 #include <chucho/optional.hpp>
+#include <cstdint>
 
 namespace chucho
 {

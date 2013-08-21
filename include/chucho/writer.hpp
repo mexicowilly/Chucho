@@ -20,6 +20,7 @@
 #include <chucho/filter.hpp>
 #include <chucho/formatter.hpp>
 #include <chucho/configurable.hpp>
+#include <chucho/non_copyable.hpp>
 #include <vector>
 #include <mutex>
 
@@ -37,7 +38,8 @@ namespace chucho
  *  
  * @ingroup writers 
  */
-class CHUCHO_EXPORT writer : public status_reporter,
+class CHUCHO_EXPORT writer : non_copyable,
+                             public status_reporter,
                              public configurable
 {
 public:
@@ -54,20 +56,6 @@ public:
      *        std::shared_ptr
      */
     writer(std::shared_ptr<formatter> fmt);
-    /**
-     * Unimplemented copy constructor.
-     */
-    writer(const writer&) = delete;
-    //@}
-
-    /**
-     * @name Operator
-     */
-    //@{
-    /**
-     * Unimplemented assignment operator.
-     */
-    writer& operator= (const writer&) = delete;
     //@}
 
     /**

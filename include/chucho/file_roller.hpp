@@ -19,6 +19,7 @@
 
 #include <chucho/status_reporter.hpp>
 #include <chucho/configurable.hpp>
+#include <chucho/non_copyable.hpp>
 #include <string>
 
 namespace chucho
@@ -35,32 +36,19 @@ class file_writer;
  *  
  * @ingroup rolling 
  */
-class CHUCHO_EXPORT file_roller : public virtual status_reporter,
+class CHUCHO_EXPORT file_roller : non_copyable,
+                                  public virtual status_reporter,
                                   public virtual configurable
 {
 public:
     /**
-     * @name Constructors
+     * @name Constructor
      */
     //@{
     /**
      * Construct a file roller.
      */
     file_roller();
-    /**
-     * Unimplemented copy constructor.
-     */
-    file_roller(const file_roller&) = delete;
-    //@}
-
-    /**
-     * @name Operator
-     */
-    //@{
-    /**
-     * Unimplemented assignment operator.
-     */
-    file_roller& operator= (const file_roller&) = delete;
     //@}
 
     /**

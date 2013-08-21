@@ -14,40 +14,32 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_PRINTF_UTIL_HPP__)
-#define CHUCHO_PRINTF_UTIL_HPP__
-
-#if !defined(chucho_EXPORTS)
-#error "This header if private"
-#endif
-
-#include <string>
+#include "error_util.hpp"
 
 namespace chucho
 {
 
-namespace printf
+namespace error_util
 {
 
-template <typename rep_type>
-inline std::string get_milli_format()
+std::string message(DWORD err)
 {
+    char* msg;
+    if (FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+                       nullptr,
+                       err,
+                       0,
+                       reinterpret_cast<char*>(&msg),
+                       1,
+                       nullptr) == 0)
+    {
+        return std::string();
+    }
+    std::string result(msg);
+    LocalFree(msg);
+    return result;
 }
 
-template <>
-inline std::string get_milli_format<long long int>()
-{
-    return "%03lli";
-}
-
-template <>
-inline std::string get_milli_format<long int>()
-{
-    return "%03li";
 }
 
 }
-
-}
-
-#endif

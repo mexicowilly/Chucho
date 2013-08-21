@@ -23,13 +23,17 @@
 #include <chucho/diagnostic_context.hpp>
 #include <chucho/calendar.hpp>
 #include <chucho/host.hpp>
+#include <chucho/line_ending.hpp>
 #include <sstream>
 #include <thread>
+#if defined(CHUCHO_WINDOWS)
+#include <process.h>
+#endif
 
 namespace
 {
 
-#if defined(_WIN32)
+#if defined(CHUCHO_WINDOWS)
 const char* file_name = "\\one\\two";
 #else
 const char* file_name = "/one/two";
@@ -42,7 +46,7 @@ class pattern_formatter_test : public ::testing::Test
 public:
     pattern_formatter_test()
         : evt_(chucho::logger::get("pattern logger"),
-               chucho::level::INFO(),
+               chucho::level::INFO_(),
                "hi",
                file_name,
                10,
@@ -93,10 +97,8 @@ TEST_F(pattern_formatter_test, function)
 
 TEST_F(pattern_formatter_test, end_of_line)
 {
-    std::ostringstream stream;
-    stream << std::endl;
     chucho::pattern_formatter f("%n");
-    EXPECT_EQ(stream.str(), f.format(evt_).c_str());
+    EXPECT_STREQ(chucho::line_ending::EOL, f.format(evt_).c_str());
 }
 
 TEST_F(pattern_formatter_test, level)
@@ -107,8 +109,8 @@ TEST_F(pattern_formatter_test, level)
 
 TEST_F(pattern_formatter_test, pid)
 {
-    #if defined(_WIN32)
-    pid_t p = _getpid();
+    #if defined(CHUCHO_WINDOWS)
+    int p = _getpid();
     #else
     pid_t p = getpid();
     #endif

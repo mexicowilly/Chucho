@@ -19,6 +19,7 @@
 
 #include "socket_reader.hpp"
 #include <chucho/logger.hpp>
+#include <chucho/non_copyable.hpp>
 #include <atomic>
 
 namespace chucho
@@ -27,14 +28,11 @@ namespace chucho
 namespace server
 {
 
-class socket_listener
+class socket_listener : non_copyable
 {
 public:
     socket_listener(std::uint16_t port);
-    socket_listener(const socket_listener&) = delete;
     ~socket_listener();
-
-    socket_listener& operator= (const socket_listener&) = delete;
 
     std::shared_ptr<socket_reader> accept();
 

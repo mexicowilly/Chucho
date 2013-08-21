@@ -17,12 +17,13 @@
 #if !defined(CHUCHO_FILE_HPP__)
 #define CHUCHO_FILE_HPP__
 
-#if !defined(chucho_EXPORTS)
+#if !defined(CHUCHO_BUILD)
 #error "This header is private"
 #endif
 
 #include <chucho/export.hpp>
 #include <string>
+#include <cstdint>
 
 namespace chucho
 {

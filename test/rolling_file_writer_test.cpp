@@ -53,12 +53,12 @@ protected:
 
     chucho::event get_event(const std::string& msg)
     {
-        return chucho::event(logger_, chucho::level::INFO(), msg, __FILE__, __LINE__, __FUNCTION__);
+        return chucho::event(logger_, chucho::level::INFO_(), msg, __FILE__, __LINE__, __FUNCTION__);
     }
 
     std::string get_file_name(const std::string& base)
     {
-        return dir_name_ + '/' + base;
+        return dir_name_ + chucho::file::dir_sep + base;
     }
 
     std::string get_line(const std::string& file_name)
@@ -66,6 +66,8 @@ protected:
         std::ifstream stream(file_name);
         std::string line;
         std::getline(stream, line);
+        if (!line.empty() && line.back() == '\r')
+            line.pop_back();
         return line;
     }
 
@@ -117,18 +119,19 @@ TEST_F(rolling_file_writer_test, time_names)
     std::shared_ptr<chucho::file_roller> roll;
     std::unique_ptr<chucho::rolling_file_writer> w;
     std::string fname;
-    for (char c : std::string("MHdVmY"))
+    for (char c : std::string("MHdmY"))
     {
         chucho::status_manager::get()->clear();
         std::string simple("%d{%$}");
         std::replace(simple.begin(), simple.end(), '$', c);
         roll.reset(new chucho::time_file_roller(get_file_name(simple), 1));
-        w.reset(new chucho::rolling_file_writer(fmt, std::move(roll)));
+        w.reset(new chucho::rolling_file_writer(fmt, roll));
         w->write(get_event("one"));
         EXPECT_EQ(0, chucho::status_manager::get()->get_count());
         fname = get_file_name(get_time(std::string("%") + c));
         EXPECT_TRUE(chucho::file::exists(fname));
-        chucho::file::remove(fname);
+        w.reset();
+        EXPECT_NO_THROW(chucho::file::remove(fname));
     }
     roll.reset(new chucho::time_file_roller(get_file_name("sub1/sub2/%d{%Y,aux}/%d{%m}"), 1));
     w.reset(new chucho::rolling_file_writer(fmt, std::move(roll)));

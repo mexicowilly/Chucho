@@ -14,7 +14,12 @@
 #    limitations under the License.
 #
 
-ADD_DEFINITIONS(-DGTEST_HAS_TR1_TUPLE=0 -Dchucho_EXPORTS)
+ADD_DEFINITIONS(-DGTEST_HAS_TR1_TUPLE=0)
+IF(CHUCHO_POSIX)
+    ADD_DEFINITIONS(-DCHUCHO_POSIX)
+ELSEIF(CHUCHO_WINDOWS)
+    ADD_DEFINITIONS(-DCHUCHO_WINDOWS)
+ENDIF()
 INCLUDE_DIRECTORIES("${CHUCHO_EXTERNAL_PREFIX}/include")
 
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
@@ -39,6 +44,13 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                yaml_configurator_test.cpp)
 TARGET_LINK_LIBRARIES(unit-test chucho gtest ${CHUCHO_THREAD_LIB})
 
+IF(MSVC)
+    SET_SOURCE_FILES_PROPERTIES(pattern_formatter_test.cpp PROPERTIES
+                                COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
+    SET_SOURCE_FILES_PROPERTIES(rolling_file_writer_test.cpp PROPERTIES
+                                COMPILE_FLAGS /wd4018)
+ENDIF()
+
 ADD_CUSTOM_TARGET(check
                   COMMAND unit-test)
 
@@ -55,3 +67,6 @@ TARGET_LINK_LIBRARIES(syslog-writer-test chucho gtest ${CHUCHO_THREAD_LIB})
 ADD_EXECUTABLE(remote-writer-test EXCLUDE_FROM_ALL
                remote_writer_test.cpp)
 TARGET_LINK_LIBRARIES(remote-writer-test chucho ${CHUCHO_THREAD_LIB})
+
+ADD_CUSTOM_TARGET(all-test
+                  DEPENDS unit-test rolling-file-test syslog-writer-test remote-writer-test)

@@ -74,6 +74,9 @@ public:
      * @param ctx the context to set
      */
     static void set(const std::map<std::string, std::string>& ctx);
+
+private:
+    static std::map<std::string, std::string>& get_map();
 };
 
 }

@@ -17,11 +17,12 @@
 #if !defined(CHUCHO_REGEX_HPP__)
 #define CHUCHO_REGEX_HPP__
 
-#if !defined(chucho_EXPORTS)
+#if !defined(CHUCHO_BUILD)
 #error "This header is private"
 #endif
 
 #include <chucho/export.hpp>
+#include <chucho/non_copyable.hpp>
 #include <memory>
 #include <string>
 #include <iterator>
@@ -35,13 +36,10 @@ namespace chucho
 namespace regex
 {
 
-struct CHUCHO_EXPORT expression
+struct CHUCHO_EXPORT expression : non_copyable
 {
     expression(const std::string& re);
-    expression(const expression& ex) = delete;
     ~expression();
-
-    expression& operator= (const expression& ex) = delete;
 
     TRex* trex_;
 };

@@ -25,9 +25,11 @@ OPTION(ENABLE_SHARED "Whether to build a shared object" FALSE)
 
 # framework or not
 OPTION(ENABLE_FRAMEWORK "Whether to build as a framework on Macintosh" TRUE)
-IF(ENABLE_FRAMEWORK)
-    SET(CHUCHO_NEED_TO_USE_THE_FRAMEWORK_VARIABLE_OR_CMAKE_COMPLAINS ${ENABLE_FRAMEWORK})
-ENDIF()
+SET(CHUCHO_NEEDS_TO_USE_THE_FRAMEWORK_VARIABLE_OR_CMAKE_COMPLAINS ${ENABLE_FRAMEWORK})
+
+# whether to install chucod as a service or not on platforms that have
+# services.
+OPTION(INSTALL_SERVICE "Whether to install chuchod as a system service" TRUE)
 
 # Set consistent platform names
 IF(CMAKE_SYSTEM_NAME STREQUAL Windows)
@@ -54,7 +56,7 @@ ENDIF()
 # Set default build type
 IF(NOT CMAKE_BUILD_TYPE)
     SET(CMAKE_BUILD_TYPE Release CACHE STRING "Build type, one of: Release, Debug, RelWithDebInfo, or MinSizeRel" FORCE)
-ENDIF(NOT CMAKE_BUILD_TYPE)
+ENDIF()
 MESSAGE(STATUS "Build type -- ${CMAKE_BUILD_TYPE}")
 
 # Compiler flags
@@ -87,13 +89,33 @@ ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
     ELSE()
         MESSAGE(FATAL_ERROR "-std=c++11 is required")
     ENDIF()
+ELSEIF(MSVC)
+    IF(MSVC_VERSION LESS 1700)
+        MESSAGE(FATAL_ERROR "Microsoft compiler version 17 or later is required (the compiler that ships with Visual Studio 2012)")
+    ENDIF()
 ENDIF()
+
+# We are building Chucho
+ADD_DEFINITIONS(-DCHUCHO_BUILD)
+
+# Configure our export definitions
+IF(NOT ENABLE_SHARED)
+    SET(CHUCHO_STATIC TRUE)
+ENDIF()
+MAKE_DIRECTORY("${CMAKE_BINARY_DIR}/chucho")
+CONFIGURE_FILE(include/chucho/export.hpp.in "${CMAKE_BINARY_DIR}/chucho/export.hpp")
 
 # rpath
 SET(CMAKE_SKIP_BUILD_RPATH FALSE)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 SET(CMAKE_INSTALL_RPATH_USE_LINK_RPATH FALSE)
+
+# stdlib.h is required on all platforms
+CHECK_INCLUDE_FILE_CXX(stdlib.h CHUCHO_HAVE_STDLIB_H)
+IF(NOT CHUCHO_HAVE_STDLIB_H)
+    MESSAGE(FATAL_ERROR "The header stdlib.h is required")
+ENDIF()
 
 IF(CHUCHO_POSIX)
     # headers
@@ -226,6 +248,37 @@ IF(CHUCHO_POSIX)
             MESSAGE(FATAL_ERROR "${SYM} is required")
         ENDIF()
     ENDFOREACH()
+ELSEIF(CHUCHO_WINDOWS)
+    FOREACH(HEAD windows.h winsock2.h io.h process.h ws2tcpip.h time.h)
+        STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
+        STRING(TOUPPER ${CHUCHO_HEAD_VAR_NAME} CHUCHO_HEAD_VAR_NAME)
+        CHECK_INCLUDE_FILE_CXX(${HEAD} ${CHUCHO_HEAD_VAR_NAME})
+        IF(NOT ${CHUCHO_HEAD_VAR_NAME})
+            MESSAGE(FATAL_ERROR "The header ${HEAD} is required")
+        ENDIF()
+    ENDFOREACH()
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_WINSOCK2_H)
+    # Shellapi.h has to have windows.h included first
+    CHECK_CXX_SOURCE_COMPILES("#include <windows.h>\n#include <shellapi.h>\nint main() { return 0; }" CHUCHO_HAVE_SHELLAPI_H)
+    IF(NOT CHUCHO_HAVE_SHELLAPI_H)
+        MESSAGE(FATAL_ERROR "shellapi.h is required")
+    ENDIF()
+
+    # sc
+    IF(INSTALL_SERVICE)
+        MESSAGE(STATUS "Looking for sc")
+        FIND_PROGRAM(CHUCHO_SC sc)
+        IF(NOT CHUCHO_SC)
+            MESSAGE(FATAL_ERROR "sc is required in order to install the Chucho service")
+        ENDIF()
+        MESSAGE(STATUS "Looking for sc - ${CHUCHO_SC}")
+    ENDIF()
+ENDIF()
+
+CHECK_CXX_SOURCE_COMPILES("#include <exception>\nint main() { std::exception e; std::throw_with_nested(e); std::rethrow_if_nested(e); return 0; }"
+                          CHUCHO_HAVE_NESTED_EXCEPTIONS)
+IF(CHUCHO_HAVE_NESTED_EXCEPTIONS)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_NESTED_EXCEPTIONS)
 ENDIF()
 
 #
@@ -270,6 +323,7 @@ ExternalProject_Add_Step(gtest-external
                          COMMAND "${CMAKE_COMMAND}" -E make_directory <INSTALL_DIR>/include
                          COMMAND "${CMAKE_COMMAND}" -E copy_directory <SOURCE_DIR>/include <INSTALL_DIR>/include
                          DEPENDEES build)
+ADD_LIBRARY(gtest STATIC IMPORTED)
 IF(CHUCHO_WINDOWS)
     ExternalProject_Add_Step(gtest-external
                              install-libs
@@ -279,6 +333,8 @@ IF(CHUCHO_WINDOWS)
                              COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/gtest_main.lib <INSTALL_DIR>/lib
                              COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/gtest_main.pdb <INSTALL_DIR>/lib
                              DEPENDEES install-headers)
+    SET_TARGET_PROPERTIES(gtest PROPERTIES
+                          IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/gtest.lib")
 ELSE()
     ExternalProject_Add_Step(gtest-external
                              install-libs
@@ -286,11 +342,10 @@ ELSE()
                              COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/libgtest.a <INSTALL_DIR>/lib
                              COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/libgtest_main.a <INSTALL_DIR>/lib
                              DEPENDEES install-headers)
-    ADD_LIBRARY(gtest STATIC IMPORTED)
-    ADD_DEPENDENCIES(gtest gtest-external)
     SET_TARGET_PROPERTIES(gtest PROPERTIES
                           IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/libgtest.a")
 ENDIF()
+ADD_DEPENDENCIES(gtest gtest-external)
 SET_TARGET_PROPERTIES(gtest-external PROPERTIES
                       EXCLUDE_FROM_ALL TRUE)
 ADD_DEPENDENCIES(external gtest-external)

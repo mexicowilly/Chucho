@@ -19,6 +19,7 @@
 
 #include <chucho/status_reporter.hpp>
 #include <map>
+#include <string>
 
 namespace chucho
 {

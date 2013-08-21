@@ -31,4 +31,9 @@ build. You set these with the command-line switch -D, as in
       the location of CMAKE_INSTALL_PREFIX. The default is ON.
     * CMAKE_INSTALL_PREFIX: (A directory) If you would like to install
       Chucho to a particular location, you may set it here. The default
-      is /usr/local.
+      is /usr/local on POSIX system and C:\Program Files\CHUCHO on
+      Windows. If you are on Windows, I highly recommend that you change
+      this to something more suitable.
+    * INSTALL_SERVICE: (ON or OFF) Whether you want the install target
+      to install the chuchod log server as a system service on
+      platforms that support system services. The default is ON.

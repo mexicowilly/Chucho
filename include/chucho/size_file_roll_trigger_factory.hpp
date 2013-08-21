@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_SIZE_FILE_ROLL_TRIGGER_FACTORY_HPP__)
 #define CHUCHO_SIZE_FILE_ROLL_TRIGGER_FACTORY_HPP__
 
-#if !defined(chucho_EXPORTS)
+#if !defined(CHUCHO_BUILD)
 #error "This header is private"
 #endif
 

@@ -33,7 +33,7 @@
 #include <chucho/exception.hpp>
 #include <chucho/configuration.hpp>
 #include <sstream>
-#if defined(_WIN32)
+#if defined(CHUCHO_WINDOWS)
 #include <windows.h>
 #endif
 
@@ -42,8 +42,9 @@ namespace
 
 void setenv(const char* var, const char* val)
 {
-#if defined(_WIN32)
-    SetEnvironmentVariableA(var, val);
+#if defined(CHUCHO_WINDOWS)
+    if (!SetEnvironmentVariableA(var, val))
+        std::cout << "Failed environment: " << GetLastError() << std::endl;
 #else
     ::setenv(var, val, 1);
 #endif
@@ -149,36 +150,42 @@ TEST_F(yaml_configurator, level_filter)
                      "            on_match: NEUTRAL\n"
                      "            on_mismatch: RESULT");
     std::size_t pos = tmpl.find("RESULT");
-    std::vector<std::string> bad =
+    // Visual Studio 2012 does not have initializer lists
+    const char* bad[] =
     {
         "",
         "nuetral",
-        "willy"
+        "willy",
+        nullptr
     };
-    for (auto item : bad)
+    int i = 0;
+    while (bad[i] != nullptr)
     {
         chucho::logger::remove_unused_loggers();
         chucho::status_manager::get()->clear();
         std::string rep = tmpl;
-        rep.replace(pos, 6, item);
+        rep.replace(pos, 6, bad[i++]);
         EXPECT_ANY_THROW(configure(rep.c_str()));
     }
     chucho::status_manager::get()->clear();
-    std::map<std::string, chucho::filter::result> good =
+    // Visual Studio 2012 does not have initializer lists
+    struct { const char* first; chucho::filter::result second; } good[] =
     {
         { "ACCEPT", chucho::filter::result::ACCEPT },
         { "NEUTRAL", chucho::filter::result::NEUTRAL },
         { "DENY", chucho::filter::result::DENY },
         { "aCcEpT", chucho::filter::result::ACCEPT },
         { "NEuTrAL", chucho::filter::result::NEUTRAL },
-        { "deny", chucho::filter::result::DENY }
+        { "deny", chucho::filter::result::DENY },
+        { nullptr, chucho::filter::result::ACCEPT }
     };
-    for (auto item : good)
+    i = 0;
+    while (good[i].first != nullptr)
     {
         chucho::logger::remove_unused_loggers();
         chucho::status_manager::get()->clear();
         std::string rep = tmpl;
-        rep.replace(pos, 6, item.first);
+        rep.replace(pos, 6, good[i].first);
         configure(rep.c_str());
         auto wrts = chucho::logger::get("will")->get_writers();
         ASSERT_EQ(1, wrts.size());
@@ -186,9 +193,9 @@ TEST_F(yaml_configurator, level_filter)
         ASSERT_EQ(1, flts.size());
         ASSERT_EQ(typeid(chucho::level_filter), typeid(*flts[0]));
         auto lf = std::static_pointer_cast<chucho::level_filter>(flts[0]);
-        EXPECT_EQ(*chucho::level::INFO(), *lf->get_level());
+        EXPECT_EQ(*chucho::level::INFO_(), *lf->get_level());
         EXPECT_EQ(chucho::filter::result::NEUTRAL, lf->get_on_match());
-        EXPECT_EQ(item.second, lf->get_on_mismatch());
+        EXPECT_EQ(good[i++].second, lf->get_on_mismatch());
     }
 }
 
@@ -207,7 +214,7 @@ TEST_F(yaml_configurator, level_threshold_filter)
     ASSERT_EQ(1, flts.size());
     ASSERT_EQ(typeid(chucho::level_threshold_filter), typeid(*flts[0]));
     auto thresh = std::static_pointer_cast<chucho::level_threshold_filter>(flts[0]);
-    EXPECT_EQ(*chucho::level::FATAL(), *thresh->get_level());
+    EXPECT_EQ(*chucho::level::FATAL_(), *thresh->get_level());
 }
 
 TEST_F(yaml_configurator, logger)
@@ -219,7 +226,7 @@ TEST_F(yaml_configurator, logger)
     std::shared_ptr<chucho::logger> lgr = chucho::logger::get("will");
     EXPECT_EQ(std::string("will"), lgr->get_name());
     ASSERT_TRUE(static_cast<bool>(lgr->get_level()));
-    EXPECT_EQ(*chucho::level::FATAL(), *lgr->get_level());
+    EXPECT_EQ(*chucho::level::FATAL_(), *lgr->get_level());
     EXPECT_FALSE(lgr->writes_to_ancestors());
 }
 
@@ -340,24 +347,28 @@ TEST_F(yaml_configurator, size_file_roll_trigger)
                      "            max_size: SIZE\n"
                      "        file_name: what.log\n");
     std::size_t pos = tmpl.find("SIZE");
-    std::vector<std::string> bad =
+    // Visual Studio 2012 does not have initializer lists
+    const char* bad[] =
     {
         "",
         "Willy",
         "5000x",
         "5000gx",
-        "5000gbx"
+        "5000gbx",
+        nullptr
     };
-    for (auto item : bad)
+    int i = 0;
+    while (bad[i] != nullptr)
     {
         chucho::logger::remove_unused_loggers();
         chucho::status_manager::get()->clear();
         std::string rep = tmpl;
-        rep.replace(pos, 4, item);
+        rep.replace(pos, 4, bad[i++]);
         EXPECT_ANY_THROW(configure(rep.c_str()));
     }
     chucho::status_manager::get()->clear();
-    std::map<std::string, std::uintmax_t> good =
+    // Visual Studio 2012 does not have initializer lists
+    struct { const char* first; std::uintmax_t second; } good[] =
     {
         { "5000", 5000 },
         { "5001b", 5001 },
@@ -378,13 +389,15 @@ TEST_F(yaml_configurator, size_file_roll_trigger)
         { "4G", 1024ULL * 1024ULL * 1024ULL * 4ULL },
         { "5Gb", 1024ULL * 1024ULL * 1024ULL * 5ULL },
         { "6gB", 1024ULL * 1024ULL * 1024ULL * 6ULL },
-        { "7GB", 1024ULL * 1024ULL * 1024ULL * 7ULL }
+        { "7GB", 1024ULL * 1024ULL * 1024ULL * 7ULL },
+        { nullptr, 0 }
     };
-    for (auto item : good)
+    i = 0;
+    while (good[i].first != nullptr)
     {
         chucho::logger::remove_unused_loggers();
         std::string rep = tmpl;
-        rep.replace(pos, 4, item.first);
+        rep.replace(pos, 4, good[i].first);
         configure(rep.c_str());
         auto wrts = chucho::logger::get("will")->get_writers();
         ASSERT_EQ(1, wrts.size());
@@ -395,7 +408,7 @@ TEST_F(yaml_configurator, size_file_roll_trigger)
         ASSERT_EQ(typeid(chucho::size_file_roll_trigger), typeid(*trg));
         auto strg = std::static_pointer_cast<chucho::size_file_roll_trigger>(trg);
         ASSERT_TRUE(static_cast<bool>(strg));
-        EXPECT_EQ(item.second, strg->get_max_size());
+        EXPECT_EQ(good[i++].second, strg->get_max_size());
     }
 }
 
@@ -425,21 +438,25 @@ TEST_F(yaml_configurator, syslog_writer_facility)
                      "            - pattern: '%m%n'\n"
                      "        - facility: FCL");
     std::size_t pos = tmpl.find("FCL");
-    std::vector<std::string> bad =
+    // Visual Studio 2012 does not have initializer lists
+    const char* bad[] =
     {
         "kernel",
         "my dog has fleas",
-        ""
+        "",
+        nullptr
     };
-    for (auto item : bad)
+    int i = 0;
+    while (bad[i] != nullptr)
     {
         chucho::logger::remove_unused_loggers();
         chucho::status_manager::get()->clear();
         std::string rep = tmpl;
-        rep.replace(pos, 3, item);
+        rep.replace(pos, 3, bad[i++]);
         EXPECT_ANY_THROW(configure(rep.c_str()));
     }
-    std::map<std::string, chucho::syslog::facility> good =
+    // Visual Studio 2012 does not have initializer lists
+    struct { const char* first; chucho::syslog::facility second; } good[] =
     {
         { "kern", chucho::syslog::facility::KERN },
         { "USER", chucho::syslog::facility::USER },
@@ -460,20 +477,22 @@ TEST_F(yaml_configurator, syslog_writer_facility)
         { "Local4", chucho::syslog::facility::LOCAL4 },
         { "loCAl5", chucho::syslog::facility::LOCAL5 },
         { "loCal6", chucho::syslog::facility::LOCAL6 },
-        { "LoCal7", chucho::syslog::facility::LOCAL7 }
+        { "LoCal7", chucho::syslog::facility::LOCAL7 },
+        { nullptr, chucho::syslog::facility::LOCAL7 }
     };
-    for (auto item : good)
+    i = 0;
+    while (good[i].first != nullptr)
     {
         chucho::logger::remove_unused_loggers();
         chucho::status_manager::get()->clear();
         std::string rep = tmpl;
-        rep.replace(pos, 3, item.first);
+        rep.replace(pos, 3, good[i].first);
         configure(rep.c_str());
         auto wrts = chucho::logger::get("will")->get_writers();
         ASSERT_EQ(1, wrts.size());
         EXPECT_EQ(typeid(chucho::syslog_writer), typeid(*wrts[0]));
         auto wrt = std::static_pointer_cast<chucho::syslog_writer>(wrts[0]);
-        EXPECT_EQ(item.second, wrt->get_facility());
+        EXPECT_EQ(good[i++].second, wrt->get_facility());
     }
 }
 
@@ -522,8 +541,8 @@ TEST_F(yaml_configurator, unknown)
 
 TEST_F(yaml_configurator, variables)
 {
-    setenv("CHUCHO_WRITES_KEY", "writes_to_ancestors", 1);
-    setenv("CHUCHO_WRITES_VALUE", "false", 1);
+    setenv("CHUCHO_WRITES_KEY", "writes_to_ancestors");
+    setenv("CHUCHO_WRITES_VALUE", "false");
     configure("- variables:\n"
               "    MY_NAME_IS: will\n"
               "    MY_TYPE_IS: logger\n"
@@ -537,6 +556,6 @@ TEST_F(yaml_configurator, variables)
     std::shared_ptr<chucho::logger> lgr = chucho::logger::get("will");
     EXPECT_EQ(std::string("will"), lgr->get_name());
     ASSERT_NE(nullptr, lgr->get_level().get());
-    EXPECT_EQ(*chucho::level::FATAL(), *lgr->get_level());
+    EXPECT_EQ(*chucho::level::FATAL_(), *lgr->get_level());
     EXPECT_FALSE(lgr->writes_to_ancestors());
 }
