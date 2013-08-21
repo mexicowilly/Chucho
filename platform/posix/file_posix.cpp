@@ -22,10 +22,73 @@
 #include <cerrno>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <fts.h>
 #include <limits.h>
 // Needed for realpath, which is not in <cstdlib>
 #include <stdlib.h>
+#if defined(CHUCHO_NO_FTS)
+#include <dirent.h>
+#include <cstdint>
+#else
+#include <fts.h>
+#endif
+
+#if defined(CHUCHO_NO_FTS)
+namespace
+{
+
+void remove_all_impl(const std::string& name)
+{
+    DIR* d = opendir(name.c_str());
+    if (d == nullptr)
+        throw chucho::file_exception("Could not open directory " + name + ": " + std::strerror(errno));
+    struct sentry
+    {
+        sentry(DIR* d) : d_(d) { }
+        ~sentry() { closedir(d_); }
+        DIR* d_;
+    } s(d);
+#if defined(CHUCHO_DIRENT_NEEDS_NAME)
+    std::vector<std::uint8_t> dirent_bytes(sizeof(struct dirent) +
+        pathconf(name.c_str(), _PC_NAME_MAX));
+    struct dirent* entry = reinterpret_cast<struct dirent*>(&dirent_bytes[0]);
+#else
+    struct dirent dirent_bytes;
+    struct dirent* entry = &dirent_bytes;
+#endif
+    struct dirent* result;
+    struct stat stat_buf;
+    while (true)
+    {
+        if (readdir_r(d, entry, &result) != 0)
+        {
+            // error
+        }
+        if (result == nullptr)
+            break;
+        if (std::strcmp(entry->d_name, ".") == 0 ||
+            std::strcmp(entry->d_name, "..") == 0)
+        {
+            continue;
+        }
+        std::string child(name + '/' + entry->d_name);
+        if (stat(child.c_str(), &stat_buf) != 0)
+        {
+            // error
+        }
+        if (S_ISDIR(stat_buf.st_mode))
+        {
+            remove_all_impl(child);
+        }
+        else
+        {
+            chucho::file::remove(child);
+        }
+    }
+    chucho::file::remove(name);
+}
+
+}
+#endif
 
 namespace chucho
 {
@@ -116,7 +179,7 @@ void remove_all(const std::string& name)
         int this_err = errno;
         throw file_exception("Could not stat\"" + name + "\": " + std::strerror(this_err));
     }
-    if (!(stat_buf.st_mode & S_IFDIR))
+    if (!S_ISDIR(stat_buf.st_mode))
     {
         if (std::remove(name.c_str()) != 0)
         {
@@ -125,6 +188,9 @@ void remove_all(const std::string& name)
         }
         return;
     }
+#if defined(CHUCHO_NO_FTS)
+    remove_all_impl(name);
+#else
     const char* names[] = { name.c_str(), nullptr };
     FTS* fts = fts_open(const_cast<char* const*>(names), FTS_NOSTAT, nullptr);
     if (fts == nullptr)
@@ -150,6 +216,7 @@ void remove_all(const std::string& name)
         }
         ent = fts_read(fts);
     }
+#endif
 }
 
 std::uintmax_t size(const std::string& name)

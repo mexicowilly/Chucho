@@ -43,6 +43,9 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                utf8_test.cpp
                yaml_configurator_test.cpp)
 TARGET_LINK_LIBRARIES(unit-test chucho gtest ${CHUCHO_THREAD_LIB})
+IF(CHUCHO_SOLARIS)
+    TARGET_LINK_LIBRARIES(unit-test socket nsl)
+ENDIF()
 
 IF(MSVC)
     SET_SOURCE_FILES_PROPERTIES(pattern_formatter_test.cpp PROPERTIES
@@ -58,15 +61,24 @@ ADD_EXECUTABLE(rolling-file-test EXCLUDE_FROM_ALL
                harness.cpp
                time_rolling_file_test.cpp)
 TARGET_LINK_LIBRARIES(rolling-file-test chucho gtest ${CHUCHO_THREAD_LIB})
+IF(CHUCHO_SOLARIS)
+    TARGET_LINK_LIBRARIES(rolling-file-test socket nsl)
+ENDIF()
 
 ADD_EXECUTABLE(syslog-writer-test EXCLUDE_FROM_ALL
                harness.cpp
                syslog_writer_test.cpp)
 TARGET_LINK_LIBRARIES(syslog-writer-test chucho gtest ${CHUCHO_THREAD_LIB})
+IF(CHUCHO_SOLARIS)
+    TARGET_LINK_LIBRARIES(syslog-writer-test socket nsl)
+ENDIF()
 
 ADD_EXECUTABLE(remote-writer-test EXCLUDE_FROM_ALL
                remote_writer_test.cpp)
 TARGET_LINK_LIBRARIES(remote-writer-test chucho ${CHUCHO_THREAD_LIB})
+IF(CHUCHO_SOLARIS)
+    TARGET_LINK_LIBRARIES(remote-writer-test socket nsl)
+ENDIF()
 
 ADD_CUSTOM_TARGET(all-test
                   DEPENDS unit-test rolling-file-test syslog-writer-test remote-writer-test)
