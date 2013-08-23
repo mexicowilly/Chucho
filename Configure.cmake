@@ -394,3 +394,66 @@ ADD_DEPENDENCIES(gtest gtest-external)
 SET_TARGET_PROPERTIES(gtest-external PROPERTIES
                       EXCLUDE_FROM_ALL TRUE)
 ADD_DEPENDENCIES(external gtest-external)
+
+# zlib
+#
+# You may enable zlib support by doing one of several things:
+#
+# In order to have zlib embedded into Chucho and not require external linkage later,
+# do one of these two things:
+#
+#   * Set ZLIB_PACKAGE to the name of the zlib tarball
+#   * Set ZLIB_SOURCE to the name of the directory where an unpacked zlib tarball lives
+#
+# In order to use zlib as an external library that your executable must subsequently
+# also be linked to, do one of the following two things:
+#
+#   * Set both ZLIB_INCLUDE_DIR and ZLIB_LIB_DIR
+#   * Set nothing and let CMake try to find the library and headers
+#
+# To completely disable zlib support, do the following:
+#
+#   * Set DISABLE_ZLIB
+#
+IF(ZLIB_PACKAGE OR ZLIB_SOURCE)
+    IF(ZLIB_PACKAGE)
+        IF(EXISTS "${ZLIB_PACKAGE}")
+            EXECUTE_PROCESS(COMMAND "${CMAKE_COMMAND}" tar xvf "${ZLIB_PACKAGE}"
+                            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+                            RESULT_VARIABLE CHUCHO_RESULT)
+            IF(CHUCHO_RESULT EQUAL 0)
+                FILE(GLOB ZLIB_SOURCE "${CMAKE_BINARY_DIR}/zlib-")
+                IF(NOT ZLIB_SOURCE)
+                    MESSAGE(WARNING "Zlib compression is disabled because after unpacking ${ZLIB_PACKAGE} no directory named \"zlib-*\" could be found in ${CMAKE_BINARY_DIR}")
+                ENDIF()
+            ELSE()
+                MESSAGE(WARNING "Zlib compression is disabled because ${ZLIB_PACKAGE} could not be unpacked")
+            ENDIF()
+        ELSE()
+            MESSAGE(WARNING "Zlib compression is disabled because ZLIB_PACKAGE does not reference an existing file: ${ZLIB_PACKAGE}")
+        ENDIF()
+    ENDIF()
+    IF(ZLIB_SOURCE)
+        MESSAGE(STATUS "Using zlib sources at ${ZLIB_SOURCE}")
+        FOREACH(SRC adler32 compress crc32 deflate gzclose gzlib gzwrite trees zutil)
+            LIST(APPEND CHUCHO_ZLIB_SOURCES "${ZLIB_SOURCE}/${SRC}.c")
+        ENDFOREACH()
+    ENDIF()
+ELSEIF(ZLIB_INCLUDE_DIR OR ZLIB_LIB_DIR)
+    IF(NOT ZLIB_INCLUDE_DIR)
+        MESSAGE(WARNING "Zlib compression is disabled because If ZLIB_LIB_DIR is set, then ZLIB_INCLUDE_DIR must also be set")
+        UNSET(ZLIB_LIB_DIR)
+    ELSEIF(NOT ZLIB_LIB_DIR)
+        MESSAGE(WARNING "Zlib compression is disabled because If ZLIB_INCLUDE_DIR is set, then ZLIB_LIB_DIR must also be set")
+        UNSET(ZLIB_INCLUDE_DIR)
+    ENDIF()
+ELSEIF(NOT DISABLE_ZLIB)
+    FIND_PACKAGE(ZLIB)
+    IF(ZLIB_FOUND)
+        SET(ZLIB_INCLUDE_DIR "${ZLIB_INCLUDE_DIRS}")
+        LIST(GET ZLIB_LIBRARIES 0 ZLIB_LIB_DIR)
+        GET_FILENAME_COMPONENT(ZLIB_LIB_DIR "${ZLIB_LIB_DIR}" PATH)
+    ELSE()
+        MESSAGE(WARNING "Zlib compression is disabled because the library could not be found. Set DISABLE_ZLIB to silence this warning.")
+    ENDIF()
+ENDIF()

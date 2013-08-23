@@ -23,7 +23,7 @@ INCLUDE(Configure.cmake)
 # export.hpp lives.
 INCLUDE_DIRECTORIES(include embedded/include "${CMAKE_BINARY_DIR}")
 
-SET(CHUCHO_VERSION 1.2)
+SET(CHUCHO_VERSION 1.3)
 SET(CHUCHO_SO_VERSION 1)
 # This is used for release candidate distros
 # SET(CHUCHO_DIST_VERSION try-2)
