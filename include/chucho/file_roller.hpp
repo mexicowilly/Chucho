@@ -20,6 +20,7 @@
 #include <chucho/status_reporter.hpp>
 #include <chucho/configurable.hpp>
 #include <chucho/non_copyable.hpp>
+#include <chucho/file_compressor.hpp>
 #include <string>
 
 namespace chucho
@@ -48,7 +49,7 @@ public:
     /**
      * Construct a file roller.
      */
-    file_roller();
+    file_roller(std::shared_ptr<file_compressor> cmp = std::shared_ptr<file_compressor>());
     //@}
 
     /**
@@ -84,6 +85,7 @@ protected:
      * invalid. 
      */
     file_writer* file_writer_;
+    std::shared_ptr<file_compressor> compressor_;
 };
 
 }

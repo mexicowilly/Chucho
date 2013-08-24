@@ -76,6 +76,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/event.hpp
     include/chucho/exception.hpp
     "${CMAKE_BINARY_DIR}/chucho/export.hpp"
+    include/chucho/file_compressor.hpp
     include/chucho/file_roller.hpp
     include/chucho/file_roll_trigger.hpp
     include/chucho/file_writer.hpp
@@ -90,6 +91,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/marker.hpp
     include/chucho/memento.hpp
     include/chucho/non_copyable.hpp
+    include/chucho/noop_file_compressor.hpp
     include/chucho/numbered_file_roller.hpp
 	include/chucho/optional.hpp
     include/chucho/pattern_formatter.hpp
@@ -107,6 +109,10 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/writer_factory.hpp
     include/chucho/writer_memento.hpp
     include/chucho/yaml_formatter.hpp)
+
+IF(CHUCHO_HAVE_ZLIB)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.hpp)
+ENDIF()
 
 # Update this when you rev libyaml
 SET(CHUCHO_LIBYAML_VERSION_MAJOR 0)
@@ -184,6 +190,7 @@ SET(CHUCHO_SOURCES
     logger_memento.cpp
     marker.cpp
     memento.cpp
+    noop_file_compressor.cpp
     numbered_file_roller.cpp
     numbered_file_roller_factory.cpp
     numbered_file_roller_memento.cpp
@@ -272,6 +279,24 @@ SET(CHUCHO_SOURCES
 SET_SOURCE_FILES_PROPERTIES(yaml_configurator.cpp PROPERTIES
                             COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
 
+IF(CHUCHO_HAVE_ZLIB)
+    LIST(APPEND CHUCHO_SOURCES
+         gzip_file_compressor.cpp
+         ${CHUCHO_ZLIB_SOURCES})
+    IF(ZLIB_SOURCE)
+        INCLUDE_DIRECTORIES("${ZLIB_SOURCE}")
+    ELSEIF(ZLIB_INCLUDE_DIR)
+        INCLUDE_DIRECTORIES("${ZLIB_INCLUDE_DIR}")
+    ENDIF()
+    IF(CHUCHO_ZLIB_SOURCES AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+        SET_SOURCE_FILES_PROPERTIES("${ZLIB_SOURCE}/gzlib.c"
+                                    "${ZLIB_SOURCE}/gzread.c"
+                                    "${ZLIB_SOURCE}/gzwrite.c"
+                                    PROPERTIES
+                                    COMPILE_FLAGS -Wno-implicit-function-declaration)
+    ENDIF()
+ENDIF()
+
 IF(ENABLE_SHARED)
     ADD_LIBRARY(chucho SHARED ${CHUCHO_SOURCES})
     SET_TARGET_PROPERTIES(chucho PROPERTIES
@@ -300,6 +325,11 @@ ENDIF()
 
 IF(CHUCHO_WINDOWS)
     TARGET_LINK_LIBRARIES(chucho ws2_32)
+ENDIF()
+
+IF(ZLIB_LIB_DIR)
+    LINK_DIRECTORIES("${ZLIB_LIB_DIR}")
+    TARGET_LINK_LIBRARIES(chucho z)
 ENDIF()
 
 ADD_SUBDIRECTORY(test)

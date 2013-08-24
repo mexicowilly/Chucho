@@ -27,6 +27,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                duplicate_message_filter_test.cpp
                file_test.cpp
                file_writer_test.cpp
+               gzip_file_compressor_test.cpp
                harness.cpp
                level_test.cpp
                level_filter_test.cpp

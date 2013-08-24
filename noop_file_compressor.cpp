@@ -14,23 +14,18 @@
  *    limitations under the License.
  */
 
-#include <chucho/file_roller.hpp>
-#include <chucho/file_writer.hpp>
+#include <chucho/noop_file_compressor.hpp>
 
 namespace chucho
 {
 
-file_roller::file_roller(std::shared_ptr<file_compressor> cmp)
-    : file_writer_(nullptr),
-      compressor_(cmp)
+noop_file_compressor::noop_file_compressor()
+    : file_compressor(std::numeric_limits<std::size_t>::max(), "")
 {
 }
 
-void file_roller::set_file_writer(file_writer& file_writer)
+void noop_file_compressor::compress(const std::string& file_name)
 {
-    if (file_writer_ != nullptr)
-        report_warning("The file_roller already has a file_writer, which is being replaced");
-    file_writer_ = &file_writer;
 }
 
 }
