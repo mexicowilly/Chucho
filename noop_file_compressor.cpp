@@ -20,7 +20,7 @@ namespace chucho
 {
 
 noop_file_compressor::noop_file_compressor()
-    : file_compressor(std::numeric_limits<std::size_t>::max(), "")
+    : file_compressor(std::numeric_limits<unsigned>::max(), "")
 {
 }
 

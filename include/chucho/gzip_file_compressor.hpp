@@ -25,7 +25,7 @@ namespace chucho
 class CHUCHO_EXPORT gzip_file_compressor : public file_compressor
 {
 public:
-    gzip_file_compressor(std::size_t min_idx);
+    gzip_file_compressor(unsigned min_idx);
 
     virtual void compress(const std::string& file_name) override;
 };

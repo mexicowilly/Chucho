@@ -30,17 +30,17 @@ public:
 
     virtual void compress(const std::string& file_name) = 0;
     const char* get_extension() const;
-    std::size_t get_min_index() const;
+    unsigned get_min_index() const;
 
 protected:
-    file_compressor(std::size_t min_idx, const char* extension);
+    file_compressor(unsigned min_idx, const char* extension);
 
 private:
     const char* extension_;
-    std::size_t min_index_;
+    unsigned min_index_;
 };
 
-inline file_compressor::file_compressor(std::size_t min_idx, const  char* extension)
+inline file_compressor::file_compressor(unsigned min_idx, const  char* extension)
     : extension_(extension),
       min_index_(min_idx)
 {
@@ -51,7 +51,7 @@ inline const char* file_compressor::get_extension() const
     return extension_;
 }
 
-inline std::size_t file_compressor::get_min_index() const
+inline unsigned file_compressor::get_min_index() const
 {
     return min_index_;
 }

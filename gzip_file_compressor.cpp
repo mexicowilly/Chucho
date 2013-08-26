@@ -19,18 +19,12 @@
 #include <chucho/file.hpp>
 #include <zlib.h>
 #include <fstream>
-
-namespace
-{
-
-const std::size_t BUFFER_SIZE = 120 * 1024;
-
-}
+#include <cstdio>
 
 namespace chucho
 {
 
-gzip_file_compressor::gzip_file_compressor(std::size_t min_idx)
+gzip_file_compressor::gzip_file_compressor(unsigned min_idx)
     : file_compressor(min_idx, ".gz")
 {
 }
@@ -50,10 +44,10 @@ void gzip_file_compressor::compress(const std::string& file_name)
         ~sentry() { gzclose(gz_); }
         gzFile gz_;
     } s(gz);
-    char buf[BUFFER_SIZE];
+    char buf[BUFSIZ];
     while (in.good())
     {
-        in.read(buf, BUFFER_SIZE);
+        in.read(buf, BUFSIZ);
         if (gzwrite(gz, buf, in.gcount()) == 0)
         {
             int err;

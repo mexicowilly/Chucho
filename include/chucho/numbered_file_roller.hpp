@@ -98,7 +98,7 @@ inline int numbered_file_roller::get_min_index() const
 inline bool numbered_file_roller::is_compressed(int number) const
 {
     return compressor_ &&
-           max_index_ - min_index_ + compressor_->get_min_index() > number;
+           static_cast<unsigned>(number - min_index_ + 1) >= compressor_->get_min_index();
 }
 
 }
