@@ -461,3 +461,69 @@ ENDIF()
 IF(ZLIB_SOURCE OR ZLIB_INCLUDE_DIR)
     SET(CHUCHO_HAVE_ZLIB TRUE)
 ENDIF()
+
+# bzip2
+#
+# You may enable bzip2 support by doing one of several things:
+#
+# In order to have bzip2 embedded into Chucho and not require external linkage later,
+# do one of these two things:
+#
+#   * Set BZIP2_PACKAGE to the name of the zlib tarball
+#   * Set BZIP2_SOURCE to the name of the directory where an unpacked zlib tarball lives
+#
+# In order to use bzip2 as an external library that your executable must subsequently
+# also be linked to, do one of the following two things:
+#
+#   * Set both BZIP2_INCLUDE_DIR and BZIP2_LIB_DIR
+#   * Set nothing and let CMake try to find the library and headers
+#
+# To completely disable zlib support, do the following:
+#
+#   * Set DISABLE_BZIP2
+#
+IF(BZIP2_PACKAGE OR BZIP2_SOURCE)
+    IF(BZIP2_PACKAGE)
+        IF(EXISTS "${BZIP2_PACKAGE}")
+            MESSAGE(STATUS "Unpacking the bzip2 package ${BZIP2_PACKAGE}")
+            EXECUTE_PROCESS(COMMAND "${CMAKE_COMMAND}" -E tar xf "${BZIP2_PACKAGE}"
+                            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+                            RESULT_VARIABLE CHUCHO_RESULT)
+            IF(CHUCHO_RESULT EQUAL 0)
+                FILE(GLOB BZIP2_SOURCE "${CMAKE_BINARY_DIR}/bzip2-*")
+                IF(NOT BZIP2_SOURCE)
+                    MESSAGE(WARNING "Bzip2 compression is disabled because after unpacking ${BZIP2_PACKAGE} no directory named \"bzip2-*\" could be found in ${CMAKE_BINARY_DIR}")
+                ENDIF()
+            ELSE()
+                MESSAGE(WARNING "Bzip2 compression is disabled because ${BZIP2_PACKAGE} could not be unpacked")
+            ENDIF()
+        ELSE()
+            MESSAGE(WARNING "Bzip2 compression is disabled because BZIP2_PACKAGE does not reference an existing file: ${BZIP2_PACKAGE}")
+        ENDIF()
+    ENDIF()
+    IF(BZIP2_SOURCE)
+        MESSAGE(STATUS "Using bzip2 sources at ${BZIP2_SOURCE}")
+        FOREACH(SRC blocksort bzlib compress crctable decompress huffman randtable)
+            LIST(APPEND CHUCHO_BZIP2_SOURCES "${BZIP2_SOURCE}/${SRC}.c")
+        ENDFOREACH()
+    ENDIF()
+ELSEIF(BZIP2_INCLUDE_DIR OR BZIP2_LIB_DIR)
+    IF(NOT BZIP2_INCLUDE_DIR)
+        MESSAGE(WARNING "Bzip2 compression is disabled because If BZIP2_LIB_DIR is set, then BZIP2_INCLUDE_DIR must also be set")
+        UNSET(BZIP2_LIB_DIR)
+    ELSEIF(NOT BZIP2_LIB_DIR)
+        MESSAGE(WARNING "Bzip2 compression is disabled because If BZIP2_INCLUDE_DIR is set, then BZIP2_LIB_DIR must also be set")
+        UNSET(BZIP2_INCLUDE_DIR)
+    ENDIF()
+ELSEIF(NOT DISABLE_BZIP2)
+    FIND_PACKAGE(BZip2)
+    IF(BZIP2_FOUND)
+        LIST(GET BZIP2_LIBRARIES 0 BZIP2_LIB_DIR)
+        GET_FILENAME_COMPONENT(BZIP2_LIB_DIR "${BZIP2_LIB_DIR}" PATH)
+    ELSE()
+        MESSAGE(WARNING "Bzip2 compression is disabled because the library could not be found. Set DISABLE_BZIP2 to silence this warning.")
+    ENDIF()
+ENDIF()
+IF(BZIP2_SOURCE OR BZIP2_INCLUDE_DIR)
+    SET(CHUCHO_HAVE_BZIP2 TRUE)
+ENDIF()

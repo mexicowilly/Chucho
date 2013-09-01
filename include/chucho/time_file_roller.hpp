@@ -128,7 +128,6 @@ private:
                        const std::string& active_file_name);
         std::size_t periods_elapsed(const time_type& first, const time_type& last);
         std::size_t periods_since_last(const time_type& now);
-        time_type relative(const time_type& t, int period_offset);
 
         time_file_roller& roller_;
         int oldest_period_offset_;
@@ -139,6 +138,7 @@ private:
     CHUCHO_NO_EXPORT std::string find_time_spec(const std::string& str,
                                                 std::size_t& start,
                                                 std::size_t& end) const;
+    CHUCHO_NO_EXPORT time_type relative(const time_type& t, int period_offset);
     CHUCHO_NO_EXPORT std::string resolve_file_name(const time_type& tm) const;
     CHUCHO_NO_EXPORT void set_period();
 

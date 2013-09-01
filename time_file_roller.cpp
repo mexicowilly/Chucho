@@ -195,6 +195,26 @@ bool time_file_roller::is_triggered(const std::string& active_file, const event&
     return now >= next_roll_;
 }
 
+time_file_roller::time_type time_file_roller::relative(const time_type& t, int period_offset)
+{
+    std::time_t st = clock_type::to_time_t(t);
+    struct std::tm cal = calendar::get_local(st);
+    if (period_ == period::MINUTE)
+        cal.tm_min += period_offset;
+    else if (period_ == period::HOUR)
+        cal.tm_hour += period_offset;
+    else if (period_ == period::DAY)
+        cal.tm_mday += period_offset;
+    else if (period_ == period::WEEK)
+        cal.tm_mday += period_offset * 7;
+    else if (period_ == period::MONTH)
+        cal.tm_mon += period_offset;
+    else if (period_ == period::YEAR)
+        cal.tm_year += period_offset;
+    st = std::mktime(&cal);
+    return clock_type::from_time_t(st);
+}
+
 std::string time_file_roller::resolve_file_name(const time_type& tm) const
 {
     std::tm cal = calendar::get_utc(clock_type::to_time_t(tm));
@@ -238,9 +258,22 @@ void time_file_roller::roll()
     {
         time_type now = clock_type::now();
         std::string target = resolve_file_name(now);
-        if (file::exists(target))
+        try
+        {
             file::remove(target);
+        }
+        catch (...)
+        {
+            // don't care
+        }
         std::rename(get_active_file_name().c_str(), target.c_str());
+        if (compressor_)
+        {
+            std::string to_compress = resolve_file_name(
+               relative(now, -compressor_->get_min_index()));
+            if (file::exists(to_compress))
+                compressor_->compress(to_compress);
+        }
         compute_next_roll(now);
         cleaner_->clean(now, get_active_file_name());
     }
@@ -347,8 +380,13 @@ void time_file_roller::cleaner::clean_one(const time_type& t,
                                           std::set<std::string>& cleaned,
                                           const std::string& active_file_name)
 {
-    time_type rel = relative(t, period_offset);
+    time_type rel = roller_.relative(t, period_offset);
     std::string name = roller_.resolve_file_name(rel);
+    if (roller_.compressor_)
+    {
+        if (std::abs(period_offset) >= roller_.compressor_->get_min_index())
+            name += roller_.compressor_->get_extension();
+    }
     if (cleaned.count(name) == 0 &&
         name != active_file_name &&
         file::exists(name))
@@ -393,26 +431,6 @@ std::size_t time_file_roller::cleaner::periods_since_last(const time_type& now)
     return last_clean_ ?
          periods_elapsed(*last_clean_, now) :
          std::min(periods_elapsed(now - data().MAX_PAST_SEARCH, now), MAX_INACTIVE_PERIODS);
-}
-
-time_file_roller::time_type time_file_roller::cleaner::relative(const time_type& t, int period_offset)
-{
-    std::time_t st = clock_type::to_time_t(t);
-    struct std::tm cal = calendar::get_local(st);
-    if (roller_.period_ == period::MINUTE)
-        cal.tm_min += period_offset;
-    else if (roller_.period_ == period::HOUR)
-        cal.tm_hour += period_offset;
-    else if (roller_.period_ == period::DAY)
-        cal.tm_mday += period_offset;
-    else if (roller_.period_ == period::WEEK)
-        cal.tm_mday += period_offset * 7;
-    else if (roller_.period_ == period::MONTH)
-        cal.tm_mon += period_offset;
-    else if (roller_.period_ == period::YEAR)
-        cal.tm_year += period_offset;
-    st = std::mktime(&cal);
-    return clock_type::from_time_t(st);
 }
 
 }

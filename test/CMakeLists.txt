@@ -22,12 +22,21 @@ ELSEIF(CHUCHO_WINDOWS)
 ENDIF()
 INCLUDE_DIRECTORIES("${CHUCHO_EXTERNAL_PREFIX}/include")
 
+IF(CHUCHO_HAVE_ZLIB)
+    LIST(APPEND CHUCHO_TEST_COMPRESSION_SOURCES gzip_file_compressor_test.cpp)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_ZLIB)
+ENDIF()
+
+IF(CHUCHO_HAVE_BZIP2)
+    LIST(APPEND CHUCHO_TEST_COMPRESSION_SOURCES bzip2_file_compressor_test.cpp)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_BZIP2)
+ENDIF()
+
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                diagnostic_context_test.cpp
                duplicate_message_filter_test.cpp
                file_test.cpp
                file_writer_test.cpp
-               gzip_file_compressor_test.cpp
                harness.cpp
                level_test.cpp
                level_filter_test.cpp
@@ -42,7 +51,8 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                rolling_file_writer_test.cpp
                size_file_roll_trigger_test.cpp
                utf8_test.cpp
-               yaml_configurator_test.cpp)
+               yaml_configurator_test.cpp
+               ${CHUCHO_TEST_COMPRESSION_SOURCES})
 TARGET_LINK_LIBRARIES(unit-test chucho gtest ${CHUCHO_THREAD_LIB})
 IF(CHUCHO_SOLARIS)
     TARGET_LINK_LIBRARIES(unit-test socket nsl)

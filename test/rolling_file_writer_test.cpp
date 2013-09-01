@@ -114,6 +114,8 @@ TEST_F(rolling_file_writer_test, numbered)
     EXPECT_FALSE(chucho::file::exists(fn + ".3"));
 }
 
+#if defined(CHUCHO_HAVE_ZLIB)
+
 TEST_F(rolling_file_writer_test, numbered_gzip)
 {
     auto trig = std::make_shared<chucho::size_file_roll_trigger>(5);
@@ -148,6 +150,8 @@ TEST_F(rolling_file_writer_test, numbered_gzip_with_gap)
     EXPECT_TRUE(chucho::file::exists(fn + ".0.gz"));
     EXPECT_TRUE(chucho::file::exists(fn + ".1.gz"));
 }
+
+#endif
 
 TEST_F(rolling_file_writer_test, time_names)
 {
