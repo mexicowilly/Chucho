@@ -48,6 +48,6 @@ TEST(zip_file_compressor, compress)
     EXPECT_FALSE(chucho::file::exists(name));
     name += ".zip";
     EXPECT_TRUE(chucho::file::exists(name));
-    //chucho::file::remove(name);
+    chucho::file::remove(name);
 }
 

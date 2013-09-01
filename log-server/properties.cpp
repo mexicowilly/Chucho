@@ -17,6 +17,7 @@
 #include "properties.hpp"
 #include <chucho/remote_writer.hpp>
 #include <chucho/logger.hpp>
+#include <chucho/version.hpp>
 #include <sstream>
 
 namespace
@@ -38,7 +39,7 @@ std::ostream& operator<< (std::ostream& stream, properties& props)
     stream << "  - console mode: " << std::boolalpha << props.console_mode() << '\n';
     stream << "  - chuchod log level: " << *chucho::logger::get("chuchod")->get_level() << '\n';
     stream << "  - port: " << props.port() << '\n';
-    stream << "  - version: " << CHUCHO_VERSION << '\n';
+    stream << "  - version: " << chucho::version::TEXT_ << '\n';
     stream << "  - worker threads: " << props.vassal_count();
     return stream;
 }

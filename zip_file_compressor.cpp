@@ -50,6 +50,8 @@ void zip_file_compressor::compress(const std::string& file_name)
     zipfi.tmz_date.tm_mday = now.tm_mday;
     zipfi.tmz_date.tm_mon = now.tm_mon;
     zipfi.tmz_date.tm_year = now.tm_year;
+    std::string created_msg("Created by Chucho version ");
+    created_msg += version::TEXT_;
     if (zipOpenNewFileInZip(z,
                             file::base_name(file_name).c_str(),
                             &zipfi,
@@ -61,7 +63,7 @@ void zip_file_compressor::compress(const std::string& file_name)
                             Z_DEFLATED,
                             Z_DEFAULT_COMPRESSION) != ZIP_OK)
     {
-        zipClose(z, "Created by Chucho");
+        zipClose(z, created_msg.c_str());
         try
         {
             file::remove(to_write);
@@ -74,13 +76,11 @@ void zip_file_compressor::compress(const std::string& file_name)
     }
     struct sentry
     {
-        sentry(zipFile z) : z_(z) { }
-        ~sentry() { zipCloseFileInZip(z_);
-                    std::string msg("Created by Chucho version ");
-                    msg += version::TEXT_;
-                    zipClose(z_, msg.c_str()); }
+        sentry(zipFile z, const std::string& msg) : z_(z) { }
+        ~sentry() { zipCloseFileInZip(z_); zipClose(z_, msg_.c_str()); }
         zipFile z_;
-    } s(z);
+        std::string msg_;
+    } s(z, created_msg);
     char buf[BUFSIZ];
     while (in.good())
     {
@@ -91,14 +91,7 @@ void zip_file_compressor::compress(const std::string& file_name)
     }
     if (!in.eof())
         throw exception("Did not read to end of input file during gzip compression");
-    try
-    {
-        file::remove(file_name);
-    }
-    catch (...)
-    {
-        throw exception("Unable to remove " + file_name + " after compressing it to " + to_write);
-    }
+    file::remove(file_name);
 }
 
 }

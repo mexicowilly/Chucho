@@ -17,13 +17,13 @@
 #if !defined(CHUCHO_FILE_COMPRESSOR_HPP__)
 #define CHUCHO_FILE_COMPRESSOR_HPP__
 
-#include <chucho/export.hpp>
+#include <chucho/configurable.hpp>
 #include <string>
 
 namespace chucho
 {
 
-class CHUCHO_EXPORT file_compressor
+class CHUCHO_EXPORT file_compressor : public configurable
 {
 public:
     virtual ~file_compressor() { }
