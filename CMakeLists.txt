@@ -80,6 +80,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/file_compressor_factory.hpp
     include/chucho/file_compressor_memento.hpp
     include/chucho/file_roller.hpp
+    include/chucho/file_roller_memento.hpp
     include/chucho/file_roll_trigger.hpp
     include/chucho/file_writer.hpp
     include/chucho/filter.hpp
@@ -186,6 +187,7 @@ SET(CHUCHO_SOURCES
     file_compressor_memento.cpp
     file_exception.cpp
     file_roller.cpp
+    file_roller_memento.cpp
     file_writer.cpp
     file_writer_factory.cpp
     file_writer_memento.cpp

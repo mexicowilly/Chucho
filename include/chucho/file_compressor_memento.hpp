@@ -28,13 +28,13 @@ class CHUCHO_EXPORT file_compressor_memento : public memento
 public:
     file_compressor_memento(const configurator& cfg);
 
-    const optional<int>& get_min_index() const;
+    const optional<unsigned>& get_min_index() const;
 
 private:
-    optional<int> min_index_;
+    optional<unsigned> min_index_;
 };
 
-inline const optional<int>& file_compressor_memento::get_min_index() const
+inline const optional<unsigned>& file_compressor_memento::get_min_index() const
 {
     return min_index_;
 }

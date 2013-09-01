@@ -23,7 +23,7 @@ file_compressor_memento::file_compressor_memento(const configurator& cfg)
     : memento(cfg)
 {
     set_status_origin("file_compressor_memento");
-    set_handler("min_index", [this] (const std::string& idx) { min_index_ = std::stoi(idx); });
+    set_handler("min_index", [this] (const std::string& idx) { min_index_ = std::stoul(idx); });
 }
 
 }

@@ -14,17 +14,30 @@
  *    limitations under the License.
  */
 
-#include <chucho/time_file_roller_memento.hpp>
+#include <chucho/file_roller_memento.hpp>
+#include <chucho/demangle.hpp>
 
 namespace chucho
 {
 
-time_file_roller_memento::time_file_roller_memento(const configurator& cfg)
-    : file_roller_memento(cfg)
+file_roller_memento::file_roller_memento(const configurator& cfg)
+    : memento(cfg)
 {
-    set_status_origin("tile_file_roller_memento");
-    set_handler("file_name_pattern", [this] (const std::string& val) { file_name_pattern_ = val; });
-    set_handler("max_history", [this] (const std::string& val) { max_history_ = std::stoul(val); });
+    set_status_origin("file_roller_memento");
+}
+
+void file_roller_memento::handle(std::shared_ptr<configurable> cnf)
+{
+    auto comp = std::dynamic_pointer_cast<file_compressor>(cnf);
+    if (comp)
+    {
+        compressor_ = comp;
+    }
+    else
+    {
+        report_error("A file_roller cannot make use of type " +
+            demangle::get_demangled_name(typeid(*cnf)) + ". Only file_compressors can be embedded in the configuration.");
+    }
 }
 
 }
