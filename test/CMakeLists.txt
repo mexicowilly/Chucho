@@ -32,6 +32,11 @@ IF(CHUCHO_HAVE_BZIP2)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_BZIP2)
 ENDIF()
 
+IF(CHUCHO_HAVE_MINIZIP)
+    LIST(APPEND CHUCHO_TEST_COMPRESSION_SOURCES zip_file_compressor_test.cpp)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_MINIZIP)
+ENDIF()
+
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                diagnostic_context_test.cpp
                duplicate_message_filter_test.cpp

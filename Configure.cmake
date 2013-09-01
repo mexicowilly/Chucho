@@ -105,6 +105,11 @@ ENDIF()
 MAKE_DIRECTORY("${CMAKE_BINARY_DIR}/chucho")
 CONFIGURE_FILE(include/chucho/export.hpp.in "${CMAKE_BINARY_DIR}/chucho/export.hpp")
 
+# Configure our version header
+STRING(REGEX REPLACE "^([0-9]+)\\..+$" "\\1" CHUCHO_VERSION_MAJOR ${CHUCHO_VERSION})
+STRING(REGEX REPLACE "^.+\\.([0-9]+)$" "\\1" CHUCHO_VERSION_MINOR ${CHUCHO_VERSION})
+CONFIGURE_FILE(include/chucho/version.hpp.in "${CMAKE_BINARY_DIR}/chucho/version.hpp")
+
 # rpath
 SET(CMAKE_SKIP_BUILD_RPATH FALSE)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
@@ -526,4 +531,45 @@ ELSEIF(NOT DISABLE_BZIP2)
 ENDIF()
 IF(BZIP2_SOURCE OR BZIP2_INCLUDE_DIR)
     SET(CHUCHO_HAVE_BZIP2 TRUE)
+ENDIF()
+
+# minizip (for compressing to a zip archive)
+#
+# You may enable minizip support for inclusion in the Chucho library like this.
+#
+#   * Set MINIZIP_PACKAGE to the name of the minizip source zip archive
+#   * Set MINIZIP_SOURCE to the name of the directory where an unpacked minizip sources live
+#
+IF(MINIZIP_PACKAGE OR MINIZIP_SOURCE)
+    IF(CHUCHO_HAVE_ZLIB)
+        IF(MINIZIP_PACKAGE)
+            IF(EXISTS "${MINIZIP_PACKAGE}")
+                MESSAGE(STATUS "Unpacking the minizip package ${MINIZIP_PACKAGE}")
+                SET(MINIZIP_SOURCE "${CMAKE_BINARY_DIR}/minizip")
+                FILE(MAKE_DIRECTORY "${MINIZIP_SOURCE}")
+                EXECUTE_PROCESS(COMMAND "${CMAKE_COMMAND}" -E tar xzf "${MINIZIP_PACKAGE}"
+                                WORKING_DIRECTORY "${MINIZIP_SOURCE}"
+                                RESULT_VARIABLE CHUCHO_RESULT)
+                IF(NOT CHUCHO_RESULT EQUAL 0)
+                    MESSAGE(WARNING "Zip archive compression is disabled because ${MINIZIP_PACKAGE} could not be unpacked")
+                    UNSET(MINIZIP_SOURCE)
+                ENDIF()
+            ELSE()
+                MESSAGE(WARNING "Zip archive compression is disabled because MINIZIP_PACKAGE does not reference an existing file: ${MINIZIP_PACKAGE}")
+            ENDIF()
+        ENDIF()
+        IF(MINIZIP_SOURCE)
+            MESSAGE(STATUS "Using minizip sources at ${MINIZIP_SOURCE}")
+            LIST(APPEND CHUCHO_MINIZIP_SOURCES "${MINIZIP_SOURCE}/zip.c")
+            IF(CHUCHO_WINDOWS)
+                LIST(APPEND CHUCHO_MINIZIP_SOURCES "${MINIZIP_SOURCE}/iowin32.c")
+            ELSE()
+                LIST(APPEND CHUCHO_MINIZIP_SOURCES "${MINIZIP_SOURCE}/ioapi.c")
+            ENDIF()
+            SET(CHUCHO_HAVE_MINIZIP TRUE)
+            CHECK_SYMBOL_EXISTS(fopen64 stdio.h CHUCHO_HAVE_FOPEN64)
+        ENDIF()
+    ELSE()
+        MESSAGE(WARNING "Minizip requires that zlib also be included")
+    ENDIF()
 ENDIF()

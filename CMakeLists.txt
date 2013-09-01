@@ -17,16 +17,16 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.10)
 PROJECT(CHUCHO CXX C)
 
+SET(CHUCHO_VERSION 1.3)
+SET(CHUCHO_SO_VERSION 1)
+# This is used for release candidate distros
+# SET(CHUCHO_DIST_VERSION try-2)
+
 INCLUDE(Configure.cmake)
 
 # Include CMAKE_BINARY_DIR because that's where the generated file
 # export.hpp lives.
 INCLUDE_DIRECTORIES(include embedded/include "${CMAKE_BINARY_DIR}")
-
-SET(CHUCHO_VERSION 1.3)
-SET(CHUCHO_SO_VERSION 1)
-# This is used for release candidate distros
-# SET(CHUCHO_DIST_VERSION try-2)
 
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
@@ -105,6 +105,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/syslog_constants.hpp
     include/chucho/syslog_writer.hpp
     include/chucho/time_file_roller.hpp
+    "${CMAKE_BINARY_DIR}/chucho/version.hpp"
     include/chucho/writer.hpp
     include/chucho/writer_factory.hpp
     include/chucho/writer_memento.hpp
@@ -116,6 +117,10 @@ ENDIF()
 
 IF(CHUCHO_HAVE_BZIP2)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.hpp)
+ENDIF()
+
+IF(CHUCHO_HAVE_MINIZIP)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/zip_file_compressor.hpp)
 ENDIF()
 
 # Update this when you rev libyaml
@@ -309,6 +314,23 @@ IF(CHUCHO_HAVE_BZIP2)
         INCLUDE_DIRECTORIES("${BZIP2_SOURCE}")
     ELSEIF(BZIP2_INCLUDE_DIR)
         INCLUDE_DIRECTORIES("${BZIP2_INCLUDE_DIR}")
+    ENDIF()
+ENDIF()
+
+IF(CHUCHO_HAVE_MINIZIP)
+    LIST(APPEND CHUCHO_SOURCES
+         zip_file_compressor.cpp
+         ${CHUCHO_MINIZIP_SOURCES})
+    INCLUDE_DIRECTORIES("${MINIZIP_SOURCE}")
+    IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+        SET_SOURCE_FILES_PROPERTIES("${MINIZIP_SOURCE}/zip.c"
+                                    PROPERTIES
+                                    COMPILE_FLAGS "-Wno-parentheses-equality -Wno-incompatible-pointer-types")
+        IF(NOT CHUCHO_HAVE_FOPEN64)
+            SET_SOURCE_FILES_PROPERTIES(${CHUCHO_MINIZIP_SOURCES}
+                                        PROPERTIES
+                                        COMPILE_DEFINITIONS USE_FILE32API)
+        ENDIF()
     ENDIF()
 ENDIF()
 
