@@ -59,6 +59,7 @@ public:
      * @return the file name
      */
     virtual std::string get_active_file_name() = 0;
+    std::shared_ptr<file_compressor> get_file_compressor() const;
     /**
      * Roll the files.
      */
@@ -87,6 +88,11 @@ protected:
     file_writer* file_writer_;
     std::shared_ptr<file_compressor> compressor_;
 };
+
+inline std::shared_ptr<file_compressor> file_roller::get_file_compressor() const
+{
+    return compressor_;
+}
 
 }
 

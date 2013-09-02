@@ -90,7 +90,7 @@ void zip_file_compressor::compress(const std::string& file_name)
 
     }
     if (!in.eof())
-        throw exception("Did not read to end of input file during gzip compression");
+        throw exception("Did not read to end of input file " + file_name + " during zip compression");
     file::remove(file_name);
 }
 

@@ -28,14 +28,14 @@ class CHUCHO_EXPORT file_roller_memento : public memento
 public:
     file_roller_memento(const configurator& cfg);
 
-    std::shared_ptr<file_compressor> get_compressor() const;
+    std::shared_ptr<file_compressor> get_file_compressor() const;
     virtual void handle(std::shared_ptr<configurable> cnf) override;
 
 private:
     std::shared_ptr<file_compressor> compressor_;
 };
 
-inline std::shared_ptr<file_compressor> file_roller_memento::get_compressor() const
+inline std::shared_ptr<file_compressor> file_roller_memento::get_file_compressor() const
 {
     return compressor_;
 }

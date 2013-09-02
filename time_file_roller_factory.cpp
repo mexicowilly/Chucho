@@ -39,7 +39,7 @@ std::shared_ptr<configurable> time_file_roller_factory::create_configurable(std:
         throw exception("time_file_roller_factory: The max_history field must be set");
     std::shared_ptr<configurable> cnf(new time_file_roller(tfrm->get_file_name_pattern(),
                                                            *tfrm->get_max_history(),
-                                                           tfrm->get_compressor()));
+                                                           tfrm->get_file_compressor()));
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
     return cnf;
 }

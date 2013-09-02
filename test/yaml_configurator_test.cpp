@@ -30,6 +30,16 @@
 #include <chucho/duplicate_message_filter.hpp>
 #include <chucho/syslog_writer.hpp>
 #include <chucho/remote_writer.hpp>
+#include <chucho/noop_file_compressor.hpp>
+#if defined(CHUCHO_HAVE_BZIP2)
+#include <chucho/bzip2_file_compressor.hpp>
+#endif
+#if defined(CHUCHO_HAVE_ZLIB)
+#include <chucho/gzip_file_compressor.hpp>
+#endif
+#if defined(CHUCHO_HAVE_MINIZIP)
+#include <chucho/zip_file_compressor.hpp>
+#endif
 #include <chucho/exception.hpp>
 #include <chucho/configuration.hpp>
 #include <sstream>
@@ -78,6 +88,40 @@ protected:
 private:
     chucho::yaml_configurator cnf_;
 };
+
+TEST_F(yaml_configurator, bzip2_file_compressor)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::rolling_file_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m%n'\n"
+              "        chucho::numbered_file_roller:\n"
+              "            min_index: 3\n"
+              "            max_index: 5\n"
+              "            chucho::bzip2_file_compressor:\n"
+              "                min_index: 1\n"
+              "        chucho::size_file_roll_trigger:\n"
+              "            max_size: 5000\n"
+              "        file_name: what.log");
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
+    auto fwrt = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(fwrt));
+    auto rlr = fwrt->get_file_roller();
+    ASSERT_EQ(typeid(chucho::numbered_file_roller), typeid(*rlr));
+    auto nrlr = std::static_pointer_cast<chucho::numbered_file_roller>(rlr);
+    ASSERT_TRUE(static_cast<bool>(nrlr));
+    auto cmp = nrlr->get_file_compressor();
+    ASSERT_TRUE(static_cast<bool>(cmp));
+#if defined(CHUCHO_HAVE_BZIP2)
+    ASSERT_EQ(typeid(chucho::bzip2_file_compressor), typeid(*cmp));
+    EXPECT_EQ(1, cmp->get_min_index());
+#else
+    ASSERT_EQ(typeid(chucho::noop_file_compressor), typeid(*cmp));
+#endif
+}
 
 TEST_F(yaml_configurator, cerr_writer)
 {
@@ -136,6 +180,37 @@ TEST_F(yaml_configurator, file_writer)
     EXPECT_EQ(std::string("hello.log"), fwrt->get_file_name());
     EXPECT_FALSE(fwrt->get_flush());
     EXPECT_EQ(chucho::file_writer::on_start::TRUNCATE, fwrt->get_on_start());
+}
+
+TEST_F(yaml_configurator, gzip_file_compressor)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::rolling_file_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m%n'\n"
+              "        chucho::time_file_roller:\n"
+              "            file_name_pattern: '%d{%d}'\n"
+              "            max_history: 5\n"
+              "            chucho::gzip_file_compressor:\n"
+              "                min_index: 7");
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
+    auto fwrt = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(fwrt));
+    auto rlr = fwrt->get_file_roller();
+    ASSERT_EQ(typeid(chucho::time_file_roller), typeid(*rlr));
+    auto trlr = std::static_pointer_cast<chucho::time_file_roller>(rlr);
+    ASSERT_TRUE(static_cast<bool>(trlr));
+    auto cmp = trlr->get_file_compressor();
+    ASSERT_TRUE(static_cast<bool>(cmp));
+#if defined(CHUCHO_HAVE_ZLIB)
+    ASSERT_EQ(typeid(chucho::gzip_file_compressor), typeid(*cmp));
+    EXPECT_EQ(7, cmp->get_min_index());
+#else
+    ASSERT_EQ(typeid(chucho::noop_file_compressor), typeid(*cmp));
+#endif
 }
 
 TEST_F(yaml_configurator, level_filter)
@@ -558,4 +633,35 @@ TEST_F(yaml_configurator, variables)
     ASSERT_NE(nullptr, lgr->get_level().get());
     EXPECT_EQ(*chucho::level::FATAL_(), *lgr->get_level());
     EXPECT_FALSE(lgr->writes_to_ancestors());
+}
+
+TEST_F(yaml_configurator, zip_file_compressor)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::rolling_file_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m%n'\n"
+              "        chucho::time_file_roller:\n"
+              "            file_name_pattern: '%d{%d}'\n"
+              "            max_history: 5\n"
+              "            chucho::zip_file_compressor:\n"
+              "                min_index: 700");
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
+    auto fwrt = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(fwrt));
+    auto rlr = fwrt->get_file_roller();
+    ASSERT_EQ(typeid(chucho::time_file_roller), typeid(*rlr));
+    auto trlr = std::static_pointer_cast<chucho::time_file_roller>(rlr);
+    ASSERT_TRUE(static_cast<bool>(trlr));
+    auto cmp = trlr->get_file_compressor();
+    ASSERT_TRUE(static_cast<bool>(cmp));
+#if defined(CHUCHO_HAVE_MINIZIP)
+    ASSERT_EQ(typeid(chucho::zip_file_compressor), typeid(*cmp));
+    EXPECT_EQ(700, cmp->get_min_index());
+#else
+    ASSERT_EQ(typeid(chucho::noop_file_compressor), typeid(*cmp));
+#endif
 }

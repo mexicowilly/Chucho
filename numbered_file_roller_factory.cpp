@@ -37,9 +37,9 @@ std::shared_ptr<configurable> numbered_file_roller_factory::create_configurable(
         throw exception("numbered_file_roller_factory: The max_index field must be set");
     std::shared_ptr<numbered_file_roller> nfr;
     if (nfrm->get_min_index())
-        nfr.reset(new numbered_file_roller(*nfrm->get_min_index(), *nfrm->get_max_index(), nfrm->get_compressor()));
+        nfr.reset(new numbered_file_roller(*nfrm->get_min_index(), *nfrm->get_max_index(), nfrm->get_file_compressor()));
     else
-        nfr.reset(new numbered_file_roller(*nfrm->get_max_index(), nfrm->get_compressor()));
+        nfr.reset(new numbered_file_roller(*nfrm->get_max_index(), nfrm->get_file_compressor()));
     report_info("Created a " + demangle::get_demangled_name(typeid(*nfr)));
     return std::static_pointer_cast<configurable>(nfr);
 }

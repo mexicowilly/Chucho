@@ -58,7 +58,7 @@ void bzip2_file_compressor::compress(const std::string& file_name)
             throw exception("Could not write to bzip2 compressed file " + to_write);
     }
     if (!in.eof())
-        throw exception("Did not read to end of input file during gzip compression");
+        throw exception("Did not read to end of input file " + file_name + " during bzip2 compression");
     file::remove(file_name);
 }
 
