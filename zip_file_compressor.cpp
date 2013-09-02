@@ -23,6 +23,7 @@
 #include <fstream>
 #include <cstdio>
 #include <chrono>
+#include <cstring>
 
 namespace chucho
 {

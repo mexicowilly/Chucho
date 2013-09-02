@@ -15,6 +15,7 @@
  */
 
 #include <chucho/noop_file_compressor.hpp>
+#include <limits>
 
 namespace chucho
 {
