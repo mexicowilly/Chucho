@@ -37,7 +37,13 @@ std::shared_ptr<configurable> gzip_file_compressor_factory::create_configurable(
     assert(fcm);
     if (!fcm->get_min_index())
         throw exception("gzip_file_compressor_factory: The min_index field must be set");
-    auto gfc = std::make_shared<gzip_file_compressor>(*fcm->get_min_index());
+    unsigned mi = *fcm->get_min_index();
+    if (mi == 0)
+    {
+        report_warning("A min_index of 0 was given, which will be reset to the minimum value of 1");
+        mi = 1;
+    }
+    auto gfc = std::make_shared<gzip_file_compressor>(mi);
 #else
     report_warning("A gzip_file_compressor was requested in the configuration, but this Chucho library was built without gzip support.");
     auto gfc = std::make_shared<noop_file_compressor>();
