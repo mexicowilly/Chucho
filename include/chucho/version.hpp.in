@@ -23,9 +23,9 @@ namespace chucho
 namespace version
 {
 
-constexpr int MAJOR_ = ${CHUCHO_VERSION_MAJOR};
-constexpr int MINOR_ = ${CHUCHO_VERSION_MINOR}; 
-constexpr const char* TEXT_ = "${CHUCHO_VERSION}";
+const int MAJOR_ = ${CHUCHO_VERSION_MAJOR};
+const int MINOR_ = ${CHUCHO_VERSION_MINOR}; 
+const char* TEXT_ = "${CHUCHO_VERSION}";
 
 }
 

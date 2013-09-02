@@ -311,12 +311,20 @@ IF(CHUCHO_HAVE_ZLIB)
     ELSEIF(ZLIB_INCLUDE_DIR)
         INCLUDE_DIRECTORIES("${ZLIB_INCLUDE_DIR}")
     ENDIF()
-    IF(CHUCHO_ZLIB_SOURCES AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-        SET_SOURCE_FILES_PROPERTIES("${ZLIB_SOURCE}/gzlib.c"
-                                    "${ZLIB_SOURCE}/gzread.c"
-                                    "${ZLIB_SOURCE}/gzwrite.c"
-                                    PROPERTIES
-                                    COMPILE_FLAGS -Wno-implicit-function-declaration)
+    IF(CHUCHO_ZLIB_SOURCES)
+        IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+            SET_SOURCE_FILES_PROPERTIES("${ZLIB_SOURCE}/gzlib.c"
+                                        "${ZLIB_SOURCE}/gzread.c"
+                                        "${ZLIB_SOURCE}/gzwrite.c"
+                                        PROPERTIES
+                                        COMPILE_FLAGS -Wno-implicit-function-declaration)
+        ELSEIF(MSVC)
+            SET_SOURCE_FILES_PROPERTIES("${ZLIB_SOURCE}/gzlib.c"
+                                        "${ZLIB_SOURCE}/gzread.c"
+                                        "${ZLIB_SOURCE}/gzwrite.c"
+                                        PROPERTIES
+                                        COMPILE_FLAGS /wd4996)
+        ENDIF()
     ENDIF()
 ENDIF()
 
@@ -330,6 +338,14 @@ IF(CHUCHO_HAVE_BZIP2)
         INCLUDE_DIRECTORIES("${BZIP2_SOURCE}")
     ELSEIF(BZIP2_INCLUDE_DIR)
         INCLUDE_DIRECTORIES("${BZIP2_INCLUDE_DIR}")
+    ENDIF()
+    IF(MSVC)
+        SET_SOURCE_FILES_PROPERTIES(bzip2_file_compressor PROPERTIES
+                                    COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
+        IF(CHUCHO_BZIP2_SOURCES)
+            SET_SOURCE_FILES_PROPERTIES("${BZIP2_SOURCE}/bzlib.c" PROPERTIES
+                                        COMPILE_FLAGS /wd4996)
+        ENDIF()
     ENDIF()
 ENDIF()
 

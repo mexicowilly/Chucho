@@ -270,7 +270,7 @@ void time_file_roller::roll()
         if (compressor_)
         {
             std::string to_compress = resolve_file_name(
-               relative(now, -compressor_->get_min_index()));
+               relative(now, -static_cast<int>(compressor_->get_min_index())));
             if (file::exists(to_compress))
                 compressor_->compress(to_compress);
         }
@@ -384,7 +384,7 @@ void time_file_roller::cleaner::clean_one(const time_type& t,
     std::string name = roller_.resolve_file_name(rel);
     if (roller_.compressor_)
     {
-        if (std::abs(period_offset) >= roller_.compressor_->get_min_index())
+        if (static_cast<unsigned>(std::abs(period_offset)) >= roller_.compressor_->get_min_index())
             name += roller_.compressor_->get_extension();
     }
     if (cleaned.count(name) == 0 &&

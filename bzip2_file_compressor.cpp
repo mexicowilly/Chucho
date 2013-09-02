@@ -53,12 +53,13 @@ void bzip2_file_compressor::compress(const std::string& file_name)
     while (in.good())
     {
         in.read(buf, BUFSIZ);
-        BZ2_bzWrite(&err, bz, buf, in.gcount());
+        BZ2_bzWrite(&err, bz, buf, static_cast<int>(in.gcount()));
         if (err != BZ_OK)
             throw exception("Could not write to bzip2 compressed file " + to_write);
     }
     if (!in.eof())
         throw exception("Did not read to end of input file " + file_name + " during bzip2 compression");
+    in.close();
     file::remove(file_name);
 }
 

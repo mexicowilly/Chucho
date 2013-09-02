@@ -86,12 +86,13 @@ void zip_file_compressor::compress(const std::string& file_name)
     while (in.good())
     {
         in.read(buf, BUFSIZ);
-        if (zipWriteInFileInZip(z, buf, in.gcount()) != ZIP_OK)
+        if (zipWriteInFileInZip(z, buf, static_cast<unsigned>(in.gcount())) != ZIP_OK)
             throw exception("Could not write file " + file::base_name(file_name) + " in zip archive " + to_write);
 
     }
     if (!in.eof())
         throw exception("Did not read to end of input file " + file_name + " during zip compression");
+    in.close();
     file::remove(file_name);
 }
 

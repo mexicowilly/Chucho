@@ -48,7 +48,7 @@ void gzip_file_compressor::compress(const std::string& file_name)
     while (in.good())
     {
         in.read(buf, BUFSIZ);
-        if (gzwrite(gz, buf, in.gcount()) == 0)
+        if (gzwrite(gz, buf, static_cast<unsigned>(in.gcount())) == 0)
         {
             int err;
             throw exception("Could not write to " + to_write + ": " + std::string(gzerror(gz, &err)));
@@ -56,6 +56,7 @@ void gzip_file_compressor::compress(const std::string& file_name)
     }
     if (!in.eof())
         throw exception("Did not read to end of input file " + file_name + " during gzip compression");
+    in.close();
     file::remove(file_name);
 }
 
