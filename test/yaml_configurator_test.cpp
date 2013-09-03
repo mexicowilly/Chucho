@@ -120,6 +120,7 @@ TEST_F(yaml_configurator, bzip2_file_compressor)
     EXPECT_EQ(1, cmp->get_min_index());
 #else
     ASSERT_EQ(typeid(chucho::noop_file_compressor), typeid(*cmp));
+    chucho::status_manager::get()->clear();
 #endif
 }
 
@@ -210,6 +211,7 @@ TEST_F(yaml_configurator, gzip_file_compressor)
     EXPECT_EQ(7, cmp->get_min_index());
 #else
     ASSERT_EQ(typeid(chucho::noop_file_compressor), typeid(*cmp));
+    chucho::status_manager::get()->clear();
 #endif
 }
 
@@ -663,5 +665,6 @@ TEST_F(yaml_configurator, zip_file_compressor)
     EXPECT_EQ(700, cmp->get_min_index());
 #else
     ASSERT_EQ(typeid(chucho::noop_file_compressor), typeid(*cmp));
+    chucho::status_manager::get()->clear();
 #endif
 }
