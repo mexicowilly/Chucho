@@ -75,9 +75,9 @@ the -D option, as in -DZLIB_URL=http://my/special/zlib.tar.gz.
         Support for external linkage of minizip is not supported, since
     the minizip build does not even support a library target.
     Additionally, minizip is dependent on zlib, so you must have a
-    zlib in order to have a usable minizip. You have three options for
-    embedding the minizip sources into the Chucho library in order to
-    support zip archive compression:
+    usable zlib in order to have a usable minizip. You have three
+    options for embedding the minizip sources into the Chucho library in
+    order to support zip archive compression:
 
         * Set MINIZIP_URL to the URL from which to retrieve the minizip
           archive.
