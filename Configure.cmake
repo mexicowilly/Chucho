@@ -105,6 +105,11 @@ ENDIF()
 MAKE_DIRECTORY("${CMAKE_BINARY_DIR}/chucho")
 CONFIGURE_FILE(include/chucho/export.hpp.in "${CMAKE_BINARY_DIR}/chucho/export.hpp")
 
+# Configure our version header
+STRING(REGEX REPLACE "^([0-9]+)\\..+$" "\\1" CHUCHO_VERSION_MAJOR ${CHUCHO_VERSION})
+STRING(REGEX REPLACE "^.+\\.([0-9]+)$" "\\1" CHUCHO_VERSION_MINOR ${CHUCHO_VERSION})
+CONFIGURE_FILE(include/chucho/version.hpp.in "${CMAKE_BINARY_DIR}/chucho/version.hpp")
+
 # rpath
 SET(CMAKE_SKIP_BUILD_RPATH FALSE)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
@@ -395,13 +400,32 @@ SET_TARGET_PROPERTIES(gtest-external PROPERTIES
                       EXCLUDE_FROM_ALL TRUE)
 ADD_DEPENDENCIES(external gtest-external)
 
+MACRO(CHUCHO_DOWNLOAD CHUCHO_DL_URL CHUCHO_DL_PKG_VAR)
+    FILE(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/packages")
+    GET_FILENAME_COMPONENT(CHUCHO_DL_BASE_FILE "${CHUCHO_DL_URL}" NAME)
+    SET(CHUCHO_DL_PKG_NAME "${CMAKE_BINARY_DIR}/packages/${CHUCHO_DL_BASE_FILE}")
+    MESSAGE(STATUS "Attempting to download ${CHUCHO_DL_URL}")
+    FILE(DOWNLOAD "${CHUCHO_DL_URL}" "${CHUCHO_DL_PKG_NAME}"
+         INACTIVITY_TIMEOUT 60
+         STATUS CHUCHO_DL_STATUS
+         SHOW_PROGRESS)
+    LIST(GET CHUCHO_DL_STATUS 0 CHUCHO_DL_STATUS_0)
+    IF(CHUCHO_DL_STATUS_0 EQUAL 0)
+        SET(${CHUCHO_DL_PKG_VAR} "${CHUCHO_DL_PKG_NAME}")
+    ELSE()
+        LIST(GET CHUCHO_DL_STATUS 1 CHUCHO_DL_STATUS_1)
+        MESSAGE(WARNING "An error occurred downloading ${CHUCHO_DL_URL}: ${CHUCHO_DL_STATUS_1}")
+    ENDIF()
+ENDMACRO()
+
 # zlib
 #
 # You may enable zlib support by doing one of several things:
 #
 # In order to have zlib embedded into Chucho and not require external linkage later,
-# do one of these two things:
+# do one of these three things:
 #
+#   * Set ZLIB_URL to the URL from which to retrieve the zlib tarball
 #   * Set ZLIB_PACKAGE to the name of the zlib tarball
 #   * Set ZLIB_SOURCE to the name of the directory where an unpacked zlib tarball lives
 #
@@ -415,45 +439,185 @@ ADD_DEPENDENCIES(external gtest-external)
 #
 #   * Set DISABLE_ZLIB
 #
-IF(ZLIB_PACKAGE OR ZLIB_SOURCE)
-    IF(ZLIB_PACKAGE)
-        IF(EXISTS "${ZLIB_PACKAGE}")
-            EXECUTE_PROCESS(COMMAND "${CMAKE_COMMAND}" tar xvf "${ZLIB_PACKAGE}"
-                            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-                            RESULT_VARIABLE CHUCHO_RESULT)
-            IF(CHUCHO_RESULT EQUAL 0)
-                FILE(GLOB ZLIB_SOURCE "${CMAKE_BINARY_DIR}/zlib-")
-                IF(NOT ZLIB_SOURCE)
-                    MESSAGE(WARNING "Zlib compression is disabled because after unpacking ${ZLIB_PACKAGE} no directory named \"zlib-*\" could be found in ${CMAKE_BINARY_DIR}")
+IF(NOT CHUCHO_HAVE_ZLIB)
+    IF(ZLIB_URL OR ZLIB_PACKAGE OR ZLIB_SOURCE)
+        IF(ZLIB_URL)
+            CHUCHO_DOWNLOAD("${ZLIB_URL}" ZLIB_PACKAGE)
+        ENDIF()
+        IF(ZLIB_PACKAGE)
+            IF(EXISTS "${ZLIB_PACKAGE}")
+                MESSAGE(STATUS "Unpacking the zlib package ${ZLIB_PACKAGE}")
+                EXECUTE_PROCESS(COMMAND "${CMAKE_COMMAND}" -E tar xf "${ZLIB_PACKAGE}"
+                                WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+                                RESULT_VARIABLE CHUCHO_RESULT)
+                IF(CHUCHO_RESULT EQUAL 0)
+                    FILE(GLOB ZLIB_SOURCE "${CMAKE_BINARY_DIR}/zlib-*")
+                    IF(NOT ZLIB_SOURCE)
+                        MESSAGE(WARNING "Zlib compression is disabled because after unpacking ${ZLIB_PACKAGE} no directory named \"zlib-*\" could be found in ${CMAKE_BINARY_DIR}")
+                    ENDIF()
+                ELSE()
+                    MESSAGE(WARNING "Zlib compression is disabled because ${ZLIB_PACKAGE} could not be unpacked")
                 ENDIF()
             ELSE()
-                MESSAGE(WARNING "Zlib compression is disabled because ${ZLIB_PACKAGE} could not be unpacked")
+                MESSAGE(WARNING "Zlib compression is disabled because ZLIB_PACKAGE does not reference an existing file: ${ZLIB_PACKAGE}")
             ENDIF()
+        ENDIF()
+        IF(ZLIB_SOURCE)
+            SET(ZLIB_SOURCE "${ZLIB_SOURCE}" CACHE INTERNAL "The location of zlib sources")
+            MESSAGE(STATUS "Using zlib sources at ${ZLIB_SOURCE}")
+            FOREACH(SRC adler32 compress crc32 deflate gzclose gzread gzlib gzwrite inffast inflate inftrees trees zutil)
+                LIST(APPEND CHUCHO_ZLIB_SOURCES "${ZLIB_SOURCE}/${SRC}.c")
+            ENDFOREACH()
+            SET(CHUCHO_ZLIB_SOURCES ${CHUCHO_ZLIB_SOURCES} CACHE INTERNAL "The zlib sources to build")
+        ENDIF()
+    ELSEIF(ZLIB_INCLUDE_DIR OR ZLIB_LIB_DIR)
+        IF(NOT ZLIB_INCLUDE_DIR)
+            MESSAGE(WARNING "Zlib compression is disabled because If ZLIB_LIB_DIR is set, then ZLIB_INCLUDE_DIR must also be set")
+            UNSET(ZLIB_LIB_DIR)
+        ELSEIF(NOT ZLIB_LIB_DIR)
+            MESSAGE(WARNING "Zlib compression is disabled because If ZLIB_INCLUDE_DIR is set, then ZLIB_LIB_DIR must also be set")
+            UNSET(ZLIB_INCLUDE_DIR)
         ELSE()
-            MESSAGE(WARNING "Zlib compression is disabled because ZLIB_PACKAGE does not reference an existing file: ${ZLIB_PACKAGE}")
+            SET(ZLIB_INCLUDE_DIR "${ZLIB_INCLUDE_DIR}" CACHE INTERNAL "The location of zlib.h")
+            SET(ZLIB_LIB_DIR "${ZLIB_LIB_DIR}" CACHE INTERNAL "The location of libz")
+        ENDIF()
+    ELSEIF(NOT DISABLE_ZLIB)
+        FIND_PACKAGE(ZLIB)
+        IF(ZLIB_FOUND)
+            SET(ZLIB_INCLUDE_DIR "${ZLIB_INCLUDE_DIRS}" CACHE STRING "The location of zlib.h")
+            LIST(GET ZLIB_LIBRARIES 0 ZLIB_LIB_DIR)
+            GET_FILENAME_COMPONENT(ZLIB_LIB_DIR "${ZLIB_LIB_DIR}" PATH)
+            SET(ZLIB_LIB_DIR "${ZLIB_LIB_DIR}" CACHE STRING "The location of libz")
+        ELSE()
+            MESSAGE(WARNING "Zlib compression is disabled because the library could not be found. Set DISABLE_ZLIB to silence this warning.")
         ENDIF()
     ENDIF()
-    IF(ZLIB_SOURCE)
-        MESSAGE(STATUS "Using zlib sources at ${ZLIB_SOURCE}")
-        FOREACH(SRC adler32 compress crc32 deflate gzclose gzlib gzwrite trees zutil)
-            LIST(APPEND CHUCHO_ZLIB_SOURCES "${ZLIB_SOURCE}/${SRC}.c")
-        ENDFOREACH()
+    IF(ZLIB_SOURCE OR ZLIB_INCLUDE_DIR)
+        SET(CHUCHO_HAVE_ZLIB TRUE CACHE INTERNAL "Whether we have found zlib or not")
     ENDIF()
-ELSEIF(ZLIB_INCLUDE_DIR OR ZLIB_LIB_DIR)
-    IF(NOT ZLIB_INCLUDE_DIR)
-        MESSAGE(WARNING "Zlib compression is disabled because If ZLIB_LIB_DIR is set, then ZLIB_INCLUDE_DIR must also be set")
-        UNSET(ZLIB_LIB_DIR)
-    ELSEIF(NOT ZLIB_LIB_DIR)
-        MESSAGE(WARNING "Zlib compression is disabled because If ZLIB_INCLUDE_DIR is set, then ZLIB_LIB_DIR must also be set")
-        UNSET(ZLIB_INCLUDE_DIR)
+ENDIF()
+
+# bzip2
+#
+# You may enable bzip2 support by doing one of several things:
+#
+# In order to have bzip2 embedded into Chucho and not require external linkage later,
+# do one of these two things:
+#
+#   * Set BZIP2_URL to the URL from which to retrieve the bzip2 tarball
+#   * Set BZIP2_PACKAGE to the name of the bzip2 tarball
+#   * Set BZIP2_SOURCE to the name of the directory where an unpacked bzip2 tarball lives
+#
+# In order to use bzip2 as an external library that your executable must subsequently
+# also be linked to, do one of the following two things:
+#
+#   * Set both BZIP2_INCLUDE_DIR and BZIP2_LIB_DIR
+#   * Set nothing and let CMake try to find the library and headers
+#
+# To completely disable zlib support, do the following:
+#
+#   * Set DISABLE_BZIP2
+#
+IF(NOT CHUCHO_HAVE_BZIP2)
+    IF(BZIP2_URL OR BZIP2_PACKAGE OR BZIP2_SOURCE)
+        IF(BZIP2_URL)
+            CHUCHO_DOWNLOAD("${BZIP2_URL}" BZIP2_PACKAGE)
+        ENDIF()
+        IF(BZIP2_PACKAGE)
+            IF(EXISTS "${BZIP2_PACKAGE}")
+                MESSAGE(STATUS "Unpacking the bzip2 package ${BZIP2_PACKAGE}")
+                EXECUTE_PROCESS(COMMAND "${CMAKE_COMMAND}" -E tar xf "${BZIP2_PACKAGE}"
+                                WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+                                RESULT_VARIABLE CHUCHO_RESULT)
+                IF(CHUCHO_RESULT EQUAL 0)
+                    FILE(GLOB BZIP2_SOURCE "${CMAKE_BINARY_DIR}/bzip2-*")
+                    IF(NOT BZIP2_SOURCE)
+                        MESSAGE(WARNING "Bzip2 compression is disabled because after unpacking ${BZIP2_PACKAGE} no directory named \"bzip2-*\" could be found in ${CMAKE_BINARY_DIR}")
+                    ENDIF()
+                ELSE()
+                    MESSAGE(WARNING "Bzip2 compression is disabled because ${BZIP2_PACKAGE} could not be unpacked")
+                ENDIF()
+            ELSE()
+                MESSAGE(WARNING "Bzip2 compression is disabled because BZIP2_PACKAGE does not reference an existing file: ${BZIP2_PACKAGE}")
+            ENDIF()
+        ENDIF()
+        IF(BZIP2_SOURCE)
+            SET(BZIP2_SOURCE "${BZIP2_SOURCE}" CACHE INTERNAL "The location of the bzip2 sources")
+            MESSAGE(STATUS "Using bzip2 sources at ${BZIP2_SOURCE}")
+            FOREACH(SRC blocksort bzlib compress crctable decompress huffman randtable)
+                LIST(APPEND CHUCHO_BZIP2_SOURCES "${BZIP2_SOURCE}/${SRC}.c")
+            ENDFOREACH()
+            SET(CHUCHO_BZIP2_SOURCES ${CHUCHO_BZIP2_SOURCES} CACHE INTERNAL "The bzip2 sources to build")
+        ENDIF()
+    ELSEIF(BZIP2_INCLUDE_DIR OR BZIP2_LIB_DIR)
+        IF(NOT BZIP2_INCLUDE_DIR)
+            MESSAGE(WARNING "Bzip2 compression is disabled because If BZIP2_LIB_DIR is set, then BZIP2_INCLUDE_DIR must also be set")
+            UNSET(BZIP2_LIB_DIR)
+        ELSEIF(NOT BZIP2_LIB_DIR)
+            MESSAGE(WARNING "Bzip2 compression is disabled because If BZIP2_INCLUDE_DIR is set, then BZIP2_LIB_DIR must also be set")
+            UNSET(BZIP2_INCLUDE_DIR)
+        ELSE()
+            SET(BZIP2_INCLUDE_DIR "${BZIP2_INCLUDE_DIR}" CACHE INTERNAL "The location of bzlib.h")
+            SET(BZIP2_LIB_DIR "${BZIP2_LIB_DIR}" CACHE INTERNAL "The location of libbz2")
+        ENDIF()
+    ELSEIF(NOT DISABLE_BZIP2)
+        FIND_PACKAGE(BZip2)
+        IF(BZIP2_FOUND)
+            LIST(GET BZIP2_LIBRARIES 0 BZIP2_LIB_DIR)
+            GET_FILENAME_COMPONENT(BZIP2_LIB_DIR "${BZIP2_LIB_DIR}" PATH)
+            SET(BZIP2_LIB_DIR "${BZIP2_LIB_DIR}" CACHE INTERNAL "The location of libbz2")
+        ELSE()
+            MESSAGE(WARNING "Bzip2 compression is disabled because the library could not be found. Set DISABLE_BZIP2 to silence this warning.")
+        ENDIF()
     ENDIF()
-ELSEIF(NOT DISABLE_ZLIB)
-    FIND_PACKAGE(ZLIB)
-    IF(ZLIB_FOUND)
-        SET(ZLIB_INCLUDE_DIR "${ZLIB_INCLUDE_DIRS}")
-        LIST(GET ZLIB_LIBRARIES 0 ZLIB_LIB_DIR)
-        GET_FILENAME_COMPONENT(ZLIB_LIB_DIR "${ZLIB_LIB_DIR}" PATH)
-    ELSE()
-        MESSAGE(WARNING "Zlib compression is disabled because the library could not be found. Set DISABLE_ZLIB to silence this warning.")
+    IF(BZIP2_SOURCE OR BZIP2_INCLUDE_DIR)
+        SET(CHUCHO_HAVE_BZIP2 TRUE CACHE INTERNAL "Whether we have found bzip2")
+    ENDIF()
+ENDIF()
+
+# minizip (for compressing to a zip archive)
+#
+# You may enable minizip support for inclusion in the Chucho library by doing
+# one of these three things:
+#
+#   * Set MINIZIP_URL to the URL from which to retrieve the minizip source archive
+#   * Set MINIZIP_PACKAGE to the name of the minizip source zip archive
+#   * Set MINIZIP_SOURCE to the name of the directory where an unpacked minizip sources live
+#
+IF(NOT CHUCHO_HAVE_MINIZIP)
+    IF(MMINIZIP_URL OR MINIZIP_PACKAGE OR MINIZIP_SOURCE)
+        IF(CHUCHO_HAVE_ZLIB)
+            IF(MINIZIP_URL)
+                CHUCHO_DOWNLOAD("${MINIZIP_URL}" MINIZIP_PACKAGE)
+            ENDIF()
+            IF(MINIZIP_PACKAGE)
+                IF(EXISTS "${MINIZIP_PACKAGE}")
+                    MESSAGE(STATUS "Unpacking the minizip package ${MINIZIP_PACKAGE}")
+                    SET(MINIZIP_SOURCE "${CMAKE_BINARY_DIR}/minizip")
+                    FILE(MAKE_DIRECTORY "${MINIZIP_SOURCE}")
+                    EXECUTE_PROCESS(COMMAND "${CMAKE_COMMAND}" -E tar xzf "${MINIZIP_PACKAGE}"
+                                    WORKING_DIRECTORY "${MINIZIP_SOURCE}"
+                                    RESULT_VARIABLE CHUCHO_RESULT)
+                    IF(NOT CHUCHO_RESULT EQUAL 0)
+                        MESSAGE(WARNING "Zip archive compression is disabled because ${MINIZIP_PACKAGE} could not be unpacked")
+                        UNSET(MINIZIP_SOURCE)
+                    ENDIF()
+                ELSE()
+                    MESSAGE(WARNING "Zip archive compression is disabled because MINIZIP_PACKAGE does not reference an existing file: ${MINIZIP_PACKAGE}")
+                ENDIF()
+            ENDIF()
+            IF(MINIZIP_SOURCE)
+                SET(MINIZIP_SOURCE "${MINIZIP_SOURCE}" CACHE INTERNAL "The location of the minizip sources")
+                MESSAGE(STATUS "Using minizip sources at ${MINIZIP_SOURCE}")
+                FOREACH(SRC zip ioapi)
+                    LIST(APPEND CHUCHO_MINIZIP_SOURCES "${MINIZIP_SOURCE}/${SRC}.c")
+                ENDFOREACH()
+                SET(CHUCHO_MINIZIP_SOURCES ${CHUCHO_MINIZIP_SOURCES} CACHE INTERNAL "The minizip sources to build")
+                SET(CHUCHO_HAVE_MINIZIP TRUE CACHE INTERNAL "Whether we have found minizip or not")
+                CHECK_SYMBOL_EXISTS(fopen64 stdio.h CHUCHO_HAVE_FOPEN64)
+            ENDIF()
+        ELSE()
+            MESSAGE(WARNING "Minizip requires that zlib also be included")
+        ENDIF()
     ENDIF()
 ENDIF()

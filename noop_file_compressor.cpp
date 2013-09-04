@@ -14,17 +14,19 @@
  *    limitations under the License.
  */
 
-#include <chucho/time_file_roller_memento.hpp>
+#include <chucho/noop_file_compressor.hpp>
+#include <limits>
 
 namespace chucho
 {
 
-time_file_roller_memento::time_file_roller_memento(const configurator& cfg)
-    : file_roller_memento(cfg)
+noop_file_compressor::noop_file_compressor()
+    : file_compressor(std::numeric_limits<unsigned>::max(), "")
 {
-    set_status_origin("tile_file_roller_memento");
-    set_handler("file_name_pattern", [this] (const std::string& val) { file_name_pattern_ = val; });
-    set_handler("max_history", [this] (const std::string& val) { max_history_ = std::stoul(val); });
+}
+
+void noop_file_compressor::compress(const std::string& file_name)
+{
 }
 
 }

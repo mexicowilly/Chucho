@@ -22,7 +22,7 @@
 namespace
 {
 
-const char* SERVICE_NAME = "Chucho Log";
+const char* SERVICE_NAME = "Chucho";
 
 SERVICE_STATUS_HANDLE status_handle = 0;
 DWORD current_state = SERVICE_STOPPED;

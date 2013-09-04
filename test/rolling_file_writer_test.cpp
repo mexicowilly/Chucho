@@ -24,6 +24,7 @@
 #include <chucho/calendar.hpp>
 #include <chucho/time_file_roller.hpp>
 #include <chucho/status_manager.hpp>
+#include <chucho/gzip_file_compressor.hpp>
 #include <array>
 #include <algorithm>
 
@@ -112,6 +113,45 @@ TEST_F(rolling_file_writer_test, numbered)
     EXPECT_STREQ("two:hello", get_line(fn + ".2").c_str());
     EXPECT_FALSE(chucho::file::exists(fn + ".3"));
 }
+
+#if defined(CHUCHO_HAVE_ZLIB)
+
+TEST_F(rolling_file_writer_test, numbered_gzip)
+{
+    auto trig = std::make_shared<chucho::size_file_roll_trigger>(5);
+    auto comp = std::make_shared<chucho::gzip_file_compressor>(1);
+    auto roll = std::make_shared<chucho::numbered_file_roller>(1, comp);
+    auto fn = get_file_name("num_gzip");
+    auto fmt = std::make_shared<chucho::pattern_formatter>("%m%n");
+    chucho::rolling_file_writer w(fmt, fn, roll, trig);
+    w.write(get_event("one:hello"));
+    w.write(get_event("two:hello"));
+    EXPECT_TRUE(chucho::file::exists(fn));
+    EXPECT_STREQ("two:hello", get_line(fn).c_str());
+    EXPECT_TRUE(chucho::file::exists(fn + ".1.gz"));
+}
+
+TEST_F(rolling_file_writer_test, numbered_gzip_with_gap)
+{
+    auto trig = std::make_shared<chucho::size_file_roll_trigger>(5);
+    auto comp = std::make_shared<chucho::gzip_file_compressor>(2);
+    auto roll = std::make_shared<chucho::numbered_file_roller>(-1, 1, comp);
+    auto fn = get_file_name("num_gzip");
+    auto fmt = std::make_shared<chucho::pattern_formatter>("%m%n");
+    chucho::rolling_file_writer w(fmt, fn, roll, trig);
+    w.write(get_event("one:hello"));
+    w.write(get_event("two:hello"));
+    w.write(get_event("three:hello"));
+    w.write(get_event("four:hello"));
+    EXPECT_TRUE(chucho::file::exists(fn));
+    EXPECT_STREQ("four:hello", get_line(fn).c_str());
+    EXPECT_TRUE(chucho::file::exists(fn + ".-1"));
+    EXPECT_STREQ("three:hello", get_line(fn + ".-1").c_str());
+    EXPECT_TRUE(chucho::file::exists(fn + ".0.gz"));
+    EXPECT_TRUE(chucho::file::exists(fn + ".1.gz"));
+}
+
+#endif
 
 TEST_F(rolling_file_writer_test, time_names)
 {

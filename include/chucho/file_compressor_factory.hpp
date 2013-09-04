@@ -14,17 +14,22 @@
  *    limitations under the License.
  */
 
-#include <chucho/time_file_roller_memento.hpp>
+#if !defined(CHUCHO_FILE_COMPRESSOR_FACTORY_HPP__)
+#define CHUCHO_FILE_COMPRESSOR_FACTORY_HPP__
+
+#include <chucho/configurable_factory.hpp>
 
 namespace chucho
 {
 
-time_file_roller_memento::time_file_roller_memento(const configurator& cfg)
-    : file_roller_memento(cfg)
+class CHUCHO_EXPORT file_compressor_factory : public configurable_factory
 {
-    set_status_origin("tile_file_roller_memento");
-    set_handler("file_name_pattern", [this] (const std::string& val) { file_name_pattern_ = val; });
-    set_handler("max_history", [this] (const std::string& val) { max_history_ = std::stoul(val); });
-}
+public:
+    file_compressor_factory();
+
+    virtual std::shared_ptr<memento> create_memento(const configurator& cfg) override;
+};
 
 }
+
+#endif

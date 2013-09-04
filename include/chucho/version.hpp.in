@@ -14,17 +14,21 @@
  *    limitations under the License.
  */
 
-#include <chucho/time_file_roller_memento.hpp>
+#if !defined(CHUCHO_VERSION_HPP__)
+#define CHUCHO_VERSION_HPP__
 
 namespace chucho
 {
 
-time_file_roller_memento::time_file_roller_memento(const configurator& cfg)
-    : file_roller_memento(cfg)
+namespace version
 {
-    set_status_origin("tile_file_roller_memento");
-    set_handler("file_name_pattern", [this] (const std::string& val) { file_name_pattern_ = val; });
-    set_handler("max_history", [this] (const std::string& val) { max_history_ = std::stoul(val); });
+
+const int MAJOR_ = ${CHUCHO_VERSION_MAJOR};
+const int MINOR_ = ${CHUCHO_VERSION_MINOR}; 
+const char* TEXT_ = "${CHUCHO_VERSION}";
+
 }
 
 }
+
+#endif

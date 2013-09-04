@@ -196,7 +196,8 @@ void socket_connector::open_socket()
             int yes = 1;
             setsockopt(socket_, SOL_SOCKET, SO_NOSIGPIPE, &yes, sizeof(yes));
             #endif
-            fcntl(socket_, F_SETFL, O_NONBLOCK);
+            int flags = fcntl(socket_, F_GETFL);
+            fcntl(socket_, F_SETFL, (flags | O_NONBLOCK));
             if (connect(socket_, addrs->ai_addr, addrs->ai_addrlen) == 0 ||
                 errno == EINPROGRESS)
             {

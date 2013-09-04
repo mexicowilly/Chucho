@@ -14,17 +14,22 @@
  *    limitations under the License.
  */
 
-#include <chucho/time_file_roller_memento.hpp>
+#if !defined(CHUCHO_NOOP_FILE_COMPRESSOR_HPP__)
+#define CHUCHO_NOOP_FILE_COMPRESSOR_HPP__
+
+#include <chucho/file_compressor.hpp>
 
 namespace chucho
 {
 
-time_file_roller_memento::time_file_roller_memento(const configurator& cfg)
-    : file_roller_memento(cfg)
+class CHUCHO_EXPORT noop_file_compressor : public file_compressor
 {
-    set_status_origin("tile_file_roller_memento");
-    set_handler("file_name_pattern", [this] (const std::string& val) { file_name_pattern_ = val; });
-    set_handler("max_history", [this] (const std::string& val) { max_history_ = std::stoul(val); });
-}
+public:
+    noop_file_compressor();
+
+    virtual void compress(const std::string& file_name) override;
+};
 
 }
+
+#endif
