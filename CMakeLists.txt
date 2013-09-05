@@ -40,6 +40,30 @@ IF(CHUCHO_POSIX)
         platform/posix/socket_connector_posix.cpp
         platform/posix/socket_exception_posix.cpp
         platform/posix/syslog_writer_posix.cpp)
+
+    IF(CHUCHO_HAVE_GMTIME_R)
+        SET_SOURCE_FILES_PROPERTIES(platform/posix/calendar_posix.cpp PROPERTIES
+                                    COMPILE_DEFINITIONS CHUCHO_HAVE_GMTIME_R)
+    ENDIF()
+    IF(CHUCHO_HAVE_LOCALTIME_R)
+        GET_SOURCE_FILE_PROPERTY(CHUCHO_CALENDAR_DEFS platform/posix/calendar_posix.cpp COMPILE_DEFINITIONS)
+        SET_SOURCE_FILES_PROPERTIES(platform/posix/calendar_posix.cpp PROPERTIES
+                                    COMPILE_DEFINITIONS "${CHUCHO_CALENDAR_DEFS};CHUCHO_HAVE_LOCALTIME_R")
+    ENDIF()
+    IF(CHUCHO_NO_FTS)
+        SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
+                                    COMPILE_DEFINITIONS CHUCHO_NO_FTS)
+    ENDIF()
+    IF(CHUCHO_DIRENT_NEEDS_NAME)
+        GET_SOURCE_FILE_PROPERTY(CHUCHO_FILE_DEFS platform/posix/file_posix.cpp COMPILE_DEFINITIONS)
+        SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
+                                    COMPILE_DEFINITIONS "${CHUCHO_FILE_DEFS};CHUCHO_DIRENT_NEEDS_NAME")
+    ENDIF()
+    IF(CHUCHO_HAVE_PUT_TIME)
+        GET_SOURCE_FILE_PROPERTY(CHUCHO_CALENDAR_DEFS platform/posix/calendar_posix.cpp COMPILE_DEFINITIONS)
+        SET_SOURCE_FILES_PROPERTIES(platform/posix/calendar_posix.cpp PROPERTIES
+                                    COMPILE_DEFINITIONS "${CHUCHO_CALENDAR_DEFS};CHUCHO_HAVE_PUT_TIME")
+    ENDIF()
 ELSEIF(CHUCHO_WINDOWS)
     SET(CHUCHO_PLATFORM_SOURCES
         platform/windows/calendar_windows.cpp
@@ -299,6 +323,17 @@ SET(CHUCHO_SOURCES
 
 SET_SOURCE_FILES_PROPERTIES(yaml_configurator.cpp PROPERTIES
                             COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
+
+IF(CHUCHO_HAVE_ARPA_INET_H)
+    SET_SOURCE_FILES_PROPERTIES(remote_writer.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_HAVE_ARPA_INET_H)
+ENDIF()
+
+IF(CHUCHO_HAVE_WINSOCK2_H)
+    GET_SOURCE_FILE_PROPERTY(CHUCHO_REMOTE_WRITER_DEFS remote_writer.cpp COMPILE_DEFINITIONS)
+    SET_SOURCE_FILES_PROPERTIES(remote_writer.cpp PROPERTIES
+                                COMPILE_DEFINITIONS "${CHUCHO_REMOTE_WRITER_DEFS};CHUCHO_HAVE_WINSOCK2_H")
+ENDIF()
 
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_SOURCES

@@ -134,8 +134,6 @@ IF(CHUCHO_POSIX)
             MESSAGE(FATAL_ERROR "The header ${HEAD} is required")
         ENDIF()
     ENDFOREACH()
-    # We need to know this in the source
-    ADD_DEFINITIONS(-DCHUCHO_HAVE_ARPA_INET_H)
 
     # host name functions
     CHECK_CXX_SYMBOL_EXISTS(uname sys/utsname.h CHUCHO_HAVE_UNAME)
@@ -167,11 +165,8 @@ IF(CHUCHO_POSIX)
 
     # gmtime_r/localtime_r
     FOREACH(SYM gmtime_r localtime_r)
-        CHECK_CXX_SYMBOL_EXISTS(${SYM} time.h CHUCHO_HAVE_${SYM})
-        IF(CHUCHO_HAVE_${SYM})
-            STRING(TOUPPER ${SYM} CHUCHO_UPPER_${SYM})
-            ADD_DEFINITIONS(-DCHUCHO_HAVE_${CHUCHO_UPPER_${SYM}})
-        ENDIF()
+        STRING(TOUPPER ${SYM} CHUCHO_UPPER_${SYM})
+        CHECK_CXX_SYMBOL_EXISTS(${SYM} time.h CHUCHO_HAVE_${CHUCHO_UPPER_${SYM}})
     ENDFOREACH()
 
     # fts
@@ -181,13 +176,11 @@ IF(CHUCHO_POSIX)
             CHECK_CXX_SYMBOL_EXISTS(${SYM} fts.h CHUCHO_HAVE_${SYM})
             IF(NOT CHUCHO_HAVE_${SYM})
                 SET(CHUCHO_NO_FTS TRUE)
-                ADD_DEFINITIONS(-DCHUCHO_NO_FTS)
                 BREAK()
             ENDIF()
         ENDFOREACH()
     ELSE()
         SET(CHUCHO_NO_FTS TRUE)
-        ADD_DEFINITIONS(-DCHUCHO_NO_FTS)
     ENDIF()
 
     IF(CHUCHO_NO_FTS)
@@ -210,9 +203,6 @@ IF(CHUCHO_POSIX)
         # program returned 0 for the exit code.
         CHECK_CXX_SOURCE_RUNS("#include <dirent.h>\n#include <unistd.h>\nint main() { return sizeof(struct dirent) >= pathconf(\"/\", _PC_NAME_MAX); }"
                               CHUCHO_DIRENT_NEEDS_NAME)
-        IF(CHUCHO_DIRENT_NEEDS_NAME)
-            ADD_DEFINITIONS(-DCHUCHO_DIRENT_NEEDS_NAME)
-        ENDIF()
     ENDIF()
 
     # realpath
@@ -307,7 +297,6 @@ ELSEIF(CHUCHO_WINDOWS)
             MESSAGE(FATAL_ERROR "The header ${HEAD} is required")
         ENDIF()
     ENDFOREACH()
-    ADD_DEFINITIONS(-DCHUCHO_HAVE_WINSOCK2_H)
     # Shellapi.h has to have windows.h included first
     CHECK_CXX_SOURCE_COMPILES("#include <windows.h>\n#include <shellapi.h>\nint main() { return 0; }" CHUCHO_HAVE_SHELLAPI_H)
     IF(NOT CHUCHO_HAVE_SHELLAPI_H)
@@ -338,9 +327,6 @@ ENDIF()
 # std::put_time
 CHECK_CXX_SOURCE_COMPILES("#include <iomanip>\nint main() { std::tm t; std::put_time(&t, \\\"%Y\\\"); return 0; }"
                           CHUCHO_HAVE_PUT_TIME)
-IF(CHUCHO_HAVE_PUT_TIME)
-    ADD_DEFINITIONS(-DCHUCHO_HAVE_PUT_TIME)
-ENDIF()
 
 # doxygen
 FIND_PACKAGE(Doxygen)
