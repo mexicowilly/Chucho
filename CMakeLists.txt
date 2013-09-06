@@ -143,7 +143,7 @@ IF(CHUCHO_HAVE_ZLIB)
 ENDIF()
 
 IF(CHUCHO_HAVE_BZIP2)
-    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.hpp)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/bzip2_file_compressor.hpp)
 ENDIF()
 
 IF(CHUCHO_HAVE_MINIZIP)

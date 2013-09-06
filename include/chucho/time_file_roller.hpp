@@ -77,6 +77,7 @@ public:
      * @param file_name_pattern the file name pattern
      * @param max_history the maximum number of files to be retained 
      *                    in the rolling history
+     * @param cmp the @ref file_compressor
      */
     time_file_roller(const std::string& file_name_pattern,
                      std::size_t max_history,

@@ -23,12 +23,43 @@
 namespace chucho
 {
 
+/**
+ * @class file_roller_memento file_roller_memento.hpp chucho/file_roller_memento.hpp 
+ * A @ref memento shared by all @ref file_roller classes. This 
+ * @ref memento takes care of the @ref file_compressor that may 
+ * appear in the configuration. All @ref file_roller memento 
+ * classes should inherit from this @ref memento.
+ * 
+ * @ingroup rolling
+ */
 class CHUCHO_EXPORT file_roller_memento : public memento
 {
 public:
+    /**
+     * @name Constructor
+     */
+    //@{
+    /**
+     * Construct a memento.
+     * 
+     * @param cfg the configurator that is perform configuration
+     */
     file_roller_memento(const configurator& cfg);
 
+    /**
+     * Return the @ref file_compressor that may have been found by 
+     * the configuration. 
+     * 
+     * @return the @ref file_compressor
+     */
     std::shared_ptr<file_compressor> get_file_compressor() const;
+    /**
+     * Handle only the case of a @ref file_compressor. If other 
+     * types can be handled by subclasses, then this method should 
+     * be called. 
+     * 
+     * @param cnf the configurable to handle
+     */
     virtual void handle(std::shared_ptr<configurable> cnf) override;
 
 private:

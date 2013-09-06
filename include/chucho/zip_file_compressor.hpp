@@ -22,10 +22,30 @@
 namespace chucho
 {
 
+/**
+ * @class zip_file_compressor zip_file_compressor.hpp chucho/zip_file_compressor.hpp 
+ * Compress using the zip archive format and a file name extension of 
+ * @c .zip. 
+ * 
+ * @ingroup compressors
+ */
 class CHUCHO_EXPORT zip_file_compressor : public file_compressor
 {
 public:
+    /**
+     * @name Constructor
+     */
+    //@{
+    /**
+     * Construct a compressor.
+     * 
+     * @param min_idx the minimum index at which to start 
+     *                compressing
+     *  
+     * @sa get_min_index 
+     */
     zip_file_compressor(unsigned min_idx);
+    //@}
 
     virtual void compress(const std::string& file_name) override;
 };

@@ -59,6 +59,12 @@ public:
      * @return the file name
      */
     virtual std::string get_active_file_name() = 0;
+    /**
+     * Return the @ref file_compressor associated with this roller, 
+     * if there is on. 
+     * 
+     * @return the @ref file_compressor
+     */
     std::shared_ptr<file_compressor> get_file_compressor() const;
     /**
      * Roll the files.
@@ -86,6 +92,10 @@ protected:
      * invalid. 
      */
     file_writer* file_writer_;
+    /**
+     * The @ref file_compressor used by this roller, if there is 
+     * one. 
+     */
     std::shared_ptr<file_compressor> compressor_;
 };
 

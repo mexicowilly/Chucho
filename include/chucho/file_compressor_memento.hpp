@@ -23,11 +23,37 @@
 namespace chucho
 {
 
+/**
+ * @class file_compressor_memento file_compressor_memento.hpp chucho/file_compressor_memento.hpp 
+ * A @ref memento that handles shared functionality for all 
+ * file_compressors. In fact, no file_compressor_memento 
+ * subclasses are required, since this one takes care of the 
+ * single constructor argument regarding the @ref 
+ * file_compressor minimum index. 
+ * 
+ * @ingroup compressors
+ */
 class CHUCHO_EXPORT file_compressor_memento : public memento
 {
 public:
+    /**
+     * @name Constructor
+     */
+    //@{
+    /**
+     * Construct a file_compressor_memento.
+     * 
+     * @param cfg the configurator that is perform configuration
+     */
     file_compressor_memento(const configurator& cfg);
+    //@}
 
+    /**
+     * Return the minimum index that has been discovered during 
+     * configuration time. 
+     * 
+     * @return the minimum index
+     */
     const optional<unsigned>& get_min_index() const;
 
 private:

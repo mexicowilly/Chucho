@@ -90,7 +90,7 @@ public:
      * Figure out a level from its text. A case-insensitive 
      * comparison is performed to figure out which level a piece of 
      * text is talking about. For example, the text "eRroR" returns 
-     * a shared pointer to equal to the @ref ERROR member.
+     * a shared pointer to equal to the @ref ERROR_ member.
      * 
      * @param text the text describing the level
      * @return the level

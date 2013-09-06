@@ -51,6 +51,11 @@
  */
 
 /**
+ * @defgroup compressors 
+ * Classes that can compress rolling files. 
+ */
+
+/**
  * @defgroup configuration 
  * Classes that involve the configuration of chucho. 
  */

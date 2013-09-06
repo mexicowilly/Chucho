@@ -22,11 +22,38 @@
 namespace chucho
 {
 
+/**
+ * @class file_compressor_factory file_compressor_factory.hpp chucho/file_compressor_factory.hpp 
+ * A factory for creating a @ref file_compressor at 
+ * configuration time. This factory should be subclassed for 
+ * specific compressor types. The overriden @ref create_memento 
+ * method, however, should serve all subclasses, as it always 
+ * returns a @ref file_compressor_memento. 
+ * 
+ * @ingroup compressors
+ */
 class CHUCHO_EXPORT file_compressor_factory : public configurable_factory
 {
 public:
+    /**
+     * @name Constructor
+     */
+    //@{
+    /**
+     * Construct a factory.
+     */
     file_compressor_factory();
+    //@}
 
+    /**
+     * Create the @ref file_compressor_memento. This method always 
+     * returns an instance of @ref file_compressor_memento, and 
+     * there should be no need to override this method in 
+     * subclasses. 
+     * 
+     * @param cfg the @ref configuration performing configuration
+     * @return a @ref file_compressor_memento
+     */
     virtual std::shared_ptr<memento> create_memento(const configurator& cfg) override;
 };
 

@@ -22,10 +22,30 @@
 namespace chucho
 {
 
+/**
+ * @class bzip2_file_compressor bzip2_file_compressor.hpp chucho/bzip2_file_compressor.hpp
+ * Compress using the bzip2 format and a file name extension of 
+ * @c .bz2. 
+ * 
+ * @ingroup compressors
+ */
 class CHUCHO_EXPORT bzip2_file_compressor : public file_compressor
 {
 public:
+    /**
+     * @name Constructor
+     */
+    //@{
+    /**
+     * Construct a compressor.
+     * 
+     * @param min_idx the minimum index at which to start 
+     *                compressing
+     *  
+     * @sa get_min_index 
+     */
     bzip2_file_compressor(unsigned min_idx);
+    //@}
 
     virtual void compress(const std::string& file_name) override;
 };
