@@ -38,6 +38,7 @@ IF(CHUCHO_HAVE_MINIZIP)
 ENDIF()
 
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
+               async_writer_test.cpp
                diagnostic_context_test.cpp
                duplicate_message_filter_test.cpp
                file_test.cpp

@@ -88,6 +88,7 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
 ENDIF()
 
 SET(CHUCHO_PUBLIC_HEADERS
+    include/chucho/async_writer.hpp
     include/chucho/cerr_writer.hpp
     include/chucho/configurable.hpp
     include/chucho/configurable_factory.hpp
@@ -187,6 +188,7 @@ IF(CMAKE_C_COMPILER_ID STREQUAL Clang)
 ENDIF()
 
 SET(CHUCHO_SOURCES
+    async_writer.cpp
     bzip2_file_compressor_factory.cpp
     cerr_writer.cpp
     cerr_writer_factory.cpp
