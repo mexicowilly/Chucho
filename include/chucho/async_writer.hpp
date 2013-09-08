@@ -20,6 +20,7 @@
 #include <chucho/writer.hpp>
 #include <queue>
 #include <thread>
+#include <condition_variable>
 
 namespace chucho
 {
