@@ -25,19 +25,87 @@
 namespace chucho
 {
 
+/**
+ * @class async_writer async_writer.hpp chucho/async_writer.hpp 
+ * An asynchronous writer. An asynchronous writer attaches to 
+ * another writer that might be going too slowly and forwards 
+ * events to it in a second thread. This can allow applications 
+ * not to be slowed by slow writers. 
+ *  
+ * An asynchronous writer holds its events in a queue, the 
+ * capacity of which can be set. This is a blocking queue, 
+ * meaning that once the queue is full, then the asynchronous 
+ * writer pushes back on the application and becomes synchronous 
+ * again. 
+ *  
+ * The push-back is mitigated by the fact that the asynchronous 
+ * writer can drop events of an indicated level. Once the queue 
+ * is 80% full, then events at the discard threshold are 
+ * dropped. By default the discard threshold is level INFO_. 
+ * This means that any event with INFO_ level or less gets 
+ * dropped. With the default set of levels, only WARN_, ERROR_ 
+ * and FATAL_ events will get written to the underlying slow 
+ * writer. 
+ * 
+ * @ingroup writers
+ */
 class CHUCHO_EXPORT async_writer : public writer
 {
 public:
+    /**
+     * The default queue capacity, which is 256.
+     */
     static const std::size_t DEFAULT_QUEUE_CAPACITY;
 
+    /**
+     * @name Constructor and destructor
+     */
+    //@{
+    /**
+     * Construct an asynchronous writer.
+     * 
+     * @param wrt the underlying slow writer
+     * @param capacity the capacity of the blocking queue
+     * @param discard_threshold the level at which to discard events 
+     *                          once the queue is at 80% capacity or
+     *                          more
+     */
     async_writer(std::shared_ptr<writer> wrt,
                  std::size_t capacity = DEFAULT_QUEUE_CAPACITY,
                  std::shared_ptr<level> discard_threshold = level::INFO_());
+    /**
+     * Destruct an asynchronous writer.
+     */
     ~async_writer();
+    //@}
 
+    /**
+     * Return the level at which events are discarded. Once the 
+     * queue has become 80% full, then events can be discarded. Any 
+     * event whose level is at or below the discard threshold will 
+     * be thrown away. This can be disabled with level OFF_. 
+     * 
+     * @return the discard threshold
+     */
     std::shared_ptr<level> get_discard_threshold() const;
+    /**
+     * Return the queue capacity.
+     * 
+     * @return the queue capacity
+     */
     std::size_t get_queue_capacity() const;
+    /**
+     * Return the queue size. This is the number of events that are 
+     * currently in the queue. 
+     * 
+     * @return the queue size
+     */
     std::size_t get_queue_size();
+    /**
+     * Return the underlying slow writer.
+     * 
+     * @return the slow writer
+     */
     std::shared_ptr<writer> get_writer() const;
 
 protected:

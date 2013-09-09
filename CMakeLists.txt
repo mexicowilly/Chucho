@@ -189,6 +189,8 @@ ENDIF()
 
 SET(CHUCHO_SOURCES
     async_writer.cpp
+    async_writer_factory.cpp
+    async_writer_memento.cpp
     bzip2_file_compressor_factory.cpp
     cerr_writer.cpp
     cerr_writer_factory.cpp
@@ -269,6 +271,8 @@ SET(CHUCHO_SOURCES
     yaml_configurator.cpp
     yaml_formatter.cpp
     zip_file_compressor_factory.cpp
+    include/chucho/async_writer_factory.hpp
+    include/chucho/async_writer_memento.hpp
     include/chucho/bzip2_file_compressor_factory.hpp
     include/chucho/calendar.hpp
     include/chucho/cerr_writer_factory.hpp

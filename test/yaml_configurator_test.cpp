@@ -40,6 +40,7 @@
 #if defined(CHUCHO_HAVE_MINIZIP)
 #include <chucho/zip_file_compressor.hpp>
 #endif
+#include <chucho/async_writer.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/configuration.hpp>
 #include <sstream>
@@ -88,6 +89,46 @@ protected:
 private:
     chucho::yaml_configurator cnf_;
 };
+
+TEST_F(yaml_configurator, async_writer)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::async_writer:\n"
+              "        chucho::file_writer:\n"
+              "            chucho::pattern_formatter:\n"
+              "                pattern: '%m%n'\n"
+              "            file_name: hello.log");
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::async_writer), typeid(*wrts[0]));
+    auto awrt = std::static_pointer_cast<chucho::async_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(awrt));
+    EXPECT_EQ(*chucho::level::INFO_(), *awrt->get_discard_threshold());
+    EXPECT_EQ(chucho::async_writer::DEFAULT_QUEUE_CAPACITY, awrt->get_queue_capacity());
+    EXPECT_EQ(typeid(chucho::file_writer), typeid(*awrt->get_writer()));
+}
+
+TEST_F(yaml_configurator, async_writer_with_opts)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::async_writer:\n"
+              "        chucho::file_writer:\n"
+              "            chucho::pattern_formatter:\n"
+              "                pattern: '%m%n'\n"
+              "            file_name: hello.log\n"
+              "        discard_threshold: error\n"
+              "        queue_capacity: 700");
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::async_writer), typeid(*wrts[0]));
+    auto awrt = std::static_pointer_cast<chucho::async_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(awrt));
+    EXPECT_EQ(*chucho::level::ERROR_(), *awrt->get_discard_threshold());
+    EXPECT_EQ(700, awrt->get_queue_capacity());
+    EXPECT_EQ(typeid(chucho::file_writer), typeid(*awrt->get_writer()));
+}
 
 TEST_F(yaml_configurator, bzip2_file_compressor)
 {
