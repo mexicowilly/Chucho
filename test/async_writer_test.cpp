@@ -112,7 +112,7 @@ TEST_F(async_writer_test, discard)
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     auto slow = std::dynamic_pointer_cast<slow_writer>(as->get_writer());
-    EXPECT_LT(slow->get_events().size(), 20);
+    EXPECT_LT(slow->get_events().size(), 20U);
     std::cout << "Got " << slow->get_events().size() << " { ";
     for (auto evt : slow->get_events())
         std::cout << evt << ' ';
@@ -127,7 +127,7 @@ TEST_F(async_writer_test, slow)
     for (int i = 0; i < 10; i++)
         as->write(get_event(std::to_string(i)));
     // we don't know how many are there
-    EXPECT_GT(as->get_queue_size(), 0);
+    EXPECT_GT(as->get_queue_size(), 0U);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     EXPECT_EQ(0, as->get_queue_size());
     auto slow = std::dynamic_pointer_cast<slow_writer>(as->get_writer());
