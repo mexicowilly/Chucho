@@ -129,7 +129,8 @@ inline int sliding_numbered_file_roller::get_min_index() const
 
 inline bool sliding_numbered_file_roller::is_compressed(int idx) const
 {
-    return compressor_ && idx <= cur_index_ - compressor_->get_min_index();
+    return compressor_ &&
+           idx <= cur_index_ - static_cast<int>(compressor_->get_min_index());
 }
 
 }
