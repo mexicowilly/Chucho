@@ -126,6 +126,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/remote_writer.hpp
     include/chucho/rolling_file_writer.hpp
     include/chucho/size_file_roll_trigger.hpp
+    include/chucho/sliding_numbered_file_roller.hpp
     include/chucho/status.hpp
     include/chucho/status_manager.hpp
     include/chucho/status_observer.hpp
@@ -253,6 +254,9 @@ SET(CHUCHO_SOURCES
     size_file_roll_trigger.cpp
     size_file_roll_trigger_factory.cpp
     size_file_roll_trigger_memento.cpp
+    sliding_numbered_file_roller.cpp
+    sliding_numbered_file_roller_factory.cpp
+    sliding_numbered_file_roller_memento.cpp
     status.cpp
     status_manager.cpp
     status_observer.cpp
@@ -310,6 +314,8 @@ SET(CHUCHO_SOURCES
     include/chucho/rolling_file_writer_memento.hpp
     include/chucho/size_file_roll_trigger_factory.hpp
     include/chucho/size_file_roll_trigger_memento.hpp
+    include/chucho/sliding_numbered_file_roller_factory.hpp
+    include/chucho/sliding_numbered_file_roller_memento.hpp
     include/chucho/socket_connector.hpp
     include/chucho/socket_exception.hpp
     include/chucho/status.hpp

@@ -41,6 +41,7 @@
 #include <chucho/zip_file_compressor.hpp>
 #endif
 #include <chucho/async_writer.hpp>
+#include <chucho/sliding_numbered_file_roller.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/configuration.hpp>
 #include <sstream>
@@ -372,6 +373,32 @@ TEST_F(yaml_configurator, multiple_writer)
     EXPECT_EQ(std::string("two.log"), fwrt->get_file_name());
 }
 
+TEST_F(yaml_configurator, numbered_file_roller)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::rolling_file_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m%n'\n"
+              "        chucho::numbered_file_roller:\n"
+              "            max_index: 5\n"
+              "            min_index: -3\n"
+              "        chucho::size_file_roll_trigger:\n"
+              "            max_size: 5000\n"
+              "        file_name: hello");
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
+    auto fwrt = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(fwrt));
+    auto rlr = fwrt->get_file_roller();
+    ASSERT_EQ(typeid(chucho::numbered_file_roller), typeid(*rlr));
+    auto nrlr = std::static_pointer_cast<chucho::numbered_file_roller>(rlr);
+    ASSERT_TRUE(static_cast<bool>(nrlr));
+    EXPECT_EQ(5, nrlr->get_max_index());
+    EXPECT_EQ(-3, nrlr->get_min_index());
+}
+
 TEST_F(yaml_configurator, remote_writer)
 {
     configure("- chucho::logger:\n"
@@ -528,6 +555,32 @@ TEST_F(yaml_configurator, size_file_roll_trigger)
         ASSERT_TRUE(static_cast<bool>(strg));
         EXPECT_EQ(good[i++].second, strg->get_max_size());
     }
+}
+
+TEST_F(yaml_configurator, sliding_numbered_file_roller)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::rolling_file_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m%n'\n"
+              "        chucho::sliding_numbered_file_roller:\n"
+              "            max_count: 5\n"
+              "            min_index: -3\n"
+              "        chucho::size_file_roll_trigger:\n"
+              "            max_size: 5000\n"
+              "        file_name: hello");
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
+    auto fwrt = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(fwrt));
+    auto rlr = fwrt->get_file_roller();
+    ASSERT_EQ(typeid(chucho::sliding_numbered_file_roller), typeid(*rlr));
+    auto srlr = std::static_pointer_cast<chucho::sliding_numbered_file_roller>(rlr);
+    ASSERT_TRUE(static_cast<bool>(srlr));
+    EXPECT_EQ(5, srlr->get_max_count());
+    EXPECT_EQ(-3, srlr->get_min_index());
 }
 
 TEST_F(yaml_configurator, syslog_writer)
