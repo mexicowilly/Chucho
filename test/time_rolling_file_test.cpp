@@ -21,6 +21,11 @@
 #include <chucho/pattern_formatter.hpp>
 #include <chucho/file.hpp>
 #include <chucho/calendar.hpp>
+#include <chucho/gzip_file_compressor.hpp>
+#include <chucho/zip_file_compressor.hpp>
+#include <chucho/bzip2_file_compressor.hpp>
+#include <chucho/noop_file_compressor.hpp>
+#include <chucho/configuration.hpp>
 #include <chrono>
 #include <vector>
 #include <thread>
@@ -56,6 +61,7 @@ protected:
     virtual void check_impl() = 0;
     std::deque<std::string>& expected_file_names();
     std::string format_file_name(const std::string& pattern);
+    bool is_compressing() const;
     std::chrono::system_clock::time_point& next();
     std::vector<std::string>& unexpected_file_names();
     void write();
@@ -131,13 +137,38 @@ public:
 };
 
 std::string test::TOP_LEVEL_DIR("time_rolling_file_test/");
+bool no_compression = false;
+
+std::shared_ptr<chucho::file_compressor> create_compressor(int min_index)
+{
+    std::shared_ptr<chucho::file_compressor> result;
+    if (no_compression)
+    {
+        result = std::make_shared<chucho::noop_file_compressor>();
+    }
+    else
+    {
+#if defined(CHUCHO_HAVE_ZLIB)
+        result = std::make_shared<chucho::gzip_file_compressor>(min_index);
+#elif defined(CHUCHO_HAVE_BZIP2)
+        result = std::make_shared<chucho::bzip2_file_compressor>(min_index);
+#elif defined(CHUCHO_HAVE_MINIZIP)
+        result = std::make_shared<chucho::zip_file_compressor>(min_index);
+#else
+        result = std::make_shared<chucho::noop_file_compressor>();
+#endif
+    }
+    return result;
+}
 
 template <typename duration_type>
 test::test(const std::string& pattern,
            std::size_t max_history,
            const duration_type& dur)
     : writer_(std::shared_ptr<chucho::formatter>(new chucho::pattern_formatter("%m%n")),
-              std::shared_ptr<chucho::file_roller>(new chucho::time_file_roller(TOP_LEVEL_DIR + pattern, max_history))),
+              std::shared_ptr<chucho::file_roller>(new chucho::time_file_roller(TOP_LEVEL_DIR + pattern,
+                                                                                max_history,
+                                                                                create_compressor(max_history)))),
       next_(std::chrono::system_clock::now()),
       end_(std::chrono::system_clock::now() + dur)
 {
@@ -151,7 +182,9 @@ test::test(const std::string& active,
            const duration_type& dur)
     : writer_(std::shared_ptr<chucho::formatter>(new chucho::pattern_formatter("%m%n")),
               TOP_LEVEL_DIR + active,
-              std::shared_ptr<chucho::file_roller>(new chucho::time_file_roller(TOP_LEVEL_DIR + pattern, max_history))),
+              std::shared_ptr<chucho::file_roller>(new chucho::time_file_roller(TOP_LEVEL_DIR + pattern,
+                                                                                max_history,
+                                                                                create_compressor(max_history)))),
       next_(std::chrono::system_clock::now()),
       end_(std::chrono::system_clock::now() + dur)
 {
@@ -189,6 +222,11 @@ std::string test::format_file_name(const std::string& pattern)
     std::ostringstream stream;
     stream << TOP_LEVEL_DIR << chucho::calendar::format(cal, pattern);
     return stream.str();
+}
+
+bool test::is_compressing() const
+{
+    return !std::dynamic_pointer_cast<chucho::noop_file_compressor>(writer_.get_file_roller()->get_file_compressor());
 }
 
 std::chrono::system_clock::time_point& test::next()
@@ -244,16 +282,19 @@ date_only_test::date_only_test(const std::string& pattern,
 
 void date_only_test::check_impl()
 {
-    expected_file_names().push_back(format_file_name(pattern_));
-    if (expected_file_names().size() > max_history_ + 1)
+    if (!is_compressing())
     {
-        unexpected_file_names().push_back(expected_file_names().front());
-        expected_file_names().pop_front();
+        expected_file_names().push_back(format_file_name(pattern_));
+        if (expected_file_names().size() > max_history_ + 1)
+        {
+            unexpected_file_names().push_back(expected_file_names().front());
+            expected_file_names().pop_front();
+        }
+        for (auto f : expected_file_names())
+            EXPECT_PRED1(chucho::file::exists, f);
+        for (auto f : unexpected_file_names())
+            EXPECT_PRED1(file_doesnt_exist, f);
     }
-    for (auto f : expected_file_names())
-        EXPECT_PRED1(chucho::file::exists, f);
-    for (auto f : unexpected_file_names())
-        EXPECT_PRED1(file_doesnt_exist, f);
     next() += until_next_;
 }
 
@@ -280,17 +321,20 @@ fixed_active_test::fixed_active_test(const std::string& active,
 
 void fixed_active_test::check_impl()
 {
-    expected_file_names().push_back(format_file_name(pattern_));
-    if (expected_file_names().size() > max_history_)
+    if (!is_compressing())
     {
-        unexpected_file_names().push_back(expected_file_names().front());
-        expected_file_names().pop_front();
+        expected_file_names().push_back(format_file_name(pattern_));
+        if (expected_file_names().size() > max_history_)
+        {
+            unexpected_file_names().push_back(expected_file_names().front());
+            expected_file_names().pop_front();
+        }
+        EXPECT_PRED1(chucho::file::exists, TOP_LEVEL_DIR + active_);
+        for (auto f : expected_file_names())
+            EXPECT_PRED1(chucho::file::exists, f);
+        for (auto f : unexpected_file_names())
+            EXPECT_PRED1(file_doesnt_exist, f);
     }
-    EXPECT_PRED1(chucho::file::exists, TOP_LEVEL_DIR + active_);
-    for (auto f : expected_file_names())
-        EXPECT_PRED1(chucho::file::exists, f);
-    for (auto f : unexpected_file_names())
-        EXPECT_PRED1(file_doesnt_exist, f);
     next() += until_next_;
 }
 
@@ -341,6 +385,7 @@ void run(std::shared_ptr<test> tst)
 
 TEST(time_rolling_file_test, all)
 {
+    chucho::configuration::set_style(chucho::configuration::style::OFF);
     chucho::file::remove_all("time_rolling_file_test");
     // No initializer lists in VS 2012
     std::vector<std::shared_ptr<std::thread>> threads;

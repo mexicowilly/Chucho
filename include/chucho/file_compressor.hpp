@@ -116,7 +116,8 @@ protected:
      * Create a compressor with the given minimum index and file 
      * name extension. 
      * 
-     * @param min_idx the minimum index at which to start rolling
+     * @param min_idx the minimum index at which to start 
+     *                compressing
      * @param extension the file name extension for this compressor
      *  
      * @sa get_min_index, get_extension 

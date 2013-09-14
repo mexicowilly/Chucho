@@ -269,8 +269,13 @@ void time_file_roller::roll()
         std::rename(get_active_file_name().c_str(), target.c_str());
         if (compressor_)
         {
-            std::string to_compress = resolve_file_name(
-               relative(now, -static_cast<int>(compressor_->get_min_index())));
+            int cmp = -static_cast<int>(compressor_->get_min_index());
+            // If the writer has an active file name set, then we
+            // set the compression index to one step closer to the
+            // active.
+            if (!file_writer_->get_initial_file_name().empty())
+                cmp++;
+            std::string to_compress = resolve_file_name(relative(now, cmp));
             if (file::exists(to_compress))
                 compressor_->compress(to_compress);
         }

@@ -74,12 +74,12 @@ ENDIF()
 ADD_CUSTOM_TARGET(check
                   COMMAND unit-test)
 
-ADD_EXECUTABLE(rolling-file-test EXCLUDE_FROM_ALL
+ADD_EXECUTABLE(time-rolling-file-test EXCLUDE_FROM_ALL
                harness.cpp
                time_rolling_file_test.cpp)
-TARGET_LINK_LIBRARIES(rolling-file-test chucho gtest ${CHUCHO_THREAD_LIB})
+TARGET_LINK_LIBRARIES(time-rolling-file-test chucho gtest ${CHUCHO_THREAD_LIB})
 IF(CHUCHO_SOLARIS)
-    TARGET_LINK_LIBRARIES(rolling-file-test socket nsl)
+    TARGET_LINK_LIBRARIES(time-rolling-file-test socket nsl)
 ENDIF()
 
 ADD_EXECUTABLE(syslog-writer-test EXCLUDE_FROM_ALL
