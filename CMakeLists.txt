@@ -460,14 +460,14 @@ ADD_SUBDIRECTORY(log-server)
 
 # Documentation
 IF(DOXYGEN_FOUND)
-    SET(CHUCHO_DOXYGEN_INPUT \"${CMAKE_SOURCE_DIR}/main_page.hpp\")
+    SET(CHUCHO_DOXYGEN_INPUT "\"${CMAKE_SOURCE_DIR}/main_page.hpp\"")
 	FOREACH(HEAD ${CHUCHO_PUBLIC_HEADERS})
-		SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} \"${CMAKE_SOURCE_DIR}/${HEAD}\"")
+        SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
 	ENDFOREACH()
 	CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/doxygen.conf" "${CMAKE_BINARY_DIR}/doxygen_mod.conf")
 	ADD_CUSTOM_TARGET(doc
 					  COMMAND "${DOXYGEN_EXECUTABLE}" "${CMAKE_BINARY_DIR}/doxygen_mod.conf"
-					  WORKING_DIRECTORY "${CHUCHO_SOURCE_DIR}")
+					  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 ELSE()
 	ADD_CUSTOM_TARGET(doc
 					  COMMAND "${CMAKE_COMMAND}" -E echo "Doxygen was not found on this system, so the documentation cannot be generated")

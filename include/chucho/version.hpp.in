@@ -17,14 +17,33 @@
 #if !defined(CHUCHO_VERSION_HPP__)
 #define CHUCHO_VERSION_HPP__
 
+/**
+ * @file 
+ * Chucho's version constants
+ * @ingroup miscellaneous
+ */
+
 namespace chucho
 {
 
+/**
+ * The Chucho version namespace
+ */
 namespace version
 {
 
+/**
+ * The major version of Chucho in <chucho/version.hpp>.
+ */
 const int MAJOR_ = ${CHUCHO_VERSION_MAJOR};
+/**
+ * The minor version of Chucho in <chucho/version.hpp>.
+ */
 const int MINOR_ = ${CHUCHO_VERSION_MINOR}; 
+/**
+ * A textual representation of Chucho's version, like "1.3" in 
+ * <chucho/version.hpp>. 
+ */
 const char* TEXT_ = "${CHUCHO_VERSION}";
 
 }
