@@ -39,7 +39,7 @@ std::ostream& operator<< (std::ostream& stream, properties& props)
     stream << "  - console mode: " << std::boolalpha << props.console_mode() << '\n';
     stream << "  - chuchod log level: " << *chucho::logger::get("chuchod")->get_level() << '\n';
     stream << "  - port: " << props.port() << '\n';
-    stream << "  - version: " << chucho::version::TEXT_ << '\n';
+    stream << "  - version: " << chucho::version::text() << '\n';
     stream << "  - worker threads: " << props.vassal_count();
     return stream;
 }
