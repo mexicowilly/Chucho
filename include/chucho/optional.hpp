@@ -31,7 +31,7 @@ namespace chucho
  * @ingroup miscellaneous 
  */
 template <typename type>
-class CHUCHO_EXPORT optional
+class optional
 {
 public:
     /**
