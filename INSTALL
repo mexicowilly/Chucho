@@ -6,8 +6,8 @@ Prerequisites
     Chucho requires that CMake version 2.8.10 or later be installed. You
 may download CMake from http://www.cmake.org.
 
-    At present Chucho is only known to work with compilers clang 4.2.1
-and later and g++ 4.7 and later.
+    At present Chucho is only known to work with compilers clang 4.2.1,
+and later, g++ 4.7 and later, and Microsoft Visual Studio 2012 and later.
 
 Compression
 ===========
@@ -109,8 +109,8 @@ these with the command-line switch -D, as in
       the location of CMAKE_INSTALL_PREFIX. The default is ON.
     * CMAKE_INSTALL_PREFIX: (A directory) If you would like to install
       Chucho to a particular location, you may set it here. The default
-      is /usr/local on POSIX system and C:\Program Files\chucho on
-      Windows.
+      is /usr/local on POSIX systems and C:\Program Files (x86)\chucho
+      on Windows.
     * INSTALL_SERVICE: (ON or OFF) Whether you want the install target
       to install the chuchod log server as a system service on
       platforms that support system services. The default is ON.

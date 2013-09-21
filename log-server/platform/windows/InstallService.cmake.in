@@ -1,16 +1,4 @@
 MESSAGE(STATUS "Installing the Chucho service")
-MESSAGE(STATUS "Stopping existing service")
-EXECUTE_PROCESS(COMMAND "${CHUCHO_SC}" stop Chucho
-                RESULT_VARIABLE SC_RESULT)
-IF(NOT SC_RESULT EQUAL 0 AND NOT SC_RESULT EQUAL 1060 AND NOT SC_RESULT EQUAL 1062)
-    MESSAGE(FATAL_ERROR "Could stop the service")
-ENDIF()
-MESSAGE(STATUS "Deleting existing service")
-EXECUTE_PROCESS(COMMAND "${CHUCHO_SC}" delete Chucho
-                RESULT_VARIABLE SC_RESULT)
-IF(NOT SC_RESULT EQUAL 0 AND NOT SC_RESULT EQUAL 1060)
-    MESSAGE(FATAL_ERROR "Could delete the service")
-ENDIF()
 MESSAGE(STATUS "Creating the service")
 EXECUTE_PROCESS(COMMAND "${CHUCHO_SC}" create Chucho binPath= "${CMAKE_INSTALL_PREFIX}/bin/chuchod.exe" start= auto
                 RESULT_VARIABLE SC_RESULT)

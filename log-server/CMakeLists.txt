@@ -25,6 +25,8 @@ IF(CHUCHO_WINDOWS)
         CONFIGURE_FILE(platform/windows/InstallService.cmake.in
                        "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
     ENDIF()
+    CONFIGURE_FILE(platform/windows/UninstallService.cmake.in
+                   "${CMAKE_CURRENT_BINARY_DIR}/UninstallService.cmake")
 ELSEIF(CHUCHO_POSIX)
     ADD_DEFINITIONS(-DCHUCHO_POSIX)
 ENDIF()
@@ -82,12 +84,15 @@ ADD_EXECUTABLE(chuchod
                vassals.hpp
                ${CHUCHOD_PLATFORM_SOURCES})
 
+IF(NOT ENABLE_SHARED)
+    SET(CHUCHOD_DECLARE_YAML YAML_DECLARE_STATIC)
+ENDIF()
 IF(CHUCHO_HAVE_ARPA_INET_H)
     SET_SOURCE_FILES_PROPERTIES(suzerain.cpp PROPERTIES
-                                COMPILE_DEFINITIONS "YAML_DECLARE_STATIC;CHUCHO_HAVE_ARPA_INET_H")
+                                COMPILE_DEFINITIONS "${CHUCHOD_DECLARE_YAML};CHUCHO_HAVE_ARPA_INET_H")
 ELSE()
     SET_SOURCE_FILES_PROPERTIES(suzerain.cpp PROPERTIES
-                                COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
+                                COMPILE_DEFINITIONS ${CHUCHOD_DECLARE_YAML})
 ENDIF()
 
 IF(CHUCHO_HAVE_WINSOCK2_H)
@@ -106,6 +111,9 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
                                 COMPILE_FLAGS "-Wno-unused-result")
 ENDIF()
 
+IF(CHUCHO_WINDOWS)
+    INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/UninstallService.cmake")
+ENDIF()
 INSTALL(TARGETS chuchod
         RUNTIME DESTINATION bin)
 INSTALL(FILES chuchod.yaml.sample
