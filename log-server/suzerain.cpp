@@ -394,7 +394,8 @@ void suzerain::process_events(std::shared_ptr<socket_reader> reader)
 
 void suzerain::run()
 {
-    single_instance::ensure();
+    if (!props_.is_service())
+        single_instance::ensure();
     signal_handler::install(std::bind(&suzerain::sighup_handler, this));
     vassals_.reset(new vassals(props_.vassal_count(),
                                std::bind(&suzerain::process_events, this, std::placeholders::_1)));
@@ -407,7 +408,8 @@ void suzerain::run()
     {
         CHUCHO_ERROR(logger_, "Unable to create a listener socket: " << e.what());
         is_shut_down = true;
-        single_instance::release();
+        if (!props_.is_service())
+            single_instance::release();
         return;
     }
     try
@@ -447,7 +449,8 @@ void suzerain::run()
     vassals_->stop();
     selector_.reset();
     vassals_.reset();
-    single_instance::release();
+    if (!props_.is_service())
+        single_instance::release();
 }
 
 void suzerain::sighup_handler()

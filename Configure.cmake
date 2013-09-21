@@ -31,6 +31,13 @@ SET(CHUCHO_NEEDS_TO_USE_THE_FRAMEWORK_VARIABLE_OR_CMAKE_COMPLAINS ${ENABLE_FRAME
 # services.
 OPTION(INSTALL_SERVICE "Whether to install chuchod as a system service" TRUE)
 
+# We'll want this later
+MACRO(CHUCHO_FIND_PROGRAM CHUCHO_FIND_VAR CHUCHO_PROGRAM)
+    MESSAGE(STATUS "Looking for ${CHUCHO_PROGRAM}")
+    FIND_PROGRAM(${CHUCHO_FIND_VAR} "${CHUCHO_PROGRAM}")
+    MESSAGE(STATUS "Looking for ${CHUCHO_PROGRAM} - ${${CHUCHO_FIND_VAR}}")
+ENDMACRO()
+
 # Set consistent platform names
 IF(CMAKE_SYSTEM_NAME STREQUAL Windows)
     SET(CHUCHO_WINDOWS TRUE)
@@ -295,6 +302,12 @@ IF(CHUCHO_POSIX)
             MESSAGE(FATAL_ERROR "${SYM} is required")
         ENDIF()
     ENDFOREACH()
+
+    # htonl
+    CHECK_CXX_SYMBOL_EXISTS(htonl arpa/inet.h CHUCHO_HAVE_${SYM})
+    IF(NOT CHUCHO_HAVE_${SYM})
+        MESSAGE(FATAL_ERROR "htonl is required")
+    ENDIF()
 ELSEIF(CHUCHO_WINDOWS)
     FOREACH(HEAD windows.h winsock2.h io.h process.h ws2tcpip.h time.h)
         STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
@@ -311,16 +324,13 @@ ELSEIF(CHUCHO_WINDOWS)
     ENDIF()
 
     # sc
-    IF(INSTALL_SERVICE)
-        MESSAGE(STATUS "Looking for sc")
-        FIND_PROGRAM(CHUCHO_SC sc)
-        IF(NOT CHUCHO_SC)
-            MESSAGE(FATAL_ERROR "sc is required in order to install the Chucho service")
-        ENDIF()
-        MESSAGE(STATUS "Looking for sc - ${CHUCHO_SC}")
+    CHUCHO_FIND_PROGRAM(CHUCHO_SC sc)
+    IF(NOT CHUCHO_SC)
+        MESSAGE(FATAL_ERROR "sc is required")
     ENDIF()
 ENDIF()
 
+# Nested exceptions
 CHECK_CXX_SOURCE_COMPILES("#include <exception>\nint main() { std::exception e; std::throw_with_nested(e); std::rethrow_if_nested(e); return 0; }"
                           CHUCHO_HAVE_NESTED_EXCEPTIONS)
 IF(CHUCHO_HAVE_NESTED_EXCEPTIONS)
@@ -339,7 +349,19 @@ CHECK_CXX_SOURCE_COMPILES("#include <iomanip>\nint main() { std::tm t; std::put_
 FIND_PACKAGE(Doxygen)
 
 # cppcheck
-FIND_PROGRAM(CHUCHO_CPPCHECK cppcheck)
+CHUCHO_FIND_PROGRAM(CHUCHO_CPPCHECK cppcheck)
+
+# Solaris service stuff
+IF(CHUCHO_SOLARIS)
+    CHUCHO_FIND_PROGRAM(CHUCHO_SVCCFG svccfg)
+    IF(NOT CHUCHO_SVCCFG)
+        MESSAGE(FATAL_ERROR "svccfg is required")
+    ENDIF()
+    CHUCHO_FIND_PROGRAM(CHUCHO_SVCADM svcadm)
+    IF(NOT CHUCHO_SVCADM)
+        MESSAGE(FATAL_ERROR "svcadm is required")
+    ENDIF()
+ENDIF()
 
 #
 # External projects

@@ -47,7 +47,8 @@ std::ostream& operator<< (std::ostream& stream, properties& props)
 properties::properties()
     : vassal_count_(DEFAULT_VASSAL_COUNT),
       port_(chucho::remote_writer::DEFAULT_PORT),
-      console_mode_(false)
+      console_mode_(false),
+      is_service_(false)
 {
 }
 
@@ -84,6 +85,11 @@ bool properties::handle_config_value(const std::string& key, const std::string& 
     {
         std::istringstream stream(value);
         stream >> std::boolalpha >> console_mode_;
+    }
+    else if (key == "service")
+    {
+        std::istringstream stream(value);
+        stream >> std::boolalpha >> is_service_;
     }
     else
     {
