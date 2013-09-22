@@ -363,6 +363,12 @@ IF(CHUCHO_SOLARIS)
     ENDIF()
 ENDIF()
 
+# zip
+CHUCHO_FIND_PROGRAM(CHUCHO_ZIP zip)
+IF(NOT CHUCHO_ZIP)
+    MESSAGE(STATUS "No zdist target will be available, since you don't have zip")
+ENDIF()
+
 #
 # External projects
 #
