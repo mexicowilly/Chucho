@@ -52,7 +52,7 @@ void zip_file_compressor::compress(const std::string& file_name)
     zipfi.tmz_date.tm_mon = now.tm_mon;
     zipfi.tmz_date.tm_year = now.tm_year;
     std::string created_msg("Created by Chucho version ");
-    created_msg += version::TEXT_;
+    created_msg += version::text();
     if (zipOpenNewFileInZip(z,
                             file::base_name(file_name).c_str(),
                             &zipfi,

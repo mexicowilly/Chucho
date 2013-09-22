@@ -28,7 +28,7 @@
 namespace chucho
 {
 
-const std::uint16_t remote_writer::DEFAULT_PORT(32123);
+const std::uint16_t remote_writer::DEFAULT_PORT(21012);
 const std::size_t remote_writer::DEFAULT_UNSENT_CACHE_MAX(1000);
 
 remote_writer::remote_writer(const std::string& host,

@@ -391,7 +391,7 @@ std::string pattern_formatter::date_time_piece::get_text_impl(const event& evt) 
         if (clock_util::system_clock_supports_milliseconds)
         {
             std::ostringstream stream;
-            stream << std::setw(3) << (millis.count() % 1000);
+            stream << std::setw(3) << std::setfill('0') << (millis.count() % 1000);
             for (std::size_t p : milli_positions_)
                 pat.replace(p, 2, stream.str());
         }

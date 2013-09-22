@@ -21,13 +21,15 @@
 #error "This header if private"
 #endif
 
+#include <chucho/export.hpp>
+
 namespace chucho
 {
 
 namespace line_ending
 {
 
-extern const char* EOL;
+CHUCHO_EXPORT extern const char* EOL;
 
 }
 

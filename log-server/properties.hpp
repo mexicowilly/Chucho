@@ -36,12 +36,14 @@ public:
 
     bool console_mode() const;
     std::uint16_t port() const;
+    bool is_service() const;
     std::size_t vassal_count() const;
 
 private:
     std::size_t vassal_count_;
     std::uint16_t port_;
     bool console_mode_;
+    bool is_service_;
 };
 
 std::ostream& operator<< (std::ostream& stream, properties& props);
@@ -49,6 +51,11 @@ std::ostream& operator<< (std::ostream& stream, properties& props);
 inline bool properties::console_mode() const
 {
     return console_mode_;
+}
+
+inline bool properties::is_service() const
+{
+    return is_service_;
 }
 
 inline std::uint16_t properties::port() const

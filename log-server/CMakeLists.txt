@@ -25,7 +25,25 @@ IF(CHUCHO_WINDOWS)
         CONFIGURE_FILE(platform/windows/InstallService.cmake.in
                        "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
     ENDIF()
-ELSEIF(CHUCHO_POSIX)
+    CONFIGURE_FILE(platform/windows/UninstallService.cmake.in
+                   "${CMAKE_CURRENT_BINARY_DIR}/UninstallService.cmake")
+ELSEIF(CHUCHO_SOLARIS)
+    IF(INSTALL_SERVICE)
+        CONFIGURE_FILE(platform/solaris/smf-manifest.xml.in
+                       "${CMAKE_CURRENT_BINARY_DIR}/chucho.xml")
+        EXECUTE_PROCESS(COMMAND "${CHUCHO_SVCCFG}" validate "${CMAKE_CURRENT_BINARY_DIR}/chucho.xml"
+                        RESULT_VARIABLE CHUCHO_SVCCFG_RESULT)
+        IF(NOT CHUCHO_SVCCFG_RESULT EQUAL 0)
+            MESSAGE(FATAL_ERROR "Error validating the SMF manifest for the Chucho service")
+        ENDIF()
+        CONFIGURE_FILE(platform/solaris/InstallService.cmake.in
+                       "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
+    ENDIF()
+    CONFIGURE_FILE(platform/solaris/UninstallService.cmake.in
+                   "${CMAKE_CURRENT_BINARY_DIR}/UninstallService.cmake")
+ENDIF()
+
+IF(CHUCHO_POSIX)
     ADD_DEFINITIONS(-DCHUCHO_POSIX)
 ENDIF()
 
@@ -82,12 +100,15 @@ ADD_EXECUTABLE(chuchod
                vassals.hpp
                ${CHUCHOD_PLATFORM_SOURCES})
 
+IF(NOT ENABLE_SHARED)
+    SET(CHUCHOD_DECLARE_YAML YAML_DECLARE_STATIC)
+ENDIF()
 IF(CHUCHO_HAVE_ARPA_INET_H)
     SET_SOURCE_FILES_PROPERTIES(suzerain.cpp PROPERTIES
-                                COMPILE_DEFINITIONS "YAML_DECLARE_STATIC;CHUCHO_HAVE_ARPA_INET_H")
+                                COMPILE_DEFINITIONS "${CHUCHOD_DECLARE_YAML};CHUCHO_HAVE_ARPA_INET_H")
 ELSE()
     SET_SOURCE_FILES_PROPERTIES(suzerain.cpp PROPERTIES
-                                COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
+                                COMPILE_DEFINITIONS ${CHUCHOD_DECLARE_YAML})
 ENDIF()
 
 IF(CHUCHO_HAVE_WINSOCK2_H)
@@ -106,10 +127,19 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
                                 COMPILE_FLAGS "-Wno-unused-result")
 ENDIF()
 
+IF(CHUCHO_WINDOWS OR CHUCHO_SOLARIS)
+    INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/UninstallService.cmake")
+ENDIF()
 INSTALL(TARGETS chuchod
         RUNTIME DESTINATION bin)
 INSTALL(FILES chuchod.yaml.sample
         DESTINATION etc)
-IF(CHUCHO_WINDOWS AND INSTALL_SERVICE)
-    INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
+IF(INSTALL_SERVICE)
+    IF(CHUCHO_WINDOWS)
+        INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
+    ELSEIF(CHUCHO_SOLARIS)
+        INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
+        INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/chucho.xml"
+                DESTINATION /var/svc/manifest/application)
+    ENDIF()
 ENDIF()

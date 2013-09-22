@@ -39,7 +39,7 @@ socket_listener::socket_listener(std::uint16_t port)
 {
     struct addrinfo hints;
     std::memset(&hints, 0, sizeof(hints));
-    hints.ai_family = AF_UNSPEC;
+    hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
     struct addrinfo* addrs;
@@ -58,21 +58,21 @@ socket_listener::socket_listener(std::uint16_t port)
         if (socket_ == -1)
         {
             int err = errno;
-            CHUCHO_INFO(logger_, std::string("Could not create socket: ") + std::strerror(err));
+            CHUCHO_INFO(logger_, "Could not create socket: " << std::strerror(err));
             continue;
         }
         int yes = 1;
         if (setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1)
         {
             int err = errno;
-            CHUCHO_INFO(logger_, std::string("Error setting socket options: ") + std::strerror(err));
+            CHUCHO_INFO(logger_, "Error setting socket options: " << std::strerror(err));
             close(socket_);
             continue;
         }
         if (bind(socket_, cur->ai_addr, cur->ai_addrlen) == -1)
         {
             int err = errno;
-            CHUCHO_INFO(logger_, std::string("Could not bind to local address: ") + std::strerror(err));
+            CHUCHO_INFO(logger_, "Could not bind to local address: " << std::strerror(err));
             close(socket_);
             continue;
         }
@@ -84,8 +84,9 @@ socket_listener::socket_listener(std::uint16_t port)
     {
         int err = errno;
         close(socket_);
-        throw chucho::exception(std::string("Unable to listen to local address") + std::strerror(err));
+        throw chucho::exception(std::string("Unable to listen to local address: ") + std::strerror(err));
     }
+    CHUCHO_INFO_STR(logger_, "Now listening for incoming connections");
 }
 
 socket_listener::~socket_listener()

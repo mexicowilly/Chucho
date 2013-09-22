@@ -62,7 +62,7 @@ class CHUCHO_EXPORT remote_writer : public writer
 public:
     /**
      * The default port on which the chucho server is listening, 
-     * which is 32123. 
+     * which is 21012. 
      */
     static const std::uint16_t DEFAULT_PORT;
     /**
