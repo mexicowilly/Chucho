@@ -25,8 +25,7 @@
  */
 
 /**
- * Doxygen won't document the finalize function unless I 
- * document this namespace. Enjoy. 
+ * The Chucho namespace
  */
 namespace chucho
 {

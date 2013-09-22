@@ -42,8 +42,10 @@ public:
      * minimum index will be 1. 
      * 
      * @param max_index the maximum index
+     * @param cmp the file compressor
      */
-    numbered_file_roller(int max_index);
+    numbered_file_roller(int max_index,
+                         std::shared_ptr<file_compressor> cmp = std::shared_ptr<file_compressor>());
     /**
      * Construct a numbered_file_roller with both a minimum and a 
      * maximum index. 
@@ -53,8 +55,11 @@ public:
      *        max_index
      * @param min_index the minimum index
      * @param max_index the maximum index
+     * @param cmp the file compressor
      */
-    numbered_file_roller(int min_index, int max_index);
+    numbered_file_roller(int min_index,
+                         int max_index,
+                         std::shared_ptr<file_compressor> cmp = std::shared_ptr<file_compressor>());
     //@}
 
     virtual std::string get_active_file_name() override;
@@ -73,7 +78,8 @@ public:
     virtual void roll() override;
 
 private:
-    CHUCHO_NO_EXPORT std::string get_name(int number) const;
+    CHUCHO_NO_EXPORT std::string get_name(int number, bool with_compression_ext = true) const;
+    CHUCHO_NO_EXPORT bool is_compressed(int number) const;
 
     int min_index_;
     int max_index_;
@@ -87,6 +93,12 @@ inline int numbered_file_roller::get_max_index() const
 inline int numbered_file_roller::get_min_index() const
 {
     return min_index_;
+}
+
+inline bool numbered_file_roller::is_compressed(int number) const
+{
+    return compressor_ &&
+           static_cast<unsigned>(number - min_index_ + 1) >= compressor_->get_min_index();
 }
 
 }

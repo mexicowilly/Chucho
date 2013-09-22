@@ -30,6 +30,11 @@
 #include <chucho/time_file_roller_factory.hpp>
 #include <chucho/duplicate_message_filter_factory.hpp>
 #include <chucho/remote_writer_factory.hpp>
+#include <chucho/bzip2_file_compressor_factory.hpp>
+#include <chucho/gzip_file_compressor_factory.hpp>
+#include <chucho/zip_file_compressor_factory.hpp>
+#include <chucho/async_writer_factory.hpp>
+#include <chucho/sliding_numbered_file_roller_factory.hpp>
 #include <chucho/regex.hpp>
 #include <chucho/garbage_cleaner.hpp>
 #include <chucho/environment.hpp>
@@ -95,6 +100,16 @@ void configurator::initialize()
     add_configurable_factory("chucho::syslog_writer", fact);
     fact.reset(new remote_writer_factory());
     add_configurable_factory("chucho::remote_writer", fact);
+    fact.reset(new bzip2_file_compressor_factory());
+    add_configurable_factory("chucho::bzip2_file_compressor", fact);
+    fact.reset(new gzip_file_compressor_factory());
+    add_configurable_factory("chucho::gzip_file_compressor", fact);
+    fact.reset(new zip_file_compressor_factory());
+    add_configurable_factory("chucho::zip_file_compressor", fact);
+    fact.reset(new async_writer_factory());
+    add_configurable_factory("chucho::async_writer", fact);
+    fact.reset(new sliding_numbered_file_roller_factory());
+    add_configurable_factory("chucho::sliding_numbered_file_roller", fact);
 }
 
 std::string configurator::resolve_variables(const std::string& val)

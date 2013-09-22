@@ -20,7 +20,7 @@ namespace chucho
 {
 
 time_file_roller_memento::time_file_roller_memento(const configurator& cfg)
-    : memento(cfg)
+    : file_roller_memento(cfg)
 {
     set_status_origin("tile_file_roller_memento");
     set_handler("file_name_pattern", [this] (const std::string& val) { file_name_pattern_ = val; });

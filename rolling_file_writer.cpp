@@ -29,7 +29,10 @@ rolling_file_writer::rolling_file_writer(std::shared_ptr<formatter> fmt,
       trigger_(trigger)
 {
     init();
-    open(roller_->get_active_file_name());
+    std::string fn = roller_->get_active_file_name();
+    if (fn.empty())
+        throw std::invalid_argument("The file_roller does not provide an initial file name, so a rolling_file_writer constructor without file name cannot be used");
+    open(fn);
 }
 
 // TODO: Support fowarded constructors when Microsoft supports it
@@ -67,7 +70,10 @@ rolling_file_writer::rolling_file_writer(std::shared_ptr<formatter> fmt,
       trigger_(trigger)
 {
     init();
-    open(roller_->get_active_file_name());
+    std::string fn = roller_->get_active_file_name();
+    if (fn.empty())
+        throw std::invalid_argument("The file_roller does not provide an iniital file name, so a rolling_file_writer constructor without file name cannot be used");
+    open(fn);
 }
 
 void rolling_file_writer::init()

@@ -20,7 +20,7 @@ namespace chucho
 {
 
 numbered_file_roller_memento::numbered_file_roller_memento(const configurator& cfg)
-    : memento(cfg)
+    : file_roller_memento(cfg)
 {
     set_status_origin("numbered_file_roller_memento");
     set_handler("min_index", [this] (const std::string& idx) { min_index_ = std::stoi(idx); });

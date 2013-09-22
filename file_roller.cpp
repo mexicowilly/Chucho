@@ -20,8 +20,9 @@
 namespace chucho
 {
 
-file_roller::file_roller()
-    : file_writer_(nullptr)
+file_roller::file_roller(std::shared_ptr<file_compressor> cmp)
+    : file_writer_(nullptr),
+      compressor_(cmp)
 {
 }
 

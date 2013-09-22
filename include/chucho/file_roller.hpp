@@ -20,6 +20,7 @@
 #include <chucho/status_reporter.hpp>
 #include <chucho/configurable.hpp>
 #include <chucho/non_copyable.hpp>
+#include <chucho/file_compressor.hpp>
 #include <string>
 
 namespace chucho
@@ -48,7 +49,7 @@ public:
     /**
      * Construct a file roller.
      */
-    file_roller();
+    file_roller(std::shared_ptr<file_compressor> cmp = std::shared_ptr<file_compressor>());
     //@}
 
     /**
@@ -58,6 +59,13 @@ public:
      * @return the file name
      */
     virtual std::string get_active_file_name() = 0;
+    /**
+     * Return the @ref file_compressor associated with this roller, 
+     * if there is on. 
+     * 
+     * @return the @ref file_compressor
+     */
+    std::shared_ptr<file_compressor> get_file_compressor() const;
     /**
      * Roll the files.
      */
@@ -84,7 +92,17 @@ protected:
      * invalid. 
      */
     file_writer* file_writer_;
+    /**
+     * The @ref file_compressor used by this roller, if there is 
+     * one. 
+     */
+    std::shared_ptr<file_compressor> compressor_;
 };
+
+inline std::shared_ptr<file_compressor> file_roller::get_file_compressor() const
+{
+    return compressor_;
+}
 
 }
 

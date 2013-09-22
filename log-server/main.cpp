@@ -20,16 +20,19 @@
 #include "socket_life_cycle.hpp"
 #include <chucho/finalize.hpp>
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 
 using namespace chucho::server;
 
-int main()
+int main(int argc, char* argv[])
 {
     try
     {
         socket_life_cycle slf;
         properties props;
+        if (argc == 2 && std::strcmp(argv[1], "--service") == 0)
+            props.handle_config_value("service", "true");
         log::configure(props);
         suzerain lord(props);
         std::shared_ptr<chucho::logger> lgr(chucho::logger::get("chuchod"));

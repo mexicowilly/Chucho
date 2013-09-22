@@ -17,6 +17,8 @@
 #if !defined(CHUCHO_NON_COPYABLE_HPP__)
 #define CHUCHO_NON_COPYABLE_HPP__
 
+#include <chucho/export.hpp>
+
 namespace chucho
 {
 
@@ -29,7 +31,7 @@ namespace chucho
  *  
  * @ingroup miscellaneous 
  */
-class non_copyable
+class CHUCHO_EXPORT non_copyable
 {
 public:
     non_copyable() { }

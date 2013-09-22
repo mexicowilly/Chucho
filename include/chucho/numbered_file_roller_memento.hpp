@@ -21,13 +21,13 @@
 #error "This header is private"
 #endif
 
-#include <chucho/memento.hpp>
+#include <chucho/file_roller_memento.hpp>
 #include <chucho/optional.hpp>
 
 namespace chucho
 {
 
-class numbered_file_roller_memento : public memento
+class numbered_file_roller_memento : public file_roller_memento
 {
 public:
     numbered_file_roller_memento(const configurator& cfg);

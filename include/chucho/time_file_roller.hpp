@@ -77,9 +77,11 @@ public:
      * @param file_name_pattern the file name pattern
      * @param max_history the maximum number of files to be retained 
      *                    in the rolling history
+     * @param cmp the @ref file_compressor
      */
     time_file_roller(const std::string& file_name_pattern,
-                     std::size_t max_history);
+                     std::size_t max_history,
+                     std::shared_ptr<file_compressor> cmp = std::shared_ptr<file_compressor>());
     //@}
 
     virtual std::string get_active_file_name() override;
@@ -127,7 +129,6 @@ private:
                        const std::string& active_file_name);
         std::size_t periods_elapsed(const time_type& first, const time_type& last);
         std::size_t periods_since_last(const time_type& now);
-        time_type relative(const time_type& t, int period_offset);
 
         time_file_roller& roller_;
         int oldest_period_offset_;
@@ -138,6 +139,7 @@ private:
     CHUCHO_NO_EXPORT std::string find_time_spec(const std::string& str,
                                                 std::size_t& start,
                                                 std::size_t& end) const;
+    CHUCHO_NO_EXPORT time_type relative(const time_type& t, int period_offset);
     CHUCHO_NO_EXPORT std::string resolve_file_name(const time_type& tm) const;
     CHUCHO_NO_EXPORT void set_period();
 

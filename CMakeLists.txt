@@ -15,18 +15,18 @@
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.10)
-PROJECT(CHUCHO CXX C)
+PROJECT(chucho CXX C)
+
+SET(CHUCHO_VERSION 1.3)
+SET(CHUCHO_SO_VERSION 1)
+# This is used for release candidate distros
+SET(CHUCHO_DIST_VERSION try-1)
 
 INCLUDE(Configure.cmake)
 
 # Include CMAKE_BINARY_DIR because that's where the generated file
 # export.hpp lives.
 INCLUDE_DIRECTORIES(include embedded/include "${CMAKE_BINARY_DIR}")
-
-SET(CHUCHO_VERSION 1.2)
-SET(CHUCHO_SO_VERSION 1)
-# This is used for release candidate distros
-# SET(CHUCHO_DIST_VERSION try-2)
 
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
@@ -40,6 +40,30 @@ IF(CHUCHO_POSIX)
         platform/posix/socket_connector_posix.cpp
         platform/posix/socket_exception_posix.cpp
         platform/posix/syslog_writer_posix.cpp)
+
+    IF(CHUCHO_HAVE_GMTIME_R)
+        SET_SOURCE_FILES_PROPERTIES(platform/posix/calendar_posix.cpp PROPERTIES
+                                    COMPILE_DEFINITIONS CHUCHO_HAVE_GMTIME_R)
+    ENDIF()
+    IF(CHUCHO_HAVE_LOCALTIME_R)
+        GET_SOURCE_FILE_PROPERTY(CHUCHO_CALENDAR_DEFS platform/posix/calendar_posix.cpp COMPILE_DEFINITIONS)
+        SET_SOURCE_FILES_PROPERTIES(platform/posix/calendar_posix.cpp PROPERTIES
+                                    COMPILE_DEFINITIONS "${CHUCHO_CALENDAR_DEFS};CHUCHO_HAVE_LOCALTIME_R")
+    ENDIF()
+    IF(CHUCHO_NO_FTS)
+        SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
+                                    COMPILE_DEFINITIONS CHUCHO_NO_FTS)
+    ENDIF()
+    IF(CHUCHO_DIRENT_NEEDS_NAME)
+        GET_SOURCE_FILE_PROPERTY(CHUCHO_FILE_DEFS platform/posix/file_posix.cpp COMPILE_DEFINITIONS)
+        SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
+                                    COMPILE_DEFINITIONS "${CHUCHO_FILE_DEFS};CHUCHO_DIRENT_NEEDS_NAME")
+    ENDIF()
+    IF(CHUCHO_HAVE_PUT_TIME)
+        GET_SOURCE_FILE_PROPERTY(CHUCHO_CALENDAR_DEFS platform/posix/calendar_posix.cpp COMPILE_DEFINITIONS)
+        SET_SOURCE_FILES_PROPERTIES(platform/posix/calendar_posix.cpp PROPERTIES
+                                    COMPILE_DEFINITIONS "${CHUCHO_CALENDAR_DEFS};CHUCHO_HAVE_PUT_TIME")
+    ENDIF()
 ELSEIF(CHUCHO_WINDOWS)
     SET(CHUCHO_PLATFORM_SOURCES
         platform/windows/calendar_windows.cpp
@@ -64,6 +88,7 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
 ENDIF()
 
 SET(CHUCHO_PUBLIC_HEADERS
+    include/chucho/async_writer.hpp
     include/chucho/cerr_writer.hpp
     include/chucho/configurable.hpp
     include/chucho/configurable_factory.hpp
@@ -76,7 +101,11 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/event.hpp
     include/chucho/exception.hpp
     "${CMAKE_BINARY_DIR}/chucho/export.hpp"
+    include/chucho/file_compressor.hpp
+    include/chucho/file_compressor_factory.hpp
+    include/chucho/file_compressor_memento.hpp
     include/chucho/file_roller.hpp
+    include/chucho/file_roller_memento.hpp
     include/chucho/file_roll_trigger.hpp
     include/chucho/file_writer.hpp
     include/chucho/filter.hpp
@@ -90,12 +119,14 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/marker.hpp
     include/chucho/memento.hpp
     include/chucho/non_copyable.hpp
+    include/chucho/noop_file_compressor.hpp
     include/chucho/numbered_file_roller.hpp
 	include/chucho/optional.hpp
     include/chucho/pattern_formatter.hpp
     include/chucho/remote_writer.hpp
     include/chucho/rolling_file_writer.hpp
     include/chucho/size_file_roll_trigger.hpp
+    include/chucho/sliding_numbered_file_roller.hpp
     include/chucho/status.hpp
     include/chucho/status_manager.hpp
     include/chucho/status_observer.hpp
@@ -103,10 +134,23 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/syslog_constants.hpp
     include/chucho/syslog_writer.hpp
     include/chucho/time_file_roller.hpp
+    "${CMAKE_BINARY_DIR}/chucho/version.hpp"
     include/chucho/writer.hpp
     include/chucho/writer_factory.hpp
     include/chucho/writer_memento.hpp
     include/chucho/yaml_formatter.hpp)
+
+IF(CHUCHO_HAVE_ZLIB)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.hpp)
+ENDIF()
+
+IF(CHUCHO_HAVE_BZIP2)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/bzip2_file_compressor.hpp)
+ENDIF()
+
+IF(CHUCHO_HAVE_MINIZIP)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/zip_file_compressor.hpp)
+ENDIF()
 
 # Update this when you rev libyaml
 SET(CHUCHO_LIBYAML_VERSION_MAJOR 0)
@@ -121,14 +165,19 @@ SET(CHUCHO_EMBEDDED_SOURCES
     embedded/libyaml/reader.c
     embedded/libyaml/scanner.c)
 
+IF(ENABLE_SHARED)
+    SET(CHUCHO_DECLARE_YAML YAML_DECLARE_EXPORT)
+ELSE()
+    SET(CHUCHO_DECLARE_YAML YAML_DECLARE_STATIC)
+ENDIF()
 SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/api.c PROPERTIES
-                            COMPILE_DEFINITIONS "YAML_VERSION_MAJOR=${CHUCHO_LIBYAML_VERSION_MAJOR};YAML_VERSION_MINOR=${CHUCHO_LIBYAML_VERSION_MINOR};YAML_VERSION_PATCH=${CHUCHO_LIBYAML_VERSION_PATCH};YAML_VERSION_STRING=\"${CHUCHO_LIB_YAML_VERSION_MAJOR}.${CHUCHO_LIBYAML_VERSION_MINOR}.${CHUCHO_LIBYAML_VERSION_PATCH}\";YAML_DECLARE_STATIC")
+                            COMPILE_DEFINITIONS "YAML_VERSION_MAJOR=${CHUCHO_LIBYAML_VERSION_MAJOR};YAML_VERSION_MINOR=${CHUCHO_LIBYAML_VERSION_MINOR};YAML_VERSION_PATCH=${CHUCHO_LIBYAML_VERSION_PATCH};YAML_VERSION_STRING=\"${CHUCHO_LIB_YAML_VERSION_MAJOR}.${CHUCHO_LIBYAML_VERSION_MINOR}.${CHUCHO_LIBYAML_VERSION_PATCH}\";${CHUCHO_DECLARE_YAML}")
 SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/loader.c
                             embedded/libyaml/parser.c
                             embedded/libyaml/reader.c
                             embedded/libyaml/scanner.c
                             PROPERTIES
-                            COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
+                            COMPILE_DEFINITIONS ${CHUCHO_DECLARE_YAML})
 IF(MSVC)
     # Microsoft doesn't want libyaml to use strdup
     SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/api.c PROPERTIES
@@ -145,6 +194,10 @@ IF(CMAKE_C_COMPILER_ID STREQUAL Clang)
 ENDIF()
 
 SET(CHUCHO_SOURCES
+    async_writer.cpp
+    async_writer_factory.cpp
+    async_writer_memento.cpp
+    bzip2_file_compressor_factory.cpp
     cerr_writer.cpp
     cerr_writer_factory.cpp
     cerr_writer_memento.cpp
@@ -164,13 +217,17 @@ SET(CHUCHO_SOURCES
     duplicate_message_filter_memento.cpp
     event.cpp
     exception.cpp
+    file_compressor_factory.cpp
+    file_compressor_memento.cpp
     file_exception.cpp
     file_roller.cpp
+    file_roller_memento.cpp
     file_writer.cpp
     file_writer_factory.cpp
     file_writer_memento.cpp
     finalize.cpp
     garbage_cleaner.cpp
+    gzip_file_compressor_factory.cpp
     host.cpp
     level.cpp
     level_filter.cpp
@@ -184,6 +241,7 @@ SET(CHUCHO_SOURCES
     logger_memento.cpp
     marker.cpp
     memento.cpp
+    noop_file_compressor.cpp
     numbered_file_roller.cpp
     numbered_file_roller_factory.cpp
     numbered_file_roller_memento.cpp
@@ -201,6 +259,9 @@ SET(CHUCHO_SOURCES
     size_file_roll_trigger.cpp
     size_file_roll_trigger_factory.cpp
     size_file_roll_trigger_memento.cpp
+    sliding_numbered_file_roller.cpp
+    sliding_numbered_file_roller_factory.cpp
+    sliding_numbered_file_roller_memento.cpp
     status.cpp
     status_manager.cpp
     status_observer.cpp
@@ -218,6 +279,10 @@ SET(CHUCHO_SOURCES
     writer_memento.cpp
     yaml_configurator.cpp
     yaml_formatter.cpp
+    zip_file_compressor_factory.cpp
+    include/chucho/async_writer_factory.hpp
+    include/chucho/async_writer_memento.hpp
+    include/chucho/bzip2_file_compressor_factory.hpp
     include/chucho/calendar.hpp
     include/chucho/cerr_writer_factory.hpp
     include/chucho/cerr_writer_memento.hpp
@@ -233,6 +298,7 @@ SET(CHUCHO_SOURCES
     include/chucho/file.hpp
     include/chucho/file_exception.hpp
     include/chucho/garbage_cleaner.hpp
+    include/chucho/gzip_file_compressor_factory.hpp
     include/chucho/host.hpp
     include/chucho/level_filter_factory.hpp
     include/chucho/level_filter_memento.hpp
@@ -253,6 +319,8 @@ SET(CHUCHO_SOURCES
     include/chucho/rolling_file_writer_memento.hpp
     include/chucho/size_file_roll_trigger_factory.hpp
     include/chucho/size_file_roll_trigger_memento.hpp
+    include/chucho/sliding_numbered_file_roller_factory.hpp
+    include/chucho/sliding_numbered_file_roller_memento.hpp
     include/chucho/socket_connector.hpp
     include/chucho/socket_exception.hpp
     include/chucho/status.hpp
@@ -265,12 +333,92 @@ SET(CHUCHO_SOURCES
     include/chucho/time_file_roller_memento.hpp
     include/chucho/utf8.hpp
     include/chucho/yaml_configurator.hpp
+    include/chucho/zip_file_compressor_factory.hpp
     ${CHUCHO_PLATFORM_SOURCES}
     ${CHUCHO_EMBEDDED_SOURCES}
     ${CHUCHO_PUBLIC_HEADERS})
 
 SET_SOURCE_FILES_PROPERTIES(yaml_configurator.cpp PROPERTIES
                             COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
+
+IF(CHUCHO_HAVE_ARPA_INET_H)
+    SET_SOURCE_FILES_PROPERTIES(remote_writer.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_HAVE_ARPA_INET_H)
+ENDIF()
+
+IF(CHUCHO_HAVE_WINSOCK2_H)
+    GET_SOURCE_FILE_PROPERTY(CHUCHO_REMOTE_WRITER_DEFS remote_writer.cpp COMPILE_DEFINITIONS)
+    SET_SOURCE_FILES_PROPERTIES(remote_writer.cpp PROPERTIES
+                                COMPILE_DEFINITIONS "${CHUCHO_REMOTE_WRITER_DEFS};CHUCHO_HAVE_WINSOCK2_H")
+ENDIF()
+
+IF(CHUCHO_HAVE_ZLIB)
+    LIST(APPEND CHUCHO_SOURCES
+         gzip_file_compressor.cpp
+         ${CHUCHO_ZLIB_SOURCES})
+    SET_SOURCE_FILES_PROPERTIES(gzip_file_compressor_factory.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_HAVE_ZLIB)
+    IF(ZLIB_SOURCE)
+        INCLUDE_DIRECTORIES("${ZLIB_SOURCE}")
+    ELSEIF(ZLIB_INCLUDE_DIR)
+        INCLUDE_DIRECTORIES("${ZLIB_INCLUDE_DIR}")
+    ENDIF()
+    IF(CHUCHO_ZLIB_SOURCES)
+        IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+            SET_SOURCE_FILES_PROPERTIES("${ZLIB_SOURCE}/gzlib.c"
+                                        "${ZLIB_SOURCE}/gzread.c"
+                                        "${ZLIB_SOURCE}/gzwrite.c"
+                                        PROPERTIES
+                                        COMPILE_FLAGS -Wno-implicit-function-declaration)
+        ELSEIF(MSVC)
+            SET_SOURCE_FILES_PROPERTIES("${ZLIB_SOURCE}/gzlib.c"
+                                        "${ZLIB_SOURCE}/gzread.c"
+                                        "${ZLIB_SOURCE}/gzwrite.c"
+                                        PROPERTIES
+                                        COMPILE_FLAGS /wd4996)
+        ENDIF()
+    ENDIF()
+ENDIF()
+
+IF(CHUCHO_HAVE_BZIP2)
+    LIST(APPEND CHUCHO_SOURCES
+         bzip2_file_compressor.cpp
+         ${CHUCHO_BZIP2_SOURCES})
+    SET_SOURCE_FILES_PROPERTIES(bzip2_file_compressor_factory.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_HAVE_BZIP2)
+    IF(BZIP2_SOURCE)
+        INCLUDE_DIRECTORIES("${BZIP2_SOURCE}")
+    ELSEIF(BZIP2_INCLUDE_DIR)
+        INCLUDE_DIRECTORIES("${BZIP2_INCLUDE_DIR}")
+    ENDIF()
+    IF(MSVC)
+        SET_SOURCE_FILES_PROPERTIES(bzip2_file_compressor PROPERTIES
+                                    COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
+        IF(CHUCHO_BZIP2_SOURCES)
+            SET_SOURCE_FILES_PROPERTIES("${BZIP2_SOURCE}/bzlib.c" PROPERTIES
+                                        COMPILE_FLAGS /wd4996)
+        ENDIF()
+    ENDIF()
+ENDIF()
+
+IF(CHUCHO_HAVE_MINIZIP)
+    LIST(APPEND CHUCHO_SOURCES
+         zip_file_compressor.cpp
+         ${CHUCHO_MINIZIP_SOURCES})
+    SET_SOURCE_FILES_PROPERTIES(zip_file_compressor_factory.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_HAVE_MINIZIP)
+    INCLUDE_DIRECTORIES("${MINIZIP_SOURCE}")
+    IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+        SET_SOURCE_FILES_PROPERTIES("${MINIZIP_SOURCE}/zip.c"
+                                    PROPERTIES
+                                    COMPILE_FLAGS "-Wno-parentheses-equality -Wno-incompatible-pointer-types")
+        IF(NOT CHUCHO_HAVE_FOPEN64)
+            SET_SOURCE_FILES_PROPERTIES(${CHUCHO_MINIZIP_SOURCES}
+                                        PROPERTIES
+                                        COMPILE_DEFINITIONS USE_FILE32API)
+        ENDIF()
+    ENDIF()
+ENDIF()
 
 IF(ENABLE_SHARED)
     ADD_LIBRARY(chucho SHARED ${CHUCHO_SOURCES})
@@ -302,19 +450,29 @@ IF(CHUCHO_WINDOWS)
     TARGET_LINK_LIBRARIES(chucho ws2_32)
 ENDIF()
 
+IF(ZLIB_LIB_DIR)
+    LINK_DIRECTORIES("${ZLIB_LIB_DIR}")
+    TARGET_LINK_LIBRARIES(chucho z)
+ENDIF()
+
+IF(BZIP2_LIB_DIR)
+    LINK_DIRECTORIES("${BZIP2_LIB_DIR}")
+    TARGET_LINK_LIBRARIES(chucho bz2)
+ENDIF()
+
 ADD_SUBDIRECTORY(test)
 ADD_SUBDIRECTORY(log-server)
 
 # Documentation
 IF(DOXYGEN_FOUND)
-    SET(CHUCHO_DOXYGEN_INPUT \"${CMAKE_SOURCE_DIR}/main_page.hpp\")
+    SET(CHUCHO_DOXYGEN_INPUT "\"${CMAKE_SOURCE_DIR}/main_page.hpp\"")
 	FOREACH(HEAD ${CHUCHO_PUBLIC_HEADERS})
-		SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} \"${CMAKE_SOURCE_DIR}/${HEAD}\"")
+        SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
 	ENDFOREACH()
 	CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/doxygen.conf" "${CMAKE_BINARY_DIR}/doxygen_mod.conf")
 	ADD_CUSTOM_TARGET(doc
 					  COMMAND "${DOXYGEN_EXECUTABLE}" "${CMAKE_BINARY_DIR}/doxygen_mod.conf"
-					  WORKING_DIRECTORY "${CHUCHO_SOURCE_DIR}")
+					  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 ELSE()
 	ADD_CUSTOM_TARGET(doc
 					  COMMAND "${CMAKE_COMMAND}" -E echo "Doxygen was not found on this system, so the documentation cannot be generated")
@@ -339,8 +497,9 @@ ENDIF()
 # Distro
 FILE(GLOB_RECURSE CHUCHO_SOURCES RELATIVE "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/*")
 FILE(RELATIVE_PATH CHUCHO_REL_BINARY_DIR "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
+UNSET(CHUCHO_TO_REMOVE)
 FOREACH(SRC ${CHUCHO_SOURCES})
-    IF(SRC MATCHES "^${CHUCHO_REL_BINARY_DIR}" OR SRC MATCHES ".git" OR SRC MATCHES ".DS_Store")
+    IF(SRC MATCHES "^${CHUCHO_REL_BINARY_DIR}/" OR SRC MATCHES "\\.git" OR SRC MATCHES ".DS_Store$")
         LIST(APPEND CHUCHO_TO_REMOVE "${SRC}")
     ENDIF()
 ENDFOREACH()
@@ -359,5 +518,10 @@ FOREACH(SRC ${CHUCHO_SOURCES})
                        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 ENDFOREACH()
 ADD_CUSTOM_TARGET(dist
-                  COMMAND "${CMAKE_COMMAND}" -E tar czvf "${CHUCHO_DIST_NAME_BASE}.tar.gz" "${CHUCHO_DIST_NAME_BASE}"
+                  COMMAND "${CMAKE_COMMAND}" -E tar czvf ${CHUCHO_DIST_NAME_BASE}.tar.gz ${CHUCHO_DIST_NAME_BASE}
                   DEPENDS ${CHUCHO_DIST_OUTPUT})
+IF(CHUCHO_ZIP)
+    ADD_CUSTOM_TARGET(zdist
+                      COMMAND "${CHUCHO_ZIP}" --recurse-paths --to-crlf ${CHUCHO_DIST_NAME_BASE}.zip ${CHUCHO_DIST_NAME_BASE}
+                      DEPENDS ${CHUCHO_DIST_OUTPUT})
+ENDIF()

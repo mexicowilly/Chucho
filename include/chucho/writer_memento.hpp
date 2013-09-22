@@ -37,11 +37,16 @@ class CHUCHO_EXPORT writer_memento : public memento
 {
 public:
     /**
+     * @name Constructor
+     */
+    //@{
+    /**
      * Construct a writer_memento.
      * 
      * @param cfg the configurator that is perform configuration
      */
     writer_memento(const configurator& cfg);
+    //@}
 
     /**
      * Return the filters that have been discovered during 
