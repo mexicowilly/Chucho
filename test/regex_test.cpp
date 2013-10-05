@@ -77,3 +77,17 @@ TEST(regex, search)
     chucho::regex::expression re("d.g");
     EXPECT_TRUE(chucho::regex::search("my dog has fleas", re));
 }
+
+TEST(regex, search_with_match)
+{
+    chucho::regex::expression re("^.*(d.g).*(f.*s)$");
+    chucho::regex::match mch;
+    ASSERT_TRUE(chucho::regex::search("my dog has fleas", re, mch));
+    ASSERT_TRUE(mch.size() == 3);
+    EXPECT_EQ(3, mch[0].begin());
+    EXPECT_EQ(13, mch[0].length());
+    EXPECT_EQ(3, mch[1].begin());
+    EXPECT_EQ(3, mch[1].length());
+    EXPECT_EQ(11, mch[2].begin());
+    EXPECT_EQ(5, mch[2].length());
+}

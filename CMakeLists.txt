@@ -248,6 +248,7 @@ SET(CHUCHO_SOURCES
     pattern_formatter.cpp
     pattern_formatter_factory.cpp
     pattern_formatter_memento.cpp
+    properties.cpp
     regex.cpp
     regex_exception.cpp
     remote_writer.cpp
@@ -311,6 +312,7 @@ SET(CHUCHO_SOURCES
     include/chucho/numbered_file_roller_memento.hpp
     include/chucho/pattern_formatter_factory.hpp
     include/chucho/pattern_formatter_memento.hpp
+    include/chucho/properties.hpp
     include/chucho/regex.hpp
     include/chucho/regex_exception.hpp
     include/chucho/remote_writer_factory.hpp

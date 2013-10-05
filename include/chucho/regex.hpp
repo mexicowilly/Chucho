@@ -65,6 +65,7 @@ public:
 
 protected:
     friend class iterator;
+    friend bool search(const std::string& text, expression& re, match& mch);
 
 private:
     std::vector<sub_match> subs_;
@@ -91,6 +92,7 @@ private:
 
 CHUCHO_EXPORT std::string replace(const std::string& text, expression& re, const std::string& rep);
 CHUCHO_EXPORT bool search(const std::string& text, expression& re);
+CHUCHO_EXPORT bool search(const std::string& text, expression& re, match& mch);
 
 inline sub_match::sub_match(int begin, std::size_t length)
     : begin_(begin),

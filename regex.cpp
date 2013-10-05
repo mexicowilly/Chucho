@@ -130,6 +130,29 @@ bool search(const std::string& text, expression& re)
     return trex_search(re.trex_, text.c_str(), &found, &last) == TRex_True;
 }
 
+bool search(const std::string& text, expression& re, match& mch)
+{
+    const char* found;
+    const char* last;
+    mch.subs_.clear();
+    if (trex_search(re.trex_, text.c_str(), &found, &last))
+    {
+	TRexMatch m;
+	for (int i = 0; i < trex_getsubexpcount(re.trex_); i++)
+	{
+	    if (trex_getsubexp(re.trex_, i, &m))
+	    {
+		if (m.len == 0)
+		    mch.subs_.push_back(sub_match(-1, 0));
+		else
+		    mch.subs_.push_back(sub_match(m.begin - text.c_str(), m.len));
+	    }
+	}
+	return true;
+    }
+    return false;
+}
+
 }
 
 }
