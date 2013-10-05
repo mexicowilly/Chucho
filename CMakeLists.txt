@@ -20,7 +20,7 @@ PROJECT(chucho CXX C)
 SET(CHUCHO_VERSION 1.3)
 SET(CHUCHO_SO_VERSION 1)
 # This is used for release candidate distros
-SET(CHUCHO_DIST_VERSION try-1)
+# SET(CHUCHO_DIST_VERSION try-1)
 
 INCLUDE(Configure.cmake)
 
