@@ -87,13 +87,16 @@ iterator::iterator(const std::string& text, expression& re)
 {
 #if defined(CHUCHO_HAVE_STD_REGEX)
       pimpl_->itor_ = std::sregex_iterator(text_.begin(), text_.end(), re.pimpl_->re_);
-      std::smatch mch = *pimpl_->itor_;
-      for (int i = 0; i < mch.size(); i++)
+      if (pimpl_->itor_ != std::sregex_iterator())
       {
-	  if (mch[i].matched)
-	      match_.subs_.push_back(sub_match(mch.position(i), mch.length(i)));
-	  else
-	      match_.subs_.push_back(sub_match(-1, 0));
+          std::smatch mch = *pimpl_->itor_;
+          for (unsigned i = 0; i < mch.size(); i++)
+          {
+              if (mch[i].matched)
+                  match_.subs_.push_back(sub_match(mch.position(i), mch.length(i)));
+              else
+                  match_.subs_.push_back(sub_match(-1, 0));
+          }
       }
 #elif defined(CHUCHO_HAVE_POSIX_REGEX)
       pimpl_->re_ = &re;
@@ -149,13 +152,16 @@ iterator& iterator::operator++ ()
 {
     match_.subs_.clear();
 #if defined(CHUCHO_HAVE_STD_REGEX)
-    std::smatch mch = *++pimpl_->itor_;
-    for (int i = 0; i < mch.size(); i++)
+    if (++pimpl_->itor_ != std::sregex_iterator())
     {
-	if (mch[i].matched)
-	    match_.subs_.push_back(sub_match(mch.position(i), mch.length(i)));
-	else
-	    match_.subs_.push_back(sub_match(-1, 0));
+        std::smatch mch = *pimpl_->itor_;
+        for (unsigned i = 0; i < mch.size(); i++)
+        {
+        if (mch[i].matched)
+            match_.subs_.push_back(sub_match(mch.position(i), mch.length(i)));
+        else
+            match_.subs_.push_back(sub_match(-1, 0));
+        }
     }
 #elif defined(CHUCHO_HAVE_POSIX_REGEX)
     if (pimpl_->re_ && pimpl_->offset_ < text_.length())
@@ -225,7 +231,7 @@ bool search(const std::string& text, expression& re, match& mch)
     std::smatch res;
     if (std::regex_search(text, res, re.pimpl_->re_))
     {
-	for (int i = 0; i < res.size(); i++)
+	for (unsigned i = 0; i < res.size(); i++)
 	{
 	    if (res[i].matched)
 		mch.subs_.push_back(sub_match(res.position(i), res.length(i)));
