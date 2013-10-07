@@ -114,7 +114,7 @@ void configurator::initialize()
 
 std::string configurator::resolve_variables(const std::string& val)
 {
-    static regex::expression re("\\$([Ee][Nn][Vv])?\\{(.+)\\}");
+    static regex::expression re("\\$([Ee][Nn][Vv])?\\{([^{]+)\\}");
 
     std::string result(val);
     int pos_offset = 0;

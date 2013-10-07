@@ -158,7 +158,6 @@ SET(CHUCHO_LIBYAML_VERSION_MINOR 1)
 SET(CHUCHO_LIBYAML_VERSION_PATCH 4)
 
 SET(CHUCHO_EMBEDDED_SOURCES
-    embedded/trex/trex.c
     embedded/libyaml/api.c
     embedded/libyaml/loader.c
     embedded/libyaml/parser.c
@@ -182,15 +181,6 @@ IF(MSVC)
     # Microsoft doesn't want libyaml to use strdup
     SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/api.c PROPERTIES
                                 COMPILE_FLAGS /wd4996)
-    # If _DEBUG is defined, which it is by CMake here with Microsoft's
-    # compiler, then trex likes to print all kinds of unhelpful things
-    # to stdout. 
-    SET_SOURCE_FILES_PROPERTIES(embedded/trex/trex.c PROPERTIES
-                                COMPILE_FLAGS /U_DEBUG)
-ENDIF()
-IF(CMAKE_C_COMPILER_ID STREQUAL Clang)
-    SET_SOURCE_FILES_PROPERTIES(embedded/trex/trex.c PROPERTIES
-                                COMPILE_FLAGS "-Wno-logical-op-parentheses -Wno-unused-value")
 ENDIF()
 
 SET(CHUCHO_SOURCES
@@ -352,6 +342,16 @@ IF(CHUCHO_HAVE_WINSOCK2_H)
     GET_SOURCE_FILE_PROPERTY(CHUCHO_REMOTE_WRITER_DEFS remote_writer.cpp COMPILE_DEFINITIONS)
     SET_SOURCE_FILES_PROPERTIES(remote_writer.cpp PROPERTIES
                                 COMPILE_DEFINITIONS "${CHUCHO_REMOTE_WRITER_DEFS};CHUCHO_HAVE_WINSOCK2_H")
+ENDIF()
+
+IF(CHUCHO_HAVE_STD_REGEX)
+    SET_SOURCE_FILES_PROPERTIES(regex.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_HAVE_STD_REGEX)
+ELSEIF(CHUCHO_HAVE_POSIX_REGEX)
+    SET_SOURCE_FILES_PROPERTIES(regex.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_HAVE_POSIX_REGEX)
+ELSE()
+    MESSAGE(FATAL_ERROR "You don't have regular expressions")
 ENDIF()
 
 IF(CHUCHO_HAVE_ZLIB)

@@ -345,6 +345,56 @@ ENDIF()
 CHECK_CXX_SOURCE_COMPILES("#include <iomanip>\nint main() { std::tm t; std::put_time(&t, \\\"%Y\\\"); return 0; }"
                           CHUCHO_HAVE_PUT_TIME)
 
+# Regular expressions
+CHECK_INCLUDE_FILE_CXX(regex CHUCHO_HAVE_STD_REGEX_HEADER)
+IF(CHUCHO_HAVE_STD_REGEX_HEADER)
+    # Clang's 4.2.1 std::regex library has a bug where it doesn't match properly
+    # when you make a regex ungreedy by matching against everything but the
+    # start of the regex.
+    CHECK_CXX_SOURCE_RUNS("
+#include <regex>
+#include <fstream>
+#include <iostream>
+int main()
+{
+    std::ofstream out(\"std-regex-result\");
+    std::regex re(\"\\\\\\\\$([Ee][Nn][Vv])?\\\\\\\\{([^{]+)\\\\\\\\}\", std::regex_constants::extended);
+    std::smatch m;
+    std::string s(\"I \\\${HAVE} one and \\\$ENV{it} looks good.\");
+    if (std::regex_search(s, m, re) &&
+        m.size() == 3 &&
+        m.position(0) == 2 &&
+        m.length(0) == 7 &&
+        !m[1].matched &&
+        m.position(2) == 4 &&
+        m.length(2) == 4)
+    {
+        out << \"good\";
+    }
+    else
+    {
+        out << \"buggy\";
+    }
+    return EXIT_SUCCESS;
+}" CHUCHO_HAVE_STD_REGEX_RUNS)
+    IF(CHUCHO_HAVE_STD_REGEX_RUNS)
+        FILE(READ "${CMAKE_BINARY_DIR}/std-regex-result" CHUCHO_STD_REGEX_RESULT)
+        IF(CHUCHO_STD_REGEX_RESULT STREQUAL good)
+            SET(CHUCHO_HAVE_STD_REGEX TRUE)
+        ENDIF()
+    ENDIF()
+ENDIF()
+# Do not else this
+IF(NOT CHUCHO_HAVE_STD_REGEX)
+    CHECK_INCLUDE_FILE_CXX(regex.h CHUCHO_HAVE_POSIX_REGEX)
+    FOREACH(SYM regcomp regerror regexec regfree REG_EXTENDED)
+        CHECK_CXX_SYMBOL_EXISTS(${SYM} regex.h CHUCHO_HAVE_${SYM})
+        IF(NOT CHUCHO_HAVE_${SYM})
+            MESSAGE(FATAL_ERROR "${SYM} is required")
+        ENDIF()
+    ENDFOREACH()
+ENDIF()
+
 # doxygen
 FIND_PACKAGE(Doxygen)
 
