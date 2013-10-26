@@ -53,6 +53,27 @@ void memento::handle(std::shared_ptr<configurable> cnf)
         demangle::get_demangled_name(typeid(*cnf)));
 }
 
+void memento::set_alias(const std::string& key, const std::string& alias)
+{
+    auto found = handlers_.find(key);
+    if (found == handlers_.end())
+        unconnected_aliases_.emplace(key, alias);
+    else
+        handlers_[key] = found->second;
+}
+
+void memento::set_handler(const std::string& key, handler hand)
+{
+    handlers_[key] = hand;
+    auto range = unconnected_aliases_.equal_range(key);
+    while (range.first != range.second)
+    {
+        handlers_[range.first->second] = hand;
+        ++range.first;
+    }
+    unconnected_aliases_.erase(key);
+}
+
 std::string memento::to_lower(const std::string& value) const
 {
     std::string low;

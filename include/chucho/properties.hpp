@@ -21,9 +21,11 @@
 #error "This header is private"
 #endif
 
+#include <chucho/optional.hpp>
 #include <string>
 #include <map>
 #include <istream>
+#include <utility>
 
 namespace chucho
 {
@@ -31,18 +33,21 @@ namespace chucho
 class properties
 {
 public:
-    typedef std::map<std::string, std::string>::const_iterator const_iterator;
+    typedef std::multimap<std::string, std::string>::const_iterator const_iterator;
 
     properties(std::istream& in);
 
     const_iterator begin() const;
+    bool empty() const;
     const_iterator end() const;
+    std::pair<const_iterator, const_iterator> get(const std::string& key) const;
+    optional<std::string> get_one(const std::string& key) const;
     properties get_subset(const std::string prefix) const;
 
 private:
     properties();
 
-    std::map<std::string, std::string> props_;
+    std::multimap<std::string, std::string> props_;
 };
 
 inline properties::const_iterator properties::begin() const
@@ -50,9 +55,19 @@ inline properties::const_iterator properties::begin() const
     return props_.begin();
 }
 
+inline bool properties::empty() const
+{
+    return props_.empty();
+}
+
 inline properties::const_iterator properties::end() const
 {
     return props_.end();
+}
+
+inline std::pair<properties::const_iterator, properties::const_iterator> properties::get(const std::string& key) const
+{
+    return props_.equal_range(key);
 }
 
 }

@@ -26,34 +26,46 @@ properties::properties()
 
 properties::properties(std::istream& in)
 {
-    regex::expression re("^[ \\t]*([^ \\t]+)[ \\t]*=[ \\t]*(.*)$");
+    regex::expression re("^[ \t]*([^ \t]+)[ \t]*=[ \t]*(.*)$");
     regex::match mch;
     std::string line;
     while (std::getline(in, line))
     {
-	if (!line.empty() && line.back() == '\r')
-	    line.pop_back();
-	if (regex::search(line, re, mch))
-	{
-	    std::string k = line.substr(mch[1].begin(), mch[1].length());
-	    if (k[0] != '#')
-	    {
-		std::string v;
-		if (mch.size() == 3)
-		    v = line.substr(mch[2].begin(), mch[2].length());
-		props_[k] = v;
-	    }
-	}
+        if (!line.empty() && line.back() == '\r')
+            line.pop_back();
+        if (regex::search(line, re, mch))
+        {
+            if (mch.size() >= 2 && mch[1].begin() != -1)
+            {
+                std::string k = line.substr(mch[1].begin(), mch[1].length()); 
+                if (!k.empty() && k[0] != '#')
+                {
+                    std::string v;
+                    if (mch.size() == 3 && mch[2].begin() != -1)
+                    v = line.substr(mch[2].begin(), mch[2].length());
+                    props_.emplace(k, v);
+                }
+            }
+        }
     }
+}
+
+optional<std::string> properties::get_one(const std::string& key) const
+{
+    optional<std::string> result;
+    auto found = props_.equal_range(key);
+    if (found.first != found.second)
+        result = found.first->second;
+    return result;
 }
 
 properties properties::get_subset(const std::string prefix) const
 {
     properties result;
-    for (const std::map<std::string, std::string>::value_type& i : props_)
+    for (const std::multimap<std::string, std::string>::value_type& i : props_)
     {
-	if (i.first.find(prefix) == 0)
-	    result.props_[i.first.substr(prefix.length())] = i.second;
+        if (i.first.find(prefix) == 0)
+            result.props_.emplace(i.first.substr(prefix.length()), i.second);
     }
     return result;
 }

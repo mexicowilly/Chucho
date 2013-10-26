@@ -121,7 +121,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/non_copyable.hpp
     include/chucho/noop_file_compressor.hpp
     include/chucho/numbered_file_roller.hpp
-	include/chucho/optional.hpp
+    include/chucho/optional.hpp
     include/chucho/pattern_formatter.hpp
     include/chucho/remote_writer.hpp
     include/chucho/rolling_file_writer.hpp
@@ -196,6 +196,7 @@ SET(CHUCHO_SOURCES
     configurable_factory.cpp
     configuration.cpp
     configurator.cpp
+    config_file_configurator.cpp
     console_writer.cpp
     cout_writer.cpp
     cout_writer_factory.cpp
@@ -279,6 +280,7 @@ SET(CHUCHO_SOURCES
     include/chucho/cerr_writer_memento.hpp
     include/chucho/clock_util.hpp
     include/chucho/configurator.hpp
+    include/chucho/config_file_configurator.hpp
     include/chucho/cout_writer_factory.hpp
     include/chucho/cout_writer_memento.hpp
     include/chucho/demangle.hpp
@@ -468,16 +470,30 @@ ADD_SUBDIRECTORY(log-server)
 # Documentation
 IF(DOXYGEN_FOUND)
     SET(CHUCHO_DOXYGEN_INPUT "\"${CMAKE_SOURCE_DIR}/main_page.hpp\"")
-	FOREACH(HEAD ${CHUCHO_PUBLIC_HEADERS})
-        SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
-	ENDFOREACH()
-	CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/doxygen.conf" "${CMAKE_BINARY_DIR}/doxygen_mod.conf")
-	ADD_CUSTOM_TARGET(doc
-					  COMMAND "${DOXYGEN_EXECUTABLE}" "${CMAKE_BINARY_DIR}/doxygen_mod.conf"
-					  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+    IF(CHUCHO_DOCUMENT_ALL)
+        FOREACH(HEAD ${CHUCHO_SOURCES})
+            IF(HEAD MATCHES "^include/chucho/.+\\.hpp$")
+                SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
+            ENDIF()
+        ENDFOREACH()
+        FILE(GLOB CHUCHO_GENERATED_HEADERS RELATIVE "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/chucho/*.hpp")
+        FOREACH(HEAD ${CHUCHO_GENERATED_HEADERS})
+            SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
+        ENDFOREACH()
+        SET(CHUCHO_DOXYGEN_EXTRACT_ALL YES)
+    ELSE()
+        FOREACH(HEAD ${CHUCHO_PUBLIC_HEADERS})
+            SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
+        ENDFOREACH()
+        SET(CHUCHO_DOXYGEN_EXTRACT_ALL NO)
+    ENDIF()
+    CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/doxygen.conf" "${CMAKE_BINARY_DIR}/doxygen_mod.conf")
+    ADD_CUSTOM_TARGET(doc
+                      COMMAND "${DOXYGEN_EXECUTABLE}" "${CMAKE_BINARY_DIR}/doxygen_mod.conf"
+                      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 ELSE()
-	ADD_CUSTOM_TARGET(doc
-					  COMMAND "${CMAKE_COMMAND}" -E echo "Doxygen was not found on this system, so the documentation cannot be generated")
+    ADD_CUSTOM_TARGET(doc
+                      COMMAND "${CMAKE_COMMAND}" -E echo "Doxygen was not found on this system, so the documentation cannot be generated")
 ENDIF()
 
 # Static analysis

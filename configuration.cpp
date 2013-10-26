@@ -44,6 +44,7 @@ struct static_data
     chucho::configuration::unknown_handler_type unknown_handler_;
     std::string loaded_file_name_;
     bool is_configured;
+    chucho::configuration::format format_;
 };
 
 static_data::static_data()
@@ -51,7 +52,8 @@ static_data::static_data()
       file_name_(std::string(1, '.') + chucho::file::dir_sep + std::string("chucho.yaml")),
       allow_default_config_(true),
       environment_variable_("CHUCHO_CONFIG"),
-      is_configured(false)
+      is_configured(false),
+      format_(chucho::configuration::format::CHUCHO_YAML)
 {
     chucho::garbage_cleaner::get().add([this] () { delete this; });
 }
@@ -164,6 +166,11 @@ const std::string& configuration::get_file_name()
     return data().file_name_;
 }
 
+configuration::format get_format()
+{
+    return data().format_;
+}
+
 const std::string& configuration::get_loaded_file_name()
 {
     return data().loaded_file_name_;
@@ -203,7 +210,7 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
     {
         if (file::exists(fn))
         {
-            sd.is_configured = configure_from_yaml_file(fn, report);
+            sd.is_configured = configure_from_yaml_file(fn, report); 
             if (!sd.is_configured)
                 logger::remove_unused_loggers();
         }
@@ -295,6 +302,11 @@ void configuration::set_fallback(const std::string& config)
 void configuration::set_file_name(const std::string& name)
 {
     data().file_name_ = name;
+}
+
+void configuration::set_format(format fmt)
+{
+    data().format_ = fmt;
 }
 
 void configuration::set_style(style stl)

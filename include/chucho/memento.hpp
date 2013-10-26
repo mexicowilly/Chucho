@@ -92,6 +92,7 @@ protected:
      *         "false"
      */
     bool boolean_value(const std::string& value);
+    void set_alias(const std::string& key, const std::string& alias);
     /**
      * Set a handler. The handler will be invoked when the @ref 
      * configurator encounters the given key. 
@@ -116,12 +117,8 @@ protected:
 
 private:
     std::map<std::string, handler> handlers_;
+    std::multimap<std::string, std::string> unconnected_aliases_;
 };
-
-inline void memento::set_handler(const std::string& key, handler hand)
-{
-    handlers_[key] = hand;
-}
 
 }
 

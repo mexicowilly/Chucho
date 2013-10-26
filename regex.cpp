@@ -47,9 +47,9 @@ expression::expression(const std::string& re)
     int rc = regcomp(&pimpl_->re_, re.c_str(), REG_EXTENDED);
     if (rc != 0)
     {
-	char buf[1024];
-	regerror(rc, &pimpl_->re_, buf, sizeof(buf));
-	throw chucho::regex_exception(buf);
+        char buf[1024];
+        regerror(rc, &pimpl_->re_, buf, sizeof(buf));
+        throw chucho::regex_exception(buf);
     }
 #endif
 }
@@ -123,10 +123,10 @@ iterator& iterator::operator= (const iterator& it)
 {
     if (&it != this)
     {
-	text_ = it.text_;
-	match_ = it.match_;
-	delete pimpl_;
-	pimpl_ = new iterator_impl(*it.pimpl_);
+        text_ = it.text_;
+        match_ = it.match_;
+        delete pimpl_;
+        pimpl_ = new iterator_impl(*it.pimpl_);
     }
     return *this;
 }
@@ -166,20 +166,20 @@ iterator& iterator::operator++ ()
 #elif defined(CHUCHO_HAVE_POSIX_REGEX)
     if (pimpl_->re_ && pimpl_->offset_ < text_.length())
     {
-	regex_t& re(pimpl_->re_->pimpl_->re_);
-	auto sub_count = re.re_nsub + 1;
-	regmatch_t pmatch[sub_count];
+        regex_t& re(pimpl_->re_->pimpl_->re_);
+        auto sub_count = re.re_nsub + 1;
+        regmatch_t pmatch[sub_count];
         const char* cur = text_.c_str() + pimpl_->offset_;
-	int rc = regexec(&re, cur, sub_count, pmatch, 0);
-	if (rc == 0)
-	{
-	    for (int i = 0; i < sub_count; i++)
-	    {
-		if (pmatch[i].rm_so == -1)
-		    match_.subs_.push_back(sub_match(-1, 0));
-		else
-		    match_.subs_.push_back(sub_match(pmatch[i].rm_so + pimpl_->offset_, pmatch[i].rm_eo - pmatch[i].rm_so));
-	    }
+        int rc = regexec(&re, cur, sub_count, pmatch, 0);
+        if (rc == 0)
+        {
+            for (int i = 0; i < sub_count; i++)
+            {
+                if (pmatch[i].rm_so == -1)
+                    match_.subs_.push_back(sub_match(-1, 0));
+                else
+                    match_.subs_.push_back(sub_match(pmatch[i].rm_so + pimpl_->offset_, pmatch[i].rm_eo - pmatch[i].rm_so));
+            }
             pimpl_->offset_ = match_.subs_[0].begin() + match_.subs_[0].length();
         }
         else
@@ -231,28 +231,28 @@ bool search(const std::string& text, expression& re, match& mch)
     std::smatch res;
     if (std::regex_search(text, res, re.pimpl_->re_))
     {
-	for (unsigned i = 0; i < res.size(); i++)
-	{
-	    if (res[i].matched)
-		mch.subs_.push_back(sub_match(res.position(i), res.length(i)));
-	    else
-		mch.subs_.push_back(sub_match(-1, 0));
-	}
-	return true;
+        for (unsigned i = 0; i < res.size(); i++)
+        {
+            if (res[i].matched)
+                mch.subs_.push_back(sub_match(res.position(i), res.length(i)));
+            else
+                mch.subs_.push_back(sub_match(-1, 0));
+        }
+        return true;
     }
 #elif defined(CHUCHO_HAVE_POSIX_REGEX)
     auto sub_count = re.pimpl_->re_.re_nsub + 1;
     regmatch_t pmatch[sub_count];
     if (regexec(&re.pimpl_->re_, text.c_str(), sub_count, pmatch, 0) == 0)
     {
-	for (int i = 0; i < sub_count; i++)
-	{
-	    if (pmatch[i].rm_so == -1)
-		mch.subs_.push_back(sub_match(-1, 0));
-	    else
-		mch.subs_.push_back(sub_match(pmatch[i].rm_so, pmatch[i].rm_eo - pmatch[i].rm_so));
-	}
-	return true;
+        for (int i = 0; i < sub_count; i++)
+        {
+            if (pmatch[i].rm_so == -1)
+                mch.subs_.push_back(sub_match(-1, 0));
+            else
+                mch.subs_.push_back(sub_match(pmatch[i].rm_so, pmatch[i].rm_eo - pmatch[i].rm_so));
+        }
+        return true;
     }
 #endif
     return false;

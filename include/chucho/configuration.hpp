@@ -99,6 +99,13 @@ public:
         OFF
     };
 
+    enum class format
+    {
+        CHUCHO_YAML,
+        CHUCHO_CONF,
+        LOG4CPLUS_CONF
+    };
+
     /**
      * Whether the default configuration is allowed. In the absence 
      * of a configuration file, chucho can establish a default 
@@ -135,6 +142,7 @@ public:
      * @return the configuration file name
      */
     static const std::string& get_file_name();
+    static format get_format();
     /**
      * Return the name of the last file that was successfully loaded 
      * for Chucho configuration. 
@@ -230,6 +238,7 @@ public:
      * @param name the file name
      */
     static void set_file_name(const std::string& name);
+    static void set_format(format fmt);
     /**
      * Set the configuration style.
      * 
