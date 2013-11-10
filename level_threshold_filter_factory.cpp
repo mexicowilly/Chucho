@@ -43,7 +43,7 @@ std::shared_ptr<configurable> level_threshold_filter_factory::create_configurabl
 
 std::shared_ptr<memento> level_threshold_filter_factory::create_memento(const configurator& cfg)
 {
-    std::shared_ptr<memento> mnto(new level_threshold_filter_memento(cfg));
+    std::shared_ptr<memento> mnto = std::make_shared<level_threshold_filter_memento>(cfg, get_memento_key_set(cfg));
     return mnto;
 }
 

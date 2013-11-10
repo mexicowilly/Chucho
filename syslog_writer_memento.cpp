@@ -27,6 +27,7 @@ syslog_writer_memento::syslog_writer_memento(const configurator& cfg)
     set_status_origin("syslog_writer_memento");
     set_handler("facility", std::bind(&syslog_writer_memento::set_facility, this, std::placeholders::_1));
     set_handler("host_name", [this] (const std::string& name) { host_name_ = name; });
+    set_alias("host_nemae", "host");
 }
 
 void syslog_writer_memento::set_facility(const std::string& name)

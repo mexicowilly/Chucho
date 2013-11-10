@@ -23,6 +23,8 @@
 
 #include <chucho/configurator.hpp>
 #include <chucho/configurable.hpp>
+#include <chucho/memento.hpp>
+#include <chucho/memento_key_set.hpp>
 #include <map>
 #include <vector>
 
@@ -38,6 +40,7 @@ public:
     config_file_configurator();
 
     virtual void configure(std::istream& in) override;
+    memento_key_set get_memento_key_set() const;
 
 private:
     class properties_processor
@@ -87,8 +90,6 @@ private:
         bool boolean_value(const std::string& text) const;
         std::shared_ptr<configurable> create_console_writer(std::shared_ptr<formatter> fmt,
                                                             const properties& props);
-        std::shared_ptr<configurable> create_file_writer(std::shared_ptr<formatter> fmt,
-                                                         const properties& props);
         std::shared_ptr<formatter> create_formatter(const std::string& type,
                                                     const properties& props);
         std::shared_ptr<configurable> create_logger(const std::string& name,
@@ -96,14 +97,23 @@ private:
                                                     const properties& props);
         std::shared_ptr<configurable> create_numbered_rolling_writer(std::shared_ptr<formatter> fmt,
                                                                      const properties& props);
-        std::shared_ptr<configurable> create_remote_writer(const properties& props);
-        std::shared_ptr<configurable> create_syslog_writer(std::shared_ptr<formatter> fmt,
-                                                           const properties& props);
         std::shared_ptr<configurable> create_writer(const std::string& name,
                                                     const properties& props);
+        void fill_file_writer_memento(std::shared_ptr<memento> mnto,
+                                      std::shared_ptr<formatter> fmt,
+                                      const properties& props);
         std::vector<std::string> split_logger_descriptor(const std::string& desc);
+
+        std::map<std::string, std::string> factory_keys_;
     };
+
+    memento_key_set memento_key_set_;
 };
+
+inline memento_key_set config_file_configurator::get_memento_key_set() const
+{
+    return memento_key_set_;
+}
 
 }
 

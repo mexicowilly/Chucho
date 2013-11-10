@@ -20,15 +20,27 @@
 namespace chucho
 {
 
-file_writer_memento::file_writer_memento(const configurator& cfg)
+file_writer_memento::file_writer_memento(const configurator& cfg, memento_key_set ks)
     : writer_memento(cfg),
       start_(file_writer::on_start::APPEND),
       flush_(true)
 {
     set_status_origin("file_writer_memento");
-    set_handler("file_name", [this] (const std::string& name) { file_name_ = name; });
-    set_handler("on_start", std::bind(&file_writer_memento::set_on_start, this, std::placeholders::_1));
-    set_handler("flush", [this] (const std::string& val) { flush_ = boolean_value(val); });
+    handler fn_hnd = [this] (const std::string& name) { file_name_ = name; };
+    handler flsh_hnd = [this] (const std::string& val) { flush_ = boolean_value(val); };
+    if (ks == memento_key_set::CHUCHO)
+    {
+        set_handler("file_name", fn_hnd);
+        set_handler("on_start", std::bind(&file_writer_memento::set_on_start, this, std::placeholders::_1));
+        set_handler("flush", flsh_hnd);
+    }
+    else if (ks == memento_key_set::LOG4CPLUS)
+    {
+        set_handler("File", fn_hnd);
+        set_handler("Append", [this] (const std::string& val) { set_on_start(boolean_value(val) ? "append" : "truncate"); });
+        set_handler("ImmediateFlush", flsh_hnd);
+        start_ = file_writer::on_start::TRUNCATE;
+    }
 }
 
 void file_writer_memento::set_on_start(const std::string& value)

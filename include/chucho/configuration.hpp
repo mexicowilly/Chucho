@@ -142,7 +142,6 @@ public:
      * @return the configuration file name
      */
     static const std::string& get_file_name();
-    static format get_format();
     /**
      * Return the name of the last file that was successfully loaded 
      * for Chucho configuration. 
@@ -238,7 +237,6 @@ public:
      * @param name the file name
      */
     static void set_file_name(const std::string& name);
-    static void set_format(format fmt);
     /**
      * Set the configuration style.
      * 

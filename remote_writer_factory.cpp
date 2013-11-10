@@ -46,7 +46,7 @@ std::shared_ptr<configurable> remote_writer_factory::create_configurable(std::sh
 
 std::shared_ptr<memento> remote_writer_factory::create_memento(const configurator& cfg)
 {
-    std::shared_ptr<memento> mnto(new remote_writer_memento(cfg));
+    std::shared_ptr<memento> mnto = std::make_shared<remote_writer_memento>(cfg, get_memento_key_set(cfg));
     return mnto;
 }
 

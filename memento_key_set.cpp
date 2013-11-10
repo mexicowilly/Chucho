@@ -14,21 +14,19 @@
  *    limitations under the License.
  */
 
-#include <chucho/level_threshold_filter_memento.hpp>
-#include <chucho/exception.hpp>
+#include <chucho/memento_key_set.hpp>
+#include <chucho/config_file_configurator.hpp>
 
 namespace chucho
 {
 
-level_threshold_filter_memento::level_threshold_filter_memento(const configurator& cfg, memento_key_set ks)
-    : memento(cfg)
+memento_key_set get_memento_key_set(const configurator& cfg)
 {
-    set_status_origin("level_threshold_filter_memento");
-    handler lvl_hnd = [this](const std::string& name) { level_ = level::from_text(name); };
-    if (ks == memento_key_set::CHUCHO)
-        set_handler("level", lvl_hnd);
-    else if (ks == memento_key_set::LOG4CPLUS)
-        set_handler("LogLevelMin", lvl_hnd);
+    memento_key_set ks = memento_key_set::CHUCHO;
+    auto ccfg = dynamic_cast<const config_file_configurator*>(&cfg);
+    if (ccfg != nullptr)
+        ks = ccfg->get_memento_key_set();
+    return ks;
 }
 
 }

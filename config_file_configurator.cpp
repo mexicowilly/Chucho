@@ -28,6 +28,7 @@ namespace chucho
 {
 
 config_file_configurator::config_file_configurator()
+    : memento_key_set_(memento_key_set::CHUCHO)
 {
     set_status_origin("config_file_configurator");
 }
@@ -196,6 +197,9 @@ config_file_configurator::log4cplus_properties_processor::log4cplus_properties_p
     : properties_processor(cfg)
 {
     cfg_.report_info("Using log4cplus-style config file configuration");
+    factory_keys_["log4cplus::FileAppender"] = "chucho::file_writer";
+    factory_keys_["log4cplus::SocketAppender"] = "chucho::remote_writer";
+    factory_keys_["log4cplus::SysLogAppender"] = "chucho::syslog_writer";
 }
 
 bool config_file_configurator::log4cplus_properties_processor::boolean_value(const std::string& text) const
@@ -218,27 +222,6 @@ std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_pro
     else
         result = std::make_shared<cout_writer>(fmt);
     return result;
-}
-
-std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_processor::create_file_writer(std::shared_ptr<formatter> fmt,
-                                                                                                           const properties& props)
-{
-    assert(cfg_.get_factories().find("chucho::file_writer") != cfg_.get_factories().end());
-    auto fact = cfg_.get_factories().find("chucho::file_writer")->second;
-    auto mnto = fact->create_memento(cfg_);
-    mnto->handle(fmt);
-    auto prop = props.get_one("Append");
-    std::string open_mode = "truncate";
-    if (prop && boolean_value(*prop))
-        open_mode = "append";
-    mnto->handle("on_start", open_mode);
-    prop = props.get_one("File");
-    if (prop)
-        mnto->handle("file_name", *prop);
-    prop = props.get_one("ImmediateFlush");
-    if (prop)
-        mnto->handle("flush", *prop);
-    return fact->create_configurable(mnto);
 }
 
 std::shared_ptr<formatter> config_file_configurator::log4cplus_properties_processor::create_formatter(const std::string& type,
@@ -268,6 +251,7 @@ std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_pro
                                                                                                       const std::string& desc,
                                                                                                       const properties& props)
 {
+    assert(get_factories().find("chucho::logger") != get_factories().end());
     auto lgr_fact = get_factories().find("chucho::logger")->second;
     auto mnto = lgr_fact->create_memento(cfg_);
     mnto->handle("name", name);
@@ -289,22 +273,11 @@ std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_pro
     assert(cfg_.get_factories().find("chucho::rolling_file_writer") != cfg_.get_factories().end());
     auto fact = cfg_.get_factories().find("chucho::rolling_file_writer")->second;
     auto mnto = fact->create_memento(cfg_);
-    mnto->handle(fmt);
-    auto prop = props.get_one("Append");
-    std::string open_mode = "truncate";
-    if (prop && boolean_value(*prop))
-        open_mode = "append";
-    mnto->handle("on_start", open_mode);
-    prop = props.get_one("File");
-    if (prop)
-        mnto->handle("file_name", *prop);
-    prop = props.get_one("ImmediateFlush");
-    if (prop)
-        mnto->handle("flush", *prop);
+    fill_file_writer_memento(mnto, fmt, props);
     assert(cfg_.get_factories().find("chucho::numbered_file_roller") != cfg_.get_factories().end()); 
     auto roller_fact = cfg_.get_factories().find("chucho::numbered_file_roller")->second;
     auto roller_mnto = roller_fact->create_memento(cfg_);
-    prop = props.get_one("MaxBackupIndex");
+    auto prop = props.get_one("MaxBackupIndex");
     if (prop)
         roller_mnto->handle("max_index", *prop);
     mnto->handle(roller_fact->create_configurable(roller_mnto));
@@ -316,36 +289,6 @@ std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_pro
         trigger_mnto->handle("max_size", *prop);
     mnto->handle(trigger_fact->create_configurable(trigger_mnto));
     return fact->create_configurable(mnto); 
-}
-
-std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_processor::create_remote_writer(const properties& props)
-{
-    assert(cfg_.get_factories().find("chucho::remote_writer") != cfg_.get_factories().end());
-    auto fact = cfg_.get_factories().find("chucho::remote_writer")->second;
-    auto mnto = fact->create_memento(cfg_);
-    auto prop = props.get_one("host");
-    if (prop)
-        mnto->handle("host", *prop);
-    prop = props.get_one("port");
-    if (prop)
-        mnto->handle("port", *prop);
-    return fact->create_configurable(mnto);
-}
-
-std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_processor::create_syslog_writer(std::shared_ptr<formatter> fmt,
-                                                                                                             const properties& props)
-{
-    assert(cfg_.get_factories().find("chucho::syslog_writer") != cfg_.get_factories().end());
-    auto fact = cfg_.get_factories().find("chucho::syslog_writer")->second;
-    auto mnto = fact->create_memento(cfg_);
-    mnto->handle(fmt);
-    auto prop = props.get_one("facility");
-    if (prop)
-        mnto->handle("facility", *prop);
-    prop = props.get_one("host");
-    if (prop)
-        mnto->handle("host_name", *prop);
-    return fact->create_configurable(mnto);
 }
 
 std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_processor::create_writer(const std::string& name,
@@ -367,23 +310,49 @@ std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_pro
     {
         result = create_console_writer(fmt, wrt_props);
     }
-    else if (*type == "log4cplus::FileAppender")
-    {
-        result = create_file_writer(fmt, wrt_props);
-    }
     else if (*type == "log4cplus::RollingFileAppender")
     {
         result = create_numbered_rolling_writer(fmt, wrt_props);
     }
-    else if (*type == "log4cplus::SocketAppender")
+    else
     {
-        result = create_remote_writer(wrt_props);
-    }
-    else if (*type == "log4cplus::SysLogAppender")
-    {
-        result = create_syslog_writer(fmt, wrt_props);
+        auto key = factory_keys_.find(*type);
+        if (key == factory_keys_.end())
+        {
+            cfg_.report_warning("Unknown log4cplus key: " + *type);
+        }
+        else
+        {
+            auto fact = cfg_.get_factories().find(key->second);
+            assert(fact != cfg_.get_factories().end());
+            auto mnto = fact->second->create_memento(cfg_);
+            for (auto prp : wrt_props)
+            {
+                if (prp.second.find("layout.") != 0)
+                    mnto->handle(prp.first, prp.second); 
+            }
+            result = fact->second->create_configurable(mnto);
+        }
     }
     return result; 
+}
+
+void config_file_configurator::log4cplus_properties_processor::fill_file_writer_memento(std::shared_ptr<memento> mnto,
+                                                                                        std::shared_ptr<formatter> fmt,
+                                                                                        const properties& props)
+{
+    mnto->handle(fmt);
+    auto prop = props.get_one("Append");
+    std::string open_mode = "truncate";
+    if (prop && boolean_value(*prop))
+        open_mode = "append";
+    mnto->handle("on_start", open_mode);
+    prop = props.get_one("File");
+    if (prop)
+        mnto->handle("file_name", *prop);
+    prop = props.get_one("ImmediateFlush");
+    if (prop)
+        mnto->handle("flush", *prop);
 }
 
 void config_file_configurator::log4cplus_properties_processor::process(const properties& props)
