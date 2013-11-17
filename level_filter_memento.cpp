@@ -16,6 +16,7 @@
 
 #include <chucho/level_filter_memento.hpp>
 #include <chucho/exception.hpp>
+#include <chucho/text_util.hpp>
 #include <algorithm>
 
 namespace chucho
@@ -43,7 +44,7 @@ level_filter_memento::level_filter_memento(const configurator& cfg, memento_key_
 
 filter::result level_filter_memento::text_to_result(const std::string& text) const
 {
-    std::string low = to_lower(text);
+    std::string low = text_util::to_lower(text);
     if (low == "deny")
         return chucho::filter::result::DENY;
     if (low == "neutral")

@@ -16,6 +16,7 @@
 
 #include <chucho/file_writer_memento.hpp>
 #include <chucho/exception.hpp>
+#include <chucho/text_util.hpp>
 
 namespace chucho
 {
@@ -45,7 +46,7 @@ file_writer_memento::file_writer_memento(const configurator& cfg, memento_key_se
 
 void file_writer_memento::set_on_start(const std::string& value)
 {
-    std::string low = to_lower(value);
+    std::string low = text_util::to_lower(value);
     if (low == "append")
         start_ = file_writer::on_start::APPEND;
     else if (low == "truncate")

@@ -17,8 +17,7 @@
 #include <chucho/memento.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
-#include <algorithm>
-#include <cctype>
+#include <chucho/text_util.hpp>
 
 namespace chucho
 {
@@ -34,7 +33,7 @@ bool memento::boolean_value(const std::string& value)
     static const std::string zero("0");
     static const std::string falso("false");
 
-    std::string low = to_lower(value);
+    std::string low = text_util::to_lower(value);
     return (low.empty() || low == zero || low == falso) ? false : true;
 }
 
@@ -72,16 +71,6 @@ void memento::set_handler(const std::string& key, handler hand)
         ++range.first;
     }
     unconnected_aliases_.erase(key);
-}
-
-std::string memento::to_lower(const std::string& value) const
-{
-    std::string low;
-    std::transform(value.begin(),
-                   value.end(),
-                   std::back_inserter(low),
-                   [] (char c) { return std::tolower(c); });
-    return low;
 }
 
 }

@@ -16,6 +16,7 @@
 
 #include <chucho/syslog_writer_memento.hpp>
 #include <chucho/exception.hpp>
+#include <chucho/text_util.hpp>
 
 namespace chucho
 {
@@ -32,7 +33,7 @@ syslog_writer_memento::syslog_writer_memento(const configurator& cfg)
 
 void syslog_writer_memento::set_facility(const std::string& name)
 {
-    auto lname = to_lower(name);
+    auto lname = text_util::to_lower(name);
     if (lname == "kern")
         facility_ = syslog::facility::KERN;
     else if (lname == "user")

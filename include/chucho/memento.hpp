@@ -101,14 +101,6 @@ protected:
      * @param hand the function
      */
     void set_handler(const std::string& key, handler hand);
-    /**
-     * Convert a piece of text to lower case. This is used for 
-     * case-insensitive comparison.
-     * 
-     * @param value the text to case fold 
-     * @return the lowercase version of the text
-     */
-    std::string to_lower(const std::string& value) const;
 
     /**
      * The @ref configurator that is perform configuration.

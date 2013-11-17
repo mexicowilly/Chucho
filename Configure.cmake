@@ -105,7 +105,7 @@ ELSEIF(MSVC)
         MESSAGE(FATAL_ERROR "Microsoft compiler version 17 or later is required (the compiler that ships with Visual Studio 2012)")
     ENDIF()
     IF(ENABLE_SHARED)
-        SET(CMAKE_CXX_FLAGS "/wd4275 /EHsc")
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4275 /EHsc")
     ENDIF()
 ENDIF()
 

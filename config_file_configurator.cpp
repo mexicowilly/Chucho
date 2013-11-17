@@ -22,6 +22,9 @@
 #include <chucho/pattern_formatter.hpp>
 #include <chucho/cout_writer.hpp>
 #include <chucho/cerr_writer.hpp>
+#include <chucho/text_util.hpp>
+#include <chucho/file_writer_memento.hpp>
+#include <chucho/level_threshold_filter.hpp>
 #include <assert.h>
 
 namespace chucho
@@ -200,16 +203,70 @@ config_file_configurator::log4cplus_properties_processor::log4cplus_properties_p
     factory_keys_["log4cplus::FileAppender"] = "chucho::file_writer";
     factory_keys_["log4cplus::SocketAppender"] = "chucho::remote_writer";
     factory_keys_["log4cplus::SysLogAppender"] = "chucho::syslog_writer";
+    factory_keys_["log4cplus::spi::LogLevelMatchFilter"] = "chucho::level_filter";
+    factory_keys_["log4cplus::spi::LogLevelRangeFilter"] = "chucho::level_threshold_filter";
+}
+
+void config_file_configurator::log4cplus_properties_processor::add_filters(std::shared_ptr<writer> wrt,
+                                                                           const properties& props)
+{
+    auto flts = props.get_subset("filters.");
+    std::size_t num = 1;
+    std::string name = std::to_string(num);
+    optional<std::string> type = flts.get_one(name);
+    while (type)
+    {
+        if (*type == "log4cplus::spi::DenyAllFilter")
+        {
+            auto flt = std::make_shared<level_threshold_filter>(level::OFF_());
+            wrt->add_filter(flt);
+        }
+        else if (*type == "log4cplus::spi::StringMatchFilter") 
+        {
+            cfg_.report_info("Chucho does not have an equivalent of StringMatchFilter");
+        }
+        else
+        {
+            auto key = factory_keys_.find(*type);
+            if (key == factory_keys_.end())
+            {
+                cfg_.report_warning("Unknown log4cplus key: " + *type);
+            }
+            else
+            {
+                auto fact = cfg_.get_factories().find(key->second);
+                assert(fact != cfg_.get_factories().end());
+                auto mnto = fact->second->create_memento(cfg_);
+                auto flt_props = flts.get_subset(name + ".");
+                for (auto prp : flt_props)
+                {
+                    if (prp.second.find(*type) != 0)
+                        mnto->handle(prp.first, prp.second); 
+                }
+                wrt->add_filter(std::dynamic_pointer_cast<filter>(fact->second->create_configurable(mnto)));
+            }
+        }
+        name = std::to_string(++num);
+        type = flts.get_one(name);
+    }
 }
 
 bool config_file_configurator::log4cplus_properties_processor::boolean_value(const std::string& text) const
 {
-    std::string low;
-    std::transform(text.begin(),
-                   text.end(),
-                   std::back_inserter(low),
-                   [] (char c) { return std::tolower(c); });
+    std::string low = text_util::to_lower(text);
     return low == "0" || low == "false" ? false : true;
+}
+
+std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_processor::create_async_writer(const properties& top_props,
+                                                                                                            const properties& wrt_props)
+{
+    assert(cfg_.get_factories().find("chucho::async_writer") != cfg_.get_factories().end());
+    auto fact = cfg_.get_factories().find("chucho::async_writer")->second;
+    auto mnto = fact->create_memento(cfg_);
+    auto app = wrt_props.get_one("Appender");
+    if (app)
+        mnto->handle(create_writer(*app, top_props));
+    return fact->create_configurable(mnto);
 }
 
 std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_processor::create_console_writer(std::shared_ptr<formatter> fmt,
@@ -267,8 +324,8 @@ std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_pro
     return lgr_fact->create_configurable(mnto); 
 }
 
-std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_processor::create_numbered_rolling_writer(std::shared_ptr<formatter> fmt,
-                                                                                                                       const properties& props)
+std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_processor::create_size_rolling_writer(std::shared_ptr<formatter> fmt,
+                                                                                                                   const properties& props)
 {
     assert(cfg_.get_factories().find("chucho::rolling_file_writer") != cfg_.get_factories().end());
     auto fact = cfg_.get_factories().find("chucho::rolling_file_writer")->second;
@@ -288,6 +345,24 @@ std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_pro
     if (prop)
         trigger_mnto->handle("max_size", *prop);
     mnto->handle(trigger_fact->create_configurable(trigger_mnto));
+    return fact->create_configurable(mnto); 
+}
+
+std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_processor::create_time_rolling_writer(std::shared_ptr<formatter> fmt,
+                                                                                                                   const properties& props)
+{
+    assert(cfg_.get_factories().find("chucho::rolling_file_writer") != cfg_.get_factories().end());
+    auto fact = cfg_.get_factories().find("chucho::rolling_file_writer")->second;
+    auto mnto = fact->create_memento(cfg_);
+    fill_file_writer_memento(mnto, fmt, props);
+    assert(cfg_.get_factories().find("chucho::time_file_roller") != cfg_.get_factories().end()); 
+    auto roller_fact = cfg_.get_factories().find("chucho::time_file_roller")->second;
+    auto roller_mnto = roller_fact->create_memento(cfg_);
+    auto prop = props.get_one("MaxBackupIndex");
+    roller_mnto->handle("max_history", prop ? *prop : "10");
+    std::string fn = std::dynamic_pointer_cast<file_writer_memento>(mnto)->get_file_name();
+    roller_mnto->handle("file_name_pattern", time_pattern_from_log4cplus_schedule(props.get_one("Schedule"), fn));
+    mnto->handle(roller_fact->create_configurable(roller_mnto));
     return fact->create_configurable(mnto); 
 }
 
@@ -312,9 +387,17 @@ std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_pro
     }
     else if (*type == "log4cplus::RollingFileAppender")
     {
-        result = create_numbered_rolling_writer(fmt, wrt_props);
+        result = create_size_rolling_writer(fmt, wrt_props);
     }
-    else
+    else if (*type == "log4cplus::DailyRollingFileAppender")
+    {
+        result = create_time_rolling_writer(fmt, wrt_props);
+    }
+    else if (*type == "log4cplus::AsyncAppender")
+    {
+        result = create_async_writer(props, wrt_props);
+    }
+    else 
     {
         auto key = factory_keys_.find(*type);
         if (key == factory_keys_.end())
@@ -334,6 +417,7 @@ std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_pro
             result = fact->second->create_configurable(mnto);
         }
     }
+    add_filters(std::dynamic_pointer_cast<writer>(result), wrt_props);
     return result; 
 }
 
@@ -377,6 +461,31 @@ std::vector<std::string> config_file_configurator::log4cplus_properties_processo
     {
         regex::match mch = *itor;
         result.push_back(desc.substr(mch[1].begin(), mch[1].length()));
+    }
+    return result;
+}
+
+std::string config_file_configurator::log4cplus_properties_processor::time_pattern_from_log4cplus_schedule(const optional<std::string>& sched,
+                                                                                                           const std::string& file_name)
+{
+    std::string result = file_name + ".%d{%Y-%m-%d}";
+    if (sched)
+    {
+        auto low = text_util::to_lower(*sched);
+        if (low == "monthly")
+            result = file_name + ".%d{%Y-%m}";
+        else if (low == "weekly")
+            result = file_name + ".%d{%Y-%U}";
+        else if (low == "hourly")
+            result = file_name + ".%d{%Y-%m-%d %H}";
+        else if (low == "minutely")
+            result = file_name + ".%d{%Y-%m-%d %H:%M}";
+        else if (low != "daily" && low != "twice_daily")
+            cfg_.report_warning("The schedule is not valid: " + *sched);
+    }
+    else
+    {
+        cfg_.report_warning("The schedule has not been set");
     }
     return result;
 }

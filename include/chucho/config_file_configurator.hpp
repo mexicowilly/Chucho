@@ -25,6 +25,8 @@
 #include <chucho/configurable.hpp>
 #include <chucho/memento.hpp>
 #include <chucho/memento_key_set.hpp>
+#include <chucho/optional.hpp>
+#include <chucho/writer.hpp>
 #include <map>
 #include <vector>
 
@@ -87,7 +89,10 @@ private:
         virtual void process(const properties& props) override;
 
     private:
+        void add_filters(std::shared_ptr<writer> wrt, const properties& props);
         bool boolean_value(const std::string& text) const;
+        std::shared_ptr<configurable> create_async_writer(const properties& top_props,
+                                                          const properties& wrt_props);
         std::shared_ptr<configurable> create_console_writer(std::shared_ptr<formatter> fmt,
                                                             const properties& props);
         std::shared_ptr<formatter> create_formatter(const std::string& type,
@@ -95,14 +100,18 @@ private:
         std::shared_ptr<configurable> create_logger(const std::string& name,
                                                     const std::string& desc,
                                                     const properties& props);
-        std::shared_ptr<configurable> create_numbered_rolling_writer(std::shared_ptr<formatter> fmt,
-                                                                     const properties& props);
+        std::shared_ptr<configurable> create_size_rolling_writer(std::shared_ptr<formatter> fmt,
+                                                                 const properties& props);
+        std::shared_ptr<configurable> create_time_rolling_writer(std::shared_ptr<formatter> fmt,
+                                                                 const properties& props);
         std::shared_ptr<configurable> create_writer(const std::string& name,
                                                     const properties& props);
         void fill_file_writer_memento(std::shared_ptr<memento> mnto,
                                       std::shared_ptr<formatter> fmt,
                                       const properties& props);
         std::vector<std::string> split_logger_descriptor(const std::string& desc);
+        std::string time_pattern_from_log4cplus_schedule(const optional<std::string>& sched,
+                                                         const std::string& file_name);
 
         std::map<std::string, std::string> factory_keys_;
     };
