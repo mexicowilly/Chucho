@@ -24,6 +24,9 @@
 #include <chucho/logger.hpp>
 #include <chucho/garbage_cleaner.hpp>
 #include <chucho/environment.hpp>
+#include <chucho/yaml_parser.hpp>
+#include <chucho/properties.hpp>
+#include <chucho/config_file_configurator.hpp>
 #include <fstream>
 #include <algorithm>
 #include <sstream>
@@ -111,6 +114,39 @@ void set_default_config(std::shared_ptr<chucho::logger> root_logger)
     }
 }
 
+enum class format
+{
+    YAML,
+    CONFIG_FILE,
+    DONT_KNOW
+};
+
+format detect_format(std::istream& stream_1, std::istream& stream_2)
+{
+    chucho::yaml_parser prs(stream_1);
+    yaml_document_t doc;
+    if (yaml_parser_load(prs, &doc))
+        return format::YAML;
+    chucho::properties props(stream_2);
+    if (props.size() > 0)
+        return format::CONFIG_FILE;
+    return format::DONT_KNOW; 
+}
+
+format detect_file_format(const std::string& file_name)
+{
+    std::ifstream stream_1(file_name);
+    std::ifstream stream_2(file_name);
+    return detect_format(stream_1, stream_2);
+}
+
+format detect_text_format(const std::string& text)
+{
+    std::istringstream stream_1(text);
+    std::istringstream stream_2(text);
+    return detect_format(stream_1, stream_2);
+}
+
 }
 
 namespace chucho
@@ -119,6 +155,27 @@ namespace chucho
 bool configuration::allow_default()
 {
     return data().allow_default_config_;
+}
+
+bool configuration::configure_from_config_file(const std::string& file_name, reporter& report)
+{
+    std::ifstream in(file_name.c_str());
+    if (in.is_open())
+    {
+        try
+        {
+            chucho::config_file_configurator cnf;
+            cnf.configure(in);
+            data().loaded_file_name_ = file_name;
+            return true;
+        }
+        catch (std::exception& e)
+        {
+            report.error("Error reading " + file_name +
+                ": " + chucho::exception::nested_whats(e));
+        }
+    }
+    return false; 
 }
 
 bool configuration::configure_from_yaml_file(const std::string& file_name, reporter& report)
@@ -203,8 +260,22 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
     {
         if (file::exists(fn))
         {
-            sd.is_configured = configure_from_yaml_file(fn, report); 
-            if (!sd.is_configured)
+            format fmt = detect_file_format(fn);
+            if (fmt == format::YAML)
+            {
+                report.info("The file, " + fn + ", is in YAML format");
+                sd.is_configured = configure_from_yaml_file(fn, report); 
+            }
+            else if (fmt == format::CONFIG_FILE)
+            {
+                report.info("The file, " + fn + ", is in config file format");
+                sd.is_configured = configure_from_config_file(fn, report);
+            }
+            else
+            {
+                report.warning("Unable to determine the format of the file " + fn);
+            }
+            if (!sd.is_configured) 
                 logger::remove_unused_loggers();
         }
         else
@@ -216,12 +287,28 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
     {
         try
         {
-            yaml_configurator yam;
-            // this is already validated UTF-8
-            std::istringstream fb_in(sd.fallback_);
-            yam.configure(fb_in);
-            sd.is_configured = true;
-            report.info("Using the fallback configuration");
+            format fmt = detect_text_format(sd.fallback_);
+            if (fmt == format::YAML)
+            {
+                yaml_configurator yam; 
+                // this is already validated UTF-8
+                std::istringstream fb_in(sd.fallback_);
+                yam.configure(fb_in);
+                sd.is_configured = true;
+                report.info("Using the YAML format fallback configuration"); 
+            }
+            else if (fmt == format::CONFIG_FILE)
+            {
+                config_file_configurator cnf;
+                std::istringstream fb_in(sd.fallback_);
+                cnf.configure(fb_in);
+                sd.is_configured = true;
+                report.info("Using the config file format fallback configuration"); 
+            }
+            else
+            {
+                report.warning("Unable to detect the format of the fallback configuration");
+            }
         }
         catch (std::exception& e)
         {

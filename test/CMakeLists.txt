@@ -39,6 +39,9 @@ ENDIF()
 
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
+               chucho_config_file_configurator_test.cpp
+               configurator_test.cpp
+               configurator_test.hpp
                diagnostic_context_test.cpp
                duplicate_message_filter_test.cpp
                file_test.cpp

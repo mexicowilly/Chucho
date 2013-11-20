@@ -143,7 +143,7 @@ std::shared_ptr<configurable> config_file_configurator::chucho_properties_proces
                                                                                                    const properties& props)
 {
     std::string type("writer");
-    auto fact = get_factory(type, name, props);
+    auto fact = get_factory(type, name, props); 
     auto mnto = fact->create_memento(cfg_);
     auto cur_props = props.get_subset(type + '.' + name + '.');
     for (auto cur : cur_props)
@@ -156,8 +156,10 @@ std::shared_ptr<configurable> config_file_configurator::chucho_properties_proces
             mnto->handle(create_file_roller(cur.second, props));
         else if (cur.first == "file_roll_trigger")
             mnto->handle(create_file_roll_trigger(cur.second, props));
-        else 
-            mnto->handle(cur.first, cur.second);
+        else if (cur.first == "writer")
+            mnto->handle(create_writer(cur.second, props));
+        else if (cur.first.find('.') == std::string::npos)
+            mnto->handle(cur.first, cur.second); 
     }
     return fact->create_configurable(mnto); 
 }
@@ -177,19 +179,21 @@ std::shared_ptr<configurable_factory> config_file_configurator::chucho_propertie
 
 void config_file_configurator::chucho_properties_processor::process(const properties& props)
 {
-    auto loggers = props.get("logger");
+    auto chuprops = props.get_subset("chucho.");
+    auto loggers = props.get("chucho.logger");
     assert(get_factories().find("chucho::logger") != get_factories().end());
     auto lgr_fact = get_factories().find("chucho::logger")->second;
     while (loggers.first != loggers.second)
     {
         auto mnto = lgr_fact->create_memento(cfg_);
-        properties cur_props = props.get_subset("logger." + loggers.first->second + '.');
+        mnto->handle("name", loggers.first->second);
+        properties cur_props = props.get_subset("chucho.logger." + loggers.first->second + '.');
         for (auto cur : cur_props)
         {
             if (cur.first == "writer")
-                mnto->handle(create_writer(cur.second, props));
-            else
-                mnto->handle(cur.first, cur.second);
+                mnto->handle(create_writer(cur.second, chuprops));
+            else if (cur.first.find('.') == std::string::npos)
+                mnto->handle(cur.first, cur.second); 
         }
         lgr_fact->create_configurable(mnto);
         ++loggers.first;

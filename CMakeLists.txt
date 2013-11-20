@@ -273,6 +273,7 @@ SET(CHUCHO_SOURCES
     writer_memento.cpp
     yaml_configurator.cpp
     yaml_formatter.cpp
+    yaml_parser.cpp
     zip_file_compressor_factory.cpp
     include/chucho/async_writer_factory.hpp
     include/chucho/async_writer_memento.hpp
@@ -333,6 +334,7 @@ SET(CHUCHO_SOURCES
     include/chucho/time_file_roller_memento.hpp
     include/chucho/utf8.hpp
     include/chucho/yaml_configurator.hpp
+    include/chucho/yaml_parser.hpp
     include/chucho/zip_file_compressor_factory.hpp
     ${CHUCHO_PLATFORM_SOURCES}
     ${CHUCHO_EMBEDDED_SOURCES}

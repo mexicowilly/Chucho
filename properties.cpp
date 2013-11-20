@@ -42,7 +42,7 @@ properties::properties(std::istream& in)
                 {
                     std::string v;
                     if (mch.size() == 3 && mch[2].begin() != -1)
-                    v = line.substr(mch[2].begin(), mch[2].length());
+                        v = line.substr(mch[2].begin(), mch[2].length());
                     props_.emplace(k, v);
                 }
             }

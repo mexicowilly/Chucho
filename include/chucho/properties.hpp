@@ -43,6 +43,7 @@ public:
     std::pair<const_iterator, const_iterator> get(const std::string& key) const;
     optional<std::string> get_one(const std::string& key) const;
     properties get_subset(const std::string prefix) const;
+    std::size_t size() const;
 
 private:
     properties();
@@ -68,6 +69,11 @@ inline properties::const_iterator properties::end() const
 inline std::pair<properties::const_iterator, properties::const_iterator> properties::get(const std::string& key) const
 {
     return props_.equal_range(key);
+}
+
+inline std::size_t properties::size() const
+{
+    return props_.size();
 }
 
 }
