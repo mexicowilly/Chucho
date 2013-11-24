@@ -36,7 +36,7 @@ level_filter_memento::level_filter_memento(const configurator& cfg, memento_key_
     else if (ks == memento_key_set::LOG4CPLUS)
     {
         on_mismatch_ = chucho::filter::result::NEUTRAL;
-        on_mismatch_ = chucho::filter::result::ACCEPT;
+        on_match_ = chucho::filter::result::DENY;
         set_handler("LogLevelToMatch", lvl_hnd);
         set_handler("AcceptOnMatch", [this] (const std::string& val) { on_match_ = boolean_value(val) ? chucho::filter::result::ACCEPT : chucho::filter::result::DENY; });
     }

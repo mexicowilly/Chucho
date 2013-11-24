@@ -27,6 +27,8 @@
 #include <chucho/level_threshold_filter.hpp>
 #include <assert.h>
 
+#include <iostream>
+
 namespace chucho
 {
 
@@ -49,15 +51,9 @@ void config_file_configurator::configure(std::istream& in)
     {
         id.reset(new properties(props.get_subset("log4cplus.")));
         if (id->empty())
-        {
-            report_warning("The given properties have nothing that Chucho can use");
-            return;
-        }
-        else
-        {
-            proc.reset(new log4cplus_properties_processor(*this));
-        }
-
+            throw exception("Found neither Chucho nor log4cplus keys in the configuration");
+        proc.reset(new log4cplus_properties_processor(*this));
+        memento_key_set_ = memento_key_set::LOG4CPLUS;
     }
     id.reset();
     proc->process(props);
@@ -323,7 +319,13 @@ std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_pro
     if (!tokens.empty())
     {
         for (auto tok : tokens)
-            mnto->handle(create_writer(tok, props));
+        {
+            auto wrt = create_writer(tok, props);
+            if (wrt)
+                mnto->handle(wrt);
+            else
+                cfg_.report_warning("The writer " + tok + " could not be created");
+        }
     }
     return lgr_fact->create_configurable(mnto); 
 }
@@ -339,15 +341,13 @@ std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_pro
     auto roller_fact = cfg_.get_factories().find("chucho::numbered_file_roller")->second;
     auto roller_mnto = roller_fact->create_memento(cfg_);
     auto prop = props.get_one("MaxBackupIndex");
-    if (prop)
-        roller_mnto->handle("max_index", *prop);
+    roller_mnto->handle("max_index", (prop ? *prop : "1"));
     mnto->handle(roller_fact->create_configurable(roller_mnto));
     assert(cfg_.get_factories().find("chucho::size_file_roll_trigger") != cfg_.get_factories().end()); 
     auto trigger_fact = cfg_.get_factories().find("chucho::size_file_roll_trigger")->second;
     auto trigger_mnto = trigger_fact->create_memento(cfg_);
     prop = props.get_one("MaxFileSize");
-    if (prop)
-        trigger_mnto->handle("max_size", *prop);
+    trigger_mnto->handle("max_size", (prop ? *prop : "10m"));
     mnto->handle(trigger_fact->create_configurable(trigger_mnto));
     return fact->create_configurable(mnto); 
 }
@@ -374,11 +374,11 @@ std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_pro
                                                                                                       const properties& props)
 {
     std::shared_ptr<configurable> result;
-    auto type = props.get_one("log4cplus.appender." + name);
+    auto type = props.get_one("appender." + name); 
     if (!type)
         return result;
-    auto wrt_props = props.get_subset("log4cplus.appender." + name + "."); 
-    auto fmt_type = wrt_props.get_one("layout");
+    auto wrt_props = props.get_subset("appender." + name + "."); 
+    auto fmt_type = wrt_props.get_one("layout"); 
     std::shared_ptr<formatter> fmt;
     if (fmt_type)
     {
@@ -413,9 +413,11 @@ std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_pro
             auto fact = cfg_.get_factories().find(key->second);
             assert(fact != cfg_.get_factories().end());
             auto mnto = fact->second->create_memento(cfg_);
+            if (fmt)
+                mnto->handle(fmt); 
             for (auto prp : wrt_props)
             {
-                if (prp.second.find("layout.") != 0)
+                if (prp.first.find("layout") != 0)
                     mnto->handle(prp.first, prp.second); 
             }
             result = fact->second->create_configurable(mnto);
@@ -431,35 +433,35 @@ void config_file_configurator::log4cplus_properties_processor::fill_file_writer_
 {
     mnto->handle(fmt);
     auto prop = props.get_one("Append");
-    std::string open_mode = "truncate";
-    if (prop && boolean_value(*prop))
-        open_mode = "append";
-    mnto->handle("on_start", open_mode);
+    if (prop)
+        mnto->handle("Append", *prop);
     prop = props.get_one("File");
     if (prop)
-        mnto->handle("file_name", *prop);
+        mnto->handle("File", *prop);
     prop = props.get_one("ImmediateFlush");
     if (prop)
-        mnto->handle("flush", *prop);
+        mnto->handle("ImmediateFlush", *prop);
 }
 
 void config_file_configurator::log4cplus_properties_processor::process(const properties& props)
 {
-    auto root = props.get_one("rootLogger");
+    auto lprops = props.get_subset("log4cplus.");
+    /*
+    for (auto p : lprops)
+        std::cout << p.first << '=' << p.second << std::endl;
+    */
+    auto root = lprops.get_one("rootLogger"); 
     if (root)
-        create_logger("", *root, props);
-    auto loggers = props.get("logger");
-    while (loggers.first != loggers.second)
-    {
-        create_logger(loggers.first->first, loggers.first->second, props);
-        ++loggers.first;
-    }
+        create_logger("", *root, lprops);
+    auto loggers = lprops.get_subset("logger.");
+    for (const properties::const_iterator::value_type& lgr : loggers)
+        create_logger(lgr.first, lgr.second, lprops);
 }
 
 std::vector<std::string> config_file_configurator::log4cplus_properties_processor::split_logger_descriptor(const std::string& desc)
 {
     std::vector<std::string> result;
-    regex::expression re("[ \\t]*([^ \\t,]+)");
+    regex::expression re("[ \t]*([^ \t,]+)");
     regex::iterator end;
     for (regex::iterator itor(desc, re); itor != end; ++itor)
     {

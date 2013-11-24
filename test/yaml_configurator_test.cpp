@@ -35,7 +35,7 @@ void setenv(const char* var, const char* val)
 class yaml_configurator : public chucho::test::configurator
 {
 protected:
-    chucho::configurator& get_configurator() override;
+    virtual chucho::configurator& get_configurator() override;
 
 private:
     chucho::yaml_configurator cnf_;

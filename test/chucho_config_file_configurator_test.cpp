@@ -23,7 +23,7 @@ namespace
 class chucho_config_file_configurator : public chucho::test::configurator
 {
 protected:
-    chucho::configurator& get_configurator() override;
+    virtual chucho::configurator& get_configurator() override;
 
 private:
     chucho::config_file_configurator cnf_;

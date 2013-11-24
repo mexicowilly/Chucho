@@ -58,7 +58,7 @@ void memento::set_alias(const std::string& key, const std::string& alias)
     if (found == handlers_.end())
         unconnected_aliases_.emplace(key, alias);
     else
-        handlers_[key] = found->second;
+        handlers_[alias] = found->second;
 }
 
 void memento::set_handler(const std::string& key, handler hand)

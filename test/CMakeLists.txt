@@ -50,6 +50,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                level_test.cpp
                level_filter_test.cpp
                level_threshold_filter_test.cpp
+               log4cplus_config_file_configurator_test.cpp
                logger_test.cpp
                log_macro_test.cpp
                marker_test.cpp
