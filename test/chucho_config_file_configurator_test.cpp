@@ -345,11 +345,6 @@ TEST_F(chucho_config_file_configurator, time_file_roller)
     time_file_roller_body();
 }
 
-TEST_F(chucho_config_file_configurator, unknown)
-{
-    FAIL();
-}
-
 TEST_F(chucho_config_file_configurator, zip_file_compressor)
 {
     configure("chucho.logger = will\n"

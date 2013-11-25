@@ -24,7 +24,7 @@ namespace chucho
 std::string pattern_formatter::milliseconds_since_start_piece::get_text_impl(const event& evt) const
 {
     clock_t clocks = clock();
-    std::string result = 0;
+    std::string result;
     if (clocks != -1)
         result = std::to_string(clocks / (CLOCKS_PER_SEC / 1000));
     return result;

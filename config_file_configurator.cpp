@@ -29,6 +29,22 @@
 
 #include <iostream>
 
+namespace
+{
+
+class writer_creation_exception : public chucho::exception
+{
+public:
+    writer_creation_exception(const std::string& name);
+};
+
+writer_creation_exception::writer_creation_exception(const std::string& name)
+    : exception("Could not create the writer named " + name)
+{
+}
+
+}
+
 namespace chucho
 {
 
@@ -320,11 +336,16 @@ std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_pro
     {
         for (auto tok : tokens)
         {
-            auto wrt = create_writer(tok, props);
-            if (wrt)
-                mnto->handle(wrt);
-            else
-                cfg_.report_warning("The writer " + tok + " could not be created");
+            try
+            {
+                auto wrt = create_writer(tok, props);
+                if (wrt)
+                    mnto->handle(wrt);
+            }
+            catch (writer_creation_exception& e)
+            {
+                cfg_.report_warning(e.what());
+            }
         }
     }
     return lgr_fact->create_configurable(mnto); 
@@ -401,6 +422,10 @@ std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_pro
     {
         result = create_async_writer(props, wrt_props);
     }
+    else if (*type == "log4cplus::NullAppender")
+    {
+        return result;
+    }
     else 
     {
         auto key = factory_keys_.find(*type);
@@ -417,13 +442,15 @@ std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_pro
                 mnto->handle(fmt); 
             for (auto prp : wrt_props)
             {
-                if (prp.first.find("layout") != 0)
+                if (prp.first.find("layout") != 0 && prp.first.find("filters") != 0)
                     mnto->handle(prp.first, prp.second); 
             }
             result = fact->second->create_configurable(mnto);
         }
     }
-    add_filters(std::dynamic_pointer_cast<writer>(result), wrt_props);
+    if (!result)
+        throw writer_creation_exception(name);
+    add_filters(std::dynamic_pointer_cast<writer>(result), wrt_props); 
     return result; 
 }
 
