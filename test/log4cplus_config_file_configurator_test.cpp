@@ -25,6 +25,8 @@
 #include <chucho/pattern_formatter.hpp>
 #include <chucho/event.hpp>
 #include <chucho/line_ending.hpp>
+#include <chucho/calendar.hpp>
+#include <chucho/time_file_roller.hpp>
 #include <thread>
 
 namespace
@@ -79,7 +81,47 @@ TEST_F(log4cplus_config_file_configurator, cout_writer)
 
 TEST_F(log4cplus_config_file_configurator, daily_rolling_file_appender)
 {
-    FAIL();
+    std::pair<const char*, const char*> exp[] =
+    {
+        std::make_pair("monthly", "%Y-%m"),
+        std::make_pair("WEEKLY", "%Y-%U"),
+        std::make_pair("HoUrLy", "%Y-%m-%d %H"),
+        std::make_pair("HoUrLy", "%Y-%m-%d %H"),
+        std::make_pair("mInUtElY", "%Y-%m-%d %H:%M"),
+        std::make_pair("daily", "%Y-%m-%d"),
+        std::make_pair("never", "%Y-%m-%d"),
+        std::make_pair(nullptr, nullptr)
+    };
+    std::string tmpl("log4cplus.logger.will = info, drf\n"
+                     "log4cplus.appender.drf = log4cplus::DailyRollingFileAppender\n"
+                     "log4cplus.appender.drf.layout = log4cplus::PatternLayout\n"
+                     "log4cplus.appender.drf.layout.ConversionPattern = %m%n\n"
+                     "log4cplus.appender.drf.Schedule = SCHEDULE");
+    std::size_t rep_loc = tmpl.find("SCHEDULE");
+    int i = 0;
+    while (exp[i].first != nullptr)
+    {
+        chucho::logger::remove_unused_loggers();
+        chucho::status_manager::get()->clear();
+        std::string rep = tmpl;
+        rep.replace(rep_loc, 8, exp[i].first);
+        struct std::tm now = chucho::calendar::get_utc(time(nullptr));
+        configure(rep.c_str());
+        auto wrts = chucho::logger::get("will")->get_writers();
+        ASSERT_EQ(1, wrts.size());
+        ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
+        auto rfw = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
+        ASSERT_TRUE(static_cast<bool>(rfw));
+        auto rlr = rfw->get_file_roller();
+        ASSERT_EQ(typeid(chucho::time_file_roller), typeid(*rlr));
+        auto tfr = std::static_pointer_cast<chucho::time_file_roller>(rlr);
+        ASSERT_TRUE(static_cast<bool>(tfr));
+        std::string fn = tfr->get_active_file_name();
+        EXPECT_EQ("." + chucho::calendar::format(now, exp[i].second), fn);
+        i++;
+    }
+    // clear the status because we generated some warnings
+    chucho::status_manager::get()->clear();
 }
 
 TEST_F(log4cplus_config_file_configurator, file_writer)
