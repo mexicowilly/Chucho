@@ -56,6 +56,8 @@ private:
         config_file_configurator& cfg_;
     };
 
+    #if defined(CHUCHO_CONFIG_FILE)
+
     class chucho_properties_processor : public properties_processor
     {
     public:
@@ -80,6 +82,10 @@ private:
                                                           const std::string& name,
                                                           const properties& props);
     };
+
+    #endif
+
+    #if defined(CHUCHO_LOG4CPLUS_FILE)
 
     class log4cplus_properties_processor : public properties_processor
     {
@@ -115,6 +121,8 @@ private:
 
         std::map<std::string, std::string> factory_keys_;
     };
+
+    #endif
 
     memento_key_set memento_key_set_;
 };

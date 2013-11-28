@@ -50,6 +50,10 @@ IF(CHUCHO_POSIX)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/calendar_posix.cpp PROPERTIES
                                     COMPILE_DEFINITIONS "${CHUCHO_CALENDAR_DEFS};CHUCHO_HAVE_LOCALTIME_R")
     ENDIF()
+    IF(CMAKE_COMPILER_IS_GNUCXX)
+        SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
+                                    COMPILE_FLAGS "-Wno-unused-result")
+    ENDIF()
     IF(CHUCHO_NO_FTS)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
                                     COMPILE_DEFINITIONS CHUCHO_NO_FTS)
@@ -80,11 +84,6 @@ ELSEIF(CHUCHO_WINDOWS)
         platform/windows/syslog_writer_windows.cpp
         platform/windows/winsock_startup.cpp
         platform/windows/winsock_startup.hpp)
-ENDIF()
-
-IF(CMAKE_COMPILER_IS_GNUCXX)
-    SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
-                                COMPILE_FLAGS "-Wno-unused-result")
 ENDIF()
 
 SET(CHUCHO_PUBLIC_HEADERS
@@ -152,35 +151,71 @@ IF(CHUCHO_HAVE_MINIZIP)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/zip_file_compressor.hpp)
 ENDIF()
 
-# Update this when you rev libyaml
-SET(CHUCHO_LIBYAML_VERSION_MAJOR 0)
-SET(CHUCHO_LIBYAML_VERSION_MINOR 1)
-SET(CHUCHO_LIBYAML_VERSION_PATCH 4)
+# Configurator settings
+IF(YAML_CONFIG)
+    # Update this when you rev libyaml
+    SET(CHUCHO_LIBYAML_VERSION_MAJOR 0)
+    SET(CHUCHO_LIBYAML_VERSION_MINOR 1)
+    SET(CHUCHO_LIBYAML_VERSION_PATCH 4)
 
-SET(CHUCHO_EMBEDDED_SOURCES
-    embedded/libyaml/api.c
-    embedded/libyaml/loader.c
-    embedded/libyaml/parser.c
-    embedded/libyaml/reader.c
-    embedded/libyaml/scanner.c)
+    SET(CHUCHO_EMBEDDED_SOURCES
+        embedded/libyaml/api.c
+        embedded/libyaml/loader.c
+        embedded/libyaml/parser.c
+        embedded/libyaml/reader.c
+        embedded/libyaml/scanner.c)
 
-IF(ENABLE_SHARED)
-    SET(CHUCHO_DECLARE_YAML YAML_DECLARE_EXPORT)
-ELSE()
-    SET(CHUCHO_DECLARE_YAML YAML_DECLARE_STATIC)
-ENDIF()
-SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/api.c PROPERTIES
-                            COMPILE_DEFINITIONS "YAML_VERSION_MAJOR=${CHUCHO_LIBYAML_VERSION_MAJOR};YAML_VERSION_MINOR=${CHUCHO_LIBYAML_VERSION_MINOR};YAML_VERSION_PATCH=${CHUCHO_LIBYAML_VERSION_PATCH};YAML_VERSION_STRING=\"${CHUCHO_LIB_YAML_VERSION_MAJOR}.${CHUCHO_LIBYAML_VERSION_MINOR}.${CHUCHO_LIBYAML_VERSION_PATCH}\";${CHUCHO_DECLARE_YAML}")
-SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/loader.c
-                            embedded/libyaml/parser.c
-                            embedded/libyaml/reader.c
-                            embedded/libyaml/scanner.c
-                            PROPERTIES
-                            COMPILE_DEFINITIONS ${CHUCHO_DECLARE_YAML})
-IF(MSVC)
-    # Microsoft doesn't want libyaml to use strdup
+    IF(ENABLE_SHARED)
+        SET(CHUCHO_DECLARE_YAML YAML_DECLARE_EXPORT)
+    ELSE()
+        SET(CHUCHO_DECLARE_YAML YAML_DECLARE_STATIC)
+    ENDIF()
     SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/api.c PROPERTIES
-                                COMPILE_FLAGS /wd4996)
+                                COMPILE_DEFINITIONS "YAML_VERSION_MAJOR=${CHUCHO_LIBYAML_VERSION_MAJOR};YAML_VERSION_MINOR=${CHUCHO_LIBYAML_VERSION_MINOR};YAML_VERSION_PATCH=${CHUCHO_LIBYAML_VERSION_PATCH};YAML_VERSION_STRING=\"${CHUCHO_LIB_YAML_VERSION_MAJOR}.${CHUCHO_LIBYAML_VERSION_MINOR}.${CHUCHO_LIBYAML_VERSION_PATCH}\";${CHUCHO_DECLARE_YAML}")
+    SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/loader.c
+                                embedded/libyaml/parser.c
+                                embedded/libyaml/reader.c
+                                embedded/libyaml/scanner.c
+                                PROPERTIES
+                                COMPILE_DEFINITIONS ${CHUCHO_DECLARE_YAML})
+    IF(MSVC)
+        # Microsoft doesn't want libyaml to use strdup
+        SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/api.c PROPERTIES
+                                    COMPILE_FLAGS /wd4996)
+    ENDIF()
+
+    SET(CHUCHO_CONFIGURATOR_SOURCES
+        yaml_configurator.cpp
+        yaml_parser.cpp
+        include/chucho/utf8.hpp
+        include/chucho/yaml_configurator.hpp
+        include/chucho/yaml_parser.hpp)
+    SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_YAML_CONFIG)
+    MESSAGE(STATUS "Chucho has YAML configuration parsing enabled")
+ENDIF()
+
+IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
+    LIST(APPEND CHUCHO_CONFIGURATOR_SOURCES
+         config_file_configurator.cpp
+         properties.cpp
+         include/chucho/config_file_configurator.hpp
+         include/chucho/properties.hpp)
+    GET_SOURCE_FILE_PROPERTY(CHUCHO_CONFIGURATION_DEFS configuration.cpp COMPILE_DEFINITIONS)
+    SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
+                                COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATION_DEFS};CHUCHO_CONFIG_FILE_CONFIG")
+    IF(CONFIG_FILE_CONFIG)
+        SET(CHUCHO_CONFIGURATOR_DEFS CHUCHO_CONFIG_FILE)
+        MESSAGE(STATUS "Chucho has config file configuration parsing enabled")
+    ENDIF()
+    IF(LOG4CPLUS_CONFIG)
+        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_LOG4CPLUS_FILE)
+        MESSAGE(STATUS "Chucho has log4cplus configuration parsing enabled")
+    ENDIF()
+    SET_SOURCE_FILES_PROPERTIES(config_file_configurator.cpp PROPERTIES
+                                COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATOR_DEFS}")
+    SET_SOURCE_FILES_PROPERTIES(memento_key_set.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_CONFIG_FILE_CONFIG)
 ENDIF()
 
 SET(CHUCHO_SOURCES
@@ -196,7 +231,6 @@ SET(CHUCHO_SOURCES
     configurable_factory.cpp
     configuration.cpp
     configurator.cpp
-    config_file_configurator.cpp
     console_writer.cpp
     cout_writer.cpp
     cout_writer_factory.cpp
@@ -240,7 +274,6 @@ SET(CHUCHO_SOURCES
     pattern_formatter.cpp
     pattern_formatter_factory.cpp
     pattern_formatter_memento.cpp
-    properties.cpp
     regex.cpp
     regex_exception.cpp
     remote_writer.cpp
@@ -271,9 +304,7 @@ SET(CHUCHO_SOURCES
     writer.cpp
     writer_factory.cpp
     writer_memento.cpp
-    yaml_configurator.cpp
     yaml_formatter.cpp
-    yaml_parser.cpp
     zip_file_compressor_factory.cpp
     include/chucho/async_writer_factory.hpp
     include/chucho/async_writer_memento.hpp
@@ -283,7 +314,6 @@ SET(CHUCHO_SOURCES
     include/chucho/cerr_writer_memento.hpp
     include/chucho/clock_util.hpp
     include/chucho/configurator.hpp
-    include/chucho/config_file_configurator.hpp
     include/chucho/cout_writer_factory.hpp
     include/chucho/cout_writer_memento.hpp
     include/chucho/demangle.hpp
@@ -310,7 +340,6 @@ SET(CHUCHO_SOURCES
     include/chucho/numbered_file_roller_memento.hpp
     include/chucho/pattern_formatter_factory.hpp
     include/chucho/pattern_formatter_memento.hpp
-    include/chucho/properties.hpp
     include/chucho/regex.hpp
     include/chucho/regex_exception.hpp
     include/chucho/remote_writer_factory.hpp
@@ -333,9 +362,8 @@ SET(CHUCHO_SOURCES
     include/chucho/time_file_roller_factory.hpp
     include/chucho/time_file_roller_memento.hpp
     include/chucho/utf8.hpp
-    include/chucho/yaml_configurator.hpp
-    include/chucho/yaml_parser.hpp
     include/chucho/zip_file_compressor_factory.hpp
+    ${CHUCHO_CONFIGURATOR_SOURCES}
     ${CHUCHO_PLATFORM_SOURCES}
     ${CHUCHO_EMBEDDED_SOURCES}
     ${CHUCHO_PUBLIC_HEADERS})

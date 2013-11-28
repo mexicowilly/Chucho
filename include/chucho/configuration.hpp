@@ -273,8 +273,7 @@ private:
         void warning(const std::string& message, std::exception_ptr ex = std::exception_ptr()) const;
     };
 
-    CHUCHO_NO_EXPORT static bool configure_from_config_file(const std::string& file_name, reporter& report);
-    CHUCHO_NO_EXPORT static bool configure_from_yaml_file(const std::string& file_name, reporter& report);
+    CHUCHO_NO_EXPORT static bool configure_from_file(const std::string& file_name, reporter& report);
     CHUCHO_NO_EXPORT static void perform(std::shared_ptr<logger> root_logger);
 };
 

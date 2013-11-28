@@ -31,6 +31,11 @@ SET(CHUCHO_NEEDS_TO_USE_THE_FRAMEWORK_VARIABLE_OR_CMAKE_COMPLAINS ${ENABLE_FRAME
 # services.
 OPTION(INSTALL_SERVICE "Whether to install chuchod as a system service" TRUE)
 
+# what kinds of configurations will we support
+OPTION(YAML_CONFIG "Whether to include the YAML configuration parser" TRUE)
+OPTION(CONFIG_FILE_CONFIG "Whether to include the config file configuration parser that uses Chucho keys" FALSE)
+OPTION(LOG4CPLUS_CONFIG "Whether to support reading log4cplus configuration files" FALSE)
+
 # We'll want this later
 MACRO(CHUCHO_FIND_PROGRAM CHUCHO_FIND_VAR CHUCHO_PROGRAM)
     MESSAGE(STATUS "Looking for ${CHUCHO_PROGRAM}")

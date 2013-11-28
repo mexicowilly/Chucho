@@ -58,6 +58,9 @@ void config_file_configurator::configure(std::istream& in)
 {
     std::unique_ptr<properties_processor> proc;
     properties props(in);
+
+    #if defined(CHUCHO_CONFIG_FILE)
+
     std::unique_ptr<properties> id(new properties(props.get_subset("chucho.")));
     if (!id->empty())
     {
@@ -65,12 +68,31 @@ void config_file_configurator::configure(std::istream& in)
     }
     else
     {
+        #if defined(CHUCHO_LOG4CPLUS_FILE)
+
         id.reset(new properties(props.get_subset("log4cplus.")));
         if (id->empty())
             throw exception("Found neither Chucho nor log4cplus keys in the configuration");
         proc.reset(new log4cplus_properties_processor(*this));
         memento_key_set_ = memento_key_set::LOG4CPLUS;
+
+        #else
+
+        throw exception("Found no Chucho keys in the configuration");
+
+        #endif
     }
+
+    #elif defined(CHUCHO_LOG4CPLUS_FILE)
+
+    std::unique_ptr<properties> id(new properties(props.get_subset("log4cplus.")));
+    if (id->empty())
+        throw exception("Found no log4cplus keys in the configuration");
+    proc.reset(new log4cplus_properties_processor(*this));
+    memento_key_set_ = memento_key_set::LOG4CPLUS;
+
+    #endif
+
     id.reset();
     proc->process(props);
 }
@@ -79,6 +101,8 @@ config_file_configurator::properties_processor::properties_processor(config_file
     : cfg_(cfg)
 {
 }
+
+#if defined(CHUCHO_CONFIG_FILE)
 
 config_file_configurator::chucho_properties_processor::chucho_properties_processor(config_file_configurator& cfg)
     : properties_processor(cfg)
@@ -211,6 +235,10 @@ void config_file_configurator::chucho_properties_processor::process(const proper
         ++loggers.first;
     }
 }
+
+#endif
+
+#if defined(CHUCHO_LOG4CPLUS_FILE)
 
 config_file_configurator::log4cplus_properties_processor::log4cplus_properties_processor(config_file_configurator& cfg)
     : properties_processor(cfg)
@@ -522,5 +550,7 @@ std::string config_file_configurator::log4cplus_properties_processor::time_patte
     }
     return result;
 }
+
+#endif
 
 }
