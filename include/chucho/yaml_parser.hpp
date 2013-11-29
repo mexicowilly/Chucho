@@ -14,34 +14,48 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_LEVEL_THRESHOLD_FILTER_MEMENTO_HPP__)
-#define CHUCHO_LEVEL_THRESHOLD_FILTER_MEMENTO_HPP__
+#if !defined(CHUCHO_YAML_PARSER_HPP__)
+#define CHUCHO_YAML_PARSER_HPP__
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"
 #endif
 
-#include <chucho/memento.hpp>
-#include <chucho/level.hpp>
-#include <chucho/memento_key_set.hpp>
+#include <chucho/non_copyable.hpp>
+#include <yaml.h>
+#include <istream>
 
 namespace chucho
 {
 
-class level_threshold_filter_memento : public memento
+class yaml_parser : non_copyable
 {
 public:
-    level_threshold_filter_memento(const configurator& cfg, memento_key_set ks);
+    yaml_parser(std::istream& stream);
+    ~yaml_parser();
 
-    std::shared_ptr<level> get_level() const;
+    operator yaml_parser_t* ();
+
+    yaml_mark_t problem_mark() const;
+    std::string problem_message() const;
 
 private:
-    std::shared_ptr<level> level_;
+    yaml_parser_t parser_;
 };
 
-inline std::shared_ptr<level> level_threshold_filter_memento::get_level() const
+inline yaml_parser::operator yaml_parser_t* ()
 {
-    return level_;
+    return &parser_;
+}
+
+inline yaml_mark_t yaml_parser::problem_mark() const
+{
+    return parser_.problem_mark;
+}
+
+inline std::string yaml_parser::problem_message() const
+{
+    return parser_.problem;
 }
 
 }

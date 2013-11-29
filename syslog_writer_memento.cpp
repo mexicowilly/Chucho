@@ -16,6 +16,7 @@
 
 #include <chucho/syslog_writer_memento.hpp>
 #include <chucho/exception.hpp>
+#include <chucho/text_util.hpp>
 
 namespace chucho
 {
@@ -27,11 +28,12 @@ syslog_writer_memento::syslog_writer_memento(const configurator& cfg)
     set_status_origin("syslog_writer_memento");
     set_handler("facility", std::bind(&syslog_writer_memento::set_facility, this, std::placeholders::_1));
     set_handler("host_name", [this] (const std::string& name) { host_name_ = name; });
+    set_alias("host_name", "host");
 }
 
 void syslog_writer_memento::set_facility(const std::string& name)
 {
-    auto lname = to_lower(name);
+    auto lname = text_util::to_lower(name);
     if (lname == "kern")
         facility_ = syslog::facility::KERN;
     else if (lname == "user")

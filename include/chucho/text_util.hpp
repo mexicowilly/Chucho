@@ -14,21 +14,26 @@
  *    limitations under the License.
  */
 
-#include <chucho/level_threshold_filter_memento.hpp>
-#include <chucho/exception.hpp>
+#if !defined(CHUCHO_TO_LOWER_HPP__)
+#define CHUCHO_TO_LOWER_HPP__
+
+#if !defined(CHUCHO_BUILD)
+#error "This header is private"
+#endif
+
+#include <chucho/export.hpp>
+#include <string>
 
 namespace chucho
 {
 
-level_threshold_filter_memento::level_threshold_filter_memento(const configurator& cfg, memento_key_set ks)
-    : memento(cfg)
+namespace text_util
 {
-    set_status_origin("level_threshold_filter_memento");
-    handler lvl_hnd = [this](const std::string& name) { level_ = level::from_text(name); };
-    if (ks == memento_key_set::CHUCHO)
-        set_handler("level", lvl_hnd);
-    else if (ks == memento_key_set::LOG4CPLUS)
-        set_handler("LogLevelMin", lvl_hnd);
+
+CHUCHO_NO_EXPORT std::string to_lower(const std::string& text);
+
 }
 
 }
+
+#endif

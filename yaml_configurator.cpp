@@ -18,6 +18,7 @@
 #include <chucho/exception.hpp>
 #include <chucho/logger_factory.hpp>
 #include <chucho/configuration.hpp>
+#include <chucho/yaml_parser.hpp>
 #include <istream>
 
 namespace
@@ -26,31 +27,12 @@ namespace
 class yaml_location_exception : public chucho::exception
 {
 public:
-    yaml_location_exception(const yaml_mark_t mark, const std::string& msg)
+    yaml_location_exception(const yaml_mark_t& mark, const std::string& msg)
         : exception("YAML error [line " + std::to_string(mark.line) +
                     ", column " + std::to_string(mark.column) + "] " + msg)
     {
     }
 };
-
-int istream_reader(void* raw,
-                   unsigned char* buf,
-                   std::size_t size,
-                   std::size_t* size_read)
-{
-    // You don't own this pointer
-    std::istream* stream = reinterpret_cast<std::istream*>(raw);
-    if (stream->eof())
-    {
-        *size_read = 0;
-        return 1;
-    }
-    if (!stream->good())
-        return 0;
-    stream->read(reinterpret_cast<char*>(buf), size);
-    *size_read = static_cast<std::size_t>(stream->gcount());
-    return 1;
-}
 
 }
 
@@ -64,20 +46,12 @@ yaml_configurator::yaml_configurator()
 
 void yaml_configurator::configure(std::istream& in)
 {
-    yaml_parser_t prs;
-    yaml_parser_initialize(&prs);
-    struct prs_sentry
-    {
-        prs_sentry(yaml_parser_t& prs) : prs_(prs) { }
-        ~prs_sentry() { yaml_parser_delete(&prs_); }
-        yaml_parser_t& prs_;
-    } ps(prs);
-    yaml_parser_set_input(&prs, istream_reader, &in);
+    yaml_parser prs(in);
     yaml_document_t doc;
     while (true)
     {
-        if (!yaml_parser_load(&prs, &doc))
-            throw yaml_location_exception(prs.problem_mark, prs.problem);
+        if (!yaml_parser_load(prs, &doc))
+            throw yaml_location_exception(prs.problem_mark(), prs.problem_message());
         struct doc_sentry
         {
             doc_sentry(yaml_document_t& doc) : doc_(doc) { }

@@ -74,6 +74,7 @@ public:
      * @return the filters
      */
     std::vector<std::shared_ptr<filter>> get_filters();
+    std::shared_ptr<formatter> get_formatter() const;
     /**
      * Write an event. This non-virtual method takes care of all the 
      * common housekeeping that writers must undertake when writing 
@@ -114,6 +115,11 @@ private:
     std::recursive_mutex guard_;
     bool i_am_writing_;
 };
+
+inline std::shared_ptr<formatter> writer::get_formatter() const
+{
+    return formatter_;
+}
 
 }
 

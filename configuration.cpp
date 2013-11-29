@@ -16,14 +16,23 @@
 
 #include <chucho/configuration.hpp>
 #include <chucho/file.hpp>
-#include <chucho/yaml_configurator.hpp>
-#include <chucho/utf8.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/cout_writer.hpp>
 #include <chucho/pattern_formatter.hpp>
 #include <chucho/logger.hpp>
 #include <chucho/garbage_cleaner.hpp>
 #include <chucho/environment.hpp>
+#include <chucho/configurator.hpp>
+
+#if defined(CHUCHO_YAML_CONFIG)
+#include <chucho/yaml_parser.hpp>
+#include <chucho/yaml_configurator.hpp>
+#endif
+#if defined(CHUCHO_CONFIG_FILE_CONFIG)
+#include <chucho/config_file_configurator.hpp>
+#include <chucho/properties.hpp>
+#endif
+
 #include <fstream>
 #include <algorithm>
 #include <sstream>
@@ -111,6 +120,49 @@ void set_default_config(std::shared_ptr<chucho::logger> root_logger)
     }
 }
 
+enum class format
+{
+    YAML,
+    CONFIG_FILE,
+    DONT_KNOW
+};
+
+format detect_format(std::istream& stream_1, std::istream& stream_2)
+{
+    #if defined(CHUCHO_YAML_CONFIG)
+
+    chucho::yaml_parser prs(stream_1);
+    yaml_document_t doc;
+    if (yaml_parser_load(prs, &doc))
+        return format::YAML;
+
+    #endif
+
+    #if defined(CHUCHO_CONFIG_FILE_CONFIG)
+
+    chucho::properties props(stream_2);
+    if (props.size() > 0)
+        return format::CONFIG_FILE;
+
+    #endif
+
+    return format::DONT_KNOW; 
+}
+
+format detect_file_format(const std::string& file_name)
+{
+    std::ifstream stream_1(file_name);
+    std::ifstream stream_2(file_name);
+    return detect_format(stream_1, stream_2);
+}
+
+format detect_text_format(const std::string& text)
+{
+    std::istringstream stream_1(text);
+    std::istringstream stream_2(text);
+    return detect_format(stream_1, stream_2);
+}
+
 }
 
 namespace chucho
@@ -121,20 +173,46 @@ bool configuration::allow_default()
     return data().allow_default_config_;
 }
 
-bool configuration::configure_from_yaml_file(const std::string& file_name, reporter& report)
+bool configuration::configure_from_file(const std::string& file_name, reporter& report)
 {
-    std::ifstream val_in(file_name.c_str());
-    if (val_in.is_open())
+    bool result = false;
+    format fmt = detect_file_format(file_name);
+    std::unique_ptr<configurator> cfg;
+
+    #if defined(CHUCHO_YAML_CONFIG)
+
+    if (fmt == format::YAML)
+    {
+        report.info("The file, " + file_name + ", is in YAML format");
+        cfg.reset(new yaml_configurator);
+    }
+
+    #endif
+
+    #if defined(CHUCHO_CONFIG_FILE_CONFIG)
+
+    if (fmt == format::CONFIG_FILE)
+    {
+        report.info("The file, " + file_name + ", is in config file format");
+        cfg.reset(new config_file_configurator);
+    }
+
+    #endif
+
+    if (fmt == format::DONT_KNOW)
+    {
+        report.warning("Unable to determine the format of the file " + file_name);
+        return result;
+    }
+
+    std::ifstream in(file_name.c_str());
+    if (in.is_open())
     {
         try
         {
-            chucho::utf8::validate(val_in);
-            val_in.close();
-            std::ifstream yam_in(file_name.c_str());
-            chucho::yaml_configurator yam;
-            yam.configure(yam_in);
+            cfg->configure(in);
             data().loaded_file_name_ = file_name;
-            return true;
+            result = true;
         }
         catch (std::exception& e)
         {
@@ -146,7 +224,7 @@ bool configuration::configure_from_yaml_file(const std::string& file_name, repor
     {
         report.warning(file_name + " exists, but I can't open it for reading");
     }
-    return false;
+    return result;
 }
 
 const std::string& configuration::get_environment_variable()
@@ -189,6 +267,9 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
         report.info("Configuration will not be performed because it has been turned off");
         return;
     }
+
+    #if defined(CHUCHO_YAML_CONFIG) || defined(CHUCHO_CONFIG_FILE_CONFIG)
+
     configurator::initialize();
     std::string fn;
     if (!sd.environment_variable_.empty())
@@ -203,8 +284,8 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
     {
         if (file::exists(fn))
         {
-            sd.is_configured = configure_from_yaml_file(fn, report);
-            if (!sd.is_configured)
+            sd.is_configured = configure_from_file(fn, report);
+            if (!sd.is_configured) 
                 logger::remove_unused_loggers();
         }
         else
@@ -216,12 +297,37 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
     {
         try
         {
-            yaml_configurator yam;
-            // this is already validated UTF-8
-            std::istringstream fb_in(sd.fallback_);
-            yam.configure(fb_in);
-            sd.is_configured = true;
-            report.info("Using the fallback configuration");
+            format fmt = detect_text_format(sd.fallback_);
+
+            #if defined(CHUCHO_YAML_CONFIG)
+
+            if (fmt == format::YAML)
+            {
+                yaml_configurator yam; 
+                // this is already validated UTF-8
+                std::istringstream fb_in(sd.fallback_);
+                yam.configure(fb_in);
+                sd.is_configured = true;
+                report.info("Using the YAML format fallback configuration"); 
+            }
+
+            #endif
+
+            #if defined(CHUCHO_CONFIG_FILE_CONFIG)
+
+            if (fmt == format::CONFIG_FILE)
+            {
+                config_file_configurator cnf;
+                std::istringstream fb_in(sd.fallback_);
+                cnf.configure(fb_in);
+                sd.is_configured = true;
+                report.info("Using the config file format fallback configuration"); 
+            }
+
+            #endif
+
+            if (fmt == format::DONT_KNOW)
+                report.warning("Unable to detect the format of the fallback configuration");
         }
         catch (std::exception& e)
         {
@@ -229,6 +335,9 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
             report.error("Error setting fallback configuration: " + exception::nested_whats(e));
         }
     }
+
+    #endif
+
     if (!sd.is_configured && sd.allow_default_config_)
     {
         set_default_config(root_logger);
@@ -257,7 +366,7 @@ bool configuration::reconfigure()
                 states.emplace_back(lgr);
                 lgr->reset();
             }
-            if (configure_from_yaml_file(to_try, report))
+            if (configure_from_file(to_try, report))
             {
                 result = true;
             }
@@ -288,7 +397,6 @@ void configuration::set_environment_variable(const std::string& var)
 void configuration::set_fallback(const std::string& config)
 {
     std::istringstream stream(config);
-    utf8::validate(stream);
     data().fallback_ = config;
 }
 

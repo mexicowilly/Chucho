@@ -50,6 +50,10 @@ IF(CHUCHO_POSIX)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/calendar_posix.cpp PROPERTIES
                                     COMPILE_DEFINITIONS "${CHUCHO_CALENDAR_DEFS};CHUCHO_HAVE_LOCALTIME_R")
     ENDIF()
+    IF(CMAKE_COMPILER_IS_GNUCXX)
+        SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
+                                    COMPILE_FLAGS "-Wno-unused-result")
+    ENDIF()
     IF(CHUCHO_NO_FTS)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
                                     COMPILE_DEFINITIONS CHUCHO_NO_FTS)
@@ -80,11 +84,6 @@ ELSEIF(CHUCHO_WINDOWS)
         platform/windows/syslog_writer_windows.cpp
         platform/windows/winsock_startup.cpp
         platform/windows/winsock_startup.hpp)
-ENDIF()
-
-IF(CMAKE_COMPILER_IS_GNUCXX)
-    SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
-                                COMPILE_FLAGS "-Wno-unused-result")
 ENDIF()
 
 SET(CHUCHO_PUBLIC_HEADERS
@@ -121,7 +120,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/non_copyable.hpp
     include/chucho/noop_file_compressor.hpp
     include/chucho/numbered_file_roller.hpp
-	include/chucho/optional.hpp
+    include/chucho/optional.hpp
     include/chucho/pattern_formatter.hpp
     include/chucho/remote_writer.hpp
     include/chucho/rolling_file_writer.hpp
@@ -152,45 +151,71 @@ IF(CHUCHO_HAVE_MINIZIP)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/zip_file_compressor.hpp)
 ENDIF()
 
-# Update this when you rev libyaml
-SET(CHUCHO_LIBYAML_VERSION_MAJOR 0)
-SET(CHUCHO_LIBYAML_VERSION_MINOR 1)
-SET(CHUCHO_LIBYAML_VERSION_PATCH 4)
+# Configurator settings
+IF(YAML_CONFIG)
+    # Update this when you rev libyaml
+    SET(CHUCHO_LIBYAML_VERSION_MAJOR 0)
+    SET(CHUCHO_LIBYAML_VERSION_MINOR 1)
+    SET(CHUCHO_LIBYAML_VERSION_PATCH 4)
 
-SET(CHUCHO_EMBEDDED_SOURCES
-    embedded/trex/trex.c
-    embedded/libyaml/api.c
-    embedded/libyaml/loader.c
-    embedded/libyaml/parser.c
-    embedded/libyaml/reader.c
-    embedded/libyaml/scanner.c)
+    SET(CHUCHO_EMBEDDED_SOURCES
+        embedded/libyaml/api.c
+        embedded/libyaml/loader.c
+        embedded/libyaml/parser.c
+        embedded/libyaml/reader.c
+        embedded/libyaml/scanner.c)
 
-IF(ENABLE_SHARED)
-    SET(CHUCHO_DECLARE_YAML YAML_DECLARE_EXPORT)
-ELSE()
-    SET(CHUCHO_DECLARE_YAML YAML_DECLARE_STATIC)
-ENDIF()
-SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/api.c PROPERTIES
-                            COMPILE_DEFINITIONS "YAML_VERSION_MAJOR=${CHUCHO_LIBYAML_VERSION_MAJOR};YAML_VERSION_MINOR=${CHUCHO_LIBYAML_VERSION_MINOR};YAML_VERSION_PATCH=${CHUCHO_LIBYAML_VERSION_PATCH};YAML_VERSION_STRING=\"${CHUCHO_LIB_YAML_VERSION_MAJOR}.${CHUCHO_LIBYAML_VERSION_MINOR}.${CHUCHO_LIBYAML_VERSION_PATCH}\";${CHUCHO_DECLARE_YAML}")
-SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/loader.c
-                            embedded/libyaml/parser.c
-                            embedded/libyaml/reader.c
-                            embedded/libyaml/scanner.c
-                            PROPERTIES
-                            COMPILE_DEFINITIONS ${CHUCHO_DECLARE_YAML})
-IF(MSVC)
-    # Microsoft doesn't want libyaml to use strdup
+    IF(ENABLE_SHARED)
+        SET(CHUCHO_DECLARE_YAML YAML_DECLARE_EXPORT)
+    ELSE()
+        SET(CHUCHO_DECLARE_YAML YAML_DECLARE_STATIC)
+    ENDIF()
     SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/api.c PROPERTIES
-                                COMPILE_FLAGS /wd4996)
-    # If _DEBUG is defined, which it is by CMake here with Microsoft's
-    # compiler, then trex likes to print all kinds of unhelpful things
-    # to stdout. 
-    SET_SOURCE_FILES_PROPERTIES(embedded/trex/trex.c PROPERTIES
-                                COMPILE_FLAGS /U_DEBUG)
+                                COMPILE_DEFINITIONS "YAML_VERSION_MAJOR=${CHUCHO_LIBYAML_VERSION_MAJOR};YAML_VERSION_MINOR=${CHUCHO_LIBYAML_VERSION_MINOR};YAML_VERSION_PATCH=${CHUCHO_LIBYAML_VERSION_PATCH};YAML_VERSION_STRING=\"${CHUCHO_LIB_YAML_VERSION_MAJOR}.${CHUCHO_LIBYAML_VERSION_MINOR}.${CHUCHO_LIBYAML_VERSION_PATCH}\";${CHUCHO_DECLARE_YAML}")
+    SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/loader.c
+                                embedded/libyaml/parser.c
+                                embedded/libyaml/reader.c
+                                embedded/libyaml/scanner.c
+                                PROPERTIES
+                                COMPILE_DEFINITIONS ${CHUCHO_DECLARE_YAML})
+    IF(MSVC)
+        # Microsoft doesn't want libyaml to use strdup
+        SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/api.c PROPERTIES
+                                    COMPILE_FLAGS /wd4996)
+    ENDIF()
+
+    SET(CHUCHO_CONFIGURATOR_SOURCES
+        yaml_configurator.cpp
+        yaml_parser.cpp
+        include/chucho/utf8.hpp
+        include/chucho/yaml_configurator.hpp
+        include/chucho/yaml_parser.hpp)
+    SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_YAML_CONFIG)
+    MESSAGE(STATUS "Chucho has YAML configuration parsing enabled")
 ENDIF()
-IF(CMAKE_C_COMPILER_ID STREQUAL Clang)
-    SET_SOURCE_FILES_PROPERTIES(embedded/trex/trex.c PROPERTIES
-                                COMPILE_FLAGS "-Wno-logical-op-parentheses -Wno-unused-value")
+
+IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
+    LIST(APPEND CHUCHO_CONFIGURATOR_SOURCES
+         config_file_configurator.cpp
+         properties.cpp
+         include/chucho/config_file_configurator.hpp
+         include/chucho/properties.hpp)
+    GET_SOURCE_FILE_PROPERTY(CHUCHO_CONFIGURATION_DEFS configuration.cpp COMPILE_DEFINITIONS)
+    SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
+                                COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATION_DEFS};CHUCHO_CONFIG_FILE_CONFIG")
+    IF(CONFIG_FILE_CONFIG)
+        SET(CHUCHO_CONFIGURATOR_DEFS CHUCHO_CONFIG_FILE)
+        MESSAGE(STATUS "Chucho has config file configuration parsing enabled")
+    ENDIF()
+    IF(LOG4CPLUS_CONFIG)
+        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_LOG4CPLUS_FILE)
+        MESSAGE(STATUS "Chucho has log4cplus configuration parsing enabled")
+    ENDIF()
+    SET_SOURCE_FILES_PROPERTIES(config_file_configurator.cpp PROPERTIES
+                                COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATOR_DEFS}")
+    SET_SOURCE_FILES_PROPERTIES(memento_key_set.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_CONFIG_FILE_CONFIG)
 ENDIF()
 
 SET(CHUCHO_SOURCES
@@ -241,6 +266,7 @@ SET(CHUCHO_SOURCES
     logger_memento.cpp
     marker.cpp
     memento.cpp
+    memento_key_set.cpp
     noop_file_compressor.cpp
     numbered_file_roller.cpp
     numbered_file_roller_factory.cpp
@@ -270,6 +296,7 @@ SET(CHUCHO_SOURCES
     syslog_writer.cpp
     syslog_writer_factory.cpp
     syslog_writer_memento.cpp
+    text_util.cpp
     time_file_roller.cpp
     time_file_roller_factory.cpp
     time_file_roller_memento.cpp
@@ -277,7 +304,6 @@ SET(CHUCHO_SOURCES
     writer.cpp
     writer_factory.cpp
     writer_memento.cpp
-    yaml_configurator.cpp
     yaml_formatter.cpp
     zip_file_compressor_factory.cpp
     include/chucho/async_writer_factory.hpp
@@ -297,6 +323,8 @@ SET(CHUCHO_SOURCES
     include/chucho/exception.hpp
     include/chucho/file.hpp
     include/chucho/file_exception.hpp
+    include/chucho/file_writer_factory.hpp
+    include/chucho/file_writer_memento.hpp
     include/chucho/garbage_cleaner.hpp
     include/chucho/gzip_file_compressor_factory.hpp
     include/chucho/host.hpp
@@ -307,6 +335,7 @@ SET(CHUCHO_SOURCES
     include/chucho/line_ending.hpp
     include/chucho/logger_factory.hpp
     include/chucho/logger_memento.hpp
+    include/chucho/memento_key_set.hpp
     include/chucho/numbered_file_roller_factory.hpp
     include/chucho/numbered_file_roller_memento.hpp
     include/chucho/pattern_formatter_factory.hpp
@@ -329,11 +358,12 @@ SET(CHUCHO_SOURCES
     include/chucho/status_reporter.hpp
     include/chucho/syslog_writer_factory.hpp
     include/chucho/syslog_writer_memento.hpp
+    include/chucho/text_util.hpp
     include/chucho/time_file_roller_factory.hpp
     include/chucho/time_file_roller_memento.hpp
     include/chucho/utf8.hpp
-    include/chucho/yaml_configurator.hpp
     include/chucho/zip_file_compressor_factory.hpp
+    ${CHUCHO_CONFIGURATOR_SOURCES}
     ${CHUCHO_PLATFORM_SOURCES}
     ${CHUCHO_EMBEDDED_SOURCES}
     ${CHUCHO_PUBLIC_HEADERS})
@@ -350,6 +380,16 @@ IF(CHUCHO_HAVE_WINSOCK2_H)
     GET_SOURCE_FILE_PROPERTY(CHUCHO_REMOTE_WRITER_DEFS remote_writer.cpp COMPILE_DEFINITIONS)
     SET_SOURCE_FILES_PROPERTIES(remote_writer.cpp PROPERTIES
                                 COMPILE_DEFINITIONS "${CHUCHO_REMOTE_WRITER_DEFS};CHUCHO_HAVE_WINSOCK2_H")
+ENDIF()
+
+IF(CHUCHO_HAVE_STD_REGEX)
+    SET_SOURCE_FILES_PROPERTIES(regex.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_HAVE_STD_REGEX)
+ELSEIF(CHUCHO_HAVE_POSIX_REGEX)
+    SET_SOURCE_FILES_PROPERTIES(regex.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_HAVE_POSIX_REGEX)
+ELSE()
+    MESSAGE(FATAL_ERROR "You don't have regular expressions")
 ENDIF()
 
 IF(CHUCHO_HAVE_ZLIB)
@@ -466,16 +506,30 @@ ADD_SUBDIRECTORY(log-server)
 # Documentation
 IF(DOXYGEN_FOUND)
     SET(CHUCHO_DOXYGEN_INPUT "\"${CMAKE_SOURCE_DIR}/main_page.hpp\"")
-	FOREACH(HEAD ${CHUCHO_PUBLIC_HEADERS})
-        SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
-	ENDFOREACH()
-	CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/doxygen.conf" "${CMAKE_BINARY_DIR}/doxygen_mod.conf")
-	ADD_CUSTOM_TARGET(doc
-					  COMMAND "${DOXYGEN_EXECUTABLE}" "${CMAKE_BINARY_DIR}/doxygen_mod.conf"
-					  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+    IF(CHUCHO_DOCUMENT_ALL)
+        FOREACH(HEAD ${CHUCHO_SOURCES})
+            IF(HEAD MATCHES "^include/chucho/.+\\.hpp$")
+                SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
+            ENDIF()
+        ENDFOREACH()
+        FILE(GLOB CHUCHO_GENERATED_HEADERS RELATIVE "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/chucho/*.hpp")
+        FOREACH(HEAD ${CHUCHO_GENERATED_HEADERS})
+            SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
+        ENDFOREACH()
+        SET(CHUCHO_DOXYGEN_EXTRACT_ALL YES)
+    ELSE()
+        FOREACH(HEAD ${CHUCHO_PUBLIC_HEADERS})
+            SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
+        ENDFOREACH()
+        SET(CHUCHO_DOXYGEN_EXTRACT_ALL NO)
+    ENDIF()
+    CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/doxygen.conf" "${CMAKE_BINARY_DIR}/doxygen_mod.conf")
+    ADD_CUSTOM_TARGET(doc
+                      COMMAND "${DOXYGEN_EXECUTABLE}" "${CMAKE_BINARY_DIR}/doxygen_mod.conf"
+                      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 ELSE()
-	ADD_CUSTOM_TARGET(doc
-					  COMMAND "${CMAKE_COMMAND}" -E echo "Doxygen was not found on this system, so the documentation cannot be generated")
+    ADD_CUSTOM_TARGET(doc
+                      COMMAND "${CMAKE_COMMAND}" -E echo "Doxygen was not found on this system, so the documentation cannot be generated")
 ENDIF()
 
 # Static analysis

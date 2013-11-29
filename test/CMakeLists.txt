@@ -37,8 +37,24 @@ IF(CHUCHO_HAVE_MINIZIP)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_MINIZIP)
 ENDIF()
 
+IF(YAML_CONFIG)
+    SET(CHUCHO_CONFIGURATOR_TESTS yaml_configurator_test.cpp utf8_test.cpp)
+ENDIF()
+
+IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
+    LIST(APPEND CHUCHO_CONFIGURATOR_TESTS properties_test.cpp)
+    IF(CONFIG_FILE_CONFIG)
+        LIST(APPEND CHUCHO_CONFIGURATOR_TESTS chucho_config_file_configurator_test.cpp)
+    ENDIF()
+    IF(LOG4CPLUS_CONFIG)
+        LIST(APPEND CHUCHO_CONFIGURATOR_TESTS log4cplus_config_file_configurator_test.cpp)
+    ENDIF()
+ENDIF()
+
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
+               configurator_test.cpp
+               configurator_test.hpp
                diagnostic_context_test.cpp
                duplicate_message_filter_test.cpp
                file_test.cpp
@@ -57,8 +73,8 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                rolling_file_writer_test.cpp
                size_file_roll_trigger_test.cpp
                utf8_test.cpp
-               yaml_configurator_test.cpp
-               ${CHUCHO_TEST_COMPRESSION_SOURCES})
+               ${CHUCHO_TEST_COMPRESSION_SOURCES}
+               ${CHUCHO_CONFIGURATOR_TESTS})
 TARGET_LINK_LIBRARIES(unit-test chucho gtest ${CHUCHO_THREAD_LIB})
 IF(CHUCHO_SOLARIS)
     TARGET_LINK_LIBRARIES(unit-test socket nsl)
