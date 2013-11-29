@@ -19,6 +19,7 @@
 #include <chucho/configuration.hpp>
 #include <chucho/status_manager.hpp>
 #include <chucho/garbage_cleaner.hpp>
+#include <chucho/time_util.hpp>
 #include <map>
 #include <stdexcept>
 #include <atomic>
@@ -174,6 +175,7 @@ std::vector<std::shared_ptr<writer>> logger::get_writers()
 
 void logger::initialize()
 {
+    time_util::start_now();
     static_data& sd(data());
     std::lock_guard<std::recursive_mutex> lg(sd.loggers_guard_);
     // When loggers are created during configuration, this variable

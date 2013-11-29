@@ -160,12 +160,6 @@ IF(CHUCHO_POSIX)
         MESSAGE(FATAL_ERROR "uname is required")
     ENDIF()
 
-    # resource usage
-    CHECK_CXX_SYMBOL_EXISTS(clock time.h CHUCHO_HAVE_CLOCK)
-    IF(NOT CHUCHO_HAVE_CLOCK)
-        MESSAGE(FATAL_ERROR "clock is required")
-    ENDIF()
-
     # getpid/access/getuid/fork/close/setsid/dup2/chdir/_exit
     FOREACH(SYM getpid access getuid fork close setsid dup2 chdir _exit)
         CHECK_CXX_SYMBOL_EXISTS(${SYM} unistd.h CHUCHO_HAVE_${SYM})

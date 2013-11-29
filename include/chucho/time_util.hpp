@@ -14,25 +14,30 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_TEXT_UTIL_HPP__)
-#define CHUCHO_TEXT_UTIL_HPP__
+#if !defined(CHUCHO_TIME_UTIL_HPP__)
+#define CHUCHO_TIME_UTIL_HPP__
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"
 #endif
 
 #include <chucho/export.hpp>
-#include <string>
+#include <chrono>
+#include <cstdint>
 
 namespace chucho
 {
 
-namespace text_util
+class time_util
 {
+public:
+    static std::chrono::milliseconds::rep milliseconds_since_start();
 
-CHUCHO_NO_EXPORT std::string to_lower(const std::string& text);
+private:
+    friend class logger;
 
-}
+    static void start_now();
+};
 
 }
 

@@ -15,20 +15,10 @@
  */
 
 #include <chucho/pattern_formatter.hpp>
-#include <time.h>
 #include <unistd.h>
 
 namespace chucho
 {
-
-std::string pattern_formatter::milliseconds_since_start_piece::get_text_impl(const event& evt) const
-{
-    clock_t clocks = clock();
-    std::string result;
-    if (clocks != -1)
-        result = std::to_string(clocks / (CLOCKS_PER_SEC / 1000));
-    return result;
-}
 
 std::string pattern_formatter::pid_piece::get_text_impl(const event& evt) const
 {

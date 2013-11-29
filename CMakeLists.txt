@@ -301,6 +301,7 @@ SET(CHUCHO_SOURCES
     time_file_roller.cpp
     time_file_roller_factory.cpp
     time_file_roller_memento.cpp
+    time_util.cpp
     utf8.cpp
     writer.cpp
     writer_factory.cpp
@@ -362,6 +363,7 @@ SET(CHUCHO_SOURCES
     include/chucho/text_util.hpp
     include/chucho/time_file_roller_factory.hpp
     include/chucho/time_file_roller_memento.hpp
+    include/chucho/time_util.hpp
     include/chucho/utf8.hpp
     include/chucho/zip_file_compressor_factory.hpp
     ${CHUCHO_CONFIGURATOR_SOURCES}

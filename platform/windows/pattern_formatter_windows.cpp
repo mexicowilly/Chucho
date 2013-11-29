@@ -15,37 +15,10 @@
  */
 
 #include <chucho/pattern_formatter.hpp>
-#include <windows.h>
 #include <process.h>
 
 namespace chucho
 {
-
-std::string pattern_formatter::milliseconds_since_start_piece::get_text_impl(const event& evt) const
-{
-    std::string result("0");
-    FILETIME creation;
-    FILETIME exit;
-    FILETIME kernel;
-    FILETIME user;
-    if (GetProcessTimes(GetCurrentProcess(),
-                        &creation,
-                        &exit,
-                        &kernel,
-                        &user))
-    {
-        FILETIME cur;
-        GetSystemTimeAsFileTime(&cur);
-        ULARGE_INTEGER biggy1;
-        biggy1.LowPart = creation.dwLowDateTime;
-        biggy1.HighPart = creation.dwHighDateTime;
-        ULARGE_INTEGER biggy2;
-        biggy2.LowPart = cur.dwLowDateTime;
-        biggy2.HighPart = cur.dwHighDateTime;
-        result = std::to_string((biggy2.QuadPart - biggy1.QuadPart) / 10000);
-    }
-    return result;
-}
 
 std::string pattern_formatter::pid_piece::get_text_impl(const event& evt) const
 {

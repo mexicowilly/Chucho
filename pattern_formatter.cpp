@@ -24,6 +24,7 @@
 #include <chucho/diagnostic_context.hpp>
 #include <chucho/line_ending.hpp>
 #include <chucho/host.hpp>
+#include <chucho/time_util.hpp>
 #include <limits>
 #include <sstream>
 #include <mutex>
@@ -501,6 +502,11 @@ std::string pattern_formatter::level_piece::get_text_impl(const event& evt) cons
 pattern_formatter::milliseconds_since_start_piece::milliseconds_since_start_piece(const format_params& params)
     : piece(params)
 {
+}
+
+std::string pattern_formatter::milliseconds_since_start_piece::get_text_impl(const event& evt) const
+{
+    return std::to_string(time_util::milliseconds_since_start());
 }
 
 pattern_formatter::pid_piece::pid_piece(const format_params& params)
