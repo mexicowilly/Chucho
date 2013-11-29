@@ -64,7 +64,6 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                level_test.cpp
                level_filter_test.cpp
                level_threshold_filter_test.cpp
-               logger_test.cpp
                log_macro_test.cpp
                marker_test.cpp
                multithread_test.cpp

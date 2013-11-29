@@ -330,6 +330,20 @@ TEST_F(chucho_config_file_configurator, syslog_writer_facility)
     syslog_writer_facility_body(tmpl);
 }
 
+TEST_F(chucho_config_file_configurator, syslog_writer_port)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = sw\n"
+              "chucho.writer.sw = chucho::syslog_writer\n"
+              "chucho.writer.sw.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m%n\n"
+              "chucho.writer.sw.facility = LOCAL0\n"
+              "chucho.writer.sw.host_name = localhost\n"
+              "chucho.writer.sw.port = 19567");
+    syslog_writer_port_body();
+}
+
 TEST_F(chucho_config_file_configurator, time_file_roller)
 {
     configure("chucho.logger = will\n"

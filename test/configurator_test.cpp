@@ -421,6 +421,8 @@ void configurator::syslog_writer_body()
     auto wrt = std::static_pointer_cast<chucho::syslog_writer>(wrts[0]);
     EXPECT_EQ(chucho::syslog::facility::LOCAL0, wrt->get_facility());
     EXPECT_EQ(std::string("localhost"), wrt->get_host_name());
+    ASSERT_TRUE(wrt->get_port());
+    EXPECT_EQ(514, *wrt->get_port());
 }
 
 void configurator::syslog_writer_facility_body(const std::string& tmpl)
@@ -482,6 +484,18 @@ void configurator::syslog_writer_facility_body(const std::string& tmpl)
         auto wrt = std::static_pointer_cast<chucho::syslog_writer>(wrts[0]);
         EXPECT_EQ(good[i++].second, wrt->get_facility());
     }
+}
+
+void configurator::syslog_writer_port_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    EXPECT_EQ(typeid(chucho::syslog_writer), typeid(*wrts[0]));
+    auto wrt = std::static_pointer_cast<chucho::syslog_writer>(wrts[0]);
+    EXPECT_EQ(chucho::syslog::facility::LOCAL0, wrt->get_facility());
+    EXPECT_EQ(std::string("localhost"), wrt->get_host_name());
+    ASSERT_TRUE(wrt->get_port());
+    EXPECT_EQ(19567, *wrt->get_port());
 }
 
 void configurator::time_file_roller_body()

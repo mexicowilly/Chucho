@@ -308,6 +308,19 @@ TEST_F(yaml_configurator, syslog_writer_facility)
     syslog_writer_facility_body(tmpl);
 }
 
+TEST_F(yaml_configurator, syslog_writer_port)
+{
+    configure("chucho::logger:\n"
+              "    - name: will\n"
+              "    - chucho::syslog_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            - pattern: '%m%n'\n"
+              "        - facility: LOCAL0\n"
+              "        - host_name: localhost\n"
+              "        - port: 19567");
+    syslog_writer_port_body();
+}
+
 TEST_F(yaml_configurator, time_file_roller)
 {
     configure("chucho::logger:\n"

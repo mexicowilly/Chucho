@@ -81,6 +81,13 @@ public:
      * @return the syslog host name
      */
     const std::string& get_host_name() const;
+    /**
+     * Return the host name. This optional will not be set if no 
+     * host name was provided in the contructor. 
+     * 
+     * @return the syslog host name
+     */
+    const optional<std::uint16_t> get_port() const;
 
 protected:
     virtual void write_impl(const event& evt) override;
@@ -113,6 +120,7 @@ private:
     transport transport_;
     syslog::facility facility_;
     std::string host_name_;
+    optional<std::uint16_t> port_;
 };
 
 inline syslog::facility syslog_writer::get_facility() const
@@ -123,6 +131,11 @@ inline syslog::facility syslog_writer::get_facility() const
 inline const std::string& syslog_writer::get_host_name() const
 {
     return host_name_;
+}
+
+inline const optional<std::uint16_t> syslog_writer::get_port() const
+{
+    return port_;
 }
 
 }

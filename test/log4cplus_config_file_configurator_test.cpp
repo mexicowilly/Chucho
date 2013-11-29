@@ -364,6 +364,18 @@ TEST_F(log4cplus_config_file_configurator, syslog_writer_facility)
     syslog_writer_facility_body(tmpl);
 }
 
+TEST_F(log4cplus_config_file_configurator, syslog_writer_port)
+{
+    configure("log4cplus.logger.will = info, sl\n"
+              "log4cplus.appender.sl = log4cplus::SysLogAppender\n"
+              "log4cplus.appender.sl.layout = log4cplus::PatternLayout\n"
+              "log4cplus.appender.sl.layout.ConversionPattern = %m%n\n"
+              "log4cplus.appender.sl.host = localhost\n"
+              "log4cplus.appender.sl.facility = LOCAL0\n"
+              "log4cplus.appender.sl.port = 19567");
+    syslog_writer_port_body();
+}
+
 TEST_F(log4cplus_config_file_configurator, ttcc_layout)
 {
     configure("log4cplus.logger.will = info, sl\n"

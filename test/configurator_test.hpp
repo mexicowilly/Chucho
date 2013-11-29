@@ -51,6 +51,7 @@ protected:
     void sliding_numbered_file_roller_body();
     void syslog_writer_body();
     void syslog_writer_facility_body(const std::string& tmpl);
+    void syslog_writer_port_body();
     void time_file_roller_body();
     void zip_file_compressor_body();
 };

@@ -35,12 +35,14 @@ public:
 
     const optional<syslog::facility>& get_facility() const;
     const std::string& get_host_name() const;
+    const optional<std::uint16_t> get_port() const;
 
 private:
     void set_facility(const std::string& name);
 
     std::string host_name_;
     optional<syslog::facility> facility_;
+    optional<std::uint16_t> port_;
 };
 
 inline const optional<syslog::facility>& syslog_writer_memento::get_facility() const
@@ -51,6 +53,11 @@ inline const optional<syslog::facility>& syslog_writer_memento::get_facility() c
 inline const std::string& syslog_writer_memento::get_host_name() const
 {
     return host_name_;
+}
+
+inline const optional<std::uint16_t> syslog_writer_memento::get_port() const
+{
+    return port_;
 }
 
 }

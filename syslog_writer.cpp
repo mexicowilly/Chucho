@@ -35,7 +35,8 @@ syslog_writer::syslog_writer(std::shared_ptr<formatter> fmt,
     : writer(fmt),
       transport_(host, port),
       facility_(fcl),
-      host_name_(host)
+      host_name_(host),
+      port_(port)
 {
     set_status_origin("syslog_writer");
 }
