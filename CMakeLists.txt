@@ -223,6 +223,7 @@ SET(CHUCHO_SOURCES
     async_writer_factory.cpp
     async_writer_memento.cpp
     bzip2_file_compressor_factory.cpp
+    calendar.cpp
     cerr_writer.cpp
     cerr_writer_factory.cpp
     cerr_writer_memento.cpp

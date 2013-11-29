@@ -401,7 +401,7 @@ std::string pattern_formatter::date_time_piece::get_text_impl(const event& evt) 
                 pat.replace(p, 2, "");
         }
     }
-    struct std::tm cal;
+    calendar::pieces cal;
     to_calendar(millis.count() / 1000, cal);
     return calendar::format(cal, pat);
 }
@@ -412,7 +412,7 @@ pattern_formatter::utc_date_time_piece::utc_date_time_piece(const std::string& d
 {
 }
 
-void pattern_formatter::utc_date_time_piece::to_calendar(time_t t, struct std::tm& cal) const
+void pattern_formatter::utc_date_time_piece::to_calendar(time_t t, calendar::pieces& cal) const
 {
     cal = calendar::get_utc(t);
 }
@@ -423,7 +423,7 @@ pattern_formatter::local_date_time_piece::local_date_time_piece(const std::strin
 {
 }
 
-void pattern_formatter::local_date_time_piece::to_calendar(time_t t, struct std::tm& cal) const
+void pattern_formatter::local_date_time_piece::to_calendar(time_t t, calendar::pieces& cal) const
 {
     cal = calendar::get_local(t);
 }

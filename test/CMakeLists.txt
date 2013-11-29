@@ -53,6 +53,7 @@ ENDIF()
 
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
+               calendar_test.cpp
                configurator_test.cpp
                configurator_test.hpp
                diagnostic_context_test.cpp

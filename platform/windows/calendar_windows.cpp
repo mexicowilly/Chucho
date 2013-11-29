@@ -25,24 +25,29 @@ namespace chucho
 namespace calendar
 {
 
-std::string format(const struct std::tm& cal, const std::string& pattern)
+std::string format_time_zone(const pieces&, const std::string&);
+
+std::string format(const pieces& cal, const std::string& pattern)
 {
+    std::string new_pat = format_time_zone(cal, pattern);
     std::ostringstream stream;
-    stream << std::put_time(const_cast<struct std::tm*>(&cal), pattern.c_str());
+    stream << std::put_time(const_cast<pieces*>(&cal), pattern.c_str());
     return stream.str();
 }
 
-struct std::tm get_local(std::time_t t)
+pieces get_local(std::time_t t)
 {
-    struct std::tm result;
+    pieces result;
     localtime_s(&result, &t);
+    result.is_utc = false;
     return result;
 }
 
-struct std::tm get_utc(std::time_t t)
+pieces get_utc(std::time_t t)
 {
-    struct std::tm result;
+    pieces result;
     gmtime_s(&result, &t);
+    result.is_utc = true;
     return result;
 }
 

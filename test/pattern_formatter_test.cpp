@@ -142,7 +142,8 @@ TEST_F(pattern_formatter_test, utc_date_time)
 {
     chucho::pattern_formatter f("%d");
     std::time_t secs = std::chrono::duration_cast<std::chrono::seconds>(evt_.get_time().time_since_epoch()).count();
-    struct std::tm cal = *std::gmtime(&secs);
+    chucho::calendar::pieces cal = *std::gmtime(&secs);
+    cal.is_utc = true;
     EXPECT_EQ(chucho::calendar::format(cal, "%Y-%m-%d %H:%M:%S"), f.format(evt_));
     f = chucho::pattern_formatter("%d{%Y}");
     EXPECT_EQ(chucho::calendar::format(cal, "%Y"), f.format(evt_));
@@ -152,7 +153,8 @@ TEST_F(pattern_formatter_test, local_date_time)
 {
     chucho::pattern_formatter f("%D");
     std::time_t secs = std::chrono::duration_cast<std::chrono::seconds>(evt_.get_time().time_since_epoch()).count();
-    struct std::tm cal = *std::localtime(&secs);
+    chucho::calendar::pieces cal = *std::localtime(&secs);
+    cal.is_utc = false;
     EXPECT_EQ(chucho::calendar::format(cal, "%Y-%m-%d %H:%M:%S"), f.format(evt_));
     f = chucho::pattern_formatter("%D{%Y}");
     EXPECT_EQ(chucho::calendar::format(cal, "%Y"), f.format(evt_));

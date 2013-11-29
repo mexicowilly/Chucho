@@ -75,7 +75,7 @@ protected:
 
     std::string get_time(const std::string& fmt)
     {
-        struct std::tm t = chucho::calendar::get_utc(
+        chucho::calendar::pieces t = chucho::calendar::get_utc(
             std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         return chucho::calendar::format(t, fmt);
     }

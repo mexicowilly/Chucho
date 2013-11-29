@@ -24,6 +24,13 @@
 namespace chucho
 {
 
+namespace calendar
+{
+
+struct pieces;
+
+}
+
 /**
  * @class pattern_formatter pattern_formatter.hpp chucho/pattern_formatter.hpp 
  * A pattern_formatter accepts a pattern in its constructor that 
@@ -233,7 +240,7 @@ private:
 
     protected:
         virtual std::string get_text_impl(const event& evt) const override;
-        virtual void to_calendar(time_t t, struct std::tm& cal) const = 0;
+        virtual void to_calendar(time_t t, calendar::pieces& cal) const = 0;
 
     private:
         std::string date_pattern_;
@@ -247,7 +254,7 @@ private:
                             const format_params& params);
 
     protected:
-        virtual void to_calendar(time_t t, struct std::tm& cal) const override;
+        virtual void to_calendar(time_t t, calendar::pieces& cal) const override;
     };
 
     class CHUCHO_NO_EXPORT local_date_time_piece : public date_time_piece
@@ -257,7 +264,7 @@ private:
                               const format_params& params);
 
     protected:
-        virtual void to_calendar(time_t t, struct std::tm& cal) const override;
+        virtual void to_calendar(time_t t, calendar::pieces& cal) const override;
     };
 
     class CHUCHO_NO_EXPORT base_host_piece : public piece

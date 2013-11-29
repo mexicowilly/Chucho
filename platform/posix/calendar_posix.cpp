@@ -58,20 +58,27 @@ namespace chucho
 namespace calendar
 {
 
-std::string format(const struct std::tm& cal, const std::string& pattern)
+std::string format_time_zone(const pieces&, const std::string&);
+
+std::string format(const pieces& cal, const std::string& pattern)
 {
+    std::string new_pat = format_time_zone(cal, pattern);
+
     #if defined(CHUCHO_HAVE_PUT_TIME)
+
     std::ostringstream stream;
-    stream << std::put_time(&cal, pattern.c_str());
+    stream << std::put_time(&cal, new_pat.c_str());
     return stream.str();
+
     #else
+
     std::vector<char> buf(1024);
     std::string result;
     while (true)
     {
         std::size_t rc = std::strftime(&buf[0],
                                        buf.size(),
-                                       pattern.c_str(),
+                                       new_pat.c_str(),
                                        &cal);
         if (rc > 0)
         {
@@ -83,29 +90,46 @@ std::string format(const struct std::tm& cal, const std::string& pattern)
         buf.resize(buf.size() + 1024);
     }
     return result;
+
     #endif
 }
 
-struct std::tm get_local(std::time_t t)
+pieces get_local(std::time_t t)
 {
+    pieces result;
+
     #if defined(CHUCHO_HAVE_LOCALTIME_R)
-    struct std::tm cal;
-    return *::localtime_r(&t, &cal);
+
+    ::localtime_r(&t, &result);
+
     #else
+
     std::lock_guard<std::mutex> lg(calendar_guard());
-    return *std::localtime(&t);
+    result = *std::localtime(&t);
+
     #endif
+
+    result.is_utc = false;
+    return result;
 }
 
-struct std::tm get_utc(std::time_t t)
+pieces get_utc(std::time_t t)
 {
+    pieces result;
+
     #if defined(CHUCHO_HAVE_GMTIME_R)
-    struct std::tm cal;
-    return *::gmtime_r(&t, &cal);
+
+    ::gmtime_r(&t, &result);
+
     #else
+
     std::lock_guard<std::mutex> lg(calendar_guard());
-    return *std::gmtime(&t);
+    result = *std::gmtime(&t);
+
     #endif
+
+    result.is_utc = true;
+    return result;
 }
 
 }

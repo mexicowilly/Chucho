@@ -218,7 +218,7 @@ std::deque<std::string>& test::expected_file_names()
 
 std::string test::format_file_name(const std::string& pattern)
 {
-    struct std::tm cal = chucho::calendar::get_utc(std::time(nullptr));
+    chucho::calendar::pieces cal = chucho::calendar::get_utc(std::time(nullptr));
     std::ostringstream stream;
     stream << TOP_LEVEL_DIR << chucho::calendar::format(cal, pattern);
     return stream.str();

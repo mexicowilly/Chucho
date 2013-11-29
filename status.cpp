@@ -44,12 +44,12 @@ std::ostream& operator<< (std::ostream& stream, const status& st)
         auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(since);
         std::ostringstream fmt_stream;
         fmt_stream << "%H.%M.%S." << (millis.count() % 1000);
-        struct std::tm cal = calendar::get_utc(millis.count() / 1000);
+        calendar::pieces cal = calendar::get_utc(millis.count() / 1000);
         stream << calendar::format(cal, fmt_stream.str());
     }
     else
     {
-        struct std::tm cal = calendar::get_utc(status::clock_type::to_time_t(st.time_));
+        calendar::pieces cal = calendar::get_utc(status::clock_type::to_time_t(st.time_));
         stream << calendar::format(cal, "%H:%M:%S");
 
     }

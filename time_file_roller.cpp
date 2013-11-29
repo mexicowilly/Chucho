@@ -95,7 +95,7 @@ time_file_roller::time_file_roller(const std::string& file_name_pattern,
 
 void time_file_roller::compute_next_roll(const time_type& now)
 {
-    struct std::tm next_cal = calendar::get_utc(clock_type::to_time_t(now));
+    calendar::pieces next_cal = calendar::get_utc(clock_type::to_time_t(now));
     while (now >= next_roll_)
     {
         if (period_ == period::MINUTE)
@@ -190,7 +190,7 @@ std::string time_file_roller::get_active_file_name()
 
 bool time_file_roller::is_triggered(const std::string& active_file, const event& e)
 {
-    struct std::tm now_cal = calendar::get_utc(clock_type::to_time_t(clock_type::now()));
+    calendar::pieces now_cal = calendar::get_utc(clock_type::to_time_t(clock_type::now()));
     time_type now = clock_type::from_time_t(std::mktime(&now_cal));
     return now >= next_roll_;
 }
@@ -198,7 +198,7 @@ bool time_file_roller::is_triggered(const std::string& active_file, const event&
 time_file_roller::time_type time_file_roller::relative(const time_type& t, int period_offset)
 {
     std::time_t st = clock_type::to_time_t(t);
-    struct std::tm cal = calendar::get_local(st);
+    calendar::pieces cal = calendar::get_local(st);
     if (period_ == period::MINUTE)
         cal.tm_min += period_offset;
     else if (period_ == period::HOUR)
@@ -217,7 +217,7 @@ time_file_roller::time_type time_file_roller::relative(const time_type& t, int p
 
 std::string time_file_roller::resolve_file_name(const time_type& tm) const
 {
-    std::tm cal = calendar::get_utc(clock_type::to_time_t(tm));
+    calendar::pieces cal = calendar::get_utc(clock_type::to_time_t(tm));
     std::size_t start;
     std::size_t end;
     std::string result = file_name_pattern_;
@@ -309,7 +309,7 @@ void time_file_roller::set_period()
                 return;
             }
             primary_spec = spec;
-            struct std::tm epoch = calendar::get_utc(0);
+            calendar::pieces epoch = calendar::get_utc(0);
             std::string fmt1 = calendar::format(epoch, spec);
             if (fmt1.empty())
             {
@@ -327,7 +327,7 @@ void time_file_roller::set_period()
             };
             for (period p : periods)
             {
-                struct std::tm rolled = epoch;
+                calendar::pieces rolled = epoch;
                 if (p == period::MINUTE)
                     rolled.tm_min++;
                 else if (p == period::HOUR)
@@ -409,16 +409,16 @@ std::size_t time_file_roller::cleaner::periods_elapsed(const time_type& first, c
     std::size_t result;
     if (roller_.period_ == period::MONTH)
     {
-        struct std::tm first_cal = calendar::get_utc(clock_type::to_time_t(first));
-        struct std::tm last_cal = calendar::get_utc(clock_type::to_time_t(last));
+        calendar::pieces first_cal = calendar::get_utc(clock_type::to_time_t(first));
+        calendar::pieces last_cal = calendar::get_utc(clock_type::to_time_t(last));
         int year_diff = last_cal.tm_year - first_cal.tm_year;
         int month_diff = last_cal.tm_mon - first_cal.tm_mon;
         result = year_diff * 12 + month_diff;
     }
     else if (roller_.period_ == period::YEAR)
     {
-        struct std::tm first_cal = calendar::get_utc(clock_type::to_time_t(first));
-        struct std::tm last_cal = calendar::get_utc(clock_type::to_time_t(last));
+        calendar::pieces first_cal = calendar::get_utc(clock_type::to_time_t(first));
+        calendar::pieces last_cal = calendar::get_utc(clock_type::to_time_t(last));
         result = last_cal.tm_year - first_cal.tm_year;
     }
     else
