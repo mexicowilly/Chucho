@@ -82,6 +82,8 @@ ELSEIF(CHUCHO_WINDOWS)
         platform/windows/socket_connector_windows.cpp
         platform/windows/socket_exception_windows.cpp
         platform/windows/syslog_writer_windows.cpp
+        platform/windows/windows_event_log_writer.cpp
+        include/chucho/windows_event_log_writer.hpp
         platform/windows/winsock_startup.cpp
         platform/windows/winsock_startup.hpp)
 ENDIF()

@@ -19,6 +19,7 @@
 #include <chucho/text_util.hpp>
 #include <sstream>
 #include <algorithm>
+#include <cctype>
 
 namespace chucho
 {
