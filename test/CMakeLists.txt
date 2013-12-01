@@ -113,5 +113,12 @@ IF(CHUCHO_SOLARIS)
     TARGET_LINK_LIBRARIES(remote-writer-test socket nsl)
 ENDIF()
 
+IF(CHUCHO_WINDOWS)
+    ADD_EXECUTABLE(windows-event-log-writer-test EXCLUDE_FROM_ALL
+                   harness.cpp
+                   windows_event_log_writer_test.cpp)
+    TARGET_LINK_LIBRARIES(windows-event-log-writer-test chucho gtest ${CHUCHO_THREAD_LIB})
+ENDIF()
+
 ADD_CUSTOM_TARGET(all-test
-                  DEPENDS unit-test rolling-file-test syslog-writer-test remote-writer-test)
+                  DEPENDS unit-test rolling-file-test syslog-writer-test remote-writer-test windows-event-log-writer-test)

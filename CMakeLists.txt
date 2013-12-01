@@ -193,7 +193,9 @@ IF(YAML_CONFIG)
         include/chucho/yaml_configurator.hpp
         include/chucho/yaml_parser.hpp)
     SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
-                                COMPILE_DEFINITIONS CHUCHO_YAML_CONFIG)
+                                COMPILE_DEFINITIONS "CHUCHO_YAML_CONFIG;${CHUCHO_DECLARE_YAML}")
+    SET_SOURCE_FILES_PROPERTIES(yaml_parser.cpp PROPERTIES
+                                COMPILE_DEFINITIONS ${CHUCHO_DECLARE_YAML})
     MESSAGE(STATUS "Chucho has YAML configuration parsing enabled")
 ENDIF()
 

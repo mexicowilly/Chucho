@@ -27,12 +27,15 @@ class CHUCHO_EXPORT windows_event_log_writer : public writer
 {
 public:
     windows_event_log_writer(std::shared_ptr<formatter> fmt,
-                             const std::string& source);
+                             const std::string& source,
+                             const std::string& host = std::string());
     windows_event_log_writer(std::shared_ptr<formatter> fmt,
                              const std::string& log,
-                             const std::string& source);
+                             const std::string& source,
+                             const std::string& host = std::string());
     ~windows_event_log_writer();
 
+    const std::string& get_host() const;
     const std::string& get_log() const;
     const std::string& get_source() const;
 
@@ -48,7 +51,23 @@ private:
     SID* user_;
     std::string log_;
     std::string source_;
+    std::string host_;
 };
+
+inline const std::string& windows_event_log_writer::get_host() const
+{
+    return host_;
+}
+
+inline const std::string& windows_event_log_writer::get_log() const
+{
+    return log_;
+}
+
+inline const std::string& windows_event_log_writer::get_source() const
+{
+    return source_;
+}
 
 }
 

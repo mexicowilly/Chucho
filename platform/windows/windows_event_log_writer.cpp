@@ -22,24 +22,28 @@ namespace chucho
 {
 
 windows_event_log_writer::windows_event_log_writer(std::shared_ptr<formatter> fmt,
-                                                   const std::string& source)
+                                                   const std::string& source,
+                                                   const std::string& host)
     : writer(fmt),
       handle_(nullptr),
       user_(nullptr),
       log_("Application"),
-      source_(source)
+      source_(source),
+      host_(host)
 {
     init();
 }
 
 windows_event_log_writer::windows_event_log_writer(std::shared_ptr<formatter> fmt,
                                                    const std::string& log,
-                                                   const std::string& source)
+                                                   const std::string& source,
+                                                   const std::string& host)
     : writer(fmt),
       handle_(nullptr),
       user_(nullptr),
       log_(log),
-      source_(source)
+      source_(source),
+      host_(host)
 {
     init();
 }
@@ -56,7 +60,8 @@ void windows_event_log_writer::init()
         throw exception("Source must be set for windows_event_log_writer");
     look_up_user();
     prepare_registry();
-    handle_ = RegisterEventSourceA(nullptr, source_.c_str());
+    const char* actual_host = host_.empty() ? nullptr : host_.c_str();
+    handle_ = RegisterEventSourceA(actual_host, source_.c_str());
     if (handle_ == nullptr)
     {
         DWORD err = GetLastError();
@@ -69,7 +74,10 @@ void windows_event_log_writer::look_up_user()
 {
     HANDLE proc;
     if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &proc))
-        throw exception("Unable to query the process token");
+    {
+        DWORD err = GetLastError();
+        throw exception("Unable to query the process token: " + error_util::message(err));
+    }
     struct sentry
     {
         sentry(HANDLE h) : h_(h) { }
@@ -78,23 +86,31 @@ void windows_event_log_writer::look_up_user()
     } s(proc);
     DWORD len;
     if (!GetTokenInformation(proc, TokenUser, nullptr, 0, &len))
-        throw exception("Unable to query user token length");
+    {
+        DWORD err = GetLastError();
+        if (err != ERROR_INSUFFICIENT_BUFFER)
+            throw exception("Unable to query user token length: " + error_util::message(err));
+    }
     std::vector<std::uint8_t> raw_toke(len);
     if (!GetTokenInformation(proc, TokenUser, &raw_toke[0], len, &len))
-        throw exception("Could not retrieve user token");
+    {
+        DWORD err = GetLastError();
+        throw exception("Could not retrieve user token: " + error_util::message(err));
+    }
     TOKEN_USER* toke = reinterpret_cast<TOKEN_USER*>(&raw_toke[0]);
     DWORD toke_len = GetLengthSid(toke->User.Sid);
     user_ = reinterpret_cast<SID*>(new std::uint8_t[toke_len]);
     if (!CopySid(toke_len, user_, toke->User.Sid))
     {
         delete [] reinterpret_cast<std::uint8_t*>(user_);
-        throw exception("Unable to copy user SID");
+        DWORD err = GetLastError();
+        throw exception("Unable to copy user SID: " + error_util::message(err));
     }
 }
 
 void windows_event_log_writer::prepare_registry()
 {
-    std::string key_name = "SYSTEM\\CurrentControlSet\\Services\\EventLog" +
+    std::string key_name = "SYSTEM\\CurrentControlSet\\Services\\EventLog\\" +
         log_ + "\\" + source_;
     HKEY key;
     LONG rc = RegCreateKeyExA(HKEY_LOCAL_MACHINE,
@@ -148,8 +164,8 @@ void windows_event_log_writer::write_impl(const event& evt)
         const char* cmsg = msg.c_str();
         if (!ReportEventA(handle_,
                           type,
-                          evt.get_level()->get_value(),
-                          1,
+                          0,
+                          700,
                           user_,
                           1,
                           0,
