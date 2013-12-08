@@ -41,12 +41,14 @@ chucho::event create_event(std::shared_ptr<chucho::logger> log,
 
 TEST(windows_event_log, same_host)
 {
+    std:: cout << "CHUCHO_EVENT_LOG_DLL " << CHUCHO_EVENT_LOG_DLL << std::endl;
+    SetEnvironmentVariableA("CHUCHO_EVENT_LOG_DLL", CHUCHO_EVENT_LOG_DLL);
     chucho::logger::remove_unused_loggers();
     auto wrt = std::make_shared<chucho::windows_event_log_writer>(
         std::make_shared<chucho::pattern_formatter>("%m"),
-        "Chucho_test");
+        "ChuchoTest");
     auto log = chucho::logger::get("windows_event_log_writer_test");
     log->add_writer(wrt);
     wrt->write(create_event(log, chucho::level::INFO_(), "same host INFO"));
-    std::cout << "Check your syslog for an error level message \"same host INFO\"" << std::endl;
+    std::cout << "Check your event log for an info level message \"same host INFO\"" << std::endl;
 }

@@ -117,6 +117,11 @@ IF(CHUCHO_WINDOWS)
     ADD_EXECUTABLE(windows-event-log-writer-test EXCLUDE_FROM_ALL
                    harness.cpp
                    windows_event_log_writer_test.cpp)
+    FILE(TO_NATIVE_PATH "${CMAKE_BINARY_DIR}" CHUCHO_EVENT_LOG_DLL)
+    SET(CHUCHO_EVENT_LOG_DLL "${CHUCHO_EVENT_LOG_DLL}\\event_log.dll")
+    STRING(REPLACE "\\" "\\\\" CHUCHO_EVENT_LOG_DLL "${CHUCHO_EVENT_LOG_DLL}")
+    SET_SOURCE_FILES_PROPERTIES(windows_event_log_writer_test PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_EVENT_LOG_DLL="${CHUCHO_EVENT_LOG_DLL}")
     TARGET_LINK_LIBRARIES(windows-event-log-writer-test chucho gtest ${CHUCHO_THREAD_LIB})
 ENDIF()
 

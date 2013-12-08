@@ -17,6 +17,82 @@
 #include <chucho/windows_event_log_writer.hpp>
 #include <chucho/exception.hpp>
 #include "error_util.hpp"
+#include "event_log.hpp"
+#include <stdlib.h>
+
+namespace
+{
+
+std::string get_dll_name()
+{
+    std::string result;
+    std::vector<char> env(1024);
+    DWORD rc = GetEnvironmentVariableA("CHUCHO_EVENT_LOG_DLL",
+                                       &env[0],
+                                       env.size());
+    if (rc > env.size() - 1)
+    {
+        env.resize(rc);
+        rc = GetEnvironmentVariableA("CHUCHO_EVENT_LOG_DLL",
+                                     &env[0],
+                                     env.size());
+    }
+    if (rc == 0)
+    {
+        result = CMAKE_INSTALL_PREFIX;
+        for (auto itor = result.begin(); itor != result.end(); itor++)
+        {
+            if (*itor == '/')
+                *itor = '\\';
+        }
+        result += "\\bin\\event_log.dll";
+    }
+    else
+    {
+        result = &env[0];
+    }
+    return result;
+}
+
+DWORD query_registry(HKEY key, const char* const name, std::vector<BYTE>& bytes)
+{
+    DWORD count = bytes.size();
+    DWORD type;
+    BYTE* bp = bytes.empty() ? nullptr : &bytes[0];
+    LONG rc = RegQueryValueExA(key,
+                               name,
+                               nullptr,
+                               &type,
+                               bp,
+                               &count);
+    if (rc == ERROR_FILE_NOT_FOUND)
+    {
+        return REG_NONE;
+    }
+    else if (rc == ERROR_MORE_DATA || (rc == ERROR_SUCCESS && count > bytes.size()))
+    {
+        bytes.resize(count);
+        rc = RegQueryValueExA(key,
+                              name,
+                              nullptr,
+                              &type,
+                              &bytes[0],
+                              &count);
+        if (rc != ERROR_SUCCESS)
+        {
+            throw chucho::exception("Unable to query registry: " +
+                chucho::error_util::message(rc));
+        }
+    }
+    else if (rc != ERROR_SUCCESS)
+    {
+        throw chucho::exception("Unable to query registry value size: " +
+            chucho::error_util::message(rc));
+    }
+    return type;
+}
+
+}
 
 namespace chucho
 {
@@ -118,7 +194,7 @@ void windows_event_log_writer::prepare_registry()
                               0,
                               nullptr,
                               REG_OPTION_NON_VOLATILE,
-                              KEY_WRITE,
+                              KEY_READ | KEY_WRITE,
                               nullptr,
                               &key,
                               nullptr);
@@ -133,49 +209,71 @@ void windows_event_log_writer::prepare_registry()
         ~sentry() { RegCloseKey(k_); }
         HKEY k_;
     } s(key);
-    const char* mf = "ChuchoPlaceholderMessages.dll";
-    rc = RegSetValueExA(key,
-                        "EventMessageFile",
-                        0,
-                        REG_SZ,
-                        reinterpret_cast<const BYTE*>(mf),
-                        std::strlen(mf) + 1);
-    if (rc != ERROR_SUCCESS)
+    std::string dll = get_dll_name();
+    const char* cdll = dll.c_str();
+    std::vector<BYTE> bytes;
+    DWORD type = query_registry(key, "EventMessageFile", bytes);
+    if ((type != REG_SZ && type != REG_EXPAND_SZ) ||
+        std::strcmp(reinterpret_cast<char*>(&bytes[0]), cdll) != 0)
     {
-        throw exception("Unable to set registry value EventMessageFile for key " +
-            key_name + ": " + error_util::message(rc));
+        rc = RegSetValueExA(key,
+                            "EventMessageFile",
+                            0,
+                            REG_SZ,
+                            reinterpret_cast<const BYTE*>(cdll),
+                            dll.length() + 1);
+        if (rc != ERROR_SUCCESS)
+        {
+            throw exception("Unable to set registry value EventMessageFile for key " +
+                key_name + ": " + error_util::message(rc));
+        }
+    }
+    DWORD types = EVENTLOG_INFORMATION_TYPE |
+                  EVENTLOG_WARNING_TYPE |
+                  EVENTLOG_ERROR_TYPE;
+    type = query_registry(key, "TypesSupported", bytes);
+    if (type != REG_DWORD || *reinterpret_cast<DWORD*>(&bytes[0]) != types)
+    {
+        rc = RegSetValueExA(key,
+                            "TypesSupported",
+                            0,
+                            REG_DWORD,
+                            reinterpret_cast<const BYTE*>(&types),
+                            sizeof(types));
+        if (rc != ERROR_SUCCESS)
+        {
+            throw exception("Unable to set registry value TypesSupported for key " +
+                key_name + ": " + error_util::message(rc));
+        }
     }
 }
 
 void windows_event_log_writer::write_impl(const event& evt)
 {
-    if (handle_ != nullptr)
+    std::string msg = formatter_->format(evt);
+    if (msg.length() > 31839)
+        msg.resize(31839);
+    WORD type;
+    if (*evt.get_level() >= *level::ERROR_())
+        type = EVENTLOG_ERROR_TYPE;
+    else if (*evt.get_level() >= *level::WARN_())
+        type = EVENTLOG_WARNING_TYPE;
+    else
+        type = EVENTLOG_INFORMATION_TYPE;
+    const char* cmsg = msg.c_str();
+    if (!ReportEventA(handle_,
+                      type,
+                      0,
+                      CHUCHO_MESSAGE,
+                      user_,
+                      1,
+                      0,
+                      &cmsg,
+                      nullptr))
     {
-        std::string msg = formatter_->format(evt);
-        if (msg.length() > 31839)
-            msg.resize(31839);
-        WORD type;
-        if (*evt.get_level() >= *level::ERROR_())
-            type = EVENTLOG_ERROR_TYPE;
-        else if (*evt.get_level() >= *level::WARN_())
-            type = EVENTLOG_WARNING_TYPE;
-        else
-            type = EVENTLOG_INFORMATION_TYPE;
-        const char* cmsg = msg.c_str();
-        if (!ReportEventA(handle_,
-                          type,
-                          0,
-                          700,
-                          user_,
-                          1,
-                          0,
-                          &cmsg,
-                          nullptr))
-        {
-            DWORD err = GetLastError();
-            throw exception("Unable to report a Windows Event Log event: " +
-                error_util::message(err));
-        }
+        DWORD err = GetLastError();
+        throw exception("Unable to report a Windows Event Log event: " +
+            error_util::message(err));
     }
 }
 

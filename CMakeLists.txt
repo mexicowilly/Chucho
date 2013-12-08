@@ -83,9 +83,10 @@ ELSEIF(CHUCHO_WINDOWS)
         platform/windows/socket_exception_windows.cpp
         platform/windows/syslog_writer_windows.cpp
         platform/windows/windows_event_log_writer.cpp
-        include/chucho/windows_event_log_writer.hpp
         platform/windows/winsock_startup.cpp
         platform/windows/winsock_startup.hpp)
+    SET_SOURCE_FILES_PROPERTIES(platform/windows/windows_event_log_writer.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 ENDIF()
 
 SET(CHUCHO_PUBLIC_HEADERS
@@ -140,6 +141,11 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/writer_factory.hpp
     include/chucho/writer_memento.hpp
     include/chucho/yaml_formatter.hpp)
+
+IF(CHUCHO_WINDOWS)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/windows_event_log_writer.hpp)
+ENDIF()
 
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.hpp)
@@ -505,6 +511,20 @@ ENDIF()
 IF(BZIP2_LIB_DIR)
     LINK_DIRECTORIES("${BZIP2_LIB_DIR}")
     TARGET_LINK_LIBRARIES(chucho bz2)
+ENDIF()
+
+IF(CHUCHO_WINDOWS)
+    ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/event_log.rc"
+                              "${CMAKE_BINARY_DIR}/event_log.hpp"
+                       COMMAND mc -e hpp -h "${CMAKE_BINARY_DIR}" -r "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}/platform/windows/event_log.mc"
+                       DEPENDS platform/windows/event_log.mc)
+    ADD_LIBRARY(event_log SHARED "${CMAKE_BINARY_DIR}/event_log.rc")
+    SET_TARGET_PROPERTIES(event_log PROPERTIES
+                          LINKER_LANGUAGE CXX
+                          LINK_FLAGS /NOENTRY)
+    ADD_DEPENDENCIES(chucho event_log)
+    INSTALL(TARGETS event_log
+            RUNTIME DESTINATION bin)
 ENDIF()
 
 ADD_SUBDIRECTORY(test)
