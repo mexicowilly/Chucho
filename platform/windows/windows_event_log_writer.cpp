@@ -45,7 +45,7 @@ std::string get_dll_name()
             if (*itor == '/')
                 *itor = '\\';
         }
-        result += "\\bin\\event_log.dll";
+        result += "\\lib\\event_log.dll";
     }
     else
     {
@@ -134,8 +134,17 @@ void windows_event_log_writer::init()
 {
     if (source_.empty())
         throw exception("Source must be set for windows_event_log_writer");
+    set_status_origin("windows_event_log_writer");
     look_up_user();
-    prepare_registry();
+    try
+    {
+        prepare_registry();
+    }
+    catch (std::exception& e)
+    {
+        report_warning(std::string("The Registry could not be prepared to inform Event Viewer of the location of the Chucho event_log.dll: ") + e.what());
+        report_warning("If the correct Registry keys are not already present in the Registry, Event Viewer will not properly display messages from Chucho.");
+    }
     const char* actual_host = host_.empty() ? nullptr : host_.c_str();
     handle_ = RegisterEventSourceA(actual_host, source_.c_str());
     if (handle_ == nullptr)

@@ -524,7 +524,7 @@ IF(CHUCHO_WINDOWS)
                           LINK_FLAGS /NOENTRY)
     ADD_DEPENDENCIES(chucho event_log)
     INSTALL(TARGETS event_log
-            RUNTIME DESTINATION bin)
+            RUNTIME DESTINATION lib)
 ENDIF()
 
 ADD_SUBDIRECTORY(test)
