@@ -98,14 +98,24 @@ namespace chucho
 {
 
 windows_event_log_writer::windows_event_log_writer(std::shared_ptr<formatter> fmt,
-                                                   const std::string& source,
-                                                   const std::string& host)
+                                                   const std::string& source)
     : writer(fmt),
       handle_(nullptr),
       user_(nullptr),
       log_("Application"),
-      source_(source),
-      host_(host)
+      source_(source)
+{
+    init();
+}
+
+windows_event_log_writer::windows_event_log_writer(std::shared_ptr<formatter> fmt,
+                                                   const std::string& log,
+                                                   const std::string& source)
+    : writer(fmt),
+      handle_(nullptr),
+      user_(nullptr),
+      log_(log),
+      source_(source)
 {
     init();
 }

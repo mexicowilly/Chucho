@@ -34,13 +34,13 @@ namespace chucho
  * levels are as follows. 
  * <table> 
  *     <tr><th>Level</th><th>Value</th></tr>
- *     <tr><td>TRACE</td><td>0</td></tr>
- *     <tr><td>DEBUG</td><td>10000</td></tr>
- *     <tr><td>INFO</td><td>20000</td></tr>
- *     <tr><td>WARN</td><td>30000</td></tr>
- *     <tr><td>ERROR</td><td>40000</td></tr>
- *     <tr><td>FATAL</td><td>50000</td></tr>
- *     <tr><td>OFF</td><td>n/a</td></tr>
+ *     <tr><td>TRACE_</td><td>0</td></tr>
+ *     <tr><td>DEBUG_</td><td>10000</td></tr>
+ *     <tr><td>INFO_</td><td>20000</td></tr>
+ *     <tr><td>WARN_</td><td>30000</td></tr>
+ *     <tr><td>ERROR_</td><td>40000</td></tr>
+ *     <tr><td>FATAL_</td><td>50000</td></tr>
+ *     <tr><td>OFF_</td><td>n/a</td></tr>
  * </table> 
  *  
  * You may create custom levels with subclasses of level, and 

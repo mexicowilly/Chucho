@@ -18,18 +18,15 @@
 #include <chucho/windows_event_log_writer.hpp>
 #include <chucho/pattern_formatter.hpp>
 #include <chucho/logger.hpp>
-#include <chucho/host.hpp>
-#include <chucho/environment.hpp>
-#include <iostream>
+#include <array>
 
 namespace
 {
 
-chucho::event create_event(std::shared_ptr<chucho::logger> log,
-                           std::shared_ptr<chucho::level> lvl,
+chucho::event create_event(std::shared_ptr<chucho::level> lvl,
                            const std::string& msg)
 {
-    return chucho::event(log,
+    return chucho::event(chucho::logger::get("windows_event_writer_test"),
                          lvl,
                          msg,
                          __FILE__,
@@ -37,17 +34,49 @@ chucho::event create_event(std::shared_ptr<chucho::logger> log,
                          __FUNCTION__);
 }
 
+class windows_event_log_writer_test : public ::testing::Test
+{
+public:
+    windows_event_log_writer_test()
+    {
+        SetEnvironmentVariableA("CHUCHO_EVENT_LOG_DLL", CHUCHO_EVENT_LOG_DLL);
+        chucho::logger::remove_unused_loggers();
+        wrt_ = std::make_shared<chucho::windows_event_log_writer>(
+            std::make_shared<chucho::pattern_formatter>("%m"),
+            "ChuchoTest");
+    }
+
+protected:
+    std::shared_ptr<chucho::writer> wrt_;
+};
+
 }
 
-TEST(windows_event_log, same_host)
+TEST_F(windows_event_log_writer_test, custom_log)
 {
-    SetEnvironmentVariableA("CHUCHO_EVENT_LOG_DLL", CHUCHO_EVENT_LOG_DLL);
-    chucho::logger::remove_unused_loggers();
-    auto wrt = std::make_shared<chucho::windows_event_log_writer>(
+    wrt_ = std::make_shared<chucho::windows_event_log_writer>(
         std::make_shared<chucho::pattern_formatter>("%m"),
-        "ChuchoTest");
-    auto log = chucho::logger::get("windows_event_log_writer_test");
-    log->add_writer(wrt);
-    wrt->write(create_event(log, chucho::level::INFO_(), "same host INFO"));
-    std::cout << "Check your event log for an info level message \"same host INFO\"" << std::endl;
+        "ChuchoLog",
+        "ChuchoLogTest");
+    wrt_->write(create_event(chucho::level::INFO_(), "custom log"));
+}
+
+TEST_F(windows_event_log_writer_test, levels)
+{
+    std::array<std::shared_ptr<chucho::level>, 6> lvls =
+    {
+        chucho::level::TRACE_(),
+        chucho::level::DEBUG_(),
+        chucho::level::INFO_(),
+        chucho::level::WARN_(),
+        chucho::level::ERROR_(),
+        chucho::level::FATAL_()
+    };
+    for (auto lvl : lvls)
+        wrt_->write(create_event(lvl, lvl->get_name()));
+}
+
+TEST_F(windows_event_log_writer_test, same_host)
+{
+    wrt_->write(create_event(chucho::level::INFO_(), "same host INFO"));
 }
