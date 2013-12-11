@@ -16,12 +16,14 @@
 
 #include <chucho/finalize.hpp>
 #include <chucho/garbage_cleaner.hpp>
+#include <chucho/logger.hpp>
 
 namespace chucho
 {
 
 void finalize()
 {
+    logger::remove_unused_loggers();
     delete &garbage_cleaner::get();
 }
 
