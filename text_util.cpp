@@ -15,6 +15,8 @@
  */
 
 #include <chucho/text_util.hpp>
+#include <cctype>
+#include <algorithm>
 
 namespace chucho
 {

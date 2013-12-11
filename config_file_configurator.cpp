@@ -249,6 +249,7 @@ config_file_configurator::log4cplus_properties_processor::log4cplus_properties_p
     factory_keys_["log4cplus::SysLogAppender"] = "chucho::syslog_writer";
     factory_keys_["log4cplus::spi::LogLevelMatchFilter"] = "chucho::level_filter";
     factory_keys_["log4cplus::spi::LogLevelRangeFilter"] = "chucho::level_threshold_filter";
+    factory_keys_["log4cplus::NTEventLogAppender"] = "chucho::windows_event_log_writer";
 }
 
 void config_file_configurator::log4cplus_properties_processor::add_filters(std::shared_ptr<writer> wrt,

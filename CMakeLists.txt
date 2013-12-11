@@ -63,11 +63,6 @@ IF(CHUCHO_POSIX)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
                                     COMPILE_DEFINITIONS "${CHUCHO_FILE_DEFS};CHUCHO_DIRENT_NEEDS_NAME")
     ENDIF()
-    IF(CHUCHO_HAVE_PUT_TIME)
-        GET_SOURCE_FILE_PROPERTY(CHUCHO_CALENDAR_DEFS platform/posix/calendar_posix.cpp COMPILE_DEFINITIONS)
-        SET_SOURCE_FILES_PROPERTIES(platform/posix/calendar_posix.cpp PROPERTIES
-                                    COMPILE_DEFINITIONS "${CHUCHO_CALENDAR_DEFS};CHUCHO_HAVE_PUT_TIME")
-    ENDIF()
 ELSEIF(CHUCHO_WINDOWS)
     SET(CHUCHO_PLATFORM_SOURCES
         platform/windows/calendar_windows.cpp
@@ -82,8 +77,15 @@ ELSEIF(CHUCHO_WINDOWS)
         platform/windows/socket_connector_windows.cpp
         platform/windows/socket_exception_windows.cpp
         platform/windows/syslog_writer_windows.cpp
+        platform/windows/windows_event_log_writer.cpp
+        platform/windows/windows_event_log_writer_factory.cpp
+        include/chucho/windows_event_log_writer_factory.hpp
+        platform/windows/windows_event_log_writer_memento.cpp
+        include/chucho/windows_event_log_writer_memento.hpp
         platform/windows/winsock_startup.cpp
         platform/windows/winsock_startup.hpp)
+    SET_SOURCE_FILES_PROPERTIES(platform/windows/windows_event_log_writer.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 ENDIF()
 
 SET(CHUCHO_PUBLIC_HEADERS
@@ -139,6 +141,11 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/writer_memento.hpp
     include/chucho/yaml_formatter.hpp)
 
+IF(CHUCHO_WINDOWS)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/windows_event_log_writer.hpp)
+ENDIF()
+
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.hpp)
 ENDIF()
@@ -191,7 +198,9 @@ IF(YAML_CONFIG)
         include/chucho/yaml_configurator.hpp
         include/chucho/yaml_parser.hpp)
     SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
-                                COMPILE_DEFINITIONS CHUCHO_YAML_CONFIG)
+                                COMPILE_DEFINITIONS "CHUCHO_YAML_CONFIG;${CHUCHO_DECLARE_YAML}")
+    SET_SOURCE_FILES_PROPERTIES(yaml_parser.cpp PROPERTIES
+                                COMPILE_DEFINITIONS ${CHUCHO_DECLARE_YAML})
     MESSAGE(STATUS "Chucho has YAML configuration parsing enabled")
 ENDIF()
 
@@ -371,6 +380,16 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_EMBEDDED_SOURCES}
     ${CHUCHO_PUBLIC_HEADERS})
 
+IF(CHUCHO_HAVE_PUT_TIME)
+    SET_SOURCE_FILES_PROPERTIES(calendar.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_HAVE_PUT_TIME)
+ENDIF()
+
+IF(CHUCHO_WINDOWS)
+    SET_SOURCE_FILES_PROPERTIES(configurator.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_WINDOWS)
+ENDIF()
+
 SET_SOURCE_FILES_PROPERTIES(yaml_configurator.cpp PROPERTIES
                             COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
 
@@ -501,6 +520,20 @@ ENDIF()
 IF(BZIP2_LIB_DIR)
     LINK_DIRECTORIES("${BZIP2_LIB_DIR}")
     TARGET_LINK_LIBRARIES(chucho bz2)
+ENDIF()
+
+IF(CHUCHO_WINDOWS)
+    ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/event_log.rc"
+                              "${CMAKE_BINARY_DIR}/event_log.hpp"
+                       COMMAND mc -e hpp -h "${CMAKE_BINARY_DIR}" -r "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}/platform/windows/event_log.mc"
+                       DEPENDS platform/windows/event_log.mc)
+    ADD_LIBRARY(event_log SHARED "${CMAKE_BINARY_DIR}/event_log.rc")
+    SET_TARGET_PROPERTIES(event_log PROPERTIES
+                          LINKER_LANGUAGE CXX
+                          LINK_FLAGS /NOENTRY)
+    ADD_DEPENDENCIES(chucho event_log)
+    INSTALL(TARGETS event_log
+            RUNTIME DESTINATION lib)
 ENDIF()
 
 ADD_SUBDIRECTORY(test)

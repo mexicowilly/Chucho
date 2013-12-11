@@ -341,8 +341,43 @@ ENDIF()
 #
 
 # std::put_time
+# We have to check whether it exists and whether it is buggy. put_time
+# on VS2012 is broken when it tries to format time zones. It just crashes.
 CHECK_CXX_SOURCE_COMPILES("#include <iomanip>\nint main() { std::tm t; std::put_time(&t, \\\"%Y\\\"); return 0; }"
-                          CHUCHO_HAVE_PUT_TIME)
+                          CHUCHO_HAVE_PUT_TIME_EXISTENCE)
+IF(CHUCHO_HAVE_PUT_TIME_EXISTENCE)
+    IF(CHUCHO_WINDOWS)
+        SET(CMAKE_REQUIRED_DEFINITIONS -DCHUCHO_WINDOWS)
+    ENDIF()
+    CHECK_CXX_SOURCE_RUNS("
+#include <iomanip>
+#include <iostream>
+#include <time.h>
+int main()
+{
+#if defined(CHUCHO_WINDOWS)
+    __try
+    {
+#endif
+    time_t t = time(nullptr);
+    struct tm* cal = localtime(&t);
+    std::cout << std::put_time(cal, \\\"%z\\\");
+#if defined(CHUCHO_WINDOWS)
+    }
+    __except()
+    {
+    return EXIT_FAILURE;
+    }
+#endif
+    return EXIT_SUCCESS;
+}" CHUCHO_HAVE_PUT_TIME_RUNS)
+    IF(CHUCHO_HAVE_PUT_TIME_RUNS)
+        SET(CHUCHO_HAVE_PUT_TIME TRUE)
+    ENDIF()
+    IF(CHUCHO_WINDOWS)
+        UNSET(CMAKE_REQUIRED_DEFINITIONS)
+    ENDIF()
+ENDIF()
 
 # Regular expressions
 CHECK_INCLUDE_FILE_CXX(regex CHUCHO_HAVE_STD_REGEX_HEADER)

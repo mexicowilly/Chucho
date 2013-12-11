@@ -14,31 +14,21 @@
  *    limitations under the License.
  */
 
-#include <chucho/calendar.hpp>
-#include <time.h>
+#include <chucho/windows_event_log_writer_memento.hpp>
 
 namespace chucho
 {
 
-namespace calendar
+windows_event_log_writer_memento::windows_event_log_writer_memento(const configurator& cfg, memento_key_set ks)
+    : writer_memento(cfg)
 {
-
-pieces get_local(std::time_t t)
-{
-    pieces result;
-    localtime_s(&result, &t);
-    result.is_utc = false;
-    return result;
-}
-
-pieces get_utc(std::time_t t)
-{
-    pieces result;
-    gmtime_s(&result, &t);
-    result.is_utc = true;
-    return result;
-}
-
+    set_status_origin("windows_event_log_writer_memento");
+    set_handler("log", [this] (const std::string& val) { log_ = val; });
+    set_handler("source", [this] (const std::string& val) { source_ = val; });
+    if (ks == memento_key_set::CHUCHO)
+        set_handler("host", [this] (const std::string& val) { host_ = val; });
+    else if (ks == memento_key_set::LOG4CPLUS)
+        set_handler("server", [this] (const std::string& val) { host_ = val; });
 }
 
 }

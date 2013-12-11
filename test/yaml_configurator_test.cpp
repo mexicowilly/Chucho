@@ -18,6 +18,9 @@
 #include <chucho/yaml_configurator.hpp>
 #include <chucho/configuration.hpp>
 #include <chucho/logger.hpp>
+#if defined(CHUCHO_WINDOWS)
+#include <windows.h>
+#endif
 
 namespace
 {
@@ -373,6 +376,31 @@ TEST_F(yaml_configurator, variables)
     EXPECT_EQ(*chucho::level::FATAL_(), *lgr->get_level());
     EXPECT_FALSE(lgr->writes_to_ancestors());
 }
+
+#if defined(CHUCHO_WINDOWS)
+TEST_F(yaml_configurator, windows_event_log_writer)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::windows_event_log_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m%n'\n"
+              "        source: what\n"
+              "        log: hello");
+    windows_event_log_writer_body();
+}
+
+TEST_F(yaml_configurator, windows_event_log_writer_no_log)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::windows_event_log_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m%n'\n"
+              "        source: what");
+    windows_event_log_writer_no_log_body();
+}
+#endif
 
 TEST_F(yaml_configurator, zip_file_compressor)
 {

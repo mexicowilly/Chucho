@@ -18,9 +18,17 @@
 #include <chucho/garbage_cleaner.hpp>
 #include <chucho/regex.hpp>
 #include <thread>
+#include <iomanip>
+#include <sstream>
 
 namespace
 {
+
+#if !defined(CHUCHO_HAVE_PUT_TIME)
+
+const std::size_t FORMAT_BUF_SIZE_MAX = 20 * 1024;
+
+#endif
 
 struct static_data
 {
@@ -94,19 +102,55 @@ std::string format_time_zone(const pieces& cal,
         ++itor;
     }
     std::string new_pat = result;
-    itor = regex::iterator(new_pat, sd.name_re_);
+    // std::regex has a bug in VS2012 where you can't assign
+    // to the already existing iterator.
+    regex::iterator itor2(new_pat, sd.name_re_);
     offset = 0;
-    while (itor != end)
+    while (itor2 != end)
     {
-        const regex::match& m(*itor);
+        const regex::match& m(*itor2);
         if ((m[0].length() & 1) == 0)
         {
             result.replace(offset + m[0].begin() + m[0].length() - 2, 2, "UTC");
             offset += 1;
         }
-        ++itor;
+        ++itor2;
     }
     return result;
+}
+
+std::string format(const pieces& cal, const std::string& pattern)
+{
+    std::string new_pat = format_time_zone(cal, pattern);
+
+    #if defined(CHUCHO_HAVE_PUT_TIME)
+
+    std::ostringstream stream;
+    stream << std::put_time(&cal, new_pat.c_str());
+    return stream.str();
+
+    #else
+
+    std::vector<char> buf(1024);
+    std::string result;
+    while (true)
+    {
+        std::size_t rc = std::strftime(&buf[0],
+                                       buf.size(),
+                                       new_pat.c_str(),
+                                       &cal);
+        if (rc > 0)
+        {
+            result = &buf[0];
+            break;
+        }
+        if (buf.size() > FORMAT_BUF_SIZE_MAX)
+            break;
+        buf.resize(buf.size() + 1024);
+    }
+    return result;
+
+    #endif
 }
 
 }
