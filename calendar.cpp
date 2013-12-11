@@ -18,6 +18,8 @@
 #include <chucho/garbage_cleaner.hpp>
 #include <chucho/regex.hpp>
 #include <thread>
+#include <iomanip>
+#include <sstream>
 
 namespace
 {
