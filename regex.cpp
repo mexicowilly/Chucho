@@ -152,7 +152,8 @@ iterator& iterator::operator++ ()
 {
     match_.subs_.clear();
 #if defined(CHUCHO_HAVE_STD_REGEX)
-    if (++pimpl_->itor_ != std::sregex_iterator())
+    std::sregex_iterator end;
+    if (pimpl_->itor_ != end && ++pimpl_->itor_ != end)
     {
         std::smatch mch = *pimpl_->itor_;
         for (unsigned i = 0; i < mch.size(); i++)

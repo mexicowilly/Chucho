@@ -403,3 +403,26 @@ TEST_F(log4cplus_config_file_configurator, ttcc_layout)
         " will - hi" << chucho::line_ending::EOL;
     EXPECT_EQ(stream.str(), f);
 }
+
+#if defined(CHUCHO_WINDOWS)
+TEST_F(log4cplus_config_file_configurator, windows_event_log_writer)
+{
+    configure("log4cplus.logger.will = info, nt\n"
+              "log4cplus.appender.nt = log4cplus::NTEventLogAppender\n"
+              "log4cplus.appender.nt.layout = log4cplus::PatternLayout\n"
+              "log4cplus.appender.nt.layout.ConversionPattern = %m%n\n"
+              "log4cplus.appender.nt.source = what\n"
+              "log4cplus.appender.nt.log = hello");
+    windows_event_log_writer_body();
+}
+
+TEST_F(log4cplus_config_file_configurator, windows_event_log_writer_no_log)
+{
+    configure("log4cplus.logger.will = info, nt\n"
+              "log4cplus.appender.nt = log4cplus::NTEventLogAppender\n"
+              "log4cplus.appender.nt.layout = log4cplus::PatternLayout\n"
+              "log4cplus.appender.nt.layout.ConversionPattern = %m%n\n"
+              "log4cplus.appender.nt.source = what");
+    windows_event_log_writer_no_log_body();
+}
+#endif

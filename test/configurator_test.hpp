@@ -53,6 +53,10 @@ protected:
     void syslog_writer_facility_body(const std::string& tmpl);
     void syslog_writer_port_body();
     void time_file_roller_body();
+#if defined(CHUCHO_WINDOWS)
+    void windows_event_log_writer_body();
+    void windows_event_log_writer_no_log_body();
+#endif
     void zip_file_compressor_body();
 };
 

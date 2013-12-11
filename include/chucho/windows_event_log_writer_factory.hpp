@@ -14,31 +14,27 @@
  *    limitations under the License.
  */
 
-#include <chucho/calendar.hpp>
-#include <time.h>
+#if !defined(CHUCHO_WINDOWS_EVENT_LOG_WRITER_FACTORY_HPP__)
+#define CHUCHO_WINDOWS_EVENT_LOG_WRITER_FACTORY_HPP__
+
+#if !defined(CHUCHO_BUILD)
+#error "This header is private"
+#endif
+
+#include <chucho/writer_factory.hpp>
 
 namespace chucho
 {
 
-namespace calendar
+class windows_event_log_writer_factory : public writer_factory
 {
+public:
+    windows_event_log_writer_factory();
 
-pieces get_local(std::time_t t)
-{
-    pieces result;
-    localtime_s(&result, &t);
-    result.is_utc = false;
-    return result;
-}
-
-pieces get_utc(std::time_t t)
-{
-    pieces result;
-    gmtime_s(&result, &t);
-    result.is_utc = true;
-    return result;
-}
+    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
+    virtual std::shared_ptr<memento> create_memento(const configurator& cfg) override;
+};
 
 }
 
-}
+#endif

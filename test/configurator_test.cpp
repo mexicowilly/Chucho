@@ -41,6 +41,9 @@
 #endif
 #include <chucho/async_writer.hpp>
 #include <chucho/sliding_numbered_file_roller.hpp>
+#if defined(CHUCHO_WINDOWS)
+#include <chucho/windows_event_log_writer.hpp>
+#endif
 #include <chucho/exception.hpp>
 #include <chucho/configuration.hpp>
 #include <sstream>
@@ -513,6 +516,36 @@ void configurator::time_file_roller_body()
     EXPECT_EQ(5, trlr->get_max_history());
     EXPECT_EQ(trlr, fwrt->get_file_roll_trigger());
 }
+
+#if defined(CHUCHO_WINDOWS)
+
+void configurator::windows_event_log_writer_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::windows_event_log_writer), typeid(*wrts[0]));
+    auto welw = std::static_pointer_cast<chucho::windows_event_log_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(welw));
+    EXPECT_TRUE(welw->get_host().empty());
+    EXPECT_EQ(std::string("what"), welw->get_source());
+    EXPECT_EQ(std::string("hello"), welw->get_log());
+    chucho::status_manager::get()->clear();
+}
+
+void configurator::windows_event_log_writer_no_log_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::windows_event_log_writer), typeid(*wrts[0]));
+    auto welw = std::static_pointer_cast<chucho::windows_event_log_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(welw));
+    EXPECT_TRUE(welw->get_host().empty());
+    EXPECT_EQ(std::string("what"), welw->get_source());
+    EXPECT_EQ(std::string("Application"), welw->get_log());
+    chucho::status_manager::get()->clear();
+}
+
+#endif
 
 void configurator::zip_file_compressor_body()
 {

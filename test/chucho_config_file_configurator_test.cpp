@@ -359,6 +359,33 @@ TEST_F(chucho_config_file_configurator, time_file_roller)
     time_file_roller_body();
 }
 
+#if defined(CHUCHO_WINDOWS)
+TEST_F(chucho_config_file_configurator, windows_event_log_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = welw\n"
+              "chucho.writer.welw = chucho::windows_event_log_writer\n"
+              "chucho.writer.welw.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m%n\n"
+              "chucho.writer.welw.source = what\n"
+              "chucho.writer.welw.log = hello");
+    windows_event_log_writer_body();
+}
+
+TEST_F(chucho_config_file_configurator, windows_event_log_writer_no_log)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = welw\n"
+              "chucho.writer.welw = chucho::windows_event_log_writer\n"
+              "chucho.writer.welw.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m%n\n"
+              "chucho.writer.welw.source = what");
+    windows_event_log_writer_no_log_body();
+}
+#endif
+
 TEST_F(chucho_config_file_configurator, zip_file_compressor)
 {
     configure("chucho.logger = will\n"

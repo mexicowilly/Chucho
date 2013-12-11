@@ -63,11 +63,6 @@ IF(CHUCHO_POSIX)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
                                     COMPILE_DEFINITIONS "${CHUCHO_FILE_DEFS};CHUCHO_DIRENT_NEEDS_NAME")
     ENDIF()
-    IF(CHUCHO_HAVE_PUT_TIME)
-        GET_SOURCE_FILE_PROPERTY(CHUCHO_CALENDAR_DEFS platform/posix/calendar_posix.cpp COMPILE_DEFINITIONS)
-        SET_SOURCE_FILES_PROPERTIES(platform/posix/calendar_posix.cpp PROPERTIES
-                                    COMPILE_DEFINITIONS "${CHUCHO_CALENDAR_DEFS};CHUCHO_HAVE_PUT_TIME")
-    ENDIF()
 ELSEIF(CHUCHO_WINDOWS)
     SET(CHUCHO_PLATFORM_SOURCES
         platform/windows/calendar_windows.cpp
@@ -83,6 +78,10 @@ ELSEIF(CHUCHO_WINDOWS)
         platform/windows/socket_exception_windows.cpp
         platform/windows/syslog_writer_windows.cpp
         platform/windows/windows_event_log_writer.cpp
+        platform/windows/windows_event_log_writer_factory.cpp
+        include/chucho/windows_event_log_writer_factory.hpp
+        platform/windows/windows_event_log_writer_memento.cpp
+        include/chucho/windows_event_log_writer_memento.hpp
         platform/windows/winsock_startup.cpp
         platform/windows/winsock_startup.hpp)
     SET_SOURCE_FILES_PROPERTIES(platform/windows/windows_event_log_writer.cpp PROPERTIES
@@ -380,6 +379,16 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_PLATFORM_SOURCES}
     ${CHUCHO_EMBEDDED_SOURCES}
     ${CHUCHO_PUBLIC_HEADERS})
+
+IF(CHUCHO_HAVE_PUT_TIME)
+    SET_SOURCE_FILES_PROPERTIES(calendar.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_HAVE_PUT_TIME)
+ENDIF()
+
+IF(CHUCHO_WINDOWS)
+    SET_SOURCE_FILES_PROPERTIES(configurator.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_WINDOWS)
+ENDIF()
 
 SET_SOURCE_FILES_PROPERTIES(yaml_configurator.cpp PROPERTIES
                             COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
