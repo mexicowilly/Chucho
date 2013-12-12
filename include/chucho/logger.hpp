@@ -91,6 +91,7 @@ public:
     * calling this method. 
     */
     static void remove_unused_loggers();
+    static std::string type_to_logger_name(const std::type_info& info);
 
    /**
     * Add a writer. This writer will be written in subsequent event 

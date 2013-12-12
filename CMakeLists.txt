@@ -116,6 +116,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/level_filter.hpp
     include/chucho/level_threshold_filter.hpp
     include/chucho/log.hpp
+    include/chucho/loggable.hpp
     include/chucho/logger.hpp
     include/chucho/marker.hpp
     include/chucho/memento.hpp

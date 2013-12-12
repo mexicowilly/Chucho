@@ -30,11 +30,31 @@ public:
     }
 };
 
+namespace one
+{
+
+namespace two
+{
+
+namespace three
+{
+
+class loggable_type
+{
+};
+
+}
+
+}
+
+}
+
 TEST_F(log_test, existing_loggers)
 {
+    chucho::logger::remove_unused_loggers();
     std::shared_ptr<chucho::logger> l = chucho::logger::get("eight.nine.ten.eleven");
     std::vector<std::shared_ptr<chucho::logger> > all = chucho::logger::get_existing_loggers();
-    EXPECT_EQ(all.size(), 5);
+    EXPECT_EQ(all.size(), 5); 
     EXPECT_FALSE(std::find_if(all.begin(), all.end(),
                               [](std::shared_ptr<chucho::logger> l) { return l->get_name() ==  ""; }) == all.end());
     EXPECT_FALSE(std::find_if(all.begin(), all.end(),
@@ -107,4 +127,10 @@ TEST_F(log_test, reset)
     EXPECT_TRUE(lgr->get_writers().empty());
     EXPECT_FALSE(static_cast<bool>(lgr->get_level()));
     EXPECT_TRUE(lgr->writes_to_ancestors());
+}
+
+TEST_F(log_test, type_to_logger_name)
+{
+    std::string name = chucho::logger::type_to_logger_name(typeid(one::two::three::loggable_type));
+    EXPECT_EQ(std::string("one.two.three.loggable_type"), name);
 }
