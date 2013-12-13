@@ -52,7 +52,8 @@ struct static_data
     std::string environment_variable_;
     chucho::configuration::unknown_handler_type unknown_handler_;
     std::string loaded_file_name_;
-    bool is_configured;
+    bool is_configured_;
+    std::size_t max_size_;
 };
 
 static_data::static_data()
@@ -60,7 +61,8 @@ static_data::static_data()
       file_name_(std::string(1, '.') + chucho::file::dir_sep + std::string("chucho.yaml")),
       allow_default_config_(true),
       environment_variable_("CHUCHO_CONFIG"),
-      is_configured(false)
+      is_configured_(false),
+      max_size_(100 * 1024)
 {
     chucho::garbage_cleaner::get().add([this] () { delete this; });
 }
@@ -247,6 +249,11 @@ const std::string& configuration::get_loaded_file_name()
     return data().loaded_file_name_;
 }
 
+std::size_t configuration::get_max_size()
+{
+    return data().max_size_;
+}
+
 configuration::style configuration::get_style()
 {
     return data().style_;
@@ -284,16 +291,25 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
     {
         if (file::exists(fn))
         {
-            sd.is_configured = configure_from_file(fn, report);
-            if (!sd.is_configured) 
-                logger::remove_unused_loggers();
+            auto sz = file::size(fn);
+            if (sz > sd.max_size_)
+            {
+                report.warning("The file, " + fn + ", is " + std::to_string(sz) +
+                    " bytes large, but the maximum allowed is " + std::to_string(sd.max_size_));
+            }
+            else
+            {
+                sd.is_configured_ = configure_from_file(fn, report);
+                if (!sd.is_configured_) 
+                    logger::remove_unused_loggers();
+            }
         }
         else
         {
             report.warning("The file " + fn + " does not exist");
         }
     }
-    if (!sd.is_configured && !sd.fallback_.empty())
+    if (!sd.is_configured_ && !sd.fallback_.empty())
     {
         try
         {
@@ -307,7 +323,7 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
                 // this is already validated UTF-8
                 std::istringstream fb_in(sd.fallback_);
                 yam.configure(fb_in);
-                sd.is_configured = true;
+                sd.is_configured_ = true;
                 report.info("Using the YAML format fallback configuration"); 
             }
 
@@ -320,7 +336,7 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
                 config_file_configurator cnf;
                 std::istringstream fb_in(sd.fallback_);
                 cnf.configure(fb_in);
-                sd.is_configured = true;
+                sd.is_configured_ = true;
                 report.info("Using the config file format fallback configuration"); 
             }
 
@@ -338,11 +354,11 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
 
     #endif
 
-    if (!sd.is_configured && sd.allow_default_config_)
+    if (!sd.is_configured_ && sd.allow_default_config_)
     {
         set_default_config(root_logger);
         report.info("Using the default configuration");
-        sd.is_configured = true;
+        sd.is_configured_ = true;
     }
 }
 
@@ -350,7 +366,7 @@ bool configuration::reconfigure()
 {
     static_data& sd(data());
     bool result = false;
-    if (sd.is_configured &&
+    if (sd.is_configured_ &&
         sd.style_ == style::AUTOMATIC &&
         (!sd.loaded_file_name_.empty() || !sd.file_name_.empty()))
     {
@@ -359,21 +375,30 @@ bool configuration::reconfigure()
             sd.file_name_ : sd.loaded_file_name_;
         if (file::exists(to_try))
         {
-            auto loggers = logger::get_existing_loggers();
-            std::vector<logger_state> states;
-            for (auto lgr : loggers)
+            auto sz = file::size(to_try);
+            if (sz > sd.max_size_)
             {
-                states.emplace_back(lgr);
-                lgr->reset();
-            }
-            if (configure_from_file(to_try, report))
-            {
-                result = true;
+                report.warning("The file, " + to_try + ", is " + std::to_string(sz) +
+                    " bytes large, but the maximum allowed is " + std::to_string(sd.max_size_));
             }
             else
             {
-                for (unsigned i = 0; i < loggers.size(); i++)
-                    states[i].restore(loggers[i]);
+                auto loggers = logger::get_existing_loggers();
+                std::vector<logger_state> states;
+                for (auto lgr : loggers)
+                {
+                    states.emplace_back(lgr);
+                    lgr->reset();
+                }
+                if (configure_from_file(to_try, report))
+                {
+                    result = true;
+                }
+                else
+                {
+                    for (unsigned i = 0; i < loggers.size(); i++)
+                        states[i].restore(loggers[i]);
+                }
             }
         }
         else
@@ -396,13 +421,26 @@ void configuration::set_environment_variable(const std::string& var)
 
 void configuration::set_fallback(const std::string& config)
 {
-    std::istringstream stream(config);
-    data().fallback_ = config;
+    if (config.length() > data().max_size_) 
+    {
+        reporter report;
+        report.error("The fallback size is " + std::to_string(config.length()) +
+            ", but the maximum allowed is " + std::to_string(data().max_size_));
+    }
+    else
+    {
+        data().fallback_ = config;
+    }
 }
 
 void configuration::set_file_name(const std::string& name)
 {
     data().file_name_ = name;
+}
+
+void configuration::set_max_size(std::size_t mx)
+{
+    data().max_size_ = mx;
 }
 
 void configuration::set_style(style stl)

@@ -142,6 +142,7 @@ public:
      * @return the loaded file name
      */
     static const std::string& get_loaded_file_name();
+    static std::size_t get_max_size();
     /**
      * Return the configuration style. AUTOMATIC is the default 
      * style. 
@@ -233,6 +234,7 @@ public:
      * @param name the file name
      */
     static void set_file_name(const std::string& name);
+    static void set_max_size(std::size_t mx);
     /**
      * Set the configuration style.
      * 
