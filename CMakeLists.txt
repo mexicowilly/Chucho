@@ -613,7 +613,8 @@ ADD_CUSTOM_TARGET(dist
                   COMMAND "${CMAKE_COMMAND}" -E tar czvf ${CHUCHO_DIST_NAME_BASE}.tar.gz ${CHUCHO_DIST_NAME_BASE}
                   DEPENDS ${CHUCHO_DIST_OUTPUT})
 IF(CHUCHO_ZIP)
+    FILE(RELATIVE_PATH CHUCHO_ZDIST_NAME_BASE "${CMAKE_BINARY_DIR}" "${CHUCHO_DIST_NAME_BASE}")
     ADD_CUSTOM_TARGET(zdist
-                      COMMAND "${CHUCHO_ZIP}" --recurse-paths --to-crlf ${CHUCHO_DIST_NAME_BASE}.zip ${CHUCHO_DIST_NAME_BASE}
+                      COMMAND "${CHUCHO_ZIP}" --recurse-paths --to-crlf ${CHUCHO_DIST_NAME_BASE}.zip ${CHUCHO_ZDIST_NAME_BASE}
                       DEPENDS ${CHUCHO_DIST_OUTPUT})
 ENDIF()
