@@ -21,6 +21,7 @@
 #error "This header is private"
 #endif
 
+#include <chucho/export.hpp>
 #include <string>
 
 namespace chucho
@@ -29,7 +30,7 @@ namespace chucho
 namespace demangle
 {
 
-std::string get_demangled_name(const std::type_info& info);
+CHUCHO_NO_EXPORT std::string get_demangled_name(const std::type_info& info);
 
 }
 

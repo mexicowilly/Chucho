@@ -125,6 +125,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/numbered_file_roller.hpp
     include/chucho/optional.hpp
     include/chucho/pattern_formatter.hpp
+    include/chucho/prefix.hpp
     include/chucho/remote_writer.hpp
     include/chucho/rolling_file_writer.hpp
     include/chucho/size_file_roll_trigger.hpp
@@ -133,6 +134,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/status_manager.hpp
     include/chucho/status_observer.hpp
     include/chucho/status_reporter.hpp
+    include/chucho/suffix.hpp
     include/chucho/syslog_constants.hpp
     include/chucho/syslog_writer.hpp
     include/chucho/time_file_roller.hpp
@@ -159,39 +161,38 @@ IF(CHUCHO_HAVE_MINIZIP)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/zip_file_compressor.hpp)
 ENDIF()
 
-# Configurator settings
-IF(YAML_CONFIG)
+# The libyaml sources are required by chuchod
+MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
     # Update this when you rev libyaml
     SET(CHUCHO_LIBYAML_VERSION_MAJOR 0)
     SET(CHUCHO_LIBYAML_VERSION_MINOR 1)
     SET(CHUCHO_LIBYAML_VERSION_PATCH 4)
 
-    SET(CHUCHO_EMBEDDED_SOURCES
-        embedded/libyaml/api.c
-        embedded/libyaml/loader.c
-        embedded/libyaml/parser.c
-        embedded/libyaml/reader.c
-        embedded/libyaml/scanner.c)
+    SET(${CHUCHO_YAML_SOURCE_VAR}
+        "${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c"
+        "${CMAKE_SOURCE_DIR}/embedded/libyaml/loader.c"
+        "${CMAKE_SOURCE_DIR}/embedded/libyaml/parser.c"
+        "${CMAKE_SOURCE_DIR}/embedded/libyaml/reader.c"
+        "${CMAKE_SOURCE_DIR}/embedded/libyaml/scanner.c")
 
-    IF(ENABLE_SHARED)
-        SET(CHUCHO_DECLARE_YAML YAML_DECLARE_EXPORT)
-    ELSE()
-        SET(CHUCHO_DECLARE_YAML YAML_DECLARE_STATIC)
-    ENDIF()
-    SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/api.c PROPERTIES
-                                COMPILE_DEFINITIONS "YAML_VERSION_MAJOR=${CHUCHO_LIBYAML_VERSION_MAJOR};YAML_VERSION_MINOR=${CHUCHO_LIBYAML_VERSION_MINOR};YAML_VERSION_PATCH=${CHUCHO_LIBYAML_VERSION_PATCH};YAML_VERSION_STRING=\"${CHUCHO_LIB_YAML_VERSION_MAJOR}.${CHUCHO_LIBYAML_VERSION_MINOR}.${CHUCHO_LIBYAML_VERSION_PATCH}\";${CHUCHO_DECLARE_YAML}")
-    SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/loader.c
-                                embedded/libyaml/parser.c
-                                embedded/libyaml/reader.c
-                                embedded/libyaml/scanner.c
+    SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
+                                COMPILE_DEFINITIONS "YAML_VERSION_MAJOR=${CHUCHO_LIBYAML_VERSION_MAJOR};YAML_VERSION_MINOR=${CHUCHO_LIBYAML_VERSION_MINOR};YAML_VERSION_PATCH=${CHUCHO_LIBYAML_VERSION_PATCH};YAML_VERSION_STRING=\"${CHUCHO_LIB_YAML_VERSION_MAJOR}.${CHUCHO_LIBYAML_VERSION_MINOR}.${CHUCHO_LIBYAML_VERSION_PATCH}\";YAML_DECLARE_STATIC")
+    SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/loader.c"
+                                "${CMAKE_SOURCE_DIR}/embedded/libyaml/parser.c"
+                                "${CMAKE_SOURCE_DIR}/embedded/libyaml/reader.c"
+                                "${CMAKE_SOURCE_DIR}/embedded/libyaml/scanner.c"
                                 PROPERTIES
-                                COMPILE_DEFINITIONS ${CHUCHO_DECLARE_YAML})
+                                COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
     IF(MSVC)
         # Microsoft doesn't want libyaml to use strdup
-        SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/api.c PROPERTIES
+        SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
                                     COMPILE_FLAGS /wd4996)
     ENDIF()
+ENDMACRO()
 
+# Configurator settings
+IF(YAML_CONFIG)
+    CHUCHO_SET_YAML_SOURCES(CHUCHO_EMBEDDED_SOURCES)
     SET(CHUCHO_CONFIGURATOR_SOURCES
         yaml_configurator.cpp
         yaml_parser.cpp
@@ -199,9 +200,9 @@ IF(YAML_CONFIG)
         include/chucho/yaml_configurator.hpp
         include/chucho/yaml_parser.hpp)
     SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
-                                COMPILE_DEFINITIONS "CHUCHO_YAML_CONFIG;${CHUCHO_DECLARE_YAML}")
+                                COMPILE_DEFINITIONS "CHUCHO_YAML_CONFIG;YAML_DECLARE_STATIC")
     SET_SOURCE_FILES_PROPERTIES(yaml_parser.cpp PROPERTIES
-                                COMPILE_DEFINITIONS ${CHUCHO_DECLARE_YAML})
+                                COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
     MESSAGE(STATUS "Chucho has YAML configuration parsing enabled")
 ENDIF()
 

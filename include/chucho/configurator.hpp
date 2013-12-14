@@ -113,7 +113,7 @@ private:
     /**
      * This is invoked by configuration::perform().
      */
-    static void initialize();
+    CHUCHO_NO_EXPORT static void initialize();
 
     std::map<std::string, std::string> variables_;
 };

@@ -17,6 +17,7 @@
 #if !defined(CHUCHO_MEMENTO_HPP__)
 #define CHUCHO_MEMENTO_HPP__
 
+#include <chucho/prefix.hpp>
 #include <chucho/configurator.hpp>
 #include <chucho/configurable.hpp>
 #include <functional>
@@ -113,5 +114,7 @@ private:
 };
 
 }
+
+#include <chucho/suffix.hpp>
 
 #endif

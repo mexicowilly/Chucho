@@ -14,25 +14,11 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_TEXT_UTIL_HPP__)
-#define CHUCHO_TEXT_UTIL_HPP__
+#if !defined(CHUCHO_SUFFIX_HPP__)
+#define CHUCHO_SUFFIX_HPP__
 
-#if !defined(CHUCHO_BUILD)
-#error "This header is private"
+#if defined(_MSC_VER)
+#pragma warning(pop)
 #endif
-
-#include <string>
-
-namespace chucho
-{
-
-namespace text_util
-{
-
-std::string to_lower(const std::string& text);
-
-}
-
-}
 
 #endif

@@ -21,6 +21,7 @@
 #error "This header is private"
 #endif
 
+#include <chucho/prefix.hpp>
 #include <chucho/export.hpp>
 #include <ctime>
 #include <string>
@@ -31,7 +32,7 @@ namespace chucho
 namespace calendar
 {
 
-struct pieces : std::tm
+struct CHUCHO_PRIV_EXPORT pieces : std::tm
 {
     pieces();
     pieces(const struct std::tm& t);
@@ -41,13 +42,15 @@ struct pieces : std::tm
     bool is_utc;
 };
 
-CHUCHO_EXPORT std::string format(const pieces& cal,
+CHUCHO_PRIV_EXPORT std::string format(const pieces& cal,
                                  const std::string& pattern);
-CHUCHO_EXPORT pieces get_local(std::time_t t);
-CHUCHO_EXPORT pieces get_utc(std::time_t t);
+CHUCHO_PRIV_EXPORT pieces get_local(std::time_t t);
+CHUCHO_PRIV_EXPORT pieces get_utc(std::time_t t);
 
 }
 
 }
+
+#include <chucho/suffix.hpp>
 
 #endif

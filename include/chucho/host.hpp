@@ -27,7 +27,7 @@
 namespace chucho
 {
 
-class CHUCHO_EXPORT host
+class CHUCHO_PRIV_EXPORT host
 {
 public:
     static const std::string& get_base_name();

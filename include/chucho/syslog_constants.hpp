@@ -17,6 +17,7 @@
 #if !defined(CHUCHO_SYSLOG_CONSTANTS_HPP__)
 #define CHUCHO_SYSLOG_CONSTANTS_HPP__
 
+#include <chucho/export.hpp>
 #include <cstdint>
 
 namespace chucho
@@ -33,7 +34,7 @@ namespace syslog
 /**
  * The default syslog port, which is 514.
  */
-extern const std::uint16_t DEFAULT_PORT;
+CHUCHO_EXPORT extern const std::uint16_t DEFAULT_PORT;
 
 /**
  * All standard syslog facilities. Defined in the file

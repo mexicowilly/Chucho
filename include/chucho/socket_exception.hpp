@@ -26,7 +26,7 @@
 namespace chucho
 {
 
-class CHUCHO_EXPORT socket_exception : public exception
+class socket_exception : public exception
 {
 public:
     socket_exception(const std::string& msg, int sys_error);

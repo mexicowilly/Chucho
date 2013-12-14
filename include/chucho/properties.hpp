@@ -21,6 +21,7 @@
 #error "This header is private"
 #endif
 
+#include <chucho/prefix.hpp>
 #include <chucho/optional.hpp>
 #include <string>
 #include <map>
@@ -30,7 +31,7 @@
 namespace chucho
 {
 
-class properties
+class CHUCHO_PRIV_EXPORT properties
 {
 public:
     typedef std::multimap<std::string, std::string>::const_iterator const_iterator;
@@ -46,7 +47,7 @@ public:
     std::size_t size() const;
 
 private:
-    properties();
+    CHUCHO_NO_EXPORT properties();
 
     std::multimap<std::string, std::string> props_;
 };
@@ -77,5 +78,7 @@ inline std::size_t properties::size() const
 }
 
 }
+
+#include <chucho/suffix.hpp>
 
 #endif

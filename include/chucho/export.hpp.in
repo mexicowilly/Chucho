@@ -26,6 +26,7 @@
 
 #define CHUCHO_EXPORT
 #define CHUCHO_NO_EXPORT
+#define CHUCHO_PRIV_EXPORT
 
 #else
 
@@ -53,6 +54,14 @@
 #define CHUCHO_EXPORT
 #endif
 
+#endif
+
+#if !defined(CHUCHO_PRIV_EXPORT)
+#if defined(NDEBUG)
+#define CHUCHO_PRIV_EXPORT
+#else
+#define CHUCHO_PRIV_EXPORT CHUCHO_EXPORT
+#endif
 #endif
 
 #if defined(__clang__) || (defined(__GNUC__) && __GNUC__ >= 4)

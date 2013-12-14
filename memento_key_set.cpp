@@ -15,7 +15,9 @@
  */
 
 #include <chucho/memento_key_set.hpp>
+#if defined(CHUCHO_CONFIG_FILE_CONFIG)
 #include <chucho/config_file_configurator.hpp>
+#endif
 
 namespace chucho
 {

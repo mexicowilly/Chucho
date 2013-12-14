@@ -17,6 +17,7 @@
 #if !defined(CHUCHO_STATUS_HPP__)
 #define CHUCHO_STATUS_HPP__
 
+#include <chucho/prefix.hpp>
 #include <chucho/export.hpp>
 #include <memory>
 #include <chrono>
@@ -168,5 +169,7 @@ inline const status::time_type& status::get_time() const
 }
 
 }
+
+#include <chucho/suffix.hpp>
 
 #endif

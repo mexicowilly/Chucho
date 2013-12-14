@@ -75,6 +75,8 @@ ELSEIF(CHUCHO_WINDOWS)
         platform/windows/socket_reader_windows.cpp)
 ENDIF()
 
+CHUCHO_SET_YAML_SOURCES(CHUCHOD_YAML_SOURCES)
+
 ADD_EXECUTABLE(chuchod
                daemon.hpp
                eof_exception.cpp
@@ -98,17 +100,15 @@ ADD_EXECUTABLE(chuchod
                suzerain.hpp
                vassals.cpp
                vassals.hpp
-               ${CHUCHOD_PLATFORM_SOURCES})
+               ${CHUCHOD_PLATFORM_SOURCES}
+               ${CHUCHOD_YAML_SOURCES})
 
-IF(NOT ENABLE_SHARED)
-    SET(CHUCHOD_DECLARE_YAML YAML_DECLARE_STATIC)
-ENDIF()
 IF(CHUCHO_HAVE_ARPA_INET_H)
     SET_SOURCE_FILES_PROPERTIES(suzerain.cpp PROPERTIES
-                                COMPILE_DEFINITIONS "${CHUCHOD_DECLARE_YAML};CHUCHO_HAVE_ARPA_INET_H")
+                                COMPILE_DEFINITIONS "YAML_DECLARE_STATIC;CHUCHO_HAVE_ARPA_INET_H")
 ELSE()
     SET_SOURCE_FILES_PROPERTIES(suzerain.cpp PROPERTIES
-                                COMPILE_DEFINITIONS ${CHUCHOD_DECLARE_YAML})
+                                COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
 ENDIF()
 
 IF(CHUCHO_HAVE_WINSOCK2_H)

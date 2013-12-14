@@ -17,6 +17,7 @@
 #if !defined(BZIP2_FILE_COMPRESSOR_HPP__)
 #define BZIP2_FILE_COMPRESSOR_HPP__
 
+#include <chucho/prefix.hpp>
 #include <chucho/file_compressor.hpp>
 
 namespace chucho
@@ -51,5 +52,7 @@ public:
 };
 
 }
+
+#include <chucho/suffix.hpp>
 
 #endif
