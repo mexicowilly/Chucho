@@ -14,27 +14,12 @@
  *    limitations under the License.
  */
 
-#include <chucho/memento_key_set.hpp>
-#if defined(CHUCHO_CONFIG_FILE_CONFIG)
-#include <chucho/config_file_configurator.hpp>
+#if !defined(CHUCHO_SUFFIX_HPP__)
+#define CHUCHO_SUFFIX_HPP__
+
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
 #endif
 
-namespace chucho
-{
-
-memento_key_set get_memento_key_set(const configurator& cfg)
-{
-    memento_key_set ks = memento_key_set::CHUCHO;
-
-    #if defined(CHUCHO_CONFIG_FILE_CONFIG)
-
-    auto ccfg = dynamic_cast<const config_file_configurator*>(&cfg);
-    if (ccfg != nullptr)
-        ks = ccfg->get_memento_key_set();
-
-    #endif
-
-    return ks;
-}
-
-}
+#endif

@@ -21,6 +21,7 @@
 #error "This header is private"
 #endif
 
+#include <chucho/prefix.hpp>
 #include <chucho/optional.hpp>
 #include <string>
 #include <map>
@@ -77,5 +78,7 @@ inline std::size_t properties::size() const
 }
 
 }
+
+#include <chucho/suffix.hpp>
 
 #endif

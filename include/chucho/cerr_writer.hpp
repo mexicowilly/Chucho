@@ -17,6 +17,7 @@
 #if !defined(CHUCHO_CERR_WRITER_HPP__)
 #define CHUCHO_CERR_WRITER_HPP__
 
+#include <chucho/prefix.hpp>
 #include <chucho/console_writer.hpp>
 
 namespace chucho
@@ -47,5 +48,7 @@ public:
 };
 
 }
+
+#include <chucho/suffix.hpp>
 
 #endif

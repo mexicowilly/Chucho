@@ -21,6 +21,7 @@
 #error "This header is private"
 #endif
 
+#include <chucho/prefix.hpp>
 #include <chucho/export.hpp>
 #include <ctime>
 #include <string>
@@ -49,5 +50,7 @@ CHUCHO_PRIV_EXPORT pieces get_utc(std::time_t t);
 }
 
 }
+
+#include <chucho/suffix.hpp>
 
 #endif

@@ -17,6 +17,7 @@
 #if !defined(CHUCHO_MARKER_HPP__)
 #define CHUCHO_MARKER_HPP__
 
+#include <chucho/prefix.hpp>
 #include <chucho/export.hpp>
 #include <memory>
 #include <string>
@@ -203,5 +204,7 @@ inline void marker::insert(const marker& mark)
 }
 
 }
+
+#include <chucho/suffix.hpp>
 
 #endif

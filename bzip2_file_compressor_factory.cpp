@@ -16,7 +16,9 @@
 
 #include <chucho/bzip2_file_compressor_factory.hpp>
 #include <chucho/file_compressor_memento.hpp>
+#if defined(CHUCHO_HAVE_BZIP2)
 #include <chucho/bzip2_file_compressor.hpp>
+#endif
 #include <chucho/noop_file_compressor.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>

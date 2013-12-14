@@ -17,6 +17,7 @@
 #if !defined(CHUCHO_CONFIGURABLE_FACTORY_HPP__)
 #define CHUCHO_CONFIGURABLE_FACTORY_HPP__
 
+#include <chucho/prefix.hpp>
 #include <chucho/memento.hpp>
 #include <chucho/configurable.hpp>
 #include <chucho/configurator.hpp>
@@ -72,5 +73,7 @@ public:
 };
 
 }
+
+#include <chucho/suffix.hpp>
 
 #endif

@@ -21,6 +21,7 @@
 #error "This header is private"
 #endif
 
+#include <chucho/prefix.hpp>
 #include <chucho/export.hpp>
 #include <chucho/non_copyable.hpp>
 #include <memory>
@@ -65,7 +66,7 @@ public:
 
 protected:
     friend class iterator;
-    friend bool search(const std::string& text, expression& re, match& mch);
+    friend CHUCHO_PRIV_EXPORT bool search(const std::string& text, expression& re, match& mch);
 
 private:
     std::vector<sub_match> subs_;
@@ -144,5 +145,7 @@ inline iterator::reference iterator::operator* ()
 }
 
 }
+
+#include <chucho/suffix.hpp>
 
 #endif

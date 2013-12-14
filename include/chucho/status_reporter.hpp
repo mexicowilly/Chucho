@@ -17,6 +17,7 @@
 #if !defined(CHUCHO_STATUS_REPORTER_HPP__)
 #define CHUCHO_STATUS_REPORTER_HPP__
 
+#include <chucho/prefix.hpp>
 #include <chucho/status.hpp>
 
 namespace chucho
@@ -102,5 +103,7 @@ inline void status_reporter::set_status_origin(const std::string& origin)
 } 
 
 }
+
+#include <chucho/suffix.hpp>
 
 #endif

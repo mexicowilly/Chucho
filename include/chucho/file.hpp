@@ -31,7 +31,7 @@ namespace chucho
 namespace file
 {
 
-CHUCHO_PRIV_EXPORT extern const char dir_sep;
+extern CHUCHO_PRIV_EXPORT const char dir_sep;
 
 CHUCHO_PRIV_EXPORT std::string base_name(const std::string& name);
 CHUCHO_PRIV_EXPORT void create_directories(const std::string& name);

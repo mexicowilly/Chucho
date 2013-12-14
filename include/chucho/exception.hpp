@@ -17,6 +17,7 @@
 #if !defined(CHUCHO_EXCEPTION_HPP__)
 #define CHUCHO_EXCEPTION_HPP__
 
+#include <chucho/prefix.hpp>
 #include <chucho/export.hpp>
 #include <exception>
 #include <string>
@@ -76,5 +77,7 @@ protected:
 };
 
 }
+
+#include <chucho/suffix.hpp>
 
 #endif
