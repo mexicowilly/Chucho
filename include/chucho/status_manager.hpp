@@ -133,7 +133,7 @@ private:
     /**
      * @pre guard_ must be locked
      */
-    void adjust_level();
+    CHUCHO_NO_EXPORT void adjust_level();
 
     std::vector<status> head_cache_;
     std::deque<status> tail_cache_;

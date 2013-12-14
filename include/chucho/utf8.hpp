@@ -30,8 +30,8 @@ namespace chucho
 namespace utf8
 {
 
-CHUCHO_EXPORT std::string escape_invalid(const std::string& text);
-CHUCHO_EXPORT void validate(std::istream& stream);
+CHUCHO_PRIV_EXPORT std::string escape_invalid(const std::string& text);
+CHUCHO_PRIV_EXPORT void validate(std::istream& stream);
 
 }
 

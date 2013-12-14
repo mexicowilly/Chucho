@@ -36,7 +36,7 @@ namespace chucho
 class properties;
 class formatter;
 
-class CHUCHO_EXPORT config_file_configurator : public configurator
+class CHUCHO_PRIV_EXPORT config_file_configurator : public configurator
 {
 public:
     config_file_configurator();

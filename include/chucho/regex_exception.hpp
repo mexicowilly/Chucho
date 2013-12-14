@@ -26,7 +26,7 @@
 namespace chucho
 {
 
-class CHUCHO_EXPORT regex_exception : public exception
+class regex_exception : public exception
 {
 public:
     regex_exception(const std::string& msg);

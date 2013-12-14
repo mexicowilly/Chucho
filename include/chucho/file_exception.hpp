@@ -26,7 +26,7 @@
 namespace chucho
 {
 
-class CHUCHO_EXPORT file_exception : public exception
+class file_exception : public exception
 {
 public:
     file_exception(const std::string& msg);

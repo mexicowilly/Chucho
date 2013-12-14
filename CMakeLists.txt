@@ -173,19 +173,14 @@ IF(YAML_CONFIG)
         embedded/libyaml/reader.c
         embedded/libyaml/scanner.c)
 
-    IF(ENABLE_SHARED)
-        SET(CHUCHO_DECLARE_YAML YAML_DECLARE_EXPORT)
-    ELSE()
-        SET(CHUCHO_DECLARE_YAML YAML_DECLARE_STATIC)
-    ENDIF()
     SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/api.c PROPERTIES
-                                COMPILE_DEFINITIONS "YAML_VERSION_MAJOR=${CHUCHO_LIBYAML_VERSION_MAJOR};YAML_VERSION_MINOR=${CHUCHO_LIBYAML_VERSION_MINOR};YAML_VERSION_PATCH=${CHUCHO_LIBYAML_VERSION_PATCH};YAML_VERSION_STRING=\"${CHUCHO_LIB_YAML_VERSION_MAJOR}.${CHUCHO_LIBYAML_VERSION_MINOR}.${CHUCHO_LIBYAML_VERSION_PATCH}\";${CHUCHO_DECLARE_YAML}")
+                                COMPILE_DEFINITIONS "YAML_VERSION_MAJOR=${CHUCHO_LIBYAML_VERSION_MAJOR};YAML_VERSION_MINOR=${CHUCHO_LIBYAML_VERSION_MINOR};YAML_VERSION_PATCH=${CHUCHO_LIBYAML_VERSION_PATCH};YAML_VERSION_STRING=\"${CHUCHO_LIB_YAML_VERSION_MAJOR}.${CHUCHO_LIBYAML_VERSION_MINOR}.${CHUCHO_LIBYAML_VERSION_PATCH}\";YAML_DECLARE_STATIC")
     SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/loader.c
                                 embedded/libyaml/parser.c
                                 embedded/libyaml/reader.c
                                 embedded/libyaml/scanner.c
                                 PROPERTIES
-                                COMPILE_DEFINITIONS ${CHUCHO_DECLARE_YAML})
+                                COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
     IF(MSVC)
         # Microsoft doesn't want libyaml to use strdup
         SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/api.c PROPERTIES
@@ -199,9 +194,9 @@ IF(YAML_CONFIG)
         include/chucho/yaml_configurator.hpp
         include/chucho/yaml_parser.hpp)
     SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
-                                COMPILE_DEFINITIONS "CHUCHO_YAML_CONFIG;${CHUCHO_DECLARE_YAML}")
+                                COMPILE_DEFINITIONS "CHUCHO_YAML_CONFIG;YAML_DECLARE_STATIC")
     SET_SOURCE_FILES_PROPERTIES(yaml_parser.cpp PROPERTIES
-                                COMPILE_DEFINITIONS ${CHUCHO_DECLARE_YAML})
+                                COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
     MESSAGE(STATUS "Chucho has YAML configuration parsing enabled")
 ENDIF()
 

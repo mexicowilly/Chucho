@@ -21,13 +21,15 @@
 #error "This header is private"
 #endif
 
+#include <chucho/export.hpp>
+
 namespace chucho
 {
 
 namespace clock_util
 {
 
-extern const bool system_clock_supports_milliseconds;
+CHUCHO_NO_EXPORT extern const bool system_clock_supports_milliseconds;
 
 }
 

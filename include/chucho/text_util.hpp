@@ -21,7 +21,6 @@
 #error "This header is private"
 #endif
 
-#include <chucho/export.hpp>
 #include <string>
 
 namespace chucho
@@ -30,7 +29,7 @@ namespace chucho
 namespace text_util
 {
 
-CHUCHO_NO_EXPORT std::string to_lower(const std::string& text);
+std::string to_lower(const std::string& text);
 
 }
 

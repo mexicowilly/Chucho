@@ -26,6 +26,7 @@
 
 #define CHUCHO_EXPORT
 #define CHUCHO_NO_EXPORT
+#define CHUCHO_PRIV_EXPORT
 
 #else
 
@@ -41,6 +42,12 @@
 #define CHUCHO_EXPORT
 #endif
 
+#if defined(NDEBUG)
+#define CHUCHO_PRIV_EXPORT
+#else
+#define CHUCHO_PRIV_EXPORT CHUCHO_EXPORT
+#endif
+
 #else
 
 #if defined(_MSC_VER)
@@ -52,6 +59,8 @@
 #else
 #define CHUCHO_EXPORT
 #endif
+
+#define CHUCHO_PRIV_EXPORT
 
 #endif
 

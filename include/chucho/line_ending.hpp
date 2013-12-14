@@ -29,7 +29,7 @@ namespace chucho
 namespace line_ending
 {
 
-CHUCHO_EXPORT extern const char* EOL;
+CHUCHO_PRIV_EXPORT extern const char* EOL;
 
 }
 

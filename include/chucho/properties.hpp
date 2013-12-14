@@ -30,7 +30,7 @@
 namespace chucho
 {
 
-class properties
+class CHUCHO_PRIV_EXPORT properties
 {
 public:
     typedef std::multimap<std::string, std::string>::const_iterator const_iterator;
@@ -46,7 +46,7 @@ public:
     std::size_t size() const;
 
 private:
-    properties();
+    CHUCHO_NO_EXPORT properties();
 
     std::multimap<std::string, std::string> props_;
 };
