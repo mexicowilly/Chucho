@@ -113,6 +113,6 @@ these with the command-line switch -D, as in
       on Windows.
     * INSTALL_SERVICE: (ON or OFF) Whether you want the install target
       to install the chuchod log server as a system service on
-      platforms that support system services. The default is ON.
+      platforms that support system services. The default is OFF.
     * Any of the aforementioned compression options for enabling
       support for rolling to compressed files.

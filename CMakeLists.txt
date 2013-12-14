@@ -496,9 +496,14 @@ IF(ENABLE_SHARED)
         SET_TARGET_PROPERTIES(chucho PROPERTIES
                               LINK_FLAGS "-std=c++11 -stdlib=libc++")
     ENDIF()
+    IF(CHUCHO_WINDOWS)
+        SET(CHUCHO_RT_DEST bin)
+    ELSE()
+        SET(CHUCHO_RT_DEST lib)
+    ENDIF()
     INSTALL(TARGETS chucho
             LIBRARY DESTINATION lib
-            RUNTIME DESTINATION lib
+            RUNTIME DESTINATION ${CHUCHO_RT_DEST}
             FRAMEWORK DESTINATION /Library/Frameworks
             PUBLIC_HEADER DESTINATION include/chucho)
 ELSE()
@@ -535,7 +540,7 @@ IF(CHUCHO_WINDOWS)
                           LINK_FLAGS /NOENTRY)
     ADD_DEPENDENCIES(chucho event_log)
     INSTALL(TARGETS event_log
-            RUNTIME DESTINATION lib)
+            RUNTIME DESTINATION bin)
 ENDIF()
 
 ADD_SUBDIRECTORY(test)

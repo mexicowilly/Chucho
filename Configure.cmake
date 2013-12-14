@@ -29,7 +29,7 @@ SET(CHUCHO_NEEDS_TO_USE_THE_FRAMEWORK_VARIABLE_OR_CMAKE_COMPLAINS ${ENABLE_FRAME
 
 # whether to install chucod as a service or not on platforms that have
 # services.
-OPTION(INSTALL_SERVICE "Whether to install chuchod as a system service" TRUE)
+OPTION(INSTALL_SERVICE "Whether to install chuchod as a system service" FALSE)
 
 # what kinds of configurations will we support
 OPTION(YAML_CONFIG "Whether to include the YAML configuration parser" TRUE)
