@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+
+<!--
+# Copyright 2013 Will Mason
+# 
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+# 
+#      http://www.apache.org/licenses/LICENSE-2.0
+# 
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+-->
+
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>Label</key>
+        <string>org.chucho.chuchod</string>
+        <key>ProgramArguments</key>
+        <array>
+            <string>${CMAKE_INSTALL_PREFIX}/bin/chuchod</string>
+            <string>--service</string>
+        </array>
+        <key>KeepAlive</key>
+        <true/>
+        <key>Sockets</key>
+        <dict>
+            <key>Listeners</key>
+            <array>
+                <dict>
+                    <key>SockFamily</key>
+                    <string>IPv4</string>
+                    <key>SockServiceName</key>
+                    <string>21012</string>
+                    <key>SockType</key>
+                    <string>stream</string>
+                </dict>
+                <dict>
+                    <key>SockFamily</key>
+                    <string>IPv6</string>
+                    <key>SockServiceName</key>
+                    <string>21012</string>
+                    <key>SockType</key>
+                    <string>stream</string>
+                </dict>
+            </array>
+        </dict>
+    </dict>
+</plist>

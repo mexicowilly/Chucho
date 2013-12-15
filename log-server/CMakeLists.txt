@@ -41,6 +41,15 @@ ELSEIF(CHUCHO_SOLARIS)
     ENDIF()
     CONFIGURE_FILE(platform/solaris/UninstallService.cmake.in
                    "${CMAKE_CURRENT_BINARY_DIR}/UninstallService.cmake")
+ELSEIF(CHUCHO_MACINTOSH)
+    IF(INSTALL_SERVICE)
+        CONFIGURE_FILE(platform/macintosh/org.chucho.chuchod.plist.in
+                       "${CMAKE_CURRENT_BINARY_DIR}/org.chucho.chuchod.plist")
+        CONFIGURE_FILE(platform/macintosh/InstallService.cmake.in
+                       "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
+    ENDIF()
+    CONFIGURE_FILE(platform/macintosh/UninstallService.cmake.in
+                   "${CMAKE_CURRENT_BINARY_DIR}/UninstallService.cmake")
 ENDIF()
 
 IF(CHUCHO_POSIX)
@@ -52,15 +61,20 @@ LIST(REMOVE_ITEM CHUCHO_DIR_DEFS CHUCHO_BUILD)
 SET_DIRECTORY_PROPERTIES(PROPERTIES COMPILE_DEFINITIONS "${CHUCHO_DIR_DEFS}")
 
 IF(CHUCHO_POSIX)
+    IF(CHUCHO_MACINTOSH AND INSTALL_SERVICE)
+        SET(CHUCHO_POSIX_DAEMON platform/macintosh/daemon_macintosh.cpp)
+    ELSE()
+        SET(CHUCHO_POSIX_DAEMON platform/posix/daemon_posix.cpp)
+    ENDIF()
     SET(CHUCHOD_PLATFORM_SOURCES
-        platform/posix/daemon_posix.cpp
         platform/posix/log_posix.cpp
         platform/posix/selector_posix.cpp
         platform/posix/signal_handler_posix.cpp
         platform/posix/single_instance_posix.cpp
         platform/posix/socket_life_cycle.cpp
         platform/posix/socket_listener_posix.cpp
-        platform/posix/socket_reader_posix.cpp)
+        platform/posix/socket_reader_posix.cpp
+        ${CHUCHO_POSIX_DAEMON})
 ELSEIF(CHUCHO_WINDOWS)
     SET(CHUCHOD_PLATFORM_SOURCES
         platform/windows/daemon_windows.cpp
@@ -127,7 +141,7 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
                                 COMPILE_FLAGS "-Wno-unused-result")
 ENDIF()
 
-IF(CHUCHO_WINDOWS OR CHUCHO_SOLARIS)
+IF(CHUCHO_WINDOWS OR CHUCHO_SOLARIS OR CHUCHO_MACINTOSH)
     INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/UninstallService.cmake")
 ENDIF()
 INSTALL(TARGETS chuchod
@@ -141,5 +155,9 @@ IF(INSTALL_SERVICE)
         INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
         INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/chucho.xml"
                 DESTINATION /var/svc/manifest/application)
+    ELSEIF(CHUCHO_MACINTOSH)
+        INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/org.chucho.chuchod.plist"
+                DESTINATION /Library/LaunchDaemons)
+        INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
     ENDIF()
 ENDIF()

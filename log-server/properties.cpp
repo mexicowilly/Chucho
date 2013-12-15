@@ -85,11 +85,15 @@ bool properties::handle_config_value(const std::string& key, const std::string& 
     {
         std::istringstream stream(value);
         stream >> std::boolalpha >> console_mode_;
+        if (console_mode_)
+            is_service_ = false; 
     }
     else if (key == "service")
     {
         std::istringstream stream(value);
         stream >> std::boolalpha >> is_service_;
+        if (is_service_)
+            console_mode_ = false;
     }
     else
     {
