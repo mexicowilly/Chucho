@@ -62,9 +62,11 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES COMPILE_DEFINITIONS "${CHUCHO_DIR_DEFS}")
 
 IF(CHUCHO_POSIX)
     IF(CHUCHO_MACINTOSH AND INSTALL_SERVICE)
-        SET(CHUCHO_POSIX_DAEMON platform/macintosh/daemon_macintosh.cpp)
+        SET(CHUCHOD_POSIX_DAEMON platform/macintosh/daemon_macintosh.cpp)
+        SET(CHUCHOD_POSIX_LISTENER platform/macintosh/socket_listener_macintosh.cpp)
     ELSE()
-        SET(CHUCHO_POSIX_DAEMON platform/posix/daemon_posix.cpp)
+        SET(CHUCHOD_POSIX_DAEMON platform/posix/daemon_posix.cpp)
+        SET(CHUCHOD_POSIX_LISTENER platform/posix/socket_listener_posix.cpp)
     ENDIF()
     SET(CHUCHOD_PLATFORM_SOURCES
         platform/posix/log_posix.cpp
@@ -72,9 +74,9 @@ IF(CHUCHO_POSIX)
         platform/posix/signal_handler_posix.cpp
         platform/posix/single_instance_posix.cpp
         platform/posix/socket_life_cycle.cpp
-        platform/posix/socket_listener_posix.cpp
         platform/posix/socket_reader_posix.cpp
-        ${CHUCHO_POSIX_DAEMON})
+        ${CHUCHOD_POSIX_DAEMON}
+        ${CHUCHOD_POSIX_LISTENER})
 ELSEIF(CHUCHO_WINDOWS)
     SET(CHUCHOD_PLATFORM_SOURCES
         platform/windows/daemon_windows.cpp

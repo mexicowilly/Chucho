@@ -32,10 +32,13 @@ namespace chucho
 namespace server
 {
 
+struct socket_listener_handle
+{
+};
+
 socket_listener::socket_listener(std::uint16_t port)
     : socket_(-1),
-      logger_(chucho::logger::get("chuchod.socket_listener")),
-      stop_(false)
+      logger_(chucho::logger::get("chuchod.socket_listener"))
 {
     struct addrinfo hints;
     std::memset(&hints, 0, sizeof(hints));

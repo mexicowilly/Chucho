@@ -28,6 +28,8 @@ namespace chucho
 namespace server
 {
 
+struct socket_listener_handle;
+
 class socket_listener : non_copyable
 {
 public:
@@ -39,7 +41,7 @@ public:
 private:
     int socket_;
     std::shared_ptr<chucho::logger> logger_;
-    std::atomic<bool> stop_;
+    std::unique_ptr<socket_listener_handle> handle_;
 };
 
 }

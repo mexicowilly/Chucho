@@ -26,29 +26,13 @@
             <string>${CMAKE_INSTALL_PREFIX}/bin/chuchod</string>
             <string>--service</string>
         </array>
-        <key>KeepAlive</key>
-        <true/>
         <key>Sockets</key>
         <dict>
             <key>Listeners</key>
-            <array>
-                <dict>
-                    <key>SockFamily</key>
-                    <string>IPv4</string>
-                    <key>SockServiceName</key>
-                    <string>21012</string>
-                    <key>SockType</key>
-                    <string>stream</string>
-                </dict>
-                <dict>
-                    <key>SockFamily</key>
-                    <string>IPv6</string>
-                    <key>SockServiceName</key>
-                    <string>21012</string>
-                    <key>SockType</key>
-                    <string>stream</string>
-                </dict>
-            </array>
+            <dict>
+                <key>SockServiceName</key>
+                <string>21012</string>
+            </dict>
         </dict>
     </dict>
 </plist>

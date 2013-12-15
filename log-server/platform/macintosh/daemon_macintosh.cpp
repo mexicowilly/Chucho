@@ -15,6 +15,7 @@
  */
 
 #include "daemon.hpp"
+#include <chucho/log.hpp>
 
 namespace chucho
 {
@@ -29,6 +30,7 @@ namespace daemon
 // process. That makes launchd mad.
 void possess(std::function<void()> func)
 {
+    CHUCHO_INFO_STR(chucho::logger::get("chuchod"), "This chuchod was built to run under launchd, so it runs as if in console mode");
     func();
 }
 

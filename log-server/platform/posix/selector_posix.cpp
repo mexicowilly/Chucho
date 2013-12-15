@@ -30,8 +30,7 @@ void selector::main()
     while (true)
     {
         std::unique_lock<std::mutex> lock(guard_);
-        while (!stop_ && readers_.empty())
-            condition_.wait(lock);
+        condition_.wait(lock, [this] () { return stop_ || !readers_.empty(); });
         if (stop_)
             return;
         fds.resize(readers_.size());
