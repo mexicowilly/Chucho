@@ -221,17 +221,24 @@ void config_file_configurator::chucho_properties_processor::process(const proper
     auto lgr_fact = get_factories().find("chucho::logger")->second;
     while (loggers.first != loggers.second)
     {
-        auto mnto = lgr_fact->create_memento(cfg_);
-        mnto->handle("name", loggers.first->second);
-        properties cur_props = props.get_subset("chucho.logger." + loggers.first->second + '.');
-        for (auto cur : cur_props)
+        try
         {
-            if (cur.first == "writer")
-                mnto->handle(create_writer(cur.second, chuprops));
-            else if (cur.first.find('.') == std::string::npos)
-                mnto->handle(cur.first, cur.second); 
+            auto mnto = lgr_fact->create_memento(cfg_);
+            mnto->handle("name", loggers.first->second);
+            properties cur_props = props.get_subset("chucho.logger." + loggers.first->second + '.');
+            for (auto cur : cur_props)
+            {
+                if (cur.first == "writer")
+                    mnto->handle(create_writer(cur.second, chuprops));
+                else if (cur.first.find('.') == std::string::npos)
+                    mnto->handle(cur.first, cur.second); 
+            }
+            lgr_fact->create_configurable(mnto);
         }
-        lgr_fact->create_configurable(mnto);
+        catch (std::exception& e) 
+        {
+            cfg_.report_error(std::string("An error occurred processing the config file: ") + e.what());
+        }
         ++loggers.first;
     }
 }
@@ -511,7 +518,17 @@ void config_file_configurator::log4cplus_properties_processor::process(const pro
         create_logger("", *root, lprops);
     auto loggers = lprops.get_subset("logger.");
     for (const properties::const_iterator::value_type& lgr : loggers)
-        create_logger(lgr.first, lgr.second, lprops);
+    {
+        try
+        {
+            create_logger(lgr.first, lgr.second, lprops);
+        }
+        catch (std::exception& e)
+        {
+            cfg_.report_error(std::string("An error occurred while processing the log4cplus config file: ") +
+                e.what());
+        }
+    }
 }
 
 std::vector<std::string> config_file_configurator::log4cplus_properties_processor::split_logger_descriptor(const std::string& desc)
