@@ -38,14 +38,9 @@ void writer_memento::handle(std::shared_ptr<configurable> cnf)
     {
         auto flt = std::dynamic_pointer_cast<filter>(cnf);
         if (flt)
-        {
             filters_.push_back(flt);
-        }
         else
-        {
-            throw exception("A writer cannot be constructed with a type of " +
-                demangle::get_demangled_name(typeid(*cnf)));
-        }
+            memento::handle(cnf);
     }
 }
 

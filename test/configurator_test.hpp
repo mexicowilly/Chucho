@@ -36,6 +36,7 @@ protected:
     void cerr_writer_body();
     virtual chucho::configurator& get_configurator() = 0;
     void configure(const char* const cnf);
+    void configure_with_error(const char* const cnf);
     void cout_writer_body();
     void duplicate_message_filter_body();
     void file_writer_body();

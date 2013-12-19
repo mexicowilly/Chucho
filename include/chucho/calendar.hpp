@@ -43,7 +43,7 @@ struct CHUCHO_PRIV_EXPORT pieces : std::tm
 };
 
 CHUCHO_PRIV_EXPORT std::string format(const pieces& cal,
-                                 const std::string& pattern);
+                                      const std::string& pattern);
 CHUCHO_PRIV_EXPORT pieces get_local(std::time_t t);
 CHUCHO_PRIV_EXPORT pieces get_utc(std::time_t t);
 

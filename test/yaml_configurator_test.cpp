@@ -63,6 +63,20 @@ TEST_F(yaml_configurator, async_writer)
     async_writer_body();
 }
 
+TEST_F(yaml_configurator, async_writer_invalid_1)
+{
+    configure_with_error("chucho::logger:\n"
+                         "    name: will\n"
+                         "    chucho::async_writer:");
+}
+
+TEST_F(yaml_configurator, async_writer_invalid_2)
+{
+    configure_with_error("chucho::logger:\n"
+                         "    - name: will\n"
+                         "    - chucho::async_writer");
+}
+
 TEST_F(yaml_configurator, async_writer_with_opts)
 {
     configure("chucho::logger:\n"
@@ -95,6 +109,38 @@ TEST_F(yaml_configurator, bzip2_file_compressor)
     bzip2_file_compressor_body();
 }
 
+TEST_F(yaml_configurator, bzip2_file_compressor_invalid_1)
+{
+    configure_with_error("chucho::logger:\n"
+                         "    name: will\n"
+                         "    chucho::rolling_file_writer:\n"
+                         "        chucho::pattern_formatter:\n"
+                         "            pattern: '%m%n'\n"
+                         "        chucho::numbered_file_roller:\n"
+                         "            min_index: 3\n"
+                         "            max_index: 5\n"
+                         "            chucho::bzip2_file_compressor:\n"
+                         "        chucho::size_file_roll_trigger:\n"
+                         "            max_size: 5000\n"
+                         "        file_name: what.log");
+}
+
+TEST_F(yaml_configurator, bzip2_file_compressor_invalid_2)
+{
+    configure_with_error("chucho::logger:\n"
+                         "    name: will\n"
+                         "    chucho::rolling_file_writer:\n"
+                         "        chucho::pattern_formatter:\n"
+                         "            pattern: '%m%n'\n"
+                         "        chucho::numbered_file_roller:\n"
+                         "            - min_index: 3\n"
+                         "            - max_index: 5\n"
+                         "            - chucho::bzip2_file_compressor\n"
+                         "        chucho::size_file_roll_trigger:\n"
+                         "            max_size: 5000\n"
+                         "        file_name: what.log");
+}
+
 TEST_F(yaml_configurator, cerr_writer)
 {
     configure("chucho::logger:\n"
@@ -105,6 +151,20 @@ TEST_F(yaml_configurator, cerr_writer)
     cerr_writer_body();
 }
 
+TEST_F(yaml_configurator, cerr_writer_invalid_1)
+{
+    configure_with_error("chucho::logger:\n"
+                         "    - name: will\n"
+                         "    - chucho::cerr_writer:");
+}
+
+TEST_F(yaml_configurator, cerr_writer_invalid_2)
+{
+    configure_with_error("chucho::logger:\n"
+                         "    - name: will\n"
+                         "    - chucho::cerr_writer");
+}
+
 TEST_F(yaml_configurator, cout_writer)
 {
     configure("chucho::logger:\n"
@@ -113,6 +173,20 @@ TEST_F(yaml_configurator, cout_writer)
               "        chucho::pattern_formatter:\n"
               "            pattern: '%m%n'");
     cout_writer_body();
+}
+
+TEST_F(yaml_configurator, cout_writer_invalid_1)
+{
+    configure_with_error("chucho::logger:\n"
+                         "    - name: will\n"
+                         "    - chucho::cout_writer:");
+}
+
+TEST_F(yaml_configurator, cout_writer_invalid_2)
+{
+    configure_with_error("chucho::logger:\n"
+                         "    - name: will\n"
+                         "    - chucho::cout_writer");
 }
 
 TEST_F(yaml_configurator, duplicate_message_filter)
@@ -139,6 +213,30 @@ TEST_F(yaml_configurator, file_writer)
     file_writer_body();
 }
 
+TEST_F(yaml_configurator, file_writer_invalid_1)
+{
+    configure_with_error("chucho::logger:\n"
+                         "    name: will\n"
+                         "    chucho::file_writer:\n"
+                         "        chucho::pattern_formatte:\n"
+                         "            pattern: '%m%n'\n"
+                         "        file_name: hello.log\n"
+                         "        on_start: truncate\n"
+                         "        flush: false");
+}
+
+TEST_F(yaml_configurator, file_writer_invalid_2)
+{
+    configure_with_error("chucho::logger:\n"
+                         "    name: will\n"
+                         "    chucho::file_writer:\n"
+                         "        chucho::pattern_formatter:\n"
+                         "            pattern: '%m%n'\n"
+                         "        file_nam: hello.log\n"
+                         "        on_star: truncate\n"
+                         "        flush:");
+}
+
 TEST_F(yaml_configurator, gzip_file_compressor)
 {
     configure("chucho::logger:\n"
@@ -152,6 +250,12 @@ TEST_F(yaml_configurator, gzip_file_compressor)
               "            chucho::gzip_file_compressor:\n"
               "                min_index: 7");
     gzip_file_compressor_body();
+}
+
+TEST_F(yaml_configurator, invalid_utf8)
+{
+    EXPECT_ANY_THROW(configure("chucho::logger:\n"
+                               "    name: \x81\x82\x83"));
 }
 
 TEST_F(yaml_configurator, level_filter)
