@@ -47,7 +47,7 @@
  * href="https://www.assembla.com/spaces/chucho/wiki" 
  * target="_blank">user manual</a>, which is under construction.
  *  
- * @copyright &copy; 2013 Will Mason 
+ * @copyright &copy; 2013-2014 Will Mason 
  */
 
 /**
