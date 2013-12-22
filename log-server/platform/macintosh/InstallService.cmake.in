@@ -16,7 +16,7 @@
 
 MESSAGE(STATUS "Installing the Chucho launch daemon")
 MESSAGE(STATUS "Loading the Chuchod plist")
-EXECUTE_PROCESS(COMMAND "${CHUCHO_LAUNCHCTL}" load /Library/LaunchDaemons/org.chucho.chuchod.plist
+EXECUTE_PROCESS(COMMAND "${CHUCHO_LAUNCHCTL}" load /Library/LaunchDaemons/org.chucho-log.chuchod.plist
                 RESULT_VARIABLE CMD_RESULT)
 IF(NOT CMD_RESULT EQUAL 0)
     MESSAGE(FATAL_ERROR "Could not load the plist")

@@ -20,7 +20,7 @@
 <plist version="1.0">
     <dict>
         <key>Label</key>
-        <string>org.chucho.chuchod</string>
+        <string>org.chucho-log.chuchod</string>
         <key>ProgramArguments</key>
         <array>
             <string>${CMAKE_INSTALL_PREFIX}/bin/chuchod</string>

@@ -43,8 +43,8 @@ ELSEIF(CHUCHO_SOLARIS)
                    "${CMAKE_CURRENT_BINARY_DIR}/UninstallService.cmake")
 ELSEIF(CHUCHO_MACINTOSH)
     IF(INSTALL_SERVICE)
-        CONFIGURE_FILE(platform/macintosh/org.chucho.chuchod.plist.in
-                       "${CMAKE_CURRENT_BINARY_DIR}/org.chucho.chuchod.plist")
+        CONFIGURE_FILE(platform/macintosh/org.chucho-log.chuchod.plist.in
+                       "${CMAKE_CURRENT_BINARY_DIR}/org.chucho-log.chuchod.plist")
         CONFIGURE_FILE(platform/macintosh/InstallService.cmake.in
                        "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
     ENDIF()
@@ -158,7 +158,7 @@ IF(INSTALL_SERVICE)
         INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/chucho.xml"
                 DESTINATION /var/svc/manifest/application)
     ELSEIF(CHUCHO_MACINTOSH)
-        INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/org.chucho.chuchod.plist"
+        INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/org.chucho-log.chuchod.plist"
                 DESTINATION /Library/LaunchDaemons)
         INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
     ENDIF()
