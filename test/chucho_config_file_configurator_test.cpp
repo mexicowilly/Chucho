@@ -137,6 +137,73 @@ TEST_F(chucho_config_file_configurator, file_writer)
     file_writer_body();
 }
 
+TEST_F(chucho_config_file_configurator, file_writer_invalid_1)
+{
+    configure_with_error("chucho.logger = will\n"
+                         "chucho.logger.will.writer = fw\n"
+                         "chucho.writer.fw = chucho::file_write\n"
+                         "chucho.writer.fw.file_name = hello.log\n"
+                         "chucho.writer.fw.on_start = truncate\n"
+                         "chucho.writer.fw.flush = false\n"
+                         "chucho.writer.fw.formatter = pf\n"
+                         "chucho.formatter.pf = chucho::pattern_formatter\n"
+                         "chucho.formatter.pf.pattern = %m%n");
+}
+
+TEST_F(chucho_config_file_configurator, file_writer_invalid_2)
+{
+    configure_with_error("chucho.logger = will\n"
+                         "chucho.logger.will.writer = fw\n"
+                         "chucho.writer.fw = chucho::file_writer");
+}
+
+TEST_F(chucho_config_file_configurator, file_writer_invalid_3)
+{
+    configure_with_error("chucho.logger = will\n"
+                         "chucho.logger.will.writer = fw\n"
+                         "chucho.writer.fw = chucho::file_writer\n"
+                         "chucho.writer.fw.file_nam = hello.log\n"
+                         "chucho.writer.fw.on_star = truncate\n"
+                         "chucho.writer.fw.flus = false\n"
+                         "chucho.writer.fw.formatter = pf\n"
+                         "chucho.formatter.pf = chucho::pattern_formatter\n"
+                         "chucho.formatter.pf.pattern = %m%n");
+}
+
+TEST_F(chucho_config_file_configurator, file_writer_invalid_4)
+{
+    configure_with_error("chucho.logger = will\n"
+                         "chucho.logger.will.writer = fw\n"
+                         "chucho.writer.fw = chucho::file_writer\n"
+                         "chucho.writer.fw.file_name = hello.log\n"
+                         "chucho.writer.fw.on_start = truncate\n"
+                         "chucho.writer.fw.flush = false\n"
+                         "chucho.writer.fw.formatter = pf\n"
+                         "chucho.formatter.pf = chucho::cout_writer\n"
+                         "chucho.formatter.pf.pattern = %m%n");
+}
+
+TEST_F(chucho_config_file_configurator, file_writer_invalid_5)
+{
+    configure_with_error("chucho.logger = will\n"
+                         "chucho.logger.will.writer = fw\n"
+                         "chucho.writer.fw = chucho::file_writer\n"
+                         "chucho.writer.fw.file_name = hello.log\n"
+                         "chucho.writer.fw.on_start = truncate\n"
+                         "chucho.writer.fw.flush = false\n"
+                         "chucho.writer.fw.formatter = pf\n"
+                         "chucho.formatter.pf = chucho::cout_writer\n"
+                         "chucho.formatter.pf.formatter = pf2\n"
+                         "chucho.formatter.pf2 = chucho::pattern_formatter\n"
+                         "chucho.formatter.pf2.patter = %m%n");
+}
+
+TEST_F(chucho_config_file_configurator, file_writer_invalid_6)
+{
+    configure_with_error("chucho.logger = will\n"
+                         "chucho.logger.will.writer = fw");
+}
+
 TEST_F(chucho_config_file_configurator, gzip_file_compressor)
 {
     configure("chucho.logger = will\n"

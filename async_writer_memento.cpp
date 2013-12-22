@@ -32,14 +32,9 @@ void async_writer_memento::handle(std::shared_ptr<configurable> cnf)
 {
     auto wrt = std::dynamic_pointer_cast<writer>(cnf);
     if (wrt)
-    {
         writer_ = wrt;
-    }
     else
-    {
-        report_error("An async_writer cannot make use of type " +
-            demangle::get_demangled_name(typeid(*cnf)) + ". Only writers can be embedded in the configuration.");
-    }
+        memento::handle(cnf);
 }
 
 }

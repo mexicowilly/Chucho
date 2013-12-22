@@ -129,6 +129,13 @@ void configurator::configure(const char* const cnf)
     get_configurator().configure(in);
 }
 
+void configurator::configure_with_error(const char* const cnf)
+{
+    configure(cnf);
+    EXPECT_EQ(chucho::status::level::ERROR, chucho::status_manager::get()->get_level());
+    chucho::status_manager::get()->clear();
+}
+
 void configurator::cout_writer_body()
 {
     auto wrts = chucho::logger::get("will")->get_writers();
@@ -197,7 +204,8 @@ void configurator::level_filter_body(const std::string& tmpl)
         chucho::status_manager::get()->clear();
         std::string rep = tmpl;
         rep.replace(pos, 6, bad[i++]);
-        EXPECT_ANY_THROW(configure(rep.c_str()));
+        configure(rep.c_str());
+        EXPECT_EQ(chucho::status::level::ERROR, chucho::status_manager::get()->get_level());
     }
     chucho::status_manager::get()->clear();
     // Visual Studio 2012 does not have initializer lists
@@ -353,7 +361,8 @@ void configurator::size_file_roll_trigger_body(const std::string& tmpl)
         chucho::status_manager::get()->clear();
         std::string rep = tmpl;
         rep.replace(pos, 4, bad[i++]);
-        EXPECT_ANY_THROW(configure(rep.c_str()));
+        configure(rep.c_str());
+        EXPECT_EQ(chucho::status::level::ERROR, chucho::status_manager::get()->get_level());
     }
     chucho::status_manager::get()->clear();
     // Visual Studio 2012 does not have initializer lists
@@ -446,7 +455,8 @@ void configurator::syslog_writer_facility_body(const std::string& tmpl)
         chucho::status_manager::get()->clear();
         std::string rep = tmpl;
         rep.replace(pos, 3, bad[i++]);
-        EXPECT_ANY_THROW(configure(rep.c_str()));
+        configure(rep.c_str());
+        EXPECT_EQ(chucho::status::level::ERROR, chucho::status_manager::get()->get_level());
     }
     // Visual Studio 2012 does not have initializer lists
     struct { const char* first; chucho::syslog::facility second; } good[] =

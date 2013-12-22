@@ -41,14 +41,14 @@ void memento::handle(const std::string& key, const std::string& value)
 {
     auto found = handlers_.find(key);
     if (found == handlers_.end())
-        report_error("The key " + key + " is not supported with " + get_status_origin());
+        report_error("The key " + key + " is not supported with " + demangle::get_demangled_name(typeid(*this)));
     else
         found->second(value);
 }
 
 void memento::handle(std::shared_ptr<configurable> cnf)
 {
-    throw exception(demangle::get_demangled_name(typeid(*this)) + " cannot handle a type of " +
+    report_error(demangle::get_demangled_name(typeid(*this)) + " cannot handle a type of " +
         demangle::get_demangled_name(typeid(*cnf)));
 }
 
