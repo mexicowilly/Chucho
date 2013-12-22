@@ -306,6 +306,53 @@ TEST_F(log4cplus_config_file_configurator, rolling_file_writer)
     EXPECT_FALSE(fwrt->get_flush());
 }
 
+TEST_F(log4cplus_config_file_configurator, rolling_file_writer_invalid_1)
+{
+    configure_with_error("log4cplus.logger.will = info, rfr");
+}
+
+TEST_F(log4cplus_config_file_configurator, rolling_file_writer_invalid_2)
+{
+    configure_with_error("log4cplus.logger.will = info, rfr\n"
+                         "log4cplus.appender.rfr = log4cplus::RollingFileAppende\n"
+                         "log4cplus.appender.rfr.layout = log4cplus::PatternLayout\n"
+                         "log4cplus.appender.rfr.layout.ConversionPattern = %m%n\n"
+                         "log4cplus.appender.rfr.File = hello.log\n"
+                         "log4cplus.appender.rfr.Append = false\n"
+                         "log4cplus.appender.rfr.ImmediateFlush = false");
+}
+
+TEST_F(log4cplus_config_file_configurator, rolling_file_writer_invalid_3)
+{
+    configure_with_error("log4cplus.logger.will = info, rfr\n"
+                         "log4cplus.appender.rfr = log4cplus::RollingFileAppender\n"
+                         "log4cplus.appender.rfr.layout = log4cplus::PatternLayout\n"
+                         "log4cplus.appender.rfr.layout.ConversionPatter = %m%n\n"
+                         "log4cplus.appender.rfr.File = hello.log\n"
+                         "log4cplus.appender.rfr.Append = false\n"
+                         "log4cplus.appender.rfr.ImmediateFlush = false");
+}
+
+TEST_F(log4cplus_config_file_configurator, rolling_file_writer_invalid_4)
+{
+    configure_with_error("log4cplus.logger.will = info, rfr\n"
+                         "log4cplus.appender.rfr = log4cplus::RollingFileAppender\n"
+                         "log4cplus.appender.rfr.File = hello.log\n"
+                         "log4cplus.appender.rfr.Append = false\n"
+                         "log4cplus.appender.rfr.ImmediateFlush = false");
+}
+
+TEST_F(log4cplus_config_file_configurator, rolling_file_writer_invalid_5)
+{
+    configure_with_error("log4cplus.logger.will = info, rfr\n"
+                         "log4cplus.appender.rfr = log4cplus::RollingFileAppender\n"
+                         "log4cplus.appender.rfr.layout = log4cplus::PatternLayout\n"
+                         "log4cplus.appender.rfr.layout.ConversionPattern = %m%n\n"
+                         "log4cplus.appender.rfr.Fil = hello.log\n"
+                         "log4cplus.appender.rfr.Append = false\n"
+                         "log4cplus.appender.rfr.ImmediateFlush = false");
+}
+
 TEST_F(log4cplus_config_file_configurator, simple_layout)
 {
     configure("log4cplus.logger.will = info, sl\n"

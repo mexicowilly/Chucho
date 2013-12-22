@@ -43,6 +43,15 @@ writer_creation_exception::writer_creation_exception(const std::string& name)
 {
 }
 
+chucho::properties get_non_empty_subset(const chucho::properties& props,
+                                        const std::string& prefix)
+{
+    chucho::properties sub = props.get_subset(prefix);
+    if (sub.empty()) 
+        throw chucho::exception("No keys with prefix " + prefix + " were found");
+    return sub;
+}
+
 }
 
 namespace chucho
@@ -237,7 +246,8 @@ void config_file_configurator::chucho_properties_processor::process(const proper
         }
         catch (std::exception& e) 
         {
-            cfg_.report_error(std::string("An error occurred processing the config file: ") + e.what());
+            cfg_.report_error("[logger " + loggers.first->second +
+                "] An error occurred processing the config file: " + e.what());
         }
         ++loggers.first;
     }
@@ -289,7 +299,7 @@ void config_file_configurator::log4cplus_properties_processor::add_filters(std::
                 auto fact = cfg_.get_factories().find(key->second);
                 assert(fact != cfg_.get_factories().end());
                 auto mnto = fact->second->create_memento(cfg_);
-                auto flt_props = flts.get_subset(name + ".");
+                auto flt_props = get_non_empty_subset(flts, name + ".");
                 for (auto prp : flt_props)
                 {
                     if (prp.second.find(*type) != 0)
@@ -343,7 +353,7 @@ std::shared_ptr<formatter> config_file_configurator::log4cplus_properties_proces
         if (pat)
             result = std::make_shared<pattern_formatter>(*pat); 
         else
-            cfg_.report_error("A log4cplus::PatternLayout requires a ConversionPattern property");
+            throw exception("A log4cplus::PatternLayout requires a ConversionPattern property");
     }
     else if (type == "log4cplus::SimpleLayout")
     {
@@ -352,6 +362,10 @@ std::shared_ptr<formatter> config_file_configurator::log4cplus_properties_proces
     else if (type == "log4cplus::TTCCLayout")
     {
         result = std::make_shared<pattern_formatter>("%r %t %p %c - %m%n");
+    }
+    else
+    {
+        throw exception("The layout type " + type + " is not recognized as a known log4cplus type");
     }
     return result;
 }
@@ -372,16 +386,9 @@ std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_pro
     {
         for (auto tok : tokens)
         {
-            try
-            {
-                auto wrt = create_writer(tok, props);
-                if (wrt)
-                    mnto->handle(wrt);
-            }
-            catch (writer_creation_exception& e)
-            {
-                cfg_.report_warning(e.what());
-            }
+            auto wrt = create_writer(tok, props);
+            if (wrt)
+                mnto->handle(wrt);
         }
     }
     return lgr_fact->create_configurable(mnto); 
@@ -433,7 +440,7 @@ std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_pro
     std::shared_ptr<configurable> result;
     auto type = props.get_one("appender." + name); 
     if (!type)
-        return result;
+        throw exception("There is no definition of appender " + name);
     auto wrt_props = props.get_subset("appender." + name + "."); 
     auto fmt_type = wrt_props.get_one("layout"); 
     std::shared_ptr<formatter> fmt;
@@ -494,7 +501,8 @@ void config_file_configurator::log4cplus_properties_processor::fill_file_writer_
                                                                                         std::shared_ptr<formatter> fmt,
                                                                                         const properties& props)
 {
-    mnto->handle(fmt);
+    if (fmt) 
+        mnto->handle(fmt);
     auto prop = props.get_one("Append");
     if (prop)
         mnto->handle("Append", *prop);
@@ -509,10 +517,6 @@ void config_file_configurator::log4cplus_properties_processor::fill_file_writer_
 void config_file_configurator::log4cplus_properties_processor::process(const properties& props)
 {
     auto lprops = props.get_subset("log4cplus.");
-    /*
-    for (auto p : lprops)
-        std::cout << p.first << '=' << p.second << std::endl;
-    */
     auto root = lprops.get_one("rootLogger"); 
     if (root)
         create_logger("", *root, lprops);
@@ -525,7 +529,8 @@ void config_file_configurator::log4cplus_properties_processor::process(const pro
         }
         catch (std::exception& e)
         {
-            cfg_.report_error(std::string("An error occurred while processing the log4cplus config file: ") +
+            cfg_.report_error("[logger " + lgr.first +
+                "] An error occurred while processing the log4cplus config file: " +
                 e.what());
         }
     }
