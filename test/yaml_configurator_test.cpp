@@ -109,38 +109,6 @@ TEST_F(yaml_configurator, bzip2_file_compressor)
     bzip2_file_compressor_body();
 }
 
-TEST_F(yaml_configurator, bzip2_file_compressor_invalid_1)
-{
-    configure_with_error("chucho::logger:\n"
-                         "    name: will\n"
-                         "    chucho::rolling_file_writer:\n"
-                         "        chucho::pattern_formatter:\n"
-                         "            pattern: '%m%n'\n"
-                         "        chucho::numbered_file_roller:\n"
-                         "            min_index: 3\n"
-                         "            max_index: 5\n"
-                         "            chucho::bzip2_file_compressor:\n"
-                         "        chucho::size_file_roll_trigger:\n"
-                         "            max_size: 5000\n"
-                         "        file_name: what.log");
-}
-
-TEST_F(yaml_configurator, bzip2_file_compressor_invalid_2)
-{
-    configure_with_error("chucho::logger:\n"
-                         "    name: will\n"
-                         "    chucho::rolling_file_writer:\n"
-                         "        chucho::pattern_formatter:\n"
-                         "            pattern: '%m%n'\n"
-                         "        chucho::numbered_file_roller:\n"
-                         "            - min_index: 3\n"
-                         "            - max_index: 5\n"
-                         "            - chucho::bzip2_file_compressor\n"
-                         "        chucho::size_file_roll_trigger:\n"
-                         "            max_size: 5000\n"
-                         "        file_name: what.log");
-}
-
 TEST_F(yaml_configurator, cerr_writer)
 {
     configure("chucho::logger:\n"

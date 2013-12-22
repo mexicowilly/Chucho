@@ -127,5 +127,8 @@ IF(CHUCHO_WINDOWS)
     TARGET_LINK_LIBRARIES(windows-event-log-writer-test chucho gtest ${CHUCHO_THREAD_LIB})
 ENDIF()
 
+ADD_CUSTOM_TARGET(check-config
+                  COMMAND "${CMAKE_COMMAND}" "-DCHUCHO_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P "${CMAKE_CURRENT_SOURCE_DIR}/CheckAllConfigs.cmake")
+
 ADD_CUSTOM_TARGET(all-test
                   DEPENDS unit-test rolling-file-test syslog-writer-test remote-writer-test windows-event-log-writer-test)
