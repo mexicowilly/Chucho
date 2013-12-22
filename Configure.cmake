@@ -490,9 +490,9 @@ ELSE()
 ENDIF()
 
 ExternalProject_Add(gtest-external
-                    URL http://googletest.googlecode.com/files/gtest-1.6.0.zip
-                    URL_MD5 4577b49f2973c90bf9ba69aa8166b786
-                    CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=Debug -Dgtest_force_shared_crt:BOOL=ON "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -DGTEST_HAS_TR1_TUPLE=0"
+                    URL http://googletest.googlecode.com/files/gtest-1.7.0.zip
+                    URL_MD5 2d6ec8ccdf5c46b05ba54a9fd1d130d7
+                    CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
                     CMAKE_GENERATOR "${CHUCHO_GTEST_GENERATOR}"
                     INSTALL_COMMAND "")
 ExternalProject_Add_Step(gtest-external
