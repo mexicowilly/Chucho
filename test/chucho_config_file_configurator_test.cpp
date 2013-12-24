@@ -16,6 +16,8 @@
 
 #include "configurator_test.hpp"
 #include <chucho/config_file_configurator.hpp>
+#include <chucho/logger.hpp>
+#include <chucho/level_threshold_filter.hpp>
 
 namespace
 {
@@ -202,6 +204,38 @@ TEST_F(chucho_config_file_configurator, file_writer_invalid_6)
 {
     configure_with_error("chucho.logger = will\n"
                          "chucho.logger.will.writer = fw");
+}
+
+TEST_F(chucho_config_file_configurator, filter_order)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = co\n"
+              "chucho.writer.co = chucho::cout_writer\n"
+              "chucho.writer.co.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m%n\n"
+              "chucho.writer.co.filter = z\n"
+              "chucho.filter.z = chucho::level_threshold_filter\n"
+              "chucho.filter.z.level = fatal\n"
+              "chucho.writer.co.filter = a\n"
+              "chucho.filter.a = chucho::level_threshold_filter\n"
+              "chucho.filter.a.level = debug\n"
+              "chucho.writer.co.filter = m\n"
+              "chucho.filter.m = chucho::level_threshold_filter\n"
+              "chucho.filter.m.level = warn");
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    auto flts = wrts[0]->get_filters();
+    ASSERT_EQ(3, flts.size());
+    ASSERT_EQ(typeid(chucho::level_threshold_filter), typeid(*flts[0]));
+    auto thresh = std::static_pointer_cast<chucho::level_threshold_filter>(flts[0]);
+    EXPECT_EQ(*chucho::level::FATAL_(), *thresh->get_level());
+    ASSERT_EQ(typeid(chucho::level_threshold_filter), typeid(*flts[1]));
+    thresh = std::static_pointer_cast<chucho::level_threshold_filter>(flts[1]);
+    EXPECT_EQ(*chucho::level::DEBUG_(), *thresh->get_level());
+    ASSERT_EQ(typeid(chucho::level_threshold_filter), typeid(*flts[2]));
+    thresh = std::static_pointer_cast<chucho::level_threshold_filter>(flts[2]);
+    EXPECT_EQ(*chucho::level::WARN_(), *thresh->get_level());
 }
 
 TEST_F(chucho_config_file_configurator, gzip_file_compressor)
