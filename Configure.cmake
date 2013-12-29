@@ -36,6 +36,9 @@ OPTION(YAML_CONFIG "Whether to include the YAML configuration parser" TRUE)
 OPTION(CONFIG_FILE_CONFIG "Whether to include the config file configuration parser that uses Chucho keys" FALSE)
 OPTION(LOG4CPLUS_CONFIG "Whether to support reading log4cplus configuration files" FALSE)
 
+# whether to build the C API
+OPTION(C_API "Whether the C API should be built into this Chucho" TRUE)
+
 # We'll want this later
 MACRO(CHUCHO_FIND_PROGRAM CHUCHO_FIND_VAR CHUCHO_PROGRAM)
     MESSAGE(STATUS "Looking for ${CHUCHO_PROGRAM}")
@@ -123,6 +126,9 @@ IF(NOT ENABLE_SHARED)
 ENDIF()
 MAKE_DIRECTORY("${CMAKE_BINARY_DIR}/chucho")
 CONFIGURE_FILE(include/chucho/export.hpp.in "${CMAKE_BINARY_DIR}/chucho/export.hpp")
+IF(C_API)
+    CONFIGURE_FILE(include/chucho/export.hpp.in "${CMAKE_BINARY_DIR}/chucho/export.h")
+ENDIF()
 
 # Configure our version header
 STRING(REGEX REPLACE "^([0-9]+)\\..+$" "\\1" CHUCHO_VERSION_MAJOR ${CHUCHO_VERSION})

@@ -88,6 +88,16 @@ ELSEIF(CHUCHO_WINDOWS)
                                 COMPILE_DEFINITIONS CMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 ENDIF()
 
+IF(C_API)
+    SET(CHUCHO_C_PUBLIC_HEADERS
+        include/chucho/error.h
+        "${CMAKE_BINARY_DIR}/chucho/export.h"
+        include/chucho/level.h
+        include/chucho/log.h
+        include/chucho/logger.h
+        include/chucho/writer.h)
+ENDIF()
+
 SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/async_writer.hpp
     include/chucho/cerr_writer.hpp
@@ -135,6 +145,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/status_observer.hpp
     include/chucho/status_reporter.hpp
     include/chucho/suffix.hpp
+    include/chucho/syslog_constants.h
     include/chucho/syslog_constants.hpp
     include/chucho/syslog_writer.hpp
     include/chucho/time_file_roller.hpp
@@ -142,7 +153,8 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/writer.hpp
     include/chucho/writer_factory.hpp
     include/chucho/writer_memento.hpp
-    include/chucho/yaml_formatter.hpp)
+    include/chucho/yaml_formatter.hpp
+    ${CHUCHO_C_PUBLIC_HEADERS})
 
 IF(CHUCHO_WINDOWS)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
@@ -227,6 +239,17 @@ IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
                                 COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATOR_DEFS}")
     SET_SOURCE_FILES_PROPERTIES(memento_key_set.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_CONFIG_FILE_CONFIG)
+ENDIF()
+
+IF(C_API)
+    SET(CHUCHO_C_SOURCES
+        c_level.cpp
+        c_log.cpp
+        c_logger.cpp
+        c_writer.cpp
+        include/chucho/c_level.hpp
+        include/chucho/c_logger.hpp
+        include/chucho/c_writer.hpp)
 ENDIF()
 
 SET(CHUCHO_SOURCES
@@ -380,7 +403,8 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_CONFIGURATOR_SOURCES}
     ${CHUCHO_PLATFORM_SOURCES}
     ${CHUCHO_EMBEDDED_SOURCES}
-    ${CHUCHO_PUBLIC_HEADERS})
+    ${CHUCHO_PUBLIC_HEADERS}
+    ${CHUCHO_C_SOURCES})
 
 IF(CHUCHO_HAVE_PUT_TIME)
     SET_SOURCE_FILES_PROPERTIES(calendar.cpp PROPERTIES
