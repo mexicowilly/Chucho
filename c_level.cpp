@@ -124,25 +124,28 @@ const chucho_level* chucho_info_level(void)
     return lvl;
 }
 
-const char* chucho_lvl_get_name(const chucho_level* lvl)
+int chucho_lvl_get_name(const chucho_level* lvl, const char** name)
 {
-    if (lvl == nullptr) 
-        return nullptr;
-    return lvl->level_->get_name();
+    if (lvl == nullptr || name == nullptr) 
+        return CHUCHO_NULL_POINTER;
+    *name = lvl->level_->get_name();
+    return CHUCHO_NO_ERROR;
 }
 
-chucho_syslog_severity chucho_lvl_get_syslog_severity(const chucho_level* lvl)
+int chucho_lvl_get_syslog_severity(const chucho_level* lvl, chucho_syslog_severity* sev)
 {
-    if (lvl == nullptr)
-        return CHUCHO_SYSLOG_SEVERITY_EMERGENCY;
-    return static_cast<chucho_syslog_severity>(lvl->level_->get_syslog_severity());
+    if (lvl == nullptr || sev == nullptr)
+        return CHUCHO_NULL_POINTER;
+    *sev = static_cast<chucho_syslog_severity>(lvl->level_->get_syslog_severity());
+    return CHUCHO_NO_ERROR;
 }
 
-int chucho_lvl_get_value(const chucho_level* lvl)
+int chucho_lvl_get_value(const chucho_level* lvl, int* val)
 {
-    if (lvl == nullptr) 
-        return std::numeric_limits<int>::max();
-    return lvl->level_->get_value();
+    if (lvl == nullptr || val == nullptr) 
+        return CHUCHO_NULL_POINTER;
+    *val = lvl->level_->get_value();
+    return CHUCHO_NO_ERROR;
 }
 
 const chucho_level* chucho_off_level(void)

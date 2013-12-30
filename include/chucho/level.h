@@ -25,7 +25,7 @@ extern "C"
 {
 #endif
 
-struct chucho_level;
+typedef struct chucho_level chucho_level;
 
 CHUCHO_EXPORT int chucho_get_level(const chucho_level** lvl, const char* const name);
 CHUCHO_EXPORT const chucho_level* chucho_trace_level(void);
@@ -36,9 +36,9 @@ CHUCHO_EXPORT const chucho_level* chucho_error_level(void);
 CHUCHO_EXPORT const chucho_level* chucho_fatal_level(void);
 CHUCHO_EXPORT const chucho_level* chucho_off_level(void);
 
-CHUCHO_EXPORT const char* chucho_lvl_get_name(const chucho_level* lvl);
-CHUCHO_EXPORT chucho_syslog_severity chucho_lvl_get_syslog_severity(const chucho_level* lvl);
-CHUCHO_EXPORT int chucho_lvl_get_value(const chucho_level* lvl);
+CHUCHO_EXPORT int chucho_lvl_get_name(const chucho_level* lvl, const char** name);
+CHUCHO_EXPORT int chucho_lvl_get_syslog_severity(const chucho_level* lvl, chucho_syslog_severity* sev);
+CHUCHO_EXPORT int chucho_lvl_get_value(const chucho_level* lvl, int* val);
 
 #if defined(__cplusplus)
 }

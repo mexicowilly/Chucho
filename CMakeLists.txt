@@ -92,9 +92,12 @@ IF(C_API)
     SET(CHUCHO_C_PUBLIC_HEADERS
         include/chucho/error.h
         "${CMAKE_BINARY_DIR}/chucho/export.h"
+        include/chucho/file_writer.h
+        include/chucho/formatter.h
         include/chucho/level.h
         include/chucho/log.h
         include/chucho/logger.h
+        include/chucho/pattern_formatter.h
         include/chucho/writer.h)
 ENDIF()
 
@@ -243,10 +246,14 @@ ENDIF()
 
 IF(C_API)
     SET(CHUCHO_C_SOURCES
+        c_file_writer.cpp
+        c_formatter.cpp
         c_level.cpp
         c_log.cpp
         c_logger.cpp
+        c_pattern_formatter.cpp
         c_writer.cpp
+        include/chucho/c_formatter.hpp
         include/chucho/c_level.hpp
         include/chucho/c_logger.hpp
         include/chucho/c_writer.hpp)

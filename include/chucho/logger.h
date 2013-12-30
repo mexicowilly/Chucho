@@ -26,14 +26,14 @@ extern "C"
 {
 #endif
 
-struct chucho_logger;
+typedef struct chucho_logger chucho_logger;
 
 CHUCHO_EXPORT int chucho_get_logger(chucho_logger** lgr, const char* const name);
 CHUCHO_EXPORT int chucho_release_logger(chucho_logger* lgr);
 
 CHUCHO_EXPORT int chucho_lgr_add_writer(chucho_logger* lgr, chucho_writer* wrt);
-CHUCHO_EXPORT const chucho_level* chucho_lgr_get_effective_level(const chucho_logger* lgr);
-CHUCHO_EXPORT const chucho_level* chucho_lgr_get_level(const chucho_logger* lgr);
+CHUCHO_EXPORT int chucho_lgr_get_effective_level(const chucho_logger* lgr, const chucho_level** lvl);
+CHUCHO_EXPORT int chucho_lgr_get_level(const chucho_logger* lgr, const chucho_level** lvl);
 CHUCHO_EXPORT int chucho_lgr_get_writers(const chucho_logger* lgr, chucho_writer** buf, size_t buf_size, size_t* count);
 CHUCHO_EXPORT int chucho_lgr_permits(const chucho_logger* lgr, const chucho_level* lvl);
 CHUCHO_EXPORT int chucho_lgr_remove_all_writers(chucho_logger* lgr);

@@ -24,7 +24,7 @@ extern "C"
 {
 #endif
 
-struct chucho_writer;
+typedef struct chucho_writer chucho_writer;
 
 CHUCHO_EXPORT int chucho_release_writer(chucho_writer* wrt);
 

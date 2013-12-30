@@ -53,27 +53,34 @@ int chucho_log(const chucho_level* lvl,
                const char* const func,
                const char* const format, ...)
 {
-    if (lvl == nullptr || lgr == nullptr)
-        return CHUCHO_NULL_POINTER; 
-    if (lgr->logger_->permits(lvl->level_))
+    try
     {
-        va_list args;
-        va_start(args, format);
-        auto msg = format_message(format, args);
-        va_end(args);
-        if (msg) 
+        if (lvl == nullptr || lgr == nullptr)
+            return CHUCHO_NULL_POINTER; 
+        if (lgr->logger_->permits(lvl->level_))
         {
-            lgr->logger_->write(chucho::event(lgr->logger_,
-                                              lvl->level_,
-                                              *msg,
-                                              file,
-                                              line,
-                                              func));
+            va_list args;
+            va_start(args, format);
+            auto msg = format_message(format, args);
+            va_end(args);
+            if (msg) 
+            {
+                lgr->logger_->write(chucho::event(lgr->logger_,
+                                                  lvl->level_,
+                                                  *msg,
+                                                  file,
+                                                  line,
+                                                  func));
+            }
+            else
+            {
+                return CHUCHO_FORMAT_ERROR;
+            }
         }
-        else
-        {
-            return CHUCHO_FORMAT_ERROR;
-        }
+    }
+    catch (std::bad_alloc&) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
     }
     return CHUCHO_NO_ERROR;
 }
@@ -86,28 +93,35 @@ int chucho_log_mark(const chucho_level* lvl,
                     const char* const mark,
                     const char* const format, ...)
 {
-    if (lvl == nullptr || lgr == nullptr || mark == nullptr)
-        return CHUCHO_NULL_POINTER; 
-    if (lgr->logger_->permits(lvl->level_))
+    try
     {
-        va_list args;
-        va_start(args, format);
-        auto msg = format_message(format, args);
-        va_end(args);
-        if (msg) 
+        if (lvl == nullptr || lgr == nullptr || mark == nullptr)
+            return CHUCHO_NULL_POINTER; 
+        if (lgr->logger_->permits(lvl->level_))
         {
-            lgr->logger_->write(chucho::event(lgr->logger_,
-                                              lvl->level_,
-                                              *msg,
-                                              file,
-                                              line,
-                                              func,
-                                              mark));
+            va_list args;
+            va_start(args, format);
+            auto msg = format_message(format, args);
+            va_end(args);
+            if (msg) 
+            {
+                lgr->logger_->write(chucho::event(lgr->logger_,
+                                                  lvl->level_,
+                                                  *msg,
+                                                  file,
+                                                  line,
+                                                  func,
+                                                  mark));
+            }
+            else
+            {
+                return CHUCHO_FORMAT_ERROR;
+            }
         }
-        else
-        {
-            return CHUCHO_FORMAT_ERROR;
-        }
+    }
+    catch (std::bad_alloc&) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
     }
     return CHUCHO_NO_ERROR;
 }

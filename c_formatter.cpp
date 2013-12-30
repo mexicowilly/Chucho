@@ -14,29 +14,11 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_ERROR_H__)
-#define CHUCHO_ERROR_H__
+#include <chucho/c_formatter.hpp>
+#include <chucho/error.h>
 
-#include <chucho/export.h>
-
-#if defined(__cplusplus)
-extern "C"
+int release_formatter(chucho_formatter* fmt)
 {
-#endif
-
-#define CHUCHO_NO_ERROR                     0
-#define CHUCHO_NO_SUCH_LEVEL                1
-#define CHUCHO_NULL_POINTER                 2
-#define CHUCHO_INSUFFICIENT_BUFFER          3
-#define CHUCHO_FORMAT_ERROR                 4
-#define CHUCHO_OUT_OF_MEMORY                5
-#define CHUCHO_TYPE_MISMATCH                6
-#define CHUCHO_INVALID_PATTERN              7
-
-CHUCHO_EXPORT const char* chucho_error_message(int err);
-
-#if defined(__cplusplus)
+    delete fmt;
+    return CHUCHO_NO_ERROR;
 }
-#endif
-
-#endif

@@ -19,6 +19,7 @@
 #include <chucho/c_level.hpp>
 #include <chucho/level.h>
 #include <chucho/error.h>
+#include <chucho/writer.h>
 
 namespace
 {
@@ -38,9 +39,16 @@ const chucho_level* cpp_level_to_c(std::shared_ptr<chucho::level> lvl)
 
 int chucho_get_logger(chucho_logger** lgr, const char* const name)
 {
-    *lgr = new chucho_logger();
-    (*lgr)->logger_ = chucho::logger::get(name);
-    return CHUCHO_NO_ERROR;
+    try
+    {
+        *lgr = new chucho_logger();
+        (*lgr)->logger_ = chucho::logger::get(name);
+        return CHUCHO_NO_ERROR;
+    }
+    catch (std::bad_alloc&) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
 }
 
 int chucho_lgr_add_writer(chucho_logger* lgr, chucho_writer* wrt)
@@ -48,17 +56,23 @@ int chucho_lgr_add_writer(chucho_logger* lgr, chucho_writer* wrt)
     if (lgr == nullptr || wrt == nullptr)
         return CHUCHO_NULL_POINTER; 
     lgr->logger_->add_writer(wrt->writer_);
+    return chucho_release_writer(wrt);
+}
+
+int chucho_lgr_get_effective_level(const chucho_logger* lgr, const chucho_level** lvl)
+{
+    if (lgr == nullptr || lvl == nullptr)
+        return CHUCHO_NULL_POINTER;
+    *lvl = cpp_level_to_c(lgr->logger_->get_effective_level());
     return CHUCHO_NO_ERROR;
 }
 
-const chucho_level* chucho_lgr_get_effective_level(const chucho_logger* lgr)
+int chucho_lgr_get_level(const chucho_logger* lgr, const chucho_level** lvl)
 {
-    return lgr == nullptr ? nullptr : cpp_level_to_c(lgr->logger_->get_effective_level());
-}
-
-const chucho_level* chucho_lgr_get_level(const chucho_logger* lgr)
-{
-    return lgr == nullptr ? nullptr : cpp_level_to_c(lgr->logger_->get_level());
+    if (lgr == nullptr || lvl == nullptr)
+        return CHUCHO_NULL_POINTER;
+    *lvl = cpp_level_to_c(lgr->logger_->get_level());
+    return CHUCHO_NO_ERROR;
 }
 
 int chucho_lgr_get_writers(const chucho_logger* lgr, chucho_writer** buf, size_t buf_size, size_t* count)

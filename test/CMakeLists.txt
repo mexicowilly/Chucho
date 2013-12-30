@@ -18,6 +18,17 @@ IF(MSVC)
     ADD_DEFINITIONS(-D_VARIADIC_MAX=10)
 ENDIF()
 
+IF(C_API)
+    IF(CMAKE_COMPILER_IS_GNUC OR CMAKE_C_COMPILER_ID STREQUAL Clang)
+        INCLUDE(CheckCCompilerFlag)
+        CHECK_C_COMPILER_FLAG(-std=c99 CHUCHO_HAVE_STDC99)
+        IF(NOT CHUCHO_HAVE_STDC99)
+            MESSAGE(FATAL_ERROR "-std=c99 is required")
+        ENDIF()
+        SET(CMAKE_C_FLAGS -std=c99)
+    ENDIF()
+ENDIF()
+
 IF(CHUCHO_POSIX)
     ADD_DEFINITIONS(-DCHUCHO_POSIX)
 ELSEIF(CHUCHO_WINDOWS)
@@ -95,6 +106,10 @@ IF(MSVC)
     SET_SOURCE_FILES_PROPERTIES(rolling_file_writer_test.cpp PROPERTIES
                                 COMPILE_FLAGS /wd4018)
 ENDIF()
+
+ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
+               harness.c)
+TARGET_LINK_LIBRARIES(c-unit-test chucho ${CHUCHO_THREAD_LIB})
 
 ADD_CUSTOM_TARGET(check
                   COMMAND unit-test)
