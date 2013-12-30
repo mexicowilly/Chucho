@@ -107,6 +107,10 @@ IF(MSVC)
                                 COMPILE_FLAGS /wd4018)
 ENDIF()
 
+ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
+               harness.c)
+TARGET_LINK_LIBRARIES(c-unit-test chucho ${CHUCHO_THREAD_LIB})
+
 ADD_CUSTOM_TARGET(check
                   COMMAND unit-test)
 
