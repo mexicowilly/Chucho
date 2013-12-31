@@ -14,16 +14,23 @@
  *    limitations under the License.
  */
 
-#include <chucho/c_formatter.hpp>
-#include <chucho/error.h>
+#include "test_util.h"
+#include <string.h>
 
-extern "C"
+char* read_line(FILE* f)
 {
-
-int chucho_release_formatter(chucho_formatter* fmt)
-{
-    delete fmt;
-    return CHUCHO_NO_ERROR;
-}
-
+    char* result = NULL;
+    if (!feof(f)) 
+    {
+        char buf[1024];
+        char* rc = fgets(buf, sizeof(buf), f);
+        if (rc != NULL) 
+        {
+            char* nl = strpbrk(buf, "\r\n");
+            if (nl != NULL)
+                *nl = 0;
+            result = strdup(buf);
+        }
+    }
+    return result;
 }

@@ -72,6 +72,9 @@ static_data& data()
 
 }
 
+extern "C"
+{
+
 const chucho_level* chucho_debug_level(void)
 {
     const chucho_level* lvl;
@@ -170,4 +173,6 @@ const chucho_level* chucho_warn_level(void)
     chucho_get_level(&lvl, "WARN");
     assert(lvl != nullptr);
     return lvl;
+}
+
 }

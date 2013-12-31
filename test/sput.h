@@ -43,6 +43,10 @@ extern "C" {
 #include <string.h>
 #include <time.h>
 
+/* CHUCHO ADDITIONS */
+typedef void (*sput_fixture_func)(void);
+/* END CHUCHO ADDITIONS */
+
 
 /* =======================================================================
  *                             definitions
@@ -63,7 +67,11 @@ extern "C" {
  *                        sput global variable
  * ======================================================================= */
 
+/* CHUCHO MODIFICATION
 static struct
+*/
+typedef struct
+/* END CHUCHO MODIFICATION */
 {
     FILE *out;
     char  initialized;
@@ -97,6 +105,9 @@ static struct
         const char   *cond;
         const char   *type;
         unsigned long line;
+        /* CHUCHO ADDITIONS */
+        const char   *file;
+        /* END CHUCHO ADDITIONS */
     } check;
 
     struct
@@ -104,8 +115,22 @@ static struct
         time_t start;
         time_t end;
     } time;
-} __sput;
 
+    /* CHUCHO ADDITIONS */
+    struct
+    {
+        sput_fixture_func tear_down;
+    } fixture;
+    /* END CHUCHO ADDITIONS */
+/* CHUCHO MODIFICATION
+} __sput;
+*/
+} sput_struct;
+/* END CHUCHO MODIFICATION */
+
+/* CHUCHO ADDITIONS */
+extern sput_struct __sput;
+/* END CHUCHO ADDITIONS */
 
 /* =======================================================================
  *                        sput internal macros
@@ -146,10 +171,13 @@ static struct
                 "[%lu:%lu]  %s:#%lu  \"%s\"  FAIL\n"                       \
                 "!    Type:      %s\n"                                     \
                 "!    Condition: %s\n"                                     \
+                /* CHUCHO ADDITIONS */                                     \
+                "!    File:      %s\n"                                     \
+                /* END CHUCHO ADDITIONS */                                 \
                 "!    Line:      %lu\n",                                   \
                 __sput.suite.nr, __sput.suite.checks, __sput.test.name,    \
                 __sput.test.nr, __sput.check.name, __sput.check.type,      \
-                __sput.check.cond, __sput.check.line);                     \
+                __sput.check.cond, __sput.check.file, __sput.check.line);  \
     }
 
 
@@ -190,6 +218,10 @@ static struct
         _sput_die_unless_initialized();                                    \
         _sput_die_unless_suite_set();                                      \
         \
+        /* CHUCHO ADDITIONS */                                             \
+        if (__sput.fixture.tear_down != NULL)                              \
+           sput_run_test(__sput.fixture.tear_down);                        \
+        /* END CHUCHO ADDITIONS */                                         \
         failp = __sput.suite.checks ? (float)                              \
                 ((__sput.suite.nok * 100.0) / __sput.suite.checks) :       \
                 0.0f;                                                      \
@@ -228,6 +260,15 @@ static struct
                 __sput.suite.nr, __sput.suite.name);                       \
     } while (0)
 
+/* CHUCHO_ADDITIONS */
+#define sput_enter_suite_fixture(_name, _set_up, _tear_down)               \
+    do {                                                                   \
+        sput_enter_suite(_name);                                           \
+        __sput.fixture.tear_down = _tear_down;                             \
+        if (_set_up != NULL)                                               \
+            sput_run_test(_set_up);                                        \
+    } while (0)
+/* END CHUCHO_ADDITIONS */
 
 #define sput_finish_testing()                                              \
     do {                                                                   \
@@ -273,6 +314,9 @@ static struct
         \
         __sput.check.name = _name ? _name : SPUT_DEFAULT_CHECK_NAME;       \
         __sput.check.line = __LINE__;                                      \
+        /* CHUCHO ADDITIONS */                                             \
+        __sput.check.file = __FILE__;                                      \
+        /* END CHUCHO ADDITIONS */                                         \
         __sput.check.cond = #_cond;                                        \
         __sput.check.type = "fail-if";                                     \
         __sput.test.nr++;                                                  \
@@ -297,6 +341,9 @@ static struct
         \
         __sput.check.name = _name ? _name : SPUT_DEFAULT_CHECK_NAME;       \
         __sput.check.line = __LINE__;                                      \
+        /* CHUCHO ADDITIONS */                                             \
+        __sput.check.file = __FILE__;                                      \
+        /* END CHUCHO ADDITIONS */                                         \
         __sput.check.cond = #_cond;                                        \
         __sput.check.type = "fail-unless";                                 \
         __sput.test.nr++;                                                  \

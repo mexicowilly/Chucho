@@ -14,16 +14,4 @@
  *    limitations under the License.
  */
 
-#include <chucho/c_formatter.hpp>
-#include <chucho/error.h>
-
-extern "C"
-{
-
-int chucho_release_formatter(chucho_formatter* fmt)
-{
-    delete fmt;
-    return CHUCHO_NO_ERROR;
-}
-
-}
+void run_log_macro_test(void);

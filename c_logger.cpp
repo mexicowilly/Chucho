@@ -37,6 +37,9 @@ const chucho_level* cpp_level_to_c(std::shared_ptr<chucho::level> lvl)
 
 }
 
+extern "C"
+{
+
 int chucho_get_logger(chucho_logger** lgr, const char* const name)
 {
     try
@@ -155,4 +158,12 @@ int chucho_lgr_writes_to_ancestors(const chucho_logger* lgr, int* state)
         return CHUCHO_NULL_POINTER;
     *state = lgr->logger_->writes_to_ancestors() ? 1 : 0;
     return CHUCHO_NO_ERROR; 
+}
+
+int chucho_remove_unused_loggers(void)
+{
+    chucho::logger::remove_unused_loggers();
+    return CHUCHO_NO_ERROR;
+}
+
 }

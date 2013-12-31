@@ -46,6 +46,9 @@ chucho::optional<std::string> format_message(const char* const fmt, va_list args
 
 }
 
+extern "C"
+{
+
 int chucho_log(const chucho_level* lvl,
                chucho_logger* lgr,
                const char* const file,
@@ -124,4 +127,6 @@ int chucho_log_mark(const chucho_level* lvl,
         return CHUCHO_OUT_OF_MEMORY;
     }
     return CHUCHO_NO_ERROR;
+}
+
 }

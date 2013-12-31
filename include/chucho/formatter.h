@@ -26,7 +26,7 @@ extern "C"
 
 typedef struct chucho_formatter chucho_formatter;
 
-CHUCHO_EXPORT int release_formatter(chucho_formatter* fmt);
+CHUCHO_EXPORT int chucho_release_formatter(chucho_formatter* fmt);
 
 #if defined(__cplusplus)
 }

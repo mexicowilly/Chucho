@@ -16,15 +16,19 @@
 
 #include <chucho/file_writer.hpp>
 #include <chucho/file_writer.h>
+#include <chucho/formatter.h>
 #include <chucho/c_writer.hpp>
 #include <chucho/c_formatter.hpp>
 #include <chucho/error.h>
 
-int create_file_writer(chucho_writer** wrt,
-                       chucho_formatter* fmt,
-                       const char* const file_name,
-                       chucho_on_start on_start,
-                       int flush)
+extern "C"
+{
+
+int chucho_create_file_writer(chucho_writer** wrt,
+                              chucho_formatter* fmt,
+                              const char* const file_name,
+                              chucho_on_start on_start,
+                              int flush)
 {
     if (wrt == nullptr || fmt == nullptr || file_name == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -36,6 +40,7 @@ int create_file_writer(chucho_writer** wrt,
                                                          ons,
                                                          flush == 0 ? false : true);
     *wrt = loc;
+    chucho_release_formatter(fmt);
     return CHUCHO_NO_ERROR;
 }
 
@@ -71,4 +76,6 @@ int chucho_fwrt_get_on_start(const chucho_writer* wrt, chucho_on_start* on_start
     *on_start = fwrt->get_on_start() == chucho::file_writer::on_start::APPEND ?
         CHUCHO_ON_START_APPEND : CHUCHO_ON_START_TRUNCATE;
     return CHUCHO_NO_ERROR;
+}
+
 }

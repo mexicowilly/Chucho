@@ -19,7 +19,10 @@
 #include <chucho/c_formatter.hpp>
 #include <chucho/error.h>
 
-int create_pattern_formatter(chucho_formatter** fmt, const char* const pattern)
+extern "C"
+{
+
+int chucho_create_pattern_formatter(chucho_formatter** fmt, const char* const pattern)
 {
     if (fmt == nullptr || pattern == nullptr)
         return CHUCHO_NULL_POINTER;
@@ -40,4 +43,6 @@ int create_pattern_formatter(chucho_formatter** fmt, const char* const pattern)
         return CHUCHO_OUT_OF_MEMORY;
     }
     return CHUCHO_NO_ERROR;
+}
+
 }

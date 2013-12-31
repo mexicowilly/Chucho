@@ -15,11 +15,14 @@
  */
 
 #include "sput.h"
+#include "log_macro_test.h"
+
+sput_struct __sput;
 
 int main()
 {
     sput_start_testing();
-    sput_enter_suite("log macros");
+    run_log_macro_test();
     sput_finish_testing();
     return sput_get_return_value();
 }

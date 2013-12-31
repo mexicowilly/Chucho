@@ -31,11 +31,11 @@ typedef enum
     CHUCHO_ON_START_TRUNCATE
 } chucho_on_start;
 
-CHUCHO_EXPORT int create_file_writer(chucho_writer** wrt,
-                                     chucho_formatter* fmt,
-                                     const char* const file_name,
-                                     chucho_on_start on_start,
-                                     int flush);
+CHUCHO_EXPORT int chucho_create_file_writer(chucho_writer** wrt,
+                                            chucho_formatter* fmt,
+                                            const char* const file_name,
+                                            chucho_on_start on_start,
+                                            int flush);
 
 CHUCHO_EXPORT int chucho_fwrt_get_file_name(const chucho_writer* wrt, const char** name);
 CHUCHO_EXPORT int chucho_fwrt_get_flush(const chucho_writer* wrt, int* flush);

@@ -24,7 +24,7 @@ extern "C"
 {
 #endif
 
-CHUCHO_EXPORT int create_pattern_formatter(chucho_formatter** fmt, const char* const pattern);
+CHUCHO_EXPORT int chucho_create_pattern_formatter(chucho_formatter** fmt, const char* const pattern);
 
 #if defined(__cplusplus)
 }

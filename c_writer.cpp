@@ -18,8 +18,13 @@
 #include <chucho/c_writer.hpp>
 #include <chucho/error.h>
 
+extern "C"
+{
+
 int chucho_release_writer(chucho_writer* wrt)
 {
     delete wrt;
     return CHUCHO_NO_ERROR;
+}
+
 }

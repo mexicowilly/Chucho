@@ -30,6 +30,7 @@ typedef struct chucho_logger chucho_logger;
 
 CHUCHO_EXPORT int chucho_get_logger(chucho_logger** lgr, const char* const name);
 CHUCHO_EXPORT int chucho_release_logger(chucho_logger* lgr);
+CHUCHO_EXPORT int chucho_remove_unused_loggers(void);
 
 CHUCHO_EXPORT int chucho_lgr_add_writer(chucho_logger* lgr, chucho_writer* wrt);
 CHUCHO_EXPORT int chucho_lgr_get_effective_level(const chucho_logger* lgr, const chucho_level** lvl);

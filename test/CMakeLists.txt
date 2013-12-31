@@ -107,12 +107,19 @@ IF(MSVC)
                                 COMPILE_FLAGS /wd4018)
 ENDIF()
 
-ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
-               harness.c)
-TARGET_LINK_LIBRARIES(c-unit-test chucho ${CHUCHO_THREAD_LIB})
-
 ADD_CUSTOM_TARGET(check
                   COMMAND unit-test)
+
+ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
+               harness.c
+               log_macro_test.c
+               log_macro_test.h
+               test_util.c
+               test_util.h)
+TARGET_LINK_LIBRARIES(c-unit-test chucho ${CHUCHO_THREAD_LIB})
+
+ADD_CUSTOM_TARGET(c-check
+                  COMMAND c-unit-test)
 
 ADD_EXECUTABLE(time-rolling-file-test EXCLUDE_FROM_ALL
                harness.cpp
