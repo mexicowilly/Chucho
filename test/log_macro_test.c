@@ -25,7 +25,7 @@
 #define LOG_FUNCTION(lvl) \
     static void log_##lvl(const char* const mark)                       \
     {                                                                   \
-        sput_enter_suite_fixture("log ##lvl", set_up, tear_down);       \
+        sput_enter_suite_fixture("log "#lvl , set_up, tear_down);       \
         int rc = chucho_lgr_set_level(lgr, chucho_##lvl##_level());     \
         sput_fail_unless(rc == CHUCHO_NO_ERROR, "set logger level");    \
         if (mark == NULL)                                               \
