@@ -17,6 +17,3 @@
 #include <stdio.h>
 
 char* read_line(FILE* f);
-void chucho_enter_suite(const char* const name,
-                        void (*set_up)(),
-                        void (*tear_down)());

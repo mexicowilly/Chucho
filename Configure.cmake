@@ -15,8 +15,11 @@
 #
 
 INCLUDE(CheckCXXCompilerFlag)
+INCLUDE(CheckCCompilerFlag)
 INCLUDE(CheckCXXSymbolExists)
+INCLUDE(CheckSymbolExists)
 INCLUDE(CheckCXXSourceRuns)
+INCLUDE(CheckCSourceCompiles)
 INCLUDE(CheckIncludeFileCXX)
 INCLUDE(ExternalProject)
 
@@ -94,6 +97,11 @@ IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     IF(CMAKE_GENERATOR STREQUAL Xcode)
         SET(CMAKE_EXE_LINKER_FLAGS "-std=c++11 -stdlib=libc++")
     ENDIF()
+    CHECK_C_COMPILER_FLAG(-std=c99 CHUCHO_HAVE_STDC99)
+    IF(NOT CHUCHO_HAVE_STDC99)
+        MESSAGE(FATAL_ERROR "-std=c99 is required")
+    ENDIF()
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
     IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.7)
         MESSAGE(FATAL_ERROR "g++ version 4.7 or later is required")
@@ -108,6 +116,11 @@ ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
     IF(CHUCHO_VIS_FLAG)
         SET(CHUCHO_CXX_SO_FLAGS -fvisibility=hidden)
     ENDIF()
+    CHECK_C_COMPILER_FLAG(-std=c99 CHUCHO_HAVE_STDC99)
+    IF(NOT CHUCHO_HAVE_STDC99)
+        MESSAGE(FATAL_ERROR "-std=c99 is required")
+    ENDIF()
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 ELSEIF(MSVC)
     IF(MSVC_VERSION LESS 1700)
         MESSAGE(FATAL_ERROR "Microsoft compiler version 17 or later is required (the compiler that ships with Visual Studio 2012)")
@@ -443,10 +456,48 @@ ELSE()
     MESSAGE(STATUS "Using regular expressions - POSIX")
 ENDIF()
 
-# htonl
+# assert
 CHECK_CXX_SYMBOL_EXISTS(assert assert.h CHUCHO_HAVE_ASSERT)
 IF(NOT CHUCHO_HAVE_ASSERT)
     MESSAGE(FATAL_ERROR "assert is required")
+ENDIF()
+
+# C API required stuff
+IF(C_API)
+    CHECK_C_SOURCE_COMPILES("
+#include <stdio.h>
+#define VA_CHK(...) printf(__VA_ARGS__)
+int main()
+{
+    VA_CHK(\"%s\", \"hello\");
+    return 0;
+}" CHUCHO_HAVE_VA_MACRO)
+    IF(NOT CHUCHO_HAVE_VA_MACRO)
+        MESSAGE(FATAL_ERROR "C macros with variadic arguments are required (standard C99)")
+    ENDIF()
+    # fopen/fgets/fclose/remove
+    FOREACH(SYM fopen fgets fclose remove)
+        CHECK_SYMBOL_EXISTS(${SYM} stdio.h CHUCHO_HAVE_${SYM})
+        IF(NOT CHUCHO_HAVE_${SYM})
+            MESSAGE(FATAL_ERROR "${SYM} is required")
+        ENDIF()
+    ENDFOREACH()
+
+    # strdup/strstr/strcmp
+    FOREACH(SYM strdup strstr strcmp)
+        CHECK_SYMBOL_EXISTS(${SYM} string.h CHUCHO_HAVE_${SYM})
+        IF(NOT CHUCHO_HAVE_${SYM})
+            MESSAGE(FATAL_ERROR "${SYM} is required")
+        ENDIF()
+    ENDFOREACH()
+
+    # calloc/free
+    FOREACH(SYM calloc free)
+        CHECK_SYMBOL_EXISTS(${SYM} stdlib.h CHUCHO_HAVE_${SYM})
+        IF(NOT CHUCHO_HAVE_${SYM})
+            MESSAGE(FATAL_ERROR "${SYM} is required")
+        ENDIF()
+    ENDFOREACH()
 ENDIF()
 
 # doxygen
