@@ -262,8 +262,9 @@ void logger::set_writes_to_ancestors(bool val)
 std::string logger::type_to_logger_name(const std::type_info& info)
 {
     std::string name = demangle::get_demangled_name(info);
-    if (name.find("class ") == 0)
-        name.erase(0, 6);
+    auto spc = name.find(' ');
+    if (spc != std::string::npos) 
+        name.erase(0, spc + 1);
     auto found = name.find("::");
     while (found != std::string::npos)
     {
