@@ -86,6 +86,22 @@ the -D option, as in -DZLIB_URL=http://my/special/zlib.tar.gz.
         * Set MINIZIP_SOURCE to the name of the directory containing the
           already unpacked sources of the minizip archive.
 
+Configuration File Formats
+==========================
+    Chucho can read configuration files in three different formats:
+YAML, config file and log4cplus config file. By default only YAML is
+enabled, but any or none of the supported formats can be turned on.
+
+    * YAML_CONFIG: (ON or OFF) Whether you plan on using configuration
+      files in YAML format. The default is ON.
+
+    * CONFIG_FILE_CONFIG: (ON or OFF) Whether you plan on using
+      configuration files in config file format. The default is OFF.
+
+    * LOG4CPLUS_CONFIG: (ON or OFF) Whether you plan on using
+      configuration files in log4cplus config file format. The default
+      is OFF.
+
 Build
 =====
     Chucho can be built with the following commands, run from the source
@@ -116,3 +132,4 @@ these with the command-line switch -D, as in
       platforms that support system services. The default is OFF.
     * Any of the aforementioned compression options for enabling
       support for rolling to compressed files.
+    * Any of the aforementioned configuration file format options.
