@@ -142,6 +142,13 @@ public:
      * @return the loaded file name
      */
     static const std::string& get_loaded_file_name();
+    /**
+     * Return the maximum size of a configuration file. Files bigger 
+     * than this value will not be loaded. The default maximum is 
+     * 100k. 
+     * 
+     * @return the maximum file size
+     */
     static std::size_t get_max_size();
     /**
      * Return the configuration style. AUTOMATIC is the default 
@@ -234,6 +241,13 @@ public:
      * @param name the file name
      */
     static void set_file_name(const std::string& name);
+    /**
+     * Set the maximum size for a configuration file. If any file 
+     * exceeds this size, it will be rejected. By default this 
+     * value is 100k. 
+     * 
+     * @param mx the maximum size
+     */
     static void set_max_size(std::size_t mx);
     /**
      * Set the configuration style.

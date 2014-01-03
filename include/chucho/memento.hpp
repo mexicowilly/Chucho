@@ -93,6 +93,14 @@ protected:
      *         "false"
      */
     bool boolean_value(const std::string& value);
+    /**
+     * Set an alias for a given key. For example, if you have a 
+     * handler for the key "hello", then you may want to set an 
+     * alias of "hi", which will just invoke the "hello" handler. 
+     * 
+     * @param key the key for which to create an alias
+     * @param alias the alias for key
+     */
     void set_alias(const std::string& key, const std::string& alias);
     /**
      * Set a handler. The handler will be invoked when the @ref 

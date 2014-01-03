@@ -23,15 +23,79 @@
 namespace chucho
 {
 
+/**
+ * @class loggable loggable.hpp chucho/loggable.hpp
+ * A class that inherits from loggable gets a logger associated 
+ * with each instance for free. This gives you the ability to 
+ * use the log macros tagged with @c LGBL in order to avoid 
+ * having to manage the logger and what it might be called. For 
+ * example, 
+ * @code 
+ * CHUCHO_INFO_LGBL("I just found " << num << " cats"); 
+ * @endcode 
+ * Instead of, 
+ * @code 
+ * CHUCHO_INFO(where_is_my_logger(), "I just found " << num << " cats"); 
+ * @endcode 
+ * By default the logger is named for the class (type template 
+ * argument). If your class is called @c my::cool::stuff, then 
+ * your logger will be named 
+ * @c my.cool.stuff. 
+ *  
+ * @ingroup miscellaneous 
+ */
 template <typename type>
 class loggable
 {
 protected:
+    /**
+     * @name Constructors
+     */
+    //@{
+    /**
+     * Construct a loggable giving the name of type to the logger. 
+     * For example, if your type is called @c my::cool::stuff, then 
+     * the logger will have the name @c my.cool.stuff. 
+     */
     loggable();
+    /**
+     * Construct a loggable using the given name for the name of the 
+     * logger. 
+     * 
+     * @param name the name of the logger
+     */
     loggable(const std::string& name);
+    //@}
 
+    /**
+     * Return the logger for this instance.
+     * 
+     * @return the logger
+     */
     std::shared_ptr<logger> get_logger() const;
+    /**
+     * Rename the logger. This method is meant to be used in cases 
+     * where a subclass of a subclass of loggable needs a different 
+     * logger name. Say you have a class hierarchy built off the 
+     * abstract class shape. You make shape a subclass of loggable, 
+     * so that everyone gets a logger. Subclasses of shape don't 
+     * want their loggers to be named shape, so they rename the 
+     * logger in the subclass' constructor. 
+     * 
+     * @param new_type the type on which to base the new name
+     */
     void rename_logger(const std::type_info& new_type);
+    /**
+     * Rename the logger. This method is meant to be used in cases 
+     * where a subclass of a subclass of loggable needs a different 
+     * logger name. Say you have a class hierarchy built off the 
+     * abstract class shape. You make shape a subclass of loggable, 
+     * so that everyone gets a logger. Subclasses of shape don't 
+     * want their loggers to be named shape, so they rename the 
+     * logger in the subclass' constructor. 
+     * 
+     * @param name the new logger name
+     */
     void rename_logger(const std::string& name);
 
 private:

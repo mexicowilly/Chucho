@@ -74,6 +74,11 @@ public:
      * @return the filters
      */
     std::vector<std::shared_ptr<filter>> get_filters();
+    /**
+     * Return this writer's formatter.
+     * 
+     * @return the formatter
+     */
     std::shared_ptr<formatter> get_formatter() const;
     /**
      * Write an event. This non-virtual method takes care of all the 

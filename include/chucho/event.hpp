@@ -52,6 +52,10 @@ public:
     typedef std::chrono::time_point<clock_type> time_type;
 
     /**
+     * @name Constructors
+     */
+    //@{
+    /**
      * Construct an event.
      * 
      * @param lgr the logger
@@ -71,6 +75,7 @@ public:
           unsigned line_number,
           const char* const function_name,
           const optional<marker>& mark = optional<marker>());
+
     /**
      * Construct an event.
      * 
@@ -126,6 +131,7 @@ public:
           const std::string& full_host_name,
           const std::string& thread_id,
           const optional<marker>& mark);
+    //@}
 
     /**
      * Return the base name of the host from which this event came. 
