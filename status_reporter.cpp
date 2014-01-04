@@ -26,12 +26,12 @@ status_reporter::~status_reporter()
 
 void status_reporter::report_error(const std::string& message, std::exception_ptr ex) const
 {
-    report_status(status(status::level::ERROR, message, origin_, ex));
+    report_status(status(status::level::ERROR_, message, origin_, ex));
 }
 
 void status_reporter::report_info(const std::string& message, std::exception_ptr ex) const
 {
-    report_status(status(status::level::INFO, message, origin_, ex));
+    report_status(status(status::level::INFO_, message, origin_, ex));
 }
 
 void status_reporter::report_status(const status& st) const
@@ -41,7 +41,7 @@ void status_reporter::report_status(const status& st) const
 
 void status_reporter::report_warning(const std::string& message, std::exception_ptr ex) const
 {
-    report_status(status(status::level::WARNING, message, origin_, ex));
+    report_status(status(status::level::WARNING_, message, origin_, ex));
 }
 
 }

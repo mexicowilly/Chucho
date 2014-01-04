@@ -49,24 +49,26 @@ public:
     typedef std::chrono::time_point<clock_type> time_type;
 
     /**
-     * The level of this status event.
+     * The level of this status event. These definitions have a
+     * trailing underscore because they can conflict with
+     * preprocessor macros defined by Windows.
      */
     enum class level
     {
         /** 
          * Information only. Nothing is wrong. 
          */ 
-        INFO,
+        INFO_,
         /** 
          * Something went wrong, but not badly enough to inhibit
          * functionality. 
          */
-        WARNING,
+        WARNING_,
         /** 
          * Chucho is prevented from doing something that it should be 
          * doing.
          */
-        ERROR
+        ERROR_
     };
 
     /**

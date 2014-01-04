@@ -202,22 +202,22 @@ TEST_F(pattern_formatter_test, invalid)
     smgr->clear();
     chucho::pattern_formatter f("%z");
     EXPECT_EQ(1, smgr->get_count());
-    EXPECT_EQ(chucho::status::level::ERROR, smgr->get_level());
+    EXPECT_EQ(chucho::status::level::ERROR_, smgr->get_level());
     EXPECT_STREQ("%z", f.format(evt_).c_str());
     f = chucho::pattern_formatter("%1.m");
     EXPECT_EQ(2, smgr->get_count());
-    EXPECT_EQ(chucho::status::level::ERROR, smgr->get_level());
+    EXPECT_EQ(chucho::status::level::ERROR_, smgr->get_level());
     EXPECT_STREQ("%1.m", f.format(evt_).c_str());
     f = chucho::pattern_formatter("");
     EXPECT_EQ(3, smgr->get_count());
-    EXPECT_EQ(chucho::status::level::ERROR, smgr->get_level());
+    EXPECT_EQ(chucho::status::level::ERROR_, smgr->get_level());
     EXPECT_STREQ("", f.format(evt_).c_str());
     f = chucho::pattern_formatter("%d{%Ym");
     EXPECT_EQ(5, smgr->get_count());
-    EXPECT_EQ(chucho::status::level::ERROR, smgr->get_level());
+    EXPECT_EQ(chucho::status::level::ERROR_, smgr->get_level());
     f = chucho::pattern_formatter("%C");
     EXPECT_EQ(6, smgr->get_count());
-    EXPECT_EQ(chucho::status::level::ERROR, smgr->get_level());
+    EXPECT_EQ(chucho::status::level::ERROR_, smgr->get_level());
 }
 
 TEST_F(pattern_formatter_test, marker)

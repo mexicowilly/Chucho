@@ -54,11 +54,11 @@ std::ostream& operator<< (std::ostream& stream, const status& st)
 
     }
     stream << ' ';
-    if (st.level_ == status::level::INFO)
+    if (st.level_ == status::level::INFO_)
         stream << "INFO";
-    else if (st.level_ == status::level::WARNING)
+    else if (st.level_ == status::level::WARNING_)
         stream << "WARN";
-    else if (st.level_ == status::level::ERROR)
+    else if (st.level_ == status::level::ERROR_)
         stream << "ERROR";
     if (!st.origin_.empty())
         stream << " [" << st.origin_ << ']';
