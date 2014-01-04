@@ -56,7 +56,7 @@ void memento::set_alias(const std::string& key, const std::string& alias)
 {
     auto found = handlers_.find(key);
     if (found == handlers_.end())
-        unconnected_aliases_.emplace(key, alias);
+        unconnected_aliases_.insert(std::make_pair(key, alias));
     else
         handlers_[alias] = found->second;
 }

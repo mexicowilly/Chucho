@@ -43,7 +43,7 @@ properties::properties(std::istream& in)
                     std::string v;
                     if (mch.size() == 3 && mch[2].begin() != -1)
                         v = line.substr(mch[2].begin(), mch[2].length());
-                    props_.emplace(k, v);
+                    props_.insert(std::make_pair(k, v));
                 }
             }
         }
@@ -65,7 +65,7 @@ properties properties::get_subset(const std::string prefix) const
     for (const std::multimap<std::string, std::string>::value_type& i : props_)
     {
         if (i.first.find(prefix) == 0)
-            result.props_.emplace(i.first.substr(prefix.length()), i.second);
+            result.props_.insert(std::make_pair(i.first.substr(prefix.length()), i.second));
     }
     return result;
 }
