@@ -27,7 +27,7 @@ OPTION(ENABLE_SHARED "Whether to build a shared object" FALSE)
 OPTION(ENABLE_FRAMEWORK "Whether to build as a framework on Macintosh" TRUE)
 SET(CHUCHO_NEEDS_TO_USE_THE_FRAMEWORK_VARIABLE_OR_CMAKE_COMPLAINS ${ENABLE_FRAMEWORK})
 
-# whether to install chucod as a service or not on platforms that have
+# whether to install chuchod as a service or not on platforms that have
 # services.
 OPTION(INSTALL_SERVICE "Whether to install chuchod as a system service" FALSE)
 

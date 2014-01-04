@@ -122,7 +122,8 @@ these with the command-line switch -D, as in
       framework on the Macintosh operating system. If you choose to
       build a framework, then it will be installed to
       /Library/Frameworks. Otherwise, the library will be installed to
-      the location of CMAKE_INSTALL_PREFIX. The default is ON.
+      the location of CMAKE_INSTALL_PREFIX. This option only takes
+      effect if ENABLE_SHARED is also ON. The default is ON.
     * CMAKE_INSTALL_PREFIX: (A directory) If you would like to install
       Chucho to a particular location, you may set it here. The default
       is /usr/local on POSIX systems and C:\Program Files (x86)\chucho

@@ -20,8 +20,8 @@ EXECUTE_PROCESS(COMMAND "${CHUCHO_LAUNCHCTL}" list org.chucho-log.chuchod
                 OUTPUT_QUIET
                 ERROR_QUIET)
 IF(CMD_RESULT EQUAL 0)
-    EXECUT_PROCESS(COMMAND "${CHUCHO_LAUNCHCTL}" unload org.chucho-log.chuchod
-                   RESULT_VARIABLE CMD_RESULT)
+    EXECUTE_PROCESS(COMMAND "${CHUCHO_LAUNCHCTL}" unload /Library/LaunchDaemons/org.chucho-log.chuchod.plist
+                    RESULT_VARIABLE CMD_RESULT)
     IF(NOT CMD_RESULT EQUAL 0)
         MESSAGE(FATAL_ERROR "Could not unload launch daemon otr.chucho.chuchod")
     ENDIF()

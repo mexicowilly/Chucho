@@ -15,7 +15,7 @@
 #
 
 MESSAGE(STATUS "Installing the Chucho launch daemon")
-MESSAGE(STATUS "Loading the Chuchod plist")
+MESSAGE(STATUS "Loading the chuchod plist")
 EXECUTE_PROCESS(COMMAND "${CHUCHO_LAUNCHCTL}" load /Library/LaunchDaemons/org.chucho-log.chuchod.plist
                 RESULT_VARIABLE CMD_RESULT)
 IF(NOT CMD_RESULT EQUAL 0)
