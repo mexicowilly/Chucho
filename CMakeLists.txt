@@ -502,7 +502,7 @@ IF(ENABLE_SHARED)
         SET(CHUCHO_RT_DEST lib)
     ENDIF()
     INSTALL(TARGETS chucho
-            LIBRARY DESTINATION lib
+            ARCHIVE DESTINATION lib
             RUNTIME DESTINATION ${CHUCHO_RT_DEST}
             FRAMEWORK DESTINATION /Library/Frameworks
             PUBLIC_HEADER DESTINATION include/chucho)
