@@ -431,6 +431,7 @@ TEST_F(chucho_config_file_configurator, syslog_writer_facility)
     syslog_writer_facility_body(tmpl);
 }
 
+#if !defined(CHUCHO_SOLARIS)
 TEST_F(chucho_config_file_configurator, syslog_writer_port)
 {
     configure("chucho.logger = will\n"
@@ -444,6 +445,7 @@ TEST_F(chucho_config_file_configurator, syslog_writer_port)
               "chucho.writer.sw.port = 19567");
     syslog_writer_port_body();
 }
+#endif
 
 TEST_F(chucho_config_file_configurator, time_file_roller)
 {

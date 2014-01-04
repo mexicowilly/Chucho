@@ -411,6 +411,7 @@ TEST_F(log4cplus_config_file_configurator, syslog_writer_facility)
     syslog_writer_facility_body(tmpl);
 }
 
+#if !defined(CHUCHO_SOLARIS)
 TEST_F(log4cplus_config_file_configurator, syslog_writer_port)
 {
     configure("log4cplus.logger.will = info, sl\n"
@@ -422,6 +423,7 @@ TEST_F(log4cplus_config_file_configurator, syslog_writer_port)
               "log4cplus.appender.sl.port = 19567");
     syslog_writer_port_body();
 }
+#endif
 
 TEST_F(log4cplus_config_file_configurator, ttcc_layout)
 {

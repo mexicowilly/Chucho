@@ -383,6 +383,7 @@ TEST_F(yaml_configurator, syslog_writer_facility)
     syslog_writer_facility_body(tmpl);
 }
 
+#if !defined(CHUCHO_SOLARIS)
 TEST_F(yaml_configurator, syslog_writer_port)
 {
     configure("chucho::logger:\n"
@@ -395,6 +396,7 @@ TEST_F(yaml_configurator, syslog_writer_port)
               "        - port: 19567");
     syslog_writer_port_body();
 }
+#endif
 
 TEST_F(yaml_configurator, time_file_roller)
 {
