@@ -548,7 +548,10 @@ ADD_SUBDIRECTORY(log-server)
 
 # Documentation
 IF(DOXYGEN_FOUND)
-    SET(CHUCHO_DOXYGEN_INPUT "\"${CMAKE_SOURCE_DIR}/main_page.hpp\"")
+    SET(CHUCHO_DOXYGEN_INPUT main_page.hpp)
+    IF(NOT CHUCHO_WINDOWS)
+        SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} include/chucho/windows_event_log_writer.hpp")
+    ENDIF()
     IF(CHUCHO_DOCUMENT_ALL)
         FOREACH(HEAD ${CHUCHO_SOURCES})
             IF(HEAD MATCHES "^include/chucho/.+\\.hpp$")
@@ -566,9 +569,9 @@ IF(DOXYGEN_FOUND)
         ENDFOREACH()
         SET(CHUCHO_DOXYGEN_EXTRACT_ALL NO)
     ENDIF()
-    CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/doxygen.conf" "${CMAKE_BINARY_DIR}/doxygen_mod.conf")
+    CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/doxygen.conf.in" "${CMAKE_BINARY_DIR}/doxygen.conf")
     ADD_CUSTOM_TARGET(doc
-                      COMMAND "${DOXYGEN_EXECUTABLE}" "${CMAKE_BINARY_DIR}/doxygen_mod.conf"
+                      COMMAND "${DOXYGEN_EXECUTABLE}" "${CMAKE_BINARY_DIR}/doxygen.conf"
                       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 ELSE()
     ADD_CUSTOM_TARGET(doc

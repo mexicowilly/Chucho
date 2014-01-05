@@ -23,22 +23,85 @@
 namespace chucho
 {
 
+/**
+ * @class windows_event_log_writer windows_event_log_writer.hpp chucho/windows_event_log_writer.hpp 
+ * A writer that sends message to Windows Event Log. This writer 
+ * requires some special handling. Please refer to the <a 
+ * href="https://www.assembla.com/spaces/chucho/wiki/Windows_Event_Log" 
+ * target="_blank">instructions</a> in order to set it up 
+ * properly. This writer is only available on Windows platforms.
+ * 
+ * @ingroup writers
+ */
 class CHUCHO_EXPORT windows_event_log_writer : public writer
 {
 public:
+    /**
+     * @name Constructors
+     */
+    //@{
+    /**
+     * Construct a writer.
+     * 
+     * @param fmt the formatter
+     * @param source the name of the source, which becomes a 
+     *               registry key
+     */
     windows_event_log_writer(std::shared_ptr<formatter> fmt,
                              const std::string& source);
+    /**
+     * Construct a writer.
+     * 
+     * @param fmt the formatter
+     * @param log the name of the log, which becomes a registry key
+     * @param source the name of the source, which becomes a 
+     *               registry key
+     */
     windows_event_log_writer(std::shared_ptr<formatter> fmt,
                              const std::string& log,
                              const std::string& source);
+    /**
+     * Construct a writer.
+     * 
+     * @param fmt the formatter
+     * @param log the name of the log, which becomes a registry key
+     * @param source the name of the source, which becomes a 
+     *               registry key
+     * @param host the name of the host to which you are writing 
+     */
     windows_event_log_writer(std::shared_ptr<formatter> fmt,
                              const std::string& log,
                              const std::string& source,
                              const std::string& host);
+    //@}
+    /**
+     * @name Destructor
+     */
+    //@{
+    /**
+     * Destroy the writer.
+     */
     ~windows_event_log_writer();
+    //@}
 
+    /**
+     * Return the host name. If the host name has not been set then 
+     * this value will be empty. 
+     * 
+     * @return the host name
+     */
     const std::string& get_host() const;
+    /**
+     * Return the name of the log.
+     * 
+     * @return the log name
+     */
     const std::string& get_log() const;
+    /**
+     * Return the name of the source.
+     * 
+     * @return the source name
+     */
     const std::string& get_source() const;
 
 protected:
