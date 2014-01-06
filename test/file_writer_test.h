@@ -14,17 +14,4 @@
  *    limitations under the License.
  */
 
-#include "sput.h"
-#include "log_macro_test.h"
-#include "file_writer_test.h"
-
-sput_struct __sput;
-
-int main()
-{
-    sput_start_testing();
-    run_log_macro_test();
-    run_file_writer_test();
-    sput_finish_testing();
-    return sput_get_return_value();
-}
+void run_file_writer_test(void);

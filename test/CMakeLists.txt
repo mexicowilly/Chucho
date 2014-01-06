@@ -111,6 +111,8 @@ ADD_CUSTOM_TARGET(check
                   COMMAND unit-test)
 
 ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
+               file_writer_test.c
+               file_writer_test.h
                harness.c
                log_macro_test.c
                log_macro_test.h

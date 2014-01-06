@@ -235,6 +235,7 @@ extern sput_struct __sput;
         __sput.overall.nok    += __sput.suite.nok;                         \
         \
         memset(&__sput.suite, 0, sizeof(__sput.suite));                    \
+        memset(&__sput.fixture, 0, sizeof(__sput.fixture));                \
     } while (0)
 
 
