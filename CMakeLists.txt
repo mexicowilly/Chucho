@@ -90,6 +90,7 @@ ENDIF()
 
 IF(C_API)
     SET(CHUCHO_C_PUBLIC_HEADERS
+        include/chucho/configuration.h
         include/chucho/error.h
         "${CMAKE_BINARY_DIR}/chucho/export.h"
         include/chucho/file_writer.h
@@ -246,6 +247,7 @@ ENDIF()
 
 IF(C_API)
     SET(CHUCHO_C_SOURCES
+        c_configuration.cpp
         c_file_writer.cpp
         c_formatter.cpp
         c_level.cpp

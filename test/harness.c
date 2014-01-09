@@ -15,16 +15,20 @@
  */
 
 #include "sput.h"
+#include <chucho/configuration.h>
 #include "log_macro_test.h"
 #include "file_writer_test.h"
+#include "configuration_test.h"
 
 sput_struct __sput;
 
 int main()
 {
+    chucho_cnf_set_style(CHUCHO_CONFIGURATION_STYLE_OFF);
     sput_start_testing();
     run_log_macro_test();
     run_file_writer_test();
+    run_configuration_test();
     sput_finish_testing();
     return sput_get_return_value();
 }

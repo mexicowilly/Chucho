@@ -19,9 +19,8 @@
 #include <chucho/pattern_formatter.h>
 #include <chucho/error.h>
 
-void run_file_writer_test(void)
+static void file_writer_test(void)
 {
-    sput_enter_suite("file_writer");
     chucho_formatter* fmt;
     int rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
@@ -40,5 +39,11 @@ void run_file_writer_test(void)
     sput_fail_unless(on == CHUCHO_ON_START_APPEND, "should append");
     rc = chucho_release_writer(wrt);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "release file writer");
+}
+
+void run_file_writer_test(void)
+{
+    sput_enter_suite("file_writer");
+    sput_run_test(file_writer_test);
     sput_leave_suite();
 }

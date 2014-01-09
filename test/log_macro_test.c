@@ -26,12 +26,14 @@
     static void log_##lvl(const char* const mark)                       \
     {                                                                   \
         sput_enter_suite_fixture("log "#lvl , set_up, tear_down);       \
+        sput_run_test(set_log_level);                                   \
         int rc = chucho_lgr_set_level(lgr, chucho_##lvl##_level());     \
         sput_fail_unless(rc == CHUCHO_NO_ERROR, "set logger level");    \
+        static_mark = mark;                                             \
         if (mark == NULL)                                               \
-            log();                                                      \
+            sput_run_test(log);                                         \
         else                                                            \
-            log_mark(mark);                                             \
+            sput_run_test(log_mark);                                    \
         expect(chucho_##lvl##_level(), mark);                           \
         sput_leave_suite();                                             \
     }
@@ -39,6 +41,7 @@
 
 
 static chucho_logger* lgr;
+static const char* static_mark;
 
 static void log()
 {
@@ -50,14 +53,14 @@ static void log()
     CHUCHO_C_FATAL(lgr, "my dog %s", "has fleas");
 }
 
-static void log_mark(const char* const mark)
+static void log_mark()
 {
-    CHUCHO_C_TRACE_M(lgr, mark, "my dog %s", "has fleas");
-    CHUCHO_C_DEBUG_M(lgr, mark, "my dog %s", "has fleas");
-    CHUCHO_C_INFO_M(lgr, mark, "my dog %s", "has fleas");
-    CHUCHO_C_WARN_M(lgr, mark, "my dog %s", "has fleas");
-    CHUCHO_C_ERROR_M(lgr, mark, "my dog %s", "has fleas");
-    CHUCHO_C_FATAL_M(lgr, mark, "my dog %s", "has fleas");
+    CHUCHO_C_TRACE_M(lgr, static_mark, "my dog %s", "has fleas");
+    CHUCHO_C_DEBUG_M(lgr, static_mark, "my dog %s", "has fleas");
+    CHUCHO_C_INFO_M(lgr, static_mark, "my dog %s", "has fleas");
+    CHUCHO_C_WARN_M(lgr, static_mark, "my dog %s", "has fleas");
+    CHUCHO_C_ERROR_M(lgr, static_mark, "my dog %s", "has fleas");
+    CHUCHO_C_FATAL_M(lgr, static_mark, "my dog %s", "has fleas");
 }
 
 static char** read_lines()
@@ -132,6 +135,11 @@ static void expect(const chucho_level* lvl, const char* mark)
         lvl_idx++;
     }
     free(lines);
+}
+
+static void set_log_level()
+{
+    // This function does nothing but help set the test name in sput
 }
 
 static void set_up(void)

@@ -14,9 +14,9 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_FILE_WRITER_TEST_H__)
-#define CHUCHO_FILE_WRITER_TEST_H__
+#if !defined(CHUCHO_CONFIGURATION_TEST_H__)
+#define CHUCHO_CONFIGURATION_TEST_H__
 
-void run_file_writer_test(void);
+void run_configuration_test(void);
 
 #endif

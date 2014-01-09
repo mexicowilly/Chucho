@@ -14,4 +14,9 @@
  *    limitations under the License.
  */
 
+#if !defined(CHUCHO_LOG_MACRO_TEST_H__)
+#define CHUCHO_LOG_MACRO_TEST_H__
+
 void run_log_macro_test(void);
+
+#endif

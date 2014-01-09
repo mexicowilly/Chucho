@@ -14,6 +14,11 @@
  *    limitations under the License.
  */
 
+#if !defined(CHUCHO_TEST_UTIL_H__)
+#define CHUCHO_TEST_UTIL_H__
+
 #include <stdio.h>
 
 char* read_line(FILE* f);
+
+#endif
