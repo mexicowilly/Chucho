@@ -14,20 +14,24 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_C_WRITER_HPP__)
-#define CHUCHO_C_WRITER_HPP__
+#include <chucho/c_util.hpp>
+#include <chucho/level.h>
+#include <chucho/error.h>
 
-#include <chucho/writer.h>
-#include <chucho/writer.hpp>
-
-extern "C"
+namespace chucho
 {
 
-struct chucho_writer
+namespace c_util
 {
-    std::shared_ptr<chucho::writer> writer_;
-};
+
+const chucho_level* cpp_level_to_c(std::shared_ptr<chucho::level> lvl)
+{
+    const chucho_level* result = nullptr;
+    if (lvl) 
+        chucho_get_level(&result, lvl->get_name());
+    return result;
+}
 
 }
 
-#endif
+}

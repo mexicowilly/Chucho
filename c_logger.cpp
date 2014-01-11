@@ -16,26 +16,10 @@
 
 #include <chucho/c_logger.hpp>
 #include <chucho/c_writer.hpp>
-#include <chucho/c_level.hpp>
+#include <chucho/c_util.hpp>
 #include <chucho/level.h>
 #include <chucho/error.h>
 #include <chucho/writer.h>
-
-namespace
-{
-
-const chucho_level* cpp_level_to_c(std::shared_ptr<chucho::level> lvl)
-{
-    if (lvl) 
-    {
-        const chucho_level* clvl;
-        chucho_get_level(&clvl, lvl->get_name());
-        return clvl;
-    }
-    return nullptr;
-}
-
-}
 
 extern "C"
 {
@@ -66,7 +50,10 @@ int chucho_lgr_get_effective_level(const chucho_logger* lgr, const chucho_level*
 {
     if (lgr == nullptr || lvl == nullptr)
         return CHUCHO_NULL_POINTER;
-    *lvl = cpp_level_to_c(lgr->logger_->get_effective_level());
+    const chucho_level* clvl = chucho::c_util::cpp_level_to_c(lgr->logger_->get_effective_level());
+    if (clvl == nullptr)
+        return CHUCHO_NO_SUCH_LEVEL;
+    *lvl = clvl;
     return CHUCHO_NO_ERROR;
 }
 
@@ -74,7 +61,10 @@ int chucho_lgr_get_level(const chucho_logger* lgr, const chucho_level** lvl)
 {
     if (lgr == nullptr || lvl == nullptr)
         return CHUCHO_NULL_POINTER;
-    *lvl = cpp_level_to_c(lgr->logger_->get_level());
+    const chucho_level* clvl = chucho::c_util::cpp_level_to_c(lgr->logger_->get_level());
+    if (clvl == nullptr) 
+        return CHUCHO_NO_SUCH_LEVEL;
+    *lvl = clvl;
     return CHUCHO_NO_ERROR;
 }
 

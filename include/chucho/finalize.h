@@ -14,20 +14,20 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_C_WRITER_HPP__)
-#define CHUCHO_C_WRITER_HPP__
+#if !defined(CHUCHO_FINALIZE_H__)
+#define CHUCHO_FINALIZE_H__
 
-#include <chucho/writer.h>
-#include <chucho/writer.hpp>
+#include <chucho/export.h>
 
+#if defined(__cplusplus)
 extern "C"
 {
+#endif
 
-struct chucho_writer
-{
-    std::shared_ptr<chucho::writer> writer_;
-};
+CHUCHO_EXPORT void chucho_finalize(void);
 
+#if defined(__cplusplus)
 }
+#endif
 
 #endif

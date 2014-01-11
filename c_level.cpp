@@ -106,10 +106,7 @@ int chucho_get_level(const chucho_level** lvl, const char* const name)
         static_data& sd(data());
         auto found = sd.levels_.find(name);
         if (found == sd.levels_.end()) 
-        {
-            *lvl = nullptr;
             return CHUCHO_NO_SUCH_LEVEL;
-        }
         *lvl = found->second.get();
     }
     catch (std::bad_alloc&) 

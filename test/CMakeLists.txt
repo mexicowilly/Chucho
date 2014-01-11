@@ -111,6 +111,8 @@ ADD_CUSTOM_TARGET(check
                   COMMAND unit-test)
 
 ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
+               async_writer_test.c
+               async_writer_test.h
                configuration_test.c
                configuration_test.h
                file_writer_test.c

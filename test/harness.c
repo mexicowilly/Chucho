@@ -16,9 +16,11 @@
 
 #include "sput.h"
 #include <chucho/configuration.h>
+#include <chucho/finalize.h>
 #include "log_macro_test.h"
 #include "file_writer_test.h"
 #include "configuration_test.h"
+#include "async_writer_test.h"
 
 sput_struct __sput;
 
@@ -29,6 +31,8 @@ int main()
     run_log_macro_test();
     run_file_writer_test();
     run_configuration_test();
+    run_async_writer_test();
     sput_finish_testing();
+    chucho_finalize();
     return sput_get_return_value();
 }
