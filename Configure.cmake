@@ -20,6 +20,7 @@ INCLUDE(CheckCXXSymbolExists)
 INCLUDE(CheckSymbolExists)
 INCLUDE(CheckCXXSourceRuns)
 INCLUDE(CheckCSourceCompiles)
+INCLUDE(CheckIncludeFile)
 INCLUDE(CheckIncludeFileCXX)
 INCLUDE(ExternalProject)
 
@@ -475,8 +476,18 @@ int main()
     IF(NOT CHUCHO_HAVE_VA_MACRO)
         MESSAGE(FATAL_ERROR "C macros with variadic arguments are required (standard C99)")
     ENDIF()
+
+    # C headers
+    # (we already checked for stdlib.h)
+    FOREACH(HEAD stdio.h string.h)
+        CHECK_INCLUDE_FILE(${HEAD} HAVE_${HEAD})
+        IF (NOT HAVE_${HEAD})
+            MESSAGE(FATAL_ERROR "${HEAD} is required")
+        ENDIF()
+    ENDFOREACH()
+
     # fopen/fgets/fclose/remove
-    FOREACH(SYM fopen fgets fclose remove)
+    FOREACH(SYM fopen fgets fclose remove fwrite)
         CHECK_SYMBOL_EXISTS(${SYM} stdio.h CHUCHO_HAVE_${SYM})
         IF(NOT CHUCHO_HAVE_${SYM})
             MESSAGE(FATAL_ERROR "${SYM} is required")
@@ -484,15 +495,15 @@ int main()
     ENDFOREACH()
 
     # strdup/strstr/strcmp
-    FOREACH(SYM strdup strstr strcmp)
+    FOREACH(SYM strdup strstr strcmp strlen strcpy strcat)
         CHECK_SYMBOL_EXISTS(${SYM} string.h CHUCHO_HAVE_${SYM})
         IF(NOT CHUCHO_HAVE_${SYM})
             MESSAGE(FATAL_ERROR "${SYM} is required")
         ENDIF()
     ENDFOREACH()
 
-    # calloc/free
-    FOREACH(SYM calloc free)
+    # calloc/free/malloc
+    FOREACH(SYM calloc free malloc)
         CHECK_SYMBOL_EXISTS(${SYM} stdlib.h CHUCHO_HAVE_${SYM})
         IF(NOT CHUCHO_HAVE_${SYM})
             MESSAGE(FATAL_ERROR "${SYM} is required")

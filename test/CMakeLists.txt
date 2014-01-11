@@ -110,6 +110,12 @@ ENDIF()
 ADD_CUSTOM_TARGET(check
                   COMMAND unit-test)
 
+IF(CHUCHO_HAVE_ZLIB OR CHUCHO_HAVE_BZIP2 OR CHUCHO_HAVE_MINIZIP)
+    SET(CHUCHO_TEST_COMPRESSION_C_SOURCES
+        file_compressor_test.c
+        file_compressor_test.h)
+ENDIF()
+
 ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
                async_writer_test.c
                async_writer_test.h
@@ -121,7 +127,8 @@ ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
                log_macro_test.c
                log_macro_test.h
                test_util.c
-               test_util.h)
+               test_util.h
+               ${CHUCHO_TEST_COMPRESSION_C_SOURCES})
 TARGET_LINK_LIBRARIES(c-unit-test chucho ${CHUCHO_THREAD_LIB})
 
 ADD_CUSTOM_TARGET(c-check

@@ -94,6 +94,7 @@ IF(C_API)
         include/chucho/configuration.h
         include/chucho/error.h
         "${CMAKE_BINARY_DIR}/chucho/export.h"
+        include/chucho/file_compressor.h
         include/chucho/file_writer.h
         include/chucho/finalize.h
         include/chucho/formatter.h
@@ -169,14 +170,23 @@ ENDIF()
 
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.h)
+    ENDIF()
 ENDIF()
 
 IF(CHUCHO_HAVE_BZIP2)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/bzip2_file_compressor.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/bzip2_file_compressor.h)
+    ENDIF()
 ENDIF()
 
 IF(CHUCHO_HAVE_MINIZIP)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/zip_file_compressor.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/zip_file_compressor.h)
+    ENDIF()
 ENDIF()
 
 # The libyaml sources are required by chuchod
@@ -251,6 +261,7 @@ IF(C_API)
     SET(CHUCHO_C_SOURCES
         c_async_writer.cpp
         c_configuration.cpp
+        c_file_compressor.cpp
         c_file_writer.cpp
         c_finalize.cpp
         c_formatter.cpp
@@ -260,6 +271,7 @@ IF(C_API)
         c_pattern_formatter.cpp
         c_util.cpp
         c_writer.cpp
+        include/chucho/c_file_compressor.hpp
         include/chucho/c_formatter.hpp
         include/chucho/c_level.hpp
         include/chucho/c_logger.hpp
@@ -459,6 +471,9 @@ IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_SOURCES
          gzip_file_compressor.cpp
          ${CHUCHO_ZLIB_SOURCES})
+    IF(C_API)
+        LIST(APPEND CHUCHO_SOURCES c_gzip_file_compressor.cpp)
+    ENDIF()
     SET_SOURCE_FILES_PROPERTIES(gzip_file_compressor_factory.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_HAVE_ZLIB)
     IF(ZLIB_SOURCE)
@@ -487,6 +502,9 @@ IF(CHUCHO_HAVE_BZIP2)
     LIST(APPEND CHUCHO_SOURCES
          bzip2_file_compressor.cpp
          ${CHUCHO_BZIP2_SOURCES})
+    IF(C_API)
+        LIST(APPEND CHUCHO_SOURCES c_bzip2_file_compressor.cpp)
+    ENDIF()
     SET_SOURCE_FILES_PROPERTIES(bzip2_file_compressor_factory.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_HAVE_BZIP2)
     IF(BZIP2_SOURCE)
@@ -495,7 +513,7 @@ IF(CHUCHO_HAVE_BZIP2)
         INCLUDE_DIRECTORIES("${BZIP2_INCLUDE_DIR}")
     ENDIF()
     IF(MSVC)
-        SET_SOURCE_FILES_PROPERTIES(bzip2_file_compressor PROPERTIES
+        SET_SOURCE_FILES_PROPERTIES(bzip2_file_compressor.cpp PROPERTIES
                                     COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
         IF(CHUCHO_BZIP2_SOURCES)
             SET_SOURCE_FILES_PROPERTIES("${BZIP2_SOURCE}/bzlib.c" PROPERTIES
@@ -508,6 +526,9 @@ IF(CHUCHO_HAVE_MINIZIP)
     LIST(APPEND CHUCHO_SOURCES
          zip_file_compressor.cpp
          ${CHUCHO_MINIZIP_SOURCES})
+    IF(C_API)
+        LIST(APPEND CHUCHO_SOURCES c_zip_file_compressor.cpp)
+    ENDIF()
     SET_SOURCE_FILES_PROPERTIES(zip_file_compressor_factory.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_HAVE_MINIZIP)
     INCLUDE_DIRECTORIES("${MINIZIP_SOURCE}")

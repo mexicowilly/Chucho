@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_ERROR_H__)
-#define CHUCHO_ERROR_H__
+#if !defined(CHUCHO_FILE_COMPRESSOR_H__)
+#define CHUCHO_FILE_COMPRESSOR_H__
 
 #include <chucho/export.h>
 
@@ -24,17 +24,13 @@ extern "C"
 {
 #endif
 
-#define CHUCHO_NO_ERROR                     0
-#define CHUCHO_NO_SUCH_LEVEL                1
-#define CHUCHO_NULL_POINTER                 2
-#define CHUCHO_INSUFFICIENT_BUFFER          3
-#define CHUCHO_FORMAT_ERROR                 4
-#define CHUCHO_OUT_OF_MEMORY                5
-#define CHUCHO_TYPE_MISMATCH                6
-#define CHUCHO_INVALID_PATTERN              7
-#define CHUCHO_COMPRESSION_FAILURE          8
+typedef struct chucho_file_compressor chucho_file_compressor;
 
-CHUCHO_EXPORT const char* chucho_error_message(int err);
+CHUCHO_EXPORT int chucho_release_file_compressor(chucho_file_compressor* cmp);
+
+CHUCHO_EXPORT int chucho_cmp_compress(chucho_file_compressor* cmp, const char* const file_name);
+CHUCHO_EXPORT int chucho_cmp_get_extension(const chucho_file_compressor* cmp, const char** ext);
+CHUCHO_EXPORT int chucho_cmp_get_min_index(const chucho_file_compressor* cmp, unsigned* idx);
 
 #if defined(__cplusplus)
 }
