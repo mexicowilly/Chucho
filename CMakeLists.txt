@@ -91,7 +91,10 @@ ENDIF()
 IF(C_API)
     SET(CHUCHO_C_PUBLIC_HEADERS
         include/chucho/async_writer.h
+        include/chucho/cerr_writer.h
+        include/chucho/cout_writer.h
         include/chucho/configuration.h
+        include/chucho/diagnostic_context.h
         include/chucho/error.h
         "${CMAKE_BINARY_DIR}/chucho/export.h"
         include/chucho/file_compressor.h
@@ -260,7 +263,10 @@ ENDIF()
 IF(C_API)
     SET(CHUCHO_C_SOURCES
         c_async_writer.cpp
+        c_cerr_writer.cpp
+        c_cout_writer.cpp
         c_configuration.cpp
+        c_diagnostic_context.cpp
         c_file_compressor.cpp
         c_file_writer.cpp
         c_finalize.cpp

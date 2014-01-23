@@ -24,6 +24,9 @@
 #if defined(CHUCHO_HAVE_ZLIB) || defined(CHUCHO_HAVE_BZIP2) || defined(CHUCHO_HAVE_MINIZIP)
 #include "file_compressor_test.h"
 #endif
+#include "cerr_writer_test.h"
+#include "cout_writer_test.h"
+#include "diagnostic_context_test.h"
 
 sput_struct __sput;
 
@@ -38,6 +41,9 @@ int main()
     #if defined(CHUCHO_HAVE_ZLIB) || defined(CHUCHO_HAVE_BZIP2) || defined(CHUCHO_HAVE_MINIZIP)
     run_file_compressor_test();
     #endif
+    run_cerr_writer_test();
+    run_cout_writer_test();
+    run_diagnostic_context_test();
     sput_finish_testing();
     chucho_finalize();
     return sput_get_return_value();

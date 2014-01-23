@@ -16,7 +16,6 @@
 
 #include <chucho/file_writer.hpp>
 #include <chucho/file_writer.h>
-#include <chucho/formatter.h>
 #include <chucho/c_writer.hpp>
 #include <chucho/c_formatter.hpp>
 #include <chucho/error.h>

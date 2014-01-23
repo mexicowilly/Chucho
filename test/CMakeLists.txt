@@ -119,8 +119,14 @@ ENDIF()
 ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
                async_writer_test.c
                async_writer_test.h
+               cerr_writer_test.c
+               cerr_writer_test.h
+               cout_writer_test.c
+               cout_writer_test.h
                configuration_test.c
                configuration_test.h
+               diagnostic_context_test.c
+               diagnostic_context_test.h
                file_writer_test.c
                file_writer_test.h
                harness.c
