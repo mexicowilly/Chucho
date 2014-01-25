@@ -62,7 +62,14 @@ int chucho_cnf_allow_default(int* val)
 {
     if (val == nullptr)
         return CHUCHO_NULL_POINTER;
-    *val = chucho::configuration::allow_default() ? 1 : 0;
+    try
+    {
+        *val = chucho::configuration::allow_default() ? 1 : 0;
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR;
 }
 
@@ -70,8 +77,15 @@ int chucho_cnf_get_environment_variable(const char** var)
 {
     if (var == nullptr)
         return CHUCHO_NULL_POINTER;
-    const std::string& cvar(chucho::configuration::get_environment_variable());
-    *var = cvar.empty() ? NULL : cvar.c_str();
+    try
+    {
+        const std::string& cvar(chucho::configuration::get_environment_variable());
+        *var = cvar.empty() ? NULL : cvar.c_str();
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR;
 }
 
@@ -79,8 +93,15 @@ int chucho_cnf_get_fallback(const char** fb)
 {
     if (fb == nullptr)
         return CHUCHO_NULL_POINTER;
-    const std::string& cfb(chucho::configuration::get_fallback());
-    *fb = cfb.empty() ? NULL : cfb.c_str();
+    try
+    {
+        const std::string& cfb(chucho::configuration::get_fallback());
+        *fb = cfb.empty() ? NULL : cfb.c_str();
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR;
 }
 
@@ -88,8 +109,15 @@ int chucho_cnf_get_file_name(const char** name)
 {
     if (name == nullptr)
         return CHUCHO_NULL_POINTER;
-    const std::string& cname(chucho::configuration::get_file_name());
-    *name = cname.empty() ? NULL : cname.c_str();
+    try
+    {
+        const std::string& cname(chucho::configuration::get_file_name());
+        *name = cname.empty() ? NULL : cname.c_str();
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR;
 }
 
@@ -97,8 +125,15 @@ int chucho_cnf_get_loaded_file_name(const char** name)
 {
     if (name == nullptr)
         return CHUCHO_NULL_POINTER;
-    const std::string& cname(chucho::configuration::get_loaded_file_name());
-    *name = cname.empty() ? NULL : cname.c_str();
+    try
+    {
+        const std::string& cname(chucho::configuration::get_loaded_file_name());
+        *name = cname.empty() ? NULL : cname.c_str();
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR;
 }
 
@@ -106,7 +141,14 @@ int chucho_cnf_get_max_size(size_t* sz)
 {
     if (sz == nullptr)
         return CHUCHO_NULL_POINTER; 
-    *sz = chucho::configuration::get_max_size();
+    try
+    {
+        *sz = chucho::configuration::get_max_size();
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR;
 }
 
@@ -114,8 +156,15 @@ int chucho_cnf_get_style(chucho_configuration_style* sty)
 {
     if (sty == nullptr)
         return CHUCHO_NULL_POINTER; 
-    *sty = chucho::configuration::get_style() == chucho::configuration::style::AUTOMATIC ?
-        CHUCHO_CONFIGURATION_STYLE_AUTOMATIC : CHUCHO_CONFIGURATION_STYLE_OFF;
+    try
+    {
+        *sty = chucho::configuration::get_style() == chucho::configuration::style::AUTOMATIC ?
+            CHUCHO_CONFIGURATION_STYLE_AUTOMATIC : CHUCHO_CONFIGURATION_STYLE_OFF;
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR;
 }
 
@@ -123,7 +172,14 @@ int chucho_cnf_get_unknown_handler(chucho_unknown_handler_type* func)
 {
     if (func == nullptr)
         return CHUCHO_NULL_POINTER;
-    *func = data().handler_;
+    try
+    {
+        *func = data().handler_;
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR;
 }
 
@@ -131,13 +187,28 @@ int chucho_cnf_reconfigure(int* rc)
 {
     if (rc == nullptr)
         return CHUCHO_NULL_POINTER;
-    *rc = chucho::configuration::reconfigure() ? 1 : 0;
+    try
+    {
+        *rc = chucho::configuration::reconfigure() ? 1 : 0;
+    }
+    catch (...) 
+    {
+        // Only bad_alloc will possibly slip out
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR;
 }
 
 int chucho_cnf_set_allow_default(int val)
 {
-    chucho::configuration::set_allow_default(val == 0 ? false : true);
+    try
+    {
+        chucho::configuration::set_allow_default(val == 0 ? false : true);
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR;
 }
 
@@ -145,7 +216,14 @@ int chucho_cnf_set_environment_variable(const char* const var)
 {
     if (var == nullptr)
         return CHUCHO_NULL_POINTER;
-    chucho::configuration::set_environment_variable(var);
+    try
+    {
+        chucho::configuration::set_environment_variable(var);
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR; 
 }
 
@@ -153,7 +231,14 @@ int chucho_cnf_set_fallback(const char* const fb)
 {
     if (fb == nullptr)
         return CHUCHO_NULL_POINTER;
-    chucho::configuration::set_fallback(fb);
+    try
+    {
+        chucho::configuration::set_fallback(fb);
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR; 
 }
 
@@ -161,27 +246,55 @@ int chucho_cnf_set_file_name(const char* const name)
 {
     if (name == nullptr)
         return CHUCHO_NULL_POINTER;
-    chucho::configuration::set_file_name(name);
+    try
+    {
+        chucho::configuration::set_file_name(name);
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR; 
 }
 
 int chucho_cnf_set_max_size(size_t sz)
 {
-    chucho::configuration::set_max_size(sz);
+    try
+    {
+        chucho::configuration::set_max_size(sz);
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR;
 }
 
 int chucho_cnf_set_style(chucho_configuration_style sty)
 {
-    chucho::configuration::set_style(sty == CHUCHO_CONFIGURATION_STYLE_AUTOMATIC ?
-        chucho::configuration::style::AUTOMATIC : chucho::configuration::style::OFF);
+    try
+    {
+        chucho::configuration::set_style(sty == CHUCHO_CONFIGURATION_STYLE_AUTOMATIC ?
+            chucho::configuration::style::AUTOMATIC : chucho::configuration::style::OFF);
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR;
 }
 
 int chucho_cnf_set_unknown_handler(chucho_unknown_handler_type func)
 {
-    data().handler_ = func;
-    chucho::configuration::set_unknown_handler(c_unknown_handler);
+    try
+    {
+        data().handler_ = func;
+        chucho::configuration::set_unknown_handler(c_unknown_handler);
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR;
 }
 

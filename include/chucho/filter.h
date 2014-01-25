@@ -14,31 +14,31 @@
  *    limitations under the License.
  */
 
-#include <chucho/cerr_writer.hpp>
-#include <chucho/cerr_writer.h>
-#include <chucho/c_formatter.hpp>
-#include <chucho/c_writer.hpp>
-#include <chucho/error.h>
+#if !defined(CHUCHO_FILTER_H__)
+#define CHUCHO_FILTER_H__
 
+#include <chucho/export.h>
+
+#if defined(__cplusplus)
 extern "C"
 {
+#endif
 
-int chucho_create_cerr_writer(chucho_writer** wrt, chucho_formatter* fmt)
+typedef struct chucho_filter chucho_filter;
+
+typedef enum
 {
-    if (wrt == nullptr || fmt == nullptr)
-        return CHUCHO_NULL_POINTER;
-    try
-    {
-        *wrt = new chucho_writer();
-        (*wrt)->writer_ = std::make_shared<chucho::cerr_writer>(fmt->fmt_);
-    }
-    catch (...) 
-    {
-        delete *wrt;
-        return CHUCHO_OUT_OF_MEMORY;
-    }
-    chucho_release_formatter(fmt);
-    return CHUCHO_NO_ERROR;
-}
+    CHUCHO_FILTER_RESULT_DENY,
+    CHUCHO_FILTER_RESULT_NEUTRAL,
+    CHUCHO_FILTER_RESULT_ACCEPT
+} chucho_filter_result;
 
+CHUCHO_EXPORT int chucho_release_filter(chucho_filter* flt);
+// Can be used to release filters returned from chucho_wrt_get_filters()
+CHUCHO_EXPORT int chucho_release_filters(chucho_filter** flts);
+
+#if defined(__cplusplus)
 }
+#endif
+
+#endif

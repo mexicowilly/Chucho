@@ -14,31 +14,22 @@
  *    limitations under the License.
  */
 
-#include <chucho/cerr_writer.hpp>
-#include <chucho/cerr_writer.h>
-#include <chucho/c_formatter.hpp>
-#include <chucho/c_writer.hpp>
+#include "sput.h"
+#include <chucho/duplicate_message_filter.h>
 #include <chucho/error.h>
 
-extern "C"
+static void duplicate_message_filter_test(void)
 {
-
-int chucho_create_cerr_writer(chucho_writer** wrt, chucho_formatter* fmt)
-{
-    if (wrt == nullptr || fmt == nullptr)
-        return CHUCHO_NULL_POINTER;
-    try
-    {
-        *wrt = new chucho_writer();
-        (*wrt)->writer_ = std::make_shared<chucho::cerr_writer>(fmt->fmt_);
-    }
-    catch (...) 
-    {
-        delete *wrt;
-        return CHUCHO_OUT_OF_MEMORY;
-    }
-    chucho_release_formatter(fmt);
-    return CHUCHO_NO_ERROR;
+    chucho_filter* flt;
+    int rc = chucho_create_duplicate_message_filter(&flt);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create duplicate messagse filter");
+    rc = chucho_release_filter(flt);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "release duplicate message filter");
 }
 
+void run_duplicate_message_filter_test(void)
+{
+    sput_enter_suite("duplicate_message_filter");
+    sput_run_test(duplicate_message_filter_test);
+    sput_leave_suite();
 }

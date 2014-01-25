@@ -30,10 +30,18 @@ int chucho_create_async_writer(chucho_writer** async,
 {
     if (async == nullptr || wrt == nullptr || discard_threshold == nullptr) 
         return CHUCHO_NULL_POINTER;
-    *async = new chucho_writer();
-    (*async)->writer_ = std::make_shared<chucho::async_writer>(wrt->writer_,
-                                                               capacity,
-                                                               discard_threshold->level_);
+    try
+    {
+        *async = new chucho_writer();
+        (*async)->writer_ = std::make_shared<chucho::async_writer>(wrt->writer_,
+                                                                   capacity,
+                                                                   discard_threshold->level_);
+    }
+    catch (...) 
+    {
+        delete *async;
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     chucho_release_writer(wrt);
     return CHUCHO_NO_ERROR;
 }

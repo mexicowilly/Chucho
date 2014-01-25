@@ -31,15 +31,22 @@ int chucho_create_file_writer(chucho_writer** wrt,
 {
     if (wrt == nullptr || fmt == nullptr || file_name == nullptr) 
         return CHUCHO_NULL_POINTER;
-    chucho_writer* loc = new chucho_writer();
-    chucho::file_writer::on_start ons = on_start == CHUCHO_ON_START_APPEND ?
-        chucho::file_writer::on_start::APPEND : chucho::file_writer::on_start::TRUNCATE;
-    loc->writer_ = std::make_shared<chucho::file_writer>(fmt->fmt_,
-                                                         file_name,
-                                                         ons,
-                                                         flush == 0 ? false : true);
-    *wrt = loc;
-    chucho_release_formatter(fmt);
+    try
+    {
+        chucho_writer* loc = new chucho_writer();
+        chucho::file_writer::on_start ons = on_start == CHUCHO_ON_START_APPEND ?
+            chucho::file_writer::on_start::APPEND : chucho::file_writer::on_start::TRUNCATE;
+        loc->writer_ = std::make_shared<chucho::file_writer>(fmt->fmt_,
+                                                             file_name,
+                                                             ons,
+                                                             flush == 0 ? false : true);
+        *wrt = loc;
+        chucho_release_formatter(fmt);
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR;
 }
 

@@ -14,31 +14,24 @@
  *    limitations under the License.
  */
 
-#include <chucho/cerr_writer.hpp>
-#include <chucho/cerr_writer.h>
-#include <chucho/c_formatter.hpp>
-#include <chucho/c_writer.hpp>
-#include <chucho/error.h>
+#if !defined(CHUCHO_LEVEL_THRESHOLD_FILTER_H__)
+#define CHUCHO_LEVEL_THRESHOLD_FILTER_H__
 
+#include <chucho/filter.h>
+#include <chucho/level.h>
+
+#if defined(__cplusplus)
 extern "C"
 {
+#endif
 
-int chucho_create_cerr_writer(chucho_writer** wrt, chucho_formatter* fmt)
-{
-    if (wrt == nullptr || fmt == nullptr)
-        return CHUCHO_NULL_POINTER;
-    try
-    {
-        *wrt = new chucho_writer();
-        (*wrt)->writer_ = std::make_shared<chucho::cerr_writer>(fmt->fmt_);
-    }
-    catch (...) 
-    {
-        delete *wrt;
-        return CHUCHO_OUT_OF_MEMORY;
-    }
-    chucho_release_formatter(fmt);
-    return CHUCHO_NO_ERROR;
-}
+CHUCHO_EXPORT int chucho_create_level_threshold_filter(chucho_filter** flt,
+                                                       const chucho_level* lvl);
 
+CHUCHO_EXPORT int chucho_ltflt_get_level(const chucho_filter* flt, const chucho_level** lvl);
+
+#if defined(__cplusplus)
 }
+#endif
+
+#endif

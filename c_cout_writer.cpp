@@ -27,11 +27,17 @@ int chucho_create_cout_writer(chucho_writer** wrt, chucho_formatter* fmt)
 {
     if (wrt == nullptr || fmt == nullptr)
         return CHUCHO_NULL_POINTER;
-    *wrt = new chucho_writer();
-    (*wrt)->writer_ = std::make_shared<chucho::cout_writer>(fmt->fmt_);
-    chucho_release_formatter(fmt);
+    try
+    {
+        *wrt = new chucho_writer();
+        (*wrt)->writer_ = std::make_shared<chucho::cout_writer>(fmt->fmt_);
+        chucho_release_formatter(fmt);
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR;
 }
 
 }
-

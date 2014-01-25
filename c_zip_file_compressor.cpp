@@ -26,8 +26,15 @@ int chucho_create_zip_file_compressor(chucho_file_compressor** cmp, unsigned min
 {
     if (cmp == nullptr)
         return CHUCHO_NULL_POINTER;
-    *cmp = new chucho_file_compressor();
-    (*cmp)->compressor_ = std::make_shared<chucho::zip_file_compressor>(min_index);
+    try
+    {
+        *cmp = new chucho_file_compressor();
+        (*cmp)->compressor_ = std::make_shared<chucho::zip_file_compressor>(min_index);
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR;
 }
 

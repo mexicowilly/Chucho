@@ -127,9 +127,15 @@ ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
                configuration_test.h
                diagnostic_context_test.c
                diagnostic_context_test.h
+               duplicate_message_filter_test.c
+               duplicate_message_filter_test.h
                file_writer_test.c
                file_writer_test.h
                harness.c
+               level_filter_test.c
+               level_filter_test.h
+               level_threshold_filter_test.c
+               level_threshold_filter_test.h
                log_macro_test.c
                log_macro_test.h
                test_util.c

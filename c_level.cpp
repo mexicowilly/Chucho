@@ -109,7 +109,7 @@ int chucho_get_level(const chucho_level** lvl, const char* const name)
             return CHUCHO_NO_SUCH_LEVEL;
         *lvl = found->second.get();
     }
-    catch (std::bad_alloc&) 
+    catch (...)
     {
         return CHUCHO_OUT_OF_MEMORY;
     }

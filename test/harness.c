@@ -27,6 +27,9 @@
 #include "cerr_writer_test.h"
 #include "cout_writer_test.h"
 #include "diagnostic_context_test.h"
+#include "duplicate_message_filter_test.h"
+#include "level_filter_test.h"
+#include "level_threshold_filter_test.h"
 
 sput_struct __sput;
 
@@ -44,6 +47,9 @@ int main()
     run_cerr_writer_test();
     run_cout_writer_test();
     run_diagnostic_context_test();
+    run_duplicate_message_filter_test();
+    run_level_filter_test();
+    run_level_threshold_filter_test();
     sput_finish_testing();
     chucho_finalize();
     return sput_get_return_value();

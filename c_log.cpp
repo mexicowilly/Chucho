@@ -35,7 +35,8 @@ chucho::optional<std::string> format_message(const char* const fmt, va_list args
     {
         chars.resize(rc + 1);
         rc = std::vsnprintf(&chars[0], chars.size(), fmt, args);
-        return chucho::optional<std::string>();
+        if (rc < 0) 
+            return chucho::optional<std::string>();
     }
     else if (rc < 0) 
     {
@@ -81,7 +82,7 @@ int chucho_log(const chucho_level* lvl,
             }
         }
     }
-    catch (std::bad_alloc&) 
+    catch (...)
     {
         return CHUCHO_OUT_OF_MEMORY;
     }
@@ -122,7 +123,7 @@ int chucho_log_mark(const chucho_level* lvl,
             }
         }
     }
-    catch (std::bad_alloc&) 
+    catch (...)
     {
         return CHUCHO_OUT_OF_MEMORY;
     }

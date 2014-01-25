@@ -27,28 +27,6 @@
 #include <chucho/zip_file_compressor.h>
 #endif
 
-static const char* create_file()
-{
-    FILE* f = fopen("file_compressor_test_file", "w");
-    if (f == NULL) 
-        return NULL;
-    char* chars = malloc(1024 * 100);
-    memset(chars, 'W', 1024 * 100);
-    fwrite(chars, 1, 1024 * 100, f);
-    free(chars);
-    fclose(f);
-    return "file_compressor_test_file";
-}
-
-static void remove_file(const char* name, const char* ext)
-{
-    char* cmp = malloc(strlen(name) + strlen(ext) + 1);
-    strcpy(cmp, name);
-    strcat(cmp, ext);
-    sput_fail_unless(remove(cmp) == 0, "remove compressed file");
-    free(cmp);
-}
-
 #if defined(CHUCHO_HAVE_ZLIB)
 static void gzip_compressor_test(void)
 {
@@ -63,10 +41,6 @@ static void gzip_compressor_test(void)
     rc = chucho_cmp_get_min_index(cmp, &idx);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get min index");
     sput_fail_unless(idx == 3, "min index is 3");
-    const char* fn = create_file();
-    rc = chucho_cmp_compress(cmp, fn);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "compress file");
-    remove_file(fn, ext);
     rc = chucho_release_file_compressor(cmp);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "release compressor");
 }
@@ -86,10 +60,6 @@ static void bzip2_compressor_test(void)
     rc = chucho_cmp_get_min_index(cmp, &idx);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get min index");
     sput_fail_unless(idx == 4, "min index is 4");
-    const char* fn = create_file();
-    rc = chucho_cmp_compress(cmp, fn);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "compress file");
-    remove_file(fn, ext);
     rc = chucho_release_file_compressor(cmp);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "release compressor");
 }
@@ -109,10 +79,6 @@ static void zip_compressor_test(void)
     rc = chucho_cmp_get_min_index(cmp, &idx);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get min index");
     sput_fail_unless(idx == 5, "min index is 5");
-    const char* fn = create_file();
-    rc = chucho_cmp_compress(cmp, fn);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "compress file");
-    remove_file(fn, ext);
     rc = chucho_release_file_compressor(cmp);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "release compressor");
 }

@@ -37,7 +37,7 @@ int chucho_create_pattern_formatter(chucho_formatter** fmt, const char* const pa
         delete loc;
         return CHUCHO_INVALID_PATTERN;
     }
-    catch (std::bad_alloc&) 
+    catch (...)
     {
         delete loc;
         return CHUCHO_OUT_OF_MEMORY;

@@ -16,6 +16,8 @@
 
 #include <chucho/writer.h>
 #include <chucho/c_writer.hpp>
+#include <chucho/c_filter.hpp>
+#include <chucho/c_formatter.hpp>
 #include <chucho/error.h>
 
 extern "C"
@@ -24,6 +26,73 @@ extern "C"
 int chucho_release_writer(chucho_writer* wrt)
 {
     delete wrt;
+    return CHUCHO_NO_ERROR;
+}
+
+int chucho_wrt_add_filter(chucho_writer* wrt, chucho_filter* flt)
+{
+    if (wrt == nullptr || flt == nullptr) 
+        return CHUCHO_NULL_POINTER;
+    try
+    {
+        wrt->writer_->add_filter(flt->flt_);
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
+    return chucho_release_filter(flt);
+}
+
+int chucho_wrt_clear_filters(chucho_writer* wrt)
+{
+    if (wrt == nullptr)
+        return CHUCHO_NULL_POINTER; 
+    wrt->writer_->clear_filters();
+    return CHUCHO_NO_ERROR;
+}
+
+int chucho_wrt_get_filters(const chucho_writer* wrt, chucho_filter*** flts)
+{
+    if (wrt == nullptr || flts == nullptr) 
+        return CHUCHO_NULL_POINTER;
+    chucho_filter** loc = nullptr;
+    int i = 0;
+    try
+    {
+        auto cpp = wrt->writer_->get_filters();
+        loc = new chucho_filter*[cpp.size() + 1];
+        std::memset(loc, 0, sizeof(chucho_filter*) * (cpp.size() + 1));
+        for ( ; i < cpp.size(); i++) 
+        {
+            loc[i] = new chucho_filter();
+            loc[i]->flt_ = cpp[i];
+        }
+    }
+    catch (...) 
+    {
+        while (i > 0) 
+            delete loc[i--];
+        delete [] loc;
+        return CHUCHO_OUT_OF_MEMORY;
+    }
+    *flts = loc;
+    return CHUCHO_NO_ERROR;
+}
+
+int chucho_wrt_get_formatter(const chucho_writer* wrt, chucho_formatter** fmt)
+{
+    if (wrt == nullptr || fmt == nullptr) 
+        return CHUCHO_NULL_POINTER;
+    try
+    {
+        *fmt = new chucho_formatter();
+        (*fmt)->fmt_ = wrt->writer_->get_formatter();
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR;
 }
 

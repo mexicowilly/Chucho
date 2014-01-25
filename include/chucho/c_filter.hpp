@@ -14,31 +14,19 @@
  *    limitations under the License.
  */
 
-#include <chucho/cerr_writer.hpp>
-#include <chucho/cerr_writer.h>
-#include <chucho/c_formatter.hpp>
-#include <chucho/c_writer.hpp>
-#include <chucho/error.h>
+#if !defined(CHUCHO_C_FILTER_HPP__)
+#define CHUCHO_C_FILTER_HPP__
+
+#include <chucho/filter.hpp>
 
 extern "C"
 {
 
-int chucho_create_cerr_writer(chucho_writer** wrt, chucho_formatter* fmt)
+struct chucho_filter
 {
-    if (wrt == nullptr || fmt == nullptr)
-        return CHUCHO_NULL_POINTER;
-    try
-    {
-        *wrt = new chucho_writer();
-        (*wrt)->writer_ = std::make_shared<chucho::cerr_writer>(fmt->fmt_);
-    }
-    catch (...) 
-    {
-        delete *wrt;
-        return CHUCHO_OUT_OF_MEMORY;
-    }
-    chucho_release_formatter(fmt);
-    return CHUCHO_NO_ERROR;
-}
+    std::shared_ptr<chucho::filter> flt_;
+};
 
 }
+
+#endif

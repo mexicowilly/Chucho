@@ -95,13 +95,17 @@ IF(C_API)
         include/chucho/cout_writer.h
         include/chucho/configuration.h
         include/chucho/diagnostic_context.h
+        include/chucho/duplicate_message_filter.h
         include/chucho/error.h
         "${CMAKE_BINARY_DIR}/chucho/export.h"
         include/chucho/file_compressor.h
         include/chucho/file_writer.h
+        include/chucho/filter.h
         include/chucho/finalize.h
         include/chucho/formatter.h
         include/chucho/level.h
+        include/chucho/level_filter.h
+        include/chucho/level_threshold_filter.h
         include/chucho/log.h
         include/chucho/logger.h
         include/chucho/pattern_formatter.h
@@ -267,17 +271,22 @@ IF(C_API)
         c_cout_writer.cpp
         c_configuration.cpp
         c_diagnostic_context.cpp
+        c_duplicate_message_filter.cpp
         c_file_compressor.cpp
         c_file_writer.cpp
+        c_filter.cpp
         c_finalize.cpp
         c_formatter.cpp
         c_level.cpp
+        c_level_filter.cpp
+        c_level_threshold_filter.cpp
         c_log.cpp
         c_logger.cpp
         c_pattern_formatter.cpp
         c_util.cpp
         c_writer.cpp
         include/chucho/c_file_compressor.hpp
+        include/chucho/c_filter.hpp
         include/chucho/c_formatter.hpp
         include/chucho/c_level.hpp
         include/chucho/c_logger.hpp

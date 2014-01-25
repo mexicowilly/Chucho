@@ -27,21 +27,6 @@ int chucho_release_file_compressor(chucho_file_compressor* cmp)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_cmp_compress(chucho_file_compressor* cmp, const char* const file_name)
-{
-    if (cmp == nullptr)
-        return CHUCHO_NULL_POINTER;
-    try
-    {
-        cmp->compressor_->compress(file_name);
-    }
-    catch (...) 
-    {
-        return CHUCHO_COMPRESSION_FAILURE;
-    }
-    return CHUCHO_NO_ERROR;
-}
-
 int chucho_cmp_get_extension(const chucho_file_compressor* cmp, const char** ext)
 {
     if (cmp == nullptr || ext == nullptr)

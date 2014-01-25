@@ -14,26 +14,25 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_WRITER_H__)
-#define CHUCHO_WRITER_H__
+#if !defined(CHUCHO_LEVEL_FILTER_H__)
+#define CHUCHO_LEVEL_FILTER_H__
 
-#include <chucho/export.h>
 #include <chucho/filter.h>
-#include <chucho/formatter.h>
+#include <chucho/level.h>
 
 #if defined(__cplusplus)
 extern "C"
 {
 #endif
 
-typedef struct chucho_writer chucho_writer;
+CHUCHO_EXPORT int chucho_create_level_filter(chucho_filter** flt,
+                                             const chucho_level* lvl,
+                                             chucho_filter_result on_match,
+                                             chucho_filter_result on_mismatch);
 
-CHUCHO_EXPORT int chucho_release_writer(chucho_writer* wrt);
-
-CHUCHO_EXPORT int chucho_wrt_add_filter(chucho_writer* wrt, chucho_filter* flt);
-CHUCHO_EXPORT int chucho_wrt_clear_filters(chucho_writer* wrt);
-CHUCHO_EXPORT int chucho_wrt_get_filters(const chucho_writer* wrt, chucho_filter*** flts);
-CHUCHO_EXPORT int chucho_wrt_get_formatter(const chucho_writer* wrt, chucho_formatter** fmt);
+CHUCHO_EXPORT int chucho_lflt_get_level(const chucho_filter* flt, const chucho_level** lvl);
+CHUCHO_EXPORT int chucho_lflt_get_on_match(const chucho_filter* flt, chucho_filter_result* res);
+CHUCHO_EXPORT int chucho_lflt_get_on_mismatch(const chucho_filter* flt, chucho_filter_result* res);
 
 #if defined(__cplusplus)
 }

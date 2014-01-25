@@ -30,19 +30,26 @@ int chucho_get_logger(chucho_logger** lgr, const char* const name)
     {
         *lgr = new chucho_logger();
         (*lgr)->logger_ = chucho::logger::get(name);
-        return CHUCHO_NO_ERROR;
     }
-    catch (std::bad_alloc&) 
+    catch (...)
     {
         return CHUCHO_OUT_OF_MEMORY;
     }
+    return CHUCHO_NO_ERROR;
 }
 
 int chucho_lgr_add_writer(chucho_logger* lgr, chucho_writer* wrt)
 {
     if (lgr == nullptr || wrt == nullptr)
         return CHUCHO_NULL_POINTER; 
-    lgr->logger_->add_writer(wrt->writer_);
+    try
+    {
+        lgr->logger_->add_writer(wrt->writer_);
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return chucho_release_writer(wrt);
 }
 
@@ -72,18 +79,25 @@ int chucho_lgr_get_writers(const chucho_logger* lgr, chucho_writer** buf, size_t
 {
     if (lgr == nullptr || count == nullptr)
         return CHUCHO_NULL_POINTER;
-    auto wrts = lgr->logger_->get_writers();
-    *count = wrts.size();
-    if (buf_size < wrts.size())
-        return CHUCHO_INSUFFICIENT_BUFFER;
-    if (buf == nullptr)
-        return CHUCHO_NULL_POINTER; 
-    unsigned idx = 0;
-    for (auto wrt : wrts) 
+    try
     {
-        buf[idx] = new chucho_writer();
-        buf[idx]->writer_ = wrt;
-        idx++;
+        auto wrts = lgr->logger_->get_writers();
+        *count = wrts.size();
+        if (buf_size < wrts.size())
+            return CHUCHO_INSUFFICIENT_BUFFER;
+        if (buf == nullptr)
+            return CHUCHO_NULL_POINTER; 
+        unsigned idx = 0;
+        for (auto wrt : wrts) 
+        {
+            buf[idx] = new chucho_writer();
+            buf[idx]->writer_ = wrt;
+            idx++;
+        }
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
     }
     return CHUCHO_NO_ERROR;
 }

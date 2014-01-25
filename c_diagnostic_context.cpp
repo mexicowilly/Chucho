@@ -90,23 +90,51 @@ int chucho_dgc_release_nodes(chucho_dgc_node** arr)
 
 const char* chucho_dgc_at(const char* const key)
 {
-    return chucho::diagnostic_context::at(key).c_str();
+    try
+    {
+        return chucho::diagnostic_context::at(key).c_str();
+    }
+    catch (...) 
+    {
+        return NULL;
+    }
 }
 
 int chucho_dgc_clear(void)
 {
-    chucho::diagnostic_context::clear();
+    try
+    {
+        chucho::diagnostic_context::clear();
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR;
 }
 
 int chucho_dgc_empty(void)
 {
-    return chucho::diagnostic_context::empty() ? 1 : 0;
+    try
+    {
+        return chucho::diagnostic_context::empty() ? 1 : 0;
+    }
+    catch (...) 
+    {
+        return 1;
+    }
 }
 
 int chucho_dgc_erase(const char* const key)
 {
-    chucho::diagnostic_context::erase(key);
+    try
+    {
+        chucho::diagnostic_context::erase(key);
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR;
 }
 
@@ -114,26 +142,33 @@ int chucho_dgc_get(chucho_dgc_node*** nodes)
 {
     if (nodes == nullptr)
         return CHUCHO_NULL_POINTER; 
-    auto cpp = chucho::diagnostic_context::get();
     chucho_dgc_node** loc;
-    int rc = create_nodes(&loc, cpp.size());
-    if (rc != CHUCHO_NO_ERROR) 
-        return rc;
-    int i = 0;
-    for (auto kv : cpp) 
+    try
     {
-        int rc = create_node(&loc[i],
-                             kv.first.c_str(),
-                             kv.second.c_str());
+        auto cpp = chucho::diagnostic_context::get();
+        int rc = create_nodes(&loc, cpp.size());
         if (rc != CHUCHO_NO_ERROR) 
+            return rc;
+        int i = 0;
+        for (auto kv : cpp) 
         {
-            while (--i >= 0) 
-                release_node((*nodes)[i]);
-            // Don't use chucho_dgc_release_nodes here
-            delete [] loc;
-            return CHUCHO_OUT_OF_MEMORY;
+            int rc = create_node(&loc[i],
+                                 kv.first.c_str(),
+                                 kv.second.c_str());
+            if (rc != CHUCHO_NO_ERROR) 
+            {
+                while (--i >= 0) 
+                    release_node((*nodes)[i]);
+                // Don't use chucho_dgc_release_nodes here
+                delete [] loc;
+                return CHUCHO_OUT_OF_MEMORY;
+            }
+            i++;
         }
-        i++;
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
     }
     *nodes = loc;
     return CHUCHO_NO_ERROR;
@@ -156,15 +191,22 @@ int chucho_dgc_set(const char* const key, const char* const value)
 
 int chucho_dgc_set_all(chucho_dgc_node** nodes)
 {
-    size_t i = 0;
-    std::map<std::string, std::string> ctx;
-    while (nodes[i] != nullptr) 
+    try
     {
-        ctx[nodes[i]->key] = nodes[i]->value;
-        i++;
+        std::map<std::string, std::string> ctx;
+        size_t i = 0;
+        while (nodes[i] != nullptr) 
+        {
+            ctx[nodes[i]->key] = nodes[i]->value;
+            i++;
+        }
+        chucho_dgc_release_nodes(nodes);
+        chucho::diagnostic_context::set(ctx);
     }
-    chucho_dgc_release_nodes(nodes);
-    chucho::diagnostic_context::set(ctx);
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
     return CHUCHO_NO_ERROR;
 }
 
