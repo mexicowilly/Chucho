@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -91,6 +91,18 @@ public:
     * calling this method. 
     */
     static void remove_unused_loggers();
+    /**
+     * Turn the name of a type into a logger name. If your type is 
+     * @c one::two::go, then the logger name returned will be @c 
+     * one.two.go.
+     *  
+     * This method is used internally in the @ref loggable class. 
+     * You may or may not find it useful. 
+     * 
+     * @param info the type information
+     * @return the logger name for the given type
+     */
+    static std::string type_to_logger_name(const std::type_info& info);
 
    /**
     * Add a writer. This writer will be written in subsequent event 

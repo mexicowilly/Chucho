@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -35,7 +35,8 @@ syslog_writer::syslog_writer(std::shared_ptr<formatter> fmt,
     : writer(fmt),
       transport_(host, port),
       facility_(fcl),
-      host_name_(host)
+      host_name_(host),
+      port_(port)
 {
     set_status_origin("syslog_writer");
 }

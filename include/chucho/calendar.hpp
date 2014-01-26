@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #error "This header is private"
 #endif
 
+#include <chucho/prefix.hpp>
 #include <chucho/export.hpp>
 #include <ctime>
 #include <string>
@@ -31,13 +32,25 @@ namespace chucho
 namespace calendar
 {
 
-CHUCHO_EXPORT std::string format(const struct std::tm& cal,
-                                 const std::string& pattern);
-CHUCHO_EXPORT struct std::tm get_local(std::time_t t);
-CHUCHO_EXPORT struct std::tm get_utc(std::time_t t);
+struct CHUCHO_PRIV_EXPORT pieces : std::tm
+{
+    pieces();
+    pieces(const struct std::tm& t);
+
+    pieces& operator= (const struct std::tm& t);
+
+    bool is_utc;
+};
+
+CHUCHO_PRIV_EXPORT std::string format(const pieces& cal,
+                                      const std::string& pattern);
+CHUCHO_PRIV_EXPORT pieces get_local(std::time_t t);
+CHUCHO_PRIV_EXPORT pieces get_utc(std::time_t t);
 
 }
 
 }
+
+#include <chucho/suffix.hpp>
 
 #endif

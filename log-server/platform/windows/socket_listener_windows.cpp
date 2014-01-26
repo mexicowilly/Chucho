@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,10 +28,13 @@ namespace chucho
 namespace server
 {
 
+struct socket_listener_handle
+{
+};
+
 socket_listener::socket_listener(std::uint16_t port)
     : socket_(INVALID_SOCKET),
-      logger_(chucho::logger::get("chuchod.socket_listener")),
-      stop_(false)
+      logger_(chucho::logger::get("chuchod.socket_listener"))
 {
     struct addrinfo hints;
     std::memset(&hints, 0, sizeof(hints));

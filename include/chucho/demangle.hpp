@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #error "This header is private"
 #endif
 
+#include <chucho/export.hpp>
 #include <string>
 
 namespace chucho
@@ -29,7 +30,7 @@ namespace chucho
 namespace demangle
 {
 
-std::string get_demangled_name(const std::type_info& info);
+CHUCHO_NO_EXPORT std::string get_demangled_name(const std::type_info& info);
 
 }
 

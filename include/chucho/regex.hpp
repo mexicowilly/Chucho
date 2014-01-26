@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #error "This header is private"
 #endif
 
+#include <chucho/prefix.hpp>
 #include <chucho/export.hpp>
 #include <chucho/non_copyable.hpp>
 #include <memory>
@@ -28,23 +29,23 @@
 #include <iterator>
 #include <vector>
 
-struct TRex;
-
 namespace chucho
 {
 
 namespace regex
 {
 
-struct CHUCHO_EXPORT expression : non_copyable
+struct expression_impl;
+
+struct CHUCHO_PRIV_EXPORT expression : non_copyable
 {
     expression(const std::string& re);
     ~expression();
 
-    TRex* trex_;
+    expression_impl* pimpl_;
 };
 
-class CHUCHO_EXPORT sub_match
+class CHUCHO_PRIV_EXPORT sub_match
 {
 public:
     sub_match(int begin, std::size_t length);
@@ -57,7 +58,7 @@ private:
     std::size_t length_;
 };
 
-class CHUCHO_EXPORT match
+class CHUCHO_PRIV_EXPORT match
 {
 public:
     const sub_match& operator[] (unsigned idx) const;
@@ -65,17 +66,23 @@ public:
 
 protected:
     friend class iterator;
+    friend CHUCHO_PRIV_EXPORT bool search(const std::string& text, expression& re, match& mch);
 
 private:
     std::vector<sub_match> subs_;
 };
 
-class CHUCHO_EXPORT iterator : public std::iterator<std::forward_iterator_tag, match>
+struct iterator_impl;
+
+class CHUCHO_PRIV_EXPORT iterator : public std::iterator<std::forward_iterator_tag, match>
 {
 public:
     iterator();
     iterator(const std::string& text, expression& re);
+    iterator(const iterator& it);
+    ~iterator();
 
+    iterator& operator= (const iterator& it);
     bool operator== (const iterator& it) const;
     bool operator!= (const iterator& it) const;
     iterator& operator++ ();
@@ -83,14 +90,14 @@ public:
     reference operator* ();
 
 private:
-    expression* re_;
     std::string text_;
-    std::size_t offset_;
     match match_;
+    iterator_impl* pimpl_;
 };
 
-CHUCHO_EXPORT std::string replace(const std::string& text, expression& re, const std::string& rep);
-CHUCHO_EXPORT bool search(const std::string& text, expression& re);
+CHUCHO_PRIV_EXPORT std::string replace(const std::string& text, expression& re, const std::string& rep);
+CHUCHO_PRIV_EXPORT bool search(const std::string& text, expression& re);
+CHUCHO_PRIV_EXPORT bool search(const std::string& text, expression& re, match& mch);
 
 inline sub_match::sub_match(int begin, std::size_t length)
     : begin_(begin),
@@ -138,5 +145,7 @@ inline iterator::reference iterator::operator* ()
 }
 
 }
+
+#include <chucho/suffix.hpp>
 
 #endif

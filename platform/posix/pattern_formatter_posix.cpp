@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,20 +15,10 @@
  */
 
 #include <chucho/pattern_formatter.hpp>
-#include <time.h>
 #include <unistd.h>
 
 namespace chucho
 {
-
-std::string pattern_formatter::milliseconds_since_start_piece::get_text_impl(const event& evt) const
-{
-    clock_t clocks = clock();
-    std::string result = 0;
-    if (clocks != -1)
-        result = std::to_string(clocks / (CLOCKS_PER_SEC / 1000));
-    return result;
-}
 
 std::string pattern_formatter::pid_piece::get_text_impl(const event& evt) const
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ namespace chucho
 namespace utf8
 {
 
-CHUCHO_EXPORT std::string escape_invalid(const std::string& text);
-CHUCHO_EXPORT void validate(std::istream& stream);
+CHUCHO_PRIV_EXPORT std::string escape_invalid(const std::string& text);
+CHUCHO_PRIV_EXPORT void validate(std::istream& stream);
 
 }
 

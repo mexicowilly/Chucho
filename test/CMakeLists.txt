@@ -1,5 +1,5 @@
 #
-# Copyright 2013 Will Mason
+# Copyright 2013-2014 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,13 +14,20 @@
 #    limitations under the License.
 #
 
-ADD_DEFINITIONS(-DGTEST_HAS_TR1_TUPLE=0)
+IF(MSVC)
+    ADD_DEFINITIONS(-D_VARIADIC_MAX=10)
+ENDIF()
+
 IF(CHUCHO_POSIX)
     ADD_DEFINITIONS(-DCHUCHO_POSIX)
 ELSEIF(CHUCHO_WINDOWS)
     ADD_DEFINITIONS(-DCHUCHO_WINDOWS)
 ENDIF()
 INCLUDE_DIRECTORIES("${CHUCHO_EXTERNAL_PREFIX}/include")
+
+IF(CHUCHO_SOLARIS)
+    ADD_DEFINITIONS(-DCHUCHO_SOLARIS)
+ENDIF()
 
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_TEST_COMPRESSION_SOURCES gzip_file_compressor_test.cpp)
@@ -37,8 +44,25 @@ IF(CHUCHO_HAVE_MINIZIP)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_MINIZIP)
 ENDIF()
 
+IF(YAML_CONFIG)
+    SET(CHUCHO_CONFIGURATOR_TESTS yaml_configurator_test.cpp utf8_test.cpp)
+ENDIF()
+
+IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
+    LIST(APPEND CHUCHO_CONFIGURATOR_TESTS properties_test.cpp)
+    IF(CONFIG_FILE_CONFIG)
+        LIST(APPEND CHUCHO_CONFIGURATOR_TESTS chucho_config_file_configurator_test.cpp)
+    ENDIF()
+    IF(LOG4CPLUS_CONFIG)
+        LIST(APPEND CHUCHO_CONFIGURATOR_TESTS log4cplus_config_file_configurator_test.cpp)
+    ENDIF()
+ENDIF()
+
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
+               calendar_test.cpp
+               configurator_test.cpp
+               configurator_test.hpp
                diagnostic_context_test.cpp
                duplicate_message_filter_test.cpp
                file_test.cpp
@@ -47,8 +71,9 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                level_test.cpp
                level_filter_test.cpp
                level_threshold_filter_test.cpp
-               logger_test.cpp
                log_macro_test.cpp
+               loggable_test.cpp
+               logger_test.cpp
                marker_test.cpp
                multithread_test.cpp
                optional_test.cpp
@@ -57,8 +82,8 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                rolling_file_writer_test.cpp
                size_file_roll_trigger_test.cpp
                utf8_test.cpp
-               yaml_configurator_test.cpp
-               ${CHUCHO_TEST_COMPRESSION_SOURCES})
+               ${CHUCHO_TEST_COMPRESSION_SOURCES}
+               ${CHUCHO_CONFIGURATOR_TESTS})
 TARGET_LINK_LIBRARIES(unit-test chucho gtest ${CHUCHO_THREAD_LIB})
 IF(CHUCHO_SOLARIS)
     TARGET_LINK_LIBRARIES(unit-test socket nsl)
@@ -97,5 +122,20 @@ IF(CHUCHO_SOLARIS)
     TARGET_LINK_LIBRARIES(remote-writer-test socket nsl)
 ENDIF()
 
+IF(CHUCHO_WINDOWS)
+    ADD_EXECUTABLE(windows-event-log-writer-test EXCLUDE_FROM_ALL
+                   harness.cpp
+                   windows_event_log_writer_test.cpp)
+    FILE(TO_NATIVE_PATH "${CMAKE_BINARY_DIR}" CHUCHO_EVENT_LOG_DLL)
+    SET(CHUCHO_EVENT_LOG_DLL "${CHUCHO_EVENT_LOG_DLL}\\event_log.dll")
+    STRING(REPLACE "\\" "\\\\" CHUCHO_EVENT_LOG_DLL "${CHUCHO_EVENT_LOG_DLL}")
+    SET_SOURCE_FILES_PROPERTIES(windows_event_log_writer_test PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_EVENT_LOG_DLL="${CHUCHO_EVENT_LOG_DLL}")
+    TARGET_LINK_LIBRARIES(windows-event-log-writer-test chucho gtest ${CHUCHO_THREAD_LIB})
+ENDIF()
+
+ADD_CUSTOM_TARGET(check-config
+                  COMMAND "${CMAKE_COMMAND}" "-DCHUCHO_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P "${CMAKE_CURRENT_SOURCE_DIR}/CheckAllConfigs.cmake")
+
 ADD_CUSTOM_TARGET(all-test
-                  DEPENDS unit-test rolling-file-test syslog-writer-test remote-writer-test)
+                  DEPENDS unit-test rolling-file-test syslog-writer-test remote-writer-test windows-event-log-writer-test)

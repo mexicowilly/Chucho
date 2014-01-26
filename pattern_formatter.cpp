@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <chucho/diagnostic_context.hpp>
 #include <chucho/line_ending.hpp>
 #include <chucho/host.hpp>
+#include <chucho/time_util.hpp>
 #include <limits>
 #include <sstream>
 #include <mutex>
@@ -401,7 +402,7 @@ std::string pattern_formatter::date_time_piece::get_text_impl(const event& evt) 
                 pat.replace(p, 2, "");
         }
     }
-    struct std::tm cal;
+    calendar::pieces cal;
     to_calendar(millis.count() / 1000, cal);
     return calendar::format(cal, pat);
 }
@@ -412,7 +413,7 @@ pattern_formatter::utc_date_time_piece::utc_date_time_piece(const std::string& d
 {
 }
 
-void pattern_formatter::utc_date_time_piece::to_calendar(time_t t, struct std::tm& cal) const
+void pattern_formatter::utc_date_time_piece::to_calendar(time_t t, calendar::pieces& cal) const
 {
     cal = calendar::get_utc(t);
 }
@@ -423,7 +424,7 @@ pattern_formatter::local_date_time_piece::local_date_time_piece(const std::strin
 {
 }
 
-void pattern_formatter::local_date_time_piece::to_calendar(time_t t, struct std::tm& cal) const
+void pattern_formatter::local_date_time_piece::to_calendar(time_t t, calendar::pieces& cal) const
 {
     cal = calendar::get_local(t);
 }
@@ -501,6 +502,11 @@ std::string pattern_formatter::level_piece::get_text_impl(const event& evt) cons
 pattern_formatter::milliseconds_since_start_piece::milliseconds_since_start_piece(const format_params& params)
     : piece(params)
 {
+}
+
+std::string pattern_formatter::milliseconds_since_start_piece::get_text_impl(const event& evt) const
+{
+    return std::to_string(time_util::milliseconds_since_start());
 }
 
 pattern_formatter::pid_piece::pid_piece(const format_params& params)

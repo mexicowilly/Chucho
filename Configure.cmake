@@ -1,5 +1,5 @@
 #
-# Copyright 2013 Will Mason
+# Copyright 2013-2014 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -27,9 +27,14 @@ OPTION(ENABLE_SHARED "Whether to build a shared object" FALSE)
 OPTION(ENABLE_FRAMEWORK "Whether to build as a framework on Macintosh" TRUE)
 SET(CHUCHO_NEEDS_TO_USE_THE_FRAMEWORK_VARIABLE_OR_CMAKE_COMPLAINS ${ENABLE_FRAMEWORK})
 
-# whether to install chucod as a service or not on platforms that have
+# whether to install chuchod as a service or not on platforms that have
 # services.
-OPTION(INSTALL_SERVICE "Whether to install chuchod as a system service" TRUE)
+OPTION(INSTALL_SERVICE "Whether to install chuchod as a system service" FALSE)
+
+# what kinds of configurations will we support
+OPTION(YAML_CONFIG "Whether to include the YAML configuration parser" TRUE)
+OPTION(CONFIG_FILE_CONFIG "Whether to include the config file configuration parser that uses Chucho keys" FALSE)
+OPTION(LOG4CPLUS_CONFIG "Whether to support reading log4cplus configuration files" FALSE)
 
 # We'll want this later
 MACRO(CHUCHO_FIND_PROGRAM CHUCHO_FIND_VAR CHUCHO_PROGRAM)
@@ -83,9 +88,9 @@ IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     IF(CHUCHO_VIS_FLAG)
         SET(CHUCHO_CXX_SO_FLAGS -fvisibility=hidden)
     ENDIF()
-	IF(CMAKE_GENERATOR STREQUAL Xcode)
-		SET(CMAKE_EXE_LINKER_FLAGS "-std=c++11 -stdlib=libc++")
-	ENDIF()
+    IF(CMAKE_GENERATOR STREQUAL Xcode)
+        SET(CMAKE_EXE_LINKER_FLAGS "-std=c++11 -stdlib=libc++")
+    ENDIF()
 ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
     IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.7)
         MESSAGE(FATAL_ERROR "g++ version 4.7 or later is required")
@@ -105,7 +110,7 @@ ELSEIF(MSVC)
         MESSAGE(FATAL_ERROR "Microsoft compiler version 17 or later is required (the compiler that ships with Visual Studio 2012)")
     ENDIF()
     IF(ENABLE_SHARED)
-        SET(CMAKE_CXX_FLAGS "/wd4275 /EHsc")
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4275 /EHsc")
     ENDIF()
 ENDIF()
 
@@ -138,7 +143,7 @@ ENDIF()
 
 IF(CHUCHO_POSIX)
     # headers
-    FOREACH(HEAD arpa/inet.h fcntl.h limits.h netdb.h poll.h pthread.h pwd.h signal.h
+    FOREACH(HEAD arpa/inet.h assert.h fcntl.h limits.h netdb.h poll.h pthread.h pwd.h signal.h
                  sys/socket.h sys/stat.h sys/utsname.h syslog.h time.h unistd.h)
         STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
         STRING(REPLACE / _ CHUCHO_HEAD_VAR_NAME ${CHUCHO_HEAD_VAR_NAME})
@@ -153,12 +158,6 @@ IF(CHUCHO_POSIX)
     CHECK_CXX_SYMBOL_EXISTS(uname sys/utsname.h CHUCHO_HAVE_UNAME)
     IF(NOT CHUCHO_HAVE_UNAME)
         MESSAGE(FATAL_ERROR "uname is required")
-    ENDIF()
-
-    # resource usage
-    CHECK_CXX_SYMBOL_EXISTS(clock time.h CHUCHO_HAVE_CLOCK)
-    IF(NOT CHUCHO_HAVE_CLOCK)
-        MESSAGE(FATAL_ERROR "clock is required")
     ENDIF()
 
     # getpid/access/getuid/fork/close/setsid/dup2/chdir/_exit
@@ -304,12 +303,12 @@ IF(CHUCHO_POSIX)
     ENDFOREACH()
 
     # htonl
-    CHECK_CXX_SYMBOL_EXISTS(htonl arpa/inet.h CHUCHO_HAVE_${SYM})
-    IF(NOT CHUCHO_HAVE_${SYM})
+    CHECK_CXX_SYMBOL_EXISTS(htonl arpa/inet.h CHUCHO_HAVE_HTONL)
+    IF(NOT CHUCHO_HAVE_HTONL)
         MESSAGE(FATAL_ERROR "htonl is required")
     ENDIF()
 ELSEIF(CHUCHO_WINDOWS)
-    FOREACH(HEAD windows.h winsock2.h io.h process.h ws2tcpip.h time.h)
+    FOREACH(HEAD windows.h winsock2.h io.h process.h ws2tcpip.h time.h assert.h)
         STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
         STRING(TOUPPER ${CHUCHO_HEAD_VAR_NAME} CHUCHO_HEAD_VAR_NAME)
         CHECK_INCLUDE_FILE_CXX(${HEAD} ${CHUCHO_HEAD_VAR_NAME})
@@ -342,8 +341,107 @@ ENDIF()
 #
 
 # std::put_time
+# We have to check whether it exists and whether it is buggy. put_time
+# on VS2012 is broken when it tries to format time zones. It just crashes.
 CHECK_CXX_SOURCE_COMPILES("#include <iomanip>\nint main() { std::tm t; std::put_time(&t, \\\"%Y\\\"); return 0; }"
-                          CHUCHO_HAVE_PUT_TIME)
+                          CHUCHO_HAVE_PUT_TIME_EXISTENCE)
+IF(CHUCHO_HAVE_PUT_TIME_EXISTENCE)
+    IF(CHUCHO_WINDOWS)
+        SET(CMAKE_REQUIRED_DEFINITIONS -DCHUCHO_WINDOWS)
+    ENDIF()
+    CHECK_CXX_SOURCE_RUNS("
+#include <iomanip>
+#include <iostream>
+#include <time.h>
+int main()
+{
+#if defined(CHUCHO_WINDOWS)
+    __try
+    {
+#endif
+    time_t t = time(nullptr);
+    struct tm* cal = localtime(&t);
+    std::cout << std::put_time(cal, \\\"%z\\\");
+#if defined(CHUCHO_WINDOWS)
+    }
+    __except()
+    {
+    return EXIT_FAILURE;
+    }
+#endif
+    return EXIT_SUCCESS;
+}" CHUCHO_HAVE_PUT_TIME_RUNS)
+    IF(CHUCHO_HAVE_PUT_TIME_RUNS)
+        SET(CHUCHO_HAVE_PUT_TIME TRUE)
+    ENDIF()
+    IF(CHUCHO_WINDOWS)
+        UNSET(CMAKE_REQUIRED_DEFINITIONS)
+    ENDIF()
+ENDIF()
+
+# Regular expressions
+CHECK_INCLUDE_FILE_CXX(regex CHUCHO_HAVE_STD_REGEX_HEADER)
+IF(CHUCHO_HAVE_STD_REGEX_HEADER)
+    # Clang's 4.2.1 std::regex library has a bug where it doesn't match properly
+    # when you make a regex ungreedy by matching against everything but the
+    # start of the regex.
+    CHECK_CXX_SOURCE_RUNS("
+#include <regex>
+#include <fstream>
+#include <iostream>
+int main()
+{
+    std::ofstream out(\"std-regex-result\");
+    std::regex re(\"\\\\\\\\$([Ee][Nn][Vv])?\\\\\\\\{([^{]+)\\\\\\\\}\", std::regex_constants::extended);
+    std::smatch m;
+    std::string s(\"I \\\${HAVE} one and \\\$ENV{it} looks good.\");
+    if (std::regex_search(s, m, re) &&
+        m.size() == 3 &&
+        m.position(0) == 2 &&
+        m.length(0) == 7 &&
+        !m[1].matched &&
+        m.position(2) == 4 &&
+        m.length(2) == 4)
+    {
+        out << \"good\";
+    }
+    else
+    {
+        out << \"buggy\";
+    }
+    return EXIT_SUCCESS;
+}" CHUCHO_HAVE_STD_REGEX_RUNS)
+    IF(CHUCHO_HAVE_STD_REGEX_RUNS)
+        FILE(READ "${CMAKE_BINARY_DIR}/std-regex-result" CHUCHO_STD_REGEX_RESULT)
+        IF(CHUCHO_STD_REGEX_RESULT STREQUAL good)
+            SET(CHUCHO_HAVE_STD_REGEX TRUE)
+        ELSE()
+            MESSAGE(STATUS "Although std::regex is available, it has bugs")
+        ENDIF()
+    ENDIF()
+ENDIF()
+# Do not else this
+IF(CHUCHO_HAVE_STD_REGEX)
+    MESSAGE(STATUS "Using regular expressions - std::regex")
+ELSE()
+    CHECK_INCLUDE_FILE_CXX(regex.h CHUCHO_HAVE_POSIX_REGEX)
+    IF(NOT CHUCHO_HAVE_POSIX_REGEX)
+        MESSAGE(FATAL_ERROR "You must have either std::regex or POSIX regex from the C library")
+    ENDIF()
+    FOREACH(SYM regcomp regerror regexec regfree REG_EXTENDED)
+        CHECK_CXX_SYMBOL_EXISTS(${SYM} regex.h CHUCHO_HAVE_${SYM})
+        IF(NOT CHUCHO_HAVE_${SYM})
+            MESSAGE(FATAL_ERROR "${SYM} is required")
+        ENDIF()
+    ENDFOREACH()
+    MESSAGE(STATUS "Using regular expressions - POSIX")
+ENDIF()
+
+# htonl
+CHECK_CXX_SYMBOL_EXISTS(assert assert.h CHUCHO_HAVE_ASSERT)
+IF(NOT CHUCHO_HAVE_ASSERT)
+    MESSAGE(FATAL_ERROR "assert is required")
+ENDIF()
 
 # doxygen
 FIND_PACKAGE(Doxygen)
@@ -360,6 +458,14 @@ IF(CHUCHO_SOLARIS)
     CHUCHO_FIND_PROGRAM(CHUCHO_SVCADM svcadm)
     IF(NOT CHUCHO_SVCADM)
         MESSAGE(FATAL_ERROR "svcadm is required")
+    ENDIF()
+ENDIF()
+
+# Macintosh launchd stuff
+IF(CHUCHO_MACINTOSH)
+    CHUCHO_FIND_PROGRAM(CHUCHO_LAUNCHCTL launchctl)
+    IF(NOT CHUCHO_LAUNCHCTL)
+        MESSAGE(FATAL_ERROR "launchctl is required")
     ENDIF()
 ENDIF()
 
@@ -383,10 +489,14 @@ ELSE()
     SET(CHUCHO_GTEST_GENERATOR "Unix Makefiles")
 ENDIF()
 
+IF(MSVC)
+    SET(CHUCHO_ADDL_GTEST_CXX_FLAGS "-D_VARIADIC_MAX=10")
+ENDIF()
+
 ExternalProject_Add(gtest-external
-                    URL http://googletest.googlecode.com/files/gtest-1.6.0.zip
-                    URL_MD5 4577b49f2973c90bf9ba69aa8166b786
-                    CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=Debug -Dgtest_force_shared_crt:BOOL=ON "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -DGTEST_HAS_TR1_TUPLE=0"
+                    URL http://googletest.googlecode.com/files/gtest-1.7.0.zip
+                    URL_MD5 2d6ec8ccdf5c46b05ba54a9fd1d130d7
+                    CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} ${CHUCHO_ADDL_GTEST_CXX_FLAGS}" -Dgtest_force_shared_crt:BOOL=ON
                     CMAKE_GENERATOR "${CHUCHO_GTEST_GENERATOR}"
                     INSTALL_COMMAND "")
 ExternalProject_Add_Step(gtest-external

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ namespace chucho
 namespace line_ending
 {
 
-CHUCHO_EXPORT extern const char* EOL;
+extern CHUCHO_PRIV_EXPORT const char* EOL;
 
 }
 

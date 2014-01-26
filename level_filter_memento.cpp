@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,23 +16,35 @@
 
 #include <chucho/level_filter_memento.hpp>
 #include <chucho/exception.hpp>
+#include <chucho/text_util.hpp>
 #include <algorithm>
 
 namespace chucho
 {
 
-level_filter_memento::level_filter_memento(const configurator& cfg)
+level_filter_memento::level_filter_memento(const configurator& cfg, memento_key_set ks)
     : memento(cfg)
 {
     set_status_origin("level_filter_memento");
-    set_handler("level", [this] (const std::string& name) { level_ = level::from_text(name); });
-    set_handler("on_match", [this] (const std::string& name) { on_match_ = text_to_result(name); });
-    set_handler("on_mismatch", [this] (const std::string& name) { on_mismatch_ = text_to_result(name); });
+    handler lvl_hnd = [this] (const std::string& name) { level_ = level::from_text(name); };
+    if (ks == memento_key_set::CHUCHO)
+    {
+        set_handler("level", lvl_hnd);
+        set_handler("on_match", [this] (const std::string& name) { on_match_ = text_to_result(name); });
+        set_handler("on_mismatch", [this] (const std::string& name) { on_mismatch_ = text_to_result(name); });
+    }
+    else if (ks == memento_key_set::LOG4CPLUS)
+    {
+        on_mismatch_ = chucho::filter::result::NEUTRAL;
+        on_match_ = chucho::filter::result::DENY;
+        set_handler("LogLevelToMatch", lvl_hnd);
+        set_handler("AcceptOnMatch", [this] (const std::string& val) { on_match_ = boolean_value(val) ? chucho::filter::result::ACCEPT : chucho::filter::result::DENY; });
+    }
 }
 
 filter::result level_filter_memento::text_to_result(const std::string& text) const
 {
-    std::string low = to_lower(text);
+    std::string low = text_util::to_lower(text);
     if (low == "deny")
         return chucho::filter::result::DENY;
     if (low == "neutral")

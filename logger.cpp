@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
 #include <chucho/configuration.hpp>
 #include <chucho/status_manager.hpp>
 #include <chucho/garbage_cleaner.hpp>
+#include <chucho/time_util.hpp>
+#include <chucho/demangle.hpp>
 #include <map>
 #include <stdexcept>
 #include <atomic>
@@ -174,6 +176,7 @@ std::vector<std::shared_ptr<writer>> logger::get_writers()
 
 void logger::initialize()
 {
+    time_util::start_now();
     static_data& sd(data());
     std::lock_guard<std::recursive_mutex> lg(sd.loggers_guard_);
     // When loggers are created during configuration, this variable
@@ -202,15 +205,30 @@ void logger::remove_unused_loggers()
     static_data& sd(data());
     std::lock_guard<std::recursive_mutex> lg(sd.loggers_guard_);
     auto itor = sd.all_loggers_.begin();
-    while (itor != sd.all_loggers_.end())
+    std::set<std::string> to_erase;
+    for (std::map<std::string, std::shared_ptr<logger>>::iterator itor = sd.all_loggers_.begin();
+         itor != sd.all_loggers_.end();
+         itor++) 
     {
-        // The first condition is checking for root. We never
-        // want to remove root.
-        if (itor->second->parent_ && itor->second.unique())
-            sd.all_loggers_.erase(itor++);
-        else
-            ++itor;
+        // Never erase root
+        if (itor->second->parent_)
+        {
+            // If it's all alone, then this one's gone.
+            if (itor->second.unique())
+                to_erase.insert(itor->first);
+            // If the child is the only logger that holds a
+            // reference to the parent and the parent is not
+            // root, then the parent is gone.
+            // (use_count 2 because 1 is the child and the other is all_loggers_)
+            if (itor->second->parent_.use_count() == 2 &&
+                itor->second->parent_->parent_)
+            {
+                to_erase.insert(itor->second->parent_->get_name());
+            }
+        }
     }
+    for (auto tgt : to_erase) 
+        sd.all_loggers_.erase(tgt);
 }
 
 void logger::remove_writer(std::shared_ptr<writer> wrt)
@@ -239,6 +257,21 @@ void logger::set_writes_to_ancestors(bool val)
 {
     std::lock_guard<std::recursive_mutex> lg(guard_);
     writes_to_ancestors_ = val;
+}
+
+std::string logger::type_to_logger_name(const std::type_info& info)
+{
+    std::string name = demangle::get_demangled_name(info);
+    auto spc = name.find(' ');
+    if (spc != std::string::npos) 
+        name.erase(0, spc + 1);
+    auto found = name.find("::");
+    while (found != std::string::npos)
+    {
+        name.replace(found, 2, 1, '.');
+        found = name.find("::", found + 1);
+    }
+    return name;
 }
 
 void logger::write(const event& evt)

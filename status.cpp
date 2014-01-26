@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -44,21 +44,21 @@ std::ostream& operator<< (std::ostream& stream, const status& st)
         auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(since);
         std::ostringstream fmt_stream;
         fmt_stream << "%H.%M.%S." << (millis.count() % 1000);
-        struct std::tm cal = calendar::get_utc(millis.count() / 1000);
+        calendar::pieces cal = calendar::get_utc(millis.count() / 1000);
         stream << calendar::format(cal, fmt_stream.str());
     }
     else
     {
-        struct std::tm cal = calendar::get_utc(status::clock_type::to_time_t(st.time_));
+        calendar::pieces cal = calendar::get_utc(status::clock_type::to_time_t(st.time_));
         stream << calendar::format(cal, "%H:%M:%S");
 
     }
     stream << ' ';
-    if (st.level_ == status::level::INFO)
+    if (st.level_ == status::level::INFO_)
         stream << "INFO";
-    else if (st.level_ == status::level::WARNING)
+    else if (st.level_ == status::level::WARNING_)
         stream << "WARN";
-    else if (st.level_ == status::level::ERROR)
+    else if (st.level_ == status::level::ERROR_)
         stream << "ERROR";
     if (!st.origin_.empty())
         stream << " [" << st.origin_ << ']';

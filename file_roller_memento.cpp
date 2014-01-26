@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,14 +30,9 @@ void file_roller_memento::handle(std::shared_ptr<configurable> cnf)
 {
     auto comp = std::dynamic_pointer_cast<file_compressor>(cnf);
     if (comp)
-    {
         compressor_ = comp;
-    }
     else
-    {
-        report_error("A file_roller cannot make use of type " +
-            demangle::get_demangled_name(typeid(*cnf)) + ". Only file_compressors can be embedded in the configuration.");
-    }
+        memento::handle(cnf);
 }
 
 }

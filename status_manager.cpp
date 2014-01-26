@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public:
 
 void warn_error_status_observer::status_reported(const chucho::status& st)
 {
-    if (st.get_level() > chucho::status::level::INFO)
+    if (st.get_level() > chucho::status::level::INFO_)
         std::cout << st << std::endl;
 }
 
@@ -73,7 +73,7 @@ namespace chucho
 
 status_manager::status_manager()
     : count_(0),
-      level_(status::level::INFO)
+      level_(status::level::INFO_)
 {
     add(std::make_shared<warn_error_status_observer>());
 }
@@ -113,12 +113,12 @@ void status_manager::add(std::shared_ptr<status_observer> obs)
 void status_manager::adjust_level()
 {
     status::level fixed_max = head_cache_.empty() ?
-        status::level::INFO :
+        status::level::INFO_ :
         (*std::max_element(head_cache_.begin(),
                            head_cache_.end(),
                            level_less())).get_level();
     status::level tailed_max = tail_cache_.empty() ?
-        status::level::INFO :
+        status::level::INFO_ :
         (*std::max_element(tail_cache_.begin(),
                            tail_cache_.end(),
                            level_less())).get_level();
@@ -131,7 +131,7 @@ void status_manager::clear()
     count_ = 0;
     head_cache_.clear();
     tail_cache_.clear();
-    level_ = status::level::INFO;
+    level_ = status::level::INFO_;
 }
 
 std::shared_ptr<status_manager> status_manager::get()

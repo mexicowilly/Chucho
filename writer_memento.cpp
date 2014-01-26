@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -38,14 +38,9 @@ void writer_memento::handle(std::shared_ptr<configurable> cnf)
     {
         auto flt = std::dynamic_pointer_cast<filter>(cnf);
         if (flt)
-        {
             filters_.push_back(flt);
-        }
         else
-        {
-            throw exception("A writer cannot be constructed with a type of " +
-                demangle::get_demangled_name(typeid(*cnf)));
-        }
+            memento::handle(cnf);
     }
 }
 

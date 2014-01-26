@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,11 +20,15 @@
 namespace chucho
 {
 
-level_threshold_filter_memento::level_threshold_filter_memento(const configurator& cfg)
+level_threshold_filter_memento::level_threshold_filter_memento(const configurator& cfg, memento_key_set ks)
     : memento(cfg)
 {
     set_status_origin("level_threshold_filter_memento");
-    set_handler("level", [this] (const std::string& name) { level_ = level::from_text(name); });
+    handler lvl_hnd = [this](const std::string& name) { level_ = level::from_text(name); };
+    if (ks == memento_key_set::CHUCHO)
+        set_handler("level", lvl_hnd);
+    else if (ks == memento_key_set::LOG4CPLUS)
+        set_handler("LogLevelMin", lvl_hnd);
 }
 
 }

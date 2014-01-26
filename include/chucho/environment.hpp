@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ namespace chucho
 namespace environment
 {
 
-optional<std::string> get(const std::string& var);
+CHUCHO_NO_EXPORT optional<std::string> get(const std::string& var);
 
 }
 

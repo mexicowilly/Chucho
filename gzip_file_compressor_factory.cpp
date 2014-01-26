@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,9 @@
 
 #include <chucho/gzip_file_compressor_factory.hpp>
 #include <chucho/file_compressor_memento.hpp>
+#if defined(CHUCHO_HAVE_ZLIB)
 #include <chucho/gzip_file_compressor.hpp>
+#endif
 #include <chucho/noop_file_compressor.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>

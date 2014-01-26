@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -39,16 +39,22 @@ int main(int argc, char* argv[])
         CHUCHO_INFO_STR(lgr, "chuchod has started");
         CHUCHO_INFO(lgr, props);
         if (props.console_mode())
+        {
+            CHUCHO_INFO_STR(lgr, "chuchod is running in console mode");
             lord.run();
+        }
         else
+        {
+            CHUCHO_INFO_STR(lgr, "chuchod is running in daemon mode");
             daemon::possess(std::bind(&suzerain::run, std::ref(lord)));
+        }
         CHUCHO_INFO(lgr, "chuchod is shutting down");
-        chucho::finalize();
     }
     catch (std::exception& e)
     {
         std::cout << "Error starting up: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
+    chucho::finalize();
     return EXIT_SUCCESS;
 }

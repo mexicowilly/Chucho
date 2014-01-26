@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,13 +17,11 @@
 #include <chucho/regex.hpp>
 #include <chucho/regex_exception.hpp>
 #include <limits>
-
-extern "C"
-{
-
-#include "trex.h"
-
-}
+#if defined(CHUCHO_HAVE_STD_REGEX)
+#include <regex>
+#elif defined(CHUCHO_HAVE_POSIX_REGEX)
+#include <regex.h>
+#endif
 
 namespace chucho
 {
@@ -31,103 +29,234 @@ namespace chucho
 namespace regex
 {
 
-expression::expression(const std::string& re)
+struct expression_impl
 {
-    const char* err = nullptr;
-    trex_ = trex_compile(re.c_str(), &err);
-    if (err != nullptr && err[0] != 0)
-        throw chucho::regex_exception(std::string(err));
+#if defined(CHUCHO_HAVE_STD_REGEX)
+    std::regex re_;
+#elif defined(CHUCHO_HAVE_POSIX_REGEX)
+    regex_t re_;
+#endif
+};
+
+expression::expression(const std::string& re)
+    : pimpl_(new expression_impl)
+{
+#if defined(CHUCHO_HAVE_STD_REGEX)
+    pimpl_->re_ = std::regex(re, std::regex_constants::extended);
+#elif defined(CHUCHO_HAVE_POSIX_REGEX)
+    int rc = regcomp(&pimpl_->re_, re.c_str(), REG_EXTENDED);
+    if (rc != 0)
+    {
+        char buf[1024];
+        regerror(rc, &pimpl_->re_, buf, sizeof(buf));
+        throw chucho::regex_exception(buf);
+    }
+#endif
 }
 
 expression::~expression()
 {
-    trex_free(trex_);
+#if defined(CHUCHO_HAVE_POSIX_REGEX)
+    regfree(&pimpl_->re_);
+#endif
+    delete pimpl_;
 }
 
-iterator::iterator()
-    : re_(nullptr),
-      offset_(0)
+struct iterator_impl
 {
+#if defined(CHUCHO_HAVE_STD_REGEX)
+    std::sregex_iterator itor_;
+#elif defined(CHUCHO_HAVE_POSIX_REGEX)
+    expression* re_;
+    std::size_t offset_;
+#endif
+};
+
+iterator::iterator()
+    : pimpl_(new iterator_impl)
+{
+#if defined(CHUCHO_HAVE_POSIX_REGEX)
+    pimpl_->re_ = nullptr;
+    pimpl_->offset_ = 0;
+#endif
 }
 
 iterator::iterator(const std::string& text, expression& re)
-    : re_(&re),
-      text_(text),
-      offset_(0)
+    : text_(text),
+      pimpl_(new iterator_impl)
 {
+#if defined(CHUCHO_HAVE_STD_REGEX)
+      pimpl_->itor_ = std::sregex_iterator(text_.begin(), text_.end(), re.pimpl_->re_);
+      if (pimpl_->itor_ != std::sregex_iterator())
+      {
+          std::smatch mch = *pimpl_->itor_;
+          for (unsigned i = 0; i < mch.size(); i++)
+          {
+              if (mch[i].matched)
+                  match_.subs_.push_back(sub_match(mch.position(i), mch.length(i)));
+              else
+                  match_.subs_.push_back(sub_match(-1, 0));
+          }
+      }
+#elif defined(CHUCHO_HAVE_POSIX_REGEX)
+      pimpl_->re_ = &re;
+      pimpl_->offset_ = 0;
+#endif
+#if !defined(CHUCHO_HAVE_STD_REGEX)
     operator++();
+#endif
+}
+
+iterator::iterator(const iterator& it)
+    : text_(it.text_),
+      match_(it.match_),
+      pimpl_(new iterator_impl(*it.pimpl_))
+{
+}
+
+iterator::~iterator()
+{
+    delete pimpl_;
+}
+
+iterator& iterator::operator= (const iterator& it)
+{
+    if (&it != this)
+    {
+        text_ = it.text_;
+        match_ = it.match_;
+        delete pimpl_;
+        pimpl_ = new iterator_impl(*it.pimpl_);
+    }
+    return *this;
 }
 
 bool iterator::operator== (const iterator& it) const
 {
-    if (!re_ && !it.re_)
+#if defined(CHUCHO_HAVE_STD_REGEX)
+    return pimpl_->itor_ == it.pimpl_->itor_;
+#elif defined(CHUCHO_HAVE_POSIX_REGEX)
+    if (!pimpl_->re_ && !it.pimpl_->re_)
         return true;
-    if (!re_)
-        return it.offset_ == std::numeric_limits<std::size_t>::max();
-    if (!it.re_)
-        return offset_ == std::numeric_limits<std::size_t>::max();
-    return re_ == it.re_ &&
+    if (pimpl_->re_ == nullptr)
+        return it.pimpl_->offset_ == std::numeric_limits<std::size_t>::max();
+    if (it.pimpl_->re_ == nullptr)
+        return pimpl_->offset_ == std::numeric_limits<std::size_t>::max();
+    return pimpl_->re_ == it.pimpl_->re_ &&
            text_ == it.text_ &&
-           offset_ == it.offset_;
+           pimpl_->offset_ == it.pimpl_->offset_;
+#endif
 }
 
 iterator& iterator::operator++ ()
 {
-    if (re_ && offset_ < text_.length())
+    match_.subs_.clear();
+#if defined(CHUCHO_HAVE_STD_REGEX)
+    std::sregex_iterator end;
+    if (pimpl_->itor_ != end && ++pimpl_->itor_ != end)
     {
-        match_.subs_.clear();
-        const char* found;
-        const char* end;
-        const char* cur = text_.c_str() + offset_;
-        if (trex_search(re_->trex_, cur, &found, &end))
+        std::smatch mch = *pimpl_->itor_;
+        for (unsigned i = 0; i < mch.size(); i++)
         {
-            TRexMatch m;
-            for (int i = 0; i < trex_getsubexpcount(re_->trex_); i++)
+        if (mch[i].matched)
+            match_.subs_.push_back(sub_match(mch.position(i), mch.length(i)));
+        else
+            match_.subs_.push_back(sub_match(-1, 0));
+        }
+    }
+#elif defined(CHUCHO_HAVE_POSIX_REGEX)
+    if (pimpl_->re_ && pimpl_->offset_ < text_.length())
+    {
+        regex_t& re(pimpl_->re_->pimpl_->re_);
+        auto sub_count = re.re_nsub + 1;
+        regmatch_t pmatch[sub_count];
+        const char* cur = text_.c_str() + pimpl_->offset_;
+        int rc = regexec(&re, cur, sub_count, pmatch, 0);
+        if (rc == 0)
+        {
+            for (int i = 0; i < sub_count; i++)
             {
-                if (trex_getsubexp(re_->trex_, i, &m))
-                {
-                    if (m.len == 0)
-                        match_.subs_.push_back(sub_match(-1, 0));
-                    else
-                        match_.subs_.push_back(sub_match(m.begin - cur + offset_, m.len));
-                }
+                if (pmatch[i].rm_so == -1)
+                    match_.subs_.push_back(sub_match(-1, 0));
+                else
+                    match_.subs_.push_back(sub_match(pmatch[i].rm_so + pimpl_->offset_, pmatch[i].rm_eo - pmatch[i].rm_so));
             }
-            offset_ = match_.subs_[0].begin() + match_.subs_[0].length();
+            pimpl_->offset_ = match_.subs_[0].begin() + match_.subs_[0].length();
         }
         else
         {
-            offset_ = std::numeric_limits<std::size_t>::max();
+            pimpl_->offset_ = std::numeric_limits<std::size_t>::max();
         }
     }
     else
     {
-        offset_ = std::numeric_limits<std::size_t>::max();
+        pimpl_->offset_ = std::numeric_limits<std::size_t>::max();
     }
+#endif
     return *this;
 }
 
 std::string replace(const std::string& text, expression& re, const std::string& rep)
 {
+#if defined(CHUCHO_HAVE_STD_REGEX)
+    return std::regex_replace(text, re.pimpl_->re_, rep);
+#elif defined(CHUCHO_HAVE_POSIX_REGEX)
     const char* cur = text.c_str();
     const char* end = text.data() + text.length();
-    const char* found;
-    const char* last;
     std::string result;
-    while (cur < end && trex_search(re.trex_, cur, &found, &last))
+    regmatch_t mch;
+    while (cur < end && regexec(&re.pimpl_->re_, cur, 1, &mch, 0) == 0)
     {
-        result.append(cur, found);
+        result.append(cur, mch.rm_so);
         result.append(rep);
-        cur = last;
+        cur += mch.rm_eo;
     }
     result.append(cur, end - cur);
     return result;
+#endif
 }
 
 bool search(const std::string& text, expression& re)
 {
-    const char* found;
-    const char* last;
-    return trex_search(re.trex_, text.c_str(), &found, &last) == TRex_True;
+#if defined(CHUCHO_HAVE_STD_REGEX)
+    return std::regex_search(text, re.pimpl_->re_);
+#elif defined(CHUCHO_HAVE_POSIX_REGEX)
+    return regexec(&re.pimpl_->re_, text.c_str(), 0, nullptr, 0) == 0;
+#endif
+}
+
+bool search(const std::string& text, expression& re, match& mch)
+{
+    mch.subs_.clear();
+#if defined(CHUCHO_HAVE_STD_REGEX)
+    std::smatch res;
+    if (std::regex_search(text, res, re.pimpl_->re_))
+    {
+        for (unsigned i = 0; i < res.size(); i++)
+        {
+            if (res[i].matched)
+                mch.subs_.push_back(sub_match(res.position(i), res.length(i)));
+            else
+                mch.subs_.push_back(sub_match(-1, 0));
+        }
+        return true;
+    }
+#elif defined(CHUCHO_HAVE_POSIX_REGEX)
+    auto sub_count = re.pimpl_->re_.re_nsub + 1;
+    regmatch_t pmatch[sub_count];
+    if (regexec(&re.pimpl_->re_, text.c_str(), sub_count, pmatch, 0) == 0)
+    {
+        for (int i = 0; i < sub_count; i++)
+        {
+            if (pmatch[i].rm_so == -1)
+                mch.subs_.push_back(sub_match(-1, 0));
+            else
+                mch.subs_.push_back(sub_match(pmatch[i].rm_so, pmatch[i].rm_eo - pmatch[i].rm_so));
+        }
+        return true;
+    }
+#endif
+    return false;
 }
 
 }

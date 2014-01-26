@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #if !defined(CHUCHO_SYSLOG_CONSTANTS_HPP__)
 #define CHUCHO_SYSLOG_CONSTANTS_HPP__
 
+#include <chucho/export.hpp>
 #include <cstdint>
 
 namespace chucho
@@ -33,7 +34,7 @@ namespace syslog
 /**
  * The default syslog port, which is 514.
  */
-extern const std::uint16_t DEFAULT_PORT;
+CHUCHO_EXPORT extern const std::uint16_t DEFAULT_PORT;
 
 /**
  * All standard syslog facilities. Defined in the file

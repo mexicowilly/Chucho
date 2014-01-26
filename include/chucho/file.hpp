@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -31,17 +31,17 @@ namespace chucho
 namespace file
 {
 
-CHUCHO_EXPORT extern const char dir_sep;
+extern CHUCHO_PRIV_EXPORT const char dir_sep;
 
-CHUCHO_EXPORT std::string base_name(const std::string& name);
-CHUCHO_EXPORT void create_directories(const std::string& name);
-CHUCHO_EXPORT void create_directory(const std::string& name);
-CHUCHO_EXPORT std::string directory_name(const std::string& name);
-CHUCHO_EXPORT bool exists(const std::string& name);
-CHUCHO_EXPORT bool is_fully_qualified(const std::string& name);
-CHUCHO_EXPORT void remove(const std::string& name);
-CHUCHO_EXPORT void remove_all(const std::string& name);
-CHUCHO_EXPORT std::uintmax_t size(const std::string& name);
+CHUCHO_PRIV_EXPORT std::string base_name(const std::string& name);
+CHUCHO_PRIV_EXPORT void create_directories(const std::string& name);
+CHUCHO_PRIV_EXPORT void create_directory(const std::string& name);
+CHUCHO_PRIV_EXPORT std::string directory_name(const std::string& name);
+CHUCHO_PRIV_EXPORT bool exists(const std::string& name);
+CHUCHO_PRIV_EXPORT bool is_fully_qualified(const std::string& name);
+CHUCHO_PRIV_EXPORT void remove(const std::string& name);
+CHUCHO_PRIV_EXPORT void remove_all(const std::string& name);
+CHUCHO_PRIV_EXPORT std::uintmax_t size(const std::string& name);
 
 }
 

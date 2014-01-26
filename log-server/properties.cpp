@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -85,11 +85,15 @@ bool properties::handle_config_value(const std::string& key, const std::string& 
     {
         std::istringstream stream(value);
         stream >> std::boolalpha >> console_mode_;
+        if (console_mode_)
+            is_service_ = false; 
     }
     else if (key == "service")
     {
         std::istringstream stream(value);
         stream >> std::boolalpha >> is_service_;
+        if (is_service_)
+            console_mode_ = false;
     }
     else
     {

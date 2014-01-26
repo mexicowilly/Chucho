@@ -1,5 +1,5 @@
 #
-# Copyright 2013 Will Mason
+# Copyright 2013-2014 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -41,6 +41,15 @@ ELSEIF(CHUCHO_SOLARIS)
     ENDIF()
     CONFIGURE_FILE(platform/solaris/UninstallService.cmake.in
                    "${CMAKE_CURRENT_BINARY_DIR}/UninstallService.cmake")
+ELSEIF(CHUCHO_MACINTOSH)
+    IF(INSTALL_SERVICE)
+        CONFIGURE_FILE(platform/macintosh/org.chucho-log.chuchod.plist.in
+                       "${CMAKE_CURRENT_BINARY_DIR}/org.chucho-log.chuchod.plist")
+        CONFIGURE_FILE(platform/macintosh/InstallService.cmake.in
+                       "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
+    ENDIF()
+    CONFIGURE_FILE(platform/macintosh/UninstallService.cmake.in
+                   "${CMAKE_CURRENT_BINARY_DIR}/UninstallService.cmake")
 ENDIF()
 
 IF(CHUCHO_POSIX)
@@ -52,15 +61,22 @@ LIST(REMOVE_ITEM CHUCHO_DIR_DEFS CHUCHO_BUILD)
 SET_DIRECTORY_PROPERTIES(PROPERTIES COMPILE_DEFINITIONS "${CHUCHO_DIR_DEFS}")
 
 IF(CHUCHO_POSIX)
+    IF(CHUCHO_MACINTOSH AND INSTALL_SERVICE)
+        SET(CHUCHOD_POSIX_DAEMON platform/macintosh/daemon_macintosh.cpp)
+        SET(CHUCHOD_POSIX_LISTENER platform/macintosh/socket_listener_macintosh.cpp)
+    ELSE()
+        SET(CHUCHOD_POSIX_DAEMON platform/posix/daemon_posix.cpp)
+        SET(CHUCHOD_POSIX_LISTENER platform/posix/socket_listener_posix.cpp)
+    ENDIF()
     SET(CHUCHOD_PLATFORM_SOURCES
-        platform/posix/daemon_posix.cpp
         platform/posix/log_posix.cpp
         platform/posix/selector_posix.cpp
         platform/posix/signal_handler_posix.cpp
         platform/posix/single_instance_posix.cpp
         platform/posix/socket_life_cycle.cpp
-        platform/posix/socket_listener_posix.cpp
-        platform/posix/socket_reader_posix.cpp)
+        platform/posix/socket_reader_posix.cpp
+        ${CHUCHOD_POSIX_DAEMON}
+        ${CHUCHOD_POSIX_LISTENER})
 ELSEIF(CHUCHO_WINDOWS)
     SET(CHUCHOD_PLATFORM_SOURCES
         platform/windows/daemon_windows.cpp
@@ -74,6 +90,8 @@ ELSEIF(CHUCHO_WINDOWS)
         platform/windows/socket_listener_windows.cpp
         platform/windows/socket_reader_windows.cpp)
 ENDIF()
+
+CHUCHO_SET_YAML_SOURCES(CHUCHOD_YAML_SOURCES)
 
 ADD_EXECUTABLE(chuchod
                daemon.hpp
@@ -98,17 +116,15 @@ ADD_EXECUTABLE(chuchod
                suzerain.hpp
                vassals.cpp
                vassals.hpp
-               ${CHUCHOD_PLATFORM_SOURCES})
+               ${CHUCHOD_PLATFORM_SOURCES}
+               ${CHUCHOD_YAML_SOURCES})
 
-IF(NOT ENABLE_SHARED)
-    SET(CHUCHOD_DECLARE_YAML YAML_DECLARE_STATIC)
-ENDIF()
 IF(CHUCHO_HAVE_ARPA_INET_H)
     SET_SOURCE_FILES_PROPERTIES(suzerain.cpp PROPERTIES
-                                COMPILE_DEFINITIONS "${CHUCHOD_DECLARE_YAML};CHUCHO_HAVE_ARPA_INET_H")
+                                COMPILE_DEFINITIONS "YAML_DECLARE_STATIC;CHUCHO_HAVE_ARPA_INET_H")
 ELSE()
     SET_SOURCE_FILES_PROPERTIES(suzerain.cpp PROPERTIES
-                                COMPILE_DEFINITIONS ${CHUCHOD_DECLARE_YAML})
+                                COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
 ENDIF()
 
 IF(CHUCHO_HAVE_WINSOCK2_H)
@@ -127,7 +143,7 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
                                 COMPILE_FLAGS "-Wno-unused-result")
 ENDIF()
 
-IF(CHUCHO_WINDOWS OR CHUCHO_SOLARIS)
+IF(CHUCHO_WINDOWS OR CHUCHO_SOLARIS OR CHUCHO_MACINTOSH)
     INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/UninstallService.cmake")
 ENDIF()
 INSTALL(TARGETS chuchod
@@ -141,5 +157,9 @@ IF(INSTALL_SERVICE)
         INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
         INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/chucho.xml"
                 DESTINATION /var/svc/manifest/application)
+    ELSEIF(CHUCHO_MACINTOSH)
+        INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/org.chucho-log.chuchod.plist"
+                DESTINATION /Library/LaunchDaemons)
+        INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
     ENDIF()
 ENDIF()

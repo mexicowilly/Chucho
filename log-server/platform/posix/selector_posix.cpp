@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,8 +30,7 @@ void selector::main()
     while (true)
     {
         std::unique_lock<std::mutex> lock(guard_);
-        while (!stop_ && readers_.empty())
-            condition_.wait(lock);
+        condition_.wait(lock, [this] () { return stop_ || !readers_.empty(); });
         if (stop_)
             return;
         fds.resize(readers_.size());

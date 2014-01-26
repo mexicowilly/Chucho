@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -113,7 +113,7 @@ private:
     /**
      * This is invoked by configuration::perform().
      */
-    static void initialize();
+    CHUCHO_NO_EXPORT static void initialize();
 
     std::map<std::string, std::string> variables_;
 };

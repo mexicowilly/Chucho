@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -142,7 +142,8 @@ TEST_F(pattern_formatter_test, utc_date_time)
 {
     chucho::pattern_formatter f("%d");
     std::time_t secs = std::chrono::duration_cast<std::chrono::seconds>(evt_.get_time().time_since_epoch()).count();
-    struct std::tm cal = *std::gmtime(&secs);
+    chucho::calendar::pieces cal = *std::gmtime(&secs);
+    cal.is_utc = true;
     EXPECT_EQ(chucho::calendar::format(cal, "%Y-%m-%d %H:%M:%S"), f.format(evt_));
     f = chucho::pattern_formatter("%d{%Y}");
     EXPECT_EQ(chucho::calendar::format(cal, "%Y"), f.format(evt_));
@@ -152,7 +153,8 @@ TEST_F(pattern_formatter_test, local_date_time)
 {
     chucho::pattern_formatter f("%D");
     std::time_t secs = std::chrono::duration_cast<std::chrono::seconds>(evt_.get_time().time_since_epoch()).count();
-    struct std::tm cal = *std::localtime(&secs);
+    chucho::calendar::pieces cal = *std::localtime(&secs);
+    cal.is_utc = false;
     EXPECT_EQ(chucho::calendar::format(cal, "%Y-%m-%d %H:%M:%S"), f.format(evt_));
     f = chucho::pattern_formatter("%D{%Y}");
     EXPECT_EQ(chucho::calendar::format(cal, "%Y"), f.format(evt_));
@@ -200,22 +202,22 @@ TEST_F(pattern_formatter_test, invalid)
     smgr->clear();
     chucho::pattern_formatter f("%z");
     EXPECT_EQ(1, smgr->get_count());
-    EXPECT_EQ(chucho::status::level::ERROR, smgr->get_level());
+    EXPECT_EQ(chucho::status::level::ERROR_, smgr->get_level());
     EXPECT_STREQ("%z", f.format(evt_).c_str());
     f = chucho::pattern_formatter("%1.m");
     EXPECT_EQ(2, smgr->get_count());
-    EXPECT_EQ(chucho::status::level::ERROR, smgr->get_level());
+    EXPECT_EQ(chucho::status::level::ERROR_, smgr->get_level());
     EXPECT_STREQ("%1.m", f.format(evt_).c_str());
     f = chucho::pattern_formatter("");
     EXPECT_EQ(3, smgr->get_count());
-    EXPECT_EQ(chucho::status::level::ERROR, smgr->get_level());
+    EXPECT_EQ(chucho::status::level::ERROR_, smgr->get_level());
     EXPECT_STREQ("", f.format(evt_).c_str());
     f = chucho::pattern_formatter("%d{%Ym");
     EXPECT_EQ(5, smgr->get_count());
-    EXPECT_EQ(chucho::status::level::ERROR, smgr->get_level());
+    EXPECT_EQ(chucho::status::level::ERROR_, smgr->get_level());
     f = chucho::pattern_formatter("%C");
     EXPECT_EQ(6, smgr->get_count());
-    EXPECT_EQ(chucho::status::level::ERROR, smgr->get_level());
+    EXPECT_EQ(chucho::status::level::ERROR_, smgr->get_level());
 }
 
 TEST_F(pattern_formatter_test, marker)

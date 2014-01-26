@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ std::shared_ptr<configurable> file_writer_factory::create_configurable(std::shar
 
 std::shared_ptr<memento> file_writer_factory::create_memento(const configurator& cfg)
 {
-    std::shared_ptr<memento> mnto(new file_writer_memento(cfg));
+    std::shared_ptr<memento> mnto = std::make_shared<file_writer_memento>(cfg, get_memento_key_set(cfg));
     return mnto;
 }
 

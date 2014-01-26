@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@
 
 TEST(regex, iterator)
 {
-    chucho::regex::expression re("\\$([Ee][Nn][Vv])?\\{(.+)\\}");
+    chucho::regex::expression re("\\$([Ee][Nn][Vv])?\\{([^{]+)\\}");
     chucho::regex::iterator i("I ${HAVE} one and $ENV{IT} looks good.", re);
     chucho::regex::iterator end;
     EXPECT_NE(i, end);
     chucho::regex::iterator j = i;
     EXPECT_EQ(i, j);
     chucho::regex::match m(*i);
-    EXPECT_EQ(3, m.size());
+    ASSERT_EQ(3, m.size());
     EXPECT_EQ(2, m[0].begin());
     EXPECT_EQ(7, m[0].length());
     EXPECT_LT(m[1].begin(), 0);
@@ -35,7 +35,7 @@ TEST(regex, iterator)
     chucho::regex::iterator k = i++;
     EXPECT_EQ(j, k);
     m = *i;
-    EXPECT_EQ(3, m.size());
+    ASSERT_EQ(3, m.size());
     EXPECT_EQ(18, m[0].begin());
     EXPECT_EQ(8, m[0].length());
     EXPECT_EQ(19, m[1].begin());
@@ -57,6 +57,7 @@ TEST(regex, iterator)
     chucho::regex::expression re2("fleas");
     i = chucho::regex::iterator("my dog has fleas", re2);
     m = *i;
+    ASSERT_EQ(1, m.size());
     EXPECT_EQ(11, m[0].begin());
     EXPECT_EQ(5, m[0].length());
     i = chucho::regex::iterator("my dog has cats", re2);
@@ -76,4 +77,18 @@ TEST(regex, search)
 {
     chucho::regex::expression re("d.g");
     EXPECT_TRUE(chucho::regex::search("my dog has fleas", re));
+}
+
+TEST(regex, search_with_match)
+{
+    chucho::regex::expression re("(d.g).*(f.*s)");
+    chucho::regex::match mch;
+    ASSERT_TRUE(chucho::regex::search("my dog has fleas", re, mch));
+    ASSERT_EQ(3, mch.size());
+    EXPECT_EQ(3, mch[0].begin());
+    EXPECT_EQ(13, mch[0].length());
+    EXPECT_EQ(3, mch[1].begin());
+    EXPECT_EQ(3, mch[1].length());
+    EXPECT_EQ(11, mch[2].begin());
+    EXPECT_EQ(5, mch[2].length());
 }

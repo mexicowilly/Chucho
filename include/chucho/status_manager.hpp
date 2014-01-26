@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -133,7 +133,7 @@ private:
     /**
      * @pre guard_ must be locked
      */
-    void adjust_level();
+    CHUCHO_NO_EXPORT void adjust_level();
 
     std::vector<status> head_cache_;
     std::deque<status> tail_cache_;

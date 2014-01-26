@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -45,9 +45,19 @@ std::shared_ptr<configurable> syslog_writer_factory::create_configurable(std::sh
     }
     else
     {
-        cnf.reset(new syslog_writer(swm->get_formatter(),
-                                    *swm->get_facility(),
-                                    swm->get_host_name()));
+        if (swm->get_port())
+        {
+            cnf.reset(new syslog_writer(swm->get_formatter(),
+                                        *swm->get_facility(),
+                                        swm->get_host_name(),
+                                        *swm->get_port()));
+        }
+        else
+        {
+            cnf.reset(new syslog_writer(swm->get_formatter(),
+                                        *swm->get_facility(),
+                                        swm->get_host_name()));
+        }
     }
     set_filters(cnf, swm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));

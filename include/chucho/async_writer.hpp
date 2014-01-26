@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #if !defined(CHUCHO_ASYNC_WRITER_HPP__)
 #define CHUCHO_ASYNC_WRITER_HPP__
 
+#include <chucho/prefix.hpp>
 #include <chucho/writer.hpp>
 #include <queue>
 #include <thread>
@@ -141,5 +142,7 @@ inline std::shared_ptr<writer> async_writer::get_writer() const
 }
 
 }
+
+#include <chucho/suffix.hpp>
 
 #endif

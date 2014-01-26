@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ namespace chucho
 {
 
 rolling_file_writer_memento::rolling_file_writer_memento(const configurator& cfg)
-    : file_writer_memento(cfg)
+    : file_writer_memento(cfg, get_memento_key_set(cfg))
 {
     set_status_origin("rolling_file_writer_memento");
 }

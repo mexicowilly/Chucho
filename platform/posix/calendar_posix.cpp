@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,9 +17,6 @@
 #include <chucho/calendar.hpp>
 #include <chucho/garbage_cleaner.hpp>
 #include <mutex>
-#include <sstream>
-#include <vector>
-#include <iomanip>
 
 #if !defined(CHUCHO_HAVE_GMTIME_R) || !defined(CHUCHO_HAVE_LOCALTIME_R)
 
@@ -41,71 +38,48 @@ std::mutex& calendar_guard()
 
 #endif
 
-#if !defined(CHUCHO_HAVE_PUT_TIME)
-
-namespace
-{
-
-const std::size_t FORMAT_BUF_SIZE_MAX = 20 * 1024;
-
-}
-
-#endif
-
 namespace chucho
 {
 
 namespace calendar
 {
 
-std::string format(const struct std::tm& cal, const std::string& pattern)
+pieces get_local(std::time_t t)
 {
-    #if defined(CHUCHO_HAVE_PUT_TIME)
-    std::ostringstream stream;
-    stream << std::put_time(&cal, pattern.c_str());
-    return stream.str();
-    #else
-    std::vector<char> buf(1024);
-    std::string result;
-    while (true)
-    {
-        std::size_t rc = std::strftime(&buf[0],
-                                       buf.size(),
-                                       pattern.c_str(),
-                                       &cal);
-        if (rc > 0)
-        {
-            result = &buf[0];
-            break;
-        }
-        if (buf.size() > FORMAT_BUF_SIZE_MAX)
-            break;
-        buf.resize(buf.size() + 1024);
-    }
-    return result;
-    #endif
-}
+    pieces result;
 
-struct std::tm get_local(std::time_t t)
-{
     #if defined(CHUCHO_HAVE_LOCALTIME_R)
-    struct std::tm cal;
-    return *::localtime_r(&t, &cal);
+
+    ::localtime_r(&t, &result);
+
     #else
+
     std::lock_guard<std::mutex> lg(calendar_guard());
-    return *std::localtime(&t);
+    result = *std::localtime(&t);
+
     #endif
+
+    result.is_utc = false;
+    return result;
 }
 
-struct std::tm get_utc(std::time_t t)
+pieces get_utc(std::time_t t)
 {
+    pieces result;
+
     #if defined(CHUCHO_HAVE_GMTIME_R)
-    struct std::tm cal;
-    return *::gmtime_r(&t, &cal);
+
+    ::gmtime_r(&t, &result);
+
     #else
+
     std::lock_guard<std::mutex> lg(calendar_guard());
-    return *std::gmtime(&t);
+    result = *std::gmtime(&t);
+
     #endif
+
+    result.is_utc = true;
+    return result;
 }
 
 }

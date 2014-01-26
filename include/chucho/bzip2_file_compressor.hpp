@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #if !defined(BZIP2_FILE_COMPRESSOR_HPP__)
 #define BZIP2_FILE_COMPRESSOR_HPP__
 
+#include <chucho/prefix.hpp>
 #include <chucho/file_compressor.hpp>
 
 namespace chucho
@@ -51,5 +52,7 @@ public:
 };
 
 }
+
+#include <chucho/suffix.hpp>
 
 #endif

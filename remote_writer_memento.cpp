@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,13 +19,14 @@
 namespace chucho
 {
 
-remote_writer_memento::remote_writer_memento(const configurator& cfg)
+remote_writer_memento::remote_writer_memento(const configurator& cfg, memento_key_set ks)
     : writer_memento(cfg)
 {
     set_status_origin("remote_writer_memento");
     set_handler("host", [this] (const std::string& name) { host_ = name; });
     set_handler("port", [this] (const std::string& port) { port_ = static_cast<std::uint16_t>(std::stoul(port)); });
-    set_handler("unsent_cache_max", [this] (const std::string& sz) { unsent_cache_max_ = static_cast<std::size_t>(stoull(sz)); });
+    if (ks == memento_key_set::CHUCHO)
+        set_handler("unsent_cache_max", [this](const std::string& sz) {unsent_cache_max_ = static_cast<std::size_t>(stoull(sz));}); 
 }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #if !defined(CHUCHO_EVENT_HPP__)
 #define CHUCHO_EVENT_HPP__
 
+#include <chucho/prefix.hpp>
 #include <chucho/level.hpp>
 #include <chucho/optional.hpp>
 #include <chucho/marker.hpp>
@@ -51,6 +52,10 @@ public:
     typedef std::chrono::time_point<clock_type> time_type;
 
     /**
+     * @name Constructors
+     */
+    //@{
+    /**
      * Construct an event.
      * 
      * @param lgr the logger
@@ -70,6 +75,7 @@ public:
           unsigned line_number,
           const char* const function_name,
           const optional<marker>& mark = optional<marker>());
+
     /**
      * Construct an event.
      * 
@@ -125,6 +131,7 @@ public:
           const std::string& full_host_name,
           const std::string& thread_id,
           const optional<marker>& mark);
+    //@}
 
     /**
      * Return the base name of the host from which this event came. 
@@ -269,5 +276,7 @@ inline const event::time_type& event::get_time() const
 }
 
 }
+
+#include <chucho/suffix.hpp>
 
 #endif

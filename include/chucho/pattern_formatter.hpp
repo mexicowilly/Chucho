@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,6 +23,13 @@
 
 namespace chucho
 {
+
+namespace calendar
+{
+
+struct pieces;
+
+}
 
 /**
  * @class pattern_formatter pattern_formatter.hpp chucho/pattern_formatter.hpp 
@@ -233,7 +240,7 @@ private:
 
     protected:
         virtual std::string get_text_impl(const event& evt) const override;
-        virtual void to_calendar(time_t t, struct std::tm& cal) const = 0;
+        virtual void to_calendar(time_t t, calendar::pieces& cal) const = 0;
 
     private:
         std::string date_pattern_;
@@ -247,7 +254,7 @@ private:
                             const format_params& params);
 
     protected:
-        virtual void to_calendar(time_t t, struct std::tm& cal) const override;
+        virtual void to_calendar(time_t t, calendar::pieces& cal) const override;
     };
 
     class CHUCHO_NO_EXPORT local_date_time_piece : public date_time_piece
@@ -257,7 +264,7 @@ private:
                               const format_params& params);
 
     protected:
-        virtual void to_calendar(time_t t, struct std::tm& cal) const override;
+        virtual void to_calendar(time_t t, calendar::pieces& cal) const override;
     };
 
     class CHUCHO_NO_EXPORT base_host_piece : public piece

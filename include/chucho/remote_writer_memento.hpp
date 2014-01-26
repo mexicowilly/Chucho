@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #endif
 
 #include <chucho/writer_memento.hpp>
+#include <chucho/memento_key_set.hpp>
 #include <chucho/optional.hpp>
 #include <cstdint>
 
@@ -31,7 +32,7 @@ namespace chucho
 class remote_writer_memento : public writer_memento
 {
 public:
-    remote_writer_memento(const configurator& cfg);
+    remote_writer_memento(const configurator& cfg, memento_key_set ks);
 
     const std::string& get_host() const;
     const optional<std::uint16_t>& get_port() const;

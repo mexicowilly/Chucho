@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -75,6 +75,12 @@ public:
      */
     std::vector<std::shared_ptr<filter>> get_filters();
     /**
+     * Return this writer's formatter.
+     * 
+     * @return the formatter
+     */
+    std::shared_ptr<formatter> get_formatter() const;
+    /**
      * Write an event. This non-virtual method takes care of all the 
      * common housekeeping that writers must undertake when writing 
      * an event. A check is made to see whether the current thread 
@@ -114,6 +120,11 @@ private:
     std::recursive_mutex guard_;
     bool i_am_writing_;
 };
+
+inline std::shared_ptr<formatter> writer::get_formatter() const
+{
+    return formatter_;
+}
 
 }
 

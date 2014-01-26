@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ namespace chucho
 namespace server
 {
 
+struct socket_listener_handle;
+
 class socket_listener : non_copyable
 {
 public:
@@ -39,7 +41,7 @@ public:
 private:
     int socket_;
     std::shared_ptr<chucho::logger> logger_;
-    std::atomic<bool> stop_;
+    std::unique_ptr<socket_listener_handle> handle_;
 };
 
 }

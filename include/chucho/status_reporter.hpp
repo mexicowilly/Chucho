@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #if !defined(CHUCHO_STATUS_REPORTER_HPP__)
 #define CHUCHO_STATUS_REPORTER_HPP__
 
+#include <chucho/prefix.hpp>
 #include <chucho/status.hpp>
 
 namespace chucho
@@ -102,5 +103,7 @@ inline void status_reporter::set_status_origin(const std::string& origin)
 } 
 
 }
+
+#include <chucho/suffix.hpp>
 
 #endif

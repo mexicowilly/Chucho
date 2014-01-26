@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #if !defined(CHUCHO_STATUS_HPP__)
 #define CHUCHO_STATUS_HPP__
 
+#include <chucho/prefix.hpp>
 #include <chucho/export.hpp>
 #include <memory>
 #include <chrono>
@@ -48,24 +49,26 @@ public:
     typedef std::chrono::time_point<clock_type> time_type;
 
     /**
-     * The level of this status event.
+     * The level of this status event. These definitions have a
+     * trailing underscore because they can conflict with
+     * preprocessor macros defined by Windows.
      */
     enum class level
     {
         /** 
          * Information only. Nothing is wrong. 
          */ 
-        INFO,
+        INFO_,
         /** 
          * Something went wrong, but not badly enough to inhibit
          * functionality. 
          */
-        WARNING,
+        WARNING_,
         /** 
          * Chucho is prevented from doing something that it should be 
          * doing.
          */
-        ERROR
+        ERROR_
     };
 
     /**
@@ -168,5 +171,7 @@ inline const status::time_type& status::get_time() const
 }
 
 }
+
+#include <chucho/suffix.hpp>
 
 #endif

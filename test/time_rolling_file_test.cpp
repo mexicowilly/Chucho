@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -218,7 +218,7 @@ std::deque<std::string>& test::expected_file_names()
 
 std::string test::format_file_name(const std::string& pattern)
 {
-    struct std::tm cal = chucho::calendar::get_utc(std::time(nullptr));
+    chucho::calendar::pieces cal = chucho::calendar::get_utc(std::time(nullptr));
     std::ostringstream stream;
     stream << TOP_LEVEL_DIR << chucho::calendar::format(cal, pattern);
     return stream.str();

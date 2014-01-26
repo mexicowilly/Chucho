@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #if !defined(CHUCHO_MEMENTO_HPP__)
 #define CHUCHO_MEMENTO_HPP__
 
+#include <chucho/prefix.hpp>
 #include <chucho/configurator.hpp>
 #include <chucho/configurable.hpp>
 #include <functional>
@@ -93,6 +94,15 @@ protected:
      */
     bool boolean_value(const std::string& value);
     /**
+     * Set an alias for a given key. For example, if you have a 
+     * handler for the key "hello", then you may want to set an 
+     * alias of "hi", which will just invoke the "hello" handler. 
+     * 
+     * @param key the key for which to create an alias
+     * @param alias the alias for key
+     */
+    void set_alias(const std::string& key, const std::string& alias);
+    /**
      * Set a handler. The handler will be invoked when the @ref 
      * configurator encounters the given key. 
      * 
@@ -100,14 +110,6 @@ protected:
      * @param hand the function
      */
     void set_handler(const std::string& key, handler hand);
-    /**
-     * Convert a piece of text to lower case. This is used for 
-     * case-insensitive comparison.
-     * 
-     * @param value the text to case fold 
-     * @return the lowercase version of the text
-     */
-    std::string to_lower(const std::string& value) const;
 
     /**
      * The @ref configurator that is perform configuration.
@@ -116,13 +118,11 @@ protected:
 
 private:
     std::map<std::string, handler> handlers_;
+    std::multimap<std::string, std::string> unconnected_aliases_;
 };
 
-inline void memento::set_handler(const std::string& key, handler hand)
-{
-    handlers_[key] = hand;
 }
 
-}
+#include <chucho/suffix.hpp>
 
 #endif

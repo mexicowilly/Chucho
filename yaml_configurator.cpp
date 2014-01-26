@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include <chucho/exception.hpp>
 #include <chucho/logger_factory.hpp>
 #include <chucho/configuration.hpp>
+#include <chucho/yaml_parser.hpp>
 #include <istream>
 
 namespace
@@ -26,31 +27,12 @@ namespace
 class yaml_location_exception : public chucho::exception
 {
 public:
-    yaml_location_exception(const yaml_mark_t mark, const std::string& msg)
-        : exception("YAML error [line " + std::to_string(mark.line) +
-                    ", column " + std::to_string(mark.column) + "] " + msg)
+    yaml_location_exception(const yaml_mark_t& mark, const std::string& msg)
+        : exception("YAML error [line " + std::to_string(mark.line + 1) +
+                    ", column " + std::to_string(mark.column + 1) + "] " + msg)
     {
     }
 };
-
-int istream_reader(void* raw,
-                   unsigned char* buf,
-                   std::size_t size,
-                   std::size_t* size_read)
-{
-    // You don't own this pointer
-    std::istream* stream = reinterpret_cast<std::istream*>(raw);
-    if (stream->eof())
-    {
-        *size_read = 0;
-        return 1;
-    }
-    if (!stream->good())
-        return 0;
-    stream->read(reinterpret_cast<char*>(buf), size);
-    *size_read = static_cast<std::size_t>(stream->gcount());
-    return 1;
-}
 
 }
 
@@ -64,20 +46,12 @@ yaml_configurator::yaml_configurator()
 
 void yaml_configurator::configure(std::istream& in)
 {
-    yaml_parser_t prs;
-    yaml_parser_initialize(&prs);
-    struct prs_sentry
-    {
-        prs_sentry(yaml_parser_t& prs) : prs_(prs) { }
-        ~prs_sentry() { yaml_parser_delete(&prs_); }
-        yaml_parser_t& prs_;
-    } ps(prs);
-    yaml_parser_set_input(&prs, istream_reader, &in);
+    yaml_parser prs(in);
     yaml_document_t doc;
     while (true)
     {
-        if (!yaml_parser_load(&prs, &doc))
-            throw yaml_location_exception(prs.problem_mark, prs.problem);
+        if (!yaml_parser_load(prs, &doc))
+            throw yaml_location_exception(prs.problem_mark(), prs.problem_message());
         struct doc_sentry
         {
             doc_sentry(yaml_document_t& doc) : doc_(doc) { }
@@ -144,63 +118,84 @@ void yaml_configurator::handle(yaml_document_t& doc,
                                const std::string& key,
                                std::shared_ptr<memento> mnto)
 {
-    if (node.type == YAML_SCALAR_NODE)
+    try
     {
-        std::string val(resolve_variables(reinterpret_cast<const char*>(node.data.scalar.value)));
-        if (mnto)
+        if (node.type == YAML_SCALAR_NODE)
         {
-            auto found = get_factories().find(val);
-            if (found == get_factories().end())
-                mnto->handle(key, val);
-            else
-                mnto->handle(found->second->create_configurable(found->second->create_memento(*this)));
-        }
-        else if (configuration::get_unknown_handler())
-        {
-            configuration::get_unknown_handler()(key, val);
-        }
-    }
-    else if (node.type == YAML_MAPPING_NODE)
-    {
-        for (yaml_node_pair_t* p = node.data.mapping.pairs.start;
-             p < node.data.mapping.pairs.top;
-             p++)
-        {
-            const yaml_node_t& key_node = *yaml_document_get_node(&doc, p->key);
-            if (key_node.type == YAML_SCALAR_NODE)
+            std::string val(resolve_variables(reinterpret_cast<const char*>(node.data.scalar.value)));
+            if (mnto)
             {
-                std::string key(resolve_variables(reinterpret_cast<const char*>(key_node.data.scalar.value)));
-                if (key == "variables")
+                auto found = get_factories().find(val);
+                if (found == get_factories().end())
                 {
-                    extract_variables(doc, *yaml_document_get_node(&doc, p->value));
-                }
-                else
-                {
-                    auto found = get_factories().find(key);
-                    if (found == get_factories().end())
+                    if (key.empty()) 
                     {
-                        handle(doc, *yaml_document_get_node(&doc, p->value), level + 1, key, mnto);
+                        report_warning("An incomplete mapping was found at line " + std::to_string(node.start_mark.line + 1) +
+                            ", column " + std::to_string(node.start_mark.column + 1));
                     }
                     else
                     {
-                        std::shared_ptr<memento> sub = found->second->create_memento(*this);
-                        handle(doc, *yaml_document_get_node(&doc, p->value), level + 1, key, sub);
-                        auto cnf = found->second->create_configurable(sub);
-                        if (mnto)
-                            mnto->handle(cnf);
+                        mnto->handle(key, val);
+                    }
+                }
+                else
+                {
+                    mnto->handle(found->second->create_configurable(found->second->create_memento(*this)));
+                }
+            }
+            else if (configuration::get_unknown_handler())
+            {
+                if (configuration::get_unknown_handler() && !key.empty()) 
+                    configuration::get_unknown_handler()(key, val);
+            }
+        }
+        else if (node.type == YAML_MAPPING_NODE)
+        {
+            for (yaml_node_pair_t* p = node.data.mapping.pairs.start;
+                 p < node.data.mapping.pairs.top;
+                 p++)
+            {
+                const yaml_node_t& key_node = *yaml_document_get_node(&doc, p->key);
+                if (key_node.type == YAML_SCALAR_NODE)
+                {
+                    std::string key(resolve_variables(reinterpret_cast<const char*>(key_node.data.scalar.value)));
+                    if (key == "variables")
+                    {
+                        extract_variables(doc, *yaml_document_get_node(&doc, p->value));
+                    }
+                    else
+                    {
+                        auto found = get_factories().find(key);
+                        if (found == get_factories().end())
+                        {
+                            handle(doc, *yaml_document_get_node(&doc, p->value), level + 1, key, mnto);
+                        }
+                        else
+                        {
+                            std::shared_ptr<memento> sub = found->second->create_memento(*this);
+                            // pass empty key here because we've just consumed the key
+                            handle(doc, *yaml_document_get_node(&doc, p->value), level + 1, "", sub);
+                            auto cnf = found->second->create_configurable(sub);
+                            if (mnto)
+                                mnto->handle(cnf);
+                        }
                     }
                 }
             }
         }
-    }
-    else if (node.type == YAML_SEQUENCE_NODE)
-    {
-        for (yaml_node_item_t* i = node.data.sequence.items.start;
-             i < node.data.sequence.items.top;
-             i++)
+        else if (node.type == YAML_SEQUENCE_NODE)
         {
-            handle(doc, *yaml_document_get_node(&doc, *i), level + 1, key, mnto);
+            for (yaml_node_item_t* i = node.data.sequence.items.start;
+                 i < node.data.sequence.items.top;
+                 i++)
+            {
+                handle(doc, *yaml_document_get_node(&doc, *i), level + 1, key, mnto);
+            }
         }
+    }
+    catch (std::exception& e)
+    {
+        report_error(std::string("An error occurred processing the YAML: ") + e.what());
     }
 }
 

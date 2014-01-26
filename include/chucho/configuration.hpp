@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -143,6 +143,14 @@ public:
      */
     static const std::string& get_loaded_file_name();
     /**
+     * Return the maximum size of a configuration file. Files bigger 
+     * than this value will not be loaded. The default maximum is 
+     * 100k. 
+     * 
+     * @return the maximum file size
+     */
+    static std::size_t get_max_size();
+    /**
      * Return the configuration style. AUTOMATIC is the default 
      * style. 
      * 
@@ -155,6 +163,9 @@ public:
      * elements in the configuration that Chucho itself does not 
      * understand. This allows the application to use the Chucho 
      * configuration for its own configurable elements. 
+     *  
+     * @note The unknown element handler is only supported in YAML 
+     *       configurations.
      * 
      * @return the function to handle unknown elements
      */
@@ -231,6 +242,14 @@ public:
      */
     static void set_file_name(const std::string& name);
     /**
+     * Set the maximum size for a configuration file. If any file 
+     * exceeds this size, it will be rejected. By default this 
+     * value is 100k. 
+     * 
+     * @param mx the maximum size
+     */
+    static void set_max_size(std::size_t mx);
+    /**
      * Set the configuration style.
      * 
      * @param stl the style
@@ -248,6 +267,9 @@ public:
      * second is the value. The unknown handler will only be called 
      * if what was found in the configuration can be converted to a 
      * key-value pair. 
+     *  
+     * @note The unknown element handler is only supported in YAML 
+     *       configurations.
      * 
      * @param hndl the unknown element handler
      */
@@ -267,7 +289,7 @@ private:
         void warning(const std::string& message, std::exception_ptr ex = std::exception_ptr()) const;
     };
 
-    CHUCHO_NO_EXPORT static bool configure_from_yaml_file(const std::string& file_name, reporter& report);
+    CHUCHO_NO_EXPORT static bool configure_from_file(const std::string& file_name, reporter& report);
     CHUCHO_NO_EXPORT static void perform(std::shared_ptr<logger> root_logger);
 };
 

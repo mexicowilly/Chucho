@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -37,7 +37,12 @@
  * releases, documentation, tickets and source code, please 
  * visit the <a href="https://www.assembla.com/spaces/chucho" 
  * target="_blank">project 
- * site</a>. 
+ * site</a>.
+ *  
+ * If you need answers to questions or help in any way, please 
+ * join our <a 
+ * href="https://groups.google.com/forum/?fromgroups#!forum/chucho-logging" 
+ * target="_blank">Google group</a>. 
  *  
  * Chucho uses the same architecture as <a 
  * href="http://logback.qos.ch/" 
@@ -47,7 +52,7 @@
  * href="https://www.assembla.com/spaces/chucho/wiki" 
  * target="_blank">user manual</a>, which is under construction.
  *  
- * @copyright &copy; 2013 Will Mason 
+ * @copyright &copy; 2013-2014 Will Mason 
  */
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include <chucho/log.hpp>
 #include <chucho/pattern_formatter.hpp>
 #include <chucho/marker.hpp>
+#include <chucho/loggable.hpp>
 #include <sstream>
 #include <vector>
 #include <array>
@@ -58,17 +59,19 @@ private:
     std::stringstream stream_;
 };
 
-class log_macro_test : public ::testing::Test
+class log_macro : protected chucho::loggable<log_macro>, public ::testing::Test
 {
 public:
-    log_macro_test()
-        : lgr_(chucho::logger::get("log_macro_test")),
-          wrt_(std::make_shared<string_writer>(std::make_shared<chucho::pattern_formatter>("%p %m %k%n")))
+    log_macro()
+        : lgr_(chucho::logger::get("log_macro")),
+          wrt_(std::make_shared<string_writer>(std::make_shared<chucho::pattern_formatter>("%p %m %k%n"))),
+          lgbl_wrt_(std::make_shared<string_writer>(std::make_shared<chucho::pattern_formatter>("%p %m %k%n")))
     {
         lgr_->add_writer(wrt_);
+        get_logger()->add_writer(lgbl_wrt_);
     }
 
-    ~log_macro_test()
+    ~log_macro()
     {
         lgr_.reset();
         chucho::logger::remove_unused_loggers();
@@ -85,6 +88,16 @@ protected:
         CHUCHO_FATAL(lgr_, "my dog " << "has fleas");
     }
 
+    void log_lgbl()
+    {
+        CHUCHO_TRACE_LGBL("my dog " << "has fleas");
+        CHUCHO_DEBUG_LGBL("my dog " << "has fleas");
+        CHUCHO_INFO_LGBL("my dog " << "has fleas");
+        CHUCHO_WARN_LGBL("my dog " << "has fleas");
+        CHUCHO_ERROR_LGBL("my dog " << "has fleas");
+        CHUCHO_FATAL_LGBL("my dog " << "has fleas");
+    }
+
     void log_marker()
     {
         CHUCHO_TRACE_M(MARK, lgr_, "my dog " << "has fleas");
@@ -93,6 +106,16 @@ protected:
         CHUCHO_WARN_M(MARK, lgr_, "my dog " << "has fleas");
         CHUCHO_ERROR_M(MARK, lgr_, "my dog " << "has fleas");
         CHUCHO_FATAL_M(MARK, lgr_, "my dog " << "has fleas");
+    }
+
+    void log_lgbl_marker()
+    {
+        CHUCHO_TRACE_LGBL_M(MARK, "my dog " << "has fleas");
+        CHUCHO_DEBUG_LGBL_M(MARK, "my dog " << "has fleas");
+        CHUCHO_INFO_LGBL_M(MARK, "my dog " << "has fleas");
+        CHUCHO_WARN_LGBL_M(MARK, "my dog " << "has fleas");
+        CHUCHO_ERROR_LGBL_M(MARK, "my dog " << "has fleas");
+        CHUCHO_FATAL_LGBL_M(MARK, "my dog " << "has fleas");
     }
 
     void log_marker_str()
@@ -105,6 +128,16 @@ protected:
         CHUCHO_FATAL_STR_M(MARK->get_name(), lgr_, "my dog has fleas");
     }
 
+    void log_lgbl_marker_str()
+    {
+        CHUCHO_TRACE_LGBL_STR_M(MARK->get_name(), "my dog has fleas");
+        CHUCHO_DEBUG_LGBL_STR_M(MARK->get_name(), "my dog has fleas");
+        CHUCHO_INFO_LGBL_STR_M(MARK->get_name(), "my dog has fleas");
+        CHUCHO_WARN_LGBL_STR_M(MARK->get_name(), "my dog has fleas");
+        CHUCHO_ERROR_LGBL_STR_M(MARK->get_name(), "my dog has fleas");
+        CHUCHO_FATAL_LGBL_STR_M(MARK->get_name(), "my dog has fleas");
+    }
+
     void log_str()
     {
         CHUCHO_TRACE_STR(lgr_, "my dog has fleas");
@@ -115,7 +148,19 @@ protected:
         CHUCHO_FATAL_STR(lgr_, "my dog has fleas");
     }
 
-    void expect(std::shared_ptr<chucho::level> lvl, const chucho::optional<chucho::marker>& mark = chucho::optional<chucho::marker>())
+    void log_lgbl_str()
+    {
+        CHUCHO_TRACE_LGBL_STR("my dog has fleas");
+        CHUCHO_DEBUG_LGBL_STR("my dog has fleas");
+        CHUCHO_INFO_LGBL_STR("my dog has fleas");
+        CHUCHO_WARN_LGBL_STR("my dog has fleas");
+        CHUCHO_ERROR_LGBL_STR("my dog has fleas");
+        CHUCHO_FATAL_LGBL_STR("my dog has fleas");
+    }
+
+    void expect(std::shared_ptr<chucho::level> lvl,
+                std::shared_ptr<string_writer> wrt,
+                const chucho::optional<chucho::marker>& mark = chucho::optional<chucho::marker>())
     {
         std::array<std::shared_ptr<chucho::level>, 6> lvls =
         {
@@ -126,7 +171,7 @@ protected:
             chucho::level::ERROR_(),
             chucho::level::FATAL_()
         };
-        std::vector<std::string> lines(wrt_->get_lines());
+        std::vector<std::string> lines(wrt->get_lines());
         std::size_t i = std::distance(lvls.begin(), std::find(lvls.begin(), lvls.end(), lvl));
         ASSERT_EQ(lvls.size() - i, lines.size());
         for (std::size_t num = 0; i < lvls.size(); i++, num++)
@@ -139,198 +184,391 @@ protected:
 
     std::shared_ptr<chucho::logger> lgr_;
     std::shared_ptr<string_writer> wrt_;
+    std::shared_ptr<string_writer> lgbl_wrt_;
 };
 
 }
 
-TEST_F(log_macro_test, debug)
+TEST_F(log_macro, debug)
 {
     SCOPED_TRACE("debug");
     lgr_->set_level(chucho::level::DEBUG_());
     log();
-    expect(chucho::level::DEBUG_());
+    expect(chucho::level::DEBUG_(), wrt_);
 }
 
-TEST_F(log_macro_test, debug_marker)
+TEST_F(log_macro, debug_lgbl)
+{
+    SCOPED_TRACE("debug_lgbl");
+    get_logger()->set_level(chucho::level::DEBUG_());
+    log_lgbl();
+    expect(chucho::level::DEBUG_(), lgbl_wrt_);
+}
+
+TEST_F(log_macro, debug_marker)
 {
     SCOPED_TRACE("debug_marker");
     lgr_->set_level(chucho::level::DEBUG_());
     log_marker();
-    expect(chucho::level::DEBUG_(), MARK);
+    expect(chucho::level::DEBUG_(), wrt_, MARK);
 }
 
-TEST_F(log_macro_test, debug_marker_str)
+TEST_F(log_macro, debug_lgbl_marker)
+{
+    SCOPED_TRACE("debug_lgbl_marker");
+    get_logger()->set_level(chucho::level::DEBUG_());
+    log_lgbl_marker();
+    expect(chucho::level::DEBUG_(), lgbl_wrt_, MARK);
+}
+
+TEST_F(log_macro, debug_marker_str)
 {
     SCOPED_TRACE("debug_marker_str");
     lgr_->set_level(chucho::level::DEBUG_());
     log_marker_str();
-    expect(chucho::level::DEBUG_(), MARK);
+    expect(chucho::level::DEBUG_(), wrt_, MARK);
 }
 
-TEST_F(log_macro_test, debug_str)
+TEST_F(log_macro, debug_lgbl_marker_str)
+{
+    SCOPED_TRACE("debug_lgbl_marker_str");
+    get_logger()->set_level(chucho::level::DEBUG_());
+    log_lgbl_marker_str();
+    expect(chucho::level::DEBUG_(), lgbl_wrt_, MARK);
+}
+
+TEST_F(log_macro, debug_str)
 {
     SCOPED_TRACE("debug_str");
     lgr_->set_level(chucho::level::DEBUG_());
     log_str();
-    expect(chucho::level::DEBUG_());
+    expect(chucho::level::DEBUG_(), wrt_);
 }
 
-TEST_F(log_macro_test, error)
+TEST_F(log_macro, debug_lgbl_str)
+{
+    SCOPED_TRACE("debug_lgbl_str");
+    get_logger()->set_level(chucho::level::DEBUG_());
+    log_lgbl_str();
+    expect(chucho::level::DEBUG_(), lgbl_wrt_);
+}
+
+TEST_F(log_macro, error)
 {
     SCOPED_TRACE("error");
     lgr_->set_level(chucho::level::ERROR_());
     log();
-    expect(chucho::level::ERROR_());
+    expect(chucho::level::ERROR_(), wrt_);
 }
 
-TEST_F(log_macro_test, error_marker)
+TEST_F(log_macro, error_lgbl)
+{
+    SCOPED_TRACE("error_lgbl");
+    get_logger()->set_level(chucho::level::ERROR_());
+    log_lgbl();
+    expect(chucho::level::ERROR_(), lgbl_wrt_);
+}
+
+TEST_F(log_macro, error_marker)
 {
     SCOPED_TRACE("error_marker");
     lgr_->set_level(chucho::level::ERROR_());
     log_marker();
-    expect(chucho::level::ERROR_(), MARK);
+    expect(chucho::level::ERROR_(), wrt_, MARK);
 }
 
-TEST_F(log_macro_test, error_marker_str)
+TEST_F(log_macro, error_lgbl_marker)
+{
+    SCOPED_TRACE("error_lgbl_marker");
+    get_logger()->set_level(chucho::level::ERROR_());
+    log_lgbl_marker();
+    expect(chucho::level::ERROR_(), lgbl_wrt_, MARK);
+}
+
+TEST_F(log_macro, error_marker_str)
 {
     SCOPED_TRACE("error_marker_str");
     lgr_->set_level(chucho::level::ERROR_());
     log_marker_str();
-    expect(chucho::level::ERROR_(), MARK);
+    expect(chucho::level::ERROR_(), wrt_, MARK);
 }
 
-TEST_F(log_macro_test, error_str)
+TEST_F(log_macro, error_lgbl_marker_str)
+{
+    SCOPED_TRACE("error_lgbl_marker_str");
+    get_logger()->set_level(chucho::level::ERROR_());
+    log_lgbl_marker_str();
+    expect(chucho::level::ERROR_(), lgbl_wrt_, MARK);
+}
+
+TEST_F(log_macro, error_str)
 {
     SCOPED_TRACE("error_str");
     lgr_->set_level(chucho::level::ERROR_());
     log_str();
-    expect(chucho::level::ERROR_());
+    expect(chucho::level::ERROR_(), wrt_);
 }
 
-TEST_F(log_macro_test, fatal)
+TEST_F(log_macro, error_lgbl_str)
+{
+    SCOPED_TRACE("error_lgbl_str");
+    get_logger()->set_level(chucho::level::ERROR_());
+    log_lgbl_str();
+    expect(chucho::level::ERROR_(), lgbl_wrt_);
+}
+
+TEST_F(log_macro, fatal)
 {
     SCOPED_TRACE("fatal");
     lgr_->set_level(chucho::level::FATAL_());
     log();
-    expect(chucho::level::FATAL_());
+    expect(chucho::level::FATAL_(), wrt_);
 }
 
-TEST_F(log_macro_test, fatal_marker)
+TEST_F(log_macro, fatal_lgbl)
+{
+    SCOPED_TRACE("fatal_lgbl");
+    get_logger()->set_level(chucho::level::FATAL_());
+    log_lgbl();
+    expect(chucho::level::FATAL_(), lgbl_wrt_);
+}
+
+TEST_F(log_macro, fatal_marker)
 {
     SCOPED_TRACE("fatal_marker");
     lgr_->set_level(chucho::level::FATAL_());
     log_marker();
-    expect(chucho::level::FATAL_(), MARK);
+    expect(chucho::level::FATAL_(), wrt_, MARK);
 }
 
-TEST_F(log_macro_test, fatal_marker_str)
+TEST_F(log_macro, fatal_lgbl_marker)
+{
+    SCOPED_TRACE("fatal_lgbl_marker");
+    get_logger()->set_level(chucho::level::FATAL_());
+    log_lgbl_marker();
+    expect(chucho::level::FATAL_(), lgbl_wrt_, MARK);
+}
+
+TEST_F(log_macro, fatal_marker_str)
 {
     SCOPED_TRACE("fatal_marker_str");
     lgr_->set_level(chucho::level::FATAL_());
     log_marker_str();
-    expect(chucho::level::FATAL_(), MARK);
+    expect(chucho::level::FATAL_(), wrt_, MARK);
 }
 
-TEST_F(log_macro_test, fatal_str)
+TEST_F(log_macro, fatal_lgbl_marker_str)
+{
+    SCOPED_TRACE("fatal_lgbl_marker_str");
+    get_logger()->set_level(chucho::level::FATAL_());
+    log_lgbl_marker_str();
+    expect(chucho::level::FATAL_(), lgbl_wrt_, MARK);
+}
+
+TEST_F(log_macro, fatal_str)
 {
     SCOPED_TRACE("fatal_str");
     lgr_->set_level(chucho::level::FATAL_());
     log_str();
-    expect(chucho::level::FATAL_());
+    expect(chucho::level::FATAL_(), wrt_);
 }
 
-TEST_F(log_macro_test, info)
+TEST_F(log_macro, fatal_lgbl_str)
+{
+    SCOPED_TRACE("fatal_lgbl_str");
+    get_logger()->set_level(chucho::level::FATAL_());
+    log_lgbl_str();
+    expect(chucho::level::FATAL_(), lgbl_wrt_);
+}
+
+TEST_F(log_macro, info)
 {
     SCOPED_TRACE("info");
     lgr_->set_level(chucho::level::INFO_());
     log();
-    expect(chucho::level::INFO_());
+    expect(chucho::level::INFO_(), wrt_);
 }
 
-TEST_F(log_macro_test, info_marker)
+TEST_F(log_macro, info_lgbl)
+{
+    SCOPED_TRACE("info_lgbl");
+    get_logger()->set_level(chucho::level::INFO_());
+    log_lgbl();
+    expect(chucho::level::INFO_(), lgbl_wrt_);
+}
+
+TEST_F(log_macro, info_marker)
 {
     SCOPED_TRACE("info_marker");
     lgr_->set_level(chucho::level::INFO_());
     log_marker();
-    expect(chucho::level::INFO_(), MARK);
+    expect(chucho::level::INFO_(), wrt_, MARK);
 }
 
-TEST_F(log_macro_test, info_marker_str)
+TEST_F(log_macro, info_lgbl_marker)
+{
+    SCOPED_TRACE("info_lgbl_marker");
+    get_logger()->set_level(chucho::level::INFO_());
+    log_lgbl_marker();
+    expect(chucho::level::INFO_(), lgbl_wrt_, MARK);
+}
+
+TEST_F(log_macro, info_marker_str)
 {
     SCOPED_TRACE("info_marker_str");
     lgr_->set_level(chucho::level::INFO_());
     log_marker_str();
-    expect(chucho::level::INFO_(), MARK);
+    expect(chucho::level::INFO_(), wrt_, MARK);
 }
 
-TEST_F(log_macro_test, info_str)
+TEST_F(log_macro, info_lgbl_marker_str)
+{
+    SCOPED_TRACE("info_lgbl_marker_str");
+    get_logger()->set_level(chucho::level::INFO_());
+    log_lgbl_marker_str();
+    expect(chucho::level::INFO_(), lgbl_wrt_, MARK);
+}
+
+TEST_F(log_macro, info_str)
 {
     SCOPED_TRACE("info_str");
     lgr_->set_level(chucho::level::INFO_());
     log_str();
-    expect(chucho::level::INFO_());
+    expect(chucho::level::INFO_(), wrt_);
 }
 
-TEST_F(log_macro_test, trace)
+TEST_F(log_macro, info_lgbl_str)
+{
+    SCOPED_TRACE("info_lgbl_str");
+    get_logger()->set_level(chucho::level::INFO_());
+    log_lgbl_str();
+    expect(chucho::level::INFO_(), lgbl_wrt_);
+}
+
+TEST_F(log_macro, trace)
 {
     SCOPED_TRACE("trace");
     lgr_->set_level(chucho::level::TRACE_());
     log();
-    expect(chucho::level::TRACE_());
+    expect(chucho::level::TRACE_(), wrt_);
 }
 
-TEST_F(log_macro_test, trace_marker)
+TEST_F(log_macro, trace_lgbl)
+{
+    SCOPED_TRACE("trace_lgbl");
+    get_logger()->set_level(chucho::level::TRACE_());
+    log_lgbl();
+    expect(chucho::level::TRACE_(), lgbl_wrt_);
+}
+
+TEST_F(log_macro, trace_marker)
 {
     SCOPED_TRACE("trace_marker");
     lgr_->set_level(chucho::level::TRACE_());
     log_marker();
-    expect(chucho::level::TRACE_(), MARK);
+    expect(chucho::level::TRACE_(), wrt_, MARK);
 }
 
-TEST_F(log_macro_test, trace_marker_str)
+TEST_F(log_macro, trace_lgbl_marker)
+{
+    SCOPED_TRACE("trace_lgbl_marker");
+    get_logger()->set_level(chucho::level::TRACE_());
+    log_lgbl_marker();
+    expect(chucho::level::TRACE_(), lgbl_wrt_, MARK);
+}
+
+TEST_F(log_macro, trace_marker_str)
 {
     SCOPED_TRACE("trace_marker_str");
     lgr_->set_level(chucho::level::TRACE_());
     log_marker_str();
-    expect(chucho::level::TRACE_(), MARK);
+    expect(chucho::level::TRACE_(), wrt_, MARK);
 }
 
-TEST_F(log_macro_test, trace_str)
+TEST_F(log_macro, trace_lgbl_marker_str)
+{
+    SCOPED_TRACE("trace_lgbl_marker_str");
+    get_logger()->set_level(chucho::level::TRACE_());
+    log_lgbl_marker_str();
+    expect(chucho::level::TRACE_(), lgbl_wrt_, MARK);
+}
+
+TEST_F(log_macro, trace_str)
 {
     SCOPED_TRACE("trace_str");
     lgr_->set_level(chucho::level::TRACE_());
     log_str();
-    expect(chucho::level::TRACE_());
+    expect(chucho::level::TRACE_(), wrt_);
 }
 
-TEST_F(log_macro_test, warn)
+TEST_F(log_macro, trace_lgbl_str)
+{
+    SCOPED_TRACE("trace_lgbl_str");
+    get_logger()->set_level(chucho::level::TRACE_());
+    log_lgbl_str();
+    expect(chucho::level::TRACE_(), lgbl_wrt_);
+}
+
+TEST_F(log_macro, warn)
 {
     SCOPED_TRACE("warn");
     lgr_->set_level(chucho::level::WARN_());
     log();
-    expect(chucho::level::WARN_());
+    expect(chucho::level::WARN_(), wrt_);
 }
 
-TEST_F(log_macro_test, warn_marker)
+TEST_F(log_macro, warn_lgbl)
+{
+    SCOPED_TRACE("warn_lgbl");
+    get_logger()->set_level(chucho::level::WARN_());
+    log_lgbl();
+    expect(chucho::level::WARN_(), lgbl_wrt_);
+}
+
+TEST_F(log_macro, warn_marker)
 {
     SCOPED_TRACE("warn_marker");
     lgr_->set_level(chucho::level::WARN_());
     log_marker();
-    expect(chucho::level::WARN_(), MARK);
+    expect(chucho::level::WARN_(), wrt_, MARK);
 }
 
-TEST_F(log_macro_test, warn_marker_str)
+TEST_F(log_macro, warn_lgbl_marker)
+{
+    SCOPED_TRACE("warn_lgbl_marker");
+    get_logger()->set_level(chucho::level::WARN_());
+    log_lgbl_marker();
+    expect(chucho::level::WARN_(), lgbl_wrt_, MARK);
+}
+
+TEST_F(log_macro, warn_marker_str)
 {
     SCOPED_TRACE("warn_marker_str");
     lgr_->set_level(chucho::level::WARN_());
     log_marker_str();
-    expect(chucho::level::WARN_(), MARK);
+    expect(chucho::level::WARN_(), wrt_, MARK);
 }
 
-TEST_F(log_macro_test, warn_str)
+TEST_F(log_macro, warn_lgbl_marker_str)
+{
+    SCOPED_TRACE("warn_lgbl_marker_str");
+    get_logger()->set_level(chucho::level::WARN_());
+    log_lgbl_marker_str();
+    expect(chucho::level::WARN_(), lgbl_wrt_, MARK);
+}
+
+TEST_F(log_macro, warn_str)
 {
     SCOPED_TRACE("warn_str");
     lgr_->set_level(chucho::level::WARN_());
     log_str();
-    expect(chucho::level::WARN_());
+    expect(chucho::level::WARN_(), wrt_);
+}
+
+TEST_F(log_macro, warn_lgbl_str)
+{
+    SCOPED_TRACE("warn_lgbl_str");
+    get_logger()->set_level(chucho::level::WARN_());
+    log_lgbl_str();
+    expect(chucho::level::WARN_(), lgbl_wrt_);
 }

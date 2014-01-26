@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ protected:
 
     std::string get_time(const std::string& fmt)
     {
-        struct std::tm t = chucho::calendar::get_utc(
+        chucho::calendar::pieces t = chucho::calendar::get_utc(
             std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         return chucho::calendar::format(t, fmt);
     }

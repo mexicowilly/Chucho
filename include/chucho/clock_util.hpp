@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,13 +21,15 @@
 #error "This header is private"
 #endif
 
+#include <chucho/export.hpp>
+
 namespace chucho
 {
 
 namespace clock_util
 {
 
-extern const bool system_clock_supports_milliseconds;
+CHUCHO_NO_EXPORT extern const bool system_clock_supports_milliseconds;
 
 }
 

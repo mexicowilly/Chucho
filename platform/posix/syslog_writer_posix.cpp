@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ std::string format_time(const chucho::event::time_type& when)
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     };
 
-    struct std::tm cal = chucho::calendar::get_local(std::chrono::system_clock::to_time_t(when));
+    chucho::calendar::pieces cal = chucho::calendar::get_local(std::chrono::system_clock::to_time_t(when));
     std::string result = english_months[cal.tm_mon];
     result += chucho::calendar::format(cal, " %e %H:%M:%S");
     return result;

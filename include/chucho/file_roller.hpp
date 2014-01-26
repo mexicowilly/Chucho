@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ public:
     virtual std::string get_active_file_name() = 0;
     /**
      * Return the @ref file_compressor associated with this roller, 
-     * if there is on. 
+     * if there is one. 
      * 
      * @return the @ref file_compressor
      */
@@ -75,6 +75,8 @@ public:
      * @ref rolling_file_writer, which calls this method in its 
      * constructor. The file_roller must have access to the writer 
      * during the normal course of its operation. 
+     *  
+     * @note This method is for Chucho's internal use only. 
      * 
      * @param file_writer the rolling_file_writer that owns this 
      *                    roller

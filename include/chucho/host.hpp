@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Will Mason
+ * Copyright 2013-2014 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
 namespace chucho
 {
 
-class CHUCHO_EXPORT host
+class CHUCHO_PRIV_EXPORT host
 {
 public:
     static const std::string& get_base_name();

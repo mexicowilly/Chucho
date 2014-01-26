@@ -1,5 +1,5 @@
 #
-# Copyright 2013 Will Mason
+# Copyright 2013-2014 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.10)
 PROJECT(chucho CXX C)
 
-SET(CHUCHO_VERSION 1.3)
+SET(CHUCHO_VERSION 1.4)
 SET(CHUCHO_SO_VERSION 1)
 # This is used for release candidate distros
-# SET(CHUCHO_DIST_VERSION try-1)
+#SET(CHUCHO_DIST_VERSION try-1)
 
 INCLUDE(Configure.cmake)
 
@@ -50,6 +50,10 @@ IF(CHUCHO_POSIX)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/calendar_posix.cpp PROPERTIES
                                     COMPILE_DEFINITIONS "${CHUCHO_CALENDAR_DEFS};CHUCHO_HAVE_LOCALTIME_R")
     ENDIF()
+    IF(CMAKE_COMPILER_IS_GNUCXX)
+        SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
+                                    COMPILE_FLAGS "-Wno-unused-result")
+    ENDIF()
     IF(CHUCHO_NO_FTS)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
                                     COMPILE_DEFINITIONS CHUCHO_NO_FTS)
@@ -58,11 +62,6 @@ IF(CHUCHO_POSIX)
         GET_SOURCE_FILE_PROPERTY(CHUCHO_FILE_DEFS platform/posix/file_posix.cpp COMPILE_DEFINITIONS)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
                                     COMPILE_DEFINITIONS "${CHUCHO_FILE_DEFS};CHUCHO_DIRENT_NEEDS_NAME")
-    ENDIF()
-    IF(CHUCHO_HAVE_PUT_TIME)
-        GET_SOURCE_FILE_PROPERTY(CHUCHO_CALENDAR_DEFS platform/posix/calendar_posix.cpp COMPILE_DEFINITIONS)
-        SET_SOURCE_FILES_PROPERTIES(platform/posix/calendar_posix.cpp PROPERTIES
-                                    COMPILE_DEFINITIONS "${CHUCHO_CALENDAR_DEFS};CHUCHO_HAVE_PUT_TIME")
     ENDIF()
 ELSEIF(CHUCHO_WINDOWS)
     SET(CHUCHO_PLATFORM_SOURCES
@@ -78,13 +77,15 @@ ELSEIF(CHUCHO_WINDOWS)
         platform/windows/socket_connector_windows.cpp
         platform/windows/socket_exception_windows.cpp
         platform/windows/syslog_writer_windows.cpp
+        platform/windows/windows_event_log_writer.cpp
+        platform/windows/windows_event_log_writer_factory.cpp
+        include/chucho/windows_event_log_writer_factory.hpp
+        platform/windows/windows_event_log_writer_memento.cpp
+        include/chucho/windows_event_log_writer_memento.hpp
         platform/windows/winsock_startup.cpp
         platform/windows/winsock_startup.hpp)
-ENDIF()
-
-IF(CMAKE_COMPILER_IS_GNUCXX)
-    SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
-                                COMPILE_FLAGS "-Wno-unused-result")
+    SET_SOURCE_FILES_PROPERTIES(platform/windows/windows_event_log_writer.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 ENDIF()
 
 SET(CHUCHO_PUBLIC_HEADERS
@@ -115,14 +116,16 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/level_filter.hpp
     include/chucho/level_threshold_filter.hpp
     include/chucho/log.hpp
+    include/chucho/loggable.hpp
     include/chucho/logger.hpp
     include/chucho/marker.hpp
     include/chucho/memento.hpp
     include/chucho/non_copyable.hpp
     include/chucho/noop_file_compressor.hpp
     include/chucho/numbered_file_roller.hpp
-	include/chucho/optional.hpp
+    include/chucho/optional.hpp
     include/chucho/pattern_formatter.hpp
+    include/chucho/prefix.hpp
     include/chucho/remote_writer.hpp
     include/chucho/rolling_file_writer.hpp
     include/chucho/size_file_roll_trigger.hpp
@@ -131,6 +134,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/status_manager.hpp
     include/chucho/status_observer.hpp
     include/chucho/status_reporter.hpp
+    include/chucho/suffix.hpp
     include/chucho/syslog_constants.hpp
     include/chucho/syslog_writer.hpp
     include/chucho/time_file_roller.hpp
@@ -139,6 +143,11 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/writer_factory.hpp
     include/chucho/writer_memento.hpp
     include/chucho/yaml_formatter.hpp)
+
+IF(CHUCHO_WINDOWS)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/windows_event_log_writer.hpp)
+ENDIF()
 
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.hpp)
@@ -152,45 +161,72 @@ IF(CHUCHO_HAVE_MINIZIP)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/zip_file_compressor.hpp)
 ENDIF()
 
-# Update this when you rev libyaml
-SET(CHUCHO_LIBYAML_VERSION_MAJOR 0)
-SET(CHUCHO_LIBYAML_VERSION_MINOR 1)
-SET(CHUCHO_LIBYAML_VERSION_PATCH 4)
+# The libyaml sources are required by chuchod
+MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
+    # Update this when you rev libyaml
+    SET(CHUCHO_LIBYAML_VERSION_MAJOR 0)
+    SET(CHUCHO_LIBYAML_VERSION_MINOR 1)
+    SET(CHUCHO_LIBYAML_VERSION_PATCH 4)
 
-SET(CHUCHO_EMBEDDED_SOURCES
-    embedded/trex/trex.c
-    embedded/libyaml/api.c
-    embedded/libyaml/loader.c
-    embedded/libyaml/parser.c
-    embedded/libyaml/reader.c
-    embedded/libyaml/scanner.c)
+    SET(${CHUCHO_YAML_SOURCE_VAR}
+        "${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c"
+        "${CMAKE_SOURCE_DIR}/embedded/libyaml/loader.c"
+        "${CMAKE_SOURCE_DIR}/embedded/libyaml/parser.c"
+        "${CMAKE_SOURCE_DIR}/embedded/libyaml/reader.c"
+        "${CMAKE_SOURCE_DIR}/embedded/libyaml/scanner.c")
 
-IF(ENABLE_SHARED)
-    SET(CHUCHO_DECLARE_YAML YAML_DECLARE_EXPORT)
-ELSE()
-    SET(CHUCHO_DECLARE_YAML YAML_DECLARE_STATIC)
+    SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
+                                COMPILE_DEFINITIONS "YAML_VERSION_MAJOR=${CHUCHO_LIBYAML_VERSION_MAJOR};YAML_VERSION_MINOR=${CHUCHO_LIBYAML_VERSION_MINOR};YAML_VERSION_PATCH=${CHUCHO_LIBYAML_VERSION_PATCH};YAML_VERSION_STRING=\"${CHUCHO_LIB_YAML_VERSION_MAJOR}.${CHUCHO_LIBYAML_VERSION_MINOR}.${CHUCHO_LIBYAML_VERSION_PATCH}\";YAML_DECLARE_STATIC")
+    SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/loader.c"
+                                "${CMAKE_SOURCE_DIR}/embedded/libyaml/parser.c"
+                                "${CMAKE_SOURCE_DIR}/embedded/libyaml/reader.c"
+                                "${CMAKE_SOURCE_DIR}/embedded/libyaml/scanner.c"
+                                PROPERTIES
+                                COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
+    IF(MSVC)
+        # Microsoft doesn't want libyaml to use strdup
+        SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
+                                    COMPILE_FLAGS /wd4996)
+    ENDIF()
+ENDMACRO()
+
+# Configurator settings
+IF(YAML_CONFIG)
+    CHUCHO_SET_YAML_SOURCES(CHUCHO_EMBEDDED_SOURCES)
+    SET(CHUCHO_CONFIGURATOR_SOURCES
+        yaml_configurator.cpp
+        yaml_parser.cpp
+        include/chucho/utf8.hpp
+        include/chucho/yaml_configurator.hpp
+        include/chucho/yaml_parser.hpp)
+    SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
+                                COMPILE_DEFINITIONS "CHUCHO_YAML_CONFIG;YAML_DECLARE_STATIC")
+    SET_SOURCE_FILES_PROPERTIES(yaml_parser.cpp PROPERTIES
+                                COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
+    MESSAGE(STATUS "Chucho has YAML configuration parsing enabled")
 ENDIF()
-SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/api.c PROPERTIES
-                            COMPILE_DEFINITIONS "YAML_VERSION_MAJOR=${CHUCHO_LIBYAML_VERSION_MAJOR};YAML_VERSION_MINOR=${CHUCHO_LIBYAML_VERSION_MINOR};YAML_VERSION_PATCH=${CHUCHO_LIBYAML_VERSION_PATCH};YAML_VERSION_STRING=\"${CHUCHO_LIB_YAML_VERSION_MAJOR}.${CHUCHO_LIBYAML_VERSION_MINOR}.${CHUCHO_LIBYAML_VERSION_PATCH}\";${CHUCHO_DECLARE_YAML}")
-SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/loader.c
-                            embedded/libyaml/parser.c
-                            embedded/libyaml/reader.c
-                            embedded/libyaml/scanner.c
-                            PROPERTIES
-                            COMPILE_DEFINITIONS ${CHUCHO_DECLARE_YAML})
-IF(MSVC)
-    # Microsoft doesn't want libyaml to use strdup
-    SET_SOURCE_FILES_PROPERTIES(embedded/libyaml/api.c PROPERTIES
-                                COMPILE_FLAGS /wd4996)
-    # If _DEBUG is defined, which it is by CMake here with Microsoft's
-    # compiler, then trex likes to print all kinds of unhelpful things
-    # to stdout. 
-    SET_SOURCE_FILES_PROPERTIES(embedded/trex/trex.c PROPERTIES
-                                COMPILE_FLAGS /U_DEBUG)
-ENDIF()
-IF(CMAKE_C_COMPILER_ID STREQUAL Clang)
-    SET_SOURCE_FILES_PROPERTIES(embedded/trex/trex.c PROPERTIES
-                                COMPILE_FLAGS "-Wno-logical-op-parentheses -Wno-unused-value")
+
+IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
+    LIST(APPEND CHUCHO_CONFIGURATOR_SOURCES
+         config_file_configurator.cpp
+         properties.cpp
+         include/chucho/config_file_configurator.hpp
+         include/chucho/properties.hpp)
+    GET_SOURCE_FILE_PROPERTY(CHUCHO_CONFIGURATION_DEFS configuration.cpp COMPILE_DEFINITIONS)
+    SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
+                                COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATION_DEFS};CHUCHO_CONFIG_FILE_CONFIG")
+    IF(CONFIG_FILE_CONFIG)
+        SET(CHUCHO_CONFIGURATOR_DEFS CHUCHO_CONFIG_FILE)
+        MESSAGE(STATUS "Chucho has config file configuration parsing enabled")
+    ENDIF()
+    IF(LOG4CPLUS_CONFIG)
+        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_LOG4CPLUS_FILE)
+        MESSAGE(STATUS "Chucho has log4cplus configuration parsing enabled")
+    ENDIF()
+    SET_SOURCE_FILES_PROPERTIES(config_file_configurator.cpp PROPERTIES
+                                COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATOR_DEFS}")
+    SET_SOURCE_FILES_PROPERTIES(memento_key_set.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_CONFIG_FILE_CONFIG)
 ENDIF()
 
 SET(CHUCHO_SOURCES
@@ -198,6 +234,7 @@ SET(CHUCHO_SOURCES
     async_writer_factory.cpp
     async_writer_memento.cpp
     bzip2_file_compressor_factory.cpp
+    calendar.cpp
     cerr_writer.cpp
     cerr_writer_factory.cpp
     cerr_writer_memento.cpp
@@ -241,6 +278,7 @@ SET(CHUCHO_SOURCES
     logger_memento.cpp
     marker.cpp
     memento.cpp
+    memento_key_set.cpp
     noop_file_compressor.cpp
     numbered_file_roller.cpp
     numbered_file_roller_factory.cpp
@@ -270,14 +308,15 @@ SET(CHUCHO_SOURCES
     syslog_writer.cpp
     syslog_writer_factory.cpp
     syslog_writer_memento.cpp
+    text_util.cpp
     time_file_roller.cpp
     time_file_roller_factory.cpp
     time_file_roller_memento.cpp
+    time_util.cpp
     utf8.cpp
     writer.cpp
     writer_factory.cpp
     writer_memento.cpp
-    yaml_configurator.cpp
     yaml_formatter.cpp
     zip_file_compressor_factory.cpp
     include/chucho/async_writer_factory.hpp
@@ -297,6 +336,8 @@ SET(CHUCHO_SOURCES
     include/chucho/exception.hpp
     include/chucho/file.hpp
     include/chucho/file_exception.hpp
+    include/chucho/file_writer_factory.hpp
+    include/chucho/file_writer_memento.hpp
     include/chucho/garbage_cleaner.hpp
     include/chucho/gzip_file_compressor_factory.hpp
     include/chucho/host.hpp
@@ -307,6 +348,7 @@ SET(CHUCHO_SOURCES
     include/chucho/line_ending.hpp
     include/chucho/logger_factory.hpp
     include/chucho/logger_memento.hpp
+    include/chucho/memento_key_set.hpp
     include/chucho/numbered_file_roller_factory.hpp
     include/chucho/numbered_file_roller_memento.hpp
     include/chucho/pattern_formatter_factory.hpp
@@ -329,14 +371,26 @@ SET(CHUCHO_SOURCES
     include/chucho/status_reporter.hpp
     include/chucho/syslog_writer_factory.hpp
     include/chucho/syslog_writer_memento.hpp
+    include/chucho/text_util.hpp
     include/chucho/time_file_roller_factory.hpp
     include/chucho/time_file_roller_memento.hpp
+    include/chucho/time_util.hpp
     include/chucho/utf8.hpp
-    include/chucho/yaml_configurator.hpp
     include/chucho/zip_file_compressor_factory.hpp
+    ${CHUCHO_CONFIGURATOR_SOURCES}
     ${CHUCHO_PLATFORM_SOURCES}
     ${CHUCHO_EMBEDDED_SOURCES}
     ${CHUCHO_PUBLIC_HEADERS})
+
+IF(CHUCHO_HAVE_PUT_TIME)
+    SET_SOURCE_FILES_PROPERTIES(calendar.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_HAVE_PUT_TIME)
+ENDIF()
+
+IF(CHUCHO_WINDOWS)
+    SET_SOURCE_FILES_PROPERTIES(configurator.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_WINDOWS)
+ENDIF()
 
 SET_SOURCE_FILES_PROPERTIES(yaml_configurator.cpp PROPERTIES
                             COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
@@ -350,6 +404,16 @@ IF(CHUCHO_HAVE_WINSOCK2_H)
     GET_SOURCE_FILE_PROPERTY(CHUCHO_REMOTE_WRITER_DEFS remote_writer.cpp COMPILE_DEFINITIONS)
     SET_SOURCE_FILES_PROPERTIES(remote_writer.cpp PROPERTIES
                                 COMPILE_DEFINITIONS "${CHUCHO_REMOTE_WRITER_DEFS};CHUCHO_HAVE_WINSOCK2_H")
+ENDIF()
+
+IF(CHUCHO_HAVE_STD_REGEX)
+    SET_SOURCE_FILES_PROPERTIES(regex.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_HAVE_STD_REGEX)
+ELSEIF(CHUCHO_HAVE_POSIX_REGEX)
+    SET_SOURCE_FILES_PROPERTIES(regex.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_HAVE_POSIX_REGEX)
+ELSE()
+    MESSAGE(FATAL_ERROR "You don't have regular expressions")
 ENDIF()
 
 IF(CHUCHO_HAVE_ZLIB)
@@ -432,9 +496,14 @@ IF(ENABLE_SHARED)
         SET_TARGET_PROPERTIES(chucho PROPERTIES
                               LINK_FLAGS "-std=c++11 -stdlib=libc++")
     ENDIF()
+    IF(CHUCHO_WINDOWS)
+        SET(CHUCHO_RT_DEST bin)
+    ELSE()
+        SET(CHUCHO_RT_DEST lib)
+    ENDIF()
     INSTALL(TARGETS chucho
-            LIBRARY DESTINATION lib
-            RUNTIME DESTINATION lib
+            ARCHIVE DESTINATION lib
+            RUNTIME DESTINATION ${CHUCHO_RT_DEST}
             FRAMEWORK DESTINATION /Library/Frameworks
             PUBLIC_HEADER DESTINATION include/chucho)
 ELSE()
@@ -460,22 +529,53 @@ IF(BZIP2_LIB_DIR)
     TARGET_LINK_LIBRARIES(chucho bz2)
 ENDIF()
 
+IF(CHUCHO_WINDOWS)
+    ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/event_log.rc"
+                              "${CMAKE_BINARY_DIR}/event_log.hpp"
+                       COMMAND mc -e hpp -h "${CMAKE_BINARY_DIR}" -r "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}/platform/windows/event_log.mc"
+                       DEPENDS platform/windows/event_log.mc)
+    ADD_LIBRARY(event_log SHARED "${CMAKE_BINARY_DIR}/event_log.rc")
+    SET_TARGET_PROPERTIES(event_log PROPERTIES
+                          LINKER_LANGUAGE CXX
+                          LINK_FLAGS /NOENTRY)
+    ADD_DEPENDENCIES(chucho event_log)
+    INSTALL(TARGETS event_log
+            RUNTIME DESTINATION bin)
+ENDIF()
+
 ADD_SUBDIRECTORY(test)
 ADD_SUBDIRECTORY(log-server)
 
 # Documentation
 IF(DOXYGEN_FOUND)
-    SET(CHUCHO_DOXYGEN_INPUT "\"${CMAKE_SOURCE_DIR}/main_page.hpp\"")
-	FOREACH(HEAD ${CHUCHO_PUBLIC_HEADERS})
-        SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
-	ENDFOREACH()
-	CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/doxygen.conf" "${CMAKE_BINARY_DIR}/doxygen_mod.conf")
-	ADD_CUSTOM_TARGET(doc
-					  COMMAND "${DOXYGEN_EXECUTABLE}" "${CMAKE_BINARY_DIR}/doxygen_mod.conf"
-					  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+    SET(CHUCHO_DOXYGEN_INPUT main_page.hpp)
+    IF(NOT CHUCHO_WINDOWS)
+        SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} include/chucho/windows_event_log_writer.hpp")
+    ENDIF()
+    IF(CHUCHO_DOCUMENT_ALL)
+        FOREACH(HEAD ${CHUCHO_SOURCES})
+            IF(HEAD MATCHES "^include/chucho/.+\\.hpp$")
+                SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
+            ENDIF()
+        ENDFOREACH()
+        FILE(GLOB CHUCHO_GENERATED_HEADERS RELATIVE "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/chucho/*.hpp")
+        FOREACH(HEAD ${CHUCHO_GENERATED_HEADERS})
+            SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
+        ENDFOREACH()
+        SET(CHUCHO_DOXYGEN_EXTRACT_ALL YES)
+    ELSE()
+        FOREACH(HEAD ${CHUCHO_PUBLIC_HEADERS})
+            SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
+        ENDFOREACH()
+        SET(CHUCHO_DOXYGEN_EXTRACT_ALL NO)
+    ENDIF()
+    CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/doxygen.conf.in" "${CMAKE_BINARY_DIR}/doxygen.conf")
+    ADD_CUSTOM_TARGET(doc
+                      COMMAND "${DOXYGEN_EXECUTABLE}" "${CMAKE_BINARY_DIR}/doxygen.conf"
+                      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 ELSE()
-	ADD_CUSTOM_TARGET(doc
-					  COMMAND "${CMAKE_COMMAND}" -E echo "Doxygen was not found on this system, so the documentation cannot be generated")
+    ADD_CUSTOM_TARGET(doc
+                      COMMAND "${CMAKE_COMMAND}" -E echo "Doxygen was not found on this system, so the documentation cannot be generated")
 ENDIF()
 
 # Static analysis
@@ -503,7 +603,10 @@ FOREACH(SRC ${CHUCHO_SOURCES})
         LIST(APPEND CHUCHO_TO_REMOVE "${SRC}")
     ENDIF()
 ENDFOREACH()
-LIST(REMOVE_ITEM CHUCHO_SOURCES ${CHUCHO_TO_REMOVE})
+LIST(LENGTH CHUCHO_TO_REMOVE CHUCHO_TO_REMOVE_LENGTH)
+IF(CHUCHO_TO_REMOVE_LENGTH GREATER 0)
+    LIST(REMOVE_ITEM CHUCHO_SOURCES ${CHUCHO_TO_REMOVE})
+ENDIF()
 STRING(TOLOWER ${CMAKE_PROJECT_NAME} CHUCHO_LOWER_PROJECT_NAME)
 SET(CHUCHO_DIST_NAME_BASE "${CMAKE_BINARY_DIR}/${CHUCHO_LOWER_PROJECT_NAME}-${CHUCHO_VERSION}")
 IF(DEFINED CHUCHO_DIST_VERSION)
@@ -521,7 +624,8 @@ ADD_CUSTOM_TARGET(dist
                   COMMAND "${CMAKE_COMMAND}" -E tar czvf ${CHUCHO_DIST_NAME_BASE}.tar.gz ${CHUCHO_DIST_NAME_BASE}
                   DEPENDS ${CHUCHO_DIST_OUTPUT})
 IF(CHUCHO_ZIP)
+    FILE(RELATIVE_PATH CHUCHO_ZDIST_NAME_BASE "${CMAKE_BINARY_DIR}" "${CHUCHO_DIST_NAME_BASE}")
     ADD_CUSTOM_TARGET(zdist
-                      COMMAND "${CHUCHO_ZIP}" --recurse-paths --to-crlf ${CHUCHO_DIST_NAME_BASE}.zip ${CHUCHO_DIST_NAME_BASE}
+                      COMMAND "${CHUCHO_ZIP}" --recurse-paths --to-crlf ${CHUCHO_DIST_NAME_BASE}.zip ${CHUCHO_ZDIST_NAME_BASE}
                       DEPENDS ${CHUCHO_DIST_OUTPUT})
 ENDIF()
