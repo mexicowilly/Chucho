@@ -37,6 +37,7 @@ int main()
 {
     chucho_cnf_set_style(CHUCHO_CONFIGURATION_STYLE_OFF);
     sput_start_testing();
+
     run_log_macro_test();
     run_file_writer_test();
     run_configuration_test();
@@ -50,6 +51,7 @@ int main()
     run_duplicate_message_filter_test();
     run_level_filter_test();
     run_level_threshold_filter_test();
+
     sput_finish_testing();
     chucho_finalize();
     return sput_get_return_value();
