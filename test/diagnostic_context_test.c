@@ -74,9 +74,11 @@ static void get(void)
         rc = chucho_dgc_set(keys[i], values[i]);
         sput_fail_unless(rc == CHUCHO_NO_ERROR, "set");
     }
-    chucho_dgc_node** nodes;
-    rc = chucho_dgc_get(&nodes);
+    chucho_dgc_node* nodes[3];
+    size_t count;
+    rc = chucho_dgc_get(nodes, 3, &count);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get");
+    sput_fail_unless(count == 3, "node count of 3");
     int got_1 = 0;
     int got_2 = 0;
     int got_3 = 0;
@@ -109,9 +111,11 @@ static void get(void)
     sput_fail_unless(got_1 == 1, "got 1");
     sput_fail_unless(got_2 == 1, "got 2");
     sput_fail_unless(got_3 == 1, "got 3");
-    sput_fail_unless(nodes[i] == NULL, "last node is NULL");
-    rc = chucho_dgc_release_nodes(nodes);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "release nodes");
+    for (int i = 0; i < 3; i++) 
+    {
+        rc = chucho_dgc_release_node(nodes[i]);
+        sput_fail_unless(rc == CHUCHO_NO_ERROR, "release nodes");
+    }
 }
 
 void run_diagnostic_context_test(void)

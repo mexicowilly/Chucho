@@ -52,31 +52,30 @@ int chucho_wrt_clear_filters(chucho_writer* wrt)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_wrt_get_filters(const chucho_writer* wrt, chucho_filter*** flts)
+int chucho_wrt_get_filters(const chucho_writer* wrt, chucho_filter** buf, size_t buf_size, size_t* count)
 {
-    if (wrt == nullptr || flts == nullptr) 
+    if (wrt == nullptr || count == nullptr) 
         return CHUCHO_NULL_POINTER;
-    chucho_filter** loc = nullptr;
-    int i = 0;
     try
     {
-        auto cpp = wrt->writer_->get_filters();
-        loc = new chucho_filter*[cpp.size() + 1];
-        std::memset(loc, 0, sizeof(chucho_filter*) * (cpp.size() + 1));
-        for ( ; i < cpp.size(); i++) 
+        auto flts = wrt->writer_->get_filters();
+        *count = flts.size();
+        if (buf_size < flts.size()) 
+            return CHUCHO_INSUFFICIENT_BUFFER;
+        if (buf == nullptr) 
+            return CHUCHO_NULL_POINTER;
+        unsigned idx = 0;
+        for (auto flt : flts)
         {
-            loc[i] = new chucho_filter();
-            loc[i]->flt_ = cpp[i];
+            buf[idx] = new chucho_filter();
+            buf[idx]->flt_ = flt;
+            idx++;
         }
     }
     catch (...) 
     {
-        while (i > 0) 
-            delete loc[i--];
-        delete [] loc;
         return CHUCHO_OUT_OF_MEMORY;
     }
-    *flts = loc;
     return CHUCHO_NO_ERROR;
 }
 

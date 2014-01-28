@@ -30,13 +30,13 @@ typedef struct
     char* value;
 } chucho_dgc_node;
 
-CHUCHO_EXPORT int chucho_dgc_release_nodes(chucho_dgc_node** arr);
+CHUCHO_EXPORT int chucho_dgc_release_node(chucho_dgc_node* node);
 
 CHUCHO_EXPORT const char* chucho_dgc_at(const char* const key);
 CHUCHO_EXPORT int chucho_dgc_clear(void);
 CHUCHO_EXPORT int chucho_dgc_empty(void);
 CHUCHO_EXPORT int chucho_dgc_erase(const char* const key);
-CHUCHO_EXPORT int chucho_dgc_get(chucho_dgc_node*** nodes);
+CHUCHO_EXPORT int chucho_dgc_get(chucho_dgc_node** buf, size_t buf_size, size_t* count);
 CHUCHO_EXPORT int chucho_dgc_set(const char* const key, const char* const value);
 
 #if defined(__cplusplus)

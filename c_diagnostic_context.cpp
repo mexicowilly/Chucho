@@ -19,72 +19,16 @@
 #include <chucho/error.h>
 #include <cstring>
 
-namespace
-{
-
-int create_node(chucho_dgc_node** node,
-                const char* const key,
-                const char* const value)
-{
-    if (node == nullptr || key == nullptr || value == nullptr) 
-        return CHUCHO_NULL_POINTER;
-    try
-    {
-        *node = new chucho_dgc_node;
-        (*node)->key = new char [std::strlen(key) + 1];
-        std::strcpy((*node)->key, key);
-        (*node)->value = new char [std::strlen(value) + 1];
-        std::strcpy((*node)->value, value);
-    }
-    catch (...)
-    {
-        if (*node != nullptr)
-        {
-            delete [] (*node)->key;
-            delete [] (*node)->value;
-            delete *node;
-            *node = nullptr;
-        }
-        return CHUCHO_OUT_OF_MEMORY;
-    }
-    return CHUCHO_NO_ERROR;
-}
-
-int create_nodes(chucho_dgc_node*** arr, size_t count)
-{
-    if (arr == nullptr)
-        return CHUCHO_NULL_POINTER;
-    try
-    {
-        *arr = new chucho_dgc_node*[count + 1];
-        std::memset(*arr, 0, sizeof(chucho_dgc_node*) * (count + 1));
-    }
-    catch (...) 
-    {
-        return CHUCHO_OUT_OF_MEMORY;
-    }
-    return CHUCHO_NO_ERROR;
-}
-
-int release_node(chucho_dgc_node* node)
-{
-    delete [] node->key;
-    delete [] node->value;
-    delete node; 
-    return CHUCHO_NO_ERROR;
-}
-
-}
-
 extern "C"
 {
 
-int chucho_dgc_release_nodes(chucho_dgc_node** arr)
+int chucho_dgc_release_node(chucho_dgc_node* node)
 {
-    std::size_t i = 0;
-    while (arr[i] != nullptr) 
-        release_node(arr[i++]);
-    delete [] arr;
+    if (node == nullptr) 
+        return CHUCHO_NULL_POINTER;
+    delete [] node->key;
+    delete [] node->value;
+    delete node;
     return CHUCHO_NO_ERROR;
 }
 
@@ -138,39 +82,33 @@ int chucho_dgc_erase(const char* const key)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_dgc_get(chucho_dgc_node*** nodes)
+int chucho_dgc_get(chucho_dgc_node** buf, size_t buf_size, size_t* count)
 {
-    if (nodes == nullptr)
+    if (count == nullptr)
         return CHUCHO_NULL_POINTER; 
-    chucho_dgc_node** loc;
     try
     {
         auto cpp = chucho::diagnostic_context::get();
-        int rc = create_nodes(&loc, cpp.size());
-        if (rc != CHUCHO_NO_ERROR) 
-            return rc;
-        int i = 0;
+        *count = cpp.size();
+        if (buf_size < cpp.size()) 
+            return CHUCHO_INSUFFICIENT_BUFFER;
+        if (buf == nullptr) 
+            return CHUCHO_NULL_POINTER;
+        unsigned idx = 0;
         for (auto kv : cpp) 
         {
-            int rc = create_node(&loc[i],
-                                 kv.first.c_str(),
-                                 kv.second.c_str());
-            if (rc != CHUCHO_NO_ERROR) 
-            {
-                while (--i >= 0) 
-                    release_node((*nodes)[i]);
-                // Don't use chucho_dgc_release_nodes here
-                delete [] loc;
-                return CHUCHO_OUT_OF_MEMORY;
-            }
-            i++;
+            buf[idx] = new chucho_dgc_node;
+            buf[idx]->key = new char[kv.first.length() + 1];
+            std::strcpy(buf[idx]->key, kv.first.c_str());
+            buf[idx]->value = new char[kv.second.length() + 1];
+            std::strcpy(buf[idx]->value, kv.second.c_str());
+            idx++;
         }
     }
     catch (...) 
     {
         return CHUCHO_OUT_OF_MEMORY;
     }
-    *nodes = loc;
     return CHUCHO_NO_ERROR;
 }
 
@@ -181,27 +119,6 @@ int chucho_dgc_set(const char* const key, const char* const value)
     try
     {
         chucho::diagnostic_context::at(key) = value;
-    }
-    catch (...) 
-    {
-        return CHUCHO_OUT_OF_MEMORY;
-    }
-    return CHUCHO_NO_ERROR;
-}
-
-int chucho_dgc_set_all(chucho_dgc_node** nodes)
-{
-    try
-    {
-        std::map<std::string, std::string> ctx;
-        size_t i = 0;
-        while (nodes[i] != nullptr) 
-        {
-            ctx[nodes[i]->key] = nodes[i]->value;
-            i++;
-        }
-        chucho_dgc_release_nodes(nodes);
-        chucho::diagnostic_context::set(ctx);
     }
     catch (...) 
     {

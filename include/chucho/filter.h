@@ -34,8 +34,6 @@ typedef enum
 } chucho_filter_result;
 
 CHUCHO_EXPORT int chucho_release_filter(chucho_filter* flt);
-// Can be used to release filters returned from chucho_wrt_get_filters()
-CHUCHO_EXPORT int chucho_release_filters(chucho_filter** flts);
 
 #if defined(__cplusplus)
 }

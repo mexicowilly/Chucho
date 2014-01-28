@@ -26,13 +26,4 @@ int chucho_release_filter(chucho_filter* flt)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_release_filters(chucho_filter** flts)
-{
-    int i = 0;
-    while (flts[i] != nullptr)
-        delete flts[i++];
-    delete [] flts;
-    return CHUCHO_NO_ERROR;
-}
-
 }

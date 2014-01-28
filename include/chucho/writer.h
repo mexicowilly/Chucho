@@ -20,6 +20,7 @@
 #include <chucho/export.h>
 #include <chucho/filter.h>
 #include <chucho/formatter.h>
+#include <stddef.h>
 
 #if defined(__cplusplus)
 extern "C"
@@ -32,7 +33,7 @@ CHUCHO_EXPORT int chucho_release_writer(chucho_writer* wrt);
 
 CHUCHO_EXPORT int chucho_wrt_add_filter(chucho_writer* wrt, chucho_filter* flt);
 CHUCHO_EXPORT int chucho_wrt_clear_filters(chucho_writer* wrt);
-CHUCHO_EXPORT int chucho_wrt_get_filters(const chucho_writer* wrt, chucho_filter*** flts);
+CHUCHO_EXPORT int chucho_wrt_get_filters(const chucho_writer* wrt, chucho_filter** buf, size_t buf_size, size_t* count);
 CHUCHO_EXPORT int chucho_wrt_get_formatter(const chucho_writer* wrt, chucho_formatter** fmt);
 
 #if defined(__cplusplus)
