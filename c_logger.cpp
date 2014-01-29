@@ -24,7 +24,7 @@
 extern "C"
 {
 
-int chucho_get_logger(chucho_logger** lgr, const char* const name)
+int chucho_create_logger(chucho_logger** lgr, const char* const name)
 {
     try
     {
@@ -102,12 +102,12 @@ int chucho_lgr_get_writers(const chucho_logger* lgr, chucho_writer** buf, size_t
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_lgr_permits(const chucho_logger* lgr, const chucho_level* lvl)
+int chucho_lgr_permits(const chucho_logger* lgr, const chucho_level* lvl, int* state)
 {
-    return lgr != nullptr &&
-           lvl != nullptr &&
-           lgr->logger_->permits(lvl->level_) ?
-        1 : 0;
+    if (lgr == nullptr || lvl == nullptr) 
+        return CHUCHO_NULL_POINTER;
+    *state = lgr->logger_->permits(lvl->level_) ? 1 : 0;
+    return CHUCHO_NO_ERROR;
 }
 
 int chucho_release_logger(chucho_logger* lgr)

@@ -138,6 +138,8 @@ ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
                level_threshold_filter_test.h
                log_macro_test.c
                log_macro_test.h
+               logger_test.c
+               logger_test.h
                test_util.c
                test_util.h
                ${CHUCHO_TEST_COMPRESSION_C_SOURCES})

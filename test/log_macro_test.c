@@ -144,7 +144,7 @@ static void set_log_level()
 
 static void set_up(void)
 {
-    int rc = chucho_get_logger(&lgr, "log_macro");
+    int rc = chucho_create_logger(&lgr, "log_macro");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get logger log_macro");
     chucho_formatter* fmt;
     rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
