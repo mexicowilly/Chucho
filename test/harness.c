@@ -33,6 +33,8 @@
 #include "logger_test.h"
 #include "numbered_file_roller_test.h"
 #include "pattern_formatter_test.h"
+#include "remote_writer_test.h"
+#include "size_file_roll_trigger_test.h"
 
 sput_struct __sput;
 
@@ -57,6 +59,8 @@ int main()
     run_logger_test();
     run_numbered_file_roller_test();
     run_pattern_formatter_test();
+    run_remote_writer_test();
+    run_size_file_roll_trigger_test();
 
     sput_finish_testing();
     chucho_finalize();

@@ -144,6 +144,12 @@ ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
                numbered_file_roller_test.h
                pattern_formatter_test.c
                pattern_formatter_test.h
+               remote_writer_test.c
+               remote_writer_test.h
+               rolling_file_writer_test.c
+               rolling_file_writer_test.h
+               size_file_roll_trigger_test.c
+               size_file_roll_trigger_test.h
                test_util.c
                test_util.h
                ${CHUCHO_TEST_COMPRESSION_C_SOURCES})

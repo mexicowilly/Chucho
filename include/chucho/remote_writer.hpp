@@ -35,7 +35,7 @@ class socket_connector;
  * any loggers that appear in the events written to this logger. 
  * The logging settings for those loggers on the chucho server 
  * itself then serve as the settings used for events written to 
- * this remote_logger.
+ * this remote_writer.
  *  
  * This writer will never block the writing thread while a 
  * connection to the chucho server is being made. However, after
