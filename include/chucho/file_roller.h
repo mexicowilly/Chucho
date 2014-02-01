@@ -14,27 +14,22 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_ERROR_H__)
-#define CHUCHO_ERROR_H__
+#if !defined(CHUCHO_FILE_ROLLER_H__)
+#define CHUCHO_FILE_ROLLER_H__
 
-#include <chucho/export.h>
+#include <chucho/file_compressor.h>
 
 #if defined(__cplusplus)
 extern "C"
 {
 #endif
 
-#define CHUCHO_NO_ERROR                     0
-#define CHUCHO_NO_SUCH_LEVEL                1
-#define CHUCHO_NULL_POINTER                 2
-#define CHUCHO_INSUFFICIENT_BUFFER          3
-#define CHUCHO_FORMAT_ERROR                 4
-#define CHUCHO_OUT_OF_MEMORY                5
-#define CHUCHO_TYPE_MISMATCH                6
-#define CHUCHO_INVALID_PATTERN              7
-#define CHUCHO_INVALID_ARGUMENT             8
+typedef struct chucho_file_roller chucho_file_roller;
 
-CHUCHO_EXPORT const char* chucho_error_message(int err);
+CHUCHO_EXPORT int chucho_release_file_roller(chucho_file_roller* rlr);
+
+CHUCHO_EXPORT int chucho_rlr_get_active_file_name(const chucho_file_roller* rlr, char* buf, size_t buf_size, size_t* count);
+CHUCHO_EXPORT int chucho_rlr_get_file_compressor(const chucho_file_roller* rlr, chucho_file_compressor** cmp);
 
 #if defined(__cplusplus)
 }

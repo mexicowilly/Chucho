@@ -31,6 +31,8 @@
 #include "level_filter_test.h"
 #include "level_threshold_filter_test.h"
 #include "logger_test.h"
+#include "numbered_file_roller_test.h"
+#include "pattern_formatter_test.h"
 
 sput_struct __sput;
 
@@ -53,6 +55,8 @@ int main()
     run_level_filter_test();
     run_level_threshold_filter_test();
     run_logger_test();
+    run_numbered_file_roller_test();
+    run_pattern_formatter_test();
 
     sput_finish_testing();
     chucho_finalize();

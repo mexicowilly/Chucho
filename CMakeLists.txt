@@ -99,6 +99,7 @@ IF(C_API)
         include/chucho/error.h
         "${CMAKE_BINARY_DIR}/chucho/export.h"
         include/chucho/file_compressor.h
+        include/chucho/file_roller.h
         include/chucho/file_writer.h
         include/chucho/filter.h
         include/chucho/finalize.h
@@ -108,6 +109,7 @@ IF(C_API)
         include/chucho/level_threshold_filter.h
         include/chucho/log.h
         include/chucho/logger.h
+        include/chucho/numbered_file_roller.h
         include/chucho/pattern_formatter.h
         include/chucho/writer.h)
 ENDIF()
@@ -273,6 +275,7 @@ IF(C_API)
         c_diagnostic_context.cpp
         c_duplicate_message_filter.cpp
         c_file_compressor.cpp
+        c_file_roller.cpp
         c_file_writer.cpp
         c_filter.cpp
         c_finalize.cpp
@@ -282,10 +285,12 @@ IF(C_API)
         c_level_threshold_filter.cpp
         c_log.cpp
         c_logger.cpp
+        c_numbered_file_roller.cpp
         c_pattern_formatter.cpp
         c_util.cpp
         c_writer.cpp
         include/chucho/c_file_compressor.hpp
+        include/chucho/c_file_roller.hpp
         include/chucho/c_filter.hpp
         include/chucho/c_formatter.hpp
         include/chucho/c_level.hpp

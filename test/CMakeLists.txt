@@ -140,6 +140,10 @@ ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
                log_macro_test.h
                logger_test.c
                logger_test.h
+               numbered_file_roller_test.c
+               numbered_file_roller_test.h
+               pattern_formatter_test.c
+               pattern_formatter_test.h
                test_util.c
                test_util.h
                ${CHUCHO_TEST_COMPRESSION_C_SOURCES})

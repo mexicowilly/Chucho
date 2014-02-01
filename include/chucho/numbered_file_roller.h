@@ -14,27 +14,23 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_ERROR_H__)
-#define CHUCHO_ERROR_H__
+#if !defined(CHUCHO_NUMBERED_FILE_ROLLER_H__)
+#define CHUCHO_NUMBERED_FILE_ROLLER_H__
 
-#include <chucho/export.h>
+#include <chucho/file_roller.h>
 
 #if defined(__cplusplus)
 extern "C"
 {
 #endif
 
-#define CHUCHO_NO_ERROR                     0
-#define CHUCHO_NO_SUCH_LEVEL                1
-#define CHUCHO_NULL_POINTER                 2
-#define CHUCHO_INSUFFICIENT_BUFFER          3
-#define CHUCHO_FORMAT_ERROR                 4
-#define CHUCHO_OUT_OF_MEMORY                5
-#define CHUCHO_TYPE_MISMATCH                6
-#define CHUCHO_INVALID_PATTERN              7
-#define CHUCHO_INVALID_ARGUMENT             8
+CHUCHO_EXPORT int chucho_create_numbered_file_roller(chucho_file_roller** rlr,
+                                                     int min_index,
+                                                     int max_index,
+                                                     chucho_file_compressor* cmp);
 
-CHUCHO_EXPORT const char* chucho_error_message(int err);
+CHUCHO_EXPORT int chucho_nfrlr_get_max_index(const chucho_file_roller* rlr, int* idx);
+CHUCHO_EXPORT int chucho_nfrlr_get_min_index(const chucho_file_roller* rlr, int* idx);
 
 #if defined(__cplusplus)
 }
