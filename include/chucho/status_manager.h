@@ -14,29 +14,24 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_ERROR_H__)
-#define CHUCHO_ERROR_H__
+#if !defined(CHUCHO_STATUS_MANAGER_H__)
+#define CHUCHO_STATUS_MANAGER_H__
 
 #include <chucho/export.h>
+#include <chucho/status.h>
 
 #if defined(__cplusplus)
 extern "C"
 {
 #endif
 
-#define CHUCHO_NO_ERROR                     0
-#define CHUCHO_NO_SUCH_LEVEL                1
-#define CHUCHO_NULL_POINTER                 2
-#define CHUCHO_INSUFFICIENT_BUFFER          3
-#define CHUCHO_FORMAT_ERROR                 4
-#define CHUCHO_OUT_OF_MEMORY                5
-#define CHUCHO_TYPE_MISMATCH                6
-#define CHUCHO_INVALID_PATTERN              7
-#define CHUCHO_INVALID_ARGUMENT             8
-#define CHUCHO_NO_SUCH_VALUE                9
-#define CHUCHO_CONNECTION_ERROR             10
+typedef void (*chucho_status_observer)(const chucho_status* st);
 
-CHUCHO_EXPORT const char* chucho_error_message(int err);
+CHUCHO_EXPORT int chucho_status_add_observer(chucho_status_observer obs);
+CHUCHO_EXPORT int chucho_status_clear(void);
+CHUCHO_EXPORT int chucho_status_get_count(size_t* cnt);
+CHUCHO_EXPORT int chucho_status_get_level(chucho_status_level* lvl);
+CHUCHO_EXPORT int chucho_status_remove_observer(chucho_status_observer obs);
 
 #if defined(__cplusplus)
 }

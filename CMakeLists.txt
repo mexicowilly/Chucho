@@ -115,6 +115,10 @@ IF(C_API)
         include/chucho/remote_writer.h
         include/chucho/rolling_file_writer.h
         include/chucho/size_file_roll_trigger.h
+        include/chucho/sliding_numbered_file_roller.h
+        include/chucho/status.h
+        include/chucho/status_manager.h
+        include/chucho/syslog_writer.h
         include/chucho/writer.h)
 ENDIF()
 
@@ -295,6 +299,9 @@ IF(C_API)
         c_remote_writer.cpp
         c_rolling_file_writer.cpp
         c_size_file_roll_trigger.cpp
+        c_sliding_numbered_file_roller.cpp
+        c_status_manager.cpp
+        c_syslog_writer.cpp
         c_util.cpp
         c_writer.cpp
         include/chucho/c_file_compressor.hpp

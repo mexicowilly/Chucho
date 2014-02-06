@@ -35,6 +35,9 @@
 #include "pattern_formatter_test.h"
 #include "remote_writer_test.h"
 #include "size_file_roll_trigger_test.h"
+#include "rolling_file_writer_test.h"
+#include "sliding_numbered_file_roller_test.h"
+#include "syslog_writer_test.h"
 
 sput_struct __sput;
 
@@ -61,6 +64,9 @@ int main()
     run_pattern_formatter_test();
     run_remote_writer_test();
     run_size_file_roll_trigger_test();
+    run_rolling_file_writer_test();
+    run_sliding_numbered_file_roller_test();
+    run_syslog_writer_test();
 
     sput_finish_testing();
     chucho_finalize();

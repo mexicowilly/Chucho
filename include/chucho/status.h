@@ -14,29 +14,30 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_ERROR_H__)
-#define CHUCHO_ERROR_H__
+#if !defined(CHUCHO_STATUS_H__)
+#define CHUCHO_STATUS_H__
 
-#include <chucho/export.h>
+#include <time.h>
 
 #if defined(__cplusplus)
 extern "C"
 {
 #endif
 
-#define CHUCHO_NO_ERROR                     0
-#define CHUCHO_NO_SUCH_LEVEL                1
-#define CHUCHO_NULL_POINTER                 2
-#define CHUCHO_INSUFFICIENT_BUFFER          3
-#define CHUCHO_FORMAT_ERROR                 4
-#define CHUCHO_OUT_OF_MEMORY                5
-#define CHUCHO_TYPE_MISMATCH                6
-#define CHUCHO_INVALID_PATTERN              7
-#define CHUCHO_INVALID_ARGUMENT             8
-#define CHUCHO_NO_SUCH_VALUE                9
-#define CHUCHO_CONNECTION_ERROR             10
+typedef enum
+{
+    chucho_status_level_info,
+    chucho_status_level_warning,
+    chucho_status_level_error
+} chucho_status_level;
 
-CHUCHO_EXPORT const char* chucho_error_message(int err);
+typedef struct
+{
+    chucho_status_level level;
+    const char* message;
+    const char* origin;
+    time_t time;
+} chucho_status;
 
 #if defined(__cplusplus)
 }

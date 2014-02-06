@@ -59,7 +59,7 @@ public:
     //@{
     /**
      * Construct a sliding roller with a maximum count and optional 
-     * compressor. 
+     * compressor. The starting index for numbering is set to one.
      * 
      * @param max_count the maximum of number of files that can 
      *                  exist for this roller at a time
@@ -83,7 +83,7 @@ public:
 
     virtual std::string get_active_file_name() override;
     /**
-     * Return the index of the file that is current being written.
+     * Return the index of the file that is currently being written.
      * @return the current index
      */
     int get_current_index() const;

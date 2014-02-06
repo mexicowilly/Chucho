@@ -150,6 +150,10 @@ ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
                rolling_file_writer_test.h
                size_file_roll_trigger_test.c
                size_file_roll_trigger_test.h
+               sliding_numbered_file_roller_test.c
+               sliding_numbered_file_roller_test.h
+               syslog_writer_test.c
+               syslog_writer_test.h
                test_util.c
                test_util.h
                ${CHUCHO_TEST_COMPRESSION_C_SOURCES})

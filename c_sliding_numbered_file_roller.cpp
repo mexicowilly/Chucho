@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#include <chucho/numbered_file_roller.hpp>
-#include <chucho/numbered_file_roller.h>
+#include <chucho/sliding_numbered_file_roller.hpp>
+#include <chucho/sliding_numbered_file_roller.h>
 #include <chucho/c_file_roller.hpp>
 #include <chucho/c_file_compressor.hpp>
 #include <chucho/file_compressor.h>
@@ -24,10 +24,10 @@
 extern "C"
 {
 
-int chucho_create_numbered_file_roller(chucho_file_roller** rlr,
-                                       int min_index,
-                                       int max_index,
-                                       chucho_file_compressor* cmp)
+int chucho_create_sliding_numbered_file_roller(chucho_file_roller** rlr,
+                                               int min_index,
+                                               size_t max_count,
+                                               chucho_file_compressor* cmp)
 {
     if (rlr == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -37,7 +37,7 @@ int chucho_create_numbered_file_roller(chucho_file_roller** rlr,
         if (cmp != nullptr) 
             cpp_cmp = cmp->compressor_;
         *rlr = new chucho_file_roller;
-        (*rlr)->rlr_ = std::make_shared<chucho::numbered_file_roller>(min_index, max_index, cpp_cmp);
+        (*rlr)->rlr_ = std::make_shared<chucho::sliding_numbered_file_roller>(min_index, max_count, cpp_cmp);
         chucho_release_file_compressor(cmp);
     }
     catch (std::invalid_argument&) 
@@ -51,22 +51,33 @@ int chucho_create_numbered_file_roller(chucho_file_roller** rlr,
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_nfrlr_get_max_index(const chucho_file_roller* rlr, int* idx)
+int chucho_snfrlr_get_current_index(const chucho_file_roller* rlr, int* idx)
 {
     if (rlr == nullptr || idx == nullptr) 
         return CHUCHO_NULL_POINTER;
-    auto cpp = std::dynamic_pointer_cast<chucho::numbered_file_roller>(rlr->rlr_);
+    auto cpp = std::dynamic_pointer_cast<chucho::sliding_numbered_file_roller>(rlr->rlr_);
     if (!cpp) 
         return CHUCHO_TYPE_MISMATCH;
-    *idx = cpp->get_max_index();
+    *idx = cpp->get_current_index();
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_nfrlr_get_min_index(const chucho_file_roller* rlr, int* idx)
+int chucho_snfrlr_get_max_count(const chucho_file_roller* rlr, size_t* cnt)
+{
+    if (rlr == nullptr || cnt == nullptr) 
+        return CHUCHO_NULL_POINTER;
+    auto cpp = std::dynamic_pointer_cast<chucho::sliding_numbered_file_roller>(rlr->rlr_);
+    if (!cpp) 
+        return CHUCHO_TYPE_MISMATCH;
+    *cnt = cpp->get_max_count();
+    return CHUCHO_NO_ERROR;
+}
+
+int chucho_snfrlr_get_min_index(const chucho_file_roller* rlr, int* idx)
 {
     if (rlr == nullptr || idx == nullptr) 
         return CHUCHO_NULL_POINTER;
-    auto cpp = std::dynamic_pointer_cast<chucho::numbered_file_roller>(rlr->rlr_);
+    auto cpp = std::dynamic_pointer_cast<chucho::sliding_numbered_file_roller>(rlr->rlr_);
     if (!cpp) 
         return CHUCHO_TYPE_MISMATCH;
     *idx = cpp->get_min_index();
