@@ -51,10 +51,10 @@ static void rolling_file_name(void)
     rc = chucho_rfwrt_get_file_roller(wrt, &got_rlr);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get file roller");
     int idx;
-    rc = chucho_nfrlr_get_min_index(got_rlr, &idx);
+    rc = chucho_nrlr_get_min_index(got_rlr, &idx);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get min index");
     sput_fail_unless(idx == 1, "min is 1");
-    rc = chucho_nfrlr_get_max_index(got_rlr, &idx);
+    rc = chucho_nrlr_get_max_index(got_rlr, &idx);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get max index");
     sput_fail_unless(idx == 10, "max is 10");
     rc = chucho_release_file_roller(got_rlr);

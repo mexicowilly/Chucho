@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_NUMBERED_FILE_ROLLER_H__)
-#define CHUCHO_NUMBERED_FILE_ROLLER_H__
+#if !defined(CHUCHO_TIME_FILE_ROLLER_H__)
+#define CHUCHO_TIME_FILE_ROLLER_H__
 
 #include <chucho/file_roller.h>
 
@@ -24,13 +24,13 @@ extern "C"
 {
 #endif
 
-CHUCHO_EXPORT int chucho_create_numbered_file_roller(chucho_file_roller** rlr,
-                                                     int min_index,
-                                                     int max_index,
-                                                     chucho_file_compressor* cmp);
+CHUCHO_EXPORT int chucho_create_time_file_roller(chucho_file_roller** rlr,
+                                                 const char* const file_name_pattern,
+                                                 size_t max_history,
+                                                 chucho_file_compressor* cmp);
 
-CHUCHO_EXPORT int chucho_nrlr_get_max_index(const chucho_file_roller* rlr, int* idx);
-CHUCHO_EXPORT int chucho_nrlr_get_min_index(const chucho_file_roller* rlr, int* idx);
+CHUCHO_EXPORT int chucho_trlr_get_file_name_pattern(const chucho_file_roller* rlr, const char** pat);
+CHUCHO_EXPORT int chucho_trlr_get_max_history(const chucho_file_roller* rlr, size_t* hist);
 
 #if defined(__cplusplus)
 }

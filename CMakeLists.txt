@@ -119,6 +119,7 @@ IF(C_API)
         include/chucho/status.h
         include/chucho/status_manager.h
         include/chucho/syslog_writer.h
+        include/chucho/time_file_roller.h
         include/chucho/writer.h)
 ENDIF()
 
@@ -302,6 +303,7 @@ IF(C_API)
         c_sliding_numbered_file_roller.cpp
         c_status_manager.cpp
         c_syslog_writer.cpp
+        c_time_file_roller.cpp
         c_util.cpp
         c_writer.cpp
         include/chucho/c_file_compressor.hpp

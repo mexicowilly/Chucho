@@ -38,6 +38,7 @@
 #include "rolling_file_writer_test.h"
 #include "sliding_numbered_file_roller_test.h"
 #include "syslog_writer_test.h"
+#include "time_file_roller_test.h"
 
 sput_struct __sput;
 
@@ -67,6 +68,7 @@ int main()
     run_rolling_file_writer_test();
     run_sliding_numbered_file_roller_test();
     run_syslog_writer_test();
+    run_time_file_roller_test();
 
     sput_finish_testing();
     chucho_finalize();

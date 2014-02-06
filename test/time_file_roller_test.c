@@ -15,30 +15,29 @@
  */
 
 #include "sput.h"
-#include <chucho/numbered_file_roller.h>
+#include <chucho/time_file_roller.h>
 #include <chucho/error.h>
 
-static void numbered_file_roller_test(void)
+static void time_file_roller_test(void)
 {
     chucho_file_roller* rlr;
-    int rc = chucho_create_numbered_file_roller(&rlr, -7, 10, NULL);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create numbered file roller");
-    int idx;
-    rc = chucho_nrlr_get_min_index(rlr, &idx);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "get min index");
-    sput_fail_unless(idx == -7, "min is -7");
-    rc = chucho_nrlr_get_max_index(rlr, &idx);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "get max index");
-    sput_fail_unless(idx == 10, "max is 10");
+    int rc = chucho_create_time_file_roller(&rlr, "%d{%d-%H}", 10, NULL);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create time file roller");
+    const char* pat;
+    rc = chucho_trlr_get_file_name_pattern(rlr, &pat);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "get file name patter");
+    sput_fail_unless(strcmp(pat, "%d{%d-%H}") == 0, "pattern is %d{%d-%H}");
+    size_t hist;
+    rc = chucho_trlr_get_max_history(rlr, &hist);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "get max history");
+    sput_fail_unless(hist == 10, "history is 10");
     rc = chucho_release_file_roller(rlr);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "release file roller");
-    rc = chucho_create_numbered_file_roller(&rlr, 5, 0, NULL);
-    sput_fail_unless(rc == CHUCHO_INVALID_ARGUMENT, "create invalid numbered file roller");
 }
 
-void run_numbered_file_roller_test(void)
+void run_time_file_roller_test(void)
 {
-    sput_enter_suite("numbered_file_roller");
-    sput_run_test(numbered_file_roller_test);
+    sput_enter_suite("time_file_roller");
+    sput_run_test(time_file_roller_test);
     sput_leave_suite();
 }

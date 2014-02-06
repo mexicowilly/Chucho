@@ -156,6 +156,8 @@ ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
                syslog_writer_test.h
                test_util.c
                test_util.h
+               time_file_roller_test.c
+               time_file_roller_test.h
                ${CHUCHO_TEST_COMPRESSION_C_SOURCES})
 TARGET_LINK_LIBRARIES(c-unit-test chucho ${CHUCHO_THREAD_LIB})
 
