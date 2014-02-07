@@ -17,7 +17,6 @@
 #include <chucho/status_manager.hpp>
 #include <chucho/garbage_cleaner.hpp>
 #include <chucho/status_manager.h>
-#include <chucho/error.h>
 #include <vector>
 #include <mutex>
 
@@ -90,7 +89,7 @@ static_data& data()
 extern "C"
 {
 
-int chucho_status_add_observer(chucho_status_observer obs)
+chucho_rc chucho_status_add_observer(chucho_status_observer obs)
 {
     if (obs == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -107,13 +106,13 @@ int chucho_status_add_observer(chucho_status_observer obs)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_status_clear(void)
+chucho_rc chucho_status_clear(void)
 {
     chucho::status_manager::get()->clear();
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_status_get_count(size_t* cnt)
+chucho_rc chucho_status_get_count(size_t* cnt)
 {
     if (cnt == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -121,7 +120,7 @@ int chucho_status_get_count(size_t* cnt)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_status_get_level(chucho_status_level* lvl)
+chucho_rc chucho_status_get_level(chucho_status_level* lvl)
 {
     if (lvl == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -135,7 +134,7 @@ int chucho_status_get_level(chucho_status_level* lvl)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_status_remove_observer(chucho_status_observer obs)
+chucho_rc chucho_status_remove_observer(chucho_status_observer obs)
 {
     if (obs == nullptr) 
         return CHUCHO_NULL_POINTER;

@@ -16,12 +16,11 @@
 
 #include "sput.h"
 #include <chucho/level_threshold_filter.h>
-#include <chucho/error.h>
 
 static void level_threshold_filter_test(void)
 {
     chucho_filter* flt;
-    int rc = chucho_create_level_threshold_filter(&flt,
+    chucho_rc rc = chucho_create_level_threshold_filter(&flt,
                                                   chucho_warn_level());
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create level threshold filter");
     const chucho_level* lvl;

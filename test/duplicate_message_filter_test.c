@@ -16,12 +16,11 @@
 
 #include "sput.h"
 #include <chucho/duplicate_message_filter.h>
-#include <chucho/error.h>
 
 static void duplicate_message_filter_test(void)
 {
     chucho_filter* flt;
-    int rc = chucho_create_duplicate_message_filter(&flt);
+    chucho_rc rc = chucho_create_duplicate_message_filter(&flt);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create duplicate messagse filter");
     rc = chucho_release_filter(flt);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "release duplicate message filter");

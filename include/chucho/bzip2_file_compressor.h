@@ -24,7 +24,7 @@ extern "C"
 {
 #endif
 
-CHUCHO_EXPORT int chucho_create_bzip2_file_compressor(chucho_file_compressor** cmp, unsigned min_index);
+CHUCHO_EXPORT chucho_rc chucho_create_bzip2_file_compressor(chucho_file_compressor** cmp, unsigned min_index);
 
 #if defined(__cplusplus)
 }

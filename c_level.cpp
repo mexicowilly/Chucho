@@ -17,7 +17,6 @@
 #include <chucho/level.h>
 #include <chucho/c_level.hpp>
 #include <chucho/garbage_cleaner.hpp>
-#include <chucho/error.h>
 #include <map>
 #include <thread>
 #include <limits>
@@ -99,7 +98,7 @@ const chucho_level* chucho_fatal_level(void)
     return lvl;
 }
 
-int chucho_get_level(const chucho_level** lvl, const char* const name)
+chucho_rc chucho_get_level(const chucho_level** lvl, const char* const name)
 {
     try
     {
@@ -124,7 +123,7 @@ const chucho_level* chucho_info_level(void)
     return lvl;
 }
 
-int chucho_lvl_get_name(const chucho_level* lvl, const char** name)
+chucho_rc chucho_lvl_get_name(const chucho_level* lvl, const char** name)
 {
     if (lvl == nullptr || name == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -132,7 +131,7 @@ int chucho_lvl_get_name(const chucho_level* lvl, const char** name)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_lvl_get_syslog_severity(const chucho_level* lvl, chucho_syslog_severity* sev)
+chucho_rc chucho_lvl_get_syslog_severity(const chucho_level* lvl, chucho_syslog_severity* sev)
 {
     if (lvl == nullptr || sev == nullptr)
         return CHUCHO_NULL_POINTER;
@@ -140,7 +139,7 @@ int chucho_lvl_get_syslog_severity(const chucho_level* lvl, chucho_syslog_severi
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_lvl_get_value(const chucho_level* lvl, int* val)
+chucho_rc chucho_lvl_get_value(const chucho_level* lvl, int* val)
 {
     if (lvl == nullptr || val == nullptr) 
         return CHUCHO_NULL_POINTER;

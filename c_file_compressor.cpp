@@ -16,18 +16,17 @@
 
 #include <chucho/file_compressor.h>
 #include <chucho/c_file_compressor.hpp>
-#include <chucho/error.h>
 
 extern "C"
 {
 
-int chucho_release_file_compressor(chucho_file_compressor* cmp)
+chucho_rc chucho_release_file_compressor(chucho_file_compressor* cmp)
 {
     delete cmp;
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_cmp_get_extension(const chucho_file_compressor* cmp, const char** ext)
+chucho_rc chucho_cmp_get_extension(const chucho_file_compressor* cmp, const char** ext)
 {
     if (cmp == nullptr || ext == nullptr)
         return CHUCHO_NULL_POINTER; 
@@ -35,7 +34,7 @@ int chucho_cmp_get_extension(const chucho_file_compressor* cmp, const char** ext
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_cmp_get_min_index(const chucho_file_compressor* cmp, unsigned* idx)
+chucho_rc chucho_cmp_get_min_index(const chucho_file_compressor* cmp, unsigned* idx)
 {
     if (cmp == nullptr || idx == nullptr)
         return CHUCHO_NULL_POINTER; 

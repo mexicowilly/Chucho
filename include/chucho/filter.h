@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_FILTER_H__)
 #define CHUCHO_FILTER_H__
 
-#include <chucho/export.h>
+#include <chucho/return_code.h>
 
 #if defined(__cplusplus)
 extern "C"
@@ -33,7 +33,7 @@ typedef enum
     CHUCHO_FILTER_RESULT_ACCEPT
 } chucho_filter_result;
 
-CHUCHO_EXPORT int chucho_release_filter(chucho_filter* flt);
+CHUCHO_EXPORT chucho_rc chucho_release_filter(chucho_filter* flt);
 
 #if defined(__cplusplus)
 }

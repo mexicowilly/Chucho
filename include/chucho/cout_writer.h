@@ -25,7 +25,7 @@ extern "C"
 {
 #endif
 
-CHUCHO_EXPORT int chucho_create_cout_writer(chucho_writer** wrt, chucho_formatter* fmt);
+CHUCHO_EXPORT chucho_rc chucho_create_cout_writer(chucho_writer** wrt, chucho_formatter* fmt);
 
 #if defined(__cplusplus)
 }

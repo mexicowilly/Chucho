@@ -17,12 +17,11 @@
 #include <chucho/duplicate_message_filter.hpp>
 #include <chucho/duplicate_message_filter.h>
 #include <chucho/c_filter.hpp>
-#include <chucho/error.h>
 
 extern "C"
 {
 
-int chucho_create_duplicate_message_filter(chucho_filter** flt)
+chucho_rc chucho_create_duplicate_message_filter(chucho_filter** flt)
 {
     if (flt == nullptr)
         return CHUCHO_NULL_POINTER;

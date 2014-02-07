@@ -17,7 +17,6 @@
 #include <chucho/remote_writer.hpp>
 #include <chucho/remote_writer.h>
 #include <chucho/c_writer.hpp>
-#include <chucho/error.h>
 
 extern "C"
 {
@@ -25,7 +24,7 @@ extern "C"
 unsigned CHUCHO_DEFAULT_REMOTE_WRITER_PORT = chucho::remote_writer::DEFAULT_PORT;
 size_t CHUCHO_DEFAULT_REMOTE_UNSENT_CACHE_MAX = chucho::remote_writer::DEFAULT_UNSENT_CACHE_MAX;
 
-int chucho_create_remote_writer(chucho_writer** wrt,
+chucho_rc chucho_create_remote_writer(chucho_writer** wrt,
                                 const char* const host,
                                 unsigned port,
                                 size_t unsent_cache_max)
@@ -44,7 +43,7 @@ int chucho_create_remote_writer(chucho_writer** wrt,
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_rwrt_get_host(const chucho_writer* wrt, const char** host)
+chucho_rc chucho_rwrt_get_host(const chucho_writer* wrt, const char** host)
 {
     if (wrt == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -55,7 +54,7 @@ int chucho_rwrt_get_host(const chucho_writer* wrt, const char** host)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_rwrt_get_port(const chucho_writer* wrt, unsigned* port)
+chucho_rc chucho_rwrt_get_port(const chucho_writer* wrt, unsigned* port)
 {
     if (wrt == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -66,7 +65,7 @@ int chucho_rwrt_get_port(const chucho_writer* wrt, unsigned* port)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_rwrt_get_unsent_cache_max(const chucho_writer* wrt, size_t* cmax)
+chucho_rc chucho_rwrt_get_unsent_cache_max(const chucho_writer* wrt, size_t* cmax)
 {
     if (wrt == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -77,7 +76,7 @@ int chucho_rwrt_get_unsent_cache_max(const chucho_writer* wrt, size_t* cmax)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_rwrt_get_unsent_cache_size(const chucho_writer* wrt, size_t* csize)
+chucho_rc chucho_rwrt_get_unsent_cache_size(const chucho_writer* wrt, size_t* csize)
 {
     if (wrt == nullptr) 
         return CHUCHO_NULL_POINTER;

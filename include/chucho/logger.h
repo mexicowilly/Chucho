@@ -28,21 +28,21 @@ extern "C"
 
 typedef struct chucho_logger chucho_logger;
 
-CHUCHO_EXPORT int chucho_create_logger(chucho_logger** lgr, const char* const name);
-CHUCHO_EXPORT int chucho_release_logger(chucho_logger* lgr);
-CHUCHO_EXPORT int chucho_remove_unused_loggers(void);
+CHUCHO_EXPORT chucho_rc chucho_create_logger(chucho_logger** lgr, const char* const name);
+CHUCHO_EXPORT chucho_rc chucho_release_logger(chucho_logger* lgr);
+CHUCHO_EXPORT chucho_rc chucho_remove_unused_loggers(void);
 
-CHUCHO_EXPORT int chucho_lgr_add_writer(chucho_logger* lgr, chucho_writer* wrt);
-CHUCHO_EXPORT int chucho_lgr_get_effective_level(const chucho_logger* lgr, const chucho_level** lvl);
-CHUCHO_EXPORT int chucho_lgr_get_level(const chucho_logger* lgr, const chucho_level** lvl);
-CHUCHO_EXPORT int chucho_lgr_get_writers(const chucho_logger* lgr, chucho_writer** buf, size_t buf_size, size_t* count);
-CHUCHO_EXPORT int chucho_lgr_permits(const chucho_logger* lgr, const chucho_level* lvl, int* state);
-CHUCHO_EXPORT int chucho_lgr_remove_all_writers(chucho_logger* lgr);
-CHUCHO_EXPORT int chucho_lgr_remove_writer(chucho_logger* lgr, chucho_writer* wrt);
-CHUCHO_EXPORT int chucho_lgr_reset(chucho_logger* lgr);
-CHUCHO_EXPORT int chucho_lgr_set_level(chucho_logger* lgr, const chucho_level* lvl);
-CHUCHO_EXPORT int chucho_lgr_set_writes_to_ancestors(chucho_logger* lgr, int state);
-CHUCHO_EXPORT int chucho_lgr_writes_to_ancestors(const chucho_logger* lgr, int* state);
+CHUCHO_EXPORT chucho_rc chucho_lgr_add_writer(chucho_logger* lgr, chucho_writer* wrt);
+CHUCHO_EXPORT chucho_rc chucho_lgr_get_effective_level(const chucho_logger* lgr, const chucho_level** lvl);
+CHUCHO_EXPORT chucho_rc chucho_lgr_get_level(const chucho_logger* lgr, const chucho_level** lvl);
+CHUCHO_EXPORT chucho_rc chucho_lgr_get_writers(const chucho_logger* lgr, chucho_writer** buf, size_t buf_size, size_t* count);
+CHUCHO_EXPORT chucho_rc chucho_lgr_permits(const chucho_logger* lgr, const chucho_level* lvl, int* state);
+CHUCHO_EXPORT chucho_rc chucho_lgr_remove_all_writers(chucho_logger* lgr);
+CHUCHO_EXPORT chucho_rc chucho_lgr_remove_writer(chucho_logger* lgr, chucho_writer* wrt);
+CHUCHO_EXPORT chucho_rc chucho_lgr_reset(chucho_logger* lgr);
+CHUCHO_EXPORT chucho_rc chucho_lgr_set_level(chucho_logger* lgr, const chucho_level* lvl);
+CHUCHO_EXPORT chucho_rc chucho_lgr_set_writes_to_ancestors(chucho_logger* lgr, int state);
+CHUCHO_EXPORT chucho_rc chucho_lgr_writes_to_ancestors(const chucho_logger* lgr, int* state);
 
 #if defined(__cplusplus)
 }

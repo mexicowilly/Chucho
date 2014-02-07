@@ -16,18 +16,17 @@
 
 #include <chucho/c_file_roller.hpp>
 #include <chucho/c_file_compressor.hpp>
-#include <chucho/error.h>
 
 extern "C"
 {
 
-int chucho_release_file_roller(chucho_file_roller* rlr)
+chucho_rc chucho_release_file_roller(chucho_file_roller* rlr)
 {
     delete rlr;
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_rlr_get_active_file_name(const chucho_file_roller* rlr, char* buf, size_t buf_size, size_t* count)
+chucho_rc chucho_rlr_get_active_file_name(const chucho_file_roller* rlr, char* buf, size_t buf_size, size_t* count)
 {
     if (rlr == nullptr || count == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -48,7 +47,7 @@ int chucho_rlr_get_active_file_name(const chucho_file_roller* rlr, char* buf, si
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_rlr_get_file_compressor(const chucho_file_roller* rlr, chucho_file_compressor** cmp)
+chucho_rc chucho_rlr_get_file_compressor(const chucho_file_roller* rlr, chucho_file_compressor** cmp)
 {
     if (rlr == nullptr || cmp == nullptr) 
         return CHUCHO_NULL_POINTER;

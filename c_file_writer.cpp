@@ -18,12 +18,11 @@
 #include <chucho/file_writer.h>
 #include <chucho/c_writer.hpp>
 #include <chucho/c_formatter.hpp>
-#include <chucho/error.h>
 
 extern "C"
 {
 
-int chucho_create_file_writer(chucho_writer** wrt,
+chucho_rc chucho_create_file_writer(chucho_writer** wrt,
                               chucho_formatter* fmt,
                               const char* const file_name,
                               chucho_on_start on_start,
@@ -50,7 +49,7 @@ int chucho_create_file_writer(chucho_writer** wrt,
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_fwrt_get_file_name(const chucho_writer* wrt, const char** name)
+chucho_rc chucho_fwrt_get_file_name(const chucho_writer* wrt, const char** name)
 {
     if (wrt == nullptr || name == nullptr)
         return CHUCHO_NULL_POINTER;
@@ -61,7 +60,7 @@ int chucho_fwrt_get_file_name(const chucho_writer* wrt, const char** name)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_fwrt_get_flush(const chucho_writer* wrt, int* flush)
+chucho_rc chucho_fwrt_get_flush(const chucho_writer* wrt, int* flush)
 {
     if (wrt == nullptr || flush == nullptr)
         return CHUCHO_NULL_POINTER;
@@ -72,7 +71,7 @@ int chucho_fwrt_get_flush(const chucho_writer* wrt, int* flush)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_fwrt_get_on_start(const chucho_writer* wrt, chucho_on_start* on_start)
+chucho_rc chucho_fwrt_get_on_start(const chucho_writer* wrt, chucho_on_start* on_start)
 {
     if (wrt == nullptr || on_start == nullptr)
         return CHUCHO_NULL_POINTER;

@@ -18,18 +18,17 @@
 #include <chucho/c_writer.hpp>
 #include <chucho/c_filter.hpp>
 #include <chucho/c_formatter.hpp>
-#include <chucho/error.h>
 
 extern "C"
 {
 
-int chucho_release_writer(chucho_writer* wrt)
+chucho_rc chucho_release_writer(chucho_writer* wrt)
 {
     delete wrt;
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_wrt_add_filter(chucho_writer* wrt, chucho_filter* flt)
+chucho_rc chucho_wrt_add_filter(chucho_writer* wrt, chucho_filter* flt)
 {
     if (wrt == nullptr || flt == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -44,7 +43,7 @@ int chucho_wrt_add_filter(chucho_writer* wrt, chucho_filter* flt)
     return chucho_release_filter(flt);
 }
 
-int chucho_wrt_clear_filters(chucho_writer* wrt)
+chucho_rc chucho_wrt_clear_filters(chucho_writer* wrt)
 {
     if (wrt == nullptr)
         return CHUCHO_NULL_POINTER; 
@@ -52,7 +51,7 @@ int chucho_wrt_clear_filters(chucho_writer* wrt)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_wrt_get_filters(const chucho_writer* wrt, chucho_filter** buf, size_t buf_size, size_t* count)
+chucho_rc chucho_wrt_get_filters(const chucho_writer* wrt, chucho_filter** buf, size_t buf_size, size_t* count)
 {
     if (wrt == nullptr || count == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -79,7 +78,7 @@ int chucho_wrt_get_filters(const chucho_writer* wrt, chucho_filter** buf, size_t
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_wrt_get_formatter(const chucho_writer* wrt, chucho_formatter** fmt)
+chucho_rc chucho_wrt_get_formatter(const chucho_writer* wrt, chucho_formatter** fmt)
 {
     if (wrt == nullptr || fmt == nullptr) 
         return CHUCHO_NULL_POINTER;

@@ -27,15 +27,15 @@ extern "C"
 extern unsigned CHUCHO_DEFAULT_REMOTE_WRITER_PORT;
 extern size_t CHUCHO_DEFAULT_REMOTE_UNSENT_CACHE_MAX;
 
-CHUCHO_EXPORT int chucho_create_remote_writer(chucho_writer** wrt,
+CHUCHO_EXPORT chucho_rc chucho_create_remote_writer(chucho_writer** wrt,
                                               const char* const host,
                                               unsigned port,
                                               size_t unsent_cache_max);
 
-CHUCHO_EXPORT int chucho_rwrt_get_host(const chucho_writer* wrt, const char** host);
-CHUCHO_EXPORT int chucho_rwrt_get_port(const chucho_writer* wrt, unsigned* port);
-CHUCHO_EXPORT int chucho_rwrt_get_unsent_cache_max(const chucho_writer* wrt, size_t* cmax);
-CHUCHO_EXPORT int chucho_rwrt_get_unsent_cache_size(const chucho_writer* wrt, size_t* csize);
+CHUCHO_EXPORT chucho_rc chucho_rwrt_get_host(const chucho_writer* wrt, const char** host);
+CHUCHO_EXPORT chucho_rc chucho_rwrt_get_port(const chucho_writer* wrt, unsigned* port);
+CHUCHO_EXPORT chucho_rc chucho_rwrt_get_unsent_cache_max(const chucho_writer* wrt, size_t* cmax);
+CHUCHO_EXPORT chucho_rc chucho_rwrt_get_unsent_cache_size(const chucho_writer* wrt, size_t* csize);
 
 #if defined(__cplusplus)
 }

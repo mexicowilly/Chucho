@@ -17,7 +17,6 @@
 #if !defined(CHUCHO_WRITER_H__)
 #define CHUCHO_WRITER_H__
 
-#include <chucho/export.h>
 #include <chucho/filter.h>
 #include <chucho/formatter.h>
 #include <stddef.h>
@@ -29,12 +28,12 @@ extern "C"
 
 typedef struct chucho_writer chucho_writer;
 
-CHUCHO_EXPORT int chucho_release_writer(chucho_writer* wrt);
+CHUCHO_EXPORT chucho_rc chucho_release_writer(chucho_writer* wrt);
 
-CHUCHO_EXPORT int chucho_wrt_add_filter(chucho_writer* wrt, chucho_filter* flt);
-CHUCHO_EXPORT int chucho_wrt_clear_filters(chucho_writer* wrt);
-CHUCHO_EXPORT int chucho_wrt_get_filters(const chucho_writer* wrt, chucho_filter** buf, size_t buf_size, size_t* count);
-CHUCHO_EXPORT int chucho_wrt_get_formatter(const chucho_writer* wrt, chucho_formatter** fmt);
+CHUCHO_EXPORT chucho_rc chucho_wrt_add_filter(chucho_writer* wrt, chucho_filter* flt);
+CHUCHO_EXPORT chucho_rc chucho_wrt_clear_filters(chucho_writer* wrt);
+CHUCHO_EXPORT chucho_rc chucho_wrt_get_filters(const chucho_writer* wrt, chucho_filter** buf, size_t buf_size, size_t* count);
+CHUCHO_EXPORT chucho_rc chucho_wrt_get_formatter(const chucho_writer* wrt, chucho_formatter** fmt);
 
 #if defined(__cplusplus)
 }

@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_STATUS_MANAGER_H__)
 #define CHUCHO_STATUS_MANAGER_H__
 
-#include <chucho/export.h>
+#include <chucho/return_code.h>
 #include <chucho/status.h>
 
 #if defined(__cplusplus)
@@ -27,11 +27,11 @@ extern "C"
 
 typedef void (*chucho_status_observer)(const chucho_status* st);
 
-CHUCHO_EXPORT int chucho_status_add_observer(chucho_status_observer obs);
-CHUCHO_EXPORT int chucho_status_clear(void);
-CHUCHO_EXPORT int chucho_status_get_count(size_t* cnt);
-CHUCHO_EXPORT int chucho_status_get_level(chucho_status_level* lvl);
-CHUCHO_EXPORT int chucho_status_remove_observer(chucho_status_observer obs);
+CHUCHO_EXPORT chucho_rc chucho_status_add_observer(chucho_status_observer obs);
+CHUCHO_EXPORT chucho_rc chucho_status_clear(void);
+CHUCHO_EXPORT chucho_rc chucho_status_get_count(size_t* cnt);
+CHUCHO_EXPORT chucho_rc chucho_status_get_level(chucho_status_level* lvl);
+CHUCHO_EXPORT chucho_rc chucho_status_remove_observer(chucho_status_observer obs);
 
 #if defined(__cplusplus)
 }

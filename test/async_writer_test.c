@@ -19,12 +19,11 @@
 #include <chucho/file_writer.h>
 #include <chucho/pattern_formatter.h>
 #include <chucho/level.h>
-#include <chucho/error.h>
 
 static void async_writer_test(void)
 {
     chucho_formatter* fmt;
-    int rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
+    chucho_rc rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
     chucho_writer* wrt;
     rc = chucho_create_file_writer(&wrt, fmt, "hello", CHUCHO_ON_START_APPEND, 0);

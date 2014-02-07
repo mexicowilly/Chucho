@@ -15,12 +15,12 @@
  */
 
 #include <chucho/c_file_roll_trigger.hpp>
-#include <chucho/error.h>
+#include <chucho/file_roll_trigger.h>
 
 extern "C"
 {
 
-int chucho_release_file_roll_trigger(chucho_file_roll_trigger* trg)
+chucho_rc chucho_release_file_roll_trigger(chucho_file_roll_trigger* trg)
 {
     delete trg;
     return CHUCHO_NO_ERROR;

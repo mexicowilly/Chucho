@@ -26,10 +26,10 @@ extern "C"
 
 typedef struct chucho_file_roller chucho_file_roller;
 
-CHUCHO_EXPORT int chucho_release_file_roller(chucho_file_roller* rlr);
+CHUCHO_EXPORT chucho_rc chucho_release_file_roller(chucho_file_roller* rlr);
 
-CHUCHO_EXPORT int chucho_rlr_get_active_file_name(const chucho_file_roller* rlr, char* buf, size_t buf_size, size_t* count);
-CHUCHO_EXPORT int chucho_rlr_get_file_compressor(const chucho_file_roller* rlr, chucho_file_compressor** cmp);
+CHUCHO_EXPORT chucho_rc chucho_rlr_get_active_file_name(const chucho_file_roller* rlr, char* buf, size_t buf_size, size_t* count);
+CHUCHO_EXPORT chucho_rc chucho_rlr_get_file_compressor(const chucho_file_roller* rlr, chucho_file_compressor** cmp);
 
 #if defined(__cplusplus)
 }

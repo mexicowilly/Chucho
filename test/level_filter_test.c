@@ -16,12 +16,11 @@
 
 #include "sput.h"
 #include <chucho/level_filter.h>
-#include <chucho/error.h>
 
 static void level_filter_test(void)
 {
     chucho_filter* flt;
-    int rc = chucho_create_level_filter(&flt,
+    chucho_rc rc = chucho_create_level_filter(&flt,
                                         chucho_error_level(),
                                         CHUCHO_FILTER_RESULT_DENY,
                                         CHUCHO_FILTER_RESULT_ACCEPT);

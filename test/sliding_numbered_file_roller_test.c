@@ -16,12 +16,11 @@
 
 #include "sput.h"
 #include <chucho/sliding_numbered_file_roller.h>
-#include <chucho/error.h>
 
 static void sliding_numbered_file_roller_test(void)
 {
     chucho_file_roller* rlr;
-    int rc = chucho_create_sliding_numbered_file_roller(&rlr, -7, 10, NULL);
+    chucho_rc rc = chucho_create_sliding_numbered_file_roller(&rlr, -7, 10, NULL);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create sliding numbered file roller");
     int idx;
     rc = chucho_snfrlr_get_min_index(rlr, &idx);

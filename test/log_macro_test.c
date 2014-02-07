@@ -19,7 +19,6 @@
 #include <chucho/logger.h>
 #include <chucho/file_writer.h>
 #include <chucho/pattern_formatter.h>
-#include <chucho/error.h>
 #include <chucho/log.h>
 
 #define LOG_FUNCTION(lvl) \
@@ -27,7 +26,7 @@
     {                                                                   \
         sput_enter_suite_fixture("log "#lvl , set_up, tear_down);       \
         sput_run_test(set_log_level);                                   \
-        int rc = chucho_lgr_set_level(lgr, chucho_##lvl##_level());     \
+        chucho_rc rc = chucho_lgr_set_level(lgr, chucho_##lvl##_level());     \
         sput_fail_unless(rc == CHUCHO_NO_ERROR, "set logger level");    \
         static_mark = mark;                                             \
         if (mark == NULL)                                               \
@@ -91,7 +90,7 @@ static void expect(const chucho_level* lvl, const char* mark)
     if (lines == NULL) 
         return;
     const char* nm;
-    int rc = chucho_lvl_get_name(lvl, &nm);
+    chucho_rc rc = chucho_lvl_get_name(lvl, &nm);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get level name");
     if (strcmp(nm, "OFF") == 0) 
     {
@@ -144,7 +143,7 @@ static void set_log_level()
 
 static void set_up(void)
 {
-    int rc = chucho_create_logger(&lgr, "log_macro");
+    chucho_rc rc = chucho_create_logger(&lgr, "log_macro");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get logger log_macro");
     chucho_formatter* fmt;
     rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
@@ -158,7 +157,7 @@ static void set_up(void)
 
 static void tear_down(void)
 {
-    int rc = chucho_release_logger(lgr);
+    chucho_rc rc = chucho_release_logger(lgr);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "release logger log_macro");
     rc = chucho_remove_unused_loggers();
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "remove unused loggers");

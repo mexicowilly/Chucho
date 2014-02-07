@@ -26,7 +26,7 @@ extern "C"
 {
 #endif
 
-CHUCHO_EXPORT int chucho_create_rolling_file_writer(chucho_writer** wrt,
+CHUCHO_EXPORT chucho_rc chucho_create_rolling_file_writer(chucho_writer** wrt,
                                                     chucho_formatter* fmt,
                                                     chucho_file_roller* rlr,
                                                     chucho_file_roll_trigger* trg,
@@ -34,8 +34,8 @@ CHUCHO_EXPORT int chucho_create_rolling_file_writer(chucho_writer** wrt,
                                                     chucho_on_start on_start,
                                                     int flush);
 
-CHUCHO_EXPORT int chucho_rfwrt_get_file_roller(const chucho_writer* wrt, chucho_file_roller** rlr);
-CHUCHO_EXPORT int chucho_rfwrt_get_file_roll_trigger(const chucho_writer* wrt, chucho_file_roll_trigger** trg);
+CHUCHO_EXPORT chucho_rc chucho_rfwrt_get_file_roller(const chucho_writer* wrt, chucho_file_roller** rlr);
+CHUCHO_EXPORT chucho_rc chucho_rfwrt_get_file_roll_trigger(const chucho_writer* wrt, chucho_file_roll_trigger** trg);
 
 #if defined(__cplusplus)
 }

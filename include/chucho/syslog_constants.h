@@ -17,12 +17,18 @@
 #if !defined(CHUCHO_SYSLOG_CONSTANTS_H__)
 #define CHUCHO_SYSLOG_CONSTANTS_H__
 
+/**
+ * @file
+ * Constants used in writing to syslog. 
+ * @ingroup c
+ */
+
 #if defined(__cplusplus)
 extern "C"
 {
 #endif
 
-#define CHUCHO_DEFAULT_SYSLOG_PORT 514
+#define CHUCHO_DEFAULT_SYSLOG_PORT 514 /**< The default syslog port */
 
 typedef enum
 {

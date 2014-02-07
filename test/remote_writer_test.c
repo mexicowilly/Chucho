@@ -16,12 +16,11 @@
 
 #include "sput.h"
 #include <chucho/remote_writer.h>
-#include <chucho/error.h>
 
 static void remote_writer_test(void)
 {
     chucho_writer* wrt;
-    int rc = chucho_create_remote_writer(&wrt, "motherboy", 19567, 12001);
+    chucho_rc rc = chucho_create_remote_writer(&wrt, "motherboy", 19567, 12001);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create remote writer");
     const char* host;
     rc = chucho_rwrt_get_host(wrt, &host);

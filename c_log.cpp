@@ -15,7 +15,6 @@
  */
 
 #include <chucho/log.h>
-#include <chucho/error.h>
 #include <chucho/event.hpp>
 #include <chucho/c_logger.hpp>
 #include <chucho/c_level.hpp>
@@ -50,7 +49,7 @@ chucho::optional<std::string> format_message(const char* const fmt, va_list args
 extern "C"
 {
 
-int chucho_log(const chucho_level* lvl,
+chucho_rc chucho_log(const chucho_level* lvl,
                chucho_logger* lgr,
                const char* const file,
                int line,
@@ -89,7 +88,7 @@ int chucho_log(const chucho_level* lvl,
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_log_mark(const chucho_level* lvl,
+chucho_rc chucho_log_mark(const chucho_level* lvl,
                     chucho_logger* lgr,
                     const char* const file,
                     int line,

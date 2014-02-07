@@ -96,7 +96,6 @@ IF(C_API)
         include/chucho/configuration.h
         include/chucho/diagnostic_context.h
         include/chucho/duplicate_message_filter.h
-        include/chucho/error.h
         "${CMAKE_BINARY_DIR}/chucho/export.h"
         include/chucho/file_compressor.h
         include/chucho/file_roll_trigger.h
@@ -113,6 +112,7 @@ IF(C_API)
         include/chucho/numbered_file_roller.h
         include/chucho/pattern_formatter.h
         include/chucho/remote_writer.h
+        include/chucho/return_code.h
         include/chucho/rolling_file_writer.h
         include/chucho/size_file_roll_trigger.h
         include/chucho/sliding_numbered_file_roller.h
@@ -298,6 +298,7 @@ IF(C_API)
         c_numbered_file_roller.cpp
         c_pattern_formatter.cpp
         c_remote_writer.cpp
+        c_return_code.cpp
         c_rolling_file_writer.cpp
         c_size_file_roll_trigger.cpp
         c_sliding_numbered_file_roller.cpp

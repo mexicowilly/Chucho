@@ -18,13 +18,12 @@
 #include <chucho/syslog_writer.h>
 #include <chucho/c_writer.hpp>
 #include <chucho/c_formatter.hpp>
-#include <chucho/error.h>
 #include <chucho/exception.hpp>
 
 extern "C"
 {
 
-int chucho_create_local_syslog_writer(chucho_writer** wrt,
+chucho_rc chucho_create_local_syslog_writer(chucho_writer** wrt,
                                       chucho_formatter* fmt,
                                       chucho_syslog_facility fcl)
 {
@@ -48,7 +47,7 @@ int chucho_create_local_syslog_writer(chucho_writer** wrt,
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_create_remote_syslog_writer(chucho_writer** wrt,
+chucho_rc chucho_create_remote_syslog_writer(chucho_writer** wrt,
                                        chucho_formatter* fmt,
                                        chucho_syslog_facility fcl,
                                        const char* const host,
@@ -76,7 +75,7 @@ int chucho_create_remote_syslog_writer(chucho_writer** wrt,
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_slwrt_get_facility(const chucho_writer* wrt, chucho_syslog_facility* fcl)
+chucho_rc chucho_slwrt_get_facility(const chucho_writer* wrt, chucho_syslog_facility* fcl)
 {
     if (wrt == nullptr || fcl == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -87,7 +86,7 @@ int chucho_slwrt_get_facility(const chucho_writer* wrt, chucho_syslog_facility* 
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_slwrt_get_host_name(const chucho_writer* wrt, const char** name)
+chucho_rc chucho_slwrt_get_host_name(const chucho_writer* wrt, const char** name)
 {
     if (wrt == nullptr || name == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -101,7 +100,7 @@ int chucho_slwrt_get_host_name(const chucho_writer* wrt, const char** name)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_slwrt_get_port(const chucho_writer* wrt, unsigned* port)
+chucho_rc chucho_slwrt_get_port(const chucho_writer* wrt, unsigned* port)
 {
     if (wrt == nullptr || port == nullptr) 
         return CHUCHO_NULL_POINTER;

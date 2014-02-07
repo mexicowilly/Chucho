@@ -17,12 +17,11 @@
 #include <chucho/zip_file_compressor.hpp>
 #include <chucho/zip_file_compressor.h>
 #include <chucho/c_file_compressor.hpp>
-#include <chucho/error.h>
 
 extern "C"
 {
 
-int chucho_create_zip_file_compressor(chucho_file_compressor** cmp, unsigned min_index)
+chucho_rc chucho_create_zip_file_compressor(chucho_file_compressor** cmp, unsigned min_index)
 {
     if (cmp == nullptr)
         return CHUCHO_NULL_POINTER;

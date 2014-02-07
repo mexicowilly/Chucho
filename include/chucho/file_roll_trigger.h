@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_FILE_ROLL_TRIGGER_H__)
 #define CHUCHO_FILE_ROLL_TRIGGER_H__
 
-#include <chucho/export.h>
+#include <chucho/return_code.h>
 
 #if defined(__cplusplus)
 extern "C"
@@ -26,7 +26,7 @@ extern "C"
 
 typedef struct chucho_file_roll_trigger chucho_file_roll_trigger;
 
-CHUCHO_EXPORT int chucho_release_file_roll_trigger(chucho_file_roll_trigger* trg);
+CHUCHO_EXPORT chucho_rc chucho_release_file_roll_trigger(chucho_file_roll_trigger* trg);
 
 #if defined(__cplusplus)
 }

@@ -17,12 +17,11 @@
 #include "sput.h"
 #include <chucho/cout_writer.h>
 #include <chucho/pattern_formatter.h>
-#include <chucho/error.h>
 
 static void cout_writer_test(void)
 {
     chucho_formatter* fmt;
-    int rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
+    chucho_rc rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
     chucho_writer* wrt;
     rc = chucho_create_cout_writer(&wrt, fmt);

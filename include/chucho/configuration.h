@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_CONFIGURATION_H__)
 #define CHUCHO_CONFIGURATION_H__
 
-#include <chucho/export.h>
+#include <chucho/return_code.h>
 #include <stddef.h>
 
 #if defined(__cplusplus)
@@ -33,22 +33,22 @@ typedef enum
 
 typedef int (*chucho_unknown_handler_type)(const char* const key, const char* const val);
 
-CHUCHO_EXPORT int chucho_cnf_allow_default(int* val);
-CHUCHO_EXPORT int chucho_cnf_get_environment_variable(const char** var);
-CHUCHO_EXPORT int chucho_cnf_get_fallback(const char** fb);
-CHUCHO_EXPORT int chucho_cnf_get_file_name(const char** name);
-CHUCHO_EXPORT int chucho_cnf_get_loaded_file_name(const char** name);
-CHUCHO_EXPORT int chucho_cnf_get_max_size(size_t* sz);
-CHUCHO_EXPORT int chucho_cnf_get_style(chucho_configuration_style* sty);
-CHUCHO_EXPORT int chucho_cnf_get_unknown_handler(chucho_unknown_handler_type* func);
-CHUCHO_EXPORT int chucho_cnf_reconfigure(int* rc);
-CHUCHO_EXPORT int chucho_cnf_set_allow_default(int val);
-CHUCHO_EXPORT int chucho_cnf_set_environment_variable(const char* const var);
-CHUCHO_EXPORT int chucho_cnf_set_fallback(const char* const fb);
-CHUCHO_EXPORT int chucho_cnf_set_file_name(const char* const name);
-CHUCHO_EXPORT int chucho_cnf_set_max_size(size_t sz);
-CHUCHO_EXPORT int chucho_cnf_set_style(chucho_configuration_style sty);
-CHUCHO_EXPORT int chucho_cnf_set_unknown_handler(chucho_unknown_handler_type func);
+CHUCHO_EXPORT chucho_rc chucho_cnf_allow_default(int* val);
+CHUCHO_EXPORT chucho_rc chucho_cnf_get_environment_variable(const char** var);
+CHUCHO_EXPORT chucho_rc chucho_cnf_get_fallback(const char** fb);
+CHUCHO_EXPORT chucho_rc chucho_cnf_get_file_name(const char** name);
+CHUCHO_EXPORT chucho_rc chucho_cnf_get_loaded_file_name(const char** name);
+CHUCHO_EXPORT chucho_rc chucho_cnf_get_max_size(size_t* sz);
+CHUCHO_EXPORT chucho_rc chucho_cnf_get_style(chucho_configuration_style* sty);
+CHUCHO_EXPORT chucho_rc chucho_cnf_get_unknown_handler(chucho_unknown_handler_type* func);
+CHUCHO_EXPORT chucho_rc chucho_cnf_reconfigure(int* rc);
+CHUCHO_EXPORT chucho_rc chucho_cnf_set_allow_default(int val);
+CHUCHO_EXPORT chucho_rc chucho_cnf_set_environment_variable(const char* const var);
+CHUCHO_EXPORT chucho_rc chucho_cnf_set_fallback(const char* const fb);
+CHUCHO_EXPORT chucho_rc chucho_cnf_set_file_name(const char* const name);
+CHUCHO_EXPORT chucho_rc chucho_cnf_set_max_size(size_t sz);
+CHUCHO_EXPORT chucho_rc chucho_cnf_set_style(chucho_configuration_style sty);
+CHUCHO_EXPORT chucho_rc chucho_cnf_set_unknown_handler(chucho_unknown_handler_type func);
 
 #if defined(__cplusplus)
 }

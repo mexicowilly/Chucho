@@ -17,12 +17,11 @@
 #include <chucho/size_file_roll_trigger.hpp>
 #include <chucho/size_file_roll_trigger.h>
 #include <chucho/c_file_roll_trigger.hpp>
-#include <chucho/error.h>
 
 extern "C"
 {
 
-int chucho_create_size_file_roll_trigger(chucho_file_roll_trigger** trg,
+chucho_rc chucho_create_size_file_roll_trigger(chucho_file_roll_trigger** trg,
                                          off_t max_size)
 {
     if (trg == nullptr) 
@@ -39,7 +38,7 @@ int chucho_create_size_file_roll_trigger(chucho_file_roll_trigger** trg,
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_sftrg_get_max_size(const chucho_file_roll_trigger* trg, off_t* sz)
+chucho_rc chucho_sftrg_get_max_size(const chucho_file_roll_trigger* trg, off_t* sz)
 {
     if (trg == nullptr || sz == nullptr) 
         return CHUCHO_NULL_POINTER;

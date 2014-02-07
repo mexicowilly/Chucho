@@ -17,8 +17,8 @@
 #if !defined(CHUCHO_LEVEL_H__)
 #define CHUCHO_LEVEL_H__
 
-#include <chucho/export.h>
 #include <chucho/syslog_constants.h>
+#include <chucho/return_code.h>
 
 #if defined(__cplusplus)
 extern "C"
@@ -27,7 +27,7 @@ extern "C"
 
 typedef struct chucho_level chucho_level;
 
-CHUCHO_EXPORT int chucho_get_level(const chucho_level** lvl, const char* const name);
+CHUCHO_EXPORT chucho_rc chucho_get_level(const chucho_level** lvl, const char* const name);
 CHUCHO_EXPORT const chucho_level* chucho_trace_level(void);
 CHUCHO_EXPORT const chucho_level* chucho_debug_level(void);
 CHUCHO_EXPORT const chucho_level* chucho_info_level(void);
@@ -36,9 +36,9 @@ CHUCHO_EXPORT const chucho_level* chucho_error_level(void);
 CHUCHO_EXPORT const chucho_level* chucho_fatal_level(void);
 CHUCHO_EXPORT const chucho_level* chucho_off_level(void);
 
-CHUCHO_EXPORT int chucho_lvl_get_name(const chucho_level* lvl, const char** name);
-CHUCHO_EXPORT int chucho_lvl_get_syslog_severity(const chucho_level* lvl, chucho_syslog_severity* sev);
-CHUCHO_EXPORT int chucho_lvl_get_value(const chucho_level* lvl, int* val);
+CHUCHO_EXPORT chucho_rc chucho_lvl_get_name(const chucho_level* lvl, const char** name);
+CHUCHO_EXPORT chucho_rc chucho_lvl_get_syslog_severity(const chucho_level* lvl, chucho_syslog_severity* sev);
+CHUCHO_EXPORT chucho_rc chucho_lvl_get_value(const chucho_level* lvl, int* val);
 
 #if defined(__cplusplus)
 }

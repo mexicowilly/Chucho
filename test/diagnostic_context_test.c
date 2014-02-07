@@ -16,12 +16,11 @@
 
 #include "sput.h"
 #include <chucho/diagnostic_context.h>
-#include <chucho/error.h>
 #include <string.h>
 
 static void at(void)
 {
-    int rc = chucho_dgc_set("at-1", "at-one");
+    chucho_rc rc = chucho_dgc_set("at-1", "at-one");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "set");
     const char* one = chucho_dgc_at("at-1");
     sput_fail_if(one == NULL, "one not NULL");
@@ -33,7 +32,7 @@ static void at(void)
 
 static void clear_empty(void)
 {
-    int rc = chucho_dgc_clear();
+    chucho_rc rc = chucho_dgc_clear();
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "clear");
     rc = chucho_dgc_empty();
     sput_fail_unless(rc == 1, "empty");
@@ -49,7 +48,7 @@ static void clear_empty(void)
 
 static void erase(void)
 {
-    int rc = chucho_dgc_clear();
+    chucho_rc rc = chucho_dgc_clear();
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "clear");
     rc = chucho_dgc_set("erase-1", "erase-one");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "set erase-1");
@@ -64,7 +63,7 @@ static void erase(void)
 
 static void get(void)
 {
-    int rc = chucho_dgc_clear();
+    chucho_rc rc = chucho_dgc_clear();
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "clear");
     const char* keys[] = { "1", "2", "3" };
     const char* values[] = { "one", "two", "three" };

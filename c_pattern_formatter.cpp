@@ -15,14 +15,14 @@
  */
 
 #include <chucho/pattern_formatter.hpp>
+#include <chucho/pattern_formatter.h>
 #include <chucho/exception.hpp>
 #include <chucho/c_formatter.hpp>
-#include <chucho/error.h>
 
 extern "C"
 {
 
-int chucho_create_pattern_formatter(chucho_formatter** fmt, const char* const pattern)
+chucho_rc chucho_create_pattern_formatter(chucho_formatter** fmt, const char* const pattern)
 {
     if (fmt == nullptr || pattern == nullptr)
         return CHUCHO_NULL_POINTER;

@@ -15,12 +15,12 @@
  */
 
 #include <chucho/c_filter.hpp>
-#include <chucho/error.h>
+#include <chucho/filter.h>
 
 extern "C"
 {
 
-int chucho_release_filter(chucho_filter* flt)
+chucho_rc chucho_release_filter(chucho_filter* flt)
 {
     delete flt;
     return CHUCHO_NO_ERROR;

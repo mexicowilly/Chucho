@@ -18,7 +18,6 @@
 #include <chucho/level_filter.h>
 #include <chucho/c_filter.hpp>
 #include <chucho/c_util.hpp>
-#include <chucho/error.h>
 
 namespace
 {
@@ -46,7 +45,7 @@ chucho_filter_result cpp_to_c(chucho::filter::result res)
 extern "C"
 {
 
-int chucho_create_level_filter(chucho_filter** flt,
+chucho_rc chucho_create_level_filter(chucho_filter** flt,
                                const chucho_level* lvl,
                                chucho_filter_result on_match,
                                chucho_filter_result on_mismatch)
@@ -68,7 +67,7 @@ int chucho_create_level_filter(chucho_filter** flt,
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_lflt_get_level(const chucho_filter* flt, const chucho_level** lvl)
+chucho_rc chucho_lflt_get_level(const chucho_filter* flt, const chucho_level** lvl)
 {
     if (flt == nullptr || lvl == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -79,7 +78,7 @@ int chucho_lflt_get_level(const chucho_filter* flt, const chucho_level** lvl)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_lflt_get_on_match(const chucho_filter* flt, chucho_filter_result* res)
+chucho_rc chucho_lflt_get_on_match(const chucho_filter* flt, chucho_filter_result* res)
 {
     if (flt == nullptr || res == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -90,7 +89,7 @@ int chucho_lflt_get_on_match(const chucho_filter* flt, chucho_filter_result* res
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_lflt_get_on_mismatch(const chucho_filter* flt, chucho_filter_result* res)
+chucho_rc chucho_lflt_get_on_mismatch(const chucho_filter* flt, chucho_filter_result* res)
 {
     if (flt == nullptr || res == nullptr) 
         return CHUCHO_NULL_POINTER;

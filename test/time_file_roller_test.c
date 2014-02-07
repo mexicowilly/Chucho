@@ -16,12 +16,11 @@
 
 #include "sput.h"
 #include <chucho/time_file_roller.h>
-#include <chucho/error.h>
 
 static void time_file_roller_test(void)
 {
     chucho_file_roller* rlr;
-    int rc = chucho_create_time_file_roller(&rlr, "%d{%d-%H}", 10, NULL);
+    chucho_rc rc = chucho_create_time_file_roller(&rlr, "%d{%d-%H}", 10, NULL);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create time file roller");
     const char* pat;
     rc = chucho_trlr_get_file_name_pattern(rlr, &pat);

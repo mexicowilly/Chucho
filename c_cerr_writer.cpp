@@ -18,12 +18,11 @@
 #include <chucho/cerr_writer.h>
 #include <chucho/c_formatter.hpp>
 #include <chucho/c_writer.hpp>
-#include <chucho/error.h>
 
 extern "C"
 {
 
-int chucho_create_cerr_writer(chucho_writer** wrt, chucho_formatter* fmt)
+chucho_rc chucho_create_cerr_writer(chucho_writer** wrt, chucho_formatter* fmt)
 {
     if (wrt == nullptr || fmt == nullptr)
         return CHUCHO_NULL_POINTER;

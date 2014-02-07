@@ -56,6 +56,11 @@
  */
 
 /**
+ * @defgroup c 
+ * Files that comprise the Chucho C API.
+ */
+
+/**
  * @defgroup compressors 
  * Classes that can compress rolling files. 
  */

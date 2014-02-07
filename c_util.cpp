@@ -16,7 +16,6 @@
 
 #include <chucho/c_util.hpp>
 #include <chucho/level.h>
-#include <chucho/error.h>
 
 namespace chucho
 {

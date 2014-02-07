@@ -24,7 +24,7 @@ extern "C"
 {
 #endif
 
-CHUCHO_EXPORT int chucho_create_duplicate_message_filter(chucho_filter** flt);
+CHUCHO_EXPORT chucho_rc chucho_create_duplicate_message_filter(chucho_filter** flt);
 
 #if defined(__cplusplus)
 }

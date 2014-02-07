@@ -26,18 +26,18 @@ extern "C"
 {
 #endif
 
-CHUCHO_EXPORT int chucho_create_local_syslog_writer(chucho_writer** wrt,
+CHUCHO_EXPORT chucho_rc chucho_create_local_syslog_writer(chucho_writer** wrt,
                                                     chucho_formatter* fmt,
                                                     chucho_syslog_facility fcl);
-CHUCHO_EXPORT int chucho_create_remote_syslog_writer(chucho_writer** wrt,
+CHUCHO_EXPORT chucho_rc chucho_create_remote_syslog_writer(chucho_writer** wrt,
                                                      chucho_formatter* fmt,
                                                      chucho_syslog_facility fcl,
                                                      const char* const host,
                                                      unsigned port);
 
-CHUCHO_EXPORT int chucho_slwrt_get_facility(const chucho_writer* wrt, chucho_syslog_facility* fcl);
-CHUCHO_EXPORT int chucho_slwrt_get_host_name(const chucho_writer* wrt, const char** name);
-CHUCHO_EXPORT int chucho_slwrt_get_port(const chucho_writer* wrt, unsigned* port);
+CHUCHO_EXPORT chucho_rc chucho_slwrt_get_facility(const chucho_writer* wrt, chucho_syslog_facility* fcl);
+CHUCHO_EXPORT chucho_rc chucho_slwrt_get_host_name(const chucho_writer* wrt, const char** name);
+CHUCHO_EXPORT chucho_rc chucho_slwrt_get_port(const chucho_writer* wrt, unsigned* port);
 
 #if defined(__cplusplus)
 }

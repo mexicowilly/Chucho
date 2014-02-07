@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_FILE_COMPRESSOR_H__)
 #define CHUCHO_FILE_COMPRESSOR_H__
 
-#include <chucho/export.h>
+#include <chucho/return_code.h>
 
 #if defined(__cplusplus)
 extern "C"
@@ -26,10 +26,10 @@ extern "C"
 
 typedef struct chucho_file_compressor chucho_file_compressor;
 
-CHUCHO_EXPORT int chucho_release_file_compressor(chucho_file_compressor* cmp);
+CHUCHO_EXPORT chucho_rc chucho_release_file_compressor(chucho_file_compressor* cmp);
 
-CHUCHO_EXPORT int chucho_cmp_get_extension(const chucho_file_compressor* cmp, const char** ext);
-CHUCHO_EXPORT int chucho_cmp_get_min_index(const chucho_file_compressor* cmp, unsigned* idx);
+CHUCHO_EXPORT chucho_rc chucho_cmp_get_extension(const chucho_file_compressor* cmp, const char** ext);
+CHUCHO_EXPORT chucho_rc chucho_cmp_get_min_index(const chucho_file_compressor* cmp, unsigned* idx);
 
 #if defined(__cplusplus)
 }

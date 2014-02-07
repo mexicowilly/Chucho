@@ -16,7 +16,6 @@
 
 #include "sput.h"
 #include <chucho/configuration.h>
-#include <chucho/error.h>
 
 #include <stdio.h>
 
@@ -27,7 +26,7 @@ static int my_unknown_handler(const char* key, const char* val)
 
 static void configuration_test(void)
 {
-    int rc = chucho_cnf_set_allow_default(0);
+    chucho_rc rc = chucho_cnf_set_allow_default(0);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "set allow default");
     int val = 1;
     rc = chucho_cnf_allow_default(&val);

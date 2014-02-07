@@ -19,12 +19,11 @@
 #include <chucho/c_file_roller.hpp>
 #include <chucho/c_file_compressor.hpp>
 #include <chucho/file_compressor.h>
-#include <chucho/error.h>
 
 extern "C"
 {
 
-int chucho_create_numbered_file_roller(chucho_file_roller** rlr,
+chucho_rc chucho_create_numbered_file_roller(chucho_file_roller** rlr,
                                        int min_index,
                                        int max_index,
                                        chucho_file_compressor* cmp)
@@ -51,7 +50,7 @@ int chucho_create_numbered_file_roller(chucho_file_roller** rlr,
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_nrlr_get_max_index(const chucho_file_roller* rlr, int* idx)
+chucho_rc chucho_nrlr_get_max_index(const chucho_file_roller* rlr, int* idx)
 {
     if (rlr == nullptr || idx == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -62,7 +61,7 @@ int chucho_nrlr_get_max_index(const chucho_file_roller* rlr, int* idx)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_nrlr_get_min_index(const chucho_file_roller* rlr, int* idx)
+chucho_rc chucho_nrlr_get_min_index(const chucho_file_roller* rlr, int* idx)
 {
     if (rlr == nullptr || idx == nullptr) 
         return CHUCHO_NULL_POINTER;

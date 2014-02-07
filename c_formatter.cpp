@@ -15,12 +15,12 @@
  */
 
 #include <chucho/c_formatter.hpp>
-#include <chucho/error.h>
+#include <chucho/formatter.h>
 
 extern "C"
 {
 
-int chucho_release_formatter(chucho_formatter* fmt)
+chucho_rc chucho_release_formatter(chucho_formatter* fmt)
 {
     delete fmt;
     return CHUCHO_NO_ERROR;

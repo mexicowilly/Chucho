@@ -24,13 +24,13 @@ extern "C"
 {
 #endif
 
-CHUCHO_EXPORT int chucho_create_numbered_file_roller(chucho_file_roller** rlr,
+CHUCHO_EXPORT chucho_rc chucho_create_numbered_file_roller(chucho_file_roller** rlr,
                                                      int min_index,
                                                      int max_index,
                                                      chucho_file_compressor* cmp);
 
-CHUCHO_EXPORT int chucho_nrlr_get_max_index(const chucho_file_roller* rlr, int* idx);
-CHUCHO_EXPORT int chucho_nrlr_get_min_index(const chucho_file_roller* rlr, int* idx);
+CHUCHO_EXPORT chucho_rc chucho_nrlr_get_max_index(const chucho_file_roller* rlr, int* idx);
+CHUCHO_EXPORT chucho_rc chucho_nrlr_get_min_index(const chucho_file_roller* rlr, int* idx);
 
 #if defined(__cplusplus)
 }

@@ -16,12 +16,11 @@
 
 #include "sput.h"
 #include <chucho/pattern_formatter.h>
-#include <chucho/error.h>
 
 static void pattern_formatter_test(void)
 {
     chucho_formatter* fmt;
-    int rc = chucho_create_pattern_formatter(&fmt, "%m%n");
+    chucho_rc rc = chucho_create_pattern_formatter(&fmt, "%m%n");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
     rc = chucho_release_formatter(fmt);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "release pattern formatter");

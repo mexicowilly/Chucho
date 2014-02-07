@@ -25,10 +25,10 @@ extern "C"
 {
 #endif
 
-CHUCHO_EXPORT int chucho_create_level_threshold_filter(chucho_filter** flt,
+CHUCHO_EXPORT chucho_rc chucho_create_level_threshold_filter(chucho_filter** flt,
                                                        const chucho_level* lvl);
 
-CHUCHO_EXPORT int chucho_ltflt_get_level(const chucho_filter* flt, const chucho_level** lvl);
+CHUCHO_EXPORT chucho_rc chucho_ltflt_get_level(const chucho_filter* flt, const chucho_level** lvl);
 
 #if defined(__cplusplus)
 }

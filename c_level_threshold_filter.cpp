@@ -18,12 +18,11 @@
 #include <chucho/level_threshold_filter.h>
 #include <chucho/c_filter.hpp>
 #include <chucho/c_util.hpp>
-#include <chucho/error.h>
 
 extern "C"
 {
 
-int chucho_create_level_threshold_filter(chucho_filter** flt,
+chucho_rc chucho_create_level_threshold_filter(chucho_filter** flt,
                                          const chucho_level* lvl)
 {
     if (flt == nullptr || lvl == nullptr) 
@@ -41,7 +40,7 @@ int chucho_create_level_threshold_filter(chucho_filter** flt,
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_ltflt_get_level(const chucho_filter* flt, const chucho_level** lvl)
+chucho_rc chucho_ltflt_get_level(const chucho_filter* flt, const chucho_level** lvl)
 {
     if (flt == nullptr || lvl == nullptr) 
         return CHUCHO_NULL_POINTER;

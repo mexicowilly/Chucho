@@ -17,7 +17,6 @@
 #include <chucho/configuration.h>
 #include <chucho/configuration.hpp>
 #include <chucho/garbage_cleaner.hpp>
-#include <chucho/error.h>
 #include <mutex>
 
 namespace
@@ -58,7 +57,7 @@ bool c_unknown_handler(const std::string& key, const std::string& val)
 extern "C"
 {
 
-int chucho_cnf_allow_default(int* val)
+chucho_rc chucho_cnf_allow_default(int* val)
 {
     if (val == nullptr)
         return CHUCHO_NULL_POINTER;
@@ -73,7 +72,7 @@ int chucho_cnf_allow_default(int* val)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_cnf_get_environment_variable(const char** var)
+chucho_rc chucho_cnf_get_environment_variable(const char** var)
 {
     if (var == nullptr)
         return CHUCHO_NULL_POINTER;
@@ -89,7 +88,7 @@ int chucho_cnf_get_environment_variable(const char** var)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_cnf_get_fallback(const char** fb)
+chucho_rc chucho_cnf_get_fallback(const char** fb)
 {
     if (fb == nullptr)
         return CHUCHO_NULL_POINTER;
@@ -105,7 +104,7 @@ int chucho_cnf_get_fallback(const char** fb)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_cnf_get_file_name(const char** name)
+chucho_rc chucho_cnf_get_file_name(const char** name)
 {
     if (name == nullptr)
         return CHUCHO_NULL_POINTER;
@@ -121,7 +120,7 @@ int chucho_cnf_get_file_name(const char** name)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_cnf_get_loaded_file_name(const char** name)
+chucho_rc chucho_cnf_get_loaded_file_name(const char** name)
 {
     if (name == nullptr)
         return CHUCHO_NULL_POINTER;
@@ -137,7 +136,7 @@ int chucho_cnf_get_loaded_file_name(const char** name)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_cnf_get_max_size(size_t* sz)
+chucho_rc chucho_cnf_get_max_size(size_t* sz)
 {
     if (sz == nullptr)
         return CHUCHO_NULL_POINTER; 
@@ -152,7 +151,7 @@ int chucho_cnf_get_max_size(size_t* sz)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_cnf_get_style(chucho_configuration_style* sty)
+chucho_rc chucho_cnf_get_style(chucho_configuration_style* sty)
 {
     if (sty == nullptr)
         return CHUCHO_NULL_POINTER; 
@@ -168,7 +167,7 @@ int chucho_cnf_get_style(chucho_configuration_style* sty)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_cnf_get_unknown_handler(chucho_unknown_handler_type* func)
+chucho_rc chucho_cnf_get_unknown_handler(chucho_unknown_handler_type* func)
 {
     if (func == nullptr)
         return CHUCHO_NULL_POINTER;
@@ -183,7 +182,7 @@ int chucho_cnf_get_unknown_handler(chucho_unknown_handler_type* func)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_cnf_reconfigure(int* rc)
+chucho_rc chucho_cnf_reconfigure(int* rc)
 {
     if (rc == nullptr)
         return CHUCHO_NULL_POINTER;
@@ -199,7 +198,7 @@ int chucho_cnf_reconfigure(int* rc)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_cnf_set_allow_default(int val)
+chucho_rc chucho_cnf_set_allow_default(int val)
 {
     try
     {
@@ -212,7 +211,7 @@ int chucho_cnf_set_allow_default(int val)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_cnf_set_environment_variable(const char* const var)
+chucho_rc chucho_cnf_set_environment_variable(const char* const var)
 {
     if (var == nullptr)
         return CHUCHO_NULL_POINTER;
@@ -227,7 +226,7 @@ int chucho_cnf_set_environment_variable(const char* const var)
     return CHUCHO_NO_ERROR; 
 }
 
-int chucho_cnf_set_fallback(const char* const fb)
+chucho_rc chucho_cnf_set_fallback(const char* const fb)
 {
     if (fb == nullptr)
         return CHUCHO_NULL_POINTER;
@@ -242,7 +241,7 @@ int chucho_cnf_set_fallback(const char* const fb)
     return CHUCHO_NO_ERROR; 
 }
 
-int chucho_cnf_set_file_name(const char* const name)
+chucho_rc chucho_cnf_set_file_name(const char* const name)
 {
     if (name == nullptr)
         return CHUCHO_NULL_POINTER;
@@ -257,7 +256,7 @@ int chucho_cnf_set_file_name(const char* const name)
     return CHUCHO_NO_ERROR; 
 }
 
-int chucho_cnf_set_max_size(size_t sz)
+chucho_rc chucho_cnf_set_max_size(size_t sz)
 {
     try
     {
@@ -270,7 +269,7 @@ int chucho_cnf_set_max_size(size_t sz)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_cnf_set_style(chucho_configuration_style sty)
+chucho_rc chucho_cnf_set_style(chucho_configuration_style sty)
 {
     try
     {
@@ -284,7 +283,7 @@ int chucho_cnf_set_style(chucho_configuration_style sty)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_cnf_set_unknown_handler(chucho_unknown_handler_type func)
+chucho_rc chucho_cnf_set_unknown_handler(chucho_unknown_handler_type func)
 {
     try
     {

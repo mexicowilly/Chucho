@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_FORMATTER_H__)
 #define CHUCHO_FORMATTER_H__
 
-#include <chucho/export.h>
+#include <chucho/return_code.h>
 
 #if defined(__cplusplus)
 extern "C"
@@ -26,7 +26,7 @@ extern "C"
 
 typedef struct chucho_formatter chucho_formatter;
 
-CHUCHO_EXPORT int chucho_release_formatter(chucho_formatter* fmt);
+CHUCHO_EXPORT chucho_rc chucho_release_formatter(chucho_formatter* fmt);
 
 #if defined(__cplusplus)
 }

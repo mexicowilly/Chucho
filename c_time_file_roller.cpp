@@ -19,12 +19,11 @@
 #include <chucho/c_file_roller.hpp>
 #include <chucho/c_file_compressor.hpp>
 #include <chucho/file_compressor.h>
-#include <chucho/error.h>
 
 extern "C"
 {
 
-int chucho_create_time_file_roller(chucho_file_roller** rlr,
+chucho_rc chucho_create_time_file_roller(chucho_file_roller** rlr,
                                    const char* const file_name_pattern,
                                    size_t max_history,
                                    chucho_file_compressor* cmp)
@@ -49,7 +48,7 @@ int chucho_create_time_file_roller(chucho_file_roller** rlr,
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_trlr_get_file_name_pattern(const chucho_file_roller* rlr, const char** pat)
+chucho_rc chucho_trlr_get_file_name_pattern(const chucho_file_roller* rlr, const char** pat)
 {
     if (rlr == nullptr || pat == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -60,7 +59,7 @@ int chucho_trlr_get_file_name_pattern(const chucho_file_roller* rlr, const char*
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_trlr_get_max_history(const chucho_file_roller* rlr, size_t* hist)
+chucho_rc chucho_trlr_get_max_history(const chucho_file_roller* rlr, size_t* hist)
 {
     if (rlr == nullptr || hist == nullptr) 
         return CHUCHO_NULL_POINTER;

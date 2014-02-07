@@ -25,14 +25,14 @@ extern "C"
 {
 #endif
 
-CHUCHO_EXPORT int chucho_create_level_filter(chucho_filter** flt,
+CHUCHO_EXPORT chucho_rc chucho_create_level_filter(chucho_filter** flt,
                                              const chucho_level* lvl,
                                              chucho_filter_result on_match,
                                              chucho_filter_result on_mismatch);
 
-CHUCHO_EXPORT int chucho_lflt_get_level(const chucho_filter* flt, const chucho_level** lvl);
-CHUCHO_EXPORT int chucho_lflt_get_on_match(const chucho_filter* flt, chucho_filter_result* res);
-CHUCHO_EXPORT int chucho_lflt_get_on_mismatch(const chucho_filter* flt, chucho_filter_result* res);
+CHUCHO_EXPORT chucho_rc chucho_lflt_get_level(const chucho_filter* flt, const chucho_level** lvl);
+CHUCHO_EXPORT chucho_rc chucho_lflt_get_on_match(const chucho_filter* flt, chucho_filter_result* res);
+CHUCHO_EXPORT chucho_rc chucho_lflt_get_on_mismatch(const chucho_filter* flt, chucho_filter_result* res);
 
 #if defined(__cplusplus)
 }

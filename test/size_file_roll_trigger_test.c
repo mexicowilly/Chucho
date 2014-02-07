@@ -16,12 +16,11 @@
 
 #include "sput.h"
 #include <chucho/size_file_roll_trigger.h>
-#include <chucho/error.h>
 
 static void size_file_roll_trigger_test(void)
 {
     chucho_file_roll_trigger* trg;
-    int rc = chucho_create_size_file_roll_trigger(&trg, 512);
+    chucho_rc rc = chucho_create_size_file_roll_trigger(&trg, 512);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create size file roll trigger");
     off_t sz;
     rc = chucho_sftrg_get_max_size(trg, &sz);

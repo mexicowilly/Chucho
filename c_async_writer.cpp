@@ -18,12 +18,11 @@
 #include <chucho/async_writer.hpp>
 #include <chucho/c_util.hpp>
 #include <chucho/c_writer.hpp>
-#include <chucho/error.h>
 
 extern "C"
 {
 
-int chucho_create_async_writer(chucho_writer** async,
+chucho_rc chucho_create_async_writer(chucho_writer** async,
                                chucho_writer* wrt,
                                size_t capacity,
                                const chucho_level* discard_threshold)
@@ -46,7 +45,7 @@ int chucho_create_async_writer(chucho_writer** async,
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_aswrt_get_discard_threshold(const chucho_writer* wrt, const chucho_level** lvl)
+chucho_rc chucho_aswrt_get_discard_threshold(const chucho_writer* wrt, const chucho_level** lvl)
 {
     if (wrt == nullptr || lvl == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -60,7 +59,7 @@ int chucho_aswrt_get_discard_threshold(const chucho_writer* wrt, const chucho_le
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_aswrt_get_queue_capacity(const chucho_writer* wrt, size_t* cap)
+chucho_rc chucho_aswrt_get_queue_capacity(const chucho_writer* wrt, size_t* cap)
 {
     if (wrt == nullptr || cap == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -71,7 +70,7 @@ int chucho_aswrt_get_queue_capacity(const chucho_writer* wrt, size_t* cap)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_aswrt_get_queue_size(const chucho_writer* wrt, size_t* sz)
+chucho_rc chucho_aswrt_get_queue_size(const chucho_writer* wrt, size_t* sz)
 {
     if (wrt == nullptr || sz == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -82,7 +81,7 @@ int chucho_aswrt_get_queue_size(const chucho_writer* wrt, size_t* sz)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_aswrt_get_writer(const chucho_writer* async, chucho_writer** wrt)
+chucho_rc chucho_aswrt_get_writer(const chucho_writer* async, chucho_writer** wrt)
 {
     if (async == nullptr || wrt == nullptr) 
         return CHUCHO_NULL_POINTER;

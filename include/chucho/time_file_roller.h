@@ -24,13 +24,13 @@ extern "C"
 {
 #endif
 
-CHUCHO_EXPORT int chucho_create_time_file_roller(chucho_file_roller** rlr,
+CHUCHO_EXPORT chucho_rc chucho_create_time_file_roller(chucho_file_roller** rlr,
                                                  const char* const file_name_pattern,
                                                  size_t max_history,
                                                  chucho_file_compressor* cmp);
 
-CHUCHO_EXPORT int chucho_trlr_get_file_name_pattern(const chucho_file_roller* rlr, const char** pat);
-CHUCHO_EXPORT int chucho_trlr_get_max_history(const chucho_file_roller* rlr, size_t* hist);
+CHUCHO_EXPORT chucho_rc chucho_trlr_get_file_name_pattern(const chucho_file_roller* rlr, const char** pat);
+CHUCHO_EXPORT chucho_rc chucho_trlr_get_max_history(const chucho_file_roller* rlr, size_t* hist);
 
 #if defined(__cplusplus)
 }

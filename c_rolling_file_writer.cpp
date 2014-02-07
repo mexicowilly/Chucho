@@ -20,12 +20,11 @@
 #include <chucho/c_formatter.hpp>
 #include <chucho/c_file_roller.hpp>
 #include <chucho/c_file_roll_trigger.hpp>
-#include <chucho/error.h>
 
 extern "C"
 {
 
-int chucho_create_rolling_file_writer(chucho_writer** wrt,
+chucho_rc chucho_create_rolling_file_writer(chucho_writer** wrt,
                                       chucho_formatter* fmt,
                                       chucho_file_roller* rlr,
                                       chucho_file_roll_trigger* trg,
@@ -75,7 +74,7 @@ int chucho_create_rolling_file_writer(chucho_writer** wrt,
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_rfwrt_get_file_roller(const chucho_writer* wrt, chucho_file_roller** rlr)
+chucho_rc chucho_rfwrt_get_file_roller(const chucho_writer* wrt, chucho_file_roller** rlr)
 {
     if (wrt == nullptr || rlr == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -94,7 +93,7 @@ int chucho_rfwrt_get_file_roller(const chucho_writer* wrt, chucho_file_roller** 
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_rfwrt_get_file_roll_trigger(const chucho_writer* wrt, chucho_file_roll_trigger** trg)
+chucho_rc chucho_rfwrt_get_file_roll_trigger(const chucho_writer* wrt, chucho_file_roll_trigger** trg)
 {
     if (wrt == nullptr || trg == nullptr) 
         return CHUCHO_NULL_POINTER;

@@ -18,13 +18,12 @@
 #include <chucho/c_writer.hpp>
 #include <chucho/c_util.hpp>
 #include <chucho/level.h>
-#include <chucho/error.h>
 #include <chucho/writer.h>
 
 extern "C"
 {
 
-int chucho_create_logger(chucho_logger** lgr, const char* const name)
+chucho_rc chucho_create_logger(chucho_logger** lgr, const char* const name)
 {
     try
     {
@@ -38,7 +37,7 @@ int chucho_create_logger(chucho_logger** lgr, const char* const name)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_lgr_add_writer(chucho_logger* lgr, chucho_writer* wrt)
+chucho_rc chucho_lgr_add_writer(chucho_logger* lgr, chucho_writer* wrt)
 {
     if (lgr == nullptr || wrt == nullptr)
         return CHUCHO_NULL_POINTER; 
@@ -53,7 +52,7 @@ int chucho_lgr_add_writer(chucho_logger* lgr, chucho_writer* wrt)
     return chucho_release_writer(wrt);
 }
 
-int chucho_lgr_get_effective_level(const chucho_logger* lgr, const chucho_level** lvl)
+chucho_rc chucho_lgr_get_effective_level(const chucho_logger* lgr, const chucho_level** lvl)
 {
     if (lgr == nullptr || lvl == nullptr)
         return CHUCHO_NULL_POINTER;
@@ -64,7 +63,7 @@ int chucho_lgr_get_effective_level(const chucho_logger* lgr, const chucho_level*
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_lgr_get_level(const chucho_logger* lgr, const chucho_level** lvl)
+chucho_rc chucho_lgr_get_level(const chucho_logger* lgr, const chucho_level** lvl)
 {
     if (lgr == nullptr || lvl == nullptr)
         return CHUCHO_NULL_POINTER;
@@ -75,7 +74,7 @@ int chucho_lgr_get_level(const chucho_logger* lgr, const chucho_level** lvl)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_lgr_get_writers(const chucho_logger* lgr, chucho_writer** buf, size_t buf_size, size_t* count)
+chucho_rc chucho_lgr_get_writers(const chucho_logger* lgr, chucho_writer** buf, size_t buf_size, size_t* count)
 {
     if (lgr == nullptr || count == nullptr)
         return CHUCHO_NULL_POINTER;
@@ -102,7 +101,7 @@ int chucho_lgr_get_writers(const chucho_logger* lgr, chucho_writer** buf, size_t
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_lgr_permits(const chucho_logger* lgr, const chucho_level* lvl, int* state)
+chucho_rc chucho_lgr_permits(const chucho_logger* lgr, const chucho_level* lvl, int* state)
 {
     if (lgr == nullptr || lvl == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -110,13 +109,13 @@ int chucho_lgr_permits(const chucho_logger* lgr, const chucho_level* lvl, int* s
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_release_logger(chucho_logger* lgr)
+chucho_rc chucho_release_logger(chucho_logger* lgr)
 {
     delete lgr;
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_lgr_remove_all_writers(chucho_logger* lgr)
+chucho_rc chucho_lgr_remove_all_writers(chucho_logger* lgr)
 {
     if (lgr == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -124,7 +123,7 @@ int chucho_lgr_remove_all_writers(chucho_logger* lgr)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_lgr_remove_writer(chucho_logger* lgr, chucho_writer* wrt)
+chucho_rc chucho_lgr_remove_writer(chucho_logger* lgr, chucho_writer* wrt)
 {
     if (lgr == nullptr || wrt == nullptr)
         return CHUCHO_NULL_POINTER; 
@@ -132,7 +131,7 @@ int chucho_lgr_remove_writer(chucho_logger* lgr, chucho_writer* wrt)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_lgr_reset(chucho_logger* lgr)
+chucho_rc chucho_lgr_reset(chucho_logger* lgr)
 {
     if (lgr == nullptr)
         return CHUCHO_NULL_POINTER;
@@ -140,7 +139,7 @@ int chucho_lgr_reset(chucho_logger* lgr)
     return CHUCHO_NO_ERROR; 
 }
 
-int chucho_lgr_set_level(chucho_logger* lgr, const chucho_level* lvl)
+chucho_rc chucho_lgr_set_level(chucho_logger* lgr, const chucho_level* lvl)
 {
     if (lgr == nullptr || lvl == nullptr)
         return CHUCHO_NULL_POINTER; 
@@ -148,7 +147,7 @@ int chucho_lgr_set_level(chucho_logger* lgr, const chucho_level* lvl)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_lgr_set_writes_to_ancestors(chucho_logger* lgr, int state)
+chucho_rc chucho_lgr_set_writes_to_ancestors(chucho_logger* lgr, int state)
 {
     if (lgr == nullptr)
         return CHUCHO_NULL_POINTER;
@@ -156,7 +155,7 @@ int chucho_lgr_set_writes_to_ancestors(chucho_logger* lgr, int state)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_lgr_writes_to_ancestors(const chucho_logger* lgr, int* state)
+chucho_rc chucho_lgr_writes_to_ancestors(const chucho_logger* lgr, int* state)
 {
     if (lgr == nullptr)
         return CHUCHO_NULL_POINTER;
@@ -164,7 +163,7 @@ int chucho_lgr_writes_to_ancestors(const chucho_logger* lgr, int* state)
     return CHUCHO_NO_ERROR; 
 }
 
-int chucho_remove_unused_loggers(void)
+chucho_rc chucho_remove_unused_loggers(void)
 {
     chucho::logger::remove_unused_loggers();
     return CHUCHO_NO_ERROR;

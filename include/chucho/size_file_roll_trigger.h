@@ -25,10 +25,10 @@ extern "C"
 {
 #endif
 
-CHUCHO_EXPORT int chucho_create_size_file_roll_trigger(chucho_file_roll_trigger** trg,
+CHUCHO_EXPORT chucho_rc chucho_create_size_file_roll_trigger(chucho_file_roll_trigger** trg,
                                                        off_t max_size);
 
-CHUCHO_EXPORT int chucho_sftrg_get_max_size(const chucho_file_roll_trigger* trg, off_t* sz);
+CHUCHO_EXPORT chucho_rc chucho_sftrg_get_max_size(const chucho_file_roll_trigger* trg, off_t* sz);
 
 #if defined(__cplusplus)
 }

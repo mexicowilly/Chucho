@@ -16,13 +16,12 @@
 
 #include <chucho/diagnostic_context.hpp>
 #include <chucho/diagnostic_context.h>
-#include <chucho/error.h>
 #include <cstring>
 
 extern "C"
 {
 
-int chucho_dgc_release_node(chucho_dgc_node* node)
+chucho_rc chucho_dgc_release_node(chucho_dgc_node* node)
 {
     if (node == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -44,7 +43,7 @@ const char* chucho_dgc_at(const char* const key)
     }
 }
 
-int chucho_dgc_clear(void)
+chucho_rc chucho_dgc_clear(void)
 {
     try
     {
@@ -69,7 +68,7 @@ int chucho_dgc_empty(void)
     }
 }
 
-int chucho_dgc_erase(const char* const key)
+chucho_rc chucho_dgc_erase(const char* const key)
 {
     try
     {
@@ -82,7 +81,7 @@ int chucho_dgc_erase(const char* const key)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_dgc_get(chucho_dgc_node** buf, size_t buf_size, size_t* count)
+chucho_rc chucho_dgc_get(chucho_dgc_node** buf, size_t buf_size, size_t* count)
 {
     if (count == nullptr)
         return CHUCHO_NULL_POINTER; 
@@ -112,7 +111,7 @@ int chucho_dgc_get(chucho_dgc_node** buf, size_t buf_size, size_t* count)
     return CHUCHO_NO_ERROR;
 }
 
-int chucho_dgc_set(const char* const key, const char* const value)
+chucho_rc chucho_dgc_set(const char* const key, const char* const value)
 {
     if (key == nullptr || value == nullptr) 
         return CHUCHO_NULL_POINTER;

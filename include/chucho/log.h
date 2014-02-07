@@ -33,14 +33,14 @@ extern "C"
 #endif
 #endif
 
-CHUCHO_EXPORT int chucho_log(const chucho_level* lvl,
+CHUCHO_EXPORT chucho_rc chucho_log(const chucho_level* lvl,
                              chucho_logger* lgr,
                              const char* const file,
                              int line,
                              const char* const func,
                              const char* const format, ...);
 
-CHUCHO_EXPORT int chucho_log_mark(const chucho_level* lvl,
+CHUCHO_EXPORT chucho_rc chucho_log_mark(const chucho_level* lvl,
                                   chucho_logger* lgr,
                                   const char* const file,
                                   int line,

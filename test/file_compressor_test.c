@@ -16,7 +16,6 @@
 
 #include "sput.h"
 #include <stdio.h>
-#include <chucho/error.h>
 #if defined(CHUCHO_HAVE_ZLIB)
 #include <chucho/gzip_file_compressor.h>
 #endif
@@ -31,7 +30,7 @@
 static void gzip_compressor_test(void)
 {
     chucho_file_compressor* cmp;
-    int rc = chucho_create_gzip_file_compressor(&cmp, 3);
+    chucho_rc rc = chucho_create_gzip_file_compressor(&cmp, 3);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create gzip compressor");
     const char* ext;
     rc = chucho_cmp_get_extension(cmp, &ext);
@@ -50,7 +49,7 @@ static void gzip_compressor_test(void)
 static void bzip2_compressor_test(void)
 {
     chucho_file_compressor* cmp;
-    int rc = chucho_create_bzip2_file_compressor(&cmp, 4);
+    chucho_rc rc = chucho_create_bzip2_file_compressor(&cmp, 4);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create bzip2 compressor");
     const char* ext;
     rc = chucho_cmp_get_extension(cmp, &ext);
@@ -69,7 +68,7 @@ static void bzip2_compressor_test(void)
 static void zip_compressor_test(void)
 {
     chucho_file_compressor* cmp;
-    int rc = chucho_create_zip_file_compressor(&cmp, 5);
+    chucho_rc rc = chucho_create_zip_file_compressor(&cmp, 5);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create zip compressor");
     const char* ext;
     rc = chucho_cmp_get_extension(cmp, &ext);

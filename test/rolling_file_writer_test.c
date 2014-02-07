@@ -20,12 +20,11 @@
 #include <chucho/size_file_roll_trigger.h>
 #include <chucho/numbered_file_roller.h>
 #include <chucho/time_file_roller.h>
-#include <chucho/error.h>
 
 static void rolling_file_name(void)
 {
     chucho_formatter* fmt;
-    int rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
+    chucho_rc rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
     chucho_file_roller* rlr;
     rc = chucho_create_numbered_file_roller(&rlr, 1, 10, NULL);
@@ -76,7 +75,7 @@ static void rolling_file_name(void)
 static void rolling_file_no_name(void)
 {
     chucho_formatter* fmt;
-    int rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
+    chucho_rc rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
     chucho_file_roller* rlr;
     rc = chucho_create_time_file_roller(&rlr, "%d{%d-%H}", 10, NULL);
