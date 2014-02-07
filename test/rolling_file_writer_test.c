@@ -19,6 +19,7 @@
 #include <chucho/pattern_formatter.h>
 #include <chucho/size_file_roll_trigger.h>
 #include <chucho/numbered_file_roller.h>
+#include <chucho/time_file_roller.h>
 #include <chucho/error.h>
 
 static void rolling_file_name(void)
@@ -72,10 +73,45 @@ static void rolling_file_name(void)
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "release file writer");
 }
 
+static void rolling_file_no_name(void)
+{
+    chucho_formatter* fmt;
+    int rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
+    chucho_file_roller* rlr;
+    rc = chucho_create_time_file_roller(&rlr, "%d{%d-%H}", 10, NULL);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create time file roller");
+    chucho_writer* wrt;
+    rc = chucho_create_rolling_file_writer(&wrt, fmt, rlr, NULL, NULL, CHUCHO_ON_START_APPEND, 0);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create rolling file writer");
+    int flsh;
+    rc = chucho_fwrt_get_flush(wrt, &flsh);
+    sput_fail_unless(flsh == 0, "should not flush");
+    chucho_on_start on;
+    rc = chucho_fwrt_get_on_start(wrt, &on);
+    sput_fail_unless(on == CHUCHO_ON_START_APPEND, "should append");
+    chucho_file_roller* got_rlr;
+    rc = chucho_rfwrt_get_file_roller(wrt, &got_rlr);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "get file roller");
+    const char* pat;
+    rc = chucho_trlr_get_file_name_pattern(got_rlr, &pat);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "get file name patter");
+    sput_fail_unless(strcmp(pat, "%d{%d-%H}") == 0, "pattern is %d{%d-%H}");
+    size_t hist;
+    rc = chucho_trlr_get_max_history(got_rlr, &hist);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "get max history");
+    sput_fail_unless(hist == 10, "history is 10");
+    rc = chucho_release_file_roller(got_rlr);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "release file roller");
+    rc = chucho_release_writer(wrt);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "release file writer");
+}
+
 void run_rolling_file_writer_test(void)
 {
     sput_enter_suite("rolling_file_writer");
     sput_run_test(rolling_file_name);
+    sput_run_test(rolling_file_no_name);
     sput_leave_suite();
 }
 
