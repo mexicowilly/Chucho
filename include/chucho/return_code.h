@@ -29,6 +29,9 @@ extern "C"
 {
 #endif
 
+/**
+ * Values that may be returned from Chucho C API functions.
+ */
 typedef enum
 {
     CHUCHO_NO_ERROR,                /**< No error */
@@ -45,7 +48,7 @@ typedef enum
 } chucho_rc;
 
 /**
- * Return an error message given a Chucho return code.
+ * Return a message given a Chucho return code.
  * 
  * @param rc the return code
  * @return the message that corresponds to the code

@@ -32,37 +32,88 @@ extern "C"
 #endif
 
 /**
+ * @name Creation
+ */
+//@{
+/**
  * Create an asynchronous writer.
+ *  
+ * @note The asynchronous writer must be releaed with the @ref 
+ *       chucho_release_writer() function.
+ *  
+ * @post Ownership of the wrt parameter is transferred to the 
+ *       callee.
  * 
  * @param[out] async the writer to create
  * @param[in] wrt the underlying writer
  * @param[in] capacity the capacity of the blocking queue
- * @param discard_threshold the level at which to discard events 
- *                          once the queue is at 80% capacity or
- *                          more
- * @return a value from @ref error.h indicating success or 
+ * @param[in] discard_threshold the level at which to discard 
+ *                          events once the queue is at 80%
+ *                          capacity or more
+ * @return a value from @ref return_code.h indicating success or
  *         failure
  */
 CHUCHO_EXPORT chucho_rc chucho_create_async_writer(chucho_writer** async,
                                                    chucho_writer* wrt,
                                                    size_t capacity,
                                                    const chucho_level* discard_threshold);
+//@}
 
 /**
  * Return the level at which events are discarded. Once the 
  * queue has become 80% full, then events can be discarded. Any 
  * event whose level is at or below the discard threshold will 
  * be thrown away. This can be disabled with the level returned 
- * by @ref chucho_level_off(). 
+ * by @ref chucho_off_level(). 
+ * 
+ * @pre The wrt parameter must have been created with the @ref 
+ *      chucho_create_async_writer() function.
  * 
  * @param[in] wrt the asynchronous writer 
  * @param[out] lvl the level 
- * @return a value from @ref error.h indicating success or 
+ * @return a value from @ref return_code.h indicating success or
  *         failure
  */
 CHUCHO_EXPORT chucho_rc chucho_aswrt_get_discard_threshold(const chucho_writer* wrt, const chucho_level** lvl);
+/**
+ * Return the capacity of the blocking queue.
+ * 
+ * @pre The wrt parameter must have been created with the @ref 
+ *      chucho_create_async_writer() function.
+ * 
+ * @param[in] wrt the asynchronous writer
+ * @param[out] cap the capacity of the queue
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_aswrt_get_queue_capacity(const chucho_writer* wrt, size_t* cap);
+/**
+ * Return the current size of the blocking queue.
+ * 
+ * @pre The wrt parameter must have been created with the @ref 
+ *      chucho_create_async_writer() function.
+ * 
+ * @param[in] wrt the asynchronous writer
+ * @param[out] sz the size of the queue
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_aswrt_get_queue_size(const chucho_writer* wrt, size_t* sz);
+/**
+ * Return the underlying slow writer.
+ *  
+ * @pre The async parameter must have been created with the @ref
+ *      chucho_create_async_writer() function.
+ * 
+ * @post Ownership of the wrt parameter is transferred to the 
+ *       caller and must be released with the @ref
+ *       chucho_release_writer() function.
+ * 
+ * @param[in] async the asynchronous writer
+ * @param[out] wrt the underlying writer
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_aswrt_get_writer(const chucho_writer* async, chucho_writer** wrt);
 
 #if defined(__cplusplus)

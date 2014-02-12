@@ -33,10 +33,10 @@ chucho_rc chucho_rlr_get_active_file_name(const chucho_file_roller* rlr, char* b
     try
     {
         std::string fn = rlr->rlr_->get_active_file_name();
-        *count = fn.length();
+        *count = fn.length() + 1;
         if (buf == nullptr) 
             return CHUCHO_NULL_POINTER;
-        if (fn.length() > buf_size - 1) 
+        if (*count > buf_size) 
             return CHUCHO_INSUFFICIENT_BUFFER;
         std::strcpy(buf, fn.c_str());
     }

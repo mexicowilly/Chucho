@@ -17,6 +17,13 @@
 #if !defined(CHUCHO_FINALIZE_H__)
 #define CHUCHO_FINALIZE_H__
 
+/**
+ * @file 
+ * Finalize the Chucho library. 
+ *  
+ * @ingroup c miscellaneous 
+ */
+
 #include <chucho/export.h>
 
 #if defined(__cplusplus)
@@ -24,6 +31,13 @@ extern "C"
 {
 #endif
 
+/**
+ * Finalize the Chucho library. This cleans up all memory held 
+ * by all Chucho objects and puts the library in an undefined 
+ * state. 
+ * 
+ * @post No Chucho functions may be called after this one is.
+ */
 CHUCHO_EXPORT void chucho_finalize(void);
 
 #if defined(__cplusplus)

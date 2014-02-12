@@ -17,6 +17,13 @@
 #if !defined(CHUCHO_COUT_WRITER_H__)
 #define CHUCHO_COUT_WRITER_H__
 
+/**
+ * @file 
+ * Creation of cout writers. 
+ *  
+ * @ingroup c writers 
+ */
+
 #include <chucho/writer.h>
 #include <chucho/formatter.h>
 
@@ -25,6 +32,21 @@ extern "C"
 {
 #endif
 
+/**
+ * Create a cout writer.
+ * 
+ * @post Ownership of the wrt parameter is transferred to the 
+ *       caller, and must be released with the @ref
+ *       chucho_release_writer() function.
+ *  
+ * @post Ownership of the fmt parameters is transferred to the 
+ *       callee.
+ * 
+ * @param[out] wrt the cerr writer to create
+ * @param[in] fmt the formatter that the writer will use
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_create_cout_writer(chucho_writer** wrt, chucho_formatter* fmt);
 
 #if defined(__cplusplus)

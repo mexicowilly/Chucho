@@ -32,7 +32,6 @@ chucho_rc chucho_create_bzip2_file_compressor(chucho_file_compressor** cmp, unsi
     }
     catch (...) 
     {
-        delete *cmp;
         return CHUCHO_OUT_OF_MEMORY;
     }
     return CHUCHO_NO_ERROR;

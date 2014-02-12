@@ -78,6 +78,9 @@ public:
      * The signature required for a function to handle unknown 
      * configuration key-value pairs. The first parameter to the 
      * function is the key and the second is the value. 
+     *
+     * @note The unknown element handler is only supported in YAML 
+     *       configurations.
      */
     typedef std::function<bool(const std::string&, const std::string&)> unknown_handler_type;
 
@@ -107,6 +110,7 @@ public:
      * 
      * @return whether default configuration is allowed, which is 
      *         true by default
+     * @sa set_allow_default
      */
     static bool allow_default();
     /**
@@ -133,6 +137,7 @@ public:
      * ./chucho.yaml is returned. 
      * 
      * @return the configuration file name
+     * @sa set_file_name
      */
     static const std::string& get_file_name();
     /**
@@ -148,6 +153,7 @@ public:
      * 100k. 
      * 
      * @return the maximum file size
+     * @sa set_max_size
      */
     static std::size_t get_max_size();
     /**
@@ -155,6 +161,7 @@ public:
      * style. 
      * 
      * @return the style
+     * @sa set_style
      */
     static style get_style();
     /**
@@ -168,6 +175,7 @@ public:
      *       configurations.
      * 
      * @return the function to handle unknown elements
+     * @sa set_unknown_handler
      */
     static unknown_handler_type get_unknown_handler();
     /**
@@ -225,9 +233,9 @@ public:
      * will be used if no config file is found. By default there is 
      * no fallback configuration. 
      *  
-     * @pre The config text must be valid UTF-8 YAML
+     * If config is empty, then there is no fallback configuration. 
+     *  
      * @param config the fallback configuration
-     * @throw exception if the UTF-8 is not valid
      * @sa get_fallback
      */
     static void set_fallback(const std::string& config);
@@ -239,6 +247,7 @@ public:
      * If name is empty, then checking a named file is disabled. 
      * 
      * @param name the file name
+     * @sa get_file_name
      */
     static void set_file_name(const std::string& name);
     /**
@@ -247,12 +256,14 @@ public:
      * value is 100k. 
      * 
      * @param mx the maximum size
+     * @sa get_max_size
      */
     static void set_max_size(std::size_t mx);
     /**
      * Set the configuration style.
      * 
      * @param stl the style
+     * @sa get_style
      */
     static void set_style(style stl);
     /**
@@ -272,6 +283,7 @@ public:
      *       configurations.
      * 
      * @param hndl the unknown element handler
+     * @sa get_unknown_handler
      */
     static void set_unknown_handler(unknown_handler_type hndl);
 

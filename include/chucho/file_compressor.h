@@ -17,6 +17,13 @@
 #if !defined(CHUCHO_FILE_COMPRESSOR_H__)
 #define CHUCHO_FILE_COMPRESSOR_H__
 
+/**
+ * @file 
+ * Functions common to all file compressors. 
+ *  
+ * @ingroup c compressors 
+ */
+
 #include <chucho/return_code.h>
 
 #if defined(__cplusplus)
@@ -24,11 +31,41 @@ extern "C"
 {
 #endif
 
+/**
+ * An opaque type that you don't care about.
+ */
 typedef struct chucho_file_compressor chucho_file_compressor;
 
+/**
+ * Release a file compressor. 
+ *  
+ * @post Ownership of the cmp paramters is transferred to the 
+ *       callee.
+ * 
+ * @param[in] cmp the file compressor
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_release_file_compressor(chucho_file_compressor* cmp);
-
+/**
+ * Return the file name extension used by the given file 
+ * compressor. 
+ * 
+ * @param[in] cmp the file compressor
+ * @param[out] ext the file name extension
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_cmp_get_extension(const chucho_file_compressor* cmp, const char** ext);
+/**
+ * Return the minimum index of rolled files at which to start 
+ * compressing them. 
+ *
+ * @param[in] cmp the file compressor
+ * @param[out] idx the minimum index
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_cmp_get_min_index(const chucho_file_compressor* cmp, unsigned* idx);
 
 #if defined(__cplusplus)

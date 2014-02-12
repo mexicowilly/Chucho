@@ -17,6 +17,13 @@
 #if !defined(CHUCHO_DUPLICATE_MESSAGE_FILTER_H__)
 #define CHUCHO_DUPLICATE_MESSAGE_FILTER_H__
 
+/**
+ * @file 
+ * Creation of duplicate message filters. 
+ *  
+ * @ingroup c filters 
+ */
+
 #include <chucho/filter.h>
 
 #if defined(__cplusplus)
@@ -24,6 +31,17 @@ extern "C"
 {
 #endif
 
+/**
+ * Create a duplicate message filter.
+ *  
+ * @post Ownership of the flt paramters is transferred to the 
+ *       caller it must be released using the @ref
+ *       chucho_release_filter() function.
+ * 
+ * @param[out] flt the filter to create
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_create_duplicate_message_filter(chucho_filter** flt);
 
 #if defined(__cplusplus)

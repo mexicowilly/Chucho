@@ -20,7 +20,7 @@
 /**
  * @file
  * Constants used in writing to syslog. 
- * @ingroup c
+ * @ingroup c syslog
  */
 
 #if defined(__cplusplus)
@@ -30,6 +30,9 @@ extern "C"
 
 #define CHUCHO_DEFAULT_SYSLOG_PORT 514 /**< The default syslog port */
 
+/**
+ * The syslog facility.
+ */
 typedef enum
 {
     CHUCHO_SYSLOG_FACILITY_KERN     = 0 * 8, /**< Kernel messages */
@@ -54,6 +57,9 @@ typedef enum
     CHUCHO_SYSLOG_FACILITY_LOCAL7   = 23 * 8 /**< Local use 7 */
 } chucho_syslog_facility;
 
+/**
+ * The syslog severity.
+ */
 typedef enum
 {
     CHUCHO_SYSLOG_SEVERITY_EMERGENCY, /**< The system is unusable */

@@ -18,7 +18,6 @@
 #define CHUCHO_LOG_H__
 
 #include <chucho/logger.h>
-#include <chucho/level.h>
 
 #if defined(__cplusplus)
 extern "C"

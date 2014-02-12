@@ -17,6 +17,13 @@
 #if !defined(CHUCHO_FORMATTER_H__)
 #define CHUCHO_FORMATTER_H__
 
+/**
+ * @file 
+ * Functions that can be used with any formatter. 
+ *  
+ * @ingroup c formatters 
+ */
+
 #include <chucho/return_code.h>
 
 #if defined(__cplusplus)
@@ -24,8 +31,21 @@ extern "C"
 {
 #endif
 
+/**
+ * An opaque structure that you don't care about.
+ */
 typedef struct chucho_formatter chucho_formatter;
 
+/**
+ * Release a formatter.
+ *  
+ * @post Ownership of the fmt parameters is transferred to the 
+ *       callee.
+ *
+ * @param fmt the formatter
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_release_formatter(chucho_formatter* fmt);
 
 #if defined(__cplusplus)

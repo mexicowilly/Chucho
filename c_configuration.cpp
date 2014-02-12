@@ -217,7 +217,7 @@ chucho_rc chucho_cnf_set_environment_variable(const char* const var)
         return CHUCHO_NULL_POINTER;
     try
     {
-        chucho::configuration::set_environment_variable(var);
+        chucho::configuration::set_environment_variable(var == nullptr ? "" : var);
     }
     catch (...) 
     {
@@ -232,7 +232,7 @@ chucho_rc chucho_cnf_set_fallback(const char* const fb)
         return CHUCHO_NULL_POINTER;
     try
     {
-        chucho::configuration::set_fallback(fb);
+        chucho::configuration::set_fallback(fb == nullptr ? "" : fb);
     }
     catch (...) 
     {
@@ -247,7 +247,7 @@ chucho_rc chucho_cnf_set_file_name(const char* const name)
         return CHUCHO_NULL_POINTER;
     try
     {
-        chucho::configuration::set_file_name(name);
+        chucho::configuration::set_file_name(name == nullptr ? "" : name);
     }
     catch (...) 
     {
