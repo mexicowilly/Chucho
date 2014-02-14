@@ -20,8 +20,9 @@
 /**
  * @file 
  * Creation of duplicate message filters. 
+ * @copydoc chucho::duplicate_message_filter
  *  
- * @ingroup c filters 
+ * @ingroup c_filters 
  */
 
 #include <chucho/filter.h>

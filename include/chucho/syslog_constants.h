@@ -20,7 +20,7 @@
 /**
  * @file
  * Constants used in writing to syslog. 
- * @ingroup c syslog
+ * @ingroup c_syslog
  */
 
 #if defined(__cplusplus)

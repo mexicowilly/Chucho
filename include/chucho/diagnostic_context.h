@@ -21,7 +21,7 @@
  * @file 
  * @copydoc chucho::diagnostic_context 
  *  
- * @ingroup c miscellaneous 
+ * @ingroup c_miscellaneous 
  */
 
 #include <chucho/return_code.h>

@@ -20,8 +20,9 @@
 /**
  * @file 
  * Types and functions common to all filters.
+ * @copydoc chucho::filter
  *  
- * @ingroup c filters 
+ * @ingroup c_filters 
  */
 
 #include <chucho/return_code.h>

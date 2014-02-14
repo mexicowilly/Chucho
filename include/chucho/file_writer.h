@@ -21,7 +21,7 @@
  * @file 
  * Functions for file writers. 
  *  
- * @ingroup c writers 
+ * @ingroup c_writers 
  */
 
 #include <chucho/writer.h>

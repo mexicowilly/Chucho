@@ -17,6 +17,14 @@
 #if !defined(CHUCHO_LEVEL_THRESHOLD_FILTER_H__)
 #define CHUCHO_LEVEL_THRESHOLD_FILTER_H__
 
+/**
+ * @file 
+ * Functions related to level threshold filters. 
+ * @copydoc chucho::level_threshold_filter 
+ *  
+ * @ingroup c_filters 
+ */
+
 #include <chucho/filter.h>
 #include <chucho/level.h>
 
@@ -25,9 +33,33 @@ extern "C"
 {
 #endif
 
+/**
+ * @name Creation
+ */
+//@{
+/**
+ * Create a level threshold filter.
+ * 
+ * @post Ownership of the flt parameter is transferred to the 
+ *       caller, and it must be released with the @ref
+ *       chucho_release_filter() function.
+ * 
+ * @param[out] flt the filter to create
+ * @param[in] lvl the level threshold
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_create_level_threshold_filter(chucho_filter** flt,
-                                                       const chucho_level* lvl);
-
+                                                             const chucho_level* lvl);
+//@}
+/**
+ * Return the level associated with a level threshold filter.
+ * 
+ * @param[in] flt the level threshold filter
+ * @param[out] lvl the level
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_ltflt_get_level(const chucho_filter* flt, const chucho_level** lvl);
 
 #if defined(__cplusplus)

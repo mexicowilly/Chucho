@@ -20,8 +20,9 @@
 /**
  * @file 
  * Types and functions common to all file rollers. 
+ * @copydoc chucho::file_roller
  *  
- * @ingroup c rolling 
+ * @ingroup c_rolling 
  */
 
 #include <chucho/file_compressor.h>

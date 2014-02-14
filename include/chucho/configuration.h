@@ -22,7 +22,7 @@
  * Functions for controlling the configuration of Chucho. 
  * @copydoc chucho::configuration
  *  
- * @ingroup c configuration 
+ * @ingroup c_configuration 
  */
 
 #include <chucho/return_code.h>

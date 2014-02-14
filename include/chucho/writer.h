@@ -22,7 +22,7 @@
  * Functions that can be used with any of the writers created by 
  * one of the writer creation functions. 
  *  
- * @ingroup c writers 
+ * @ingroup c_writers 
  */
 
 #include <chucho/filter.h>

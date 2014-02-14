@@ -56,11 +56,6 @@
  */
 
 /**
- * @defgroup c 
- * Files that comprise the Chucho C API.
- */
-
-/**
  * @defgroup compressors 
  * Classes that can compress rolling files. 
  */
@@ -117,4 +112,81 @@
 /**
  * @defgroup writers 
  * Writers write log events to destinations. 
+ */
+
+/**
+ * @defgroup c 
+ * Files that comprise the Chucho C API.
+ */
+
+/**
+ * @defgroup c_compressors Compressors 
+ * Functions for compressing rolling files.
+ *  
+ * @ingroup c 
+ */
+
+/**
+ * @defgroup c_configuration Configuration 
+ * Functions that help manage the configuration of Chucho.
+ *  
+ * @ingroup c 
+ */
+
+/**
+ * @defgroup c_filters Filters
+ * Filters are attached to @ref chucho_writer, and they can be 
+ * used to refine log filtering beyond the basic level check. 
+ *
+ * @ingroup c 
+ */
+
+/**
+ * @defgroup c_formatters Formatters 
+ * @copydoc formatters 
+ *  
+ * @ingroup c 
+ */
+
+/**
+ * @defgroup c_levels Levels 
+ * @copydoc levels 
+ *  
+ * @ingroup c 
+ */
+
+/**
+ * @defgroup c_loggers Loggers 
+ * Types, functions and macros for writing filtered log events. 
+ *  
+ * @ingroup c
+ */
+
+/**
+ * @defgroup c_miscellaneous Miscellaneous 
+ * @copydoc miscellaneous 
+ *  
+ * @ingroup c 
+ */
+
+/**
+ * @defgroup c_rolling Rolling Files 
+ * Types and functions that help with rolling files, writing 
+ * rolling files and determining when files should roll. 
+ *  
+ * @ingroup c 
+ */
+
+/**
+ * @defgroup c_syslog Syslog 
+ * Functions and enumerations for writing to syslog. 
+ *  
+ * @ingroup c 
+ */
+
+/**
+ * @defgroup c_writers Writers 
+ * @copydoc writers 
+ *  
+ * @ingroup c 
  */

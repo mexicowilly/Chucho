@@ -20,8 +20,9 @@
 /**
  * @file 
  * Functions common to all file compressors. 
+ * @copydoc chucho::file_compressor
  *  
- * @ingroup c compressors 
+ * @ingroup c_compressors 
  */
 
 #include <chucho/return_code.h>

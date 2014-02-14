@@ -20,8 +20,9 @@
 /**
  * @file 
  * Creation of cout writers. 
+ * @copydoc chucho::cout_writer
  *  
- * @ingroup c writers 
+ * @ingroup c_writers 
  */
 
 #include <chucho/writer.h>

@@ -147,9 +147,9 @@ public:
      */
     std::vector<std::shared_ptr<writer>> get_writers();
     /**
-     * Does this logger permit a level? If the level is less than or 
-     * equal to the effective level of this logger, then the level 
-     * is permitted. 
+     * Does this logger permit a level? If the level is greater than
+     * or equal to the effective level of this logger, then the 
+     * level is permitted. 
      * 
      * @param lvl the level to test
      * @return true if the level would be permitted by this logger

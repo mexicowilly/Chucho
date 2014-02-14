@@ -20,8 +20,9 @@
 /**
  * @file 
  * Functions that can be used with any formatter. 
+ * @copydoc chucho::formatter
  *  
- * @ingroup c formatters 
+ * @ingroup c_formatters 
  */
 
 #include <chucho/return_code.h>

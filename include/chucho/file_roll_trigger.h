@@ -20,8 +20,9 @@
 /**
  * @file 
  * Types and functions common to all file roll triggers. 
+ * @copydoc chucho::file_roll_trigger
  *  
- * @ingroup c rolling 
+ * @ingroup c_rolling 
  */
 
 #include <chucho/return_code.h>

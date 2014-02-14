@@ -21,7 +21,7 @@
  * @file 
  * Finalize the Chucho library. 
  *  
- * @ingroup c miscellaneous 
+ * @ingroup c_miscellaneous 
  */
 
 #include <chucho/export.h>

@@ -20,8 +20,9 @@
 /**
  * @file 
  * Levels of Chucho logging. 
+ * @copydoc chucho::level
  *  
- * @ingroup c levels 
+ * @ingroup c_levels 
  */
 
 #include <chucho/syslog_constants.h>

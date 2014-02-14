@@ -20,8 +20,9 @@
 /**
  * @file 
  * Creation of bzip2 file compressors. 
+ * @copydoc chucho::bzip2_file_compressor
  *  
- * @ingroup c compressors 
+ * @ingroup c_compressors 
  */
 
 #include <chucho/file_compressor.h>

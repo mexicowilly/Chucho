@@ -20,8 +20,9 @@
 /**
  * @file 
  * Functions related to level filters. 
+ * @copydoc chucho::level_filter
  *  
- * @ingroup c filters 
+ * @ingroup c_filters 
  */
 
 #include <chucho/filter.h>

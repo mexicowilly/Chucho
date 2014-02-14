@@ -20,7 +20,8 @@
 /**
  * @file
  * @copydoc chucho::async_writer
- * @ingroup c writers
+ *
+ * @ingroup c_writers
  */
 
 #include <chucho/writer.h>

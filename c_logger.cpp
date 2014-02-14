@@ -131,14 +131,6 @@ chucho_rc chucho_lgr_remove_writer(chucho_logger* lgr, chucho_writer* wrt)
     return CHUCHO_NO_ERROR;
 }
 
-chucho_rc chucho_lgr_reset(chucho_logger* lgr)
-{
-    if (lgr == nullptr)
-        return CHUCHO_NULL_POINTER;
-    lgr->logger_->reset();
-    return CHUCHO_NO_ERROR; 
-}
-
 chucho_rc chucho_lgr_set_level(chucho_logger* lgr, const chucho_level* lvl)
 {
     if (lgr == nullptr || lvl == nullptr)
