@@ -25,7 +25,6 @@
  */
 
 #include <chucho/writer.h>
-#include <chucho/formatter.h>
 
 #if defined(__cplusplus)
 extern "C"

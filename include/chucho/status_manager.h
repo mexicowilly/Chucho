@@ -17,6 +17,13 @@
 #if !defined(CHUCHO_STATUS_MANAGER_H__)
 #define CHUCHO_STATUS_MANAGER_H__
 
+/**
+ * @file 
+ * @copydoc chucho::status_manager 
+ *  
+ * @ingroup c_status 
+ */
+
 #include <chucho/return_code.h>
 #include <chucho/status.h>
 
@@ -25,12 +32,56 @@ extern "C"
 {
 #endif
 
+/**
+ * A status observer. You may register an observer with the @ref 
+ * chucho_status_add_observer() function. 
+ */
 typedef void (*chucho_status_observer)(const chucho_status* st);
 
+/**
+ * Add a status observer.
+ * 
+ * @param[in] obs the observer to add
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_status_add_observer(chucho_status_observer obs);
+/**
+ * Clear all cached status entries.
+ * 
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_status_clear(void);
+/**
+ * Return the number of status events. 
+ *  
+ * @note This is the number of all reported status events, not 
+ *       the number of ones currently held in the cache.
+ * 
+ * @param[out] cnt the number of status events
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_status_get_count(size_t* cnt);
+/**
+ * Return the status level.
+ * 
+ * @param[out] lvl the status level
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_status_get_level(chucho_status_level* lvl);
+/**
+ * Remove a status observer.
+ * 
+ * @note It is not an error to remove an observer that is not 
+ *       currently registered.
+ * 
+ * @param obs the observer to remove
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_status_remove_observer(chucho_status_observer obs);
 
 #if defined(__cplusplus)

@@ -17,6 +17,13 @@
 #if !defined(CHUCHO_PATTERN_FORMATTER_H__)
 #define CHUCHO_PATTERN_FORMATTER_H__
 
+/**
+ * @file 
+ * @copydoc chucho::pattern_formatter 
+ *  
+ * @ingroup c_formatters 
+ */
+
 #include <chucho/formatter.h>
 
 #if defined(__cplusplus)
@@ -24,6 +31,18 @@ extern "C"
 {
 #endif
 
+/**
+ * Create a pattern formatter.
+ * 
+ * @post Ownership of the fmt paramters is transferred to the 
+ *       caller, and it must be released with the @ref
+ *       chucho_release_formatter() function.
+ * 
+ * @param fmt the formatter to create
+ * @param pattern the pattern
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_create_pattern_formatter(chucho_formatter** fmt, const char* const pattern);
 
 #if defined(__cplusplus)

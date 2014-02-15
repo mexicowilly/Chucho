@@ -17,6 +17,13 @@
 #if !defined(CHUCHO_SIZE_FILE_ROLL_TRIGGER_H__)
 #define CHUCHO_SIZE_FILE_ROLL_TRIGGER_H__
 
+/**
+ * @file 
+ * @copydoc chucho::size_file_roll_trigger 
+ *  
+ * @ingroup c_rolling 
+ */
+
 #include <chucho/file_roll_trigger.h>
 #include <sys/types.h>
 
@@ -25,9 +32,33 @@ extern "C"
 {
 #endif
 
+/**
+ * @name Creation
+ */
+//@{
+/**
+ * Create a size file roll trigger.
+ * 
+ * @post Ownership of the trg parameter is transferred to the 
+ *       caller, and it must be release with the @ref
+ *       chucho_release_file_roll_trigger() function.
+ * 
+ * @param[out] trg the size file roll trigger to create
+ * @param[in] max_size the size at which files will roll
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_create_size_file_roll_trigger(chucho_file_roll_trigger** trg,
-                                                       off_t max_size);
-
+                                                             off_t max_size);
+//@}
+/**
+ * Return the size at which files will roll.
+ * 
+ * @param[in] trg the size file roll trigger
+ * @param[out] sz the size at which files roll
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_sftrg_get_max_size(const chucho_file_roll_trigger* trg, off_t* sz);
 
 #if defined(__cplusplus)

@@ -17,6 +17,14 @@
 #if !defined(CHUCHO_NUMBERED_FILE_ROLLER_H__)
 #define CHUCHO_NUMBERED_FILE_ROLLER_H__
 
+/**
+ * @file 
+ * Functions related to numbered file rollers. 
+ * @copydoc chucho::numbered_file_roller 
+ *  
+ * @ingroup c_rolling 
+ */
+
 #include <chucho/file_roller.h>
 
 #if defined(__cplusplus)
@@ -24,12 +32,52 @@ extern "C"
 {
 #endif
 
+/**
+ * @name Creation
+ */
+//@{
+/**
+ * Create a numbered file roller.
+ * 
+ * @post Ownership of the rlr parameter is transferred to the 
+ *       caller, and it must be released with the @ref
+ *       chucho_release_file_roller() function.
+ * @post Ownership of the cmp parameter is transferred to the 
+ *       callee, if it is not NULL.
+ * 
+ * @param[out] rlr the numbered file roller to create
+ * @param[in] min_index the minimum index at which to start 
+ *                  numbering files
+ * @param[in] max_index the maximum index at which to stop 
+ *                  numbering file
+ * @param[in] cmp the file compressor, which may be NULL if no 
+ *            compression is desired
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_create_numbered_file_roller(chucho_file_roller** rlr,
-                                                     int min_index,
-                                                     int max_index,
-                                                     chucho_file_compressor* cmp);
-
+                                                           int min_index,
+                                                           int max_index,
+                                                           chucho_file_compressor* cmp);
+//@}
+/**
+ * Return the maximum index at which rolling stops.
+ * 
+ * @param[in] rlr the numbered file roller
+ * @param[out] idx the maximum index
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_nrlr_get_max_index(const chucho_file_roller* rlr, int* idx);
+/**
+ * Return the minimum index at which numbered rolled files 
+ * starts. 
+ * 
+ * @param[in] rlr the numbered file roller
+ * @param[out] idx the minimum index
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_nrlr_get_min_index(const chucho_file_roller* rlr, int* idx);
 
 #if defined(__cplusplus)

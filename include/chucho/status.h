@@ -17,6 +17,16 @@
 #if !defined(CHUCHO_STATUS_H__)
 #define CHUCHO_STATUS_H__
 
+/**
+ * @file 
+ * Types that can be used in status reporting.
+ * @copydoc chucho::status
+ *  
+ * @sa status_manager.h 
+ *  
+ * @ingroup c_status 
+ */
+
 #include <time.h>
 
 #if defined(__cplusplus)
@@ -24,19 +34,38 @@ extern "C"
 {
 #endif
 
+/**
+ * The level of a status event.
+ */
 typedef enum
 {
+    /** 
+     * Information only. Nothing is wrong.
+     */
     chucho_status_level_info,
+    /**
+     * Something went wrong, but not badly enough to inhibit 
+     * functionality. 
+     */
     chucho_status_level_warning,
+    /**
+     * Chucho is prevented from doing something that it should be 
+     * doing. 
+     */
     chucho_status_level_error
 } chucho_status_level;
 
+/**
+ * A status event.
+ *  
+ * @ingroup c_status 
+ */
 typedef struct
 {
-    chucho_status_level level;
-    const char* message;
-    const char* origin;
-    time_t time;
+    chucho_status_level level;  /**< The level. */
+    const char* message;        /**< The message. */
+    const char* origin;         /**< The component of origin. */
+    time_t time;                /**< The time. */
 } chucho_status;
 
 #if defined(__cplusplus)
