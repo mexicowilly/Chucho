@@ -23,7 +23,7 @@ static void level_test(void)
     chucho_rc rc = chucho_add_level(&lvl, "monkey", 700, CHUCHO_SYSLOG_SEVERITY_CRITICAL);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "add level");
     const chucho_level* got;
-    rc = chucho_get_level(&got, "monkey");
+    rc = chucho_get_level(&got, "MONKEY");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get level");
     sput_fail_unless(lvl == got, "level pointer is the same");
     const char* name;

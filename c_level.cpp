@@ -17,6 +17,7 @@
 #include <chucho/level.h>
 #include <chucho/c_level.hpp>
 #include <chucho/garbage_cleaner.hpp>
+#include <chucho/text_util.hpp>
 #include <map>
 #include <thread>
 #include <limits>
@@ -40,11 +41,20 @@ private:
     chucho::syslog::severity severity_;
 };
 
+class chucho_level_less
+{
+public:
+    bool operator() (const std::string& one, const std::string& two) const
+    {
+        return chucho::text_util::to_lower(one) < chucho::text_util::to_lower(two);
+    }
+};
+
 struct static_data
 {
     static_data();
 
-    std::map<std::string, std::shared_ptr<chucho_level>> levels_;
+    std::map<std::string, std::shared_ptr<chucho_level>, chucho_level_less> levels_;
 };
 
 c_level::c_level(const char* const name, int value, chucho_syslog_severity sev)
