@@ -134,6 +134,8 @@ ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
                harness.c
                level_filter_test.c
                level_filter_test.h
+               level_test.c
+               level_test.h
                level_threshold_filter_test.c
                level_threshold_filter_test.h
                log_macro_test.c

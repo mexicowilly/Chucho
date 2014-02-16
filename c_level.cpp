@@ -25,12 +25,49 @@
 namespace
 {
 
+class c_level : public chucho::level
+{
+public:
+    c_level(const char* const name, int value, chucho_syslog_severity sev);
+
+    virtual const char* get_name() const override;
+    virtual chucho::syslog::severity get_syslog_severity() const override;
+    virtual int get_value() const override;
+
+private:
+    std::string name_;
+    int value_;
+    chucho::syslog::severity severity_;
+};
+
 struct static_data
 {
     static_data();
 
     std::map<std::string, std::shared_ptr<chucho_level>> levels_;
 };
+
+c_level::c_level(const char* const name, int value, chucho_syslog_severity sev)
+    : name_(name),
+      value_(value),
+      severity_(static_cast<chucho::syslog::severity>(sev))
+{
+}
+
+const char* c_level::get_name() const
+{
+    return name_.c_str();
+}
+
+chucho::syslog::severity c_level::get_syslog_severity() const
+{
+    return severity_;
+}
+
+int c_level::get_value() const
+{
+    return value_;
+}
 
 static_data::static_data()
 {
@@ -96,6 +133,36 @@ const chucho_level* chucho_fatal_level(void)
     chucho_get_level(&lvl, "FATAL");
     assert(lvl != nullptr);
     return lvl;
+}
+
+chucho_rc chucho_add_level(const chucho_level** lvl,
+                           const char* const name,
+                           int value,
+                           chucho_syslog_severity sev)
+{
+    if (lvl == nullptr || name == nullptr) 
+        return CHUCHO_NULL_POINTER;
+    try
+    {
+        auto cpp = std::make_shared<c_level>(name, value, sev);
+        bool state = chucho::level::add(cpp);
+        if (state) 
+        {
+            auto c = std::make_shared<chucho_level>();
+            c->level_ = cpp;
+            data().levels_[name] = c;
+            *lvl = c.get();
+        }
+        else
+        {
+            return CHUCHO_LEVEL_ALREADY_EXISTS;
+        }
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
+    return CHUCHO_NO_ERROR;
 }
 
 chucho_rc chucho_get_level(const chucho_level** lvl, const char* const name)

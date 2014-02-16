@@ -38,6 +38,11 @@ extern "C"
  */
 typedef struct chucho_level chucho_level;
 
+CHUCHO_EXPORT chucho_rc chucho_add_level(const chucho_level** lvl,
+                                         const char* const name,
+                                         int value,
+                                         chucho_syslog_severity sev);
+
 /**
  * Return a named level.
  * 

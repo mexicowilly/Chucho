@@ -52,8 +52,9 @@
  * @subsection c C API
  * Though the core of Chucho is written in C++11, a wrapping C 
  * API is also exposed. This allows Chucho to be used in C 
- * program and in C++ programs that may be built with a compiler 
- * that cannot build Chucho, such as a non-C++11 compiler. 
+ * programs and in C++ programs that may be built with a 
+ * compiler that cannot build Chucho, such as a non-C++11 
+ * compiler. 
  *  
  * The C API is expressed in header files with the extension @c 
  * .h, while the core Chucho C++11 API is in files with the 

@@ -44,7 +44,8 @@ typedef enum
     CHUCHO_INVALID_PATTERN,         /**< Invalid pattern */
     CHUCHO_INVALID_ARGUMENT,        /**< Invalid argument */
     CHUCHO_NO_SUCH_VALUE,           /**< No such value */
-    CHUCHO_CONNECTION_ERROR         /**< Connection error */
+    CHUCHO_CONNECTION_ERROR,        /**< Connection error */
+    CHUCHO_LEVEL_ALREADY_EXISTS     /**< Level already exists */
 } chucho_rc;
 
 /**
