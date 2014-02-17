@@ -19,6 +19,7 @@
 
 #include <chucho/file_compressor.h>
 #include <chucho/file_compressor.hpp>
+#include <memory>
 
 extern "C"
 {

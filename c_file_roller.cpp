@@ -16,6 +16,7 @@
 
 #include <chucho/c_file_roller.hpp>
 #include <chucho/c_file_compressor.hpp>
+#include <cstring>
 
 extern "C"
 {

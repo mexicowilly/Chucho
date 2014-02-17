@@ -19,6 +19,7 @@
 #include <chucho/status_manager.h>
 #include <vector>
 #include <mutex>
+#include <algorithm>
 
 namespace
 {

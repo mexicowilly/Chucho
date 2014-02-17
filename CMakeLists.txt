@@ -233,6 +233,9 @@ MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
         # Microsoft doesn't want libyaml to use strdup
         SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
                                     COMPILE_FLAGS /wd4996)
+    ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
+        SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
+                                    COMPILE_FLAGS "-Wno-implicit-function-declaration -Wno-int-to-pointer-cast")
     ENDIF()
 ENDMACRO()
 
@@ -521,7 +524,7 @@ IF(CHUCHO_HAVE_ZLIB)
         INCLUDE_DIRECTORIES("${ZLIB_INCLUDE_DIR}")
     ENDIF()
     IF(CHUCHO_ZLIB_SOURCES)
-        IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+        IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_COMPILER_IS_GNUCXX)
             SET_SOURCE_FILES_PROPERTIES("${ZLIB_SOURCE}/gzlib.c"
                                         "${ZLIB_SOURCE}/gzread.c"
                                         "${ZLIB_SOURCE}/gzwrite.c"
@@ -558,6 +561,9 @@ IF(CHUCHO_HAVE_BZIP2)
             SET_SOURCE_FILES_PROPERTIES("${BZIP2_SOURCE}/bzlib.c" PROPERTIES
                                         COMPILE_FLAGS /wd4996)
         ENDIF()
+    ELSEIF(CMAKE_COMPILER_IS_GNUCXX AND CHUCHO_BZIP2_SOURCES)
+        SET_SOURCE_FILES_PROPERTIES("${BZIP2_SOURCE}/bzlib.c" PROPERTIES
+                                    COMPILE_FLAGS -Wno-implicit-function-declaration)
     ENDIF()
 ENDIF()
 

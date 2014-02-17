@@ -19,6 +19,7 @@
 #include <chucho/c_file_roller.hpp>
 #include <chucho/c_file_compressor.hpp>
 #include <chucho/file_compressor.h>
+#include <stdexcept>
 
 extern "C"
 {

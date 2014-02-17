@@ -30,7 +30,7 @@
         sput_fail_unless(rc == CHUCHO_NO_ERROR, "set logger level");    \
         static_mark = mark;                                             \
         if (mark == NULL)                                               \
-            sput_run_test(log);                                         \
+            sput_run_test(log_it);                                      \
         else                                                            \
             sput_run_test(log_mark);                                    \
         expect(chucho_##lvl##_level(), mark);                           \
@@ -42,7 +42,7 @@
 static chucho_logger* lgr;
 static const char* static_mark;
 
-static void log()
+static void log_it(void)
 {
     CHUCHO_C_TRACE(lgr, "my dog %s", "has fleas");
     CHUCHO_C_DEBUG(lgr, "my dog %s", "has fleas");
@@ -52,7 +52,7 @@ static void log()
     CHUCHO_C_FATAL(lgr, "my dog %s", "has fleas");
 }
 
-static void log_mark()
+static void log_mark(void)
 {
     CHUCHO_C_TRACE_M(lgr, static_mark, "my dog %s", "has fleas");
     CHUCHO_C_DEBUG_M(lgr, static_mark, "my dog %s", "has fleas");

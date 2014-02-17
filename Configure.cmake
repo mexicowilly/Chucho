@@ -495,7 +495,7 @@ int main()
     ENDFOREACH()
 
     # strdup/strstr/strcmp
-    FOREACH(SYM strdup strstr strcmp strlen strcpy strcat)
+    FOREACH(SYM strstr strcmp strlen strcpy strcat)
         CHECK_SYMBOL_EXISTS(${SYM} string.h CHUCHO_HAVE_${SYM})
         IF(NOT CHUCHO_HAVE_${SYM})
             MESSAGE(FATAL_ERROR "${SYM} is required")

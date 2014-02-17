@@ -16,6 +16,7 @@
 
 #include "test_util.h"
 #include <string.h>
+#include <stdlib.h>
 
 char* read_line(FILE* f)
 {
@@ -29,7 +30,8 @@ char* read_line(FILE* f)
             char* nl = strpbrk(buf, "\r\n");
             if (nl != NULL)
                 *nl = 0;
-            result = strdup(buf);
+            result = malloc(strlen(buf) + 1);
+            strcpy(result, buf);
         }
     }
     return result;
