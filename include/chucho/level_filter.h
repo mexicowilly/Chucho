@@ -54,9 +54,9 @@ extern "C"
  *         failure
  */
 CHUCHO_EXPORT chucho_rc chucho_create_level_filter(chucho_filter** flt,
-                                             const chucho_level* lvl,
-                                             chucho_filter_result on_match,
-                                             chucho_filter_result on_mismatch);
+                                                   const chucho_level* lvl,
+                                                   chucho_filter_result on_match,
+                                                   chucho_filter_result on_mismatch);
 //@}
 /**
  * Return the level associated with a level filter.

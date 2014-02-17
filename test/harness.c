@@ -40,6 +40,8 @@
 #include "syslog_writer_test.h"
 #include "time_file_roller_test.h"
 #include "level_test.h"
+#include "writer_test.h"
+#include "file_roller_test.h"
 
 sput_struct __sput;
 
@@ -71,6 +73,8 @@ int main()
     run_syslog_writer_test();
     run_time_file_roller_test();
     run_level_test();
+    run_writer_test();
+    run_file_roller_test();
 
     sput_finish_testing();
     chucho_finalize();

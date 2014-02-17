@@ -129,6 +129,8 @@ ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
                diagnostic_context_test.h
                duplicate_message_filter_test.c
                duplicate_message_filter_test.h
+               file_roller_test.c
+               file_roller_test.h
                file_writer_test.c
                file_writer_test.h
                harness.c
@@ -160,6 +162,8 @@ ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
                test_util.h
                time_file_roller_test.c
                time_file_roller_test.h
+               writer_test.c
+               writer_test.h
                ${CHUCHO_TEST_COMPRESSION_C_SOURCES})
 TARGET_LINK_LIBRARIES(c-unit-test chucho ${CHUCHO_THREAD_LIB})
 
