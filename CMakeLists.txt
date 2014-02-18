@@ -594,11 +594,15 @@ IF(CHUCHO_HAVE_MINIZIP)
         SET_SOURCE_FILES_PROPERTIES("${MINIZIP_SOURCE}/zip.c"
                                     PROPERTIES
                                     COMPILE_FLAGS "-Wno-parentheses-equality -Wno-incompatible-pointer-types")
-        IF(NOT CHUCHO_HAVE_FOPEN64)
-            SET_SOURCE_FILES_PROPERTIES(${CHUCHO_MINIZIP_SOURCES}
-                                        PROPERTIES
-                                        COMPILE_DEFINITIONS USE_FILE32API)
-        ENDIF()
+    ENDIF()
+    IF(CHUCHO_SOLARIS)
+        SET_SOURCE_FILES_PROPERTIES(${CHUCHO_MINIZIP_SOURCES}
+                                    PROPERTIES
+                                    COMPILE_DEFINITIONS "_LARGEFILE_SOURCE;_FILE_OFFSET_BITS=64")
+    ELSEIF(NOT CHUCHO_HAVE_FOPEN64)
+        SET_SOURCE_FILES_PROPERTIES(${CHUCHO_MINIZIP_SOURCES}
+                                    PROPERTIES
+                                    COMPILE_DEFINITIONS USE_FILE32API)
     ENDIF()
 ENDIF()
 

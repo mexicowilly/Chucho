@@ -167,6 +167,10 @@ ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
                ${CHUCHO_TEST_COMPRESSION_C_SOURCES})
 TARGET_LINK_LIBRARIES(c-unit-test chucho ${CHUCHO_THREAD_LIB})
 
+IF(CHUCHO_SOLARIS)
+    TARGET_LINK_LIBRARIES(c-unit-test socket nsl)
+ENDIF()
+
 ADD_CUSTOM_TARGET(c-check
                   COMMAND c-unit-test)
 
