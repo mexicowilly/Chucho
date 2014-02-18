@@ -28,8 +28,8 @@ namespace chucho
  * @class diagnostic_context diagnostic_context.hpp chucho/diagnostic_context.hpp 
  * A diagnostic_context is a thread-specific set of key-value 
  * pairs. The pattern_formatter supports accepting a 
- * diagnostic_context key, which will be inserted into the 
- * message as the key's value. 
+ * diagnostic_context key, the value of which will be inserted 
+ * into the message.
  *  
  * @ingroup miscellaneous 
  */

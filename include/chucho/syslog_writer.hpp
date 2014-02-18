@@ -47,6 +47,9 @@ public:
      * the messages will be written to the local host using the 
      * syslog interface, which allows the system to manage the IPC. 
      * UDP over a socket is not used in this case. 
+     *  
+     * If the system does not support the syslog C interface, then 
+     * UDP over a socket is used to connect to the local host. 
      * 
      * @param fmt the formatter
      * @param fcl the syslog facility
@@ -87,7 +90,7 @@ public:
      * 
      * @return the syslog host name
      */
-    const optional<std::uint16_t> get_port() const;
+    const optional<std::uint16_t>& get_port() const;
 
 protected:
     virtual void write_impl(const event& evt) override;
@@ -133,7 +136,7 @@ inline const std::string& syslog_writer::get_host_name() const
     return host_name_;
 }
 
-inline const optional<std::uint16_t> syslog_writer::get_port() const
+inline const optional<std::uint16_t>& syslog_writer::get_port() const
 {
     return port_;
 }

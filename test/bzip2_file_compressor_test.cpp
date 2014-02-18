@@ -48,5 +48,5 @@ TEST(bzip2_file_compressor, compress)
     EXPECT_FALSE(chucho::file::exists(name));
     name += ".bz2";
     EXPECT_TRUE(chucho::file::exists(name));
-    //chucho::file::remove(name);
+    chucho::file::remove(name);
 }

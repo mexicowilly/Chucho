@@ -18,6 +18,17 @@ IF(MSVC)
     ADD_DEFINITIONS(-D_VARIADIC_MAX=10)
 ENDIF()
 
+IF(C_API)
+    IF(CMAKE_COMPILER_IS_GNUC OR CMAKE_C_COMPILER_ID STREQUAL Clang)
+        INCLUDE(CheckCCompilerFlag)
+        CHECK_C_COMPILER_FLAG(-std=c99 CHUCHO_HAVE_STDC99)
+        IF(NOT CHUCHO_HAVE_STDC99)
+            MESSAGE(FATAL_ERROR "-std=c99 is required")
+        ENDIF()
+        SET(CMAKE_C_FLAGS -std=c99)
+    ENDIF()
+ENDIF()
+
 IF(CHUCHO_POSIX)
     ADD_DEFINITIONS(-DCHUCHO_POSIX)
 ELSEIF(CHUCHO_WINDOWS)
@@ -98,6 +109,81 @@ ENDIF()
 
 ADD_CUSTOM_TARGET(check
                   COMMAND unit-test)
+
+IF(CHUCHO_HAVE_ZLIB OR CHUCHO_HAVE_BZIP2 OR CHUCHO_HAVE_MINIZIP)
+    SET(CHUCHO_TEST_COMPRESSION_C_SOURCES
+        file_compressor_test.c
+        file_compressor_test.h)
+ENDIF()
+
+ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
+               async_writer_test.c
+               async_writer_test.h
+               cerr_writer_test.c
+               cerr_writer_test.h
+               cout_writer_test.c
+               cout_writer_test.h
+               configuration_test.c
+               configuration_test.h
+               diagnostic_context_test.c
+               diagnostic_context_test.h
+               duplicate_message_filter_test.c
+               duplicate_message_filter_test.h
+               file_roller_test.c
+               file_roller_test.h
+               file_writer_test.c
+               file_writer_test.h
+               harness.c
+               level_filter_test.c
+               level_filter_test.h
+               level_test.c
+               level_test.h
+               level_threshold_filter_test.c
+               level_threshold_filter_test.h
+               log_macro_test.c
+               log_macro_test.h
+               logger_test.c
+               logger_test.h
+               numbered_file_roller_test.c
+               numbered_file_roller_test.h
+               pattern_formatter_test.c
+               pattern_formatter_test.h
+               remote_writer_test.c
+               remote_writer_test.h
+               rolling_file_writer_test.c
+               rolling_file_writer_test.h
+               size_file_roll_trigger_test.c
+               size_file_roll_trigger_test.h
+               sliding_numbered_file_roller_test.c
+               sliding_numbered_file_roller_test.h
+               syslog_writer_test.c
+               syslog_writer_test.h
+               test_util.c
+               test_util.h
+               time_file_roller_test.c
+               time_file_roller_test.h
+               writer_test.c
+               writer_test.h
+               ${CHUCHO_TEST_COMPRESSION_C_SOURCES})
+TARGET_LINK_LIBRARIES(c-unit-test chucho ${CHUCHO_THREAD_LIB})
+
+IF(CHUCHO_SOLARIS)
+    TARGET_LINK_LIBRARIES(c-unit-test socket nsl)
+ENDIF()
+
+ADD_CUSTOM_TARGET(c-check
+                  COMMAND c-unit-test)
+
+ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
+               harness.c
+               log_macro_test.c
+               log_macro_test.h
+               test_util.c
+               test_util.h)
+TARGET_LINK_LIBRARIES(c-unit-test chucho ${CHUCHO_THREAD_LIB})
+
+ADD_CUSTOM_TARGET(c-check
+                  COMMAND c-unit-test)
 
 ADD_EXECUTABLE(time-rolling-file-test EXCLUDE_FROM_ALL
                harness.cpp

@@ -39,7 +39,8 @@ IF(CHUCHO_POSIX)
         platform/posix/pattern_formatter_posix.cpp
         platform/posix/socket_connector_posix.cpp
         platform/posix/socket_exception_posix.cpp
-        platform/posix/syslog_writer_posix.cpp)
+        platform/posix/syslog_writer_posix.cpp
+        platform/posix/text_util_posix.cpp)
 
     IF(CHUCHO_HAVE_GMTIME_R)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/calendar_posix.cpp PROPERTIES
@@ -77,6 +78,7 @@ ELSEIF(CHUCHO_WINDOWS)
         platform/windows/socket_connector_windows.cpp
         platform/windows/socket_exception_windows.cpp
         platform/windows/syslog_writer_windows.cpp
+        platform/windows/text_util_windows.cpp
         platform/windows/windows_event_log_writer.cpp
         platform/windows/windows_event_log_writer_factory.cpp
         include/chucho/windows_event_log_writer_factory.hpp
@@ -86,6 +88,41 @@ ELSEIF(CHUCHO_WINDOWS)
         platform/windows/winsock_startup.hpp)
     SET_SOURCE_FILES_PROPERTIES(platform/windows/windows_event_log_writer.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
+ENDIF()
+
+IF(C_API)
+    SET(CHUCHO_C_PUBLIC_HEADERS
+        include/chucho/async_writer.h
+        include/chucho/cerr_writer.h
+        include/chucho/cout_writer.h
+        include/chucho/configuration.h
+        include/chucho/diagnostic_context.h
+        include/chucho/duplicate_message_filter.h
+        "${CMAKE_BINARY_DIR}/chucho/export.h"
+        include/chucho/file_compressor.h
+        include/chucho/file_roll_trigger.h
+        include/chucho/file_roller.h
+        include/chucho/file_writer.h
+        include/chucho/filter.h
+        include/chucho/finalize.h
+        include/chucho/formatter.h
+        include/chucho/level.h
+        include/chucho/level_filter.h
+        include/chucho/level_threshold_filter.h
+        include/chucho/log.h
+        include/chucho/logger.h
+        include/chucho/numbered_file_roller.h
+        include/chucho/pattern_formatter.h
+        include/chucho/remote_writer.h
+        include/chucho/return_code.h
+        include/chucho/rolling_file_writer.h
+        include/chucho/size_file_roll_trigger.h
+        include/chucho/sliding_numbered_file_roller.h
+        include/chucho/status.h
+        include/chucho/status_manager.h
+        include/chucho/syslog_writer.h
+        include/chucho/time_file_roller.h
+        include/chucho/writer.h)
 ENDIF()
 
 SET(CHUCHO_PUBLIC_HEADERS
@@ -135,6 +172,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/status_observer.hpp
     include/chucho/status_reporter.hpp
     include/chucho/suffix.hpp
+    include/chucho/syslog_constants.h
     include/chucho/syslog_constants.hpp
     include/chucho/syslog_writer.hpp
     include/chucho/time_file_roller.hpp
@@ -142,7 +180,8 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/writer.hpp
     include/chucho/writer_factory.hpp
     include/chucho/writer_memento.hpp
-    include/chucho/yaml_formatter.hpp)
+    include/chucho/yaml_formatter.hpp
+    ${CHUCHO_C_PUBLIC_HEADERS})
 
 IF(CHUCHO_WINDOWS)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
@@ -151,14 +190,23 @@ ENDIF()
 
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.h)
+    ENDIF()
 ENDIF()
 
 IF(CHUCHO_HAVE_BZIP2)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/bzip2_file_compressor.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/bzip2_file_compressor.h)
+    ENDIF()
 ENDIF()
 
 IF(CHUCHO_HAVE_MINIZIP)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/zip_file_compressor.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/zip_file_compressor.h)
+    ENDIF()
 ENDIF()
 
 # The libyaml sources are required by chuchod
@@ -187,6 +235,9 @@ MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
         # Microsoft doesn't want libyaml to use strdup
         SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
                                     COMPILE_FLAGS /wd4996)
+    ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
+        SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
+                                    COMPILE_FLAGS "-Wno-implicit-function-declaration -Wno-int-to-pointer-cast")
     ENDIF()
 ENDMACRO()
 
@@ -227,6 +278,56 @@ IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
                                 COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATOR_DEFS}")
     SET_SOURCE_FILES_PROPERTIES(memento_key_set.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_CONFIG_FILE_CONFIG)
+ENDIF()
+
+IF(C_API)
+    SET(CHUCHO_C_SOURCES
+        c_async_writer.cpp
+        c_cerr_writer.cpp
+        c_cout_writer.cpp
+        c_configuration.cpp
+        c_diagnostic_context.cpp
+        c_duplicate_message_filter.cpp
+        c_file_compressor.cpp
+        c_file_roll_trigger.cpp
+        c_file_roller.cpp
+        c_file_writer.cpp
+        c_filter.cpp
+        c_finalize.cpp
+        c_formatter.cpp
+        c_level.cpp
+        c_level_filter.cpp
+        c_level_threshold_filter.cpp
+        c_log.cpp
+        c_logger.cpp
+        c_numbered_file_roller.cpp
+        c_pattern_formatter.cpp
+        c_remote_writer.cpp
+        c_return_code.cpp
+        c_rolling_file_writer.cpp
+        c_size_file_roll_trigger.cpp
+        c_sliding_numbered_file_roller.cpp
+        c_status_manager.cpp
+        c_syslog_writer.cpp
+        c_time_file_roller.cpp
+        c_util.cpp
+        c_writer.cpp
+        include/chucho/c_file_compressor.hpp
+        include/chucho/c_file_roll_trigger.hpp
+        include/chucho/c_file_roller.hpp
+        include/chucho/c_filter.hpp
+        include/chucho/c_formatter.hpp
+        include/chucho/c_level.hpp
+        include/chucho/c_logger.hpp
+        include/chucho/c_util.hpp
+        include/chucho/c_writer.hpp)
+ENDIF()
+
+IF(MSVC)
+    SET_SOURCE_FILES_PROPERTIES(c_diagnostic_context.cpp PROPERTIES
+                                COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
+    SET_SOURCE_FILES_PROPERTIES(c_file_roller.cpp PROPERTIES
+                                COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
 ENDIF()
 
 SET(CHUCHO_SOURCES
@@ -380,7 +481,8 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_CONFIGURATOR_SOURCES}
     ${CHUCHO_PLATFORM_SOURCES}
     ${CHUCHO_EMBEDDED_SOURCES}
-    ${CHUCHO_PUBLIC_HEADERS})
+    ${CHUCHO_PUBLIC_HEADERS}
+    ${CHUCHO_C_SOURCES})
 
 IF(CHUCHO_HAVE_PUT_TIME)
     SET_SOURCE_FILES_PROPERTIES(calendar.cpp PROPERTIES
@@ -420,6 +522,13 @@ IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_SOURCES
          gzip_file_compressor.cpp
          ${CHUCHO_ZLIB_SOURCES})
+    IF(C_API)
+        LIST(APPEND CHUCHO_SOURCES c_gzip_file_compressor.cpp)
+    ENDIF()
+    IF(MSVC)
+        SET_SOURCE_FILES_PROPERTIES(gzip_file_compressor.cpp PROPERTIES
+                                    COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
+    ENDIF()
     SET_SOURCE_FILES_PROPERTIES(gzip_file_compressor_factory.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_HAVE_ZLIB)
     IF(ZLIB_SOURCE)
@@ -428,7 +537,7 @@ IF(CHUCHO_HAVE_ZLIB)
         INCLUDE_DIRECTORIES("${ZLIB_INCLUDE_DIR}")
     ENDIF()
     IF(CHUCHO_ZLIB_SOURCES)
-        IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+        IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_COMPILER_IS_GNUCXX)
             SET_SOURCE_FILES_PROPERTIES("${ZLIB_SOURCE}/gzlib.c"
                                         "${ZLIB_SOURCE}/gzread.c"
                                         "${ZLIB_SOURCE}/gzwrite.c"
@@ -448,6 +557,9 @@ IF(CHUCHO_HAVE_BZIP2)
     LIST(APPEND CHUCHO_SOURCES
          bzip2_file_compressor.cpp
          ${CHUCHO_BZIP2_SOURCES})
+    IF(C_API)
+        LIST(APPEND CHUCHO_SOURCES c_bzip2_file_compressor.cpp)
+    ENDIF()
     SET_SOURCE_FILES_PROPERTIES(bzip2_file_compressor_factory.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_HAVE_BZIP2)
     IF(BZIP2_SOURCE)
@@ -456,12 +568,15 @@ IF(CHUCHO_HAVE_BZIP2)
         INCLUDE_DIRECTORIES("${BZIP2_INCLUDE_DIR}")
     ENDIF()
     IF(MSVC)
-        SET_SOURCE_FILES_PROPERTIES(bzip2_file_compressor PROPERTIES
+        SET_SOURCE_FILES_PROPERTIES(bzip2_file_compressor.cpp PROPERTIES
                                     COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
         IF(CHUCHO_BZIP2_SOURCES)
             SET_SOURCE_FILES_PROPERTIES("${BZIP2_SOURCE}/bzlib.c" PROPERTIES
                                         COMPILE_FLAGS /wd4996)
         ENDIF()
+    ELSEIF(CMAKE_COMPILER_IS_GNUCXX AND CHUCHO_BZIP2_SOURCES)
+        SET_SOURCE_FILES_PROPERTIES("${BZIP2_SOURCE}/bzlib.c" PROPERTIES
+                                    COMPILE_FLAGS -Wno-implicit-function-declaration)
     ENDIF()
 ENDIF()
 
@@ -469,6 +584,9 @@ IF(CHUCHO_HAVE_MINIZIP)
     LIST(APPEND CHUCHO_SOURCES
          zip_file_compressor.cpp
          ${CHUCHO_MINIZIP_SOURCES})
+    IF(C_API)
+        LIST(APPEND CHUCHO_SOURCES c_zip_file_compressor.cpp)
+    ENDIF()
     SET_SOURCE_FILES_PROPERTIES(zip_file_compressor_factory.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_HAVE_MINIZIP)
     INCLUDE_DIRECTORIES("${MINIZIP_SOURCE}")
@@ -476,11 +594,15 @@ IF(CHUCHO_HAVE_MINIZIP)
         SET_SOURCE_FILES_PROPERTIES("${MINIZIP_SOURCE}/zip.c"
                                     PROPERTIES
                                     COMPILE_FLAGS "-Wno-parentheses-equality -Wno-incompatible-pointer-types")
-        IF(NOT CHUCHO_HAVE_FOPEN64)
-            SET_SOURCE_FILES_PROPERTIES(${CHUCHO_MINIZIP_SOURCES}
-                                        PROPERTIES
-                                        COMPILE_DEFINITIONS USE_FILE32API)
-        ENDIF()
+    ENDIF()
+    IF(CHUCHO_SOLARIS)
+        SET_SOURCE_FILES_PROPERTIES(${CHUCHO_MINIZIP_SOURCES}
+                                    PROPERTIES
+                                    COMPILE_DEFINITIONS "_LARGEFILE_SOURCE;_FILE_OFFSET_BITS=64")
+    ELSEIF(NOT CHUCHO_HAVE_FOPEN64)
+        SET_SOURCE_FILES_PROPERTIES(${CHUCHO_MINIZIP_SOURCES}
+                                    PROPERTIES
+                                    COMPILE_DEFINITIONS USE_FILE32API)
     ENDIF()
 ENDIF()
 

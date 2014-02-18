@@ -17,6 +17,7 @@
 #include <chucho/level.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/garbage_cleaner.hpp>
+#include <chucho/text_util.hpp>
 #include <limits>
 #include <set>
 #include <algorithm>
@@ -189,22 +190,15 @@ int off::get_value() const
 
 struct levels
 {
-    class shared_level_name_less
+    class level_name_less
     {
     public:
-        shared_level_name_less(levels& l);
-
         bool operator() (std::shared_ptr<chucho::level> lvl_one,
                          std::shared_ptr<chucho::level> lvl_two) const;
-
-    private:
-        levels& lvls_;
     };
 
     levels();
 
-    std::string to_upper(const std::string& text);
-    
     std::shared_ptr<chucho::level> TRACE_;
     std::shared_ptr<chucho::level> DEBUG_;
     std::shared_ptr<chucho::level> INFO_;
@@ -214,7 +208,7 @@ struct levels
     std::shared_ptr<chucho::level> OFF_;
     std::mutex guard_;
     std::locale c_loc_;
-    std::set<std::shared_ptr<chucho::level>, shared_level_name_less> all_levels_;
+    std::set<std::shared_ptr<chucho::level>, level_name_less> all_levels_;
 };
 
 levels::levels()
@@ -225,8 +219,7 @@ levels::levels()
       ERROR_(new error()),
       FATAL_(new fatal()),
       OFF_(new off()),
-      c_loc_("C"),
-      all_levels_(shared_level_name_less(*this))
+      c_loc_("C")
 {
     all_levels_.insert(TRACE_);
     all_levels_.insert(DEBUG_);
@@ -238,25 +231,11 @@ levels::levels()
     chucho::garbage_cleaner::get().add([this] () { delete this; });
 }
 
-std::string levels::to_upper(const std::string& text)
+bool levels::level_name_less::operator() (std::shared_ptr<chucho::level> lvl_one,
+                                          std::shared_ptr<chucho::level> lvl_two) const
 {
-    std::string up;
-    std::transform(text.begin(),
-                   text.end(),
-                   std::back_inserter(up),
-                   [this] (char c) { return std::toupper(c, c_loc_); });
-    return up;
-}
-
-levels::shared_level_name_less::shared_level_name_less(levels& l)
-    : lvls_(l)
-{
-}
-
-bool levels::shared_level_name_less::operator() (std::shared_ptr<chucho::level> lvl_one,
-                                                 std::shared_ptr<chucho::level> lvl_two) const
-{
-    return lvls_.to_upper(lvl_one->get_name()) < lvls_.to_upper(lvl_two->get_name());
+    return chucho::text_util::to_lower(lvl_one->get_name()) <
+           chucho::text_util::to_lower(lvl_two->get_name());
 }
 
 std::once_flag once;
@@ -331,10 +310,10 @@ std::shared_ptr<level> level::from_text(const std::string& text)
 {
     levels& l(lvls());
     std::lock_guard<std::mutex> guard(l.guard_);
-    std::string up = l.to_upper(text);
+    std::string down = text_util::to_lower(text);
     auto found = std::find_if(l.all_levels_.begin(),
                               l.all_levels_.end(),
-                              [&] (std::shared_ptr<level> lvl) { return l.to_upper(lvl->get_name()) == up; });
+                              [&] (std::shared_ptr<level> lvl) { return text_util::to_lower(lvl->get_name()) == down; });
     if (found == l.all_levels_.end())
         throw exception("The text " + text + " does not describe a valid log level");
     return *found;
