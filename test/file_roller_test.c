@@ -21,14 +21,15 @@ static void file_roller_test(void)
 {
     chucho_file_roller* rlr;
     chucho_rc rc = chucho_create_numbered_file_roller(&rlr, 1, 10, NULL);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create numbered file roller");
     char buf[1];
     size_t count;
+    chucho_file_compressor* cmp;
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create numbered file roller");
     rc = chucho_rlr_get_active_file_name(rlr, buf, 1, &count);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get active file name");
     sput_fail_unless(count == 1, "length is 1");
     sput_fail_unless(buf[0] == 0, "name is empty");
-    chucho_file_compressor* cmp;
     rc = chucho_rlr_get_file_compressor(rlr, &cmp);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get file compressor");
     sput_fail_unless(cmp == NULL, "compressor is NULL");

@@ -27,14 +27,18 @@ static int my_unknown_handler(const char* key, const char* val)
 static void configuration_test(void)
 {
     chucho_rc rc = chucho_cnf_set_allow_default(0);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "set allow default");
     int val = 1;
+    const char* text = NULL;
+    size_t sz = 0;
+    chucho_configuration_style sty = CHUCHO_CONFIGURATION_STYLE_AUTOMATIC;
+    chucho_unknown_handler_type unk = NULL;
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "set allow default");
     rc = chucho_cnf_allow_default(&val);
     sput_fail_unless(val == 0, "allow default");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get allow default");
     rc = chucho_cnf_set_environment_variable("MY_DOG_HAS_FLEAS");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "set environment variable");
-    const char* text = NULL;
     rc = chucho_cnf_get_environment_variable(&text);
     sput_fail_if(text == NULL, "null environment variable");
     sput_fail_unless(strcmp(text, "MY_DOG_HAS_FLEAS") == 0, "environment variable");
@@ -58,17 +62,14 @@ static void configuration_test(void)
     sput_fail_unless(text == NULL, "empty loaded file name");
     rc = chucho_cnf_set_max_size(500);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "set max size");
-    size_t sz = 0;
     rc = chucho_cnf_get_max_size(&sz);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get max size");
     sput_fail_unless(sz == 500, "max size");
-    chucho_configuration_style sty = CHUCHO_CONFIGURATION_STYLE_AUTOMATIC;
     rc = chucho_cnf_get_style(&sty);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get style");
     sput_fail_unless(sty == CHUCHO_CONFIGURATION_STYLE_OFF, "style");
     rc = chucho_cnf_set_unknown_handler(&my_unknown_handler);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "set unkown handler");
-    chucho_unknown_handler_type unk = NULL;
     rc = chucho_cnf_get_unknown_handler(&unk);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get unknown handler");
     sput_fail_unless(unk == &my_unknown_handler, "unknown handler");

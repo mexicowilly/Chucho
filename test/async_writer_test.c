@@ -23,22 +23,24 @@
 static void async_writer_test(void)
 {
     chucho_formatter* fmt;
+    chucho_writer* wrt;
+    chucho_writer* async;
+    const chucho_level* dt;
+    const char* warn;
+    size_t sz;
+    const char* fname;
+
     chucho_rc rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
-    chucho_writer* wrt;
     rc = chucho_create_file_writer(&wrt, fmt, "hello", CHUCHO_ON_START_APPEND, 0);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create file writer");
-    chucho_writer* async;
     rc = chucho_create_async_writer(&async, wrt, 777, chucho_warn_level());
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create async writer");
-    const chucho_level* dt;
     rc = chucho_aswrt_get_discard_threshold(async, &dt);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get discard threshold");
-    const char* warn;
     rc = chucho_lvl_get_name(dt, &warn);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "level get name");
     sput_fail_unless(strcmp(warn, "WARN") == 0, "level is warn");
-    size_t sz;
     rc = chucho_aswrt_get_queue_capacity(async, &sz);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get queue capacity");
     sput_fail_unless(sz == 777, "capacity is 777");
@@ -47,7 +49,6 @@ static void async_writer_test(void)
     sput_fail_unless(sz == 0, "size is 0");
     rc = chucho_aswrt_get_writer(async, &wrt);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get writer");
-    const char* fname;
     rc = chucho_fwrt_get_file_name(wrt, &fname);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get file name");
     sput_fail_unless(strcmp(fname, "hello") == 0, "file name is hello");

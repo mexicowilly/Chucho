@@ -36,7 +36,7 @@ chucho_rc chucho_create_local_syslog_writer(chucho_writer** wrt,
                                                                   static_cast<chucho::syslog::facility>(fcl));
         chucho_release_formatter(fmt);
     }
-    catch (chucho::exception& ce) 
+    catch (chucho::exception&) 
     {
         return CHUCHO_CONNECTION_ERROR;
     }
@@ -64,7 +64,7 @@ chucho_rc chucho_create_remote_syslog_writer(chucho_writer** wrt,
                                                                   port);
         chucho_release_formatter(fmt);
     }
-    catch (chucho::exception& ce) 
+    catch (chucho::exception&) 
     {
         return CHUCHO_CONNECTION_ERROR;
     }

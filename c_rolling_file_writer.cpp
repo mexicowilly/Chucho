@@ -43,20 +43,23 @@ chucho_rc chucho_create_rolling_file_writer(chucho_writer** wrt,
             std::shared_ptr<chucho::file_roll_trigger>() : trg->trg_;
         if (name == nullptr) 
         {
-            loc->writer_ = std::make_shared<chucho::rolling_file_writer>(fmt->fmt_,
-                                                                         ons,
-                                                                         flush == 0 ? false : true,
-                                                                         rlr->rlr_,
-                                                                         cpptrg);
+            loc->writer_ = std::shared_ptr<chucho::rolling_file_writer>(
+                new chucho::rolling_file_writer(fmt->fmt_,
+                                                ons,
+                                                flush == 0 ? false : true,
+                                                rlr->rlr_,
+                                                cpptrg));
         }
         else
         {
-            loc->writer_ = std::make_shared<chucho::rolling_file_writer>(fmt->fmt_,
-                                                                         name,
-                                                                         ons,
-                                                                         flush == 0 ? false : true,
-                                                                         rlr->rlr_,
-                                                                         cpptrg);
+            // Visual Studio 2012 will not allow std::make_shared here
+            loc->writer_ = std::shared_ptr<chucho::rolling_file_writer>(
+                new chucho::rolling_file_writer(fmt->fmt_,
+                                                name,
+                                                ons,
+                                                flush == 0 ? false : true,
+                                                rlr->rlr_,
+                                                cpptrg));
         }
         *wrt = loc;
         chucho_release_formatter(fmt);

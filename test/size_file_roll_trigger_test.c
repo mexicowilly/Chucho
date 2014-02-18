@@ -21,8 +21,9 @@ static void size_file_roll_trigger_test(void)
 {
     chucho_file_roll_trigger* trg;
     chucho_rc rc = chucho_create_size_file_roll_trigger(&trg, 512);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create size file roll trigger");
     off_t sz;
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create size file roll trigger");
     rc = chucho_sftrg_get_max_size(trg, &sz);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get max size");
     sput_fail_unless(sz == 512, "max size is 512");

@@ -45,7 +45,7 @@ chucho_rc chucho_sftrg_get_max_size(const chucho_file_roll_trigger* trg, off_t* 
     auto sft = std::dynamic_pointer_cast<chucho::size_file_roll_trigger>(trg->trg_);
     if (!sft) 
         return CHUCHO_TYPE_MISMATCH;
-    *sz = sft->get_max_size();
+    *sz = static_cast<off_t>(sft->get_max_size());
     return CHUCHO_NO_ERROR;
 }
 

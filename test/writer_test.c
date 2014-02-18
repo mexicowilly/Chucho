@@ -23,26 +23,27 @@ static void writer_test(void)
 {
     chucho_formatter* fmt;
     chucho_rc rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
     chucho_writer* wrt;
+    chucho_formatter* got_fmt;
+    size_t flt_count;
+    chucho_filter* dup;
+    chucho_filter* flts[1];
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
     rc = chucho_create_cout_writer(&wrt, fmt);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create cout writer");
-    chucho_formatter* got_fmt;
     rc = chucho_wrt_get_formatter(wrt, &got_fmt);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get formatter");
     // Can't do anything with the formatter
     rc = chucho_release_formatter(got_fmt);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "release formatter");
-    size_t flt_count;
     rc = chucho_wrt_get_filters(wrt, NULL, 0, &flt_count);
     sput_fail_unless(rc == CHUCHO_NULL_POINTER, "rc is CHUCHO_NULL_POINTER");
     sput_fail_unless(flt_count == 0, "filter count is zero");
-    chucho_filter* dup;
     rc = chucho_create_duplicate_message_filter(&dup);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create duplicate message filter");
     rc = chucho_wrt_add_filter(wrt, dup);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "add filter");
-    chucho_filter* flts[1];
     rc = chucho_wrt_get_filters(wrt, flts, 1, &flt_count);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get filters");
     sput_fail_unless(flt_count == 1, "filter count is 1");

@@ -21,16 +21,17 @@ static void remote_writer_test(void)
 {
     chucho_writer* wrt;
     chucho_rc rc = chucho_create_remote_writer(&wrt, "motherboy", 19567, 12001);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create remote writer");
     const char* host;
+    unsigned port;
+    size_t cache;
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create remote writer");
     rc = chucho_rwrt_get_host(wrt, &host);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get host");
     sput_fail_unless(strcmp(host, "motherboy") == 0, "host is motherboy");
-    unsigned port;
     rc = chucho_rwrt_get_port(wrt, &port);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get port");
     sput_fail_unless(port == 19567, "port is 19567");
-    size_t cache;
     rc = chucho_rwrt_get_unsent_cache_max(wrt, &cache);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get unsent cache max");
     sput_fail_unless(cache == 12001, "unsent cache max is 12001");

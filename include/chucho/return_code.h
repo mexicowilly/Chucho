@@ -38,7 +38,6 @@ typedef enum
     CHUCHO_NO_SUCH_LEVEL,           /**< No such level */
     CHUCHO_NULL_POINTER,            /**< Null pointer */
     CHUCHO_INSUFFICIENT_BUFFER,     /**< Insufficient buffer */
-    CHUCHO_FORMAT_ERROR,            /**< Format error */
     CHUCHO_OUT_OF_MEMORY,           /**< Out of memory */
     CHUCHO_TYPE_MISMATCH,           /**< Type mismatch */
     CHUCHO_INVALID_PATTERN,         /**< Invalid pattern */

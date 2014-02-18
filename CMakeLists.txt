@@ -39,7 +39,8 @@ IF(CHUCHO_POSIX)
         platform/posix/pattern_formatter_posix.cpp
         platform/posix/socket_connector_posix.cpp
         platform/posix/socket_exception_posix.cpp
-        platform/posix/syslog_writer_posix.cpp)
+        platform/posix/syslog_writer_posix.cpp
+        platform/posix/text_util_posix.cpp)
 
     IF(CHUCHO_HAVE_GMTIME_R)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/calendar_posix.cpp PROPERTIES
@@ -77,6 +78,7 @@ ELSEIF(CHUCHO_WINDOWS)
         platform/windows/socket_connector_windows.cpp
         platform/windows/socket_exception_windows.cpp
         platform/windows/syslog_writer_windows.cpp
+        platform/windows/text_util_windows.cpp
         platform/windows/windows_event_log_writer.cpp
         platform/windows/windows_event_log_writer_factory.cpp
         include/chucho/windows_event_log_writer_factory.hpp
@@ -321,6 +323,13 @@ IF(C_API)
         include/chucho/c_writer.hpp)
 ENDIF()
 
+IF(MSVC)
+    SET_SOURCE_FILES_PROPERTIES(c_diagnostic_context.cpp PROPERTIES
+                                COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
+    SET_SOURCE_FILES_PROPERTIES(c_file_roller.cpp PROPERTIES
+                                COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
+ENDIF()
+
 SET(CHUCHO_SOURCES
     async_writer.cpp
     async_writer_factory.cpp
@@ -515,6 +524,10 @@ IF(CHUCHO_HAVE_ZLIB)
          ${CHUCHO_ZLIB_SOURCES})
     IF(C_API)
         LIST(APPEND CHUCHO_SOURCES c_gzip_file_compressor.cpp)
+    ENDIF()
+    IF(MSVC)
+        SET_SOURCE_FILES_PROPERTIES(gzip_file_compressor.cpp PROPERTIES
+                                    COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
     ENDIF()
     SET_SOURCE_FILES_PROPERTIES(gzip_file_compressor_factory.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_HAVE_ZLIB)

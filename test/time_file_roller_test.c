@@ -21,12 +21,13 @@ static void time_file_roller_test(void)
 {
     chucho_file_roller* rlr;
     chucho_rc rc = chucho_create_time_file_roller(&rlr, "%d{%d-%H}", 10, NULL);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create time file roller");
     const char* pat;
+    size_t hist;
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create time file roller");
     rc = chucho_trlr_get_file_name_pattern(rlr, &pat);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get file name patter");
     sput_fail_unless(strcmp(pat, "%d{%d-%H}") == 0, "pattern is %d{%d-%H}");
-    size_t hist;
     rc = chucho_trlr_get_max_history(rlr, &hist);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get max history");
     sput_fail_unless(hist == 10, "history is 10");

@@ -22,6 +22,7 @@
 #endif
 
 #include <string>
+#include <cstdarg>
 
 namespace chucho
 {
@@ -29,6 +30,9 @@ namespace chucho
 namespace text_util
 {
 
+const std::size_t MAX_MESSAGE_SIZE = 500 * 1024;
+
+std::string format(const char* const fmt, va_list args);
 std::string to_lower(const std::string& text);
 
 }

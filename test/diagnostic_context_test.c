@@ -21,8 +21,9 @@
 static void at(void)
 {
     chucho_rc rc = chucho_dgc_set("at-1", "at-one");
+    const char* one;
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "set");
-    const char* one = chucho_dgc_at("at-1");
+    one = chucho_dgc_at("at-1");
     sput_fail_if(one == NULL, "one not NULL");
     sput_fail_unless(strcmp(one, "at-one") == 0, "at-1 is at-one");
     one = chucho_dgc_at("huh");
@@ -49,10 +50,12 @@ static void clear_empty(void)
 static void erase(void)
 {
     chucho_rc rc = chucho_dgc_clear();
+    const char* one;
+
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "clear");
     rc = chucho_dgc_set("erase-1", "erase-one");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "set erase-1");
-    const char* one = chucho_dgc_at("erase-1");
+    one = chucho_dgc_at("erase-1");
     sput_fail_if(one == NULL, "erase-1 not NULL");
     sput_fail_unless(strcmp(one, "erase-one") == 0, "erase-1 is erase-one");
     rc = chucho_dgc_erase("erase-1");
@@ -64,23 +67,24 @@ static void erase(void)
 static void get(void)
 {
     chucho_rc rc = chucho_dgc_clear();
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "clear");
     const char* keys[] = { "1", "2", "3" };
     const char* values[] = { "one", "two", "three" };
     int i;
+    size_t count;
+    int got_1 = 0;
+    int got_2 = 0;
+    int got_3 = 0;
+    chucho_dgc_node* nodes[3];
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "clear");
     for (i = 0; i < 3; i++) 
     {
         rc = chucho_dgc_set(keys[i], values[i]);
         sput_fail_unless(rc == CHUCHO_NO_ERROR, "set");
     }
-    chucho_dgc_node* nodes[3];
-    size_t count;
     rc = chucho_dgc_get(nodes, 3, &count);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get");
     sput_fail_unless(count == 3, "node count of 3");
-    int got_1 = 0;
-    int got_2 = 0;
-    int got_3 = 0;
     for (i = 0; i < 3; i++)
     {
         sput_fail_if(nodes[i] == NULL, "non-NULL node");
@@ -110,7 +114,7 @@ static void get(void)
     sput_fail_unless(got_1 == 1, "got 1");
     sput_fail_unless(got_2 == 1, "got 2");
     sput_fail_unless(got_3 == 1, "got 3");
-    for (int i = 0; i < 3; i++) 
+    for (i = 0; i < 3; i++) 
     {
         rc = chucho_dgc_release_node(nodes[i]);
         sput_fail_unless(rc == CHUCHO_NO_ERROR, "release nodes");

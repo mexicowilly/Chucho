@@ -22,8 +22,9 @@ static void level_threshold_filter_test(void)
     chucho_filter* flt;
     chucho_rc rc = chucho_create_level_threshold_filter(&flt,
                                                   chucho_warn_level());
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create level threshold filter");
     const chucho_level* lvl;
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create level threshold filter");
     rc = chucho_ltflt_get_level(flt, &lvl);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get level");
     sput_fail_unless(lvl == chucho_warn_level(), "level is WARN");

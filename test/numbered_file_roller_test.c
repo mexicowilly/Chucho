@@ -21,8 +21,9 @@ static void numbered_file_roller_test(void)
 {
     chucho_file_roller* rlr;
     chucho_rc rc = chucho_create_numbered_file_roller(&rlr, -7, 10, NULL);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create numbered file roller");
     int idx;
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create numbered file roller");
     rc = chucho_nrlr_get_min_index(rlr, &idx);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get min index");
     sput_fail_unless(idx == -7, "min is -7");

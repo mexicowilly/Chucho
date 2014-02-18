@@ -21,9 +21,10 @@
 static void cerr_writer_test(void)
 {
     chucho_formatter* fmt;
+    chucho_writer* wrt;
+
     chucho_rc rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
-    chucho_writer* wrt;
     rc = chucho_create_cerr_writer(&wrt, fmt);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create cerr writer");
     rc = chucho_release_writer(wrt);

@@ -19,42 +19,18 @@
 #include <chucho/c_logger.hpp>
 #include <chucho/c_level.hpp>
 #include <chucho/optional.hpp>
+#include <chucho/text_util.hpp>
 #include <cstdarg>
-#include <cstdio>
-#include <vector>
-
-namespace
-{
-
-chucho::optional<std::string> format_message(const char* const fmt, va_list args)
-{
-    std::vector<char> chars(1024);
-    int rc = std::vsnprintf(&chars[0], chars.size(), fmt, args);
-    if (rc > chars.size() - 1) 
-    {
-        chars.resize(rc + 1);
-        rc = std::vsnprintf(&chars[0], chars.size(), fmt, args);
-        if (rc < 0) 
-            return chucho::optional<std::string>();
-    }
-    else if (rc < 0) 
-    {
-        return chucho::optional<std::string>();
-    }
-    return std::string(&chars[0]);
-}
-
-}
 
 extern "C"
 {
 
 chucho_rc chucho_log(const chucho_level* lvl,
-               chucho_logger* lgr,
-               const char* const file,
-               int line,
-               const char* const func,
-               const char* const format, ...)
+                     chucho_logger* lgr,
+                     const char* const file,
+                     int line,
+                     const char* const func,
+                     const char* const format, ...)
 {
     try
     {
@@ -64,21 +40,14 @@ chucho_rc chucho_log(const chucho_level* lvl,
         {
             va_list args;
             va_start(args, format);
-            auto msg = format_message(format, args);
+            auto msg = chucho::text_util::format(format, args);
             va_end(args);
-            if (msg) 
-            {
-                lgr->logger_->write(chucho::event(lgr->logger_,
-                                                  lvl->level_,
-                                                  *msg,
-                                                  file,
-                                                  line,
-                                                  func));
-            }
-            else
-            {
-                return CHUCHO_FORMAT_ERROR;
-            }
+            lgr->logger_->write(chucho::event(lgr->logger_,
+                                              lvl->level_,
+                                              msg,
+                                              file,
+                                              line,
+                                              func));
         }
     }
     catch (...)
@@ -89,12 +58,12 @@ chucho_rc chucho_log(const chucho_level* lvl,
 }
 
 chucho_rc chucho_log_mark(const chucho_level* lvl,
-                    chucho_logger* lgr,
-                    const char* const file,
-                    int line,
-                    const char* const func,
-                    const char* const mark,
-                    const char* const format, ...)
+                          chucho_logger* lgr,
+                          const char* const file,
+                          int line,
+                          const char* const func,
+                          const char* const mark,
+                          const char* const format, ...)
 {
     try
     {
@@ -104,22 +73,15 @@ chucho_rc chucho_log_mark(const chucho_level* lvl,
         {
             va_list args;
             va_start(args, format);
-            auto msg = format_message(format, args);
+            auto msg = chucho::text_util::format(format, args);
             va_end(args);
-            if (msg) 
-            {
-                lgr->logger_->write(chucho::event(lgr->logger_,
-                                                  lvl->level_,
-                                                  *msg,
-                                                  file,
-                                                  line,
-                                                  func,
-                                                  mark));
-            }
-            else
-            {
-                return CHUCHO_FORMAT_ERROR;
-            }
+            lgr->logger_->write(chucho::event(lgr->logger_,
+                                              lvl->level_,
+                                              msg,
+                                              file,
+                                              line,
+                                              func,
+                                              mark));
         }
     }
     catch (...)

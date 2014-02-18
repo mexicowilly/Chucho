@@ -24,9 +24,10 @@
 #define LOG_FUNCTION(lvl) \
     static void log_##lvl(const char* const mark)                       \
     {                                                                   \
+        chucho_rc rc;                                                   \
         sput_enter_suite_fixture("log "#lvl , set_up, tear_down);       \
         sput_run_test(set_log_level);                                   \
-        chucho_rc rc = chucho_lgr_set_level(lgr, chucho_##lvl##_level());     \
+        rc = chucho_lgr_set_level(lgr, chucho_##lvl##_level());         \
         sput_fail_unless(rc == CHUCHO_NO_ERROR, "set logger level");    \
         static_mark = mark;                                             \
         if (mark == NULL)                                               \
@@ -65,15 +66,18 @@ static void log_mark(void)
 static char** read_lines()
 {
     FILE* f = fopen("log_macro.log", "r");
+    char** result;
+    int i;
+
     if (f == NULL) 
         return NULL;
-    char** result = calloc(10, sizeof(char*));
+    result = calloc(10, sizeof(char*));
     if (result == NULL) 
     {
         fclose(f);
         return NULL;
     }
-    for (int i = 0; i < 9; i++) 
+    for (i = 0; i < 9; i++) 
     {
         result[i] = read_line(f);
         if (result[i] == NULL) 
@@ -86,11 +90,26 @@ static char** read_lines()
 static void expect(const chucho_level* lvl, const char* mark)
 {
     char** lines = read_lines();
+    const char* nm;
+    chucho_rc rc;
+    const chucho_level* lvls[] =
+    {
+        chucho_trace_level(),
+        chucho_debug_level(),
+        chucho_info_level(),
+        chucho_warn_level(),
+        chucho_error_level(),
+        chucho_fatal_level()
+    };
+    int tgt_val;
+    int lvl_idx = 0;
+    int line_idx = 0;
+    int val;
+
     sput_fail_if(lines == NULL, "read file");
     if (lines == NULL) 
         return;
-    const char* nm;
-    chucho_rc rc = chucho_lvl_get_name(lvl, &nm);
+    rc = chucho_lvl_get_name(lvl, &nm);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get level name");
     if (strcmp(nm, "OFF") == 0) 
     {
@@ -103,21 +122,8 @@ static void expect(const chucho_level* lvl, const char* mark)
         if (lines[0] == NULL)
             return;
     }
-    const chucho_level* lvls[] =
-    {
-        chucho_trace_level(),
-        chucho_debug_level(),
-        chucho_info_level(),
-        chucho_warn_level(),
-        chucho_error_level(),
-        chucho_fatal_level()
-    };
-    int tgt_val;
     rc = chucho_lvl_get_value(lvl, &tgt_val);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get level value");
-    int lvl_idx = 0;
-    int line_idx = 0;
-    int val;
     while (lvl_idx < 6 && lines[line_idx] != NULL)
     {
         rc = chucho_lvl_get_value(lvls[lvl_idx], &val);
@@ -144,11 +150,12 @@ static void set_log_level()
 static void set_up(void)
 {
     chucho_rc rc = chucho_create_logger(&lgr, "log_macro");
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "get logger log_macro");
     chucho_formatter* fmt;
+    chucho_writer* wrt;
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "get logger log_macro");
     rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
-    chucho_writer* wrt;
     rc = chucho_create_file_writer(&wrt, fmt, "log_macro.log", CHUCHO_ON_START_TRUNCATE, 1);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create file writer");
     rc = chucho_lgr_add_writer(lgr, wrt);

@@ -24,12 +24,13 @@ static void level_filter_test(void)
                                         chucho_error_level(),
                                         CHUCHO_FILTER_RESULT_DENY,
                                         CHUCHO_FILTER_RESULT_ACCEPT);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create level filter");
     const chucho_level* lvl;
+    chucho_filter_result res;
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create level filter");
     rc = chucho_lflt_get_level(flt, &lvl);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get level");
     sput_fail_unless(lvl == chucho_error_level(), "level is ERROR");
-    chucho_filter_result res;
     rc = chucho_lflt_get_on_match(flt, &res);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get on match");
     sput_fail_unless(res == CHUCHO_FILTER_RESULT_DENY, "on match is DENY");

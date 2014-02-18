@@ -36,7 +36,6 @@ static_data::static_data()
     messages_[CHUCHO_NO_SUCH_LEVEL] = "No such level";
     messages_[CHUCHO_NULL_POINTER] = "Null pointer";
     messages_[CHUCHO_INSUFFICIENT_BUFFER] = "Insufficient buffer";
-    messages_[CHUCHO_FORMAT_ERROR] = "Format error";
     messages_[CHUCHO_OUT_OF_MEMORY] = "Out of memory";
     messages_[CHUCHO_TYPE_MISMATCH] = "Type mismatch";
     messages_[CHUCHO_INVALID_PATTERN] = "Invalid pattern";

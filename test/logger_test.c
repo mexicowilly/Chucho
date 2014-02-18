@@ -25,20 +25,21 @@ static void add_writer(void)
 {
     chucho_logger* lgr;
     chucho_rc rc = chucho_create_logger(&lgr, "add_writer");
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create logger");
     size_t count;
+    chucho_formatter* fmt;
+    chucho_writer* wrt;
+    chucho_writer* got_wrt;
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create logger");
     rc = chucho_lgr_get_writers(lgr, NULL, 0, &count);
     sput_fail_unless(rc == CHUCHO_NULL_POINTER, "get writers");
     sput_fail_unless(count == 0, "no writers");
-    chucho_formatter* fmt;
     rc = chucho_create_pattern_formatter(&fmt, "%m%n");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
-    chucho_writer* wrt;
     rc = chucho_create_cout_writer(&wrt, fmt);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create cout writer");
     rc = chucho_lgr_add_writer(lgr, wrt);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "add writer");
-    chucho_writer* got_wrt;
     rc = chucho_lgr_get_writers(lgr, &got_wrt, 1, &count);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get writers");
     sput_fail_unless(count == 1, "one writer");
@@ -52,8 +53,9 @@ static void levels(void)
 {
     chucho_logger* lgr;
     chucho_rc rc = chucho_create_logger(&lgr, "levels.one");
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create logger");
     const chucho_level* lvl;
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create logger");
     rc = chucho_lgr_get_level(lgr, &lvl);
     sput_fail_unless(rc == CHUCHO_NO_SUCH_LEVEL, "get level");
     rc = chucho_lgr_set_level(lgr, chucho_warn_level());
@@ -80,13 +82,14 @@ static void permits(void)
 {
     chucho_logger* lgr;
     chucho_rc rc = chucho_create_logger(&lgr, "permits");
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create logger");
     const chucho_level* lvl;
+    int perm;
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create logger");
     rc = chucho_lgr_get_level(lgr, &lvl);
     sput_fail_unless(rc == CHUCHO_NO_SUCH_LEVEL, "get level");
     rc = chucho_lgr_set_level(lgr, chucho_error_level());
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "set level");
-    int perm;
     rc = chucho_lgr_permits(lgr, chucho_info_level(), &perm);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "permits");
     sput_fail_unless(perm == 0, "does not permit");
@@ -101,20 +104,21 @@ static void remove_writers(void)
 {
     chucho_logger* lgr;
     chucho_rc rc = chucho_create_logger(&lgr, "remove_writers");
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create logger");
     size_t count;
+    chucho_formatter* fmt;
+    chucho_writer* wrt;
+    chucho_writer* got_wrt;
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create logger");
     rc = chucho_lgr_get_writers(lgr, NULL, 0, &count);
     sput_fail_unless(rc == CHUCHO_NULL_POINTER, "get writers");
     sput_fail_unless(count == 0, "no writers");
-    chucho_formatter* fmt;
     rc = chucho_create_pattern_formatter(&fmt, "%m%n");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
-    chucho_writer* wrt;
     rc = chucho_create_cout_writer(&wrt, fmt);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create cout writer");
     rc = chucho_lgr_add_writer(lgr, wrt);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "add writer");
-    chucho_writer* got_wrt;
     rc = chucho_lgr_get_writers(lgr, &got_wrt, 1, &count);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get writers");
     sput_fail_unless(count == 1, "one writer");
@@ -143,8 +147,9 @@ static void ancestors(void)
 {
     chucho_logger* lgr;
     chucho_rc rc = chucho_create_logger(&lgr, "ancestors");
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create logger");
     int anc;
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create logger");
     rc = chucho_lgr_writes_to_ancestors(lgr, &anc);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "writes to ancestors");
     sput_fail_unless(anc == 1, "does write to ancestors");

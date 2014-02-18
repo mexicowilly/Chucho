@@ -21,12 +21,13 @@ static void sliding_numbered_file_roller_test(void)
 {
     chucho_file_roller* rlr;
     chucho_rc rc = chucho_create_sliding_numbered_file_roller(&rlr, -7, 10, NULL);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create sliding numbered file roller");
     int idx;
+    size_t cnt;
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create sliding numbered file roller");
     rc = chucho_snfrlr_get_min_index(rlr, &idx);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get min index");
     sput_fail_unless(idx == -7, "min is -7");
-    size_t cnt;
     rc = chucho_snfrlr_get_max_count(rlr, &cnt);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get max count");
     sput_fail_unless(cnt == 10, "max count is 10");

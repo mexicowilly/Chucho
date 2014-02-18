@@ -31,12 +31,13 @@ static void gzip_compressor_test(void)
 {
     chucho_file_compressor* cmp;
     chucho_rc rc = chucho_create_gzip_file_compressor(&cmp, 3);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create gzip compressor");
     const char* ext;
+    unsigned idx;
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create gzip compressor");
     rc = chucho_cmp_get_extension(cmp, &ext);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get extension");
     sput_fail_unless(strcmp(ext, ".gz") == 0, "extension is .gz");
-    unsigned idx;
     rc = chucho_cmp_get_min_index(cmp, &idx);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get min index");
     sput_fail_unless(idx == 3, "min index is 3");
@@ -50,12 +51,13 @@ static void bzip2_compressor_test(void)
 {
     chucho_file_compressor* cmp;
     chucho_rc rc = chucho_create_bzip2_file_compressor(&cmp, 4);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create bzip2 compressor");
     const char* ext;
+    unsigned idx;
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create bzip2 compressor");
     rc = chucho_cmp_get_extension(cmp, &ext);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get extension");
     sput_fail_unless(strcmp(ext, ".bz2") == 0, "extension is .bz2");
-    unsigned idx;
     rc = chucho_cmp_get_min_index(cmp, &idx);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get min index");
     sput_fail_unless(idx == 4, "min index is 4");
@@ -69,12 +71,13 @@ static void zip_compressor_test(void)
 {
     chucho_file_compressor* cmp;
     chucho_rc rc = chucho_create_zip_file_compressor(&cmp, 5);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create zip compressor");
     const char* ext;
+    unsigned idx;
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create zip compressor");
     rc = chucho_cmp_get_extension(cmp, &ext);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get extension");
     sput_fail_unless(strcmp(ext, ".zip") == 0, "extension is .zip");
-    unsigned idx;
     rc = chucho_cmp_get_min_index(cmp, &idx);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get min index");
     sput_fail_unless(idx == 5, "min index is 5");
