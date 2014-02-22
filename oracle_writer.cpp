@@ -18,6 +18,7 @@
 #include <chucho/exception.hpp>
 #include <chucho/logger.hpp>
 #include <chucho/garbage_cleaner.hpp>
+#include <chucho/calendar.hpp>
 #include <sstream>
 #include <thread>
 
@@ -41,7 +42,7 @@ oracle_writer::oracle_writer(std::shared_ptr<formatter> fmt,
       ctx_(nullptr),
       insert_evt_(nullptr),
       formatted_msg_(nullptr),
-      millis_since_epoch_(nullptr),
+      timestamp_(nullptr),
       file_name_(nullptr),
       line_number_(nullptr),
       func_(nullptr),
@@ -71,7 +72,7 @@ oracle_writer::oracle_writer(std::shared_ptr<formatter> fmt,
     react(rc, "Unable to logon", true);
     rc = OCIHandleAlloc(env_, reinterpret_cast<void**>(&insert_evt_), OCI_HTYPE_STMT, 0, 0);
     react(rc, "Unable to create statement handle", true);
-    std::string sql("INSERT INTO chucho_event ( formatted_message, millis_since_epoch, file_name, line_number, function_name, logger, level_name, marker, thread ) VALUES ( :formatted_message, :millis_since_epoch, :file_name, :line_number, :function_name, :logger, :level_name, :marker, :thread )");
+    std::string sql("INSERT INTO chucho_event ( formatted_message, timestmp, file_name, line_number, function_name, logger, level_name, marker, thread ) VALUES ( :formatted_message, :timestmp, :file_name, :line_number, :function_name, :logger, :level_name, :marker, :thread )");
     rc = OCIStmtPrepare(insert_evt_,
                         err_,
                         reinterpret_cast<const OraText*>(sql.data()),
@@ -121,7 +122,7 @@ void oracle_writer::react(sword code, const std::string& msg, bool final)
         {
             if (final) 
                 finalize();
-            throw exception(full_msg);
+            throw exception("[oracle_writer]" + full_msg);
         }
         report_warning(full_msg);
     }
@@ -142,20 +143,46 @@ void oracle_writer::write_impl(const event& evt)
                              0, 0, 0, 0, 0,
                              OCI_DEFAULT);
     react(rc, "Unable to bind formatted message", false);
-    param = ":millis_since_epoch";
-    auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(
-       evt.get_time().time_since_epoch()).count();
+    param = ":timestmp";
+    auto pieces = calendar::get_utc(event::clock_type::to_time_t(evt.get_time()));
+    OCIDateTime* dt = nullptr;
+    rc = OCIDescriptorAlloc(env_,
+                            reinterpret_cast<void**>(&dt),
+                            OCI_DTYPE_TIMESTAMP,
+                            0,
+                            0);
+    react(rc, "Unable to create timestamp descriptor", false);
+    struct sentry
+    {
+        sentry(OCIDateTime* odt) : dt_(odt) { }
+        ~sentry() { OCIDescriptorFree(dt_, OCI_DTYPE_TIMESTAMP); }
+        OCIDateTime* dt_;
+    } sent(dt);
+    std::string utc("+00");
+    rc = OCIDateTimeConstruct(env_,
+                              err_,
+                              dt,
+                              pieces.tm_year + 1900,
+                              pieces.tm_mon + 1,
+                              pieces.tm_mday,
+                              pieces.tm_hour,
+                              pieces.tm_min,
+                              pieces.tm_sec,
+                              0,
+                              reinterpret_cast<OraText*>(const_cast<char*>(utc.data())),
+                              utc.length());
+    react(rc, "Unable to construct timestamp", false);
     rc = OCIBindByName(insert_evt_,
-                       &millis_since_epoch_,
+                       &timestamp_,
                        err_,
                        reinterpret_cast<const OraText*>(param.data()),
                        param.length(),
-                       reinterpret_cast<void*>(&millis),
-                       sizeof(millis),
-                       SQLT_INT,
+                       reinterpret_cast<void*>(&dt),
+                       sizeof(dt),
+                       SQLT_TIMESTAMP,
                        0, 0, 0, 0, 0,
                        OCI_DEFAULT);
-    react(rc, "Unable to bind milliseconds since epoch", false);
+    react(rc, "Unable to bind timestamp", false);
     param = ":file_name";
     rc = OCIBindByName(insert_evt_,
                        &file_name_,

@@ -18,21 +18,22 @@ CREATE TABLE chucho_event
 (
     event_id NUMBER(10) PRIMARY KEY,
     formatted_message VARCHAR2(4000) NOT NULL,
-    millis_since_epoch NUMBER(20) NOT NULL,
+    timestmp TIMESTAMP(0) NOT NULL,
     file_name VARCHAR2(1024) NOT NULL,
-    line_number SMALLINT NOT NULL,
+    line_number NUMBER(10, 0) NOT NULL,
     function_name VARCHAR2(256) NOT NULL,
     logger VARCHAR2(1024) NOT NULL,
     level_name VARCHAR2(256) NOT NULL,
     marker VARCHAR2(1024),
-    thread VARCHAR2(256)
+    thread VARCHAR2(256) NOT NULL
 );
 
 CREATE SEQUENCE chucho_event_id_seq MINVALUE 1 START WITH 1;
 
-CREATE TRIGGER chucho_event_id_trigger
+CREATE TRIGGER chucho_event_id_seq_trigger
     BEFORE INSERT ON chucho_event
     FOR EACH ROW
     BEGIN
        SELECT chucho_event_id_seq.NEXTVAL INTO :NEW.event_id FROM DUAL;
     END;
+/

@@ -44,7 +44,7 @@ private:
     OCISvcCtx* ctx_;
     OCIStmt* insert_evt_;
     OCIBind* formatted_msg_;
-    OCIBind* millis_since_epoch_;
+    OCIBind* timestamp_;
     OCIBind* file_name_;
     OCIBind* line_number_;
     OCIBind* func_;
