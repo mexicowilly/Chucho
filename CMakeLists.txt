@@ -624,6 +624,9 @@ IF(ENABLE_SHARED)
                           SOVERSION ${CHUCHO_SO_VERSION}
                           PUBLIC_HEADER "${CHUCHO_PUBLIC_HEADERS}"
                           FRAMEWORK ${ENABLE_FRAMEWORK})
+    IF(CHUCHO_HAVE_ORACLE)
+        TARGET_LINK_LIBRARIES(chucho ${ORACLE_CLIENT_LIB})
+    ENDIF()
     IF(CMAKE_GENERATOR STREQUAL Xcode AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         SET_TARGET_PROPERTIES(chucho PROPERTIES
                               LINK_FLAGS "-std=c++11 -stdlib=libc++")
@@ -635,6 +638,7 @@ IF(ENABLE_SHARED)
     ENDIF()
     INSTALL(TARGETS chucho
             ARCHIVE DESTINATION lib
+            LIBRARY DESTINATION lib
             RUNTIME DESTINATION ${CHUCHO_RT_DEST}
             FRAMEWORK DESTINATION /Library/Frameworks
             PUBLIC_HEADER DESTINATION include/chucho)
