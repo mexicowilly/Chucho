@@ -26,7 +26,10 @@ INCLUDE(Configure.cmake)
 
 # Include CMAKE_BINARY_DIR because that's where the generated file
 # export.hpp lives.
-INCLUDE_DIRECTORIES(include embedded/include "${CMAKE_BINARY_DIR}")
+INCLUDE_DIRECTORIES(include
+                    embedded/include
+                    "${CMAKE_BINARY_DIR}"
+                    "${ORACLE_INCLUDE_DIR}")
 
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
@@ -90,41 +93,6 @@ ELSEIF(CHUCHO_WINDOWS)
                                 COMPILE_DEFINITIONS CMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 ENDIF()
 
-IF(C_API)
-    SET(CHUCHO_C_PUBLIC_HEADERS
-        include/chucho/async_writer.h
-        include/chucho/cerr_writer.h
-        include/chucho/cout_writer.h
-        include/chucho/configuration.h
-        include/chucho/diagnostic_context.h
-        include/chucho/duplicate_message_filter.h
-        "${CMAKE_BINARY_DIR}/chucho/export.h"
-        include/chucho/file_compressor.h
-        include/chucho/file_roll_trigger.h
-        include/chucho/file_roller.h
-        include/chucho/file_writer.h
-        include/chucho/filter.h
-        include/chucho/finalize.h
-        include/chucho/formatter.h
-        include/chucho/level.h
-        include/chucho/level_filter.h
-        include/chucho/level_threshold_filter.h
-        include/chucho/log.h
-        include/chucho/logger.h
-        include/chucho/numbered_file_roller.h
-        include/chucho/pattern_formatter.h
-        include/chucho/remote_writer.h
-        include/chucho/return_code.h
-        include/chucho/rolling_file_writer.h
-        include/chucho/size_file_roll_trigger.h
-        include/chucho/sliding_numbered_file_roller.h
-        include/chucho/status.h
-        include/chucho/status_manager.h
-        include/chucho/syslog_writer.h
-        include/chucho/time_file_roller.h
-        include/chucho/writer.h)
-ENDIF()
-
 SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/async_writer.hpp
     include/chucho/cerr_writer.hpp
@@ -134,6 +102,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/configurator.hpp
     include/chucho/console_writer.hpp
     include/chucho/cout_writer.hpp
+    include/chucho/database_writer.hpp
     include/chucho/diagnostic_context.hpp
     include/chucho/duplicate_message_filter.hpp
     include/chucho/event.hpp
@@ -180,8 +149,42 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/writer.hpp
     include/chucho/writer_factory.hpp
     include/chucho/writer_memento.hpp
-    include/chucho/yaml_formatter.hpp
-    ${CHUCHO_C_PUBLIC_HEADERS})
+    include/chucho/yaml_formatter.hpp)
+
+IF(C_API)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/async_writer.h
+         include/chucho/cerr_writer.h
+         include/chucho/cout_writer.h
+         include/chucho/configuration.h
+         include/chucho/diagnostic_context.h
+         include/chucho/duplicate_message_filter.h
+         "${CMAKE_BINARY_DIR}/chucho/export.h"
+         include/chucho/file_compressor.h
+         include/chucho/file_roll_trigger.h
+         include/chucho/file_roller.h
+         include/chucho/file_writer.h
+         include/chucho/filter.h
+         include/chucho/finalize.h
+         include/chucho/formatter.h
+         include/chucho/level.h
+         include/chucho/level_filter.h
+         include/chucho/level_threshold_filter.h
+         include/chucho/log.h
+         include/chucho/logger.h
+         include/chucho/numbered_file_roller.h
+         include/chucho/pattern_formatter.h
+         include/chucho/remote_writer.h
+         include/chucho/return_code.h
+         include/chucho/rolling_file_writer.h
+         include/chucho/size_file_roll_trigger.h
+         include/chucho/sliding_numbered_file_roller.h
+         include/chucho/status.h
+         include/chucho/status_manager.h
+         include/chucho/syslog_writer.h
+         include/chucho/time_file_roller.h
+         include/chucho/writer.h)
+ENDIF()
 
 IF(CHUCHO_WINDOWS)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
@@ -207,6 +210,11 @@ IF(CHUCHO_HAVE_MINIZIP)
     IF(C_API)
         LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/zip_file_compressor.h)
     ENDIF()
+ENDIF()
+
+IF(ORACLE_INCLUDE_DIR)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/oracle_writer.hpp)
+    LIST(APPEND CHUCHO_DATABASE_SOURCES oracle_writer.cpp)
 ENDIF()
 
 # The libyaml sources are required by chuchod
@@ -349,6 +357,7 @@ SET(CHUCHO_SOURCES
     cout_writer_factory.cpp
     cout_writer_memento.cpp
     demangle.cpp
+    database_writer.cpp
     diagnostic_context.cpp
     duplicate_message_filter.cpp
     duplicate_message_filter_factory.cpp
@@ -482,7 +491,8 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_PLATFORM_SOURCES}
     ${CHUCHO_EMBEDDED_SOURCES}
     ${CHUCHO_PUBLIC_HEADERS}
-    ${CHUCHO_C_SOURCES})
+    ${CHUCHO_C_SOURCES}
+    ${CHUCHO_DATABASE_SOURCES})
 
 IF(CHUCHO_HAVE_PUT_TIME)
     SET_SOURCE_FILES_PROPERTIES(calendar.cpp PROPERTIES
