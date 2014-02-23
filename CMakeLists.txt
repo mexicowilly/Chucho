@@ -215,6 +215,10 @@ ENDIF()
 IF(CHUCHO_HAVE_ORACLE)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/oracle_writer.hpp)
     LIST(APPEND CHUCHO_DATABASE_SOURCES oracle_writer.cpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/oracle_writer.h)
+        LIST(APPEND CHUCHO_DATABASE_SOURCES c_oracle_writer.cpp)
+    ENDIF()
 ENDIF()
 
 # The libyaml sources are required by chuchod

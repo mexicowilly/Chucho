@@ -18,19 +18,46 @@
 #define CHUCHO_ORACLE_WRITER_HPP__
 
 #include <chucho/database_writer.hpp>
-#include "oci.h"
+#include <oci.h>
 
 namespace chucho
 {
 
+/**
+ * @class oracle_writer oracle_writer.hpp chucho/oracle_writer.hpp 
+ * A writer that sends log events to an Oracle database. The 
+ * table to which Chucho will write must exist in the database. 
+ * Please refer to the file sql/oracle.sql, which is a script 
+ * that can be exected to create the table, for information 
+ * about what columns must exist. 
+ * 
+ * @ingroup writers
+ */
 class oracle_writer : public database_writer
 {
 public:
+    /**
+     * @name Constructor and Destructor
+     */
+    //@{
+    /**
+     * Construct an Oracle writer.
+     * 
+     * @param fmt the formatter
+     * @param user the user name for the database
+     * @param password the password of the user for the database
+     * @param database the database name, which is a TNS name, such 
+     *                 as myoracleserver.com/dbname
+     */
     oracle_writer(std::shared_ptr<formatter> fmt,
                   const std::string& user,
                   const std::string& password,
                   const std::string& database);
+    /**
+     * Destroy an Oracle writer.
+     */
     ~oracle_writer();
+    //@}
 
 protected:
     virtual void write_impl(const event& evt) override;
