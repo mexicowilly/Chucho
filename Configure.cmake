@@ -511,6 +511,31 @@ int main()
     ENDFOREACH()
 ENDIF()
 
+# Oracle
+IF(ORACLE_INCLUDE_DIR)
+    SET(CMAKE_REQUIRED_INCLUDES "${ORACLE_INCLUDE_DIR}")
+    CHECK_INCLUDE_FILE_CXX(oci.h CHUCHO_OCI_H)
+    IF(CHUCHO_OCI_H)
+        IF(ORACLE_CLIENT_LIB)
+            SET(CMAKE_REQUIRED_LIBRARIES "${ORACLE_CLIENT_LIB}")
+            FOREACH(SYM OCIEnvCreate OCIHandleAlloc OCILogon2 OCIStmtPrepare OCIBindByName
+                        OCIStmtExecute OCIHandleFree OCIErrorGet OCIDescriptorAlloc OCIDescriptorFree)
+                CHECK_CXX_SYMBOL_EXISTS(${SYM} oci.h CHUCHO_HAVE_${SYM})
+                IF(NOT CHUCHO_HAVE_${SYM})
+                    MESSAGE(FATAL_ERROR "${ORACLE_CLIENT_LIB} does not contain expected OCI symbols: ${SYM}")
+                ENDIF()
+            ENDFOREACH()
+        ELSEIF(ENABLE_SHARED)
+            MESSAGE(FATAL_ERROR "You must specify ORACLE_CLIENT_LIB to build a shared library")
+        ENDIF()
+    ELSE()
+        MESSAGE(FATAL_ERROR "oci.h was not found in ORACLE_INCLUDE_DIR=${ORACLE_INCLUDE_DIR}")
+    ENDIF()
+    UNSET(CMAKE_REQUIRED_INCLUDES)
+    UNSET(CMAKE_REQUIRED_LIBRARIES)
+    SET(CHUCHO_HAVE_ORACLE TRUE)
+ENDIF()
+
 # doxygen
 FIND_PACKAGE(Doxygen)
 

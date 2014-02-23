@@ -209,6 +209,13 @@ IF(CHUCHO_WINDOWS)
     TARGET_LINK_LIBRARIES(windows-event-log-writer-test chucho gtest ${CHUCHO_THREAD_LIB})
 ENDIF()
 
+IF(CHUCHO_HAVE_ORACLE)
+    ADD_EXECUTABLE(oracle-writer-test EXCLUDE_FROM_ALL
+                   harness.cpp
+                   oracle_writer_test.cpp)
+    TARGET_LINK_LIBRARIES(oracle-writer-test chucho ${ORACLE_CLIENT_LIB} gtest ${CHUCHO_THREAD_LIB})
+ENDIF()
+
 ADD_CUSTOM_TARGET(check-config
                   COMMAND "${CMAKE_COMMAND}" "-DCHUCHO_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P "${CMAKE_CURRENT_SOURCE_DIR}/CheckAllConfigs.cmake")
 
