@@ -34,7 +34,7 @@ extern "C"
 #endif
 
 /**
- * Create a cerr writer.
+ * Create an Oracle writer.
  * 
  * @post Ownership of the wrt parameter is transferred to the 
  *       caller, and must be released with the @ref
