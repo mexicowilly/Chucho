@@ -40,12 +40,33 @@ const std::size_t async_writer::DEFAULT_QUEUE_CAPACITY = 256;
 
 async_writer::async_writer(std::shared_ptr<writer> wrt,
                            std::size_t capacity,
-                           std::shared_ptr<level> discard_threshold)
+                           std::shared_ptr<level> discard_threshold,
+                           bool flush_on_destruct)
     : writer(std::make_shared<noop_formatter>()),
       writer_(wrt),
       capacity_(capacity),
       discard_threshold_(discard_threshold),
-      stop_(false)
+      stop_(false),
+      flush_on_destruct_(flush_on_destruct)
+{
+    set_status_origin("async_writer");
+    if (writer_)
+        worker_.reset(new std::thread(std::bind(&async_writer::thread_main, this)));
+}
+
+async_writer::async_writer(std::shared_ptr<writer> wrt,
+                           std::size_t capacity,
+                           std::shared_ptr<level> discard_threshold,
+                           std::function<void()> enter_thread_cb,
+                           std::function<void()> leave_thread_cb)
+    : writer(std::make_shared<noop_formatter>()),
+      writer_(wrt),
+      capacity_(capacity),
+      discard_threshold_(discard_threshold),
+      stop_(false),
+      enter_thread_cb_(enter_thread_cb),
+      leave_thread_cb_(leave_thread_cb),
+      flush_on_destruct_(true)
 {
     set_status_origin("async_writer");
     if (writer_)
@@ -58,7 +79,6 @@ async_writer::~async_writer()
     {
         guard_.lock();
         stop_ = true;
-        queue_.clear();
         empty_condition_.notify_one();
         full_condition_.notify_all();
         guard_.unlock();
@@ -74,11 +94,13 @@ std::size_t async_writer::get_queue_size()
 
 void async_writer::thread_main()
 {
+    if (enter_thread_cb_) 
+        enter_thread_cb_();
     while (true)
     {
         std::unique_lock<std::mutex> ul(guard_);
         empty_condition_.wait(ul, [this]{ return stop_ || !queue_.empty(); });
-        if (stop_)
+        if (stop_ && (!flush_on_destruct_ || queue_.empty()))
             break;
         event evt = queue_.front();
         queue_.pop_front();
@@ -89,6 +111,9 @@ void async_writer::thread_main()
         if (full <= .8 || dt == level::OFF_() || evt.get_level() > dt)
             writer_->write(evt);
     }
+    if (leave_thread_cb_) 
+        leave_thread_cb_();
+    report_info("The writer thread is exiting");
 }
 
 void async_writer::write_impl(const event& evt)

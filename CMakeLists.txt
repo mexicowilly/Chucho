@@ -29,7 +29,8 @@ INCLUDE(Configure.cmake)
 INCLUDE_DIRECTORIES(include
                     embedded/include
                     "${CMAKE_BINARY_DIR}"
-                    "${ORACLE_INCLUDE_DIR}")
+                    ${ORACLE_INCLUDE_DIR}
+                    ${MYSQL_INCLUDE_DIR})
 
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
@@ -218,6 +219,15 @@ IF(CHUCHO_HAVE_ORACLE)
     IF(C_API)
         LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/oracle_writer.h)
         LIST(APPEND CHUCHO_DATABASE_SOURCES c_oracle_writer.cpp)
+    ENDIF()
+ENDIF()
+
+IF(CHUCHO_HAVE_MYSQL)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/mysql_writer.hpp)
+    LIST(APPEND CHUCHO_DATABASE_SOURCES mysql_writer.cpp)
+    IF(C_API)
+#        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/mysql_writer.h)
+#        LIST(APPEND CHUCHO_DATABASE_SOURCES c_mysql_writer.cpp)
     ENDIF()
 ENDIF()
 

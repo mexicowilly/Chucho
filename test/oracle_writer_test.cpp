@@ -21,7 +21,7 @@
 #include <chucho/environment.hpp>
 #include <iostream>
 
-TEST(syslog_wrtier_test, oracle)
+TEST(oracle_wrtier_test, oracle)
 {
     chucho::logger::remove_unused_loggers();
     auto user = chucho::environment::get("ORACLE_USER");

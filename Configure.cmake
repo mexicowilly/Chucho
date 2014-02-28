@@ -536,6 +536,31 @@ IF(ORACLE_INCLUDE_DIR)
     SET(CHUCHO_HAVE_ORACLE TRUE)
 ENDIF()
 
+# MySQL
+IF(MYSQL_INCLUDE_DIR)
+    SET(CMAKE_REQUIRED_INCLUDES "${MYSQL_INCLUDE_DIR}")
+    CHECK_INCLUDE_FILE_CXX(mysql.h CHUCHO_MYSQL_H)
+    IF(CHUCHO_MYSQL_H)
+        IF(MYSQL_CLIENT_LIB)
+            SET(CMAKE_REQUIRED_LIBRARIES "${MYSQL_CLIENT_LIB}")
+            FOREACH(SYM mysql_init mysql_real_connect mysql_stmt_init mysql_stmt_prepare mysql_autocommit
+                        mysql_stmt_close mysql_close mysql_stmt_bind_param mysql_stmt_execute)
+                CHECK_CXX_SYMBOL_EXISTS(${SYM} mysql.h CHUCHO_HAVE_${SYM})
+                IF(NOT CHUCHO_HAVE_${SYM})
+                    MESSAGE(FATAL_ERROR "${MYSQL_CLIENT_LIB} does not contain expected MySQL symbols: ${SYM}")
+                ENDIF()
+            ENDFOREACH()
+        ELSEIF(ENABLE_SHARED)
+            MESSAGE(FATAL_ERROR "You must specify MYSQL_CLIENT_LIB to build a shared library")
+        ENDIF()
+    ELSE()
+        MESSAGE(FATAL_ERROR "mysql.h was not found in MYSQL_INCLUDE_DIR=${MYSQL_INCLUDE_DIR}")
+    ENDIF()
+    UNSET(CMAKE_REQUIRED_INCLUDES)
+    UNSET(CMAKE_REQUIRED_LIBRARIES)
+    SET(CHUCHO_HAVE_MYSQL TRUE)
+ENDIF()
+
 # doxygen
 FIND_PACKAGE(Doxygen)
 
