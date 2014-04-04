@@ -135,9 +135,9 @@ void real_mysql_writer::write_impl(const chucho::event& evt)
     my_bool p4_null = 0;
     params[4].buffer = reinterpret_cast<void*>(const_cast<char*>(evt.get_function_name()));
     params[4].buffer_type = MYSQL_TYPE_STRING;
-    params[4].buffer_length = p2_len;
-    params[4].length = &p2_len;
-    params[4].is_null = &p2_null;
+    params[4].buffer_length = p4_len;
+    params[4].length = &p4_len;
+    params[4].is_null = &p4_null;
 
     auto lgr = evt.get_logger();
     unsigned long p5_len = lgr->get_name().length();

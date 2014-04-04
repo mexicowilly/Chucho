@@ -25,10 +25,10 @@
 TEST(mysql_wrtier_test, mysql)
 {
     chucho::logger::remove_unused_loggers();
-    auto host = chucho::environment::get("MYSQL_HOST");
-    auto user = chucho::environment::get("MYSQL_USER");
-    auto pass = chucho::environment::get("MYSQL_PASSWORD");
-    auto db = chucho::environment::get("MYSQL_DATABASE");
+    auto host = chucho::environment::get("MYSQL_HOST");     // 192.168.56.101
+    auto user = chucho::environment::get("MYSQL_USER");     // will
+    auto pass = chucho::environment::get("MYSQL_PASSWORD"); // yavasya
+    auto db = chucho::environment::get("MYSQL_DATABASE");   // test
     if (host && user && pass && db) 
     {
         auto wrt = std::make_shared<chucho::mysql_writer>(std::make_shared<chucho::pattern_formatter>("%m"),
