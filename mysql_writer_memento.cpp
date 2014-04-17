@@ -30,6 +30,7 @@ mysql_writer_memento::mysql_writer_memento(const configurator& cfg)
     set_handler("port", [this] (const std::string& port) { port_ = static_cast<std::uint16_t>(std::stoul(port)); });
     set_handler("queue_capacity", [this] (const std::string& cap) { queue_capacity_ = std::stoul(cap); });
     set_handler("discard_threshold", [this] (const std::string& name) { discard_threshold_ = level::from_text(name); });
+    set_handler("flush_on_destruct", [this] (const std::string& name) { flush_on_destruct_ = boolean_value(name); });
 }
 
 }

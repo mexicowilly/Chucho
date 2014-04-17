@@ -57,6 +57,7 @@ async_writer::async_writer(std::shared_ptr<writer> wrt,
 async_writer::async_writer(std::shared_ptr<writer> wrt,
                            std::size_t capacity,
                            std::shared_ptr<level> discard_threshold,
+                           bool flush_on_destruct,
                            std::function<void()> enter_thread_cb,
                            std::function<void()> leave_thread_cb)
     : writer(std::make_shared<noop_formatter>()),
@@ -66,7 +67,7 @@ async_writer::async_writer(std::shared_ptr<writer> wrt,
       stop_(false),
       enter_thread_cb_(enter_thread_cb),
       leave_thread_cb_(leave_thread_cb),
-      flush_on_destruct_(true)
+      flush_on_destruct_(flush_on_destruct)
 {
     set_status_origin("async_writer");
     if (writer_)

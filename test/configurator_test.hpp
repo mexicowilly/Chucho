@@ -45,6 +45,10 @@ protected:
     void level_threshold_filter_body();
     void logger_body();
     void multiple_writer_body();
+#if defined(CHUCHO_HAVE_MYSQL)
+    void mysql_writer_full_body();
+    void mysql_writer_minimal_body();
+#endif
     void numbered_file_roller_body();
     void remote_writer_body();
     void rolling_file_writer_body();

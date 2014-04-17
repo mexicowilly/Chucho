@@ -49,6 +49,8 @@ std::shared_ptr<configurable> mysql_writer_factory::create_configurable(std::sha
         *mwm->get_queue_capacity() : async_writer::DEFAULT_QUEUE_CAPACITY;
     std::shared_ptr<level> dis = mwm->get_discard_threshold() ?
         mwm->get_discard_threshold() : level::INFO_();
+    bool flsh = mwm->get_flush_on_destruct() ?
+        *mwm->get_flush_on_destruct() : true;
     auto mw = std::make_shared<mysql_writer>(mwm->get_formatter(),
                                              mwm->get_host(),
                                              mwm->get_user(),
@@ -56,7 +58,10 @@ std::shared_ptr<configurable> mysql_writer_factory::create_configurable(std::sha
                                              mwm->get_database(),
                                              port,
                                              queue_cap,
-                                             dis);
+                                             dis,
+                                             flsh);
+    set_filters(mw, mwm);
+    report_info("Created a " + demangle::get_demangled_name(typeid(*mw)));
     return mw;
 }
 

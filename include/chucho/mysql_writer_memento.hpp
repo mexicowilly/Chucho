@@ -35,6 +35,7 @@ public:
 
     const std::string& get_database() const;
     std::shared_ptr<level> get_discard_threshold() const;
+    const optional<bool>& get_flush_on_destruct() const;
     const std::string& get_host() const;
     const std::string& get_password() const;
     const optional<std::uint16_t>& get_port() const;
@@ -49,6 +50,7 @@ private:
     optional<std::uint16_t> port_;
     optional<std::size_t> queue_capacity_;
     std::shared_ptr<level> discard_threshold_;
+    optional<bool> flush_on_destruct_;
 };
 
 inline const std::string& mysql_writer_memento::get_database() const
@@ -59,6 +61,11 @@ inline const std::string& mysql_writer_memento::get_database() const
 inline std::shared_ptr<level> mysql_writer_memento::get_discard_threshold() const
 {
     return discard_threshold_;
+}
+
+inline const optional<bool>& mysql_writer_memento::get_flush_on_destruct() const
+{
+    return flush_on_destruct_;
 }
 
 inline const std::string& mysql_writer_memento::get_host() const

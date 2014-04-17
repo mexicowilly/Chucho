@@ -276,6 +276,42 @@ TEST_F(yaml_configurator, multiple_writer)
     multiple_writer_body();
 }
 
+#if defined(CHUCHO_HAVE_MYSQL)
+
+TEST_F(yaml_configurator, mysql_writer_full)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::mysql_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m'\n"
+              "        host: 192.168.56.101\n"
+              "        user: test_user\n"
+              "        password: password\n"
+              "        database: test\n"
+              "        port: 3306\n"
+              "        queue_capacity: 912\n"
+              "        discard_threshold: info\n"
+              "        flush_on_destruct: false");
+    mysql_writer_full_body();
+}
+
+TEST_F(yaml_configurator, mysql_writer_minimal)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::mysql_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m'\n"
+              "        host: 192.168.56.101\n"
+              "        user: test_user\n"
+              "        password: password\n"
+              "        database: test");
+    mysql_writer_minimal_body();
+}
+
+#endif
+
 TEST_F(yaml_configurator, numbered_file_roller)
 {
     configure("chucho::logger:\n"

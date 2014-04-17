@@ -211,15 +211,20 @@ mysql_writer::mysql_writer(std::shared_ptr<formatter> fmt,
                            const std::string& database,
                            std::uint16_t port,
                            std::size_t capacity,
-                           std::shared_ptr<level> discard_threshold)
-    : database_writer(fmt)
+                           std::shared_ptr<level> discard_threshold,
+                           bool flush_on_destruct)
+    : database_writer(fmt),
+      host_(host),
+      user_(user),
+      password_(password),
+      database_(database)
 {
     set_status_origin("mysql_writer");
     std::shared_ptr<writer> real = std::make_shared<real_mysql_writer>(fmt, host, port, user, password, database);
     // std::function won't accept the bare C functions, so wrap them in lambdas
     std::function<void()> ent([] () { if (mysql_thread_init() != 0) throw exception("Unable to initialize thread for MySQL"); });
     std::function<void()> lv([] () { mysql_thread_end(); });
-    async_.reset(new async_writer(real, capacity, discard_threshold, ent, lv));
+    async_.reset(new async_writer(real, capacity, discard_threshold, flush_on_destruct, ent, lv));
 }
 
 void mysql_writer::write_impl(const event& evt)

@@ -42,7 +42,7 @@ public:
      */
     //@{
     /**
-     * Construct an Oracle writer.
+     * Construct a MySQL writer.
      * 
      * @param fmt the formatter
      * @param user the user name for the database
@@ -57,15 +57,51 @@ public:
                  const std::string& database,
                  std::uint16_t port = DEFAULT_PORT,
                  std::size_t capacity = async_writer::DEFAULT_QUEUE_CAPACITY,
-                 std::shared_ptr<level> discard_threshold = level::INFO_());
+                 std::shared_ptr<level> discard_threshold = level::INFO_(),
+                 bool flush_on_destruct = true);
     //@}
+
+    async_writer& get_async_writer() const;
+    const std::string& get_database() const;
+    const std::string& get_host() const;
+    const std::string& get_password() const;
+    const std::string& get_user() const;
 
 protected:
     virtual void write_impl(const event& evt) override;
 
 private:
     std::unique_ptr<async_writer> async_;
+    std::string host_;
+    std::string user_;
+    std::string password_;
+    std::string database_;
 };
+
+inline async_writer& mysql_writer::get_async_writer() const
+{
+    return *async_;
+}
+
+inline const std::string& mysql_writer::get_database() const
+{
+    return database_;
+}
+
+inline const std::string& mysql_writer::get_host() const
+{
+    return host_;
+}
+
+inline const std::string& mysql_writer::get_password() const
+{
+    return password_;
+}
+
+inline const std::string& mysql_writer::get_user() const
+{
+    return user_;
+}
 
 }
 
