@@ -39,7 +39,9 @@ std::shared_ptr<configurable> async_writer_factory::create_configurable(std::sha
         *awm->get_queue_capacity() : async_writer::DEFAULT_QUEUE_CAPACITY;
     std::shared_ptr<level> dis = awm->get_discard_threshold() ?
         awm->get_discard_threshold() : level::INFO_();
-    auto aw = std::make_shared<async_writer>(awm->get_writer(), queue_cap, dis);
+    bool flsh = awm->get_flush_on_destruct() ?
+        *awm->get_flush_on_destruct() : true;
+    auto aw = std::make_shared<async_writer>(awm->get_writer(), queue_cap, dis, flsh);
     report_info("Created a " + demangle::get_demangled_name(typeid(*aw)));
     return aw;
 }

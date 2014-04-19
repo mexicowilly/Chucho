@@ -35,6 +35,7 @@ public:
     async_writer_memento(const configurator& cfg);
 
     std::shared_ptr<level> get_discard_threshold() const;
+    const optional<bool>& get_flush_on_destruct() const;
     const optional<std::size_t>& get_queue_capacity() const;
     std::shared_ptr<writer> get_writer() const;
     virtual void handle(std::shared_ptr<configurable> cnf) override;
@@ -43,11 +44,17 @@ private:
     std::shared_ptr<level> discard_threshold_;
     optional<std::size_t> queue_capacity_;
     std::shared_ptr<writer> writer_;
+    optional<bool> flush_on_destruct_;
 };
 
 inline std::shared_ptr<level> async_writer_memento::get_discard_threshold() const
 {
     return discard_threshold_;
+}
+
+inline const optional<bool>& async_writer_memento::get_flush_on_destruct() const
+{
+    return flush_on_destruct_;
 }
 
 inline const optional<std::size_t>& async_writer_memento::get_queue_capacity() const

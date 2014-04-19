@@ -60,6 +60,7 @@ TEST_F(chucho_config_file_configurator, async_writer_with_opts)
               "chucho.writer.as.writer = fw\n"
               "chucho.writer.as.discard_threshold = error\n"
               "chucho.writer.as.queue_capacity = 700\n"
+              "chucho.writer.as.flush_on_destruct = false\n"
               "chucho.writer.fw = chucho::file_writer\n"
               "chucho.writer.fw.file_name = hello.log\n"
               "chucho.writer.fw.formatter = fmt\n"

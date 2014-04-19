@@ -87,7 +87,8 @@ TEST_F(yaml_configurator, async_writer_with_opts)
               "                pattern: '%m%n'\n"
               "            file_name: hello.log\n"
               "        discard_threshold: error\n"
-              "        queue_capacity: 700");
+              "        queue_capacity: 700\n"
+              "        flush_on_destruct: false");
     async_writer_with_opts_body();
 }
 

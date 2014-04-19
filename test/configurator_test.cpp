@@ -95,6 +95,7 @@ void configurator::async_writer_with_opts_body()
     EXPECT_EQ(*chucho::level::ERROR_(), *awrt->get_discard_threshold());
     EXPECT_EQ(700, awrt->get_queue_capacity());
     EXPECT_EQ(typeid(chucho::file_writer), typeid(*awrt->get_writer()));
+    EXPECT_EQ(false, awrt->get_flush_on_destruct());
 }
 
 void configurator::bzip2_file_compressor_body()
