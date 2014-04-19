@@ -46,6 +46,9 @@
 #endif
 #include <chucho/exception.hpp>
 #include <chucho/configuration.hpp>
+#if defined(CHUCHO_HAVE_MYSQL)
+#include <chucho/mysql_writer.hpp>
+#endif
 #include <sstream>
 #if defined(CHUCHO_WINDOWS)
 #include <windows.h>
@@ -272,6 +275,40 @@ void configurator::multiple_writer_body()
     ASSERT_TRUE(static_cast<bool>(fwrt));
     EXPECT_EQ(std::string("two.log"), fwrt->get_file_name());
 }
+
+#if defined(CHUCHO_HAVE_MYSQL)
+
+void configurator::mysql_writer_full_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::mysql_writer), typeid(*wrts[0]));
+    auto mwrt = std::static_pointer_cast<chucho::mysql_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(mwrt));
+    EXPECT_EQ(std::string("test"), mwrt->get_database());
+    EXPECT_EQ(std::string("192.168.56.101"), mwrt->get_host());
+    EXPECT_EQ(std::string("test_user"), mwrt->get_user());
+    EXPECT_EQ(std::string("password"), mwrt->get_password());
+    chucho::async_writer& aw(mwrt->get_async_writer());
+    EXPECT_EQ(*chucho::level::INFO_(), *aw.get_discard_threshold());
+    EXPECT_EQ(912, aw.get_queue_capacity());
+    EXPECT_EQ(false, aw.get_flush_on_destruct());
+}
+
+void configurator::mysql_writer_minimal_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::mysql_writer), typeid(*wrts[0]));
+    auto mwrt = std::static_pointer_cast<chucho::mysql_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(mwrt));
+    EXPECT_EQ(std::string("test"), mwrt->get_database());
+    EXPECT_EQ(std::string("192.168.56.101"), mwrt->get_host());
+    EXPECT_EQ(std::string("test_user"), mwrt->get_user());
+    EXPECT_EQ(std::string("password"), mwrt->get_password());
+}
+
+#endif
 
 void configurator::numbered_file_roller_body()
 {

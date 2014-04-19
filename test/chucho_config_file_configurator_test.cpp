@@ -294,6 +294,44 @@ TEST_F(chucho_config_file_configurator, logger)
     logger_body();
 }
 
+#if defined(CHUCHO_HAVE_MYSQL)
+
+TEST_F(chucho_config_file_configurator, mysql_writer_full)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = my\n"
+              "chucho.writer.my = chucho::mysql_writer\n"
+              "chucho.writer.my.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.my.host = 192.168.56.101\n"
+              "chucho.writer.my.user = test_user\n"
+              "chucho.writer.my.password = password\n"
+              "chucho.writer.my.database = test\n"
+              "chucho.writer.my.port = 3306\n"
+              "chucho.writer.my.queue_capacity = 912\n"
+              "chucho.writer.my.discard_threshold = info\n"
+              "chucho.writer.my.flush_on_destruct = false");
+    mysql_writer_full_body();
+}
+
+TEST_F(chucho_config_file_configurator, mysql_writer_minimal)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = my\n"
+              "chucho.writer.my = chucho::mysql_writer\n"
+              "chucho.writer.my.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.my.host = 192.168.56.101\n"
+              "chucho.writer.my.user = test_user\n"
+              "chucho.writer.my.password = password\n"
+              "chucho.writer.my.database = test");
+    mysql_writer_minimal_body();
+}
+
+#endif
+
 TEST_F(chucho_config_file_configurator, multiple_writer)
 {
     configure("chucho.logger = will\n"
