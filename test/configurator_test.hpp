@@ -50,6 +50,9 @@ protected:
     void mysql_writer_minimal_body();
 #endif
     void numbered_file_roller_body();
+#if defined(CHUCHO_HAVE_ORACLE)
+    void oracle_writer_body();
+#endif
     void remote_writer_body();
     void rolling_file_writer_body();
     void size_file_roll_trigger_body(const std::string& tmpl);

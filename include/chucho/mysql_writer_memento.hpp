@@ -16,7 +16,6 @@
 
 #if !defined(CHUCHO_MYSQL_WRITER_MEMENTO_HPP__)
 #define CHUCHO_MYSQL_WRITER_MEMENTO_HPP__
-#endif
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"
@@ -94,3 +93,5 @@ inline const std::string& mysql_writer_memento::get_user() const
 }
 
 }
+
+#endif

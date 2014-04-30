@@ -368,6 +368,24 @@ TEST_F(chucho_config_file_configurator, numbered_file_roller)
     numbered_file_roller_body();
 }
 
+#if defined(CHUCHO_HAVE_ORACLE)
+
+TEST_F(chucho_config_file_configurator, oracle_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = or\n"
+              "chucho.writer.or = chucho::oracle_writer\n"
+              "chucho.writer.or.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.or.user = test_user\n"
+              "chucho.writer.or.password = password\n"
+              "chucho.writer.or.database = 192.168.56.102/pdb1");
+    oracle_writer_body();
+}
+
+#endif
+
 TEST_F(chucho_config_file_configurator, remote_writer)
 {
     configure("chucho.logger = will\n"

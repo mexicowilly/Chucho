@@ -49,6 +49,9 @@
 #if defined(CHUCHO_HAVE_MYSQL)
 #include <chucho/mysql_writer.hpp>
 #endif
+#if defined(CHUCHO_HAVE_ORACLE)
+#include <chucho/oracle_writer.hpp>
+#endif
 #include <sstream>
 #if defined(CHUCHO_WINDOWS)
 #include <windows.h>
@@ -325,6 +328,22 @@ void configurator::numbered_file_roller_body()
     EXPECT_EQ(5, nrlr->get_max_index());
     EXPECT_EQ(-3, nrlr->get_min_index());
 }
+
+#if defined(CHUCHO_HAVE_ORACLE)
+
+void configurator::oracle_writer_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::oracle_writer), typeid(*wrts[0]));
+    auto owrt = std::static_pointer_cast<chucho::oracle_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(owrt));
+    EXPECT_EQ(std::string("192.168.56.102/pdb1"), owrt->get_database());
+    EXPECT_EQ(std::string("test_user"), owrt->get_user());
+    EXPECT_EQ(std::string("password"), owrt->get_password());
+}
+
+#endif
 
 void configurator::remote_writer_body()
 {

@@ -329,6 +329,23 @@ TEST_F(yaml_configurator, numbered_file_roller)
     numbered_file_roller_body();
 }
 
+#if defined(CHUCHO_HAVE_ORACLE)
+
+TEST_F(yaml_configurator, oracle_writer)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::oracle_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m'\n"
+              "        user: test_user\n"
+              "        password: password\n"
+              "        database: 192.168.56.102/pdb1");
+    oracle_writer_body();
+}
+
+#endif
+
 TEST_F(yaml_configurator, remote_writer)
 {
     configure("- chucho::logger:\n"

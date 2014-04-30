@@ -59,6 +59,25 @@ public:
     ~oracle_writer();
     //@}
 
+    /**
+     * Return the TNS name of the database.
+     * 
+     * @return the database name
+     */
+    const std::string& get_database() const;
+    /**
+     * Return the password.
+     * 
+     * @return the password
+     */
+    const std::string& get_password() const;
+    /**
+     * Return the Oracle user name.
+     * 
+     * @return the user
+     */
+    const std::string& get_user() const;
+
 protected:
     virtual void write_impl(const event& evt) override;
 
@@ -66,6 +85,9 @@ private:
     void finalize();
     void react(sword code, const std::string& msg, bool final);
 
+    std::string user_;
+    std::string password_;
+    std::string database_;
     OCIEnv* env_;
     OCIError* err_;
     OCISvcCtx* ctx_;
@@ -80,6 +102,21 @@ private:
     OCIBind* marker_;
     OCIBind* thread_name_;
 };
+
+inline const std::string& oracle_writer::get_database() const
+{
+    return database_;
+}
+
+inline const std::string& oracle_writer::get_password() const
+{
+    return password_;
+}
+
+inline const std::string& oracle_writer::get_user() const
+{
+    return user_;
+}
 
 }
 
