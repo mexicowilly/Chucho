@@ -47,4 +47,37 @@ chucho_rc chucho_create_oracle_writer(chucho_writer** wrt,
     return CHUCHO_NO_ERROR;
 }
 
+chucho_rc chucho_owrt_get_database(const chucho_writer* wrt, const char** database)
+{
+    if (wrt == nullptr || database == nullptr)
+        return CHUCHO_NULL_POINTER;
+    auto owrt = std::dynamic_pointer_cast<chucho::oracle_writer>(wrt->writer_);
+    if (!owrt) 
+        return CHUCHO_TYPE_MISMATCH;
+    *database = owrt->get_database().c_str();
+    return CHUCHO_NO_ERROR;
+}
+
+chucho_rc chucho_owrt_get_password(const chucho_writer* wrt, const char** password)
+{
+    if (wrt == nullptr || password == nullptr)
+        return CHUCHO_NULL_POINTER;
+    auto owrt = std::dynamic_pointer_cast<chucho::oracle_writer>(wrt->writer_);
+    if (!owrt) 
+        return CHUCHO_TYPE_MISMATCH;
+    *password = owrt->get_password().c_str();
+    return CHUCHO_NO_ERROR;
+}
+
+chucho_rc chucho_owrt_get_user(const chucho_writer* wrt, const char** user)
+{
+    if (wrt == nullptr || user == nullptr)
+        return CHUCHO_NULL_POINTER;
+    auto owrt = std::dynamic_pointer_cast<chucho::oracle_writer>(wrt->writer_);
+    if (!owrt) 
+        return CHUCHO_TYPE_MISMATCH;
+    *user = owrt->get_user().c_str();
+    return CHUCHO_NO_ERROR;
+}
+
 }

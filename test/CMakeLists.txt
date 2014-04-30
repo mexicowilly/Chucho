@@ -132,6 +132,12 @@ IF(CHUCHO_HAVE_ZLIB OR CHUCHO_HAVE_BZIP2 OR CHUCHO_HAVE_MINIZIP)
         file_compressor_test.h)
 ENDIF()
 
+IF(CHUCHO_HAVE_ORACLE)
+    LIST(APPEND CHUCHO_DB_C_SOURCES
+         oracle_writer_test.c
+         oracle_writer_test.h)
+ENDIF()
+
 ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
                async_writer_test.c
                async_writer_test.h
@@ -180,8 +186,13 @@ ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
                time_file_roller_test.h
                writer_test.c
                writer_test.h
-               ${CHUCHO_TEST_COMPRESSION_C_SOURCES})
+               ${CHUCHO_TEST_COMPRESSION_C_SOURCES}
+               ${CHUCHO_DB_C_SOURCES})
 TARGET_LINK_LIBRARIES(c-unit-test chucho ${CHUCHO_THREAD_LIB})
+
+IF(CHUCHO_HAVE_ORACLE)
+    TARGET_LINK_LIBRARIES(c-unit-test "${ORACLE_CLIENT_LIB}")
+ENDIF()
 
 IF(CHUCHO_SOLARIS)
     TARGET_LINK_LIBRARIES(c-unit-test socket nsl)

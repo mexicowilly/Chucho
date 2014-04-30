@@ -58,6 +58,36 @@ CHUCHO_EXPORT chucho_rc chucho_create_oracle_writer(chucho_writer** wrt,
                                                     const char* const password,
                                                     const char* const databaes);
 
+/**
+ * Return the name of the database.
+ * 
+ * @param[in] wrt the Oracle writer
+ * @param[out] database the name of the connected database
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
+CHUCHO_EXPORT chucho_rc chucho_owrt_get_database(const chucho_writer* wrt, const char** database);
+
+/**
+ * Return the password.
+ * 
+ * @param[in] wrt the Oracle writer
+ * @param[out] password the password
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
+CHUCHO_EXPORT chucho_rc chucho_owrt_get_password(const chucho_writer* wrt, const char** password);
+
+/**
+ * Return the Oracle user name.
+ * 
+ * @param[in] wrt the Oracle writer
+ * @param[out] user the user
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
+CHUCHO_EXPORT chucho_rc chucho_owrt_get_user(const chucho_writer* wrt, const char** user);
+
 #if defined(__cplusplus)
 }
 #endif

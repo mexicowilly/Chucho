@@ -42,6 +42,9 @@
 #include "level_test.h"
 #include "writer_test.h"
 #include "file_roller_test.h"
+#if defined(CHUCHO_HAVE_ORACLE)
+#include "oracle_writer_test.h"
+#endif
 
 sput_struct __sput;
 
@@ -75,6 +78,9 @@ int main()
     run_level_test();
     run_writer_test();
     run_file_roller_test();
+    #if defined(CHUCHO_HAVE_ORACLE)
+    run_oracle_writer_test();
+    #endif
 
     sput_finish_testing();
     chucho_finalize();
