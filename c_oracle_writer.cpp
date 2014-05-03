@@ -38,9 +38,13 @@ chucho_rc chucho_create_oracle_writer(chucho_writer** wrt,
                                                                   password,
                                                                   database);
     }
-    catch (...) 
+    catch (chucho::exception&) 
     {
         delete *wrt;
+        return CHUCHO_CONNECTION_ERROR;
+    }
+    catch (...) 
+    {
         return CHUCHO_OUT_OF_MEMORY;
     }
     chucho_release_formatter(fmt);

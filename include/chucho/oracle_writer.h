@@ -40,7 +40,7 @@ extern "C"
  *       caller, and must be released with the @ref
  *       chucho_release_writer() function.
  *  
- * @post Ownership of the fmt parameters is transferred to the 
+ * @post Ownership of the fmt parameter is transferred to the 
  *       callee.
  * 
  * @param[out] the Oracle writer to create
@@ -56,7 +56,7 @@ CHUCHO_EXPORT chucho_rc chucho_create_oracle_writer(chucho_writer** wrt,
                                                     chucho_formatter* fmt,
                                                     const char* const user,
                                                     const char* const password,
-                                                    const char* const databaes);
+                                                    const char* const database);
 
 /**
  * Return the name of the database.

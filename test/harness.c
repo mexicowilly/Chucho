@@ -45,6 +45,9 @@
 #if defined(CHUCHO_HAVE_ORACLE)
 #include "oracle_writer_test.h"
 #endif
+#if defined(CHUCHO_HAVE_MYSQL)
+#include "mysql_writer_test.h"
+#endif
 
 sput_struct __sput;
 
@@ -80,6 +83,9 @@ int main()
     run_file_roller_test();
     #if defined(CHUCHO_HAVE_ORACLE)
     run_oracle_writer_test();
+    #endif
+    #if defined(CHUCHO_HAVE_MYSQL)
+    run_mysql_writer_test();
     #endif
 
     sput_finish_testing();

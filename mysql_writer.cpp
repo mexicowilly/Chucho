@@ -217,7 +217,8 @@ mysql_writer::mysql_writer(std::shared_ptr<formatter> fmt,
       host_(host),
       user_(user),
       password_(password),
-      database_(database)
+      database_(database),
+      port_(port)
 {
     set_status_origin("mysql_writer");
     std::shared_ptr<writer> real = std::make_shared<real_mysql_writer>(fmt, host, port, user, password, database);

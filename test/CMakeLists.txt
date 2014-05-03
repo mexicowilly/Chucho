@@ -138,6 +138,12 @@ IF(CHUCHO_HAVE_ORACLE)
          oracle_writer_test.h)
 ENDIF()
 
+IF(CHUCHO_HAVE_MYSQL)
+    LIST(APPEND CHUCHO_DB_C_SOURCES
+         mysql_writer_test.c
+         mysql_writer_test.h)
+ENDIF()
+
 ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
                async_writer_test.c
                async_writer_test.h
@@ -192,6 +198,10 @@ TARGET_LINK_LIBRARIES(c-unit-test chucho ${CHUCHO_THREAD_LIB})
 
 IF(CHUCHO_HAVE_ORACLE)
     TARGET_LINK_LIBRARIES(c-unit-test "${ORACLE_CLIENT_LIB}")
+ENDIF()
+
+IF(CHUCHO_HAVE_MYSQL)
+    TARGET_LINK_LIBRARIES(c-unit-test "${MYSQL_CLIENT_LIB}")
 ENDIF()
 
 IF(CHUCHO_SOLARIS)

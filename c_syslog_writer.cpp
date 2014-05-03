@@ -38,6 +38,7 @@ chucho_rc chucho_create_local_syslog_writer(chucho_writer** wrt,
     }
     catch (chucho::exception&) 
     {
+        delete *wrt;
         return CHUCHO_CONNECTION_ERROR;
     }
     catch (...) 

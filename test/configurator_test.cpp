@@ -293,10 +293,10 @@ void configurator::mysql_writer_full_body()
     EXPECT_EQ(std::string("192.168.56.101"), mwrt->get_host());
     EXPECT_EQ(std::string("test_user"), mwrt->get_user());
     EXPECT_EQ(std::string("password"), mwrt->get_password());
-    chucho::async_writer& aw(mwrt->get_async_writer());
-    EXPECT_EQ(*chucho::level::INFO_(), *aw.get_discard_threshold());
-    EXPECT_EQ(912, aw.get_queue_capacity());
-    EXPECT_EQ(false, aw.get_flush_on_destruct());
+    auto aw = mwrt->get_async_writer();
+    EXPECT_EQ(*chucho::level::INFO_(), *aw->get_discard_threshold());
+    EXPECT_EQ(912, aw->get_queue_capacity());
+    EXPECT_EQ(false, aw->get_flush_on_destruct());
 }
 
 void configurator::mysql_writer_minimal_body()

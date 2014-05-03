@@ -24,12 +24,21 @@ namespace chucho
 {
 
 /**
- * @class oracle_writer oracle_writer.hpp chucho/oracle_writer.hpp 
- * A writer that sends log events to an Oracle database. The 
- * table to which Chucho will write must exist in the database. 
- * Please refer to the file sql/oracle.sql, which is a script 
- * that can be exected to create the table, for information 
- * about what columns must exist. 
+ * @class mysql_writer mysql_writer.hpp chucho/mysql_writer.hpp 
+ * A writer that sends log events to a MySQL database. The table
+ * to which Chucho will write must exist in the database. Please
+ * refer to the file sql/mysql.sql, which is a script that can 
+ * be exected to create the table, for information about what 
+ * columns must exist. 
+ *  
+ * In order for the MySQL client to work properly in a 
+ * multi-threaded program, each thread has to be specifically 
+ * initialized for MySQL before any MySQL calls are actually 
+ * made. For this reason, Chucho uses an @ref async_writer under
+ * the covers, which has the effect of channeling all MySQL 
+ * writes through a single thread. This thread is guaranteed to 
+ * be safe for MySQL calls. Therefore, the user does not have to 
+ * prepare any threads before use with Chucho and mysql_writer. 
  * 
  * @ingroup writers
  */
@@ -61,26 +70,28 @@ public:
                  bool flush_on_destruct = true);
     //@}
 
-    async_writer& get_async_writer() const;
+    std::shared_ptr<async_writer> get_async_writer() const;
     const std::string& get_database() const;
     const std::string& get_host() const;
     const std::string& get_password() const;
+    std::uint16_t get_port() const;
     const std::string& get_user() const;
 
 protected:
     virtual void write_impl(const event& evt) override;
 
 private:
-    std::unique_ptr<async_writer> async_;
+    std::shared_ptr<async_writer> async_;
     std::string host_;
     std::string user_;
     std::string password_;
     std::string database_;
+    std::uint16_t port_;
 };
 
-inline async_writer& mysql_writer::get_async_writer() const
+inline std::shared_ptr<async_writer> mysql_writer::get_async_writer() const
 {
-    return *async_;
+    return async_;
 }
 
 inline const std::string& mysql_writer::get_database() const
@@ -96,6 +107,11 @@ inline const std::string& mysql_writer::get_host() const
 inline const std::string& mysql_writer::get_password() const
 {
     return password_;
+}
+
+inline std::uint16_t mysql_writer::get_port() const
+{
+    return port_;
 }
 
 inline const std::string& mysql_writer::get_user() const

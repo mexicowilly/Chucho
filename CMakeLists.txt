@@ -221,6 +221,7 @@ IF(CHUCHO_HAVE_ORACLE)
          oracle_writer_memento.cpp
          include/chucho/oracle_writer_factory.hpp
          include/chucho/oracle_writer_memento.hpp)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/oracle_writer.hpp)
     IF(C_API)
         LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/oracle_writer.h)
         LIST(APPEND CHUCHO_DATABASE_SOURCES c_oracle_writer.cpp)
@@ -235,9 +236,10 @@ IF(CHUCHO_HAVE_MYSQL)
          mysql_writer_memento.cpp
          include/chucho/mysql_writer_factory.hpp
          include/chucho/mysql_writer_memento.hpp)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/mysql_writer.hpp)
     IF(C_API)
-#        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/mysql_writer.h)
-#        LIST(APPEND CHUCHO_DATABASE_SOURCES c_mysql_writer.cpp)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/mysql_writer.h)
+        LIST(APPEND CHUCHO_DATABASE_SOURCES c_mysql_writer.cpp)
     ENDIF()
 ENDIF()
 
