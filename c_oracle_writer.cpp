@@ -18,6 +18,7 @@
 #include <chucho/oracle_writer.h>
 #include <chucho/c_formatter.hpp>
 #include <chucho/c_writer.hpp>
+#include <chucho/exception.hpp>
 
 extern "C"
 {

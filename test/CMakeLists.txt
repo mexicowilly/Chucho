@@ -152,6 +152,12 @@ IF(CHUCHO_HAVE_MYSQL)
          mysql_writer_test.h)
 ENDIF()
 
+IF(CHUCHO_HAVE_SQLITE)
+    LIST(APPEND CHUCHO_DB_C_SOURCES
+         sqlite_writer_test.c
+         sqlite_writer_test.h)
+ENDIF()
+
 ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
                async_writer_test.c
                async_writer_test.h
@@ -210,6 +216,10 @@ ENDIF()
 
 IF(CHUCHO_HAVE_MYSQL)
     TARGET_LINK_LIBRARIES(c-unit-test "${MYSQL_CLIENT_LIB}")
+ENDIF()
+
+IF(CHUCHO_HAVE_SQLITE)
+    TARGET_LINK_LIBRARIES(c-unit-test "${SQLITE_CLIENT_LIB}")
 ENDIF()
 
 IF(CHUCHO_SOLARIS)
