@@ -268,6 +268,13 @@ IF(CHUCHO_HAVE_MYSQL)
     TARGET_LINK_LIBRARIES(mysql-writer-test chucho "${MYSQL_CLIENT_LIB}" gtest ${CHUCHO_THREAD_LIB})
 ENDIF()
 
+IF(CHUCHO_HAVE_SQLITE)
+    ADD_EXECUTABLE(sqlite-writer-test EXCLUDE_FROM_ALL
+                   harness.cpp
+                   sqlite_writer_test.cpp)
+    TARGET_LINK_LIBRARIES(sqlite-writer-test chucho "${SQLITE_CLIENT_LIB}" gtest ${CHUCHO_THREAD_LIB})
+ENDIF()
+
 ADD_CUSTOM_TARGET(check-config
                   COMMAND "${CMAKE_COMMAND}" "-DCHUCHO_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P "${CMAKE_CURRENT_SOURCE_DIR}/CheckAllConfigs.cmake")
 
