@@ -44,6 +44,9 @@
 #if defined(CHUCHO_HAVE_ORACLE)
 #include <chucho/oracle_writer_factory.hpp>
 #endif
+#if defined(CHUCHO_HAVE_SQLITE)
+#include <chucho/sqlite_writer_factory.hpp>
+#endif
 #include <chucho/regex.hpp>
 #include <chucho/garbage_cleaner.hpp>
 #include <chucho/environment.hpp>
@@ -130,6 +133,10 @@ void configurator::initialize()
 #if defined(CHUCHO_HAVE_ORACLE)
     fact.reset(new oracle_writer_factory());
     add_configurable_factory("chucho::oracle_writer", fact);
+#endif
+#if defined(CHUCHO_HAVE_SQLITE)
+    fact.reset(new sqlite_writer_factory());
+    add_configurable_factory("chucho::sqlite_writer", fact);
 #endif
 }
 

@@ -561,6 +561,32 @@ IF(MYSQL_INCLUDE_DIR)
     SET(CHUCHO_HAVE_MYSQL TRUE)
 ENDIF()
 
+# SQLite
+IF(SQLITE_INCLUDE_DIR)
+    SET(CMAKE_REQUIRED_INCLUDES "${SQLITE_INCLUDE_DIR}")
+    CHECK_INCLUDE_FILE_CXX(sqlite3.h CHUCHO_SQLITE_H)
+    IF(CHUCHO_SQLITE_H)
+        IF(SQLITE_CLIENT_LIB)
+            SET(CMAKE_REQUIRED_LIBRARIES "${SQLITE_CLIENT_LIB}")
+            FOREACH(SYM sqlite3_threadsafe sqlite3_open sqlite3_prepare_v2 sqlite3_reset sqlite3_bind_text
+                        sqlite3_bind_int64 sqlite3_bind_int sqlite3_step sqlite3_finalize sqlite3_close
+                        sqlite3_extended_result_codes sqlite3_extended_errcode sqlite3_errmsg)
+                CHECK_CXX_SYMBOL_EXISTS(${SYM} sqlite3.h CHUCHO_HAVE_${SYM})
+                IF(NOT CHUCHO_HAVE_${SYM})
+                    MESSAGE(FATAL_ERROR "${MYSQL_CLIENT_LIB} does not contain expected SQLite symbols: ${SYM}")
+                ENDIF()
+            ENDFOREACH()
+        ELSEIF(ENABLE_SHARED)
+            MESSAGE(FATAL_ERROR "You must specify SQLITE_CLIENT_LIB to build a shared library")
+        ENDIF()
+    ELSE()
+        MESSAGE(FATAL_ERROR "sqlite3.h was not found in SQLITE_INCLUDE_DIR=${SQLITE_INCLUDE_DIR}")
+    ENDIF()
+    UNSET(CMAKE_REQUIRED_INCLUDES)
+    UNSET(CMAKE_REQUIRED_LIBRARIES)
+    SET(CHUCHO_HAVE_SQLITE TRUE)
+ENDIF()
+
 # doxygen
 FIND_PACKAGE(Doxygen)
 

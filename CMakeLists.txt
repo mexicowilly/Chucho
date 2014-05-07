@@ -243,6 +243,21 @@ IF(CHUCHO_HAVE_MYSQL)
     ENDIF()
 ENDIF()
 
+IF(CHUCHO_HAVE_SQLITE)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/sqlite_writer.hpp)
+    LIST(APPEND CHUCHO_DATABASE_SOURCES
+         sqlite_writer.cpp
+         sqlite_writer_factory.cpp
+         sqlite_writer_memento.cpp
+         include/chucho/sqlite_writer_factory.hpp
+         include/chucho/sqlite_writer_memento.hpp)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/sqlite_writer.hpp)
+    IF(C_API)
+#        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/sqlite_writer.h)
+#        LIST(APPEND CHUCHO_DATABASE_SOURCES c_sqlite_writer.cpp)
+    ENDIF()
+ENDIF()
+
 # The libyaml sources are required by chuchod
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
     # Update this when you rev libyaml
@@ -537,6 +552,10 @@ ENDIF()
 
 IF(CHUCHO_HAVE_ORACLE)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ORACLE)
+ENDIF()
+
+IF(CHUCHO_HAVE_SQLITE)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_SQLITE)
 ENDIF()
 
 IF(DEFINED CHUCHO_CONFIGURATOR_DEFS)

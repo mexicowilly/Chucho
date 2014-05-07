@@ -52,6 +52,10 @@
 #if defined(CHUCHO_HAVE_ORACLE)
 #include <chucho/oracle_writer.hpp>
 #endif
+#if defined(CHUCHO_HAVE_SQLITE)
+#include <chucho/sqlite_writer.hpp>
+#include <chucho/file.hpp>
+#endif
 #include <sstream>
 #if defined(CHUCHO_WINDOWS)
 #include <windows.h>
@@ -481,6 +485,23 @@ void configurator::sliding_numbered_file_roller_body()
     EXPECT_EQ(5, srlr->get_max_count());
     EXPECT_EQ(-3, srlr->get_min_index());
 }
+
+#if defined(CHUCHO_HAVE_SQLITE)
+
+void configurator::sqlite_writer_body()
+{
+    auto will = chucho::logger::get("will");
+    auto wrts = will->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    EXPECT_EQ(typeid(chucho::sqlite_writer), typeid(*wrts[0]));
+    auto wrt = std::static_pointer_cast<chucho::sqlite_writer>(wrts[0]);
+    EXPECT_EQ(std::string("database.sqlite"), wrt->get_file_name());
+    will->remove_writer(wrt);
+    wrt.reset();
+    chucho::file::remove("database.sqlite");
+}
+
+#endif
 
 void configurator::syslog_writer_body()
 {

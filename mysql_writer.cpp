@@ -72,7 +72,11 @@ real_mysql_writer::real_mysql_writer(std::shared_ptr<chucho::formatter> fmt,
         throw std::bad_alloc();
     std::string sql("INSERT INTO chucho_event ( formatted_message, timestmp, file_name, line_number, function_name, logger, level_name, marker, thread ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? );");
     if (mysql_stmt_prepare(insert_, sql.c_str(), sql.length()) != 0) 
-        throw chucho::exception(std::string("[real_mysql_writer] Error preparing insert statement: ") + mysql_error(mysql_));
+    {
+        std::string msg = mysql_error(mysql_);
+        mysql_close(mysql_);
+        throw chucho::exception(std::string("[real_mysql_writer] Error preparing insert statement: ") + msg);
+    }
     mysql_autocommit(mysql_, 1);
 }
 

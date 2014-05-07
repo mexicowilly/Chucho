@@ -57,6 +57,9 @@ protected:
     void rolling_file_writer_body();
     void size_file_roll_trigger_body(const std::string& tmpl);
     void sliding_numbered_file_roller_body();
+#if defined(CHUCHO_HAVE_SQLITE)
+    void sqlite_writer_body();
+#endif
     void syslog_writer_body();
     void syslog_writer_facility_body(const std::string& tmpl);
     void syslog_writer_port_body();
