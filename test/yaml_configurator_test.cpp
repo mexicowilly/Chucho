@@ -414,6 +414,21 @@ TEST_F(yaml_configurator, sliding_numbered_file_roller)
     sliding_numbered_file_roller_body();
 }
 
+#if defined(CHUCHO_HAVE_SQLITE)
+
+TEST_F(yaml_configurator, sqlite_writer)
+{
+    configure("chucho::logger:\n"
+              "    - name: will\n"
+              "    - chucho::sqlite_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            - pattern: '%m%n'\n"
+              "        - file_name: database.sqlite");
+    sqlite_writer_body();
+}
+
+#endif
+
 TEST_F(yaml_configurator, syslog_writer)
 {
     configure("chucho::logger:\n"

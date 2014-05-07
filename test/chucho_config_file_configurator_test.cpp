@@ -463,6 +463,22 @@ TEST_F(chucho_config_file_configurator, sliding_numbered_file_roller)
     sliding_numbered_file_roller_body();
 }
 
+#if defined(CHUCHO_HAVE_SQLITE)
+
+TEST_F(chucho_config_file_configurator, sqlite_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = sw\n"
+              "chucho.writer.sw = chucho::sqlite_writer\n"
+              "chucho.writer.sw.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m%n\n"
+              "chucho.writer.sw.file_name = database.sqlite");
+    sqlite_writer_body();
+}
+
+#endif
+
 TEST_F(chucho_config_file_configurator, syslog_writer)
 {
     configure("chucho.logger = will\n"

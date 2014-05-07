@@ -77,6 +77,10 @@ IF(CHUCHO_HAVE_ORACLE)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_ORACLE)
 ENDIF()
 
+IF(CHUCHO_HAVE_SQLITE)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_SQLITE)
+ENDIF()
+
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
                calendar_test.cpp
@@ -116,6 +120,10 @@ IF(CHUCHO_HAVE_ORACLE)
     TARGET_LINK_LIBRARIES(unit-test "${ORACLE_CLIENT_LIB}")
 ENDIF()
 
+IF(CHUCHO_HAVE_SQLITE)
+    TARGET_LINK_LIBRARIES(unit-test "${SQLITE_CLIENT_LIB}")
+ENDIF()
+
 IF(MSVC)
     SET_SOURCE_FILES_PROPERTIES(pattern_formatter_test.cpp PROPERTIES
                                 COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
@@ -142,6 +150,12 @@ IF(CHUCHO_HAVE_MYSQL)
     LIST(APPEND CHUCHO_DB_C_SOURCES
          mysql_writer_test.c
          mysql_writer_test.h)
+ENDIF()
+
+IF(CHUCHO_HAVE_SQLITE)
+    LIST(APPEND CHUCHO_DB_C_SOURCES
+         sqlite_writer_test.c
+         sqlite_writer_test.h)
 ENDIF()
 
 ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
@@ -204,6 +218,10 @@ IF(CHUCHO_HAVE_MYSQL)
     TARGET_LINK_LIBRARIES(c-unit-test "${MYSQL_CLIENT_LIB}")
 ENDIF()
 
+IF(CHUCHO_HAVE_SQLITE)
+    TARGET_LINK_LIBRARIES(c-unit-test "${SQLITE_CLIENT_LIB}")
+ENDIF()
+
 IF(CHUCHO_SOLARIS)
     TARGET_LINK_LIBRARIES(c-unit-test socket nsl)
 ENDIF()
@@ -258,6 +276,13 @@ IF(CHUCHO_HAVE_MYSQL)
                    harness.cpp
                    mysql_writer_test.cpp)
     TARGET_LINK_LIBRARIES(mysql-writer-test chucho "${MYSQL_CLIENT_LIB}" gtest ${CHUCHO_THREAD_LIB})
+ENDIF()
+
+IF(CHUCHO_HAVE_SQLITE)
+    ADD_EXECUTABLE(sqlite-writer-test EXCLUDE_FROM_ALL
+                   harness.cpp
+                   sqlite_writer_test.cpp)
+    TARGET_LINK_LIBRARIES(sqlite-writer-test chucho "${SQLITE_CLIENT_LIB}" gtest ${CHUCHO_THREAD_LIB})
 ENDIF()
 
 ADD_CUSTOM_TARGET(check-config
