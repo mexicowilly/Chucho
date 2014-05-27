@@ -21,6 +21,10 @@
 #include <chucho/logger.hpp>
 #include <chucho/status_manager.hpp>
 #include <fstream>
+#include <thread>
+
+namespace
+{
 
 class file_writer_test : public ::testing::Test
 {
@@ -39,7 +43,7 @@ public:
 
     std::shared_ptr<chucho::file_writer> get_writer(chucho::file_writer::on_start start = chucho::file_writer::on_start::APPEND)
     {
-        std::shared_ptr<chucho::formatter> f(new chucho::pattern_formatter("%m%n"));
+        std::shared_ptr<chucho::formatter> f = std::make_shared<chucho::pattern_formatter>("%m%n");
         std::shared_ptr<chucho::file_writer> w = std::make_shared<chucho::file_writer>(f, file_name_, start);
         return w;
     }
@@ -47,6 +51,27 @@ public:
 protected:
     std::string file_name_;
 };
+
+#if defined(CHUCHO_POSIX)
+
+void make_unwriteable(const std::string& file_name)
+{
+    struct stat stat_buf;
+    ASSERT_EQ(0, stat(file_name.c_str(), &stat_buf));
+    ASSERT_EQ(0, chmod(file_name.c_str(), stat_buf.st_mode & ~(S_IWUSR | S_IWGRP | S_IWOTH)));
+}
+
+void make_writeable(const std::string& file_name)
+{
+    struct stat stat_buf;
+    ASSERT_EQ(0, stat(file_name.c_str(), &stat_buf));
+    ASSERT_EQ(0, chmod(file_name.c_str(), stat_buf.st_mode | (S_IWUSR | S_IWGRP | S_IWOTH)));
+}
+
+#elif defined(CHUCHO_WINDOWS)
+#endif
+
+}
 
 TEST_F(file_writer_test, error)
 {
@@ -103,4 +128,38 @@ TEST_F(file_writer_test, write)
     if (!line.empty() && line.back() == '\r')
         line.pop_back();
     EXPECT_TRUE(stream.eof());
+}
+
+TEST_F(file_writer_test, writeable_non_writeable)
+{
+    auto w = get_writer();
+    ASSERT_EQ(0, chucho::status_manager::get()->get_count());
+    std::shared_ptr<chucho::logger> log = chucho::logger::get("file_writer_test");
+    chucho::event evt(log, chucho::level::INFO_(), "hello", __FILE__, __LINE__, __FUNCTION__);
+    w->write(evt);
+    auto sz = chucho::file::size(file_name_);
+    make_unwriteable(file_name_);
+    std::this_thread::sleep_for(std::chrono::seconds(4));
+    w->write(evt);
+    EXPECT_EQ(2, chucho::status_manager::get()->get_count());
+    EXPECT_EQ(sz, chucho::file::size(file_name_));
+    make_writeable(file_name_);
+    std::this_thread::sleep_for(std::chrono::seconds(4));
+    w->write(evt);
+    EXPECT_EQ(4, chucho::status_manager::get()->get_count());
+    EXPECT_GT(chucho::file::size(file_name_), sz);
+}
+
+TEST_F(file_writer_test, writeable_removed)
+{
+    auto w = get_writer();
+    ASSERT_EQ(0, chucho::status_manager::get()->get_count());
+    std::shared_ptr<chucho::logger> log = chucho::logger::get("file_writer_test");
+    chucho::event evt(log, chucho::level::INFO_(), "hello", __FILE__, __LINE__, __FUNCTION__);
+    w->write(evt);
+    auto sz = chucho::file::size(file_name_);
+    chucho::file::remove(file_name_);
+    std::this_thread::sleep_for(std::chrono::seconds(4));
+    w->write(evt);
+    EXPECT_EQ(sz, chucho::file::size(file_name_));
 }

@@ -158,6 +158,17 @@ bool exists(const std::string& name)
     return access(name.c_str(), F_OK) == 0;
 }
 
+writeability get_writeability(const std::string& name)
+{
+    writeability result = writeability::NON_WRITEABLE;
+    int rc = access(name.c_str(), W_OK);
+    if (rc == 0)
+        result = writeability::WRITEABLE;
+    else if (errno == ENOENT) 
+        result = writeability::NON_EXISTENT;
+    return result;
+}
+
 bool is_fully_qualified(const std::string& name)
 {
     return !name.empty() && name[0] == '/';

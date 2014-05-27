@@ -33,11 +33,19 @@ namespace file
 
 extern CHUCHO_PRIV_EXPORT const char dir_sep;
 
+enum class writeability
+{
+    WRITEABLE,
+    NON_WRITEABLE,
+    NON_EXISTENT
+};
+
 CHUCHO_PRIV_EXPORT std::string base_name(const std::string& name);
 CHUCHO_PRIV_EXPORT void create_directories(const std::string& name);
 CHUCHO_PRIV_EXPORT void create_directory(const std::string& name);
 CHUCHO_PRIV_EXPORT std::string directory_name(const std::string& name);
 CHUCHO_PRIV_EXPORT bool exists(const std::string& name);
+CHUCHO_PRIV_EXPORT writeability get_writeability(const std::string& name);
 CHUCHO_PRIV_EXPORT bool is_fully_qualified(const std::string& name);
 CHUCHO_PRIV_EXPORT void remove(const std::string& name);
 CHUCHO_PRIV_EXPORT void remove_all(const std::string& name);
