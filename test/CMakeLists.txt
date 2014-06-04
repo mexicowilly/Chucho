@@ -285,6 +285,10 @@ IF(CHUCHO_HAVE_SQLITE)
     TARGET_LINK_LIBRARIES(sqlite-writer-test chucho "${SQLITE_CLIENT_LIB}" gtest ${CHUCHO_THREAD_LIB})
 ENDIF()
 
+ADD_EXECUTABLE(configuration-off EXCLUDE_FROM_ALL
+               configuration_off.cpp)
+TARGET_LINK_LIBRARIES(configuration-off chucho ${CHUCHO_THREAD_LIB})
+
 ADD_CUSTOM_TARGET(check-config
                   COMMAND "${CMAKE_COMMAND}" "-DCHUCHO_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P "${CMAKE_CURRENT_SOURCE_DIR}/CheckAllConfigs.cmake")
 
