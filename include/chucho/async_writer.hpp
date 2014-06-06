@@ -70,6 +70,8 @@ public:
      * @param discard_threshold the level at which to discard events 
      *                          once the queue is at 80% capacity or
      *                          more
+     * @param flush_on_destruct whether to flush the pending events 
+     *                          when the writer is destroyed
      */
     async_writer(std::shared_ptr<writer> wrt,
                  std::size_t capacity = DEFAULT_QUEUE_CAPACITY,
@@ -90,6 +92,12 @@ public:
      * @return the discard threshold
      */
     std::shared_ptr<level> get_discard_threshold() const;
+    /**
+     * Return whether this writer should flush any cached events at 
+     * destruction time. 
+     * 
+     * @return whether the writer flushes on destruct
+     */
     bool get_flush_on_destruct() const;
     /**
      * Return the queue capacity.

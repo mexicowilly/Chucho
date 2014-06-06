@@ -22,10 +22,13 @@
 extern "C"
 {
 
+size_t CHUCHO_DEFAULT_ASYNC_QUEUE_CAPACITY = chucho::async_writer::DEFAULT_QUEUE_CAPACITY;
+
 chucho_rc chucho_create_async_writer(chucho_writer** async,
                                chucho_writer* wrt,
                                size_t capacity,
-                               const chucho_level* discard_threshold)
+                               const chucho_level* discard_threshold,
+                               int flush_on_destruct)
 {
     if (async == nullptr || wrt == nullptr || discard_threshold == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -34,7 +37,8 @@ chucho_rc chucho_create_async_writer(chucho_writer** async,
         *async = new chucho_writer();
         (*async)->writer_ = std::make_shared<chucho::async_writer>(wrt->writer_,
                                                                    capacity,
-                                                                   discard_threshold->level_);
+                                                                   discard_threshold->level_,
+                                                                   flush_on_destruct != 0);
     }
     catch (...) 
     {
@@ -56,6 +60,17 @@ chucho_rc chucho_aswrt_get_discard_threshold(const chucho_writer* wrt, const chu
     if (clvl == nullptr) 
         return CHUCHO_NO_SUCH_LEVEL;
     *lvl = clvl;
+    return CHUCHO_NO_ERROR;
+}
+
+chucho_rc chucho_aswrt_get_flush_on_destruct(const chucho_writer* wrt, int* flsh)
+{
+    if (wrt == nullptr || flsh == nullptr)
+        return CHUCHO_NULL_POINTER;
+    auto aswrt = std::dynamic_pointer_cast<chucho::async_writer>(wrt->writer_);
+    if (!aswrt) 
+        return CHUCHO_TYPE_MISMATCH;
+    *flsh = aswrt->get_flush_on_destruct() ? 1 : 0;
     return CHUCHO_NO_ERROR;
 }
 

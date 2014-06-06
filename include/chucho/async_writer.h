@@ -33,6 +33,11 @@ extern "C"
 #endif
 
 /**
+ * @copydoc chucho::async_writer::DEFAULT_QUEUE_CAPACITY
+ */
+extern size_t CHUCHO_DEFAULT_ASYNC_QUEUE_CAPACITY;
+
+/**
  * @name Creation
  */
 //@{
@@ -51,13 +56,17 @@ extern "C"
  * @param[in] discard_threshold the level at which to discard 
  *                          events once the queue is at 80%
  *                          capacity or more
+ * @param[in] flush_on_destruct whether to flush the pending
+ *                              events when the writer is
+ *                              destroyed
  * @return a value from @ref return_code.h indicating success or
  *         failure
  */
 CHUCHO_EXPORT chucho_rc chucho_create_async_writer(chucho_writer** async,
                                                    chucho_writer* wrt,
                                                    size_t capacity,
-                                                   const chucho_level* discard_threshold);
+                                                   const chucho_level* discard_threshold,
+                                                   int flush_on_destruct);
 //@}
 
 /**
@@ -76,6 +85,20 @@ CHUCHO_EXPORT chucho_rc chucho_create_async_writer(chucho_writer** async,
  *         failure
  */
 CHUCHO_EXPORT chucho_rc chucho_aswrt_get_discard_threshold(const chucho_writer* wrt, const chucho_level** lvl);
+/**
+ * Return whether this writer should flush any cached events at 
+ * destruction time. 
+ * 
+ * @pre The wrt parameter must have been created with the @ref 
+ *      chucho_create_async_writer() function.
+ * 
+ * @param[in] wrt the asynchronous writer 
+ * @param[out] whether the writer flushes cached events at 
+ *       destruction time
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
+CHUCHO_EXPORT chucho_rc chucho_aswrt_get_flush_on_destruct(const chucho_writer* wrt, int* flsh);
 /**
  * Return the capacity of the blocking queue.
  * 

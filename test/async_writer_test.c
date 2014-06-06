@@ -29,13 +29,17 @@ static void async_writer_test(void)
     const char* warn;
     size_t sz;
     const char* fname;
+    int flsh;
 
     chucho_rc rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
     rc = chucho_create_file_writer(&wrt, fmt, "hello", CHUCHO_ON_START_APPEND, 0);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create file writer");
-    rc = chucho_create_async_writer(&async, wrt, 777, chucho_warn_level());
+    rc = chucho_create_async_writer(&async, wrt, 777, chucho_warn_level(), 0);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create async writer");
+    rc = chucho_aswrt_get_flush_on_destruct(async, &flsh);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "get flush on destruct");
+    sput_fail_unless(flsh == 0, "flush on destruct is false");
     rc = chucho_aswrt_get_discard_threshold(async, &dt);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get discard threshold");
     rc = chucho_lvl_get_name(dt, &warn);
