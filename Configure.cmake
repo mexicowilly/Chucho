@@ -41,7 +41,7 @@ OPTION(CONFIG_FILE_CONFIG "Whether to include the config file configuration pars
 OPTION(LOG4CPLUS_CONFIG "Whether to support reading log4cplus configuration files" FALSE)
 
 # whether to build the C API
-OPTION(C_API "Whether the C API should be built into this Chucho" TRUE)
+OPTION(C_API "Whether the C API should be built into this Chucho" FALSE)
 
 # We'll want this later
 MACRO(CHUCHO_FIND_PROGRAM CHUCHO_FIND_VAR CHUCHO_PROGRAM)
