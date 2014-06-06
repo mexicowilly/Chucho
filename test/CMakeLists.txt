@@ -134,100 +134,102 @@ ENDIF()
 ADD_CUSTOM_TARGET(check
                   COMMAND unit-test)
 
-IF(CHUCHO_HAVE_ZLIB OR CHUCHO_HAVE_BZIP2 OR CHUCHO_HAVE_MINIZIP)
-    SET(CHUCHO_TEST_COMPRESSION_C_SOURCES
-        file_compressor_test.c
-        file_compressor_test.h)
+IF(C_API)
+    IF(CHUCHO_HAVE_ZLIB OR CHUCHO_HAVE_BZIP2 OR CHUCHO_HAVE_MINIZIP)
+        SET(CHUCHO_TEST_COMPRESSION_C_SOURCES
+            file_compressor_test.c
+            file_compressor_test.h)
+    ENDIF()
+
+    IF(CHUCHO_HAVE_ORACLE)
+        LIST(APPEND CHUCHO_DB_C_SOURCES
+             oracle_writer_test.c
+             oracle_writer_test.h)
+    ENDIF()
+
+    IF(CHUCHO_HAVE_MYSQL)
+        LIST(APPEND CHUCHO_DB_C_SOURCES
+             mysql_writer_test.c
+             mysql_writer_test.h)
+    ENDIF()
+
+    IF(CHUCHO_HAVE_SQLITE)
+        LIST(APPEND CHUCHO_DB_C_SOURCES
+             sqlite_writer_test.c
+             sqlite_writer_test.h)
+    ENDIF()
+
+    ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
+                   async_writer_test.c
+                   async_writer_test.h
+                   cerr_writer_test.c
+                   cerr_writer_test.h
+                   cout_writer_test.c
+                   cout_writer_test.h
+                   configuration_test.c
+                   configuration_test.h
+                   diagnostic_context_test.c
+                   diagnostic_context_test.h
+                   duplicate_message_filter_test.c
+                   duplicate_message_filter_test.h
+                   file_roller_test.c
+                   file_roller_test.h
+                   file_writer_test.c
+                   file_writer_test.h
+                   harness.c
+                   level_filter_test.c
+                   level_filter_test.h
+                   level_test.c
+                   level_test.h
+                   level_threshold_filter_test.c
+                   level_threshold_filter_test.h
+                   log_macro_test.c
+                   log_macro_test.h
+                   logger_test.c
+                   logger_test.h
+                   numbered_file_roller_test.c
+                   numbered_file_roller_test.h
+                   pattern_formatter_test.c
+                   pattern_formatter_test.h
+                   remote_writer_test.c
+                   remote_writer_test.h
+                   rolling_file_writer_test.c
+                   rolling_file_writer_test.h
+                   size_file_roll_trigger_test.c
+                   size_file_roll_trigger_test.h
+                   sliding_numbered_file_roller_test.c
+                   sliding_numbered_file_roller_test.h
+                   syslog_writer_test.c
+                   syslog_writer_test.h
+                   test_util.c
+                   test_util.h
+                   time_file_roller_test.c
+                   time_file_roller_test.h
+                   writer_test.c
+                   writer_test.h
+                   ${CHUCHO_TEST_COMPRESSION_C_SOURCES}
+                   ${CHUCHO_DB_C_SOURCES})
+    TARGET_LINK_LIBRARIES(c-unit-test chucho ${CHUCHO_THREAD_LIB})
+
+    IF(CHUCHO_HAVE_ORACLE)
+        TARGET_LINK_LIBRARIES(c-unit-test "${ORACLE_CLIENT_LIB}")
+    ENDIF()
+
+    IF(CHUCHO_HAVE_MYSQL)
+        TARGET_LINK_LIBRARIES(c-unit-test "${MYSQL_CLIENT_LIB}")
+    ENDIF()
+
+    IF(CHUCHO_HAVE_SQLITE)
+        TARGET_LINK_LIBRARIES(c-unit-test "${SQLITE_CLIENT_LIB}")
+    ENDIF()
+
+    IF(CHUCHO_SOLARIS)
+        TARGET_LINK_LIBRARIES(c-unit-test socket nsl)
+    ENDIF()
+
+    ADD_CUSTOM_TARGET(c-check
+                      COMMAND c-unit-test)
 ENDIF()
-
-IF(CHUCHO_HAVE_ORACLE)
-    LIST(APPEND CHUCHO_DB_C_SOURCES
-         oracle_writer_test.c
-         oracle_writer_test.h)
-ENDIF()
-
-IF(CHUCHO_HAVE_MYSQL)
-    LIST(APPEND CHUCHO_DB_C_SOURCES
-         mysql_writer_test.c
-         mysql_writer_test.h)
-ENDIF()
-
-IF(CHUCHO_HAVE_SQLITE)
-    LIST(APPEND CHUCHO_DB_C_SOURCES
-         sqlite_writer_test.c
-         sqlite_writer_test.h)
-ENDIF()
-
-ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
-               async_writer_test.c
-               async_writer_test.h
-               cerr_writer_test.c
-               cerr_writer_test.h
-               cout_writer_test.c
-               cout_writer_test.h
-               configuration_test.c
-               configuration_test.h
-               diagnostic_context_test.c
-               diagnostic_context_test.h
-               duplicate_message_filter_test.c
-               duplicate_message_filter_test.h
-               file_roller_test.c
-               file_roller_test.h
-               file_writer_test.c
-               file_writer_test.h
-               harness.c
-               level_filter_test.c
-               level_filter_test.h
-               level_test.c
-               level_test.h
-               level_threshold_filter_test.c
-               level_threshold_filter_test.h
-               log_macro_test.c
-               log_macro_test.h
-               logger_test.c
-               logger_test.h
-               numbered_file_roller_test.c
-               numbered_file_roller_test.h
-               pattern_formatter_test.c
-               pattern_formatter_test.h
-               remote_writer_test.c
-               remote_writer_test.h
-               rolling_file_writer_test.c
-               rolling_file_writer_test.h
-               size_file_roll_trigger_test.c
-               size_file_roll_trigger_test.h
-               sliding_numbered_file_roller_test.c
-               sliding_numbered_file_roller_test.h
-               syslog_writer_test.c
-               syslog_writer_test.h
-               test_util.c
-               test_util.h
-               time_file_roller_test.c
-               time_file_roller_test.h
-               writer_test.c
-               writer_test.h
-               ${CHUCHO_TEST_COMPRESSION_C_SOURCES}
-               ${CHUCHO_DB_C_SOURCES})
-TARGET_LINK_LIBRARIES(c-unit-test chucho ${CHUCHO_THREAD_LIB})
-
-IF(CHUCHO_HAVE_ORACLE)
-    TARGET_LINK_LIBRARIES(c-unit-test "${ORACLE_CLIENT_LIB}")
-ENDIF()
-
-IF(CHUCHO_HAVE_MYSQL)
-    TARGET_LINK_LIBRARIES(c-unit-test "${MYSQL_CLIENT_LIB}")
-ENDIF()
-
-IF(CHUCHO_HAVE_SQLITE)
-    TARGET_LINK_LIBRARIES(c-unit-test "${SQLITE_CLIENT_LIB}")
-ENDIF()
-
-IF(CHUCHO_SOLARIS)
-    TARGET_LINK_LIBRARIES(c-unit-test socket nsl)
-ENDIF()
-
-ADD_CUSTOM_TARGET(c-check
-                  COMMAND c-unit-test)
 
 ADD_EXECUTABLE(time-rolling-file-test EXCLUDE_FROM_ALL
                harness.cpp
