@@ -26,6 +26,13 @@ namespace chucho
 class sqlite_writer : public database_writer
 {
 public:
+    /**
+     * @param fmt 
+     * @param file_name 
+     * @throw std::invalid_argument if fmt is an uninitialized 
+     *        std::shared_ptr
+     * @throw exception if the SQLite database cannot be opened
+     */
     sqlite_writer(std::shared_ptr<formatter> fmt, const std::string& file_name);
     ~sqlite_writer();
 

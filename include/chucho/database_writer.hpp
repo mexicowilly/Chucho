@@ -39,6 +39,8 @@ protected:
      * Construct a database writer.
      *
      * @param fmt the formatter
+     * @throw std::invalid_argument if fmt is an uninitialized 
+     *        std::shared_ptr
      */
     database_writer(std::shared_ptr<formatter> fmt);
     //@}

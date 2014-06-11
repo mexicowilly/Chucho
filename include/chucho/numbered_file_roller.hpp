@@ -43,6 +43,8 @@ public:
      * 
      * @param max_index the maximum index
      * @param cmp the file compressor
+     * @throw std::invalid_argument if the default minimum index of 
+     *        1 is greater than max_index
      */
     numbered_file_roller(int max_index,
                          std::shared_ptr<file_compressor> cmp = std::shared_ptr<file_compressor>());

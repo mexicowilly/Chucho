@@ -72,6 +72,8 @@ public:
      *                          more
      * @param flush_on_destruct whether to flush the pending events 
      *                          when the writer is destroyed
+     * @throw std::invalid_argument if fmt is an uninitialized 
+     *        std::shared_ptr
      */
     async_writer(std::shared_ptr<writer> wrt,
                  std::size_t capacity = DEFAULT_QUEUE_CAPACITY,

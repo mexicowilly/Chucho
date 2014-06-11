@@ -53,6 +53,10 @@ public:
      * 
      * @param fmt the formatter
      * @param fcl the syslog facility
+     * @throw std::invalid_argument if fmt is an uninitialized 
+     *        std::shared_ptr
+     * @throw exception if the connection to the syslog cannot be 
+     *        established
      */
     syslog_writer(std::shared_ptr<formatter> fmt,
                   syslog::facility fcl);
@@ -64,6 +68,10 @@ public:
      * @param fcl the syslog facility
      * @param host the syslog host 
      * @param port the port on which syslogd is listening 
+     * @throw std::invalid_argument if fmt is an uninitialized 
+     *        std::shared_ptr
+     * @throw exception if the connection to the syslog cannot be 
+     *        established
      */
     syslog_writer(std::shared_ptr<formatter> fmt,
                   syslog::facility fcl,

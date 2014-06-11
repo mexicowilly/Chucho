@@ -143,7 +143,7 @@ windows_event_log_writer::~windows_event_log_writer()
 void windows_event_log_writer::init()
 {
     if (source_.empty())
-        throw exception("Source must be set for windows_event_log_writer");
+        throw std::invalid_argument("Source must be set for windows_event_log_writer");
     set_status_origin("windows_event_log_writer");
     look_up_user();
     try

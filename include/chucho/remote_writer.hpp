@@ -83,6 +83,10 @@ public:
      * @param port the port on which the chucho server is listening
      * @param unsent_cache_max the maximum size of the unsent event 
      *                         cache
+     * @throw std::invalid_argument if fmt is an uninitialized 
+     *        std::shared_ptr
+     * @throw std::invalid_argument if the host name is empty
+     * @throw std::invalid_argument if the port is zero
      */
     remote_writer(const std::string& host,
                   std::uint16_t port = DEFAULT_PORT,

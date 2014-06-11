@@ -48,6 +48,10 @@ public:
      * @param password the password of the user for the database
      * @param database the database name, which is a TNS name, such 
      *                 as myoracleserver.com/dbname
+     * @throw std::invalid_argument if fmt is an uninitialized 
+     *        std::shared_ptr
+     * @throw exception if there is a problem connecting to the 
+     *        database
      */
     oracle_writer(std::shared_ptr<formatter> fmt,
                   const std::string& user,

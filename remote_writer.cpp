@@ -41,9 +41,9 @@ remote_writer::remote_writer(const std::string& host,
 {
     set_status_origin("remote_writer");
     if (host.empty())
-        throw exception("The host name cannot be empty");
+        throw std::invalid_argument("The host name cannot be empty");
     if (port == 0)
-        throw exception("The port cannot be zero");
+        throw std::invalid_argument("The port cannot be zero");
     connector_.reset(new socket_connector(host, port));
 }
 
