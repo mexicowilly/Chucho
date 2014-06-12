@@ -154,39 +154,39 @@ SET(CHUCHO_PUBLIC_HEADERS
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS ${CHUCHO_PUBLIC_HEADERS})
 
+SET(CHUCHO_C_HEADERS
+    include/chucho/async_writer.h
+    include/chucho/cerr_writer.h
+    include/chucho/cout_writer.h
+    include/chucho/configuration.h
+    include/chucho/diagnostic_context.h
+    include/chucho/duplicate_message_filter.h
+    "${CMAKE_BINARY_DIR}/chucho/export.h"
+    include/chucho/file_compressor.h
+    include/chucho/file_roll_trigger.h
+    include/chucho/file_roller.h
+    include/chucho/file_writer.h
+    include/chucho/filter.h
+    include/chucho/finalize.h
+    include/chucho/formatter.h
+    include/chucho/level.h
+    include/chucho/level_filter.h
+    include/chucho/level_threshold_filter.h
+    include/chucho/log.h
+    include/chucho/logger.h
+    include/chucho/numbered_file_roller.h
+    include/chucho/pattern_formatter.h
+    include/chucho/remote_writer.h
+    include/chucho/return_code.h
+    include/chucho/rolling_file_writer.h
+    include/chucho/size_file_roll_trigger.h
+    include/chucho/sliding_numbered_file_roller.h
+    include/chucho/status.h
+    include/chucho/status_manager.h
+    include/chucho/syslog_writer.h
+    include/chucho/time_file_roller.h
+    include/chucho/writer.h)
 IF(C_API)
-    SET(CHUCHO_C_HEADERS
-        include/chucho/async_writer.h
-        include/chucho/cerr_writer.h
-        include/chucho/cout_writer.h
-        include/chucho/configuration.h
-        include/chucho/diagnostic_context.h
-        include/chucho/duplicate_message_filter.h
-        "${CMAKE_BINARY_DIR}/chucho/export.h"
-        include/chucho/file_compressor.h
-        include/chucho/file_roll_trigger.h
-        include/chucho/file_roller.h
-        include/chucho/file_writer.h
-        include/chucho/filter.h
-        include/chucho/finalize.h
-        include/chucho/formatter.h
-        include/chucho/level.h
-        include/chucho/level_filter.h
-        include/chucho/level_threshold_filter.h
-        include/chucho/log.h
-        include/chucho/logger.h
-        include/chucho/numbered_file_roller.h
-        include/chucho/pattern_formatter.h
-        include/chucho/remote_writer.h
-        include/chucho/return_code.h
-        include/chucho/rolling_file_writer.h
-        include/chucho/size_file_roll_trigger.h
-        include/chucho/sliding_numbered_file_roller.h
-        include/chucho/status.h
-        include/chucho/status_manager.h
-        include/chucho/syslog_writer.h
-        include/chucho/time_file_roller.h
-        include/chucho/writer.h)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS ${CHUCHO_C_HEADERS})
 ENDIF()
 

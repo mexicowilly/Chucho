@@ -31,7 +31,7 @@ namespace chucho
  * that can be exected to create the table, for information 
  * about what columns must exist. 
  * 
- * @ingroup writers
+ * @ingroup writers database
  */
 class oracle_writer : public database_writer
 {

@@ -26,7 +26,7 @@ namespace chucho
  * @class database_writer database_writer.hpp chucho/database_writer.hpp
  * A writer that writes to a database.
  * 
- * @ingroup writers
+ * @ingroup writers database
  */
 class database_writer : public writer
 {

@@ -43,7 +43,7 @@ extern "C"
  * @post Ownership of the fmt parameter is transferred to the 
  *       callee.
  * 
- * @param[out] the Oracle writer to create
+ * @param[out] wrt the Oracle writer to create
  * @param[in] fmt the formatter
  * @param[in] user the user name for the database
  * @param[in] password the password of the user for the database

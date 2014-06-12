@@ -86,6 +86,11 @@
  */
 
 /**
+ * @defgroup database 
+ * Classes that write to databases. 
+ */
+
+/**
  * @defgroup filters 
  * Filters are attached to @ref writers, and they can be used to 
  * refine log filtering beyond the basic level check. 
@@ -149,6 +154,13 @@
 /**
  * @defgroup c_configuration Configuration 
  * Functions that help manage the configuration of Chucho.
+ *  
+ * @ingroup c 
+ */
+
+/**
+ * @defgroup c_database Database
+ * Functions that help manage database writers.
  *  
  * @ingroup c 
  */

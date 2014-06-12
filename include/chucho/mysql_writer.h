@@ -34,6 +34,9 @@ extern "C"
 {
 #endif
 
+/**
+ * @copydoc chucho::mysql_writer::DEFAULT_PORT
+ */
 extern unsigned CHUCHO_DEFAULT_MYSQL_PORT;
 
 /**
@@ -46,7 +49,7 @@ extern unsigned CHUCHO_DEFAULT_MYSQL_PORT;
  * @post Ownership of the fmt parameter is transferred to the 
  *       callee.
  * 
- * @param[out] the MySQL writer to create
+ * @param[out] wrt the MySQL writer to create
  * @param[in] fmt the formatter
  * @param[in] host the host where the database is running
  * @param[in] user the user name for the database
@@ -54,11 +57,11 @@ extern unsigned CHUCHO_DEFAULT_MYSQL_PORT;
  * @param[in] database the database name
  * @param[in] port the port on which to connect 
  * @param[in] capacity the default queue capacity of the 
- *       underlying @ref async_writer
+ *       underlying async writer
  * @param[in] discard_threshold the discard threshold of the 
- *       underlying @ref async_writer
- * @param[in] flush_on_destruct whether the underlying @ref 
- *       async_writer will flush its queue when it is destroyed
+ *       underlying async writer
+ * @param[in] flush_on_destruct whether the underlying
+ *       async writer will flush its queue when it is destroyed
  * @return a value from @ref return_code.h indicating success or
  *         failure
  */
@@ -73,6 +76,22 @@ CHUCHO_EXPORT chucho_rc chucho_create_mysql_writer(chucho_writer** wrt,
                                                    const chucho_level* discard_threshold,
                                                    int flush_on_destruct);
 
+/**
+ * Return the async writer that underlies this writer. The 
+ * async writer has the effect of channeling all MySQL 
+ * traffic for this writer through a single thread, which 
+ * guarantees that the thread has been prepared for use with 
+ * MySQL. 
+ *  
+ * @post Ownership of the async writer is transferred to the 
+ *       caller and must be released with the @ref
+ *       chucho_release_writer() function.
+ * 
+ * @param[in] wrt the MySQL writer
+ * @param[out] async the underlying async writer
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_mwrt_get_async_writer(const chucho_writer* wrt, chucho_writer** async);
 
 /**
@@ -105,6 +124,15 @@ CHUCHO_EXPORT chucho_rc chucho_mwrt_get_host(const chucho_writer* wrt, const cha
  */
 CHUCHO_EXPORT chucho_rc chucho_mwrt_get_password(const chucho_writer* wrt, const char** password);
 
+/**
+ * Return the port on which the database connection has been 
+ * made. 
+ * 
+ * @param[in] wrt the MySQL writer
+ * @param[out] port the port
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_mwrt_get_port(const chucho_writer* wrt, unsigned* port);
 
 /**

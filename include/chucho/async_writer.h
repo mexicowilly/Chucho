@@ -93,7 +93,7 @@ CHUCHO_EXPORT chucho_rc chucho_aswrt_get_discard_threshold(const chucho_writer* 
  *      chucho_create_async_writer() function.
  * 
  * @param[in] wrt the asynchronous writer 
- * @param[out] whether the writer flushes cached events at 
+ * @param[out] flsh whether the writer flushes cached events at 
  *       destruction time
  * @return a value from @ref return_code.h indicating success or
  *         failure

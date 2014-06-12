@@ -33,10 +33,29 @@ extern "C"
 {
 #endif
 
+/**
+ * Create a SQLite writer.
+ * 
+ * @param[out] wrt the writer to create
+ * @param[in] fmt the formatter
+ * @param[in] file_name the name of the file in which the 
+ *       database is stored
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_create_sqlite_writer(chucho_writer** wrt,
                                                     chucho_formatter* fmt,
                                                     const char* const file_name);
 
+/**
+ * Return the file name in which the SQLite database is stored.
+ * 
+ * @param[in] wrt the SQLite writer
+ * @param[out] file_name the name of the file in which the 
+ *       database is stored
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_sltwrt_get_file_name(const chucho_writer* wrt, const char** file_name);
 
 #if defined(__cplusplus)

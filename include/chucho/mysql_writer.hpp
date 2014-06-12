@@ -40,11 +40,14 @@ namespace chucho
  * be safe for MySQL calls. Therefore, the user does not have to 
  * prepare any threads before use with Chucho and mysql_writer. 
  * 
- * @ingroup writers
+ * @ingroup writers database
  */
 class mysql_writer : public database_writer
 {
 public:
+    /**
+     * The default MySQL port, which is 3306.
+     */
     static std::uint16_t DEFAULT_PORT;
     /**
      * @name Constructor
@@ -54,14 +57,27 @@ public:
      * Construct a MySQL writer.
      * 
      * @param fmt the formatter
+     * @param host the host on which MySQL is running
      * @param user the user name for the database
      * @param password the password of the user for the database
      * @param database the database name, which is a TNS name, such 
      *                 as myoracleserver.com/dbname
+     * @param port the port to which to connect
+     * @param capacity the capacity of the blocking queue in the 
+     *                 @ref async_writer underlying the MySQL writer
+     * @param discard_threshold the level at which to discard events 
+     *                          when the queue capacity of the
+     *                          underlying @ref async_writer has
+     *                          reached 80% capacity
+     * @param flush_on_destruct whether to flush pending events in 
+     *                          the underlying @ref async_writer
+     *                          when this writer is destroyed
      * @throw std::invalid_argument if fmt is an uninitialized 
      *        std::shared_ptr
      * @throw exception if there is a problem connecting to the 
      *        MySQL database
+     *  
+     * @sa async_writer 
      */
     mysql_writer(std::shared_ptr<formatter> fmt,
                  const std::string& host,
@@ -74,11 +90,44 @@ public:
                  bool flush_on_destruct = true);
     //@}
 
+    /**
+     * Return the underlying @ref async_writer. The MySQL writer 
+     * channels all writes through the underlying @ref async_writer. 
+     * This is to ensure that the thread to which the events are 
+     * written is prepared for interaction with the MySQL client. 
+     * 
+     * @return the @ref async_writer
+     */
     std::shared_ptr<async_writer> get_async_writer() const;
+    /**
+     * Return the name of the database.
+     * 
+     * @return the database name
+     */
     const std::string& get_database() const;
+    /**
+     * Return the host on which MySQL is running.
+     * 
+     * @return the host name
+     */
     const std::string& get_host() const;
+    /**
+     * Return the password used to connect to the database.
+     * 
+     * @return the password
+     */
     const std::string& get_password() const;
+    /**
+     * Return the port used to connect to the database.
+     * 
+     * @return the port
+     */
     std::uint16_t get_port() const;
+    /**
+     * Return the databaes user name.
+     * 
+     * @return the user name
+     */
     const std::string& get_user() const;
 
 protected:

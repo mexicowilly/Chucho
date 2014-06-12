@@ -38,6 +38,20 @@ extern "C"
  */
 typedef struct chucho_level chucho_level;
 
+/**
+ * Add a custom level. This allows the @ref chucho_get_level 
+ * function to return a custom level. This is primarily used for
+ * allowing custom levels to appear in configuration files. If 
+ * you call this method before configuration happens, then your 
+ * custom level will be able to be resolved by the configurator.
+ * 
+ * @param[out] lvl the level to add
+ * @param[in] name the name of the level 
+ * @param[in] value the value 
+ * @param[in] sev the syslog severity
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_add_level(const chucho_level** lvl,
                                          const char* const name,
                                          int value,

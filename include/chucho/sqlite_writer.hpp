@@ -23,19 +23,46 @@
 namespace chucho
 {
 
+/**
+ * @class sqlite_writer sqlite_writer.hpp chucho/sqlite_writer.hpp 
+ * A writer that writes log events to a SQLite database. Please 
+ * refer to the sql/sqlite.sql for information about the name of 
+ * the table involved and what columns exist. Unlike with the 
+ * MySQL and Orcale databases, the table for SQLite does not 
+ * have to exist before the database is used. It will be created 
+ * automatically if it does not yet exist. 
+ * 
+ * @ingroup writers database
+ */
 class sqlite_writer : public database_writer
 {
 public:
     /**
-     * @param fmt 
-     * @param file_name 
+     * @name Constructor and Destructor
+     */
+    //@{
+    /**
+     * Create a SQLite writer.
+     *
+     * @param fmt the formatter to use
+     * @param file_name the name of the file that does or will hold 
+     *                  the database
      * @throw std::invalid_argument if fmt is an uninitialized 
      *        std::shared_ptr
      * @throw exception if the SQLite database cannot be opened
      */
     sqlite_writer(std::shared_ptr<formatter> fmt, const std::string& file_name);
+    /**
+     * Destroy a SQLite writer.
+     */
     ~sqlite_writer();
+    //@}
 
+    /**
+     * Return the name of the file that holds the database.
+     * 
+     * @return the file name
+     */
     const std::string& get_file_name() const;
 
 protected:
