@@ -40,7 +40,7 @@ extern "C"
  *       caller, and must be released with the @ref
  *       chucho_release_writer() function.
  *  
- * @post Ownership of the fmt parameters is transferred to the 
+ * @post Ownership of the fmt parameter is transferred to the 
  *       callee.
  * 
  * @param[out] wrt the cerr writer to create

@@ -35,9 +35,9 @@ extern "C"
 /**
  * Create a bzip2 file compressor.
  *  
- * @post Ownership of the cmp parameters is transferred to the 
+ * @post Ownership of the cmp parameter is transferred to the 
  *       caller, and must be released with the @ref
- *       chucho_release_file_compressor function.
+ *       chucho_release_file_compressor() function.
  * 
  * @param[out] cmp the compressor to create
  * @param[in] min_index the minimum index at which to start 

@@ -42,7 +42,7 @@ typedef struct chucho_writer chucho_writer;
 /**
  * Release a writer.
  *  
- * @post Ownership of the wrt parameters is transferred to the 
+ * @post Ownership of the wrt parameter is transferred to the 
  *       callee.
  * 
  * @param[in] wrt the writer to release
@@ -53,7 +53,7 @@ CHUCHO_EXPORT chucho_rc chucho_release_writer(chucho_writer* wrt);
 /**
  * Add a filter to the writer.
  *  
- * @post Ownership of the flt parameters is transferred to the 
+ * @post Ownership of the flt parameter is transferred to the 
  *       callee.
  * 
  * @param[in] wrt the writer

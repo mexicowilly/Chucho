@@ -61,9 +61,9 @@ extern size_t CHUCHO_DEFAULT_REMOTE_UNSENT_CACHE_MAX;
  *         failure
  */
 CHUCHO_EXPORT chucho_rc chucho_create_remote_writer(chucho_writer** wrt,
-                                              const char* const host,
-                                              unsigned port,
-                                              size_t unsent_cache_max);
+                                                    const char* const host,
+                                                    unsigned port,
+                                                    size_t unsent_cache_max);
 //@}
 /**
  * Return the host on which the chuchod server is running.

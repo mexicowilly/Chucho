@@ -38,7 +38,7 @@ extern "C"
 /**
  * Create a sliding numbered file roller.
  * 
- * @post Ownership of the rlr parameters is transferred to the 
+ * @post Ownership of the rlr parameter is transferred to the 
  *       caller, and it must be release with the @ref
  *       chucho_release_file_roller() function.
  * 

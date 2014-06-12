@@ -35,7 +35,7 @@ extern "C"
 /**
  * Create a gzip file compressor.
  *  
- * @post Ownership of the cmp parameters is transferred to the 
+ * @post Ownership of the cmp parameter is transferred to the 
  *       caller, and must be released with the @ref
  *       chucho_release_file_compressor() function.
  * 

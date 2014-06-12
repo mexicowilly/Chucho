@@ -35,7 +35,7 @@ extern "C"
 /**
  * Create a duplicate message filter.
  *  
- * @post Ownership of the flt paramters is transferred to the 
+ * @post Ownership of the flt paramter is transferred to the 
  *       caller it must be released using the @ref
  *       chucho_release_filter() function.
  * 

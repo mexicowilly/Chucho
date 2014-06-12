@@ -64,10 +64,10 @@ typedef enum
  *         failure
  */
 CHUCHO_EXPORT chucho_rc chucho_create_file_writer(chucho_writer** wrt,
-                                            chucho_formatter* fmt,
-                                            const char* const file_name,
-                                            chucho_on_start on_start,
-                                            int flush);
+                                                  chucho_formatter* fmt,
+                                                  const char* const file_name,
+                                                  chucho_on_start on_start,
+                                                  int flush);
 //@}
 /**
  * Return the name of the file.

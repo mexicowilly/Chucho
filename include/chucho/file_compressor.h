@@ -40,7 +40,7 @@ typedef struct chucho_file_compressor chucho_file_compressor;
 /**
  * Release a file compressor. 
  *  
- * @post Ownership of the cmp paramters is transferred to the 
+ * @post Ownership of the cmp paramter is transferred to the 
  *       callee.
  * 
  * @param[in] cmp the file compressor

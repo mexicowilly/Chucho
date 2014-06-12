@@ -40,14 +40,14 @@ extern "C"
 /**
  * Create a rolling file writer.
  * 
- * @post Ownership of the wrt parameters if transferred to the 
+ * @post Ownership of the wrt parameter if transferred to the 
  *       caller, and it must be released with the @ref
  *       chucho_release_writer() function.
- * @post Ownership of the fmt parameters is transferred to the 
+ * @post Ownership of the fmt parameter is transferred to the 
  *       callee.
- * @post Ownership of the rlr parameters is transferred to the 
+ * @post Ownership of the rlr parameter is transferred to the 
  *       callee.
- * @post Ownership of the trg parameters is transferred to the 
+ * @post Ownership of the trg parameter is transferred to the 
  *       callee.
  *  
  * @note The trg parameter can be NULL if the given file roller 

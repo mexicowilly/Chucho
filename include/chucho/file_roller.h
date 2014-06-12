@@ -41,7 +41,7 @@ typedef struct chucho_file_roller chucho_file_roller;
  * Release a file roller that was created by one of the file 
  * roller creation functions. 
  * 
- * @post Ownership of the rlr parameters is transferred to the 
+ * @post Ownership of the rlr parameter is transferred to the 
  *       callee.
  * 
  * @param[in] rlr the roller to release

@@ -41,7 +41,7 @@ typedef struct chucho_file_roll_trigger chucho_file_roll_trigger;
  * Release a file roll trigger that was created by one of the 
  * trigger creation functions. 
  * 
- * @post Ownership of the trg parameters is transferred to the 
+ * @post Ownership of the trg parameter is transferred to the 
  *       callee.
  * 
  * @param trg the file roll trigger

@@ -386,6 +386,7 @@ IF(C_API)
         c_size_file_roll_trigger.cpp
         c_sliding_numbered_file_roller.cpp
         c_status_manager.cpp
+        c_syslog_constants.cpp
         c_syslog_writer.cpp
         c_time_file_roller.cpp
         c_util.cpp

@@ -43,7 +43,7 @@ extern "C"
  *       caller, and it must be released with the @ref
  *       chucho_release_file_roller() function.
  * @post Ownership of the cmp parameter is transferred to the 
- *       callee, if it is not NULL.
+ *       callee.
  * 
  * @param[out] rlr the numbered file roller to create
  * @param[in] min_index the minimum index at which to start 

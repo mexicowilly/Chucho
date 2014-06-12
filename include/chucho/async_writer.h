@@ -44,11 +44,9 @@ extern size_t CHUCHO_DEFAULT_ASYNC_QUEUE_CAPACITY;
 /**
  * Create an asynchronous writer.
  *  
- * @note The asynchronous writer must be releaed with the @ref 
- *       chucho_release_writer() function.
- *  
  * @post Ownership of the wrt parameter is transferred to the 
- *       callee.
+ *       callee and must be released with the @ref
+ *       chucho_release_writer() function.
  * 
  * @param[out] async the writer to create
  * @param[in] wrt the underlying writer
@@ -76,9 +74,6 @@ CHUCHO_EXPORT chucho_rc chucho_create_async_writer(chucho_writer** async,
  * be thrown away. This can be disabled with the level returned 
  * by @ref chucho_off_level(). 
  * 
- * @pre The wrt parameter must have been created with the @ref 
- *      chucho_create_async_writer() function.
- * 
  * @param[in] wrt the asynchronous writer 
  * @param[out] lvl the level 
  * @return a value from @ref return_code.h indicating success or
@@ -88,9 +83,6 @@ CHUCHO_EXPORT chucho_rc chucho_aswrt_get_discard_threshold(const chucho_writer* 
 /**
  * Return whether this writer should flush any cached events at 
  * destruction time. 
- * 
- * @pre The wrt parameter must have been created with the @ref 
- *      chucho_create_async_writer() function.
  * 
  * @param[in] wrt the asynchronous writer 
  * @param[out] flsh whether the writer flushes cached events at 
@@ -102,9 +94,6 @@ CHUCHO_EXPORT chucho_rc chucho_aswrt_get_flush_on_destruct(const chucho_writer* 
 /**
  * Return the capacity of the blocking queue.
  * 
- * @pre The wrt parameter must have been created with the @ref 
- *      chucho_create_async_writer() function.
- * 
  * @param[in] wrt the asynchronous writer
  * @param[out] cap the capacity of the queue
  * @return a value from @ref return_code.h indicating success or
@@ -113,9 +102,6 @@ CHUCHO_EXPORT chucho_rc chucho_aswrt_get_flush_on_destruct(const chucho_writer* 
 CHUCHO_EXPORT chucho_rc chucho_aswrt_get_queue_capacity(const chucho_writer* wrt, size_t* cap);
 /**
  * Return the current size of the blocking queue.
- * 
- * @pre The wrt parameter must have been created with the @ref 
- *      chucho_create_async_writer() function.
  * 
  * @param[in] wrt the asynchronous writer
  * @param[out] sz the size of the queue
@@ -126,9 +112,6 @@ CHUCHO_EXPORT chucho_rc chucho_aswrt_get_queue_size(const chucho_writer* wrt, si
 /**
  * Return the underlying slow writer.
  *  
- * @pre The async parameter must have been created with the @ref
- *      chucho_create_async_writer() function.
- * 
  * @post Ownership of the wrt parameter is transferred to the 
  *       caller and must be released with the @ref
  *       chucho_release_writer() function.

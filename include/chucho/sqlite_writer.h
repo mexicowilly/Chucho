@@ -36,6 +36,13 @@ extern "C"
 /**
  * Create a SQLite writer.
  * 
+ * @post Ownership of the wrt parameter is transferred to the 
+ *       caller, and must be released with the @ref
+ *       chucho_release_writer() function.
+ *  
+ * @post Ownership of the fmt parameter is transferred to the 
+ *       callee.
+ * 
  * @param[out] wrt the writer to create
  * @param[in] fmt the formatter
  * @param[in] file_name the name of the file in which the 

@@ -34,7 +34,7 @@ extern "C"
 /**
  * Create a pattern formatter.
  * 
- * @post Ownership of the fmt paramters is transferred to the 
+ * @post Ownership of the fmt paramter is transferred to the 
  *       caller, and it must be released with the @ref
  *       chucho_release_formatter() function.
  * 

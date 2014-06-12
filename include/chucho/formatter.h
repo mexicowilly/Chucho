@@ -40,7 +40,7 @@ typedef struct chucho_formatter chucho_formatter;
 /**
  * Release a formatter.
  *  
- * @post Ownership of the fmt parameters is transferred to the 
+ * @post Ownership of the fmt parameter is transferred to the 
  *       callee.
  *
  * @param fmt the formatter
