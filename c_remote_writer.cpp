@@ -36,6 +36,10 @@ chucho_rc chucho_create_remote_writer(chucho_writer** wrt,
         *wrt = new chucho_writer;
         (*wrt)->writer_ = std::make_shared<chucho::remote_writer>(host, port, unsent_cache_max);
     }
+    catch (std::invalid_argument&) 
+    {
+        return CHUCHO_INVALID_ARGUMENT;
+    }
     catch (...) 
     {
         return CHUCHO_OUT_OF_MEMORY;

@@ -24,9 +24,9 @@ extern "C"
 {
 
 chucho_rc chucho_create_time_file_roller(chucho_file_roller** rlr,
-                                   const char* const file_name_pattern,
-                                   size_t max_history,
-                                   chucho_file_compressor* cmp)
+                                         const char* const file_name_pattern,
+                                         size_t max_history,
+                                         chucho_file_compressor* cmp)
 {
     if (rlr == nullptr || file_name_pattern == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -40,6 +40,10 @@ chucho_rc chucho_create_time_file_roller(chucho_file_roller** rlr,
                                                                   max_history,
                                                                   cpp_cmp);
         chucho_release_file_compressor(cmp);
+    }
+    catch (std::invalid_argument&) 
+    {
+        return CHUCHO_INVALID_ARGUMENT;
     }
     catch (...) 
     {
