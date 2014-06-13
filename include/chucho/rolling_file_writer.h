@@ -35,8 +35,8 @@ extern "C"
 
 /**
  * @name Creation
+ * @{
  */
-//@{
 /**
  * Create a rolling file writer.
  * 
@@ -79,7 +79,7 @@ CHUCHO_EXPORT chucho_rc chucho_create_rolling_file_writer(chucho_writer** wrt,
                                                           const char* const name,
                                                           chucho_on_start on_start,
                                                           int flush);
-//@}
+/** @} */
 /**
  * Return the file roller associated with a rolling file writer.
  * 

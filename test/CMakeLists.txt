@@ -134,6 +134,12 @@ ENDIF()
 ADD_CUSTOM_TARGET(check
                   COMMAND unit-test)
 
+IF(CHUCHO_WINDOWS)
+    FILE(TO_NATIVE_PATH "${CMAKE_BINARY_DIR}" CHUCHO_EVENT_LOG_DLL)
+    SET(CHUCHO_EVENT_LOG_DLL "${CHUCHO_EVENT_LOG_DLL}\\event_log.dll")
+    STRING(REPLACE "\\" "\\\\" CHUCHO_EVENT_LOG_DLL "${CHUCHO_EVENT_LOG_DLL}")
+ENDIF()
+
 IF(C_API)
     IF(CHUCHO_HAVE_ZLIB OR CHUCHO_HAVE_BZIP2 OR CHUCHO_HAVE_MINIZIP)
         SET(CHUCHO_TEST_COMPRESSION_C_SOURCES
@@ -157,6 +163,20 @@ IF(C_API)
         LIST(APPEND CHUCHO_DB_C_SOURCES
              sqlite_writer_test.c
              sqlite_writer_test.h)
+    ENDIF()
+
+    IF(CHUCHO_WINDOWS)
+        SET_SOURCE_FILES_PROPERTIES(windows_event_log_writer_test.c PROPERTIES
+                                    COMPILE_DEFINITIONS CHUCHO_EVENT_LOG_DLL="${CHUCHO_EVENT_LOG_DLL}")
+        IF(MSVC)
+            SET_SOURCE_FILES_PROPERTIES(log_macro_test.c PROPERTIES
+                                        COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
+            SET_SOURCE_FILES_PROPERTIES(test_util.c PROPERTIES
+                                        COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
+        ENDIF()
+        SET(CHUCHO_PLATFORM_C_SOURCES
+            windows_event_log_writer_test.c
+            windows_event_log_writer_test.h)
     ENDIF()
 
     ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
@@ -208,7 +228,8 @@ IF(C_API)
                    writer_test.c
                    writer_test.h
                    ${CHUCHO_TEST_COMPRESSION_C_SOURCES}
-                   ${CHUCHO_DB_C_SOURCES})
+                   ${CHUCHO_DB_C_SOURCES}
+                   ${CHUCHO_PLATFORM_C_SOURCES})
     TARGET_LINK_LIBRARIES(c-unit-test chucho ${CHUCHO_THREAD_LIB})
 
     IF(CHUCHO_HAVE_ORACLE)
@@ -258,10 +279,7 @@ IF(CHUCHO_WINDOWS)
     ADD_EXECUTABLE(windows-event-log-writer-test EXCLUDE_FROM_ALL
                    harness.cpp
                    windows_event_log_writer_test.cpp)
-    FILE(TO_NATIVE_PATH "${CMAKE_BINARY_DIR}" CHUCHO_EVENT_LOG_DLL)
-    SET(CHUCHO_EVENT_LOG_DLL "${CHUCHO_EVENT_LOG_DLL}\\event_log.dll")
-    STRING(REPLACE "\\" "\\\\" CHUCHO_EVENT_LOG_DLL "${CHUCHO_EVENT_LOG_DLL}")
-    SET_SOURCE_FILES_PROPERTIES(windows_event_log_writer_test PROPERTIES
+    SET_SOURCE_FILES_PROPERTIES(windows_event_log_writer_test.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_EVENT_LOG_DLL="${CHUCHO_EVENT_LOG_DLL}")
     TARGET_LINK_LIBRARIES(windows-event-log-writer-test chucho gtest ${CHUCHO_THREAD_LIB})
 ENDIF()

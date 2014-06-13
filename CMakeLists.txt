@@ -186,6 +186,10 @@ SET(CHUCHO_C_HEADERS
     include/chucho/syslog_writer.h
     include/chucho/time_file_roller.h
     include/chucho/writer.h)
+IF(CHUCHO_WINDOWS)
+    LIST(APPEND CHUCHO_C_HEADERS
+         include/chucho/windows_event_log_writer.h)
+ENDIF()
 IF(C_API)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS ${CHUCHO_C_HEADERS})
 ENDIF()
@@ -400,6 +404,10 @@ IF(C_API)
         include/chucho/c_logger.hpp
         include/chucho/c_util.hpp
         include/chucho/c_writer.hpp)
+    IF(CHUCHO_WINDOWS)
+        LIST(APPEND CHUCHO_C_SOURCES
+             platform/windows/c_windows_event_log_writer.cpp)
+    ENDIF()
 ENDIF()
 
 IF(MSVC)

@@ -22,7 +22,7 @@
  * Creation of SQLite writers. 
  * @copydoc chucho::sqlite_writer
  *  
- * @ingroup c_writers 
+ * @ingroup c_writers c_database
  */
 
 #include <chucho/writer.h>

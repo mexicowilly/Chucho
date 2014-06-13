@@ -22,6 +22,9 @@
 #include <chucho/status_manager.hpp>
 #include <fstream>
 #include <thread>
+#if defined(CHUCHO_WINDOWS)
+#include <windows.h>
+#endif
 
 namespace
 {
@@ -69,6 +72,21 @@ void make_writeable(const std::string& file_name)
 }
 
 #elif defined(CHUCHO_WINDOWS)
+
+void make_unwriteable(const std::string& file_name)
+{
+    ASSERT_EQ(TRUE,
+        SetFileAttributesA(file_name.c_str(),
+                           GetFileAttributesA(file_name.c_str()) | FILE_ATTRIBUTE_READONLY));
+}
+
+void make_writeable(const std::string& file_name)
+{
+    ASSERT_EQ(TRUE,
+        SetFileAttributesA(file_name.c_str(),
+                           GetFileAttributesA(file_name.c_str()) & ~FILE_ATTRIBUTE_READONLY));
+}
+
 #endif
 
 }
@@ -150,6 +168,8 @@ TEST_F(file_writer_test, writeable_non_writeable)
     EXPECT_GT(chucho::file::size(file_name_), sz);
 }
 
+#if defined(CHUCHO_POSIX)
+
 TEST_F(file_writer_test, writeable_removed)
 {
     auto w = get_writer();
@@ -163,3 +183,5 @@ TEST_F(file_writer_test, writeable_removed)
     w->write(evt);
     EXPECT_EQ(sz, chucho::file::size(file_name_));
 }
+
+#endif
