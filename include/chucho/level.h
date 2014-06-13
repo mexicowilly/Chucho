@@ -68,8 +68,8 @@ CHUCHO_EXPORT chucho_rc chucho_add_level(const chucho_level** lvl,
 CHUCHO_EXPORT chucho_rc chucho_get_level(const chucho_level** lvl, const char* const name);
 /**
  * @name Built-in Levels
+ * @{
  */
-//@{
 /**
  * Return the trace level. Trace has a level of 0.
  * 
@@ -113,7 +113,7 @@ CHUCHO_EXPORT const chucho_level* chucho_fatal_level(void);
  * @return the off level
  */
 CHUCHO_EXPORT const chucho_level* chucho_off_level(void);
-//@}
+/** @} */
 /**
  * Return the name of a level.
  * 

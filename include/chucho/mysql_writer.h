@@ -40,6 +40,10 @@ extern "C"
 extern unsigned CHUCHO_DEFAULT_MYSQL_PORT;
 
 /**
+ * @name Creation 
+ * @{ 
+ */
+/**
  * Create a MySQL writer.
  * 
  * @post Ownership of the wrt parameter is transferred to the 
@@ -75,6 +79,7 @@ CHUCHO_EXPORT chucho_rc chucho_create_mysql_writer(chucho_writer** wrt,
                                                    size_t capacity,
                                                    const chucho_level* discard_threshold,
                                                    int flush_on_destruct);
+/** @}  */
 
 /**
  * Return the async writer that underlies this writer. The 

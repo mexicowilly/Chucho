@@ -33,8 +33,8 @@ extern "C"
 
 /**
  * @name Creation
+ * @{
  */
-//@{
 /**
  * Create a sliding numbered file roller.
  * 
@@ -56,7 +56,7 @@ CHUCHO_EXPORT chucho_rc chucho_create_sliding_numbered_file_roller(chucho_file_r
                                                                    int min_index,
                                                                    size_t max_count,
                                                                    chucho_file_compressor* cmp);
-//@}
+/** @}  */
 /**
  * Return the index of the file that is current being written.
  * 

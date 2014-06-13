@@ -53,6 +53,8 @@ extern "C"
  * @param[in] source the name of the event source
  * @param[in] host the name of the host to which to connect,
  *            which can be NULL to connect to the local host
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
  */
 CHUCHO_EXPORT chucho_rc chucho_create_windows_event_log_writer(chucho_writer** wrt,
                                                                chucho_formatter* fmt,
@@ -61,8 +63,34 @@ CHUCHO_EXPORT chucho_rc chucho_create_windows_event_log_writer(chucho_writer** w
                                                                const char* const host);
 /** @} */
 
+/**
+ * Return the name of the host.
+ * 
+ * @param[in] wrt the Windows event log writer
+ * @param[out] host the name of the host to which the writer is 
+ *       connected, or NULL if it is the local host
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_welwrt_get_host(const chucho_writer* wrt, const char** host);
+/**
+ * Return the name of the log.
+ * 
+ * @param[in] wrt the Windows event log writer
+ * @param[out] log the name of the log to which the writer is 
+ *       writing
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_welwrt_get_log(const chucho_writer* wrt, const char** log);
+/**
+ * Return the name of the event source.
+ * 
+ * @param[in] wrt the Windows event log writer
+ * @param[out] log the name of the event source
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_welwrt_get_source(const chucho_writer* wrt, const char** source);
 
 #if defined(__cplusplus)

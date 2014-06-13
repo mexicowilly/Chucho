@@ -34,6 +34,10 @@ extern "C"
 #endif
 
 /**
+ * @name Creation 
+ * @{ 
+ */
+/**
  * Create an Oracle writer.
  * 
  * @post Ownership of the wrt parameter is transferred to the 
@@ -57,6 +61,7 @@ CHUCHO_EXPORT chucho_rc chucho_create_oracle_writer(chucho_writer** wrt,
                                                     const char* const user,
                                                     const char* const password,
                                                     const char* const database);
+/** @}  */
 
 /**
  * Return the name of the database.

@@ -42,8 +42,8 @@ typedef struct chucho_logger chucho_logger;
 
 /**
  * @name Creation and Release
+ * @{
  */
-//@{
 /**
  * Create a logger with the given name.
  * 
@@ -68,7 +68,7 @@ CHUCHO_EXPORT chucho_rc chucho_create_logger(chucho_logger** lgr, const char* co
  *         failure
  */
 CHUCHO_EXPORT chucho_rc chucho_release_logger(chucho_logger* lgr);
-//@}
+/** @}  */
 /**
  * @copydoc chucho::logger::remove_unused_loggers
  *

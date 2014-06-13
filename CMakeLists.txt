@@ -189,7 +189,11 @@ SET(CHUCHO_C_HEADERS
 IF(CHUCHO_WINDOWS)
     LIST(APPEND CHUCHO_C_HEADERS
          include/chucho/windows_event_log_writer.h)
+ELSE()
+    LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+         include/chucho/windows_event_log_writer.h)
 ENDIF()
+
 IF(C_API)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS ${CHUCHO_C_HEADERS})
 ENDIF()

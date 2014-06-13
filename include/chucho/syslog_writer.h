@@ -35,8 +35,8 @@ extern "C"
 
 /**
  * @name Creation
+ * @{
  */
-//@{
 /**
  * Create a syslog writer that writes to the local host.
  * 
@@ -77,7 +77,7 @@ CHUCHO_EXPORT chucho_rc chucho_create_remote_syslog_writer(chucho_writer** wrt,
                                                            chucho_syslog_facility fcl,
                                                            const char* const host,
                                                            unsigned port);
-//@}
+/** @}  */
 /**
  * Return the facility of a syslog writer.
  * 

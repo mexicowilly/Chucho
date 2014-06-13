@@ -35,8 +35,8 @@ extern "C"
 
 /**
  * @name Creation
+ * @{
  */
-//@{
 /**
  * Create a level threshold filter.
  * 
@@ -51,7 +51,7 @@ extern "C"
  */
 CHUCHO_EXPORT chucho_rc chucho_create_level_threshold_filter(chucho_filter** flt,
                                                              const chucho_level* lvl);
-//@}
+/** @} */
 /**
  * Return the level associated with a level threshold filter.
  * 

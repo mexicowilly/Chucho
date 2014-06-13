@@ -34,6 +34,10 @@ extern "C"
 #endif
 
 /**
+ * @name Creation 
+ * @{ 
+ */
+/**
  * Create a SQLite writer.
  * 
  * @post Ownership of the wrt parameter is transferred to the 
@@ -53,6 +57,7 @@ extern "C"
 CHUCHO_EXPORT chucho_rc chucho_create_sqlite_writer(chucho_writer** wrt,
                                                     chucho_formatter* fmt,
                                                     const char* const file_name);
+/** @}  */
 
 /**
  * Return the file name in which the SQLite database is stored.

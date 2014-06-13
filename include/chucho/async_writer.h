@@ -38,9 +38,9 @@ extern "C"
 extern size_t CHUCHO_DEFAULT_ASYNC_QUEUE_CAPACITY;
 
 /**
- * @name Creation
+ * @name Creation 
+ * @{ 
  */
-//@{
 /**
  * Create an asynchronous writer.
  *  
@@ -65,7 +65,7 @@ CHUCHO_EXPORT chucho_rc chucho_create_async_writer(chucho_writer** async,
                                                    size_t capacity,
                                                    const chucho_level* discard_threshold,
                                                    int flush_on_destruct);
-//@}
+/** @} */
 
 /**
  * Return the level at which events are discarded. Once the 

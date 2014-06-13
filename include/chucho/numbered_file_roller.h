@@ -34,8 +34,8 @@ extern "C"
 
 /**
  * @name Creation
+ * @{
  */
-//@{
 /**
  * Create a numbered file roller.
  * 
@@ -59,7 +59,7 @@ CHUCHO_EXPORT chucho_rc chucho_create_numbered_file_roller(chucho_file_roller** 
                                                            int min_index,
                                                            int max_index,
                                                            chucho_file_compressor* cmp);
-//@}
+/** @} */
 /**
  * Return the maximum index at which rolling stops.
  * 

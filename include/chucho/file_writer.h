@@ -42,8 +42,8 @@ typedef enum
 
 /**
  * @name Creation
+ * @{
  */
-//@{
 /**
  * Create a file writer.
  * 
@@ -68,7 +68,8 @@ CHUCHO_EXPORT chucho_rc chucho_create_file_writer(chucho_writer** wrt,
                                                   const char* const file_name,
                                                   chucho_on_start on_start,
                                                   int flush);
-//@}
+/** @} */
+
 /**
  * Return the name of the file.
  * 

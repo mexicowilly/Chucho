@@ -38,6 +38,10 @@ extern "C"
 typedef struct chucho_file_roller chucho_file_roller;
 
 /**
+ * @name Release 
+ * @{ 
+ */
+/**
  * Release a file roller that was created by one of the file 
  * roller creation functions. 
  * 
@@ -49,6 +53,7 @@ typedef struct chucho_file_roller chucho_file_roller;
  *         failure
  */
 CHUCHO_EXPORT chucho_rc chucho_release_file_roller(chucho_file_roller* rlr);
+/** @}  */
 /**
  * Return this roller's currently active file name. This is the 
  * name of the file to which the writer is currently writing. 

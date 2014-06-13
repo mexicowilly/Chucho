@@ -33,8 +33,8 @@ extern "C"
 
 /**
  * @name Creation
+ * @{
  */
-//@{
 /**
  * Create a time file roller.
  * 
@@ -58,7 +58,7 @@ CHUCHO_EXPORT chucho_rc chucho_create_time_file_roller(chucho_file_roller** rlr,
                                                        const char* const file_name_pattern,
                                                        size_t max_history,
                                                        chucho_file_compressor* cmp);
-//@}
+/** @} */
 /**
  * Return the file name pattern in use by this roller.
  * 

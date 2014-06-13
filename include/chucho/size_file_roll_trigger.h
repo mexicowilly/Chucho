@@ -34,8 +34,8 @@ extern "C"
 
 /**
  * @name Creation
+ * @{
  */
-//@{
 /**
  * Create a size file roll trigger.
  * 
@@ -50,7 +50,7 @@ extern "C"
  */
 CHUCHO_EXPORT chucho_rc chucho_create_size_file_roll_trigger(chucho_file_roll_trigger** trg,
                                                              off_t max_size);
-//@}
+/** @} */
 /**
  * Return the size at which files will roll.
  * 

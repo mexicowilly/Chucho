@@ -35,8 +35,8 @@ extern "C"
 
 /**
  * @name Creation
+ * @{
  */
-//@{
 /**
  * Create a level filter.
  * 
@@ -57,7 +57,7 @@ CHUCHO_EXPORT chucho_rc chucho_create_level_filter(chucho_filter** flt,
                                                    const chucho_level* lvl,
                                                    chucho_filter_result on_match,
                                                    chucho_filter_result on_mismatch);
-//@}
+/** @} */
 /**
  * Return the level associated with a level filter.
  * 
