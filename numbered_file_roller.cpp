@@ -47,7 +47,7 @@ numbered_file_roller::numbered_file_roller(int min_index, int max_index, std::sh
 
 std::string numbered_file_roller::get_active_file_name()
 {
-    return file_writer_->get_file_name();
+    return file_writer_ == nullptr ? "" : file_writer_->get_file_name();
 }
 
 std::string numbered_file_roller::get_name(int number, bool with_compression_ext) const
@@ -68,8 +68,6 @@ void numbered_file_roller::roll()
         std::string to_name;
         for (int i = max_index_; i > min_index_; i--)
         {
-            bool from_compressed = is_compressed(i - 1);
-            bool to_compressed = is_compressed(i);
             from_name = get_name(i - 1);
             if (file::exists(from_name))
             {

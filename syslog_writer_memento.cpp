@@ -29,7 +29,7 @@ syslog_writer_memento::syslog_writer_memento(const configurator& cfg)
     set_handler("facility", std::bind(&syslog_writer_memento::set_facility, this, std::placeholders::_1));
     set_handler("host_name", [this] (const std::string& name) { host_name_ = name; });
     set_alias("host_name", "host");
-    set_handler("port", [this] (const std::string& port) { port_ = static_cast<std::uint16_t>(stoul(port)); });
+    set_handler("port", [this] (const std::string& port) { port_ = static_cast<std::uint16_t>(std::stoul(port)); });
 }
 
 void syslog_writer_memento::set_facility(const std::string& name)

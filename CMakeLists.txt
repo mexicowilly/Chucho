@@ -17,7 +17,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.10)
 PROJECT(chucho CXX C)
 
-SET(CHUCHO_VERSION 1.4)
+SET(CHUCHO_VERSION 1.5)
 SET(CHUCHO_SO_VERSION 1)
 # This is used for release candidate distros
 #SET(CHUCHO_DIST_VERSION try-1)
@@ -26,7 +26,11 @@ INCLUDE(Configure.cmake)
 
 # Include CMAKE_BINARY_DIR because that's where the generated file
 # export.hpp lives.
-INCLUDE_DIRECTORIES(include embedded/include "${CMAKE_BINARY_DIR}")
+INCLUDE_DIRECTORIES(include
+                    embedded/include
+                    "${CMAKE_BINARY_DIR}"
+                    ${ORACLE_INCLUDE_DIR}
+                    ${MYSQL_INCLUDE_DIR})
 
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
@@ -39,7 +43,8 @@ IF(CHUCHO_POSIX)
         platform/posix/pattern_formatter_posix.cpp
         platform/posix/socket_connector_posix.cpp
         platform/posix/socket_exception_posix.cpp
-        platform/posix/syslog_writer_posix.cpp)
+        platform/posix/syslog_writer_posix.cpp
+        platform/posix/text_util_posix.cpp)
 
     IF(CHUCHO_HAVE_GMTIME_R)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/calendar_posix.cpp PROPERTIES
@@ -77,6 +82,7 @@ ELSEIF(CHUCHO_WINDOWS)
         platform/windows/socket_connector_windows.cpp
         platform/windows/socket_exception_windows.cpp
         platform/windows/syslog_writer_windows.cpp
+        platform/windows/text_util_windows.cpp
         platform/windows/windows_event_log_writer.cpp
         platform/windows/windows_event_log_writer_factory.cpp
         include/chucho/windows_event_log_writer_factory.hpp
@@ -97,6 +103,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/configurator.hpp
     include/chucho/console_writer.hpp
     include/chucho/cout_writer.hpp
+    include/chucho/database_writer.hpp
     include/chucho/diagnostic_context.hpp
     include/chucho/duplicate_message_filter.hpp
     include/chucho/event.hpp
@@ -144,22 +151,149 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/writer_memento.hpp
     include/chucho/yaml_formatter.hpp)
 
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS ${CHUCHO_PUBLIC_HEADERS})
+
+SET(CHUCHO_C_HEADERS
+    include/chucho/async_writer.h
+    include/chucho/cerr_writer.h
+    include/chucho/cout_writer.h
+    include/chucho/configuration.h
+    include/chucho/diagnostic_context.h
+    include/chucho/duplicate_message_filter.h
+    "${CMAKE_BINARY_DIR}/chucho/export.h"
+    include/chucho/file_compressor.h
+    include/chucho/file_roll_trigger.h
+    include/chucho/file_roller.h
+    include/chucho/file_writer.h
+    include/chucho/filter.h
+    include/chucho/finalize.h
+    include/chucho/formatter.h
+    include/chucho/level.h
+    include/chucho/level_filter.h
+    include/chucho/level_threshold_filter.h
+    include/chucho/log.h
+    include/chucho/logger.h
+    include/chucho/numbered_file_roller.h
+    include/chucho/pattern_formatter.h
+    include/chucho/remote_writer.h
+    include/chucho/return_code.h
+    include/chucho/rolling_file_writer.h
+    include/chucho/size_file_roll_trigger.h
+    include/chucho/sliding_numbered_file_roller.h
+    include/chucho/status.h
+    include/chucho/status_manager.h
+    include/chucho/syslog_constants.h
+    include/chucho/syslog_writer.h
+    include/chucho/time_file_roller.h
+    include/chucho/writer.h)
+IF(CHUCHO_WINDOWS)
+    LIST(APPEND CHUCHO_C_HEADERS
+         include/chucho/windows_event_log_writer.h)
+ELSE()
+    LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+         include/chucho/windows_event_log_writer.h)
+ENDIF()
+
+IF(C_API)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS ${CHUCHO_C_HEADERS})
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS ${CHUCHO_C_HEADERS})
+
 IF(CHUCHO_WINDOWS)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
          include/chucho/windows_event_log_writer.hpp)
 ENDIF()
 
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/windows_event_log_writer.hpp)
+
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.h)
+    ENDIF()
 ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/gzip_file_compressor.hpp
+     include/chucho/gzip_file_compressor.h)
 
 IF(CHUCHO_HAVE_BZIP2)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/bzip2_file_compressor.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/bzip2_file_compressor.h)
+    ENDIF()
 ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/bzip2_file_compressor.hpp
+     include/chucho/bzip2_file_compressor.h)
 
 IF(CHUCHO_HAVE_MINIZIP)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/zip_file_compressor.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/zip_file_compressor.h)
+    ENDIF()
 ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/zip_file_compressor.hpp
+     include/chucho/zip_file_compressor.h)
+
+IF(CHUCHO_HAVE_ORACLE)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/oracle_writer.hpp)
+    LIST(APPEND CHUCHO_DATABASE_SOURCES
+         oracle_writer.cpp
+         oracle_writer_factory.cpp
+         oracle_writer_memento.cpp
+         include/chucho/oracle_writer_factory.hpp
+         include/chucho/oracle_writer_memento.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/oracle_writer.h)
+        LIST(APPEND CHUCHO_DATABASE_SOURCES c_oracle_writer.cpp)
+    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/oracle_writer.hpp
+     include/chucho/oracle_writer.h)
+
+IF(CHUCHO_HAVE_MYSQL)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/mysql_writer.hpp)
+    LIST(APPEND CHUCHO_DATABASE_SOURCES
+         mysql_writer.cpp
+         mysql_writer_factory.cpp
+         mysql_writer_memento.cpp
+         include/chucho/mysql_writer_factory.hpp
+         include/chucho/mysql_writer_memento.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/mysql_writer.h)
+        LIST(APPEND CHUCHO_DATABASE_SOURCES c_mysql_writer.cpp)
+    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/mysql_writer.hpp
+     include/chucho/mysql_writer.h)
+
+IF(CHUCHO_HAVE_SQLITE)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/sqlite_writer.hpp)
+    LIST(APPEND CHUCHO_DATABASE_SOURCES
+         sqlite_writer.cpp
+         sqlite_writer_factory.cpp
+         sqlite_writer_memento.cpp
+         include/chucho/sqlite_writer_factory.hpp
+         include/chucho/sqlite_writer_memento.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/sqlite_writer.h)
+        LIST(APPEND CHUCHO_DATABASE_SOURCES c_sqlite_writer.cpp)
+    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/sqlite_writer.hpp
+     include/chucho/sqlite_writer.h)
 
 # The libyaml sources are required by chuchod
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
@@ -187,6 +321,9 @@ MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
         # Microsoft doesn't want libyaml to use strdup
         SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
                                     COMPILE_FLAGS /wd4996)
+    ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
+        SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
+                                    COMPILE_FLAGS "-Wno-implicit-function-declaration -Wno-int-to-pointer-cast")
     ENDIF()
 ENDMACRO()
 
@@ -229,6 +366,61 @@ IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
                                 COMPILE_DEFINITIONS CHUCHO_CONFIG_FILE_CONFIG)
 ENDIF()
 
+IF(C_API)
+    SET(CHUCHO_C_SOURCES
+        c_async_writer.cpp
+        c_cerr_writer.cpp
+        c_cout_writer.cpp
+        c_configuration.cpp
+        c_diagnostic_context.cpp
+        c_duplicate_message_filter.cpp
+        c_file_compressor.cpp
+        c_file_roll_trigger.cpp
+        c_file_roller.cpp
+        c_file_writer.cpp
+        c_filter.cpp
+        c_finalize.cpp
+        c_formatter.cpp
+        c_level.cpp
+        c_level_filter.cpp
+        c_level_threshold_filter.cpp
+        c_log.cpp
+        c_logger.cpp
+        c_numbered_file_roller.cpp
+        c_pattern_formatter.cpp
+        c_remote_writer.cpp
+        c_return_code.cpp
+        c_rolling_file_writer.cpp
+        c_size_file_roll_trigger.cpp
+        c_sliding_numbered_file_roller.cpp
+        c_status_manager.cpp
+        c_syslog_constants.cpp
+        c_syslog_writer.cpp
+        c_time_file_roller.cpp
+        c_util.cpp
+        c_writer.cpp
+        include/chucho/c_file_compressor.hpp
+        include/chucho/c_file_roll_trigger.hpp
+        include/chucho/c_file_roller.hpp
+        include/chucho/c_filter.hpp
+        include/chucho/c_formatter.hpp
+        include/chucho/c_level.hpp
+        include/chucho/c_logger.hpp
+        include/chucho/c_util.hpp
+        include/chucho/c_writer.hpp)
+    IF(CHUCHO_WINDOWS)
+        LIST(APPEND CHUCHO_C_SOURCES
+             platform/windows/c_windows_event_log_writer.cpp)
+    ENDIF()
+ENDIF()
+
+IF(MSVC)
+    SET_SOURCE_FILES_PROPERTIES(c_diagnostic_context.cpp PROPERTIES
+                                COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
+    SET_SOURCE_FILES_PROPERTIES(c_file_roller.cpp PROPERTIES
+                                COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
+ENDIF()
+
 SET(CHUCHO_SOURCES
     async_writer.cpp
     async_writer_factory.cpp
@@ -248,6 +440,7 @@ SET(CHUCHO_SOURCES
     cout_writer_factory.cpp
     cout_writer_memento.cpp
     demangle.cpp
+    database_writer.cpp
     diagnostic_context.cpp
     duplicate_message_filter.cpp
     duplicate_message_filter_factory.cpp
@@ -380,7 +573,9 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_CONFIGURATOR_SOURCES}
     ${CHUCHO_PLATFORM_SOURCES}
     ${CHUCHO_EMBEDDED_SOURCES}
-    ${CHUCHO_PUBLIC_HEADERS})
+    ${CHUCHO_PUBLIC_HEADERS}
+    ${CHUCHO_C_SOURCES}
+    ${CHUCHO_DATABASE_SOURCES})
 
 IF(CHUCHO_HAVE_PUT_TIME)
     SET_SOURCE_FILES_PROPERTIES(calendar.cpp PROPERTIES
@@ -388,8 +583,26 @@ IF(CHUCHO_HAVE_PUT_TIME)
 ENDIF()
 
 IF(CHUCHO_WINDOWS)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_WINDOWS)
     SET_SOURCE_FILES_PROPERTIES(configurator.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_WINDOWS)
+ENDIF()
+
+IF(CHUCHO_HAVE_MYSQL)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_MYSQL)
+ENDIF()
+
+IF(CHUCHO_HAVE_ORACLE)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ORACLE)
+ENDIF()
+
+IF(CHUCHO_HAVE_SQLITE)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_SQLITE)
+ENDIF()
+
+IF(DEFINED CHUCHO_CONFIGURATOR_DEFS)
+    SET_SOURCE_FILES_PROPERTIES(configurator.cpp PROPERTIES
+                                COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATOR_DEFS}")
 ENDIF()
 
 SET_SOURCE_FILES_PROPERTIES(yaml_configurator.cpp PROPERTIES
@@ -420,6 +633,13 @@ IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_SOURCES
          gzip_file_compressor.cpp
          ${CHUCHO_ZLIB_SOURCES})
+    IF(C_API)
+        LIST(APPEND CHUCHO_SOURCES c_gzip_file_compressor.cpp)
+    ENDIF()
+    IF(MSVC)
+        SET_SOURCE_FILES_PROPERTIES(gzip_file_compressor.cpp PROPERTIES
+                                    COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
+    ENDIF()
     SET_SOURCE_FILES_PROPERTIES(gzip_file_compressor_factory.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_HAVE_ZLIB)
     IF(ZLIB_SOURCE)
@@ -428,7 +648,7 @@ IF(CHUCHO_HAVE_ZLIB)
         INCLUDE_DIRECTORIES("${ZLIB_INCLUDE_DIR}")
     ENDIF()
     IF(CHUCHO_ZLIB_SOURCES)
-        IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+        IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_COMPILER_IS_GNUCXX)
             SET_SOURCE_FILES_PROPERTIES("${ZLIB_SOURCE}/gzlib.c"
                                         "${ZLIB_SOURCE}/gzread.c"
                                         "${ZLIB_SOURCE}/gzwrite.c"
@@ -448,6 +668,9 @@ IF(CHUCHO_HAVE_BZIP2)
     LIST(APPEND CHUCHO_SOURCES
          bzip2_file_compressor.cpp
          ${CHUCHO_BZIP2_SOURCES})
+    IF(C_API)
+        LIST(APPEND CHUCHO_SOURCES c_bzip2_file_compressor.cpp)
+    ENDIF()
     SET_SOURCE_FILES_PROPERTIES(bzip2_file_compressor_factory.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_HAVE_BZIP2)
     IF(BZIP2_SOURCE)
@@ -456,12 +679,15 @@ IF(CHUCHO_HAVE_BZIP2)
         INCLUDE_DIRECTORIES("${BZIP2_INCLUDE_DIR}")
     ENDIF()
     IF(MSVC)
-        SET_SOURCE_FILES_PROPERTIES(bzip2_file_compressor PROPERTIES
+        SET_SOURCE_FILES_PROPERTIES(bzip2_file_compressor.cpp PROPERTIES
                                     COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
         IF(CHUCHO_BZIP2_SOURCES)
             SET_SOURCE_FILES_PROPERTIES("${BZIP2_SOURCE}/bzlib.c" PROPERTIES
                                         COMPILE_FLAGS /wd4996)
         ENDIF()
+    ELSEIF(CMAKE_COMPILER_IS_GNUCXX AND CHUCHO_BZIP2_SOURCES)
+        SET_SOURCE_FILES_PROPERTIES("${BZIP2_SOURCE}/bzlib.c" PROPERTIES
+                                    COMPILE_FLAGS -Wno-implicit-function-declaration)
     ENDIF()
 ENDIF()
 
@@ -469,6 +695,9 @@ IF(CHUCHO_HAVE_MINIZIP)
     LIST(APPEND CHUCHO_SOURCES
          zip_file_compressor.cpp
          ${CHUCHO_MINIZIP_SOURCES})
+    IF(C_API)
+        LIST(APPEND CHUCHO_SOURCES c_zip_file_compressor.cpp)
+    ENDIF()
     SET_SOURCE_FILES_PROPERTIES(zip_file_compressor_factory.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_HAVE_MINIZIP)
     INCLUDE_DIRECTORIES("${MINIZIP_SOURCE}")
@@ -476,11 +705,15 @@ IF(CHUCHO_HAVE_MINIZIP)
         SET_SOURCE_FILES_PROPERTIES("${MINIZIP_SOURCE}/zip.c"
                                     PROPERTIES
                                     COMPILE_FLAGS "-Wno-parentheses-equality -Wno-incompatible-pointer-types")
-        IF(NOT CHUCHO_HAVE_FOPEN64)
-            SET_SOURCE_FILES_PROPERTIES(${CHUCHO_MINIZIP_SOURCES}
-                                        PROPERTIES
-                                        COMPILE_DEFINITIONS USE_FILE32API)
-        ENDIF()
+    ENDIF()
+    IF(CHUCHO_SOLARIS)
+        SET_SOURCE_FILES_PROPERTIES(${CHUCHO_MINIZIP_SOURCES}
+                                    PROPERTIES
+                                    COMPILE_DEFINITIONS "_LARGEFILE_SOURCE;_FILE_OFFSET_BITS=64")
+    ELSEIF(NOT CHUCHO_HAVE_FOPEN64)
+        SET_SOURCE_FILES_PROPERTIES(${CHUCHO_MINIZIP_SOURCES}
+                                    PROPERTIES
+                                    COMPILE_DEFINITIONS USE_FILE32API)
     ENDIF()
 ENDIF()
 
@@ -492,6 +725,9 @@ IF(ENABLE_SHARED)
                           SOVERSION ${CHUCHO_SO_VERSION}
                           PUBLIC_HEADER "${CHUCHO_PUBLIC_HEADERS}"
                           FRAMEWORK ${ENABLE_FRAMEWORK})
+    IF(CHUCHO_HAVE_ORACLE)
+        TARGET_LINK_LIBRARIES(chucho ${ORACLE_CLIENT_LIB})
+    ENDIF()
     IF(CMAKE_GENERATOR STREQUAL Xcode AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         SET_TARGET_PROPERTIES(chucho PROPERTIES
                               LINK_FLAGS "-std=c++11 -stdlib=libc++")
@@ -503,6 +739,7 @@ IF(ENABLE_SHARED)
     ENDIF()
     INSTALL(TARGETS chucho
             ARCHIVE DESTINATION lib
+            LIBRARY DESTINATION lib
             RUNTIME DESTINATION ${CHUCHO_RT_DEST}
             FRAMEWORK DESTINATION /Library/Frameworks
             PUBLIC_HEADER DESTINATION include/chucho)
@@ -549,9 +786,6 @@ ADD_SUBDIRECTORY(log-server)
 # Documentation
 IF(DOXYGEN_FOUND)
     SET(CHUCHO_DOXYGEN_INPUT main_page.hpp)
-    IF(NOT CHUCHO_WINDOWS)
-        SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} include/chucho/windows_event_log_writer.hpp")
-    ENDIF()
     IF(CHUCHO_DOCUMENT_ALL)
         FOREACH(HEAD ${CHUCHO_SOURCES})
             IF(HEAD MATCHES "^include/chucho/.+\\.hpp$")
@@ -564,7 +798,7 @@ IF(DOXYGEN_FOUND)
         ENDFOREACH()
         SET(CHUCHO_DOXYGEN_EXTRACT_ALL YES)
     ELSE()
-        FOREACH(HEAD ${CHUCHO_PUBLIC_HEADERS})
+        FOREACH(HEAD ${CHUCHO_DOCUMENTABLE_HEADERS})
             SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
         ENDFOREACH()
         SET(CHUCHO_DOXYGEN_EXTRACT_ALL NO)

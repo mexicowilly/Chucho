@@ -18,6 +18,7 @@
 #define CHUCHO_SYSLOG_CONSTANTS_HPP__
 
 #include <chucho/export.hpp>
+#include <chucho/syslog_constants.h>
 #include <cstdint>
 
 namespace chucho
@@ -42,26 +43,26 @@ CHUCHO_EXPORT extern const std::uint16_t DEFAULT_PORT;
  */
 enum class facility
 {
-    KERN        = 0 * 8, /**< Kernel messages */
-    USER        = 1 * 8, /**< User-level messages */
-    MAIL        = 2 * 8, /**< Mail system */
-    DAEMON      = 3 * 8, /**< System daemons */
-    AUTH        = 4 * 8, /**< Security/authorization messages */
-    SYSLOG      = 5 * 8, /**< Message generated interally by syslogd */
-    LPR         = 6 * 8, /**< Line printer subsystem */
-    NEWS        = 7 * 8, /**< Network news subsystem */
-    UUCP        = 8 * 8, /**< UUCP subsystem */
-    CRON        = 9 * 8, /**< Clock/scheduling daemon */
-    AUTHPRIV    = 10 * 8, /**< Security/authorization messages */
-    FTP         = 11 * 8, /**< FTP daemon */
-    LOCAL0      = 16 * 8, /**< Local use 0 */
-    LOCAL1      = 17 * 8, /**< Local use 1 */
-    LOCAL2      = 18 * 8, /**< Local use 2 */
-    LOCAL3      = 19 * 8, /**< Local use 3 */
-    LOCAL4      = 20 * 8, /**< Local use 4 */
-    LOCAL5      = 21 * 8, /**< Local use 5 */
-    LOCAL6      = 22 * 8, /**< Local use 6 */
-    LOCAL7      = 23 * 8 /**< Local use 7 */
+    KERN        = CHUCHO_SYSLOG_FACILITY_KERN, /**< Kernel messages */
+    USER        = CHUCHO_SYSLOG_FACILITY_USER, /**< User-level messages */
+    MAIL        = CHUCHO_SYSLOG_FACILITY_MAIL, /**< Mail system */
+    DAEMON      = CHUCHO_SYSLOG_FACILITY_DAEMON, /**< System daemons */
+    AUTH        = CHUCHO_SYSLOG_FACILITY_AUTH, /**< Security/authorization messages */
+    SYSLOG      = CHUCHO_SYSLOG_FACILITY_SYSLOG, /**< Message generated interally by syslogd */
+    LPR         = CHUCHO_SYSLOG_FACILITY_LPR, /**< Line printer subsystem */
+    NEWS        = CHUCHO_SYSLOG_FACILITY_NEWS, /**< Network news subsystem */
+    UUCP        = CHUCHO_SYSLOG_FACILITY_UUCP, /**< UUCP subsystem */
+    CRON        = CHUCHO_SYSLOG_FACILITY_CRON, /**< Clock/scheduling daemon */
+    AUTHPRIV    = CHUCHO_SYSLOG_FACILITY_AUTHPRIV, /**< Security/authorization messages */
+    FTP         = CHUCHO_SYSLOG_FACILITY_FTP, /**< FTP daemon */
+    LOCAL0      = CHUCHO_SYSLOG_FACILITY_LOCAL0, /**< Local use 0 */
+    LOCAL1      = CHUCHO_SYSLOG_FACILITY_LOCAL1, /**< Local use 1 */
+    LOCAL2      = CHUCHO_SYSLOG_FACILITY_LOCAL2, /**< Local use 2 */
+    LOCAL3      = CHUCHO_SYSLOG_FACILITY_LOCAL3, /**< Local use 3 */
+    LOCAL4      = CHUCHO_SYSLOG_FACILITY_LOCAL4, /**< Local use 4 */
+    LOCAL5      = CHUCHO_SYSLOG_FACILITY_LOCAL5, /**< Local use 5 */
+    LOCAL6      = CHUCHO_SYSLOG_FACILITY_LOCAL6, /**< Local use 6 */
+    LOCAL7      = CHUCHO_SYSLOG_FACILITY_LOCAL7 /**< Local use 7 */
 };
 
 /**
@@ -70,14 +71,14 @@ enum class facility
  */
 enum class severity
 {
-    EMERGENCY, /**< The system is unusable */
-    ALERT, /**< Action must be taken immediately */
-    CRITICAL, /**< Critical conditions */
-    ERROR, /**< Error conditions */
-    WARNING, /**< Warning conditions */
-    NOTICE, /**< Normal but significant conditions */
-    INFORMATIONAL, /**< Information messages */
-    DEBUG_ /**< Debug-level messages. This constant has a trailing underscore so that it will not clash with a possible macro named DEBUG. */
+    EMERGENCY       = CHUCHO_SYSLOG_SEVERITY_EMERGENCY, /**< The system is unusable */
+    ALERT           = CHUCHO_SYSLOG_SEVERITY_ALERT, /**< Action must be taken immediately */
+    CRITICAL        = CHUCHO_SYSLOG_SEVERITY_CRITICAL, /**< Critical conditions */
+    ERROR           = CHUCHO_SYSLOG_SEVERITY_ERROR, /**< Error conditions */
+    WARNING         = CHUCHO_SYSLOG_SEVERITY_WARNING, /**< Warning conditions */
+    NOTICE          = CHUCHO_SYSLOG_SEVERITY_NOTICE, /**< Normal but significant conditions */
+    INFORMATIONAL   = CHUCHO_SYSLOG_SEVERITY_INFORMATIONAL, /**< Information messages */
+    DEBUG_          = CHUCHO_SYSLOG_SEVERITY_DEBUG_/**< Debug-level messages. This constant has a trailing underscore so that it will not clash with a possible macro named DEBUG. */
 };
 //@}
 

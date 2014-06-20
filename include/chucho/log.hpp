@@ -17,9 +17,6 @@
 #if !defined(CHUCHO_LOG_HPP__)
 #define CHUCHO_LOG_HPP__
 
-#include <chucho/logger.hpp>
-#include <sstream>
-
 /**
  * @file
  * Macros for writing messages to logs. These macros handle the 
@@ -27,6 +24,9 @@
  *  
  * @ingroup loggers 
  */
+
+#include <chucho/logger.hpp>
+#include <sstream>
 
 #if !defined(CHUCHO_DONT_DOCUMENT)
 

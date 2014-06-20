@@ -15,8 +15,12 @@
 #
 
 INCLUDE(CheckCXXCompilerFlag)
+INCLUDE(CheckCCompilerFlag)
 INCLUDE(CheckCXXSymbolExists)
+INCLUDE(CheckSymbolExists)
 INCLUDE(CheckCXXSourceRuns)
+INCLUDE(CheckCSourceCompiles)
+INCLUDE(CheckIncludeFile)
 INCLUDE(CheckIncludeFileCXX)
 INCLUDE(ExternalProject)
 
@@ -35,6 +39,9 @@ OPTION(INSTALL_SERVICE "Whether to install chuchod as a system service" FALSE)
 OPTION(YAML_CONFIG "Whether to include the YAML configuration parser" TRUE)
 OPTION(CONFIG_FILE_CONFIG "Whether to include the config file configuration parser that uses Chucho keys" FALSE)
 OPTION(LOG4CPLUS_CONFIG "Whether to support reading log4cplus configuration files" FALSE)
+
+# whether to build the C API
+OPTION(C_API "Whether the C API should be built into this Chucho" FALSE)
 
 # We'll want this later
 MACRO(CHUCHO_FIND_PROGRAM CHUCHO_FIND_VAR CHUCHO_PROGRAM)
@@ -91,6 +98,11 @@ IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     IF(CMAKE_GENERATOR STREQUAL Xcode)
         SET(CMAKE_EXE_LINKER_FLAGS "-std=c++11 -stdlib=libc++")
     ENDIF()
+    CHECK_C_COMPILER_FLAG(-std=c99 CHUCHO_HAVE_STDC99)
+    IF(NOT CHUCHO_HAVE_STDC99)
+        MESSAGE(FATAL_ERROR "-std=c99 is required")
+    ENDIF()
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
     IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.7)
         MESSAGE(FATAL_ERROR "g++ version 4.7 or later is required")
@@ -105,6 +117,11 @@ ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
     IF(CHUCHO_VIS_FLAG)
         SET(CHUCHO_CXX_SO_FLAGS -fvisibility=hidden)
     ENDIF()
+    CHECK_C_COMPILER_FLAG(-std=c99 CHUCHO_HAVE_STDC99)
+    IF(NOT CHUCHO_HAVE_STDC99)
+        MESSAGE(FATAL_ERROR "-std=c99 is required")
+    ENDIF()
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 ELSEIF(MSVC)
     IF(MSVC_VERSION LESS 1700)
         MESSAGE(FATAL_ERROR "Microsoft compiler version 17 or later is required (the compiler that ships with Visual Studio 2012)")
@@ -118,11 +135,19 @@ ENDIF()
 ADD_DEFINITIONS(-DCHUCHO_BUILD)
 
 # Configure our export definitions
-IF(NOT ENABLE_SHARED)
+IF(ENABLE_SHARED)
+    # Do we want to export private symbols for testing?
+    IF(CHUCHO_PRIV_EXPORT)
+        ADD_DEFINITIONS(-DCHUCHO_PRIV_EXPORT=CHUCHO_EXPORT)
+    ENDIF()
+ELSE()
     SET(CHUCHO_STATIC TRUE)
 ENDIF()
 MAKE_DIRECTORY("${CMAKE_BINARY_DIR}/chucho")
 CONFIGURE_FILE(include/chucho/export.hpp.in "${CMAKE_BINARY_DIR}/chucho/export.hpp")
+IF(C_API)
+    CONFIGURE_FILE(include/chucho/export.hpp.in "${CMAKE_BINARY_DIR}/chucho/export.h")
+ENDIF()
 
 # Configure our version header
 STRING(REGEX REPLACE "^([0-9]+)\\..+$" "\\1" CHUCHO_VERSION_MAJOR ${CHUCHO_VERSION})
@@ -437,10 +462,134 @@ ELSE()
     MESSAGE(STATUS "Using regular expressions - POSIX")
 ENDIF()
 
-# htonl
+# assert
 CHECK_CXX_SYMBOL_EXISTS(assert assert.h CHUCHO_HAVE_ASSERT)
 IF(NOT CHUCHO_HAVE_ASSERT)
     MESSAGE(FATAL_ERROR "assert is required")
+ENDIF()
+
+# C API required stuff
+IF(C_API)
+    CHECK_C_SOURCE_COMPILES("
+#include <stdio.h>
+#define VA_CHK(...) printf(__VA_ARGS__)
+int main()
+{
+    VA_CHK(\"%s\", \"hello\");
+    return 0;
+}" CHUCHO_HAVE_VA_MACRO)
+    IF(NOT CHUCHO_HAVE_VA_MACRO)
+        MESSAGE(FATAL_ERROR "C macros with variadic arguments are required (standard C99)")
+    ENDIF()
+
+    # C headers
+    # (we already checked for stdlib.h)
+    FOREACH(HEAD stdio.h string.h)
+        CHECK_INCLUDE_FILE(${HEAD} HAVE_${HEAD})
+        IF (NOT HAVE_${HEAD})
+            MESSAGE(FATAL_ERROR "${HEAD} is required")
+        ENDIF()
+    ENDFOREACH()
+
+    # fopen/fgets/fclose/remove
+    FOREACH(SYM fopen fgets fclose remove fwrite)
+        CHECK_SYMBOL_EXISTS(${SYM} stdio.h CHUCHO_HAVE_${SYM})
+        IF(NOT CHUCHO_HAVE_${SYM})
+            MESSAGE(FATAL_ERROR "${SYM} is required")
+        ENDIF()
+    ENDFOREACH()
+
+    # strdup/strstr/strcmp
+    FOREACH(SYM strstr strcmp strlen strcpy strcat)
+        CHECK_SYMBOL_EXISTS(${SYM} string.h CHUCHO_HAVE_${SYM})
+        IF(NOT CHUCHO_HAVE_${SYM})
+            MESSAGE(FATAL_ERROR "${SYM} is required")
+        ENDIF()
+    ENDFOREACH()
+
+    # calloc/free/malloc
+    FOREACH(SYM calloc free malloc)
+        CHECK_SYMBOL_EXISTS(${SYM} stdlib.h CHUCHO_HAVE_${SYM})
+        IF(NOT CHUCHO_HAVE_${SYM})
+            MESSAGE(FATAL_ERROR "${SYM} is required")
+        ENDIF()
+    ENDFOREACH()
+ENDIF()
+
+# Oracle
+IF(ORACLE_INCLUDE_DIR)
+    SET(CMAKE_REQUIRED_INCLUDES "${ORACLE_INCLUDE_DIR}")
+    CHECK_INCLUDE_FILE_CXX(oci.h CHUCHO_OCI_H)
+    IF(CHUCHO_OCI_H)
+        IF(ORACLE_CLIENT_LIB)
+            SET(CMAKE_REQUIRED_LIBRARIES "${ORACLE_CLIENT_LIB}")
+            FOREACH(SYM OCIEnvCreate OCIHandleAlloc OCILogon2 OCIStmtPrepare OCIBindByName
+                        OCIStmtExecute OCIHandleFree OCIErrorGet OCIDescriptorAlloc OCIDescriptorFree)
+                CHECK_CXX_SYMBOL_EXISTS(${SYM} oci.h CHUCHO_HAVE_${SYM})
+                IF(NOT CHUCHO_HAVE_${SYM})
+                    MESSAGE(FATAL_ERROR "${ORACLE_CLIENT_LIB} does not contain expected OCI symbols: ${SYM}")
+                ENDIF()
+            ENDFOREACH()
+        ELSEIF(ENABLE_SHARED)
+            MESSAGE(FATAL_ERROR "You must specify ORACLE_CLIENT_LIB to build a shared library")
+        ENDIF()
+    ELSE()
+        MESSAGE(FATAL_ERROR "oci.h was not found in ORACLE_INCLUDE_DIR=${ORACLE_INCLUDE_DIR}")
+    ENDIF()
+    UNSET(CMAKE_REQUIRED_INCLUDES)
+    UNSET(CMAKE_REQUIRED_LIBRARIES)
+    SET(CHUCHO_HAVE_ORACLE TRUE)
+ENDIF()
+
+# MySQL
+IF(MYSQL_INCLUDE_DIR)
+    SET(CMAKE_REQUIRED_INCLUDES "${MYSQL_INCLUDE_DIR}")
+    CHECK_INCLUDE_FILE_CXX(mysql.h CHUCHO_MYSQL_H)
+    IF(CHUCHO_MYSQL_H)
+        IF(MYSQL_CLIENT_LIB)
+            SET(CMAKE_REQUIRED_LIBRARIES "${MYSQL_CLIENT_LIB}")
+            FOREACH(SYM mysql_init mysql_real_connect mysql_stmt_init mysql_stmt_prepare mysql_autocommit
+                        mysql_stmt_close mysql_close mysql_stmt_bind_param mysql_stmt_execute)
+                CHECK_CXX_SYMBOL_EXISTS(${SYM} mysql.h CHUCHO_HAVE_${SYM})
+                IF(NOT CHUCHO_HAVE_${SYM})
+                    MESSAGE(FATAL_ERROR "${MYSQL_CLIENT_LIB} does not contain expected MySQL symbols: ${SYM}")
+                ENDIF()
+            ENDFOREACH()
+        ELSEIF(ENABLE_SHARED)
+            MESSAGE(FATAL_ERROR "You must specify MYSQL_CLIENT_LIB to build a shared library")
+        ENDIF()
+    ELSE()
+        MESSAGE(FATAL_ERROR "mysql.h was not found in MYSQL_INCLUDE_DIR=${MYSQL_INCLUDE_DIR}")
+    ENDIF()
+    UNSET(CMAKE_REQUIRED_INCLUDES)
+    UNSET(CMAKE_REQUIRED_LIBRARIES)
+    SET(CHUCHO_HAVE_MYSQL TRUE)
+ENDIF()
+
+# SQLite
+IF(SQLITE_INCLUDE_DIR)
+    SET(CMAKE_REQUIRED_INCLUDES "${SQLITE_INCLUDE_DIR}")
+    CHECK_INCLUDE_FILE_CXX(sqlite3.h CHUCHO_SQLITE_H)
+    IF(CHUCHO_SQLITE_H)
+        IF(SQLITE_CLIENT_LIB)
+            SET(CMAKE_REQUIRED_LIBRARIES "${SQLITE_CLIENT_LIB}")
+            FOREACH(SYM sqlite3_threadsafe sqlite3_open sqlite3_prepare_v2 sqlite3_reset sqlite3_bind_text
+                        sqlite3_bind_int64 sqlite3_bind_int sqlite3_step sqlite3_finalize sqlite3_close
+                        sqlite3_extended_result_codes sqlite3_extended_errcode sqlite3_errmsg)
+                CHECK_CXX_SYMBOL_EXISTS(${SYM} sqlite3.h CHUCHO_HAVE_${SYM})
+                IF(NOT CHUCHO_HAVE_${SYM})
+                    MESSAGE(FATAL_ERROR "${MYSQL_CLIENT_LIB} does not contain expected SQLite symbols: ${SYM}")
+                ENDIF()
+            ENDFOREACH()
+        ELSEIF(ENABLE_SHARED)
+            MESSAGE(FATAL_ERROR "You must specify SQLITE_CLIENT_LIB to build a shared library")
+        ENDIF()
+    ELSE()
+        MESSAGE(FATAL_ERROR "sqlite3.h was not found in SQLITE_INCLUDE_DIR=${SQLITE_INCLUDE_DIR}")
+    ENDIF()
+    UNSET(CMAKE_REQUIRED_INCLUDES)
+    UNSET(CMAKE_REQUIRED_LIBRARIES)
+    SET(CHUCHO_HAVE_SQLITE TRUE)
 ENDIF()
 
 # doxygen
@@ -450,7 +599,7 @@ FIND_PACKAGE(Doxygen)
 CHUCHO_FIND_PROGRAM(CHUCHO_CPPCHECK cppcheck)
 
 # Solaris service stuff
-IF(CHUCHO_SOLARIS)
+IF(CHUCHO_SOLARIS AND INSTALL_SERVICE)
     CHUCHO_FIND_PROGRAM(CHUCHO_SVCCFG svccfg)
     IF(NOT CHUCHO_SVCCFG)
         MESSAGE(FATAL_ERROR "svccfg is required")
@@ -462,7 +611,7 @@ IF(CHUCHO_SOLARIS)
 ENDIF()
 
 # Macintosh launchd stuff
-IF(CHUCHO_MACINTOSH)
+IF(CHUCHO_MACINTOSH AND INSTALL_SERVICE)
     CHUCHO_FIND_PROGRAM(CHUCHO_LAUNCHCTL launchctl)
     IF(NOT CHUCHO_LAUNCHCTL)
         MESSAGE(FATAL_ERROR "launchctl is required")

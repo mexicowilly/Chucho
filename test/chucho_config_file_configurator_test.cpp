@@ -60,6 +60,7 @@ TEST_F(chucho_config_file_configurator, async_writer_with_opts)
               "chucho.writer.as.writer = fw\n"
               "chucho.writer.as.discard_threshold = error\n"
               "chucho.writer.as.queue_capacity = 700\n"
+              "chucho.writer.as.flush_on_destruct = false\n"
               "chucho.writer.fw = chucho::file_writer\n"
               "chucho.writer.fw.file_name = hello.log\n"
               "chucho.writer.fw.formatter = fmt\n"
@@ -294,6 +295,44 @@ TEST_F(chucho_config_file_configurator, logger)
     logger_body();
 }
 
+#if defined(CHUCHO_HAVE_MYSQL)
+
+TEST_F(chucho_config_file_configurator, mysql_writer_full)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = my\n"
+              "chucho.writer.my = chucho::mysql_writer\n"
+              "chucho.writer.my.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.my.host = 192.168.56.101\n"
+              "chucho.writer.my.user = test_user\n"
+              "chucho.writer.my.password = password\n"
+              "chucho.writer.my.database = test\n"
+              "chucho.writer.my.port = 3306\n"
+              "chucho.writer.my.queue_capacity = 912\n"
+              "chucho.writer.my.discard_threshold = info\n"
+              "chucho.writer.my.flush_on_destruct = false");
+    mysql_writer_full_body();
+}
+
+TEST_F(chucho_config_file_configurator, mysql_writer_minimal)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = my\n"
+              "chucho.writer.my = chucho::mysql_writer\n"
+              "chucho.writer.my.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.my.host = 192.168.56.101\n"
+              "chucho.writer.my.user = test_user\n"
+              "chucho.writer.my.password = password\n"
+              "chucho.writer.my.database = test");
+    mysql_writer_minimal_body();
+}
+
+#endif
+
 TEST_F(chucho_config_file_configurator, multiple_writer)
 {
     configure("chucho.logger = will\n"
@@ -328,6 +367,24 @@ TEST_F(chucho_config_file_configurator, numbered_file_roller)
               "chucho.writer.rfw.file_name = hello");
     numbered_file_roller_body();
 }
+
+#if defined(CHUCHO_HAVE_ORACLE)
+
+TEST_F(chucho_config_file_configurator, oracle_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = or\n"
+              "chucho.writer.or = chucho::oracle_writer\n"
+              "chucho.writer.or.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.or.user = test_user\n"
+              "chucho.writer.or.password = password\n"
+              "chucho.writer.or.database = 192.168.56.102/pdb1");
+    oracle_writer_body();
+}
+
+#endif
 
 TEST_F(chucho_config_file_configurator, remote_writer)
 {
@@ -405,6 +462,22 @@ TEST_F(chucho_config_file_configurator, sliding_numbered_file_roller)
               "chucho.writer.rfw.file_name = hello");
     sliding_numbered_file_roller_body();
 }
+
+#if defined(CHUCHO_HAVE_SQLITE)
+
+TEST_F(chucho_config_file_configurator, sqlite_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = sw\n"
+              "chucho.writer.sw = chucho::sqlite_writer\n"
+              "chucho.writer.sw.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m%n\n"
+              "chucho.writer.sw.file_name = database.sqlite");
+    sqlite_writer_body();
+}
+
+#endif
 
 TEST_F(chucho_config_file_configurator, syslog_writer)
 {

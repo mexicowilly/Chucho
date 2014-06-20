@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_EXPORT_HPP__)
-#define CHUCHO_EXPORT_HPP__
+#if !defined(CHUCHO_EXPORT__)
+#define CHUCHO_EXPORT__
 
 // This definition is set by CMake at build time. If defined, then Chucho
 // is configured as a static library. It corresponds to the CMake variable
@@ -57,11 +57,7 @@
 #endif
 
 #if !defined(CHUCHO_PRIV_EXPORT)
-#if defined(NDEBUG)
 #define CHUCHO_PRIV_EXPORT
-#else
-#define CHUCHO_PRIV_EXPORT CHUCHO_EXPORT
-#endif
 #endif
 
 #if defined(__clang__) || (defined(__GNUC__) && __GNUC__ >= 4)

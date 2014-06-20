@@ -20,6 +20,7 @@
 #include <zlib.h>
 #include <fstream>
 #include <cstdio>
+#include <cstring>
 
 namespace chucho
 {
@@ -48,10 +49,16 @@ void gzip_file_compressor::compress(const std::string& file_name)
     while (in.good())
     {
         in.read(buf, BUFSIZ);
-        if (gzwrite(gz, buf, static_cast<unsigned>(in.gcount())) == 0)
+        if (gzwrite(gz, buf, static_cast<unsigned>(in.gcount())) <= 0)
         {
             int err;
-            throw exception("Could not write to " + to_write + ": " + std::string(gzerror(gz, &err)));
+            const char* err_msg = gzerror(gz, &err);
+            if (err != Z_OK) 
+            {
+                if (err == Z_ERRNO) 
+                    err_msg = std::strerror(errno);
+                throw exception("Could not write to " + to_write + ": (" + std::to_string(err) + ") " + std::string(err_msg));
+            }
         }
     }
     if (!in.eof())

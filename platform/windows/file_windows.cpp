@@ -108,7 +108,18 @@ std::string directory_name(const std::string& name)
 
 bool exists(const std::string& name)
 {
-    return _access(name.c_str(), 0) == 0;
+    return _access_s(name.c_str(), 0) == 0;
+}
+
+writeability get_writeability(const std::string& name)
+{
+    writeability result = writeability::NON_WRITEABLE;
+    int rc = _access_s(name.c_str(), 2);
+    if (rc == 0)
+        result = writeability::WRITEABLE;
+    else if (rc == ENOENT) 
+        result = writeability::NON_EXISTENT;
+    return result;
 }
 
 bool is_fully_qualified(const std::string& name)

@@ -14,12 +14,13 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_FILE_WRITER__)
-#define CHUCHO_FILE_WRITER__
+#if !defined(CHUCHO_FILE_WRITER_HPP__)
+#define CHUCHO_FILE_WRITER_HPP__
 
 #include <chucho/writer.hpp>
 #include <fstream>
 #include <string>
+#include <chrono>
 
 namespace chucho
 {
@@ -137,11 +138,15 @@ protected:
     virtual void write_impl(const event& evt) override;
 
 private:
+    void ensure_access();
+
     std::string initial_file_name_;
     std::string file_name_;
     std::ofstream file_;
     on_start start_;
     bool flush_;
+    std::chrono::steady_clock::time_point next_access_check_;
+    optional<int> writeability_;
 };
 
 inline void file_writer::close()

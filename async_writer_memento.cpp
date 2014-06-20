@@ -26,6 +26,7 @@ async_writer_memento::async_writer_memento(const configurator& cfg)
     set_status_origin("async_writer_memento");
     set_handler("discard_threshold", [this] (const std::string& name) { discard_threshold_ = level::from_text(name); });
     set_handler("queue_capacity", [this] (const std::string& cap) { queue_capacity_ = std::stoul(cap); });
+    set_handler("flush_on_destruct", [this] (const std::string& val) { flush_on_destruct_ = boolean_value(val); });
 }
 
 void async_writer_memento::handle(std::shared_ptr<configurable> cnf)
