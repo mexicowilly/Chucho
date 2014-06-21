@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 
+#include <chucho/logger.h>
 #include <chucho/c_logger.hpp>
 #include <chucho/c_writer.hpp>
 #include <chucho/c_util.hpp>

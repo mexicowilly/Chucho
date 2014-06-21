@@ -245,7 +245,7 @@ IF(C_API)
     ENDIF()
 
     IF(CHUCHO_SOLARIS)
-        TARGET_LINK_LIBRARIES(c-unit-test socket nsl)
+        TARGET_LINK_LIBRARIES(c-unit-test socket nsl "${CHUCHO_LIBSTDCXX}")
     ENDIF()
 
     ADD_CUSTOM_TARGET(c-check

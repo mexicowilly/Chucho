@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 
+#include <chucho/file_roller.h>
 #include <chucho/c_file_roller.hpp>
 #include <chucho/c_file_compressor.hpp>
 #include <cstring>

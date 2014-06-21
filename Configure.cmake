@@ -514,6 +514,51 @@ int main()
             MESSAGE(FATAL_ERROR "${SYM} is required")
         ENDIF()
     ENDFOREACH()
+
+    # On Solaris with gcc we don't get the transitive linkage
+    # to the C++ runtime when linking a C program against a Chucho
+    # shared object. So, we need to figure out where the C++
+    # runtime is and add it to the target link libraries of the
+    # C unit test app.
+    IF(ENABLE_SHARED AND CHUCHO_SOLARIS AND CMAKE_COMPILER_IS_GNUCXX)
+        CHUCHO_FIND_PROGRAM(CHUCHO_LDD ldd)
+        IF(NOT CHUCHO_LDD)
+            MESSAGE(FATAL_ERROR "Could not find ldd")
+        ENDIF()
+        MESSAGE(STATUS "Looking for libstdc++")
+        FILE(WRITE "${CMAKE_BINARY_DIR}/libstdc++-check.cpp"
+             "#include <string>\nint main() { std::string s; return 0; }")
+        TRY_COMPILE(CHUCHO_CXX_RESULT
+                    "${CMAKE_BINARY_DIR}/libstdc++-check.out"
+                    "${CMAKE_BINARY_DIR}/libstdc++-check.cpp"
+                    COPY_FILE "${CMAKE_BINARY_DIR}/libstdc++-check")
+        IF(NOT CHUCHO_CXX_RESULT)
+            MESSAGE(FATAL_ERROR "Could not compile the program to find libstdc++")
+        ENDIF()
+        EXECUTE_PROCESS(COMMAND "${CHUCHO_LDD}" "${CMAKE_BINARY_DIR}/libstdc++-check"
+                        RESULT_VARIABLE CHUCHO_LDD_RESULT
+                        OUTPUT_VARIABLE CHUCHO_LDD_OUTPUT)
+        IF(NOT CHUCHO_LDD_RESULT EQUAL 0)
+            MESSAGE(FATAL_ERROR "Error running ldd to find libstdc++")
+        ENDIF()
+        FILE(WRITE "${CMAKE_BINARY_DIR}/libstdc++-check-ldd.out"
+             "${CHUCHO_LDD_OUTPUT}")
+        FILE(STRINGS "${CMAKE_BINARY_DIR}/libstdc++-check-ldd.out" CHUCHO_LDD_OUTPUT)
+        FOREACH(LINE ${CHUCHO_LDD_OUTPUT})
+            IF(LINE MATCHES libstdc)
+                STRING(REGEX REPLACE
+                       "^.+=>[ \\\t]*(.+libstdc.+)$"
+                       "\\1"
+                       CHUCHO_LIBSTDCXX
+                       "${LINE}")
+                BREAK()
+            ENDIF()
+        ENDFOREACH()
+        IF(NOT CHUCHO_LIBSTDCXX)
+            MESSAGE(FATAL_ERROR "Could not determine the location of libstdc++")
+        ENDIF()
+        MESSAGE(STATUS "Looking for libstdc++ - ${CHUCHO_LIBSTDCXX}")
+    ENDIF()
 ENDIF()
 
 # Oracle
