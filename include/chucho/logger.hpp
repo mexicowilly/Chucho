@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_LOGGER_HPP__)
 #define CHUCHO_LOGGER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/writer.hpp>
 #include <vector>
 
@@ -231,5 +236,9 @@ inline const std::string& logger::get_name() const
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

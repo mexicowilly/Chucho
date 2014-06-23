@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_MYSQL_WRITER_HPP__)
 #define CHUCHO_MYSQL_WRITER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/database_writer.hpp>
 #include <chucho/async_writer.hpp>
 
@@ -173,5 +178,9 @@ inline const std::string& mysql_writer::get_user() const
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

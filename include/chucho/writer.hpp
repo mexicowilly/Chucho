@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_WRITER_HPP__)
 #define CHUCHO_WRITER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/filter.hpp>
 #include <chucho/formatter.hpp>
 #include <chucho/configurable.hpp>
@@ -127,5 +132,9 @@ inline std::shared_ptr<formatter> writer::get_formatter() const
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

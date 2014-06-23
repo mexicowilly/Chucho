@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_SQLITE_WRITER_HPP__)
 #define CHUCHO_SQLITE_WRITER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/database_writer.hpp>
 #include <sqlite3.h>
 
@@ -80,5 +85,9 @@ inline const std::string& sqlite_writer::get_file_name() const
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_REMOTE_WRITER_HPP__)
 #define CHUCHO_REMOTE_WRITER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/writer.hpp>
 #include <cstdint>
 #include <queue>
@@ -161,5 +166,9 @@ inline std::size_t remote_writer::get_unsent_cache_size() const
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

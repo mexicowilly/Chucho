@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_CONFIGURATOR_HPP__)
 #define CHUCHO_CONFIGURATOR_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/status_reporter.hpp>
 #include <map>
 #include <string>
@@ -130,5 +135,9 @@ inline void configurator::add_variables(const std::map<std::string, std::string>
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

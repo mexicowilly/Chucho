@@ -17,7 +17,11 @@
 #if !defined(CHUCHO_ASYNC_WRITER_HPP__)
 #define CHUCHO_ASYNC_WRITER_HPP__
 
-#include <chucho/prefix.hpp>
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/writer.hpp>
 #include <queue>
 #include <thread>
@@ -172,6 +176,8 @@ inline std::shared_ptr<writer> async_writer::get_writer() const
 
 }
 
-#include <chucho/suffix.hpp>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

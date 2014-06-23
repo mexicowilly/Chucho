@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_ORACLE_WRITER_HPP__)
 #define CHUCHO_ORACLE_WRITER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/database_writer.hpp>
 #include <oci.h>
 
@@ -123,5 +128,9 @@ inline const std::string& oracle_writer::get_user() const
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

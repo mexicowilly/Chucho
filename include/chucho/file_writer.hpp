@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_FILE_WRITER_HPP__)
 #define CHUCHO_FILE_WRITER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/writer.hpp>
 #include <fstream>
 #include <string>
@@ -175,5 +180,9 @@ inline file_writer::on_start file_writer::get_on_start() const
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

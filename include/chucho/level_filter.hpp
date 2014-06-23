@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_LEVEL_FILTER_HPP__)
 #define CHUCHO_LEVEL_FILTER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/filter.hpp>
 
 namespace chucho
@@ -104,5 +109,9 @@ inline filter::result level_filter::get_on_mismatch() const
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

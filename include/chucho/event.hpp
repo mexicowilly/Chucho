@@ -17,7 +17,11 @@
 #if !defined(CHUCHO_EVENT_HPP__)
 #define CHUCHO_EVENT_HPP__
 
-#include <chucho/prefix.hpp>
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/level.hpp>
 #include <chucho/optional.hpp>
 #include <chucho/marker.hpp>
@@ -277,6 +281,8 @@ inline const event::time_type& event::get_time() const
 
 }
 
-#include <chucho/suffix.hpp>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

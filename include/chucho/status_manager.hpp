@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_STATUS_MANAGER_HPP__)
 #define CHUCHO_STATUS_MANAGER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/status_observer.hpp>
 #include <vector>
 #include <mutex>
@@ -145,5 +150,9 @@ private:
 };
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

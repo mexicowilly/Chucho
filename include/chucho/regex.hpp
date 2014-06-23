@@ -21,7 +21,11 @@
 #error "This header is private"
 #endif
 
-#include <chucho/prefix.hpp>
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/export.hpp>
 #include <chucho/non_copyable.hpp>
 #include <memory>
@@ -146,6 +150,8 @@ inline iterator::reference iterator::operator* ()
 
 }
 
-#include <chucho/suffix.hpp>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

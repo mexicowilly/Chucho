@@ -132,7 +132,6 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/numbered_file_roller.hpp
     include/chucho/optional.hpp
     include/chucho/pattern_formatter.hpp
-    include/chucho/prefix.hpp
     include/chucho/remote_writer.hpp
     include/chucho/rolling_file_writer.hpp
     include/chucho/size_file_roll_trigger.hpp
@@ -141,7 +140,6 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/status_manager.hpp
     include/chucho/status_observer.hpp
     include/chucho/status_reporter.hpp
-    include/chucho/suffix.hpp
     include/chucho/syslog_constants.hpp
     include/chucho/syslog_writer.hpp
     include/chucho/time_file_roller.hpp

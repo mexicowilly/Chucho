@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_WRITER_MEMENTO_HPP__)
 #define CHUCHO_WRITER_MEMENTO_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/memento.hpp>
 #include <chucho/filter.hpp>
 #include <chucho/formatter.hpp>
@@ -80,5 +85,9 @@ inline std::shared_ptr<formatter> writer_memento::get_formatter() const
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

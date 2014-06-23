@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_WINDOWS_EVENT_LOG_WRITER__)
 #define CHUCHO_WINDOWS_EVENT_LOG_WRITER__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/writer.hpp>
 #include <windows.h>
 
@@ -150,5 +155,9 @@ inline const std::string& windows_event_log_writer::get_source() const
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif
