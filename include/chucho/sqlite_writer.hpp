@@ -39,7 +39,7 @@ namespace chucho
  * 
  * @ingroup writers database
  */
-class sqlite_writer : public database_writer
+class CHUCHO_EXPORT sqlite_writer : public database_writer
 {
 public:
     /**

@@ -47,7 +47,7 @@ namespace chucho
  * 
  * @ingroup writers database
  */
-class mysql_writer : public database_writer
+class CHUCHO_EXPORT mysql_writer : public database_writer
 {
 public:
     /**

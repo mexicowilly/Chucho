@@ -28,7 +28,7 @@ namespace chucho
  * 
  * @ingroup writers database
  */
-class database_writer : public writer
+class CHUCHO_EXPORT database_writer : public writer
 {
 protected:
     /**

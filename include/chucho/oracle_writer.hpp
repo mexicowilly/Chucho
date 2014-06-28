@@ -38,7 +38,7 @@ namespace chucho
  * 
  * @ingroup writers database
  */
-class oracle_writer : public database_writer
+class CHUCHO_EXPORT oracle_writer : public database_writer
 {
 public:
     /**
