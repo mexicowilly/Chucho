@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_LEVEL_THRESHOLD_FILTER_HPP__)
 #define CHUCHO_LEVEL_THRESHOLD_FILTER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/filter.hpp>
 #include <chucho/level.hpp>
 
@@ -81,5 +86,9 @@ inline std::shared_ptr<level> level_threshold_filter::get_level() const
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

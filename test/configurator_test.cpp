@@ -46,6 +46,16 @@
 #endif
 #include <chucho/exception.hpp>
 #include <chucho/configuration.hpp>
+#if defined(CHUCHO_HAVE_MYSQL)
+#include <chucho/mysql_writer.hpp>
+#endif
+#if defined(CHUCHO_HAVE_ORACLE)
+#include <chucho/oracle_writer.hpp>
+#endif
+#if defined(CHUCHO_HAVE_SQLITE)
+#include <chucho/sqlite_writer.hpp>
+#include <chucho/file.hpp>
+#endif
 #include <sstream>
 #if defined(CHUCHO_WINDOWS)
 #include <windows.h>
@@ -92,6 +102,7 @@ void configurator::async_writer_with_opts_body()
     EXPECT_EQ(*chucho::level::ERROR_(), *awrt->get_discard_threshold());
     EXPECT_EQ(700, awrt->get_queue_capacity());
     EXPECT_EQ(typeid(chucho::file_writer), typeid(*awrt->get_writer()));
+    EXPECT_FALSE(awrt->get_flush_on_destruct());
 }
 
 void configurator::bzip2_file_compressor_body()
@@ -273,6 +284,40 @@ void configurator::multiple_writer_body()
     EXPECT_EQ(std::string("two.log"), fwrt->get_file_name());
 }
 
+#if defined(CHUCHO_HAVE_MYSQL)
+
+void configurator::mysql_writer_full_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::mysql_writer), typeid(*wrts[0]));
+    auto mwrt = std::static_pointer_cast<chucho::mysql_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(mwrt));
+    EXPECT_EQ(std::string("test"), mwrt->get_database());
+    EXPECT_EQ(std::string("192.168.56.101"), mwrt->get_host());
+    EXPECT_EQ(std::string("test_user"), mwrt->get_user());
+    EXPECT_EQ(std::string("password"), mwrt->get_password());
+    auto aw = mwrt->get_async_writer();
+    EXPECT_EQ(*chucho::level::INFO_(), *aw->get_discard_threshold());
+    EXPECT_EQ(912, aw->get_queue_capacity());
+    EXPECT_EQ(false, aw->get_flush_on_destruct());
+}
+
+void configurator::mysql_writer_minimal_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::mysql_writer), typeid(*wrts[0]));
+    auto mwrt = std::static_pointer_cast<chucho::mysql_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(mwrt));
+    EXPECT_EQ(std::string("test"), mwrt->get_database());
+    EXPECT_EQ(std::string("192.168.56.101"), mwrt->get_host());
+    EXPECT_EQ(std::string("test_user"), mwrt->get_user());
+    EXPECT_EQ(std::string("password"), mwrt->get_password());
+}
+
+#endif
+
 void configurator::numbered_file_roller_body()
 {
     auto wrts = chucho::logger::get("will")->get_writers();
@@ -287,6 +332,22 @@ void configurator::numbered_file_roller_body()
     EXPECT_EQ(5, nrlr->get_max_index());
     EXPECT_EQ(-3, nrlr->get_min_index());
 }
+
+#if defined(CHUCHO_HAVE_ORACLE)
+
+void configurator::oracle_writer_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::oracle_writer), typeid(*wrts[0]));
+    auto owrt = std::static_pointer_cast<chucho::oracle_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(owrt));
+    EXPECT_EQ(std::string("192.168.56.102/pdb1"), owrt->get_database());
+    EXPECT_EQ(std::string("test_user"), owrt->get_user());
+    EXPECT_EQ(std::string("password"), owrt->get_password());
+}
+
+#endif
 
 void configurator::remote_writer_body()
 {
@@ -424,6 +485,23 @@ void configurator::sliding_numbered_file_roller_body()
     EXPECT_EQ(5, srlr->get_max_count());
     EXPECT_EQ(-3, srlr->get_min_index());
 }
+
+#if defined(CHUCHO_HAVE_SQLITE)
+
+void configurator::sqlite_writer_body()
+{
+    auto will = chucho::logger::get("will");
+    auto wrts = will->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    EXPECT_EQ(typeid(chucho::sqlite_writer), typeid(*wrts[0]));
+    auto wrt = std::static_pointer_cast<chucho::sqlite_writer>(wrts[0]);
+    EXPECT_EQ(std::string("database.sqlite"), wrt->get_file_name());
+    will->remove_writer(wrt);
+    wrt.reset();
+    chucho::file::remove("database.sqlite");
+}
+
+#endif
 
 void configurator::syslog_writer_body()
 {

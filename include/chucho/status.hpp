@@ -17,7 +17,11 @@
 #if !defined(CHUCHO_STATUS_HPP__)
 #define CHUCHO_STATUS_HPP__
 
-#include <chucho/prefix.hpp>
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/export.hpp>
 #include <memory>
 #include <chrono>
@@ -172,6 +176,8 @@ inline const status::time_type& status::get_time() const
 
 }
 
-#include <chucho/suffix.hpp>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

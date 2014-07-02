@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_TIME_FILE_ROLLER_HPP__)
 #define CHUCHO_TIME_FILE_ROLLER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/file_roller.hpp>
 #include <chucho/file_roll_trigger.hpp>
 #include <chucho/optional.hpp>
@@ -161,5 +166,9 @@ inline std::size_t time_file_roller::get_max_history() const
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

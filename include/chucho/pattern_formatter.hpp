@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_PATTERN_FORMATTER_HPP__)
 #define CHUCHO_PATTERN_FORMATTER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/formatter.hpp>
 #include <vector>
 #include <ctime>
@@ -402,5 +407,9 @@ private:
 };
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

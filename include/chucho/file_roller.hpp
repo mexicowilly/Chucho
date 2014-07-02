@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_FILE_ROLLER_HPP__)
 #define CHUCHO_FILE_ROLLER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/status_reporter.hpp>
 #include <chucho/configurable.hpp>
 #include <chucho/non_copyable.hpp>
@@ -107,5 +112,9 @@ inline std::shared_ptr<file_compressor> file_roller::get_file_compressor() const
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

@@ -17,7 +17,11 @@
 #if !defined(CHUCHO_ASYNC_WRITER_HPP__)
 #define CHUCHO_ASYNC_WRITER_HPP__
 
-#include <chucho/prefix.hpp>
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/writer.hpp>
 #include <queue>
 #include <thread>
@@ -70,10 +74,15 @@ public:
      * @param discard_threshold the level at which to discard events 
      *                          once the queue is at 80% capacity or
      *                          more
+     * @param flush_on_destruct whether to flush the pending events 
+     *                          when the writer is destroyed
+     * @throw std::invalid_argument if fmt is an uninitialized 
+     *        std::shared_ptr
      */
     async_writer(std::shared_ptr<writer> wrt,
                  std::size_t capacity = DEFAULT_QUEUE_CAPACITY,
-                 std::shared_ptr<level> discard_threshold = level::INFO_());
+                 std::shared_ptr<level> discard_threshold = level::INFO_(),
+                 bool flush_on_destruct = true);
     /**
      * Destruct an asynchronous writer.
      */
@@ -89,6 +98,13 @@ public:
      * @return the discard threshold
      */
     std::shared_ptr<level> get_discard_threshold() const;
+    /**
+     * Return whether this writer should flush any cached events at 
+     * destruction time. 
+     * 
+     * @return whether the writer flushes on destruct
+     */
+    bool get_flush_on_destruct() const;
     /**
      * Return the queue capacity.
      * 
@@ -113,6 +129,15 @@ protected:
     virtual void write_impl(const event& evt) override;
 
 private:
+    friend class mysql_writer;
+
+    CHUCHO_NO_EXPORT async_writer(std::shared_ptr<writer> wrt,
+                                  std::size_t capacity,
+                                  std::shared_ptr<level> discard_threshold,
+                                  bool flush_on_destruct,
+                                  std::function<void()> enter_thread_cb,
+                                  std::function<void()> leave_thread_cb);
+
     CHUCHO_NO_EXPORT void thread_main();
 
     std::deque<event> queue_;
@@ -124,11 +149,19 @@ private:
     std::shared_ptr<level> discard_threshold_;
     bool stop_;
     std::unique_ptr<std::thread> worker_;
+    std::function<void()> enter_thread_cb_;
+    std::function<void()> leave_thread_cb_;
+    bool flush_on_destruct_;
 };
 
 inline std::shared_ptr<level> async_writer::get_discard_threshold() const
 {
     return discard_threshold_;
+}
+
+inline bool async_writer::get_flush_on_destruct() const
+{
+    return flush_on_destruct_;
 }
 
 inline std::size_t async_writer::get_queue_capacity() const
@@ -143,6 +176,8 @@ inline std::shared_ptr<writer> async_writer::get_writer() const
 
 }
 
-#include <chucho/suffix.hpp>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

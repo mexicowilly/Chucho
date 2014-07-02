@@ -17,7 +17,11 @@
 #if !defined(CHUCHO_MEMENTO_HPP__)
 #define CHUCHO_MEMENTO_HPP__
 
-#include <chucho/prefix.hpp>
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/configurator.hpp>
 #include <chucho/configurable.hpp>
 #include <functional>
@@ -123,6 +127,8 @@ private:
 
 }
 
-#include <chucho/suffix.hpp>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

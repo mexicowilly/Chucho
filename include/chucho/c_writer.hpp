@@ -14,12 +14,20 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_SUFFIX_HPP__)
-#define CHUCHO_SUFFIX_HPP__
+#if !defined(CHUCHO_C_WRITER_HPP__)
+#define CHUCHO_C_WRITER_HPP__
 
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable:4251)
-#endif
+#include <chucho/writer.h>
+#include <chucho/writer.hpp>
+
+extern "C"
+{
+
+struct chucho_writer
+{
+    std::shared_ptr<chucho::writer> writer_;
+};
+
+}
 
 #endif

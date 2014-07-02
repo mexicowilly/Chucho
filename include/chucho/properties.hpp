@@ -21,7 +21,11 @@
 #error "This header is private"
 #endif
 
-#include <chucho/prefix.hpp>
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/optional.hpp>
 #include <string>
 #include <map>
@@ -79,6 +83,8 @@ inline std::size_t properties::size() const
 
 }
 
-#include <chucho/suffix.hpp>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

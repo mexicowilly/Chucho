@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_REMOTE_WRITER_HPP__)
 #define CHUCHO_REMOTE_WRITER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/writer.hpp>
 #include <cstdint>
 #include <queue>
@@ -35,7 +40,7 @@ class socket_connector;
  * any loggers that appear in the events written to this logger. 
  * The logging settings for those loggers on the chucho server 
  * itself then serve as the settings used for events written to 
- * this remote_logger.
+ * this remote_writer.
  *  
  * This writer will never block the writing thread while a 
  * connection to the chucho server is being made. However, after
@@ -83,6 +88,10 @@ public:
      * @param port the port on which the chucho server is listening
      * @param unsent_cache_max the maximum size of the unsent event 
      *                         cache
+     * @throw std::invalid_argument if fmt is an uninitialized 
+     *        std::shared_ptr
+     * @throw std::invalid_argument if the host name is empty
+     * @throw std::invalid_argument if the port is zero
      */
     remote_writer(const std::string& host,
                   std::uint16_t port = DEFAULT_PORT,
@@ -157,5 +166,9 @@ inline std::size_t remote_writer::get_unsent_cache_size() const
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

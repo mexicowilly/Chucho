@@ -17,7 +17,11 @@
 #if !defined(CHUCHO_MARKER_HPP__)
 #define CHUCHO_MARKER_HPP__
 
-#include <chucho/prefix.hpp>
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/export.hpp>
 #include <memory>
 #include <string>
@@ -205,6 +209,8 @@ inline void marker::insert(const marker& mark)
 
 }
 
-#include <chucho/suffix.hpp>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

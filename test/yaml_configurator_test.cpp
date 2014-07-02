@@ -87,7 +87,8 @@ TEST_F(yaml_configurator, async_writer_with_opts)
               "                pattern: '%m%n'\n"
               "            file_name: hello.log\n"
               "        discard_threshold: error\n"
-              "        queue_capacity: 700");
+              "        queue_capacity: 700\n"
+              "        flush_on_destruct: false");
     async_writer_with_opts_body();
 }
 
@@ -276,6 +277,42 @@ TEST_F(yaml_configurator, multiple_writer)
     multiple_writer_body();
 }
 
+#if defined(CHUCHO_HAVE_MYSQL)
+
+TEST_F(yaml_configurator, mysql_writer_full)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::mysql_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m'\n"
+              "        host: 192.168.56.101\n"
+              "        user: test_user\n"
+              "        password: password\n"
+              "        database: test\n"
+              "        port: 3306\n"
+              "        queue_capacity: 912\n"
+              "        discard_threshold: info\n"
+              "        flush_on_destruct: false");
+    mysql_writer_full_body();
+}
+
+TEST_F(yaml_configurator, mysql_writer_minimal)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::mysql_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m'\n"
+              "        host: 192.168.56.101\n"
+              "        user: test_user\n"
+              "        password: password\n"
+              "        database: test");
+    mysql_writer_minimal_body();
+}
+
+#endif
+
 TEST_F(yaml_configurator, numbered_file_roller)
 {
     configure("chucho::logger:\n"
@@ -291,6 +328,23 @@ TEST_F(yaml_configurator, numbered_file_roller)
               "        file_name: hello");
     numbered_file_roller_body();
 }
+
+#if defined(CHUCHO_HAVE_ORACLE)
+
+TEST_F(yaml_configurator, oracle_writer)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::oracle_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m'\n"
+              "        user: test_user\n"
+              "        password: password\n"
+              "        database: 192.168.56.102/pdb1");
+    oracle_writer_body();
+}
+
+#endif
 
 TEST_F(yaml_configurator, remote_writer)
 {
@@ -359,6 +413,21 @@ TEST_F(yaml_configurator, sliding_numbered_file_roller)
               "        file_name: hello");
     sliding_numbered_file_roller_body();
 }
+
+#if defined(CHUCHO_HAVE_SQLITE)
+
+TEST_F(yaml_configurator, sqlite_writer)
+{
+    configure("chucho::logger:\n"
+              "    - name: will\n"
+              "    - chucho::sqlite_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            - pattern: '%m%n'\n"
+              "        - file_name: database.sqlite");
+    sqlite_writer_body();
+}
+
+#endif
 
 TEST_F(yaml_configurator, syslog_writer)
 {

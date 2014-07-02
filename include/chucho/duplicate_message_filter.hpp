@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_DUPLICATE_MESSAGE_FILTER_HPP__)
 #define CHUCHO_DUPLICATE_MESSAGE_FILTER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/filter.hpp>
 
 namespace chucho
@@ -60,5 +65,9 @@ private:
 };
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

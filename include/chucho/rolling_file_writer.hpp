@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_ROLLING_FILE_WRITER_HPP__)
 #define CHUCHO_ROLLING_FILE_WRITER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/file_writer.hpp>
 #include <chucho/file_roller.hpp>
 #include <chucho/file_roll_trigger.hpp>
@@ -175,5 +180,9 @@ inline std::shared_ptr<file_roll_trigger> rolling_file_writer::get_file_roll_tri
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

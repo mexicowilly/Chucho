@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_FILE_COMPRESSOR_MEMENTO_HPP__)
 #define CHUCHO_FILE_COMPRESSOR_MEMENTO_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/memento.hpp>
 #include <chucho/optional.hpp>
 
@@ -66,5 +71,9 @@ inline const optional<unsigned>& file_compressor_memento::get_min_index() const
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_FILE_ROLLER_MEMENTO_HPP__)
 #define CHUCHO_FILE_ROLLER_MEMENTO_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/memento.hpp>
 #include <chucho/file_compressor.hpp>
 
@@ -72,5 +77,9 @@ inline std::shared_ptr<file_compressor> file_roller_memento::get_file_compressor
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

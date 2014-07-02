@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_WINDOWS_EVENT_LOG_WRITER__)
 #define CHUCHO_WINDOWS_EVENT_LOG_WRITER__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/writer.hpp>
 #include <windows.h>
 
@@ -46,6 +51,11 @@ public:
      * @param fmt the formatter
      * @param source the name of the source, which becomes a 
      *               registry key
+     * @throw std::invalid_argument if fmt is an uninitialized 
+     *        std::shared_ptr
+     * @throw std::invalid_argument if the source is empty
+     * @throw exception if there is a problem registering the event 
+     *        source
      */
     windows_event_log_writer(std::shared_ptr<formatter> fmt,
                              const std::string& source);
@@ -56,6 +66,11 @@ public:
      * @param log the name of the log, which becomes a registry key
      * @param source the name of the source, which becomes a 
      *               registry key
+     * @throw std::invalid_argument if fmt is an uninitialized 
+     *        std::shared_ptr
+     * @throw std::invalid_argument if the source is empty
+     * @throw exception if there is a problem registering the event 
+     *        source
      */
     windows_event_log_writer(std::shared_ptr<formatter> fmt,
                              const std::string& log,
@@ -68,6 +83,11 @@ public:
      * @param source the name of the source, which becomes a 
      *               registry key
      * @param host the name of the host to which you are writing 
+     * @throw std::invalid_argument if fmt is an uninitialized 
+     *        std::shared_ptr
+     * @throw std::invalid_argument if the source is empty
+     * @throw exception if there is a problem registering the event 
+     *        source
      */
     windows_event_log_writer(std::shared_ptr<formatter> fmt,
                              const std::string& log,
@@ -135,5 +155,9 @@ inline const std::string& windows_event_log_writer::get_source() const
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

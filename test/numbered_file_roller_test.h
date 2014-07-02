@@ -14,11 +14,9 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_SUFFIX_HPP__)
-#define CHUCHO_SUFFIX_HPP__
+#if !defined(CHUCHO_NUMBERED_FILE_ROLLER_TEST_H__)
+#define CHUCHO_NUMBERED_FILE_ROLLER_TEST_H__
 
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
+void run_numbered_file_roller_test(void);
 
 #endif

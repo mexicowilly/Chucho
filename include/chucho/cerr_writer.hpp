@@ -17,7 +17,11 @@
 #if !defined(CHUCHO_CERR_WRITER_HPP__)
 #define CHUCHO_CERR_WRITER_HPP__
 
-#include <chucho/prefix.hpp>
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/console_writer.hpp>
 
 namespace chucho
@@ -25,7 +29,7 @@ namespace chucho
 
 /**
  * @class cerr_writer cerr_writer.hpp chucho/cerr_writer.hpp 
- * A @ref console_writer that writes to std::cerr. 
+ * A @ref chucho::console_writer that writes to std::cerr. 
  * 
  * @ingroup writers
  */
@@ -49,6 +53,8 @@ public:
 
 }
 
-#include <chucho/suffix.hpp>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

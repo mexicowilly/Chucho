@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_STATUS_MANAGER_HPP__)
 #define CHUCHO_STATUS_MANAGER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/status_observer.hpp>
 #include <vector>
 #include <mutex>
@@ -115,7 +120,7 @@ public:
      * For example, to print only errors and warnings to stdout, the
      * following code could be used. 
      * @code 
-     * chucho::status_manager::get()->print(std::cout, chucho::status::level::WARNING); 
+     * chucho::status_manager::get()->print(std::cout, chucho::status::level::WARNING_); 
      * @endcode 
      * 
      * @param stream the stream to which to print the entries
@@ -145,5 +150,9 @@ private:
 };
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif
