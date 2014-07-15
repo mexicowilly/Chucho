@@ -367,21 +367,37 @@ TEST_F(yaml_configurator, remote_writer)
 
 TEST_F(yaml_configurator, rolling_file_writer)
 {
-        configure("chucho::logger:\n"
-                  "    name: will\n"
-                  "    chucho::rolling_file_writer:\n"
-                  "        chucho::pattern_formatter:\n"
-                  "            pattern: '%m%n'\n"
-                  "        chucho::numbered_file_roller:\n"
-                  "            min_index: 3\n"
-                  "            max_index: 5\n"
-                  "        chucho::size_file_roll_trigger:\n"
-                  "            max_size: 5000\n"
-                  "        file_name: what.log\n"
-                  "        on_start: TruNCAte\n"
-                  "        flush: false");
-        rolling_file_writer_body();
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::rolling_file_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m%n'\n"
+              "        chucho::numbered_file_roller:\n"
+              "            min_index: 3\n"
+              "            max_index: 5\n"
+              "        chucho::size_file_roll_trigger:\n"
+              "            max_size: 5000\n"
+              "        file_name: what.log\n"
+              "        on_start: TruNCAte\n"
+              "        flush: false");
+    rolling_file_writer_body();
 }
+
+#if defined(CHUCHO_HAVE_RUBY)
+
+TEST_F(yaml_configurator, ruby_evaluator_filter)
+{
+    configure("- chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::cout_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m%n'\n"
+              "        chucho::ruby_evaluator_filter:\n"
+              "            expression: '$logger == \"will\"'");
+    ruby_evaluator_filter_body();
+}
+
+#endif
 
 TEST_F(yaml_configurator, size_file_roll_trigger)
 {

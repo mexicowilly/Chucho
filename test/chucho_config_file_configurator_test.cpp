@@ -426,6 +426,24 @@ TEST_F(chucho_config_file_configurator, rolling_file_writer)
     rolling_file_writer_body();
 }
 
+#if defined(CHUCHO_HAVE_RUBY)
+
+TEST_F(chucho_config_file_configurator, ruby_evaluator_filter)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = co\n"
+              "chucho.writer.co = chucho::cout_writer\n"
+              "chucho.writer.co.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m%n\n"
+              "chucho.writer.co.filter = ref\n"
+              "chucho.filter.ref = chucho::ruby_evaluator_filter\n"
+              "chucho.filter.ref.expression = $logger == \"will\"");
+    ruby_evaluator_filter_body();
+}
+
+#endif
+
 TEST_F(chucho_config_file_configurator, size_file_roll_trigger)
 {
     std::string tmpl("chucho.logger = will\n"
