@@ -57,7 +57,7 @@ public:
      * @param evt the event to evaluate
      * @return the result
      */
-    result evaluate(const event& evt) override;
+    virtual result evaluate(const event& evt) override;
 
 private:
     std::string message_;

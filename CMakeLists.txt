@@ -41,6 +41,9 @@ ENDIF()
 IF(CHUCHO_HAVE_SQLITE)
     INCLUDE_DIRECTORIES("${SQLITE_INCLUDE_DIR}")
 ENDIF()
+IF(CHUCHO_HAVE_RUBY AND RUBY_INCLUDE_DIR)
+    INCLUDE_DIRECTORIES("${RUBY_INCLUDE_DIR}")
+ENDIF()
 
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
@@ -116,6 +119,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/database_writer.hpp
     include/chucho/diagnostic_context.hpp
     include/chucho/duplicate_message_filter.hpp
+    include/chucho/evaluator_filter.hpp
     include/chucho/event.hpp
     include/chucho/exception.hpp
     "${CMAKE_BINARY_DIR}/chucho/export.hpp"
@@ -144,6 +148,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/pattern_formatter.hpp
     include/chucho/remote_writer.hpp
     include/chucho/rolling_file_writer.hpp
+    include/chucho/ruby_evaluator_filter.hpp
     include/chucho/size_file_roll_trigger.hpp
     include/chucho/sliding_numbered_file_roller.hpp
     include/chucho/status.hpp
@@ -302,6 +307,23 @@ ENDIF()
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/sqlite_writer.hpp
      include/chucho/sqlite_writer.h)
+
+IF(CHUCHO_HAVE_RUBY)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/ruby_evaluator_filter.hpp)
+    LIST(APPEND CHUCHO_EVALUATOR_SOURCES
+         ruby_evaluator_filter.cpp
+         ruby_evaluator_filter_factory.cpp
+         ruby_evaluator_filter_memento.cpp
+         include/chucho/ruby_evaluator_filter_factory.hpp
+         include/chucho/ruby_evaluator_filter_memento.hpp)
+    IF(RUBY_FRAMEWORK)
+        SET_SOURCE_FILES_PROPERTIES(ruby_evaluator_filter.cpp PROPERTIES
+                                    COMPILE_DEFINITIONS CHUCHO_RUBY_FRAMEWORK)
+    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/ruby_evaluator_filter.hpp)
 
 # The libyaml sources are required by chuchod
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
@@ -583,7 +605,8 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_EMBEDDED_SOURCES}
     ${CHUCHO_PUBLIC_HEADERS}
     ${CHUCHO_C_SOURCES}
-    ${CHUCHO_DATABASE_SOURCES})
+    ${CHUCHO_DATABASE_SOURCES}
+    ${CHUCHO_EVALUATOR_SOURCES})
 
 IF(CHUCHO_HAVE_PUT_TIME)
     SET_SOURCE_FILES_PROPERTIES(calendar.cpp PROPERTIES
@@ -606,6 +629,10 @@ ENDIF()
 
 IF(CHUCHO_HAVE_SQLITE)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_SQLITE)
+ENDIF()
+
+IF(CHUCHO_HAVE_RUBY)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RUBY)
 ENDIF()
 
 IF(DEFINED CHUCHO_CONFIGURATOR_DEFS)
@@ -728,13 +755,15 @@ ENDIF()
 IF(ENABLE_SHARED)
     ADD_LIBRARY(chucho SHARED ${CHUCHO_SOURCES})
     SET_TARGET_PROPERTIES(chucho PROPERTIES
-                          COMPILE_FLAGS "${CHUCHO_CXX_SO_FLAGS}"
                           VERSION ${CHUCHO_VERSION}
                           SOVERSION ${CHUCHO_SO_VERSION}
                           PUBLIC_HEADER "${CHUCHO_PUBLIC_HEADERS}"
                           FRAMEWORK ${ENABLE_FRAMEWORK})
     IF(CHUCHO_HAVE_ORACLE)
-        TARGET_LINK_LIBRARIES(chucho ${ORACLE_CLIENT_LIB})
+        TARGET_LINK_LIBRARIES(chucho "${ORACLE_CLIENT_LIB}")
+    ENDIF()
+    IF(CHUCHO_HAVE_RUBY)
+        TARGET_LINK_LIBRARIES(chucho "${RUBY_LIB}")
     ENDIF()
     IF(CMAKE_GENERATOR STREQUAL Xcode AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         SET_TARGET_PROPERTIES(chucho PROPERTIES

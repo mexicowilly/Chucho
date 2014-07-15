@@ -54,6 +54,9 @@ protected:
     void oracle_writer_body();
 #endif
     void remote_writer_body();
+#if defined(CHUCHO_HAVE_RUBY)
+    void ruby_evaluator_filter_body();
+#endif
     void rolling_file_writer_body();
     void size_file_roll_trigger_body(const std::string& tmpl);
     void sliding_numbered_file_roller_body();

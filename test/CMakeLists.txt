@@ -81,6 +81,11 @@ IF(CHUCHO_HAVE_SQLITE)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_SQLITE)
 ENDIF()
 
+IF(CHUCHO_HAVE_RUBY)
+    LIST(APPEND CHUCHO_TEST_EVALUATOR_SOURCES ruby_evaluator_filter_test.cpp)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_RUBY)
+ENDIF()
+
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
                calendar_test.cpp
@@ -106,7 +111,8 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                size_file_roll_trigger_test.cpp
                utf8_test.cpp
                ${CHUCHO_TEST_COMPRESSION_SOURCES}
-               ${CHUCHO_CONFIGURATOR_TESTS})
+               ${CHUCHO_CONFIGURATOR_TESTS}
+               ${CHUCHO_TEST_EVALUATOR_SOURCES})
 TARGET_LINK_LIBRARIES(unit-test chucho gtest ${CHUCHO_THREAD_LIB})
 IF(CHUCHO_SOLARIS)
     TARGET_LINK_LIBRARIES(unit-test socket nsl)
@@ -122,6 +128,10 @@ ENDIF()
 
 IF(CHUCHO_HAVE_SQLITE)
     TARGET_LINK_LIBRARIES(unit-test "${SQLITE_CLIENT_LIB}")
+ENDIF()
+
+IF(CHUCHO_HAVE_RUBY AND NOT RUBY_FRAMEWORK)
+    TARGET_LINK_LIBRARIES(unit-test "${RUBY_LIB}")
 ENDIF()
 
 IF(MSVC)
@@ -242,6 +252,10 @@ IF(C_API)
 
     IF(CHUCHO_HAVE_SQLITE)
         TARGET_LINK_LIBRARIES(c-unit-test "${SQLITE_CLIENT_LIB}")
+    ENDIF()
+
+    IF(CHUCHO_HAVE_RUBY AND NOT RUBY_FRAMEWORK)
+        TARGET_LINK_LIBRARIES(c-unit-test "${RUBY_LIB}")
     ENDIF()
 
     IF(CHUCHO_SOLARIS)
