@@ -316,6 +316,10 @@ IF(CHUCHO_HAVE_RUBY)
          ruby_evaluator_filter_memento.cpp
          include/chucho/ruby_evaluator_filter_factory.hpp
          include/chucho/ruby_evaluator_filter_memento.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/ruby_evaluator_filter.h)
+        LIST(APPEND CHUCHO_EVALUATOR_SOURCES c_ruby_evaluator_filter.cpp)
+    ENDIF()
     IF(RUBY_FRAMEWORK)
         SET_SOURCE_FILES_PROPERTIES(ruby_evaluator_filter.cpp PROPERTIES
                                     COMPILE_DEFINITIONS CHUCHO_RUBY_FRAMEWORK)
@@ -323,7 +327,8 @@ IF(CHUCHO_HAVE_RUBY)
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
-     include/chucho/ruby_evaluator_filter.hpp)
+     include/chucho/ruby_evaluator_filter.hpp
+     include/chucho/ruby_evaluator_filter.h)
 
 # The libyaml sources are required by chuchod
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)

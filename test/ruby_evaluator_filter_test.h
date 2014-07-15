@@ -14,29 +14,9 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_EVALUATOR_FILTER_HPP__)
-#define CHUCHO_EVALUATOR_FILTER_HPP__
+#if !defined(CHUCHO_RUBY_EVALUATOR_FILTER_TEST_H__)
+#define CHUCHO_RUBY_EVALUATOR_FILTER_TEST_H__
 
-#include <chucho/filter.hpp>
-
-namespace chucho
-{
-
-/**
- * @class evaluator_filter evaluator_filter.hpp chucho/evaluator_filter.hpp 
- * An evaluator filter determines the filtration status of an 
- * @ref event by evaluating a piece of code. The code that is 
- * run has access to all the data carried in the @ref event, so 
- * that it can evaluate it with full knowledge. 
- *  
- * @ingroup filters 
- * @sa ruby_evaluator_filter 
- */
-
-class evaluator_filter : public filter
-{
-};
-
-}
+void run_ruby_evaluator_filter_test(void);
 
 #endif

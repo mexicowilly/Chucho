@@ -54,6 +54,9 @@
 #if defined(CHUCHO_WINDOWS)
 #include "windows_event_log_writer_test.h"
 #endif
+#if defined(CHUCHO_HAVE_RUBY)
+#include "ruby_evaluator_filter_test.h"
+#endif
 
 sput_struct __sput;
 
@@ -98,6 +101,9 @@ int main()
     #endif
     #if defined(CHUCHO_WINDOWS)
     run_windows_event_log_writer_test();
+    #endif
+    #if defined(CHUCHO_HAVE_RUBY)
+    run_ruby_evaluator_filter_test();
     #endif
 
     sput_finish_testing();

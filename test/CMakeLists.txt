@@ -175,6 +175,12 @@ IF(C_API)
              sqlite_writer_test.h)
     ENDIF()
 
+    IF(CHUCHO_HAVE_RUBY)
+        LIST(APPEND CHUCHO_EVALUATOR_C_SOURCES
+             ruby_evaluator_filter_test.c
+             ruby_evaluator_filter_test.h)
+    ENDIF()
+
     IF(CHUCHO_WINDOWS)
         SET_SOURCE_FILES_PROPERTIES(windows_event_log_writer_test.c PROPERTIES
                                     COMPILE_DEFINITIONS CHUCHO_EVENT_LOG_DLL="${CHUCHO_EVENT_LOG_DLL}")
@@ -239,6 +245,7 @@ IF(C_API)
                    writer_test.h
                    ${CHUCHO_TEST_COMPRESSION_C_SOURCES}
                    ${CHUCHO_DB_C_SOURCES}
+                   ${CHUCHO_EVALUATOR_C_SOURCES}
                    ${CHUCHO_PLATFORM_C_SOURCES})
     TARGET_LINK_LIBRARIES(c-unit-test chucho ${CHUCHO_THREAD_LIB})
 

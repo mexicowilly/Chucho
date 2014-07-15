@@ -639,7 +639,8 @@ ENDIF()
 
 # Ruby
 MACRO(CHUCHO_CHECK_RUBY_SYMBOLS CHUCHO_RUBY_HEADER)
-    FOREACH(SYM ruby_init ruby_finalize)
+    FOREACH(SYM ruby_init ruby_finalize rb_funcall rb_str_new2 rb_define_variable rb_path2class
+                rb_intern rb_rescue rb_eval_string Qtrue Qfalse Qnil INT2NUM StringValueCStr)
         CHECK_CXX_SYMBOL_EXISTS(${SYM} ${CHUCHO_RUBY_HEADER} CHUCHO_HAVE_${SYM})
         IF(NOT CHUCHO_HAVE_${SYM})
             MESSAGE(FATAL_ERROR "${RUBY_LIB} does not contain expected Ruby symbols: ${SYM}")
