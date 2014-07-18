@@ -41,6 +41,9 @@ ENDIF()
 IF(CHUCHO_HAVE_SQLITE)
     INCLUDE_DIRECTORIES("${SQLITE_INCLUDE_DIR}")
 ENDIF()
+IF(CHUCHO_HAVE_POSTGRES)
+    INCLUDE_DIRECTORIES("${POSTGRES_INCLUDE_DIR}")
+ENDIF()
 
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
@@ -304,6 +307,24 @@ ENDIF()
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/sqlite_writer.hpp
      include/chucho/sqlite_writer.h)
+
+IF(CHUCHO_HAVE_POSTGRES)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/postgres_writer.hpp)
+    LIST(APPEND CHUCHO_DATABASE_SOURCES
+         postgres_writer.cpp)
+#         sqlite_writer_factory.cpp
+#         sqlite_writer_memento.cpp
+#         include/chucho/sqlite_writer_factory.hpp
+#         include/chucho/sqlite_writer_memento.hpp)
+#    IF(C_API)
+#        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/sqlite_writer.h)
+#        LIST(APPEND CHUCHO_DATABASE_SOURCES c_sqlite_writer.cpp)
+#    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/postgres_writer.hpp)
+#     include/chucho/postgres_writer.h)
 
 IF(CHUCHO_HAVE_RUBY)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/ruby_evaluator_filter.hpp)
@@ -766,6 +787,9 @@ IF(ENABLE_SHARED)
                           FRAMEWORK ${ENABLE_FRAMEWORK})
     IF(CHUCHO_HAVE_ORACLE)
         TARGET_LINK_LIBRARIES(chucho "${ORACLE_CLIENT_LIB}")
+    ENDIF()
+    IF(CHUCHO_HAVE_POSTGRES)
+        TARGET_LINK_LIBRARIES(chucho "${POSTGRES_CLIENT_LIB}")
     ENDIF()
     IF(CHUCHO_HAVE_RUBY)
         TARGET_LINK_LIBRARIES(chucho "${RUBY_LIB}")
