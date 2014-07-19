@@ -183,6 +183,12 @@ IF(C_API)
              sqlite_writer_test.h)
     ENDIF()
 
+    IF(CHUCHO_HAVE_POSTGRES)
+        LIST(APPEND CHUCHO_DB_C_SOURCES
+             postgres_writer_test.c
+             postgres_writer_test.h)
+    ENDIF()
+
     IF(CHUCHO_HAVE_RUBY)
         LIST(APPEND CHUCHO_EVALUATOR_C_SOURCES
              ruby_evaluator_filter_test.c
@@ -267,6 +273,10 @@ IF(C_API)
 
     IF(CHUCHO_HAVE_SQLITE)
         TARGET_LINK_LIBRARIES(c-unit-test "${SQLITE_CLIENT_LIB}")
+    ENDIF()
+
+    IF(CHUCHO_HAVE_POSTGRES)
+        TARGET_LINK_LIBRARIES(c-unit-test "${POSTGRES_CLIENT_LIB}")
     ENDIF()
 
     IF(CHUCHO_HAVE_RUBY AND NOT RUBY_FRAMEWORK)

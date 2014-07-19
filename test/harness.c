@@ -51,6 +51,9 @@
 #if defined(CHUCHO_HAVE_SQLITE)
 #include "sqlite_writer_test.h"
 #endif
+#if defined(CHUCHO_HAVE_POSTGRES)
+#include "postgres_writer_test.h"
+#endif
 #if defined(CHUCHO_WINDOWS)
 #include "windows_event_log_writer_test.h"
 #endif
@@ -98,6 +101,9 @@ int main()
     #endif
     #if defined(CHUCHO_HAVE_SQLITE)
     run_sqlite_writer_test();
+    #endif
+    #if defined(CHUCHO_HAVE_POSTGRES)
+    run_postgres_writer_test();
     #endif
     #if defined(CHUCHO_WINDOWS)
     run_windows_event_log_writer_test();

@@ -316,15 +316,15 @@ IF(CHUCHO_HAVE_POSTGRES)
          postgres_writer_memento.cpp
          include/chucho/postgres_writer_factory.hpp
          include/chucho/postgres_writer_memento.hpp)
-#    IF(C_API)
-#        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/postgres_writer.h)
-#        LIST(APPEND CHUCHO_DATABASE_SOURCES c_postgres_writer.cpp)
-#    ENDIF()
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/postgres_writer.h)
+        LIST(APPEND CHUCHO_DATABASE_SOURCES c_postgres_writer.cpp)
+    ENDIF()
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
-     include/chucho/postgres_writer.hpp)
-#     include/chucho/postgres_writer.h)
+     include/chucho/postgres_writer.hpp
+     include/chucho/postgres_writer.h)
 
 IF(CHUCHO_HAVE_RUBY)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/ruby_evaluator_filter.hpp)
