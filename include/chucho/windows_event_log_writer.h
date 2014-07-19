@@ -87,7 +87,7 @@ CHUCHO_EXPORT chucho_rc chucho_welwrt_get_log(const chucho_writer* wrt, const ch
  * Return the name of the event source.
  * 
  * @param[in] wrt the Windows event log writer
- * @param[out] log the name of the event source
+ * @param[out] source the name of the event source
  * @return a value from @ref return_code.h indicating success or
  *         failure
  */

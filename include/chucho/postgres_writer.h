@@ -64,7 +64,7 @@ CHUCHO_EXPORT chucho_rc chucho_create_postgres_writer(chucho_writer** wrt,
  * Return the connection URI.
  * 
  * @param[in] wrt the PostgreSQL writer
- * @param[out] the connection URI
+ * @param[out] uri the connection URI
  * @return a value from @ref return_code.h indicating success or
  *         failure
  */

@@ -56,7 +56,8 @@ CHUCHO_EXPORT chucho_rc chucho_create_ruby_evaluator_filter(chucho_filter** flt,
  * Return the Ruby expression
  * 
  * @param[in] flt the Ruby evaluator filter
- * @param[out] the Ruby expression associated with this filter 
+ * @param[out] exp the Ruby expression associated with this 
+ *       filter
  * @return a value from @ref return_code.h indicating success or
  *         failure
  */
