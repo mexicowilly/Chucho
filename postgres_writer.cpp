@@ -41,7 +41,7 @@ postgres_writer::postgres_writer(std::shared_ptr<formatter> fmt, const std::stri
     }
     PGresult* res = PQprepare(connection_,
                               "chucho_insert_event",
-                              "INSERT INTO chucho_event ( formatted_message, timestmp, file_name, line_number, function_name, logger, level_name, marker, thread ) VALUES ( '$1', '$2'::TIMESTAMP, '$3', $4, '$5', '$6', '$7', '$8', '$9' )",
+                              "INSERT INTO chucho_event ( formatted_message, timestamp, file_name, line_number, function_name, logger, level_name, marker, thread ) VALUES ( $1, $2, $3, $4, $5, $6, $7, $8, $9 )",
                               9,
                               nullptr); 
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
@@ -63,8 +63,13 @@ postgres_writer::~postgres_writer()
 void postgres_writer::write_impl(const event& evt)
 {
     calendar::pieces cal = calendar::get_utc(event::clock_type::to_time_t(evt.get_time()));
-    std::string timestamp = calendar::format(cal, "%Y-%m-%d %H:%M:%S UTC");
+    std::string msg = "'" + evt.get_message() + "'";
+    std::string timestamp = calendar::format(cal, "'%Y-%m-%d %H:%M:%S UTC'");
+    std::string fn = std::string("'") + evt.get_file_name() + "'";
     std::string line_number = std::to_string(evt.get_line_number());
+    std::string func = std::string("'") + evt.get_function_name() + "'";
+    std::string lg = "'" + evt.get_logger()->get_name() + "'";
+    std::string lvl = std::string("'") + evt.get_level()->get_name() + "'";
     std::string marker;
     const char* c_marker = nullptr;
     if (evt.get_marker())
@@ -75,17 +80,17 @@ void postgres_writer::write_impl(const event& evt)
         c_marker = marker.c_str();
     }
     std::ostringstream stream;
-    stream << std::this_thread::get_id();
+    stream << '\'' << std::this_thread::get_id() << '\'';
     std::string tid = stream.str();
     const char* params[9] =
     {
-        evt.get_message().c_str(),
+        msg.c_str(),
         timestamp.c_str(),
-        evt.get_file_name(),
+        fn.c_str(),
         line_number.c_str(),
-        evt.get_function_name(),
-        evt.get_logger()->get_name().c_str(),
-        evt.get_level()->get_name(),
+        func.c_str(),
+        lg.c_str(),
+        lvl.c_str(),
         c_marker,
         tid.c_str()
     };

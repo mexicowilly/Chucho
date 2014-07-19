@@ -326,6 +326,13 @@ IF(CHUCHO_HAVE_SQLITE)
     TARGET_LINK_LIBRARIES(sqlite-writer-test chucho "${SQLITE_CLIENT_LIB}" gtest ${CHUCHO_THREAD_LIB})
 ENDIF()
 
+IF(CHUCHO_HAVE_POSTGRES)
+    ADD_EXECUTABLE(postgres-writer-test EXCLUDE_FROM_ALL
+                   harness.cpp
+                   postgres_writer_test.cpp)
+    TARGET_LINK_LIBRARIES(postgres-writer-test chucho ${POSTGRES_CLIENT_LIB} gtest ${CHUCHO_THREAD_LIB})
+ENDIF()
+
 ADD_EXECUTABLE(configuration-off EXCLUDE_FROM_ALL
                configuration_off.cpp)
 TARGET_LINK_LIBRARIES(configuration-off chucho ${CHUCHO_THREAD_LIB})

@@ -49,7 +49,7 @@ private:
     PGconn* connection_;
 };
 
-const std::string& postgres_writer::get_uri() const
+inline const std::string& postgres_writer::get_uri() const
 {
     return uri_;
 }
