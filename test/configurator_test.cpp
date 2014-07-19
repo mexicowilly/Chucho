@@ -56,6 +56,9 @@
 #include <chucho/sqlite_writer.hpp>
 #include <chucho/file.hpp>
 #endif
+#if defined(CHUCHO_HAVE_POSTGRES)
+#include <chucho/postgres_writer.hpp>
+#endif
 #if defined(CHUCHO_HAVE_RUBY)
 #include <chucho/ruby_evaluator_filter.hpp>
 #endif
@@ -348,6 +351,20 @@ void configurator::oracle_writer_body()
     EXPECT_EQ(std::string("192.168.56.102/pdb1"), owrt->get_database());
     EXPECT_EQ(std::string("test_user"), owrt->get_user());
     EXPECT_EQ(std::string("password"), owrt->get_password());
+}
+
+#endif
+
+#if defined(CHUCHO_HAVE_POSTGRES)
+
+void configurator::postgres_writer_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::postgres_writer), typeid(*wrts[0]));
+    auto pwrt = std::static_pointer_cast<chucho::postgres_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(pwrt));
+    EXPECT_EQ(std::string("postgres://test_user:password@192.168.56.101/postgres"), pwrt->get_uri());
 }
 
 #endif

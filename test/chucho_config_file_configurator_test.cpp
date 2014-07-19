@@ -386,6 +386,22 @@ TEST_F(chucho_config_file_configurator, oracle_writer)
 
 #endif
 
+#if defined(CHUCHO_HAVE_POSTGRES)
+
+TEST_F(chucho_config_file_configurator, postgres_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = pg\n"
+              "chucho.writer.pg = chucho::postgres_writer\n"
+              "chucho.writer.pg.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.pg.uri = postgres://test_user:password@192.168.56.101/postgres");
+    postgres_writer_body();
+}
+
+#endif
+
 TEST_F(chucho_config_file_configurator, remote_writer)
 {
     configure("chucho.logger = will\n"

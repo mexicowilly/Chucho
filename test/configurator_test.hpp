@@ -53,6 +53,9 @@ protected:
 #if defined(CHUCHO_HAVE_ORACLE)
     void oracle_writer_body();
 #endif
+#if defined(CHUCHO_HAVE_POSTGRES)
+    void postgres_writer_body();
+#endif
     void remote_writer_body();
 #if defined(CHUCHO_HAVE_RUBY)
     void ruby_evaluator_filter_body();

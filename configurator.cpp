@@ -47,6 +47,9 @@
 #if defined(CHUCHO_HAVE_SQLITE)
 #include <chucho/sqlite_writer_factory.hpp>
 #endif
+#if defined(CHUCHO_HAVE_POSTGRES)
+#include <chucho/postgres_writer_factory.hpp>
+#endif
 #if defined(CHUCHO_HAVE_RUBY)
 #include <chucho/ruby_evaluator_filter_factory.hpp>
 #endif
@@ -140,6 +143,10 @@ void configurator::initialize()
 #if defined(CHUCHO_HAVE_SQLITE)
     fact.reset(new sqlite_writer_factory());
     add_configurable_factory("chucho::sqlite_writer", fact);
+#endif
+#if defined(CHUCHO_HAVE_POSTGRES)
+    fact.reset(new postgres_writer_factory());
+    add_configurable_factory("chucho::postgres_writer", fact);
 #endif
 #if defined(CHUCHO_HAVE_RUBY)
     fact.reset(new ruby_evaluator_filter_factory());

@@ -346,6 +346,21 @@ TEST_F(yaml_configurator, oracle_writer)
 
 #endif
 
+#if defined(CHUCHO_HAVE_POSTGRES)
+
+TEST_F(yaml_configurator, postgres_writer)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::postgres_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m'\n"
+              "        uri: 'postgres://test_user:password@192.168.56.101/postgres'");
+    postgres_writer_body();
+}
+
+#endif
+
 TEST_F(yaml_configurator, remote_writer)
 {
     configure("- chucho::logger:\n"

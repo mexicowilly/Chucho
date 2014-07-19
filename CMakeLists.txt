@@ -311,14 +311,14 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
 IF(CHUCHO_HAVE_POSTGRES)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/postgres_writer.hpp)
     LIST(APPEND CHUCHO_DATABASE_SOURCES
-         postgres_writer.cpp)
-#         sqlite_writer_factory.cpp
-#         sqlite_writer_memento.cpp
-#         include/chucho/sqlite_writer_factory.hpp
-#         include/chucho/sqlite_writer_memento.hpp)
+         postgres_writer.cpp
+         postgres_writer_factory.cpp
+         postgres_writer_memento.cpp
+         include/chucho/postgres_writer_factory.hpp
+         include/chucho/postgres_writer_memento.hpp)
 #    IF(C_API)
-#        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/sqlite_writer.h)
-#        LIST(APPEND CHUCHO_DATABASE_SOURCES c_sqlite_writer.cpp)
+#        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/postgres_writer.h)
+#        LIST(APPEND CHUCHO_DATABASE_SOURCES c_postgres_writer.cpp)
 #    ENDIF()
 ENDIF()
 
@@ -655,6 +655,10 @@ ENDIF()
 
 IF(CHUCHO_HAVE_SQLITE)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_SQLITE)
+ENDIF()
+
+IF(CHUCHO_HAVE_POSTGRES)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_POSTGRES)
 ENDIF()
 
 IF(CHUCHO_HAVE_RUBY)
