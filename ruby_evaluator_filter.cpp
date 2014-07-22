@@ -18,6 +18,7 @@
 #include <chucho/garbage_cleaner.hpp>
 #include <chucho/logger.hpp>
 #include <sstream>
+#include <mutex>
 #if defined(CHUCHO_RUBY_FRAMEWORK)
 #include <Ruby/ruby.h>
 #else
@@ -27,12 +28,28 @@
 namespace
 {
 
-std::once_flag once;
+struct static_data
+{
+    static_data();
 
-void initialize_ruby()
+    std::mutex guard_;
+};
+
+static_data::static_data()
 {
     ruby_init();
-    chucho::garbage_cleaner::get().add([] () { ruby_finalize(); });
+    chucho::garbage_cleaner::get().add([this] () { delete this; ruby_finalize(); });
+}
+
+std::once_flag once;
+
+static_data& data()
+{
+    // This is cleaned in finalize
+    static static_data* sd;
+
+    std::call_once(once, [&] () { sd = new static_data(); });
+    return *sd;
 }
 
 VALUE report_exception(VALUE rprt, VALUE except)
@@ -51,11 +68,11 @@ namespace chucho
 ruby_evaluator_filter::ruby_evaluator_filter(const std::string& expression)
     : expression_(expression)
 {
-    std::call_once(once, initialize_ruby);
 }
 
 filter::result ruby_evaluator_filter::evaluate(const event& evt)
 {
+    std::lock_guard<std::mutex> lg(data().guard_);
     VALUE log_name = rb_str_new2(evt.get_logger()->get_name().c_str());
     rb_define_variable("logger", &log_name);
     VALUE level_name = rb_str_new2(evt.get_level()->get_name());

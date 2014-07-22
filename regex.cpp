@@ -158,10 +158,10 @@ iterator& iterator::operator++ ()
         std::smatch mch = *pimpl_->itor_;
         for (unsigned i = 0; i < mch.size(); i++)
         {
-        if (mch[i].matched)
-            match_.subs_.push_back(sub_match(mch.position(i), mch.length(i)));
-        else
-            match_.subs_.push_back(sub_match(-1, 0));
+            if (mch[i].matched)
+                match_.subs_.push_back(sub_match(mch.position(i), mch.length(i)));
+            else
+                match_.subs_.push_back(sub_match(-1, 0));
         }
     }
 #elif defined(CHUCHO_HAVE_POSIX_REGEX)
