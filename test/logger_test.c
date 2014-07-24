@@ -49,6 +49,25 @@ static void add_writer(void)
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "release logger");
 }
 
+static void ancestors(void)
+{
+    chucho_logger* lgr;
+    chucho_rc rc = chucho_create_logger(&lgr, "ancestors");
+    int anc;
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create logger");
+    rc = chucho_lgr_writes_to_ancestors(lgr, &anc);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "writes to ancestors");
+    sput_fail_unless(anc == 1, "does write to ancestors");
+    rc = chucho_lgr_set_writes_to_ancestors(lgr, 0);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "set writes to ancestors");
+    rc = chucho_lgr_writes_to_ancestors(lgr, &anc);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "writes to ancestors");
+    sput_fail_unless(anc == 0, "does not write to ancestors");
+    rc = chucho_release_logger(lgr);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "release logger");
+}
+
 static void levels(void)
 {
     chucho_logger* lgr;
@@ -72,6 +91,21 @@ static void levels(void)
     rc = chucho_lgr_get_effective_level(lgr, &lvl);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get effective level");
     sput_fail_unless(lvl == chucho_warn_level(), "level is WARN");
+    rc = chucho_release_logger(lgr);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "release logger");
+    rc = chucho_remove_unused_loggers();
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "remove unused loggers");
+}
+
+static void name(void)
+{
+    chucho_logger* lgr;
+    chucho_rc rc = chucho_create_logger(&lgr, "name");
+    const char* nm;
+
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create logger");
+    rc = chucho_lgr_get_name(lgr, &nm);
+    sput_fail_unless(strcmp(nm, "name") == 0, "get name");
     rc = chucho_release_logger(lgr);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "release logger");
     rc = chucho_remove_unused_loggers();
@@ -143,32 +177,14 @@ static void remove_writers(void)
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "release logger");
 }
 
-static void ancestors(void)
-{
-    chucho_logger* lgr;
-    chucho_rc rc = chucho_create_logger(&lgr, "ancestors");
-    int anc;
-
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create logger");
-    rc = chucho_lgr_writes_to_ancestors(lgr, &anc);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "writes to ancestors");
-    sput_fail_unless(anc == 1, "does write to ancestors");
-    rc = chucho_lgr_set_writes_to_ancestors(lgr, 0);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "set writes to ancestors");
-    rc = chucho_lgr_writes_to_ancestors(lgr, &anc);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "writes to ancestors");
-    sput_fail_unless(anc == 0, "does not write to ancestors");
-    rc = chucho_release_logger(lgr);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "release logger");
-}
-
 void run_logger_test(void)
 {
     sput_enter_suite("logger");
     sput_run_test(add_writer);
+    sput_run_test(ancestors);
     sput_run_test(levels);
+    sput_run_test(name);
     sput_run_test(permits);
     sput_run_test(remove_writers);
-    sput_run_test(ancestors);
     sput_leave_suite();
 }

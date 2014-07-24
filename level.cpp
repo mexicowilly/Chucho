@@ -22,7 +22,6 @@
 #include <set>
 #include <algorithm>
 #include <mutex>
-#include <locale>
 
 namespace
 {
@@ -207,7 +206,6 @@ struct levels
     std::shared_ptr<chucho::level> FATAL_;
     std::shared_ptr<chucho::level> OFF_;
     std::mutex guard_;
-    std::locale c_loc_;
     std::set<std::shared_ptr<chucho::level>, level_name_less> all_levels_;
 };
 
@@ -218,8 +216,7 @@ levels::levels()
       WARN_(new warn()),
       ERROR_(new error()),
       FATAL_(new fatal()),
-      OFF_(new off()),
-      c_loc_("C")
+      OFF_(new off())
 {
     all_levels_.insert(TRACE_);
     all_levels_.insert(DEBUG_);

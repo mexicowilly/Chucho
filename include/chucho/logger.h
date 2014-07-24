@@ -114,6 +114,15 @@ CHUCHO_EXPORT chucho_rc chucho_lgr_get_effective_level(const chucho_logger* lgr,
  */
 CHUCHO_EXPORT chucho_rc chucho_lgr_get_level(const chucho_logger* lgr, const chucho_level** lvl);
 /**
+ * Return the name of a logger.
+
+ * @param lgr the logger
+ * @param nm the name
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
+CHUCHO_EXPORT chucho_rc chucho_lgr_get_name(const chucho_logger* lgr, const char** nm);
+/**
  * Get all writers associated with a logger. The buf parameter 
  * is an array of @ref chucho_writer pointers. The size of the 
  * array is buf_size, and the count parameter will tell you how 
