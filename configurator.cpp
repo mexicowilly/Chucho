@@ -59,21 +59,6 @@
 #include <cstring>
 #include <mutex>
 
-namespace
-{
-
-std::once_flag once;
-// This will be cleaned at finalize()
-std::map<std::string, std::shared_ptr<chucho::configurable_factory>>* factories;
-
-void init_factories()
-{
-    factories = new std::map<std::string, std::shared_ptr<chucho::configurable_factory>>();
-    chucho::garbage_cleaner::get().add([&] () { delete factories; });
-}
-
-}
-
 namespace chucho
 {
 
@@ -84,7 +69,15 @@ configurator::configurator()
 
 std::map<std::string, std::shared_ptr<configurable_factory>>& configurator::get_factories()
 {
-    std::call_once(once, init_factories);
+    static std::once_flag once;
+    // This will be cleaned at finalize()
+    static std::map<std::string, std::shared_ptr<chucho::configurable_factory>>* factories;
+
+    std::call_once(once, [&] ()
+    {
+        factories = new std::map<std::string, std::shared_ptr<chucho::configurable_factory>>();
+        garbage_cleaner::get().add([&] () { delete factories; });
+    });
     return *factories;
 }
 

@@ -16,13 +16,6 @@
 
 #include <chucho/garbage_cleaner.hpp>
 
-namespace
-{
-
-std::once_flag once;
-
-}
-
 namespace chucho
 {
 
@@ -40,6 +33,7 @@ void garbage_cleaner::add(cleaner_type cln)
 
 garbage_cleaner& garbage_cleaner::get()
 {
+    static std::once_flag once;
     // This gets cleaned by finalize
     static garbage_cleaner* gc;
 

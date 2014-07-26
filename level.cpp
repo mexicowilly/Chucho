@@ -235,10 +235,9 @@ bool levels::level_name_less::operator() (std::shared_ptr<chucho::level> lvl_one
            chucho::text_util::to_lower(lvl_two->get_name());
 }
 
-std::once_flag once;
-
 levels& lvls()
 {
+    static std::once_flag once;
     // This gets cleaned in finalize()
     static levels* ls;
 

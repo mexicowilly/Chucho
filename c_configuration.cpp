@@ -35,10 +35,9 @@ static_data::static_data()
     chucho::garbage_cleaner::get().add([this] () { delete this; });
 }
 
-std::once_flag once;
-
 static_data& data()
 {
+    static std::once_flag once;
     static static_data* sd;
 
     std::call_once(once, [&] () { sd = new static_data(); });

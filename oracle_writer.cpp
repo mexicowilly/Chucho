@@ -22,13 +22,6 @@
 #include <sstream>
 #include <thread>
 
-namespace
-{
-
-std::once_flag once;
-
-}
-
 namespace chucho
 {
 
@@ -54,6 +47,8 @@ oracle_writer::oracle_writer(std::shared_ptr<formatter> fmt,
       marker_(nullptr),
       thread_name_(nullptr)
 {
+    static std::once_flag once;
+
     std::call_once(once, [] () { garbage_cleaner::get().add([] () { OCITerminate(OCI_DEFAULT); }); });
     set_status_origin("oracle_writer");
     auto rc = OCIEnvCreate(&env_, OCI_DEFAULT, 0, 0, 0, 0, 0, 0);

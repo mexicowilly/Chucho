@@ -41,10 +41,9 @@ static_data::static_data()
     chucho::garbage_cleaner::get().add([this] () { delete this; ruby_finalize(); });
 }
 
-std::once_flag once;
-
 static_data& data()
 {
+    static std::once_flag once;
     // This is cleaned in finalize
     static static_data* sd;
 
