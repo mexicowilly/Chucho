@@ -31,7 +31,7 @@ namespace chucho
 class rolling_file_writer_memento : public file_writer_memento
 {
 public:
-    rolling_file_writer_memento(const configurator& cfg);
+    rolling_file_writer_memento(configurator& cfg);
 
     std::shared_ptr<file_roller> get_file_roller() const;
     std::shared_ptr<file_roll_trigger> get_file_roll_trigger() const;

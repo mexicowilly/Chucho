@@ -24,10 +24,11 @@
 namespace chucho
 {
 
-size_file_roll_trigger_memento::size_file_roll_trigger_memento(const configurator& cfg)
+size_file_roll_trigger_memento::size_file_roll_trigger_memento(configurator& cfg)
     : memento(cfg)
 {
     set_status_origin("size_file_roll_trigger_memento");
+    cfg.get_security_policy().set_integer("size_file_roll_trigger::max_size", static_cast<std::uintmax_t>(1), static_cast<std::uintmax_t>(1024 * 1024 * 1024));
     set_handler("max_size", std::bind(&size_file_roll_trigger_memento::parse, this, std::placeholders::_1));
 }
 
@@ -35,7 +36,7 @@ void size_file_roll_trigger_memento::parse(const std::string& spec)
 {
     if (spec.empty() || !std::isdigit(spec[0]))
         throw exception(get_status_origin() + ": The size specification must start with a digit");
-    std::istringstream stream(spec);
+    std::istringstream stream(validate("size_file_roll_trigger::max_size(text)", spec));
     std::uintmax_t tmp;
     stream >> tmp;
     std::string suffix;
@@ -65,7 +66,7 @@ void size_file_roll_trigger_memento::parse(const std::string& spec)
             break;
         }
     }
-    max_size_ = tmp;
+    max_size_ = validate("size_file_roll_trigger::max_size", tmp);
 }
 
 }

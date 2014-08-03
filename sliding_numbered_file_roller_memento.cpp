@@ -19,12 +19,14 @@
 namespace chucho
 {
 
-sliding_numbered_file_roller_memento::sliding_numbered_file_roller_memento(const configurator& cfg)
+sliding_numbered_file_roller_memento::sliding_numbered_file_roller_memento(configurator& cfg)
     : file_roller_memento(cfg)
 {
     set_status_origin("sliding_numbered_file_roller_memento");
-    set_handler("min_index", [this] (const std::string& idx) { min_index_ = std::stoi(idx); });
-    set_handler("max_count", [this] (const std::string& cnt) { max_count_ = std::stoul(cnt); });
+    cfg.get_security_policy().set_integer("sliding_numbered_file_roller::min_index", -1000, 1000);
+    cfg.get_security_policy().set_integer("sliding_numbered_file_roller::max_count", static_cast<std::size_t>(1), static_cast<std::size_t>(1000));
+    set_handler("min_index", [this] (const std::string& idx) { min_index_ = validate("sliding_numbered_file_roller::min_index", std::stoi(validate("sliding_numbered_file_roller::min_index(text)", idx))); });
+    set_handler("max_count", [this] (const std::string& cnt) { max_count_ = validate("sliding_numbered_file_roller::max_count", std::stoul(validate("sliding_numbered_file_roller::max_count(text)", cnt))); });
 }
 
 }

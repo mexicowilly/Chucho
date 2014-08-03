@@ -20,7 +20,7 @@
 namespace chucho
 {
 
-file_roller_memento::file_roller_memento(const configurator& cfg)
+file_roller_memento::file_roller_memento(configurator& cfg)
     : memento(cfg)
 {
     set_status_origin("file_roller_memento");

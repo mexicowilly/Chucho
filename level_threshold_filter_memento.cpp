@@ -20,11 +20,11 @@
 namespace chucho
 {
 
-level_threshold_filter_memento::level_threshold_filter_memento(const configurator& cfg, memento_key_set ks)
+level_threshold_filter_memento::level_threshold_filter_memento(configurator& cfg, memento_key_set ks)
     : memento(cfg)
 {
     set_status_origin("level_threshold_filter_memento");
-    handler lvl_hnd = [this](const std::string& name) { level_ = level::from_text(name); };
+    handler lvl_hnd = [this](const std::string& name) { level_ = level::from_text(validate("level_threshold_filter::level", name)); };
     if (ks == memento_key_set::CHUCHO)
         set_handler("level", lvl_hnd);
     else if (ks == memento_key_set::LOG4CPLUS)

@@ -29,7 +29,7 @@ namespace chucho
 class pattern_formatter_memento : public memento
 {
 public:
-    pattern_formatter_memento(const configurator& cfg);
+    pattern_formatter_memento(configurator& cfg);
 
     const std::string& get_pattern() const;
 

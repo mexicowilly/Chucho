@@ -29,7 +29,7 @@ namespace chucho
 class cout_writer_memento : public writer_memento
 {
 public:
-    cout_writer_memento(const configurator& cfg);
+    cout_writer_memento(configurator& cfg);
 };
 
 }

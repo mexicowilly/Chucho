@@ -40,7 +40,7 @@ std::shared_ptr<configurable> size_file_roll_trigger_factory::create_configurabl
     return cnf;
 }
 
-std::shared_ptr<memento> size_file_roll_trigger_factory::create_memento(const configurator& cfg)
+std::shared_ptr<memento> size_file_roll_trigger_factory::create_memento(configurator& cfg)
 {
     std::shared_ptr<memento> mnto(new size_file_roll_trigger_memento(cfg));
     return mnto;

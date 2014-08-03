@@ -41,7 +41,7 @@ std::shared_ptr<configurable> ruby_evaluator_filter_factory::create_configurable
     return cnf;
 }
 
-std::shared_ptr<memento> ruby_evaluator_filter_factory::create_memento(const configurator& cfg)
+std::shared_ptr<memento> ruby_evaluator_filter_factory::create_memento(configurator& cfg)
 {
     std::shared_ptr<memento> mnto = std::make_shared<ruby_evaluator_filter_memento>(cfg);
     return mnto;

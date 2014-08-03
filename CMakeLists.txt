@@ -149,6 +149,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/remote_writer.hpp
     include/chucho/rolling_file_writer.hpp
     include/chucho/ruby_evaluator_filter.hpp
+    include/chucho/security_policy.hpp
     include/chucho/size_file_roll_trigger.hpp
     include/chucho/sliding_numbered_file_roller.hpp
     include/chucho/status.hpp
@@ -543,6 +544,7 @@ SET(CHUCHO_SOURCES
     rolling_file_writer.cpp
     rolling_file_writer_factory.cpp
     rolling_file_writer_memento.cpp
+    security_policy.cpp
     size_file_roll_trigger.cpp
     size_file_roll_trigger_factory.cpp
     size_file_roll_trigger_memento.cpp

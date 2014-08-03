@@ -19,7 +19,7 @@
 namespace chucho
 {
 
-duplicate_message_filter_memento::duplicate_message_filter_memento(const configurator& cfg)
+duplicate_message_filter_memento::duplicate_message_filter_memento(configurator& cfg)
     : memento(cfg)
 {
 }

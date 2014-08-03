@@ -19,11 +19,11 @@
 namespace chucho
 {
 
-sqlite_writer_memento::sqlite_writer_memento(const configurator& cfg)
+sqlite_writer_memento::sqlite_writer_memento(configurator& cfg)
     : writer_memento(cfg)
 {
     set_status_origin("sqlite_writer_memento");
-    set_handler("file_name", [this] (const std::string& fn) { file_name_ = fn; });
+    set_handler("file_name", [this] (const std::string& fn) { file_name_ = validate("sqlite_writer::file_name", fn); });
 }
 
 }

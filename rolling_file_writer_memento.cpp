@@ -21,7 +21,7 @@
 namespace chucho
 {
 
-rolling_file_writer_memento::rolling_file_writer_memento(const configurator& cfg)
+rolling_file_writer_memento::rolling_file_writer_memento(configurator& cfg)
     : file_writer_memento(cfg, get_memento_key_set(cfg))
 {
     set_status_origin("rolling_file_writer_memento");

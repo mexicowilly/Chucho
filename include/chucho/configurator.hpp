@@ -23,6 +23,7 @@
 #endif
 
 #include <chucho/status_reporter.hpp>
+#include <chucho/security_policy.hpp>
 #include <map>
 #include <string>
 
@@ -69,7 +70,7 @@ public:
     /**
      * Make a configurator.
      */
-    configurator();
+    configurator(const security_policy& sec_pol);
     //@}
 
     /**
@@ -80,6 +81,7 @@ public:
      * @param in the input stream
      */
     virtual void configure(std::istream& in) = 0;
+    security_policy& get_security_policy();
 
 protected:
     /**
@@ -104,7 +106,7 @@ protected:
      */
     void add_variables(const std::map<std::string, std::string>& vars);
     /**
-     * Resove variables. As the configurator encounters pieces of 
+     * Resolve variables. As the configurator encounters pieces of 
      * text, they may contain variable references. These are 
      * resolved here. 
      *
@@ -121,6 +123,7 @@ private:
     CHUCHO_NO_EXPORT static void initialize();
 
     std::map<std::string, std::string> variables_;
+    security_policy security_policy_;
 };
 
 inline void configurator::add_configurable_factory(const std::string& name,
@@ -132,6 +135,11 @@ inline void configurator::add_configurable_factory(const std::string& name,
 inline void configurator::add_variables(const std::map<std::string, std::string>& vars)
 {
     variables_.insert(vars.begin(), vars.end());
+}
+
+inline security_policy& configurator::get_security_policy()
+{
+    return security_policy_;
 }
 
 }

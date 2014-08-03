@@ -43,7 +43,7 @@ std::shared_ptr<configurable> postgres_writer_factory::create_configurable(std::
     return pw;
 }
 
-std::shared_ptr<memento> postgres_writer_factory::create_memento(const configurator& cfg)
+std::shared_ptr<memento> postgres_writer_factory::create_memento(configurator& cfg)
 {
     std::shared_ptr<memento> mnto = std::make_shared<postgres_writer_memento>(cfg);
     return mnto;

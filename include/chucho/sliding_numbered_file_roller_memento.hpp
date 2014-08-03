@@ -30,7 +30,7 @@ namespace chucho
 class sliding_numbered_file_roller_memento : public file_roller_memento
 {
 public:
-    sliding_numbered_file_roller_memento(const configurator& cfg);
+    sliding_numbered_file_roller_memento(configurator& cfg);
 
     const optional<std::size_t>& get_max_count() const;
     const optional<int>& get_min_index() const;

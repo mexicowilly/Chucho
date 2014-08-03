@@ -29,7 +29,7 @@ namespace chucho
 class duplicate_message_filter_memento : public memento
 {
 public:
-    duplicate_message_filter_memento(const configurator& cfg);
+    duplicate_message_filter_memento(configurator& cfg);
 };
 
 }

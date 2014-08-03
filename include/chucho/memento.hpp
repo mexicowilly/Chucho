@@ -57,7 +57,7 @@ public:
      * 
      * @param cfg the configurator that is performing configuration
      */
-    memento(const configurator& cfg);
+    memento(configurator& cfg);
 
     /**
      * Handle a key-value pair from the configuration file. A 
@@ -114,16 +114,30 @@ protected:
      * @param hand the function
      */
     void set_handler(const std::string& key, handler hand);
+    std::string validate(const std::string& key, const std::string& val) const;
+    template <typename val_type>
+    val_type validate(const std::string& key, const val_type& val) const;
 
     /**
      * The @ref configurator that is perform configuration.
      */
-    const configurator& cfg_;
+    configurator& cfg_;
 
 private:
     std::map<std::string, handler> handlers_;
     std::multimap<std::string, std::string> unconnected_aliases_;
 };
+
+inline std::string memento::validate(const std::string& key, const std::string& val) const
+{
+    return cfg_.get_security_policy().validate(key, val);
+}
+
+template <typename val_type>
+val_type memento::validate(const std::string& key, const val_type& val) const
+{
+    return cfg_.get_security_policy().validate(key, val);
+}
 
 }
 

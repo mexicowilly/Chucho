@@ -73,7 +73,7 @@ public:
      * @param cfg the configurator currently in action
      * @return the memento
      */
-    virtual std::shared_ptr<memento> create_memento(const configurator& cfg) = 0;
+    virtual std::shared_ptr<memento> create_memento(configurator& cfg) = 0;
 };
 
 }

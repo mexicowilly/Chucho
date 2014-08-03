@@ -56,7 +56,7 @@ std::shared_ptr<configurable> windows_event_log_writer_factory::create_configura
     return cnf;
 }
 
-std::shared_ptr<memento> windows_event_log_writer_factory::create_memento(const configurator& cfg)
+std::shared_ptr<memento> windows_event_log_writer_factory::create_memento(configurator& cfg)
 {
     std::shared_ptr<memento> mnto = std::make_shared<windows_event_log_writer_memento>(cfg, get_memento_key_set(cfg));
     return mnto;

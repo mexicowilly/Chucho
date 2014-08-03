@@ -62,7 +62,8 @@
 namespace chucho
 {
 
-configurator::configurator()
+configurator::configurator(const security_policy& sec_pol)
+    : security_policy_(sec_pol)
 {
     set_status_origin("configurator");
 }

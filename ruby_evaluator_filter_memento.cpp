@@ -19,11 +19,11 @@
 namespace chucho
 {
 
-ruby_evaluator_filter_memento::ruby_evaluator_filter_memento(const configurator& cfg)
+ruby_evaluator_filter_memento::ruby_evaluator_filter_memento(configurator& cfg)
     : memento(cfg)
 {
     set_status_origin("ruby_evaluator_filter_memento");
-    set_handler("expression", [this] (const std::string& val) { expression_ = val; });
+    set_handler("expression", [this] (const std::string& val) { expression_ = validate("ruby_evaluator_filter::expression", val); });
 }
 
 }

@@ -22,7 +22,7 @@
 namespace chucho
 {
 
-memento::memento(const configurator& cfg)
+memento::memento(configurator& cfg)
     : cfg_(cfg)
 {
     set_status_origin("memento");

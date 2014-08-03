@@ -54,6 +54,7 @@ struct static_data
     std::string loaded_file_name_;
     bool is_configured_;
     std::size_t max_size_;
+    chucho::security_policy security_policy_;
 };
 
 static_data::static_data()
@@ -185,7 +186,7 @@ bool configuration::configure_from_file(const std::string& file_name, reporter& 
     if (fmt == format::YAML)
     {
         report.info("The file, " + file_name + ", is in YAML format");
-        cfg.reset(new yaml_configurator);
+        cfg.reset(new yaml_configurator(data().security_policy_));
     }
 
     #endif
@@ -195,7 +196,7 @@ bool configuration::configure_from_file(const std::string& file_name, reporter& 
     if (fmt == format::CONFIG_FILE)
     {
         report.info("The file, " + file_name + ", is in config file format");
-        cfg.reset(new config_file_configurator);
+        cfg.reset(new config_file_configurator(data().security_policy_));
     }
 
     #endif
@@ -251,6 +252,11 @@ const std::string& configuration::get_loaded_file_name()
 std::size_t configuration::get_max_size()
 {
     return data().max_size_;
+}
+
+security_policy& configuration::get_security_policy()
+{
+    return data().security_policy_;
 }
 
 configuration::style configuration::get_style()
@@ -318,7 +324,7 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
 
             if (fmt == format::YAML)
             {
-                yaml_configurator yam; 
+                yaml_configurator yam(data().security_policy_);
                 // this is already validated UTF-8
                 std::istringstream fb_in(sd.fallback_);
                 yam.configure(fb_in);
@@ -332,7 +338,7 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
 
             if (fmt == format::CONFIG_FILE)
             {
-                config_file_configurator cnf;
+                config_file_configurator cnf(data().security_policy_);
                 std::istringstream fb_in(sd.fallback_);
                 cnf.configure(fb_in);
                 sd.is_configured_ = true;

@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_CONFIGURATION_HPP__)
 #define CHUCHO_CONFIGURATION_HPP__
 
-#include <chucho/export.hpp>
+#include <chucho/security_policy.hpp>
 #include <chucho/status_reporter.hpp>
 #include <string>
 #include <functional>
@@ -157,6 +157,13 @@ public:
      */
     static std::size_t get_max_size();
     /**
+     * Return the security policy.
+     * 
+     * @return the security policy 
+     * @sa @ref security_policy 
+     */
+    static security_policy& get_security_policy();
+    /**
      * Return the configuration style. AUTOMATIC is the default 
      * style. 
      * 
@@ -291,7 +298,7 @@ protected:
     friend class logger;
 
 private:
-    class reporter : public chucho::status_reporter
+    class CHUCHO_NO_EXPORT reporter : public chucho::status_reporter
     {
     public:
         reporter();

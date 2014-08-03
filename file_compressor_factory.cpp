@@ -25,7 +25,7 @@ file_compressor_factory::file_compressor_factory()
     set_status_origin("file_compressor_factory");
 }
 
-std::shared_ptr<memento> file_compressor_factory::create_memento(const configurator& cfg)
+std::shared_ptr<memento> file_compressor_factory::create_memento(configurator& cfg)
 {
     auto mnto = std::make_shared<file_compressor_memento>(cfg);
     return mnto;

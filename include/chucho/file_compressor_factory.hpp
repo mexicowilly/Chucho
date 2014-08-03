@@ -54,7 +54,7 @@ public:
      * @param cfg the @ref configuration performing configuration
      * @return a @ref file_compressor_memento
      */
-    virtual std::shared_ptr<memento> create_memento(const configurator& cfg) override;
+    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
 };
 
 }

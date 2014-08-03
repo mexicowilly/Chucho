@@ -29,7 +29,7 @@ namespace chucho
 class oracle_writer_memento : public writer_memento
 {
 public:
-    oracle_writer_memento(const configurator& cfg);
+    oracle_writer_memento(configurator& cfg);
 
     const std::string& get_database() const;
     const std::string& get_password() const;
