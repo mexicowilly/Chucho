@@ -19,13 +19,13 @@
 namespace chucho
 {
 
-oracle_writer_memento::oracle_writer_memento(const configurator& cfg)
+oracle_writer_memento::oracle_writer_memento(configurator& cfg)
     : writer_memento(cfg)
 {
     set_status_origin("oracle_writer_memento");
-    set_handler("user", [this] (const std::string& user) { user_ = user; });
-    set_handler("password", [this] (const std::string& password) { password_ = password; });
-    set_handler("database", [this] (const std::string& database) { database_ = database; });
+    set_handler("user", [this] (const std::string& user) { user_ = validate("oracle_writer::user", user); });
+    set_handler("password", [this] (const std::string& password) { password_ = validate("oracle_writer::password", password); });
+    set_handler("database", [this] (const std::string& database) { database_ = validate("oracle_writer::database", database); });
 }
 
 }

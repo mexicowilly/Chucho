@@ -22,19 +22,20 @@ namespace chucho
 {
 
 
-syslog_writer_memento::syslog_writer_memento(const configurator& cfg)
+syslog_writer_memento::syslog_writer_memento(configurator& cfg)
     : writer_memento(cfg)
 {
     set_status_origin("syslog_writer_memento");
+    cfg.get_security_policy().set_integer("syslog_writer::port", static_cast<std::uint16_t>(1), static_cast<std::uint16_t>(65535));
     set_handler("facility", std::bind(&syslog_writer_memento::set_facility, this, std::placeholders::_1));
-    set_handler("host_name", [this] (const std::string& name) { host_name_ = name; });
+    set_handler("host_name", [this] (const std::string& name) { host_name_ = validate("syslog_writer::host_name", name); });
     set_alias("host_name", "host");
-    set_handler("port", [this] (const std::string& port) { port_ = static_cast<std::uint16_t>(std::stoul(port)); });
+    set_handler("port", [this] (const std::string& port) { port_ = validate("syslog_writer::port", static_cast<std::uint16_t>(std::stoul(validate("syslog_writer::port(text)", port)))); });
 }
 
 void syslog_writer_memento::set_facility(const std::string& name)
 {
-    auto lname = text_util::to_lower(name);
+    auto lname = text_util::to_lower(validate("syslog_writer::facility", name));
     if (lname == "kern")
         facility_ = syslog::facility::KERN;
     else if (lname == "user")

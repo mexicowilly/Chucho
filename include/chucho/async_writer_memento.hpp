@@ -32,7 +32,7 @@ namespace chucho
 class async_writer_memento : public memento
 {
 public:
-    async_writer_memento(const configurator& cfg);
+    async_writer_memento(configurator& cfg);
 
     std::shared_ptr<level> get_discard_threshold() const;
     const optional<bool>& get_flush_on_destruct() const;

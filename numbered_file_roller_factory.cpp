@@ -44,7 +44,7 @@ std::shared_ptr<configurable> numbered_file_roller_factory::create_configurable(
     return std::static_pointer_cast<configurable>(nfr);
 }
 
-std::shared_ptr<memento> numbered_file_roller_factory::create_memento(const configurator& cfg)
+std::shared_ptr<memento> numbered_file_roller_factory::create_memento(configurator& cfg)
 {
     std::shared_ptr<memento> mnto(new numbered_file_roller_memento(cfg));
     return mnto;

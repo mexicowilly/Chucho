@@ -44,7 +44,7 @@ std::shared_ptr<configurable> time_file_roller_factory::create_configurable(std:
     return cnf;
 }
 
-std::shared_ptr<memento> time_file_roller_factory::create_memento(const configurator& cfg)
+std::shared_ptr<memento> time_file_roller_factory::create_memento(configurator& cfg)
 {
     std::shared_ptr<memento> mnto(new time_file_roller_memento(cfg));
     return mnto;

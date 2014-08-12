@@ -112,6 +112,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                pattern_formatter_test.cpp
                regex_test.cpp
                rolling_file_writer_test.cpp
+               security_policy_test.cpp
                size_file_roll_trigger_test.cpp
                utf8_test.cpp
                ${CHUCHO_TEST_COMPRESSION_SOURCES}
@@ -245,6 +246,8 @@ IF(C_API)
                    remote_writer_test.h
                    rolling_file_writer_test.c
                    rolling_file_writer_test.h
+                   security_policy_test.c
+                   security_policy_test.h
                    size_file_roll_trigger_test.c
                    size_file_roll_trigger_test.h
                    sliding_numbered_file_roller_test.c

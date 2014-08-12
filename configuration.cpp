@@ -23,6 +23,7 @@
 #include <chucho/garbage_cleaner.hpp>
 #include <chucho/environment.hpp>
 #include <chucho/configurator.hpp>
+#include <chucho/configurable_factory.hpp>
 
 #if defined(CHUCHO_YAML_CONFIG)
 #include <chucho/yaml_parser.hpp>
@@ -54,6 +55,7 @@ struct static_data
     std::string loaded_file_name_;
     bool is_configured_;
     std::size_t max_size_;
+    chucho::security_policy security_policy_;
 };
 
 static_data::static_data()
@@ -185,7 +187,7 @@ bool configuration::configure_from_file(const std::string& file_name, reporter& 
     if (fmt == format::YAML)
     {
         report.info("The file, " + file_name + ", is in YAML format");
-        cfg.reset(new yaml_configurator);
+        cfg.reset(new yaml_configurator(data().security_policy_));
     }
 
     #endif
@@ -195,7 +197,7 @@ bool configuration::configure_from_file(const std::string& file_name, reporter& 
     if (fmt == format::CONFIG_FILE)
     {
         report.info("The file, " + file_name + ", is in config file format");
-        cfg.reset(new config_file_configurator);
+        cfg.reset(new config_file_configurator(data().security_policy_));
     }
 
     #endif
@@ -253,6 +255,14 @@ std::size_t configuration::get_max_size()
     return data().max_size_;
 }
 
+security_policy& configuration::get_security_policy()
+{
+    static std::once_flag once;
+
+    std::call_once(once, initialize_security_policy);
+    return data().security_policy_;
+}
+
 configuration::style configuration::get_style()
 {
     return data().style_;
@@ -261,6 +271,28 @@ configuration::style configuration::get_style()
 configuration::unknown_handler_type configuration::get_unknown_handler()
 {
     return data().unknown_handler_;
+}
+
+void configuration::initialize_security_policy()
+{
+    #if defined(CHUCHO_YAML_CONFIG)
+
+    yaml_configurator cnf(data().security_policy_);
+
+    #elif defined(CHUCHO_CONFIG_FILE_CONFIG)
+
+    config_file_configurator cnf(data().security_policy_);
+
+    #else
+
+    return;
+
+    #endif
+    // The mementos are where each configurable configures
+    // its security policy.
+    auto& facts(configurator::get_factories());
+    for (auto fact : facts)
+        fact.second->create_memento(cnf);
 }
 
 void configuration::perform(std::shared_ptr<logger> root_logger)
@@ -318,7 +350,7 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
 
             if (fmt == format::YAML)
             {
-                yaml_configurator yam; 
+                yaml_configurator yam(data().security_policy_);
                 // this is already validated UTF-8
                 std::istringstream fb_in(sd.fallback_);
                 yam.configure(fb_in);
@@ -332,7 +364,7 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
 
             if (fmt == format::CONFIG_FILE)
             {
-                config_file_configurator cnf;
+                config_file_configurator cnf(data().security_policy_);
                 std::istringstream fb_in(sd.fallback_);
                 cnf.configure(fb_in);
                 sd.is_configured_ = true;

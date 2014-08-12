@@ -29,7 +29,7 @@ namespace chucho
 class ruby_evaluator_filter_memento : public memento
 {
 public:
-    ruby_evaluator_filter_memento(const configurator& cfg);
+    ruby_evaluator_filter_memento(configurator& cfg);
 
     const std::string& get_expression() const;
 

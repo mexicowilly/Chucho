@@ -14,27 +14,21 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_SLIDING_NUMBERED_FILE_ROLLER_FACTORY_HPP__)
-#define CHUCHO_SLIDING_NUMBERED_FILE_ROLLER_FACTORY_HPP__
+#if !defined(CHUCHO_C_SECURITY_POLICY_HPP__)
+#define CHUCHO_C_SECURITY_POLICY_HPP__
 
-#if !defined(CHUCHO_BUILD)
-#error "This header is private"
-#endif
+#include <chucho/security_policy.hpp>
 
-#include <chucho/configurable_factory.hpp>
-
-namespace chucho
+extern "C"
 {
 
-class sliding_numbered_file_roller_factory : public configurable_factory
+struct chucho_security_policy
 {
-public:
-    sliding_numbered_file_roller_factory();
-
-    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
-    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
+    // You don't own this pointer. It's just a settable reference.
+    chucho::security_policy* pol_;
 };
 
 }
 
 #endif
+

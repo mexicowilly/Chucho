@@ -29,7 +29,7 @@ namespace chucho
 class postgres_writer_memento : public writer_memento
 {
 public:
-    postgres_writer_memento(const configurator& cfg);
+    postgres_writer_memento(configurator& cfg);
 
     const std::string& get_uri() const;
 

@@ -19,18 +19,22 @@
 namespace chucho
 {
 
-mysql_writer_memento::mysql_writer_memento(const configurator& cfg)
+mysql_writer_memento::mysql_writer_memento(configurator& cfg)
     : writer_memento(cfg)
 {
     set_status_origin("mysql_writer_memento");
-    set_handler("host", [this] (const std::string& host) { host_ = host; });
-    set_handler("user", [this] (const std::string& user) { user_ = user; });
-    set_handler("password", [this] (const std::string& password) { password_ = password; });
-    set_handler("database", [this] (const std::string& database) { database_ = database; });
-    set_handler("port", [this] (const std::string& port) { port_ = static_cast<std::uint16_t>(std::stoul(port)); });
-    set_handler("queue_capacity", [this] (const std::string& cap) { queue_capacity_ = std::stoul(cap); });
-    set_handler("discard_threshold", [this] (const std::string& name) { discard_threshold_ = level::from_text(name); });
-    set_handler("flush_on_destruct", [this] (const std::string& name) { flush_on_destruct_ = boolean_value(name); });
+    cfg.get_security_policy().set_text("mysql_writer::user", 16);
+    cfg.get_security_policy().set_integer("mysql_writer::port", static_cast<std::uint16_t>(1), static_cast<uint16_t>(65535));
+    cfg.get_security_policy().set_text("mysql_writer::database", 64)
+    cfg.get_security_policy().set_integer("mysql_writer::queue_capacity", 10, 32 * 1024);
+    set_handler("host", [this] (const std::string& host) { host_ = validate("mysql_writer::host", host); });
+    set_handler("user", [this] (const std::string& user) { user_ = validate("mysql_writer::user", user); });
+    set_handler("password", [this] (const std::string& password) { password_ = validate("mysql_writer::password", password); });
+    set_handler("database", [this] (const std::string& database) { database_ = validate("mysql_writer::database", database); });
+    set_handler("port", [this] (const std::string& port) { port_ = validate("mysql_writer::port", static_cast<std::uint16_t>(std::stoul(validate("mysql_writer::port(text)", port)))); });
+    set_handler("queue_capacity", [this] (const std::string& cap) { queue_capacity_ = validate("mysql_writer::queue_capacity", std::stoul(validate("mysql_writer::queue_capacity(text)", cap))); });
+    set_handler("discard_threshold", [this] (const std::string& name) { discard_threshold_ = level::from_text(validate("mysql_writer::discard_threshold", name)); });
+    set_handler("flush_on_destruct", [this] (const std::string& name) { flush_on_destruct_ = boolean_value(validate("mysql_writer::flush_on_destruct", name)); });
 }
 
 }

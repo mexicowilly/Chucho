@@ -39,7 +39,8 @@ public:
 namespace chucho
 {
 
-yaml_configurator::yaml_configurator()
+yaml_configurator::yaml_configurator(const security_policy& sec_pol)
+    : configurator(sec_pol)
 {
     set_status_origin("yaml_configurator");
 }

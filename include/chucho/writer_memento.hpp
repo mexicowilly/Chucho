@@ -50,7 +50,7 @@ public:
      * 
      * @param cfg the configurator that is perform configuration
      */
-    writer_memento(const configurator& cfg);
+    writer_memento(configurator& cfg);
     //@}
 
     /**

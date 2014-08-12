@@ -19,12 +19,13 @@
 namespace chucho
 {
 
-time_file_roller_memento::time_file_roller_memento(const configurator& cfg)
+time_file_roller_memento::time_file_roller_memento(configurator& cfg)
     : file_roller_memento(cfg)
 {
-    set_status_origin("tile_file_roller_memento");
-    set_handler("file_name_pattern", [this] (const std::string& val) { file_name_pattern_ = val; });
-    set_handler("max_history", [this] (const std::string& val) { max_history_ = std::stoul(val); });
+    set_status_origin("time_file_roller_memento");
+    cfg.get_security_policy().set_integer("time_file_roller::max_history", static_cast<size_t>(1), static_cast<size_t>(1000));
+    set_handler("file_name_pattern", [this] (const std::string& val) { file_name_pattern_ = validate("time_file_roller::file_name_patter", val); });
+    set_handler("max_history", [this] (const std::string& val) { max_history_ = validate("time_file_roller::max_history", std::stoul(validate("time_file_roller::max_history(text)", val))); });
 }
 
 }

@@ -19,7 +19,7 @@
 namespace chucho
 {
 
-windows_event_log_writer_memento::windows_event_log_writer_memento(const configurator& cfg, memento_key_set ks)
+windows_event_log_writer_memento::windows_event_log_writer_memento(configurator& cfg, memento_key_set ks)
     : writer_memento(cfg)
 {
     set_status_origin("windows_event_log_writer_memento");

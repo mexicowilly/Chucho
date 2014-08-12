@@ -49,7 +49,7 @@ std::shared_ptr<configurable> logger_factory::create_configurable(std::shared_pt
     return cnf;
 }
 
-std::shared_ptr<memento> logger_factory::create_memento(const configurator& cfg)
+std::shared_ptr<memento> logger_factory::create_memento(configurator& cfg)
 {
     std::shared_ptr<memento> mnto(new logger_memento(cfg));
     return mnto;

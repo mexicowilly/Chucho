@@ -40,7 +40,7 @@ std::shared_ptr<configurable> pattern_formatter_factory::create_configurable(std
     return cnf;
 }
 
-std::shared_ptr<memento> pattern_formatter_factory::create_memento(const configurator& cfg)
+std::shared_ptr<memento> pattern_formatter_factory::create_memento(configurator& cfg)
 {
     std::shared_ptr<memento> mnto(new pattern_formatter_memento(cfg));
     return mnto;

@@ -29,7 +29,7 @@ namespace chucho
 class cerr_writer_memento : public writer_memento
 {
 public:
-    cerr_writer_memento(const configurator& cfg);
+    cerr_writer_memento(configurator& cfg);
 };
 
 }

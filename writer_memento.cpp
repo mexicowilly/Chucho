@@ -21,7 +21,7 @@
 namespace chucho
 {
 
-writer_memento::writer_memento(const configurator& cfg)
+writer_memento::writer_memento(configurator& cfg)
     : memento(cfg)
 {
     set_status_origin("writer_memento");

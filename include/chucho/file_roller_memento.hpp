@@ -49,7 +49,7 @@ public:
      * 
      * @param cfg the configurator that is perform configuration
      */
-    file_roller_memento(const configurator& cfg);
+    file_roller_memento(configurator& cfg);
 
     /**
      * Return the @ref file_compressor that may have been found by 

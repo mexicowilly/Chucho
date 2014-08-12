@@ -22,23 +22,23 @@
 namespace chucho
 {
 
-level_filter_memento::level_filter_memento(const configurator& cfg, memento_key_set ks)
+level_filter_memento::level_filter_memento(configurator& cfg, memento_key_set ks)
     : memento(cfg)
 {
     set_status_origin("level_filter_memento");
-    handler lvl_hnd = [this] (const std::string& name) { level_ = level::from_text(name); };
+    handler lvl_hnd = [this] (const std::string& name) { level_ = level::from_text(validate("level_filter::level", name)); };
     if (ks == memento_key_set::CHUCHO)
     {
         set_handler("level", lvl_hnd);
-        set_handler("on_match", [this] (const std::string& name) { on_match_ = text_to_result(name); });
-        set_handler("on_mismatch", [this] (const std::string& name) { on_mismatch_ = text_to_result(name); });
+        set_handler("on_match", [this] (const std::string& name) { on_match_ = text_to_result(validate("level_filter::on_match", name)); });
+        set_handler("on_mismatch", [this] (const std::string& name) { on_mismatch_ = text_to_result(validate("level_filter::on_mismatch", name)); });
     }
     else if (ks == memento_key_set::LOG4CPLUS)
     {
         on_mismatch_ = chucho::filter::result::NEUTRAL;
         on_match_ = chucho::filter::result::DENY;
         set_handler("LogLevelToMatch", lvl_hnd);
-        set_handler("AcceptOnMatch", [this] (const std::string& val) { on_match_ = boolean_value(val) ? chucho::filter::result::ACCEPT : chucho::filter::result::DENY; });
+        set_handler("AcceptOnMatch", [this] (const std::string& val) { on_match_ = boolean_value(validate("level_filter::on_match", val)) ? chucho::filter::result::ACCEPT : chucho::filter::result::DENY; });
     }
 }
 

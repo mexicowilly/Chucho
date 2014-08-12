@@ -34,7 +34,7 @@ enum class memento_key_set
     LOG4CPLUS
 };
 
-CHUCHO_NO_EXPORT memento_key_set get_memento_key_set(const configurator& cfg);
+CHUCHO_NO_EXPORT memento_key_set get_memento_key_set(configurator& cfg);
 
 }
 

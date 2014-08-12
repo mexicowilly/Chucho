@@ -33,7 +33,7 @@ namespace chucho
 class logger_memento : public memento
 {
 public:
-    logger_memento(const configurator& cfg);
+    logger_memento(configurator& cfg);
 
     std::shared_ptr<level> get_level() const;
     const optional<std::string>& get_name() const;

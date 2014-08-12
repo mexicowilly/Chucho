@@ -19,12 +19,13 @@
 namespace chucho
 {
 
-remote_writer_memento::remote_writer_memento(const configurator& cfg, memento_key_set ks)
+remote_writer_memento::remote_writer_memento(configurator& cfg, memento_key_set ks)
     : writer_memento(cfg)
 {
     set_status_origin("remote_writer_memento");
+    cfg.get_security_policy().set_integer("remote_writer::port", 1, 65535);
     set_handler("host", [this] (const std::string& name) { host_ = name; });
-    set_handler("port", [this] (const std::string& port) { port_ = static_cast<std::uint16_t>(std::stoul(port)); });
+    set_handler("port", [this] (const std::string& port) { port_ = validate("remote_writer::port", static_cast<std::uint16_t>(std::stoul(validate("remote_writer::port(text)", port)))); });
     if (ks == memento_key_set::CHUCHO)
         set_handler("unsent_cache_max", [this](const std::string& sz) {unsent_cache_max_ = static_cast<std::size_t>(stoull(sz));}); 
 }

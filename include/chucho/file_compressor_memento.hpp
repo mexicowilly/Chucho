@@ -50,7 +50,7 @@ public:
      * 
      * @param cfg the configurator that is perform configuration
      */
-    file_compressor_memento(const configurator& cfg);
+    file_compressor_memento(configurator& cfg);
     //@}
 
     /**

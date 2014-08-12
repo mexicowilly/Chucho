@@ -32,7 +32,7 @@ namespace chucho
 class file_writer_memento : public writer_memento
 {
 public:
-    file_writer_memento(const configurator& cfg, memento_key_set ks);
+    file_writer_memento(configurator& cfg, memento_key_set ks);
 
     const std::string& get_file_name() const;
     const optional<bool>& get_flush() const;

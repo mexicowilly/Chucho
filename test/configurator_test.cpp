@@ -478,12 +478,10 @@ void configurator::size_file_roll_trigger_body(const std::string& tmpl)
         { "5Mb", 1024 * 1024 * 5 },
         { "6mB", 1024 * 1024 * 6 },
         { "7MB", 1024 * 1024 * 7 },
-        { "2g", 1024ULL * 1024ULL * 1024ULL * 2ULL },
-        { "3gb", 1024ULL * 1024ULL * 1024ULL * 3ULL },
-        { "4G", 1024ULL * 1024ULL * 1024ULL * 4ULL },
-        { "5Gb", 1024ULL * 1024ULL * 1024ULL * 5ULL },
-        { "6gB", 1024ULL * 1024ULL * 1024ULL * 6ULL },
-        { "7GB", 1024ULL * 1024ULL * 1024ULL * 7ULL },
+        { "1g", 1024ULL * 1024ULL * 1024ULL },
+        { "1Gb", 1024ULL * 1024ULL * 1024ULL },
+        { "1GB", 1024ULL * 1024ULL * 1024ULL },
+        { "1gB", 1024ULL * 1024ULL * 1024ULL },
         { nullptr, 0 }
     };
     i = 0;

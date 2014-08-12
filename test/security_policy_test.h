@@ -14,27 +14,9 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_SLIDING_NUMBERED_FILE_ROLLER_FACTORY_HPP__)
-#define CHUCHO_SLIDING_NUMBERED_FILE_ROLLER_FACTORY_HPP__
+#if !defined(CHUCHO_SECURITY_POLICY_TEST_H__)
+#define CHUCHO_SECURITY_POLICY_TEST_H__
 
-#if !defined(CHUCHO_BUILD)
-#error "This header is private"
-#endif
-
-#include <chucho/configurable_factory.hpp>
-
-namespace chucho
-{
-
-class sliding_numbered_file_roller_factory : public configurable_factory
-{
-public:
-    sliding_numbered_file_roller_factory();
-
-    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
-    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
-};
-
-}
+void run_security_policy_test(void);
 
 #endif

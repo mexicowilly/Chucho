@@ -19,11 +19,11 @@
 namespace chucho
 {
 
-postgres_writer_memento::postgres_writer_memento(const configurator& cfg)
+postgres_writer_memento::postgres_writer_memento(configurator& cfg)
     : writer_memento(cfg)
 {
     set_status_origin("postgres_writer_memento");
-    set_handler("uri", [this] (const std::string& uri) { uri_ = uri; });
+    set_handler("uri", [this] (const std::string& uri) { uri_ = validate("postgres_writer::uri", uri); });
 }
 
 }

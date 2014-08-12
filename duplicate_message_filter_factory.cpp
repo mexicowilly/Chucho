@@ -34,7 +34,7 @@ std::shared_ptr<configurable> duplicate_message_filter_factory::create_configura
     return cnf;
 }
 
-std::shared_ptr<memento> duplicate_message_filter_factory::create_memento(const configurator& cfg)
+std::shared_ptr<memento> duplicate_message_filter_factory::create_memento(configurator& cfg)
 {
     std::shared_ptr<memento> mnto(new duplicate_message_filter_memento(cfg));
     return mnto;
