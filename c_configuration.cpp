@@ -17,6 +17,7 @@
 #include <chucho/configuration.h>
 #include <chucho/configuration.hpp>
 #include <chucho/garbage_cleaner.hpp>
+#include <chucho/c_security_policy.hpp>
 #include <mutex>
 
 namespace
@@ -142,6 +143,22 @@ chucho_rc chucho_cnf_get_max_size(size_t* sz)
     try
     {
         *sz = chucho::configuration::get_max_size();
+    }
+    catch (...) 
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
+    return CHUCHO_NO_ERROR;
+}
+
+chucho_rc chucho_cnf_get_security_policy(chucho_security_policy** pol)
+{
+    if (pol == nullptr)
+        return CHUCHO_NULL_POINTER;
+    try
+    {
+        *pol = new chucho_security_policy;
+        (*pol)->pol_ = &chucho::configuration::get_security_policy();
     }
     catch (...) 
     {

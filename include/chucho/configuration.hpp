@@ -309,6 +309,7 @@ private:
     };
 
     CHUCHO_NO_EXPORT static bool configure_from_file(const std::string& file_name, reporter& report);
+    CHUCHO_NO_EXPORT static void initialize_security_policy();
     CHUCHO_NO_EXPORT static void perform(std::shared_ptr<logger> root_logger);
 };
 

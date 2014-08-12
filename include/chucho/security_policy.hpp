@@ -18,6 +18,7 @@
 #define CHUCHO_SECURITY_POLICY_HPP__
 
 #include <chucho/exception.hpp>
+#include <chucho/optional.hpp>
 #include <map>
 #include <string>
 #include <sstream>
@@ -177,6 +178,23 @@ public:
      */
     std::size_t get_default_text_max() const;
     /**
+     * Return the range of a given integer key.
+     * 
+     * @param key they key
+     * @return the range that has been set, or an empty @ref 
+     *         optional if no range has been set
+     */
+    optional<std::pair<std::intmax_t, std::intmax_t>> get_integer_range(const std::string& key) const;
+     /**
+      * Return the maximum length of text set for a given key.
+      * 
+      * @param key the key
+      * @return the set length or the result of @ref 
+      *         get_default_text_max() if no value has been set for
+      *         the key
+      */
+    std::size_t get_text_max(const std::string& key) const;
+    /**
      * Set an integer range. This method clobbers any existing 
      * integer value for the key. The method @ref set_integer will 
      * not set the range if there is already an existing range for 
@@ -255,6 +273,7 @@ private:
     class CHUCHO_NO_EXPORT basic_range
     {
     public:
+        virtual std::pair<std::intmax_t, std::intmax_t> get_range() const = 0;
         virtual bool in_range(std::uintmax_t val) const = 0;
         virtual std::string to_text() const = 0;
     };
@@ -265,6 +284,7 @@ private:
     public:
         range(int_type low, int_type high);
 
+        virtual std::pair<std::intmax_t, std::intmax_t> get_range() const override;
         virtual bool in_range(std::uintmax_t val) const override;
         virtual std::string to_text() const override;
 
@@ -327,6 +347,12 @@ security_policy::range<int_type>::range(int_type low, int_type high)
     : low_(low),
       high_(high)
 {
+}
+
+template <typename int_type>
+std::pair<std::intmax_t, std::intmax_t> security_policy::range<int_type>::get_range() const
+{
+    return std::make_pair(static_cast<std::intmax_t>(low_), static_cast<std::intmax_t>(high_));
 }
 
 template <typename int_type>

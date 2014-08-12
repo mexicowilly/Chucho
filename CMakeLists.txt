@@ -192,6 +192,7 @@ SET(CHUCHO_C_HEADERS
     include/chucho/remote_writer.h
     include/chucho/return_code.h
     include/chucho/rolling_file_writer.h
+    include/chucho/security_policy.h
     include/chucho/size_file_roll_trigger.h
     include/chucho/sliding_numbered_file_roller.h
     include/chucho/status.h
@@ -448,6 +449,7 @@ IF(C_API)
         c_remote_writer.cpp
         c_return_code.cpp
         c_rolling_file_writer.cpp
+        c_security_policy.cpp
         c_size_file_roll_trigger.cpp
         c_sliding_numbered_file_roller.cpp
         c_status_manager.cpp
@@ -463,6 +465,7 @@ IF(C_API)
         include/chucho/c_formatter.hpp
         include/chucho/c_level.hpp
         include/chucho/c_logger.hpp
+        include/chucho/c_security_policy.hpp
         include/chucho/c_util.hpp
         include/chucho/c_writer.hpp)
     IF(CHUCHO_WINDOWS)

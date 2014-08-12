@@ -24,6 +24,21 @@ security_policy::security_policy()
 {
 }
 
+optional<std::pair<std::intmax_t, std::intmax_t>> security_policy::get_integer_range(const std::string& key) const
+{
+    optional<std::pair<std::intmax_t, std::intmax_t>> result;
+    auto found = int_ranges_.find(key);
+    if (found != int_ranges_.end())
+        result = found->second->get_range();
+    return result;
+}
+
+std::size_t security_policy::get_text_max(const std::string& key) const
+{
+    auto found = text_maxes_.find(key);
+    return (found == text_maxes_.end()) ? default_text_max_ : found->second;
+}
+
 void security_policy::set_text(const std::string& key, std::size_t max_len)
 {
     if (text_maxes_.count(key) == 0)

@@ -28,6 +28,25 @@ TEST(security_policy, default_text_max)
     EXPECT_THROW(pol.validate("what?", "hello"), chucho::exception);
 }
 
+TEST(security_policy, get_integer)
+{
+    chucho::security_policy pol;
+    EXPECT_EQ(false, static_cast<bool>(pol.get_integer_range("int")));
+    pol.set_integer("int", 1U, 10U);
+    auto rng = pol.get_integer_range("int");
+    ASSERT_TRUE(static_cast<bool>(rng));
+    EXPECT_EQ(1U, rng->first);
+    EXPECT_EQ(10U, rng->second);
+}
+
+TEST(security_policy, get_text)
+{
+    chucho::security_policy pol;
+    pol.set_text("text", 7);
+    EXPECT_EQ(7, pol.get_text_max("text"));
+    EXPECT_EQ(pol.get_default_text_max(), pol.get_text_max("what?"));
+}
+
 TEST(security_policy, override_char_ptr)
 {
     chucho::security_policy pol;

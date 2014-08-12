@@ -23,6 +23,7 @@
 #include <chucho/garbage_cleaner.hpp>
 #include <chucho/environment.hpp>
 #include <chucho/configurator.hpp>
+#include <chucho/configurable_factory.hpp>
 
 #if defined(CHUCHO_YAML_CONFIG)
 #include <chucho/yaml_parser.hpp>
@@ -256,6 +257,9 @@ std::size_t configuration::get_max_size()
 
 security_policy& configuration::get_security_policy()
 {
+    static std::once_flag once;
+
+    std::call_once(once, initialize_security_policy);
     return data().security_policy_;
 }
 
@@ -267,6 +271,28 @@ configuration::style configuration::get_style()
 configuration::unknown_handler_type configuration::get_unknown_handler()
 {
     return data().unknown_handler_;
+}
+
+void configuration::initialize_security_policy()
+{
+    #if defined(CHUCHO_YAML_CONFIG)
+
+    yaml_configurator cnf(data().security_policy_);
+
+    #elif defined(CHUCHO_CONFIG_FILE_CONFIG)
+
+    config_file_configurator cnf(data().security_policy_);
+
+    #else
+
+    return;
+
+    #endif
+    // The mementos are where each configurable configures
+    // its security policy.
+    auto& facts(configurator::get_factories());
+    for (auto fact : facts)
+        fact.second->create_memento(cnf);
 }
 
 void configuration::perform(std::shared_ptr<logger> root_logger)

@@ -60,6 +60,7 @@
 #if defined(CHUCHO_HAVE_RUBY)
 #include "ruby_evaluator_filter_test.h"
 #endif
+#include "security_policy_test.h"
 
 sput_struct __sput;
 
@@ -111,6 +112,7 @@ int main()
     #if defined(CHUCHO_HAVE_RUBY)
     run_ruby_evaluator_filter_test();
     #endif
+    run_security_policy_test();
 
     sput_finish_testing();
     chucho_finalize();

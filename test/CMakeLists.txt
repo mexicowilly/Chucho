@@ -246,6 +246,8 @@ IF(C_API)
                    remote_writer_test.h
                    rolling_file_writer_test.c
                    rolling_file_writer_test.h
+                   security_policy_test.c
+                   security_policy_test.h
                    size_file_roll_trigger_test.c
                    size_file_roll_trigger_test.h
                    sliding_numbered_file_roller_test.c

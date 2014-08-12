@@ -25,8 +25,7 @@
  * @ingroup c_configuration 
  */
 
-#include <chucho/return_code.h>
-#include <stddef.h>
+#include <chucho/security_policy.h>
 
 #if defined(__cplusplus)
 extern "C"
@@ -120,6 +119,7 @@ CHUCHO_EXPORT chucho_rc chucho_cnf_get_loaded_file_name(const char** name);
  * @sa chucho_cnf_set_max_size
  */
 CHUCHO_EXPORT chucho_rc chucho_cnf_get_max_size(size_t* sz);
+CHUCHO_EXPORT chucho_rc chucho_cnf_get_security_policy(chucho_security_policy** pol);
 /**
  * Return the configuration style. 
  * CHUCHO_CONFIGURATION_STYLE_AUTOMATIC is the default style. 
