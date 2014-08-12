@@ -114,7 +114,23 @@ protected:
      * @param hand the function
      */
     void set_handler(const std::string& key, handler hand);
+    /**
+     * Validate a piece of text found in a configuration with the 
+     * current security policy. 
+     * 
+     * @param key the security policy key
+     * @param val the value to validate
+     * @return the value if the validation passes
+     */
     std::string validate(const std::string& key, const std::string& val) const;
+    /**
+     * Validate an integer found in a configuration with the current
+     * security policy. 
+     * 
+     * @param key the security policy key
+     * @param val the value to validate
+     * @return the value if the validation passes
+     */
     template <typename val_type>
     val_type validate(const std::string& key, const val_type& val) const;
 
