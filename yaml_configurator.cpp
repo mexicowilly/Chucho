@@ -144,10 +144,9 @@ void yaml_configurator::handle(yaml_document_t& doc,
                     mnto->handle(found->second->create_configurable(found->second->create_memento(*this)));
                 }
             }
-            else if (configuration::get_unknown_handler())
+            else if (configuration::get_unknown_handler() && !key.empty())
             {
-                if (configuration::get_unknown_handler() && !key.empty()) 
-                    configuration::get_unknown_handler()(key, val);
+                configuration::get_unknown_handler()(key, val);
             }
         }
         else if (node.type == YAML_MAPPING_NODE)
