@@ -28,6 +28,8 @@ static void postgres_writer_test(void)
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
     rc = chucho_create_postgres_writer(&wrt, fmt, "postgres://test_user:password@192.168.56.101/postgres");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create postgres writer");
+    if (rc != CHUCHO_NO_ERROR)
+        return;
     rc = chucho_pgwrt_get_uri(wrt, &text);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_pgwrt_get_uri");
     sput_fail_unless(strcmp(text, "postgres://test_user:password@192.168.56.101/postgres") == 0, text);

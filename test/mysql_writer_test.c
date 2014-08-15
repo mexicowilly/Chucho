@@ -39,6 +39,8 @@ static void mysql_writer_test(void)
                                     chucho_debug_level(),
                                     0);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create mysql writer");
+    if (rc != CHUCHO_NO_ERROR)
+        return;
     rc = chucho_mwrt_get_database(wrt, &text);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_mwrt_get_database");
     sput_fail_unless(strcmp(text, "test") == 0, text);

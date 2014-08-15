@@ -25,7 +25,7 @@ mysql_writer_memento::mysql_writer_memento(configurator& cfg)
     set_status_origin("mysql_writer_memento");
     cfg.get_security_policy().set_text("mysql_writer::user", 16);
     cfg.get_security_policy().set_integer("mysql_writer::port", static_cast<std::uint16_t>(1), static_cast<uint16_t>(65535));
-    cfg.get_security_policy().set_text("mysql_writer::database", 64)
+    cfg.get_security_policy().set_text("mysql_writer::database", 64);
     cfg.get_security_policy().set_integer("mysql_writer::queue_capacity", 10, 32 * 1024);
     set_handler("host", [this] (const std::string& host) { host_ = validate("mysql_writer::host", host); });
     set_handler("user", [this] (const std::string& user) { user_ = validate("mysql_writer::user", user); });
