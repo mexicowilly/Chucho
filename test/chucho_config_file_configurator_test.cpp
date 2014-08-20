@@ -18,6 +18,7 @@
 #include <chucho/config_file_configurator.hpp>
 #include <chucho/logger.hpp>
 #include <chucho/level_threshold_filter.hpp>
+#include <chucho/configuration.hpp>
 
 namespace
 {
@@ -25,11 +26,18 @@ namespace
 class chucho_config_file_configurator : public chucho::test::configurator
 {
 protected:
+    chucho_config_file_configurator();
+
     virtual chucho::configurator& get_configurator() override;
 
 private:
     chucho::config_file_configurator cnf_;
 };
+
+chucho_config_file_configurator::chucho_config_file_configurator()
+    : cnf_(chucho::configuration::get_security_policy())
+{
+}
 
 chucho::configurator& chucho_config_file_configurator::get_configurator()
 {
@@ -255,6 +263,24 @@ TEST_F(chucho_config_file_configurator, gzip_file_compressor)
               "chucho.file_compressor.gz = chucho::gzip_file_compressor\n"
               "chucho.file_compressor.gz.min_index = 7");
     gzip_file_compressor_body();
+}
+
+TEST_F(chucho_config_file_configurator, interval_file_roll_trigger)
+{
+    std::string tmpl("chucho.logger = will\n"
+                     "chucho.logger.will.writer = rfw\n"
+                     "chucho.writer.rfw = chucho::rolling_file_writer\n"
+                     "chucho.writer.rfw.formatter = pf\n"
+                     "chucho.formatter.pf = chucho::pattern_formatter\n"
+                     "chucho.formatter.pf.pattern = %m%n\n"
+                     "chucho.writer.rfw.file_roller = nfr\n"
+                     "chucho.file_roller.nfr = chucho::numbered_file_roller\n"
+                     "chucho.file_roller.nfr.max_index = 1\n"
+                     "chucho.writer.rfw.file_roll_trigger = ifrt\n"
+                     "chucho.file_roll_trigger.ifrt = chucho::interval_file_roll_trigger\n"
+                     "chucho.file_roll_trigger.ifrt.every = PERIOD\n"
+                     "chucho.writer.rfw.file_name = what.log");
+    interval_file_roll_trigger_body(tmpl);
 }
 
 TEST_F(chucho_config_file_configurator, level_filter)

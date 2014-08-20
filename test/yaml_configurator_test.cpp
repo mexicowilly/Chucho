@@ -228,6 +228,21 @@ TEST_F(yaml_configurator, gzip_file_compressor)
     gzip_file_compressor_body();
 }
 
+TEST_F(yaml_configurator, interval_file_roll_trigger)
+{
+    std::string tmpl("chucho::logger:\n"
+                     "    name: will\n"
+                     "    chucho::rolling_file_writer:\n"
+                     "        chucho::pattern_formatter:\n"
+                     "            pattern: '%m%n'\n"
+                     "        chucho::numbered_file_roller:\n"
+                     "            max_index: 1\n"
+                     "        chucho::interval_file_roll_trigger:\n"
+                     "            every: PERIOD\n"
+                     "        file_name: what.log\n");
+    interval_file_roll_trigger_body(tmpl);
+}
+
 TEST_F(yaml_configurator, invalid_utf8)
 {
     EXPECT_ANY_THROW(configure("chucho::logger:\n"

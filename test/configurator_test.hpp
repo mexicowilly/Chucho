@@ -41,6 +41,7 @@ protected:
     void duplicate_message_filter_body();
     void file_writer_body();
     void gzip_file_compressor_body();
+    void interval_file_roll_trigger_body(const std::string& tmpl);
     void level_filter_body(const std::string& tmpl);
     void level_threshold_filter_body();
     void logger_body();

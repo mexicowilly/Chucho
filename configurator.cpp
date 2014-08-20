@@ -16,25 +16,31 @@
 
 #include <chucho/configurator.hpp>
 #include <chucho/exception.hpp>
+#include <chucho/garbage_cleaner.hpp>
+#include <chucho/environment.hpp>
+#include <chucho/regex.hpp>
+
+#include <chucho/async_writer_factory.hpp>
+#include <chucho/bzip2_file_compressor_factory.hpp>
 #include <chucho/cerr_writer_factory.hpp>
 #include <chucho/cout_writer_factory.hpp>
+#include <chucho/duplicate_message_filter_factory.hpp>
 #include <chucho/file_writer_factory.hpp>
-#include <chucho/syslog_writer_factory.hpp>
+#include <chucho/gzip_file_compressor_factory.hpp>
+#include <chucho/interval_file_roll_trigger_factory.hpp>
 #include <chucho/level_filter_factory.hpp>
 #include <chucho/level_threshold_filter_factory.hpp>
 #include <chucho/logger_factory.hpp>
 #include <chucho/numbered_file_roller_factory.hpp>
 #include <chucho/pattern_formatter_factory.hpp>
+#include <chucho/remote_writer_factory.hpp>
 #include <chucho/rolling_file_writer_factory.hpp>
 #include <chucho/size_file_roll_trigger_factory.hpp>
-#include <chucho/time_file_roller_factory.hpp>
-#include <chucho/duplicate_message_filter_factory.hpp>
-#include <chucho/remote_writer_factory.hpp>
-#include <chucho/bzip2_file_compressor_factory.hpp>
-#include <chucho/gzip_file_compressor_factory.hpp>
-#include <chucho/zip_file_compressor_factory.hpp>
-#include <chucho/async_writer_factory.hpp>
 #include <chucho/sliding_numbered_file_roller_factory.hpp>
+#include <chucho/syslog_writer_factory.hpp>
+#include <chucho/time_file_roller_factory.hpp>
+#include <chucho/zip_file_compressor_factory.hpp>
+
 #if defined(CHUCHO_WINDOWS)
 #include <chucho/windows_event_log_writer_factory.hpp>
 #endif
@@ -53,9 +59,6 @@
 #if defined(CHUCHO_HAVE_RUBY)
 #include <chucho/ruby_evaluator_filter_factory.hpp>
 #endif
-#include <chucho/regex.hpp>
-#include <chucho/garbage_cleaner.hpp>
-#include <chucho/environment.hpp>
 #include <cstring>
 #include <mutex>
 
@@ -146,6 +149,8 @@ void configurator::initialize()
     fact.reset(new ruby_evaluator_filter_factory());
     add_configurable_factory("chucho::ruby_evaluator_filter", fact);
 #endif
+    fact.reset(new interval_file_roll_trigger_factory());
+    add_configurable_factory("chucho::interval_file_roll_trigger", fact);
 }
 
 std::string configurator::resolve_variables(const std::string& val)

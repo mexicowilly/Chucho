@@ -203,6 +203,48 @@ void configurator::gzip_file_compressor_body()
 #endif
 }
 
+void configurator::interval_file_roll_trigger_body(const std::string& tmpl)
+{
+    std::size_t pos = tmpl.find("PERIOD");
+    const char* bad[] =
+    {
+        "seven seconds",
+        "5 years",
+        "12 doggies",
+        nullptr
+    };
+    int i = 0;
+    while (bad[i] != nullptr)
+    {
+        chucho::logger::remove_unused_loggers();
+        chucho::status_manager::get()->clear();
+        std::string rep = tmpl;
+        rep.replace(pos, 6, bad[i++]);
+        configure(rep.c_str());
+        EXPECT_EQ(chucho::status::level::ERROR_, chucho::status_manager::get()->get_level());
+    }
+    chucho::status_manager::get()->clear();
+    const char* good[] =
+    {
+        "2 MinUTeS",
+        "1 HOUR",
+        "4 days",
+        "5 Weeks",
+        "6 monTH",
+        nullptr
+    };
+    i = 0;
+    while (good[i] != nullptr)
+    {
+        chucho::logger::remove_unused_loggers();
+        chucho::status_manager::get()->clear();
+        std::string rep = tmpl;
+        rep.replace(pos, 6, good[i++]);
+        configure(rep.c_str());
+        EXPECT_EQ(chucho::status::level::INFO_, chucho::status_manager::get()->get_level());
+    }
+}
+
 void configurator::level_filter_body(const std::string& tmpl)
 {
     std::size_t pos = tmpl.find("RESULT");
