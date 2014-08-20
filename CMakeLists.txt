@@ -183,6 +183,7 @@ SET(CHUCHO_C_HEADERS
     include/chucho/filter.h
     include/chucho/finalize.h
     include/chucho/formatter.h
+    include/chucho/interval_file_roll_trigger.h
     include/chucho/level.h
     include/chucho/level_filter.h
     include/chucho/level_threshold_filter.h
@@ -440,6 +441,7 @@ IF(C_API)
         c_filter.cpp
         c_finalize.cpp
         c_formatter.cpp
+        c_interval_file_roll_trigger.cpp
         c_level.cpp
         c_level_filter.cpp
         c_level_threshold_filter.cpp

@@ -25,7 +25,7 @@ class CHUCHO_EXPORT interval_file_roll_trigger : public file_roll_trigger
 public:
     typedef std::chrono::system_clock clock_type;
 
-    enum class period : std::size_t
+    enum class period
     {
         MINUTE,
         HOUR,
@@ -40,7 +40,6 @@ public:
     virtual bool is_triggered(const std::string& active_file, const event& e) override;
 
 private:
-
     void CHUCHO_NO_EXPORT compute_next_roll();
 
     clock_type::time_point next_roll_;
