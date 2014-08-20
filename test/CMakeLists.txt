@@ -100,6 +100,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                file_test.cpp
                file_writer_test.cpp
                harness.cpp
+               interval_file_roll_trigger_test.cpp
                level_test.cpp
                level_filter_test.cpp
                level_threshold_filter_test.cpp

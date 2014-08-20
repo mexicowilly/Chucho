@@ -133,6 +133,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/filter.hpp
     include/chucho/finalize.hpp
     include/chucho/formatter.hpp
+    include/chucho/interval_file_roll_trigger.hpp
     include/chucho/level.hpp
     include/chucho/level_filter.hpp
     include/chucho/level_threshold_filter.hpp
@@ -182,6 +183,7 @@ SET(CHUCHO_C_HEADERS
     include/chucho/filter.h
     include/chucho/finalize.h
     include/chucho/formatter.h
+    include/chucho/interval_file_roll_trigger.h
     include/chucho/level.h
     include/chucho/level_filter.h
     include/chucho/level_threshold_filter.h
@@ -439,6 +441,7 @@ IF(C_API)
         c_filter.cpp
         c_finalize.cpp
         c_formatter.cpp
+        c_interval_file_roll_trigger.cpp
         c_level.cpp
         c_level_filter.cpp
         c_level_threshold_filter.cpp
@@ -519,6 +522,9 @@ SET(CHUCHO_SOURCES
     garbage_cleaner.cpp
     gzip_file_compressor_factory.cpp
     host.cpp
+    interval_file_roll_trigger.cpp
+    interval_file_roll_trigger_factory.cpp
+    interval_file_roll_trigger_memento.cpp
     level.cpp
     level_filter.cpp
     level_filter_factory.cpp
@@ -595,6 +601,8 @@ SET(CHUCHO_SOURCES
     include/chucho/garbage_cleaner.hpp
     include/chucho/gzip_file_compressor_factory.hpp
     include/chucho/host.hpp
+    include/chucho/interval_file_roll_trigger_factory.hpp
+    include/chucho/interval_file_roll_trigger_memento.hpp
     include/chucho/level_filter_factory.hpp
     include/chucho/level_filter_memento.hpp
     include/chucho/level_threshold_filter_factory.hpp
