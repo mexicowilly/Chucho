@@ -297,6 +297,13 @@ IF(CHUCHO_POSIX)
     # htonl
     CHUCHO_REQUIRE_SYMBOLS(arpa/inet.h htonl)
 
+    # timegm
+    CHECK_CXX_SYMBOL_EXISTS(timegm time.h CHUCHO_HAVE_TIMEGM)
+    IF(NOT CHUCHO_HAVE_TIMEGM)
+        CHUCHO_REQUIRE_SYMBOLS(stdlib.h setenv unsetenv)
+        CHUCHO_REQUIRE_SYMBOLS(time.h tzset)
+    ENDIF()
+
 ELSEIF(CHUCHO_WINDOWS)
     FOREACH(HEAD windows.h winsock2.h io.h process.h ws2tcpip.h time.h assert.h)
         STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})

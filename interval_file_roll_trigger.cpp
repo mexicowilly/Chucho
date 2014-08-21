@@ -29,7 +29,7 @@ interval_file_roll_trigger::interval_file_roll_trigger(period prd, std::size_t c
 
 void interval_file_roll_trigger::compute_next_roll()
 {
-    calendar::pieces pcs = calendar::get_local(clock_type::to_time_t(clock_type::now()));
+    calendar::pieces pcs = calendar::get_utc(clock_type::to_time_t(clock_type::now()));
     if (period_ == period::MINUTE)
     {
         pcs.tm_sec = 0;
@@ -63,7 +63,7 @@ void interval_file_roll_trigger::compute_next_roll()
         pcs.tm_mday = 1;
         pcs.tm_mon += count_;
     }
-    next_roll_ = clock_type::from_time_t(std::mktime(&pcs));
+    next_roll_ = clock_type::from_time_t(calendar::to_time_t(pcs));
 }
 
 bool interval_file_roll_trigger::is_triggered(const std::string& active_file, const event& e)
