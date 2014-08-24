@@ -223,6 +223,7 @@ public:
      * @sa allow_default 
      */
     static void set_allow_default(bool allow);
+    static bool set_configuration(const std::string& cfg);
     /**
      * Set the environment variable that will be used to find the 
      * configuration file. If this method is not called, then the
@@ -309,6 +310,7 @@ private:
     };
 
     CHUCHO_NO_EXPORT static bool configure_from_file(const std::string& file_name, reporter& report);
+    CHUCHO_NO_EXPORT static bool configure_from_text(const std::string& cfg, reporter& report);
     CHUCHO_NO_EXPORT static void initialize_security_policy();
     CHUCHO_NO_EXPORT static void perform(std::shared_ptr<logger> root_logger);
 };

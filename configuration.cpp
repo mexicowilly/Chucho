@@ -230,6 +230,51 @@ bool configuration::configure_from_file(const std::string& file_name, reporter& 
     return result;
 }
 
+bool configuration::configure_from_text(const std::string& cfg, reporter& report)
+{
+    bool result = false;
+    static_data& sd(data());
+    try
+    {
+        format fmt = detect_text_format(cfg);
+
+        #if defined(CHUCHO_YAML_CONFIG)
+
+        if (fmt == format::YAML)
+        {
+            yaml_configurator yam(sd.security_policy_);
+            std::istringstream in(cfg);
+            yam.configure(in);
+            report.info("Using the YAML format configuration"); 
+        }
+
+        #endif
+
+        #if defined(CHUCHO_CONFIG_FILE_CONFIG)
+
+        if (fmt == format::CONFIG_FILE)
+        {
+            config_file_configurator cnf(sd.security_policy_);
+            std::istringstream in(sd.fallback_);
+            cnf.configure(in);
+            report.info("Using the config file format configuration"); 
+        }
+
+        #endif
+
+        if (fmt == format::DONT_KNOW)
+            report.warning("Unable to detect the format of the configuration");
+
+        result = true;
+    }
+    catch (std::exception& e)
+    {
+        logger::remove_unused_loggers();
+        report.error("Error setting configuration: " + exception::nested_whats(e));
+    }
+    return result;
+}
+
 const std::string& configuration::get_environment_variable()
 {
     return data().environment_variable_;
@@ -342,45 +387,9 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
     }
     if (!sd.is_configured_ && !sd.fallback_.empty())
     {
-        try
-        {
-            format fmt = detect_text_format(sd.fallback_);
-
-            #if defined(CHUCHO_YAML_CONFIG)
-
-            if (fmt == format::YAML)
-            {
-                yaml_configurator yam(data().security_policy_);
-                // this is already validated UTF-8
-                std::istringstream fb_in(sd.fallback_);
-                yam.configure(fb_in);
-                sd.is_configured_ = true;
-                report.info("Using the YAML format fallback configuration"); 
-            }
-
-            #endif
-
-            #if defined(CHUCHO_CONFIG_FILE_CONFIG)
-
-            if (fmt == format::CONFIG_FILE)
-            {
-                config_file_configurator cnf(data().security_policy_);
-                std::istringstream fb_in(sd.fallback_);
-                cnf.configure(fb_in);
-                sd.is_configured_ = true;
-                report.info("Using the config file format fallback configuration"); 
-            }
-
-            #endif
-
-            if (fmt == format::DONT_KNOW)
-                report.warning("Unable to detect the format of the fallback configuration");
-        }
-        catch (std::exception& e)
-        {
+        sd.is_configured_ = configure_from_text(sd.fallback_, report);
+        if (!sd.is_configured_)
             logger::remove_unused_loggers();
-            report.error("Error setting fallback configuration: " + exception::nested_whats(e));
-        }
     }
 
     #endif
@@ -443,6 +452,37 @@ bool configuration::reconfigure()
 void configuration::set_allow_default(bool allow)
 {
     data().allow_default_config_ = allow;
+}
+
+bool configuration::set_configuration(const std::string& cfg)
+{
+    reporter report;
+    bool result = false;
+    if (cfg.length() > data().max_size_)
+    {
+        report.error("The configuration size is " + std::to_string(cfg.length()) +
+            ", but the maximum allowed is " + std::to_string(data().max_size_));
+    }
+    else
+    {
+        auto loggers = logger::get_existing_loggers();
+        std::vector<logger_state> states;
+        for (auto lgr : loggers)
+        {
+            states.emplace_back(lgr);
+            lgr->reset();
+        }
+        if (configure_from_text(cfg, report))
+        {
+            result = true;
+        }
+        else
+        {
+            for (unsigned i = 0; i < loggers.size(); i++)
+                states[i].restore(loggers[i]);
+        }
+    }
+    return result;
 }
 
 void configuration::set_environment_variable(const std::string& var)
