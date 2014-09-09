@@ -118,9 +118,11 @@ protected:
 
 private:
     /**
-     * This is invoked by configuration::perform().
+     * This is invoked by configuration::perform() and 
+     * configuration::set_configuration(). 
      */
     CHUCHO_NO_EXPORT static void initialize();
+    CHUCHO_NO_EXPORT static void initialize_impl();
 
     std::map<std::string, std::string> variables_;
     security_policy security_policy_;

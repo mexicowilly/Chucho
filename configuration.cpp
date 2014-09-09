@@ -264,8 +264,8 @@ bool configuration::configure_from_text(const std::string& cfg, reporter& report
 
         if (fmt == format::DONT_KNOW)
             report.warning("Unable to detect the format of the configuration");
-
-        result = true;
+        else
+            result = true;
     }
     catch (std::exception& e)
     {
@@ -472,6 +472,7 @@ bool configuration::set_configuration(const std::string& cfg)
             states.emplace_back(lgr);
             lgr->reset();
         }
+        configurator::initialize();
         if (configure_from_text(cfg, report))
         {
             result = true;
