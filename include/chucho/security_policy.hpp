@@ -23,6 +23,7 @@
 #include <string>
 #include <sstream>
 #include <memory>
+#include <cstdint>
 
 namespace chucho
 {
