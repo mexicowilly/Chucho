@@ -22,6 +22,7 @@
 #include <map>
 #include <string>
 #include <sstream>
+#include <memory>
 
 namespace chucho
 {
