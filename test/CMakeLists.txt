@@ -57,16 +57,24 @@ ENDIF()
 
 IF(YAML_CONFIG)
     SET(CHUCHO_CONFIGURATOR_TESTS yaml_configurator_test.cpp utf8_test.cpp)
+    SET(CHUCHO_CONFIGURATION_TEST_DEFS CHUCHO_YAML_CONFIG)
 ENDIF()
 
 IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
     LIST(APPEND CHUCHO_CONFIGURATOR_TESTS properties_test.cpp)
     IF(CONFIG_FILE_CONFIG)
         LIST(APPEND CHUCHO_CONFIGURATOR_TESTS chucho_config_file_configurator_test.cpp)
+        LIST(APPEND CHUCHO_CONFIGURATION_TEST_DEFS CHUCHO_CONFIG_FILE_CONFIG)
     ENDIF()
     IF(LOG4CPLUS_CONFIG)
         LIST(APPEND CHUCHO_CONFIGURATOR_TESTS log4cplus_config_file_configurator_test.cpp)
+        LIST(APPEND CHUCHO_CONFIGURATION_TEST_DEFS CHUCHO_LOG4CPLUS_CONFIG)
     ENDIF()
+ENDIF()
+
+IF(DEFINED CHUCHO_CONFIGURATION_TEST_DEFS)
+    SET_SOURCE_FILES_PROPERTIES(configuration_test.cpp PROPERTIES
+                                COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATION_TEST_DEFS}")
 ENDIF()
 
 IF(CHUCHO_HAVE_MYSQL)
@@ -93,6 +101,7 @@ ENDIF()
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
                calendar_test.cpp
+               configuration_test.cpp
                configurator_test.cpp
                configurator_test.hpp
                diagnostic_context_test.cpp

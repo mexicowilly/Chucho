@@ -137,7 +137,15 @@ format detect_format(std::istream& stream_1, std::istream& stream_2)
     chucho::yaml_parser prs(stream_1);
     yaml_document_t doc;
     if (yaml_parser_load(prs, &doc))
-        return format::YAML;
+    {
+        yaml_node_type_t tp = yaml_document_get_root_node(&doc)->type;
+        yaml_document_delete(&doc);
+        // A config file format will have one scalar node. A valid
+        // Chucho YAML config will not have any scalar nodes at the
+        // top level.
+        if (tp != YAML_SCALAR_NODE)
+            return format::YAML; 
+    }
 
     #endif
 
@@ -255,7 +263,7 @@ bool configuration::configure_from_text(const std::string& cfg, reporter& report
         if (fmt == format::CONFIG_FILE)
         {
             config_file_configurator cnf(sd.security_policy_);
-            std::istringstream in(sd.fallback_);
+            std::istringstream in(cfg);
             cnf.configure(in);
             report.info("Using the config file format configuration"); 
         }
@@ -454,7 +462,7 @@ void configuration::set_allow_default(bool allow)
     data().allow_default_config_ = allow;
 }
 
-bool configuration::set_configuration(const std::string& cfg)
+bool configuration::set(const std::string& cfg)
 {
     reporter report;
     bool result = false;

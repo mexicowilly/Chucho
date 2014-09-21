@@ -223,7 +223,25 @@ public:
      * @sa allow_default 
      */
     static void set_allow_default(bool allow);
-    static bool set_configuration(const std::string& cfg);
+    /**
+     * Set the configuration. The new configuration will replace the 
+     * existing one. Any configuration format supported in the 
+     * Chucho build will be detected and properly handled. By 
+     * default, only the YAML format is supported. 
+     *  
+     * If the configuration is not loadable, then the existing 
+     * configuration will be preserved. 
+     *  
+     * @note An invalid configuration is usually one where the text 
+     *       simply cannot be parsed. Erros in the configuration
+     *       parameters, like the absence of a @ref formatter for a
+     *       @ref writer, are not unrecoverable errors, and thus,
+     *       the configuration is considered valid.
+     * 
+     * @param cfg the new configuration
+     * @return true if the configuration was valid
+     */
+    static bool set(const std::string& cfg);
     /**
      * Set the environment variable that will be used to find the 
      * configuration file. If this method is not called, then the
