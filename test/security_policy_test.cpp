@@ -31,7 +31,7 @@ TEST(security_policy, default_text_max)
 TEST(security_policy, get_integer)
 {
     chucho::security_policy pol;
-    EXPECT_EQ(false, static_cast<bool>(pol.get_integer_range("int")));
+    EXPECT_FALSE(static_cast<bool>(pol.get_integer_range("int")));
     pol.set_integer("int", 1U, 10U);
     auto rng = pol.get_integer_range("int");
     ASSERT_TRUE(static_cast<bool>(rng));

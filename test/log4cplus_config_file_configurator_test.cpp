@@ -27,6 +27,7 @@
 #include <chucho/line_ending.hpp>
 #include <chucho/calendar.hpp>
 #include <chucho/time_file_roller.hpp>
+#include <chucho/configuration.hpp>
 #include <thread>
 
 namespace
@@ -35,11 +36,18 @@ namespace
 class log4cplus_config_file_configurator : public chucho::test::configurator
 {
 protected:
+    log4cplus_config_file_configurator();
+
     virtual chucho::configurator& get_configurator() override;
 
 private:
     chucho::config_file_configurator cnf_;
 };
+
+log4cplus_config_file_configurator::log4cplus_config_file_configurator()
+    : cnf_(chucho::configuration::get_security_policy())
+{
+}
 
 chucho::configurator& log4cplus_config_file_configurator::get_configurator()
 {

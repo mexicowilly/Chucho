@@ -87,6 +87,13 @@ std::map<std::string, std::shared_ptr<configurable_factory>>& configurator::get_
 
 void configurator::initialize()
 {
+    static std::once_flag once;
+
+    std::call_once(once, initialize_impl);
+}
+
+void configurator::initialize_impl()
+{
     std::shared_ptr<configurable_factory> fact(new cerr_writer_factory());
     add_configurable_factory("chucho::cerr_writer", fact);
     fact.reset(new cout_writer_factory());
