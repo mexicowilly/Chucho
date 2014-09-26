@@ -107,4 +107,17 @@ TEST_F(configuration, set_yaml)
     EXPECT_TRUE(static_cast<bool>(std::dynamic_pointer_cast<chucho::cerr_writer>(wrts[0])));
 }
 
+TEST_F(configuration, set_yaml_error)
+{
+    std::ostringstream stream;
+    stream << "- chucho::logger:" << std::endl
+           << "    name: " << get_logger_name() << std::endl
+           << "    chucho::cerr_writer:" << std::endl
+           << "        chucho::monkey_balls:" << std::endl
+           << "            pattern: '%m%n'";
+    ASSERT_TRUE(chucho::configuration::set(stream.str()));
+    auto wrts = get_logger()->get_writers();
+    EXPECT_EQ(0, wrts.size());
+}
+
 #endif

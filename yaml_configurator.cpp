@@ -168,7 +168,23 @@ void yaml_configurator::handle(yaml_document_t& doc,
                         auto found = get_factories().find(key);
                         if (found == get_factories().end())
                         {
-                            handle(doc, *yaml_document_get_node(&doc, p->value), level + 1, key, mnto);
+                            yaml_node_t* val = yaml_document_get_node(&doc, p->value);
+                            if (mnto)
+                            {
+                                // If we're in a configurable and the map key is unknown,
+                                // then the only nodes we can deal with are scalar mapped
+                                // values.
+                                if (val->type == YAML_SCALAR_NODE)
+                                    handle(doc, *val, level + 1, key, mnto); 
+                                else
+                                    report_error("Unknown YAML mapping: " + key);
+                            }
+                            else
+                            {
+                                // If there is no memento, then this is an unknown, which
+                                // we'll handle properly in the scalar block.
+                                handle(doc, *val, level + 1, key, mnto); 
+                            }
                         }
                         else
                         {
