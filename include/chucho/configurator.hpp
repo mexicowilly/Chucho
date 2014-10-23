@@ -81,6 +81,12 @@ public:
      * @param in the input stream
      */
     virtual void configure(std::istream& in) = 0;
+    /**
+     * Return the @ref security_policy associated with this 
+     * configurator. 
+     * 
+     * @return the security policy
+     */
     security_policy& get_security_policy();
 
 protected:

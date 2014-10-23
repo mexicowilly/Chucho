@@ -76,6 +76,10 @@ namespace chucho
  *         <td><i>default</i></td></tr>
  *     <tr><td>file_writer::on_start</td>
  *         <td><i>default</i></td></tr>
+ *     <tr><td>interval_file_roll_trigger::count</td>
+ *         <td>(1, 5000)</td></tr>
+ *     <tr><td>interval_file_roll_trigger::period(text)</td>
+ *         <td>12</td></tr>
  *     <tr><td>level_filter::level</td>
  *         <td><i>default</i></td></tr>
  *     <tr><td>level_filter::on_match</td>

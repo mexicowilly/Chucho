@@ -50,10 +50,10 @@ typedef enum
  * @{
  */
 /**
- * Create a size file roll trigger.
+ * Create an interval file roll trigger.
  * 
  * @post Ownership of the trg parameter is transferred to the 
- *       caller, and it must be release with the @ref
+ *       caller, and it must be released with the @ref
  *       chucho_release_file_roll_trigger() function.
  * 
  * @param[out] trg the interval file roll trigger to create

@@ -40,7 +40,7 @@ extern "C"
  * Create a size file roll trigger.
  * 
  * @post Ownership of the trg parameter is transferred to the 
- *       caller, and it must be release with the @ref
+ *       caller, and it must be released with the @ref
  *       chucho_release_file_roll_trigger() function.
  * 
  * @param[out] trg the size file roll trigger to create

@@ -20,23 +20,62 @@
 namespace chucho
 {
 
+/**
+ * @class interval_file_roll_trigger interval_file_roll_trigger.hpp chucho/interval_file_roll_trigger.hpp 
+ * A @ref file_roll_trigger that will be triggered at intervals 
+ * of time. You may select any number of minutes, hours, days, 
+ * weeks or months as the interval. 
+ * 
+ * @ingroup rolling
+ */
 class CHUCHO_EXPORT interval_file_roll_trigger : public file_roll_trigger
 {
 public:
+    /**
+     * The type of clock used to measure time.
+     */
     typedef std::chrono::system_clock clock_type;
 
+    /**
+     * Time periods at which a roll can occur.
+     */
     enum class period
     {
-        MINUTE,
-        HOUR,
-        DAY,
-        WEEK,
-        MONTH
+        MINUTE, /**< A minute */
+        HOUR,   /**< An hour */
+        DAY,    /**< A day */
+        WEEK,   /**< A week */
+        MONTH   /**< A month */
     };
 
+    /**
+     * @name Constructor
+     * @{ 
+     */
+    /**
+     * Construct an interval file roll trigger. Files will roll 
+     * after count number of periods have elapsed. 
+     * 
+     * @param prd the period of time
+     * @param count the number of periods to wait before triggering
+     */
     interval_file_roll_trigger(period prd, std::size_t count);
+    /** @} */
 
+    /**
+     * Return the time at which the next roll is scheduled to occur.
+     * 
+     * @return the time
+     */
     clock_type::time_point get_next_roll() const;
+    /**
+     * If the current time is after the scheduled next roll time, 
+     * then this trigger fires.
+     * 
+     * @param active_file the currently active file name
+     * @param e the log event
+     * @return true if the current time is after the scheduled time
+     */
     virtual bool is_triggered(const std::string& active_file, const event& e) override;
 
 private:
