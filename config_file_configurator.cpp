@@ -27,8 +27,6 @@
 #include <chucho/level_threshold_filter.hpp>
 #include <assert.h>
 
-#include <iostream>
-
 namespace
 {
 

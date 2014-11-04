@@ -48,6 +48,7 @@ namespace chucho
  *     <tr><td>marker</td><td>String</td>
  *         <td>The marker or nil if there is no marker</td></tr>
  * </table>
+ * The Ruby expression must return a true or false value.
  * 
  * @ingroup filters
  */
