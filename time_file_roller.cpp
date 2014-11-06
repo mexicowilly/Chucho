@@ -337,7 +337,7 @@ void time_file_roller::set_period()
                     rolled.tm_mon++;
                 else
                     rolled.tm_year++;
-                rolled = calendar::get_local(calendar::to_time_t(rolled));
+                rolled = calendar::get_utc(calendar::to_time_t(rolled));
                 std::string fmt2 = calendar::format(rolled, spec);
                 if (fmt1 != fmt2) {
                     period_ = p;
