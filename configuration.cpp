@@ -328,6 +328,8 @@ configuration::unknown_handler_type configuration::get_unknown_handler()
 
 void configuration::initialize_security_policy()
 {
+    #if defined(CHUCHO_YAML_CONFIG) || defined(CHUCHO_CONFIG_FILE_CONFIG)
+
     #if defined(CHUCHO_YAML_CONFIG)
 
     yaml_configurator cnf(data().security_policy_);
@@ -346,6 +348,8 @@ void configuration::initialize_security_policy()
     auto& facts(configurator::get_factories());
     for (auto fact : facts)
         fact.second->create_memento(cnf);
+
+    #endif
 }
 
 void configuration::perform(std::shared_ptr<logger> root_logger)
