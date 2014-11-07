@@ -18,6 +18,8 @@
 #include <iomanip>
 #include <sstream>
 #include <array>
+#include <tuple>
+#include <vector>
 
 namespace
 {
