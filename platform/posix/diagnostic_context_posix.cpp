@@ -58,6 +58,12 @@ key_manager::key_manager()
 
 key_manager::~key_manager()
 {
+    // Go ahead and delete manually here, because when the thread
+    // that is running the garbage_cleaner is the same thread that
+    // created the key, then the key will be deleted before the
+    // destructor function gets a chance to be called, and the map
+    // will leak. This has been observed.
+    delete reinterpret_cast<std::map<std::string, std::string>*>(pthread_getspecific(key_));
     pthread_key_delete(key_);
 }
 

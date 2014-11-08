@@ -165,6 +165,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/status_manager.hpp
     include/chucho/status_observer.hpp
     include/chucho/status_reporter.hpp
+    include/chucho/syslog_constants.h
     include/chucho/syslog_constants.hpp
     include/chucho/syslog_writer.hpp
     include/chucho/time_file_roller.hpp
@@ -207,7 +208,6 @@ SET(CHUCHO_C_HEADERS
     include/chucho/sliding_numbered_file_roller.h
     include/chucho/status.h
     include/chucho/status_manager.h
-    include/chucho/syslog_constants.h
     include/chucho/syslog_writer.h
     include/chucho/time_file_roller.h
     include/chucho/writer.h)
