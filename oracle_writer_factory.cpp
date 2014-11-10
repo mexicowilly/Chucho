@@ -50,7 +50,7 @@ std::shared_ptr<configurable> oracle_writer_factory::create_configurable(std::sh
     return ow;
 }
 
-std::shared_ptr<memento> oracle_writer_factory::create_memento(const configurator& cfg)
+std::shared_ptr<memento> oracle_writer_factory::create_memento(configurator& cfg)
 {
     std::shared_ptr<memento> mnto = std::make_shared<oracle_writer_memento>(cfg);
     return mnto;

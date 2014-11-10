@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_CONFIGURATION_HPP__)
 #define CHUCHO_CONFIGURATION_HPP__
 
-#include <chucho/export.hpp>
+#include <chucho/security_policy.hpp>
 #include <chucho/status_reporter.hpp>
 #include <string>
 #include <functional>
@@ -157,6 +157,13 @@ public:
      */
     static std::size_t get_max_size();
     /**
+     * Return the security policy.
+     * 
+     * @return the security policy 
+     * @sa @ref security_policy 
+     */
+    static security_policy& get_security_policy();
+    /**
      * Return the configuration style. AUTOMATIC is the default 
      * style. 
      * 
@@ -216,6 +223,25 @@ public:
      * @sa allow_default 
      */
     static void set_allow_default(bool allow);
+    /**
+     * Set the configuration. The new configuration will replace the 
+     * existing one. Any configuration format supported in the 
+     * Chucho build will be detected and properly handled. By 
+     * default, only the YAML format is supported. 
+     *  
+     * If the configuration is not loadable, then the existing 
+     * configuration will be preserved. 
+     *  
+     * @note An invalid configuration is usually one where the text 
+     *       simply cannot be parsed. Erros in the configuration
+     *       parameters, like the absence of a @ref formatter for a
+     *       @ref writer, are not unrecoverable errors, and thus,
+     *       the configuration is considered valid.
+     * 
+     * @param cfg the new configuration
+     * @return true if the configuration was valid
+     */
+    static bool set(const std::string& cfg);
     /**
      * Set the environment variable that will be used to find the 
      * configuration file. If this method is not called, then the
@@ -291,7 +317,7 @@ protected:
     friend class logger;
 
 private:
-    class reporter : public chucho::status_reporter
+    class CHUCHO_NO_EXPORT reporter : public chucho::status_reporter
     {
     public:
         reporter();
@@ -302,6 +328,8 @@ private:
     };
 
     CHUCHO_NO_EXPORT static bool configure_from_file(const std::string& file_name, reporter& report);
+    CHUCHO_NO_EXPORT static bool configure_from_text(const std::string& cfg, reporter& report);
+    CHUCHO_NO_EXPORT static void initialize_security_policy();
     CHUCHO_NO_EXPORT static void perform(std::shared_ptr<logger> root_logger);
 };
 

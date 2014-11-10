@@ -50,6 +50,7 @@ CHUCHO_PRIV_EXPORT std::string format(const pieces& cal,
                                       const std::string& pattern);
 CHUCHO_PRIV_EXPORT pieces get_local(std::time_t t);
 CHUCHO_PRIV_EXPORT pieces get_utc(std::time_t t);
+CHUCHO_PRIV_EXPORT std::time_t to_time_t(const pieces& cal);
 
 }
 

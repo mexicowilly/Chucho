@@ -56,6 +56,12 @@
 #include <chucho/sqlite_writer.hpp>
 #include <chucho/file.hpp>
 #endif
+#if defined(CHUCHO_HAVE_POSTGRES)
+#include <chucho/postgres_writer.hpp>
+#endif
+#if defined(CHUCHO_HAVE_RUBY)
+#include <chucho/ruby_evaluator_filter.hpp>
+#endif
 #include <sstream>
 #if defined(CHUCHO_WINDOWS)
 #include <windows.h>
@@ -195,6 +201,48 @@ void configurator::gzip_file_compressor_body()
     ASSERT_EQ(typeid(chucho::noop_file_compressor), typeid(*cmp));
     chucho::status_manager::get()->clear();
 #endif
+}
+
+void configurator::interval_file_roll_trigger_body(const std::string& tmpl)
+{
+    std::size_t pos = tmpl.find("PERIOD");
+    const char* bad[] =
+    {
+        "seven seconds",
+        "5 years",
+        "12 doggies",
+        nullptr
+    };
+    int i = 0;
+    while (bad[i] != nullptr)
+    {
+        chucho::logger::remove_unused_loggers();
+        chucho::status_manager::get()->clear();
+        std::string rep = tmpl;
+        rep.replace(pos, 6, bad[i++]);
+        configure(rep.c_str());
+        EXPECT_EQ(chucho::status::level::ERROR_, chucho::status_manager::get()->get_level());
+    }
+    chucho::status_manager::get()->clear();
+    const char* good[] =
+    {
+        "2 MinUTeS",
+        "1 HOUR",
+        "4 days",
+        "5 Weeks",
+        "6 monTH",
+        nullptr
+    };
+    i = 0;
+    while (good[i] != nullptr)
+    {
+        chucho::logger::remove_unused_loggers();
+        chucho::status_manager::get()->clear();
+        std::string rep = tmpl;
+        rep.replace(pos, 6, good[i++]);
+        configure(rep.c_str());
+        EXPECT_EQ(chucho::status::level::INFO_, chucho::status_manager::get()->get_level());
+    }
 }
 
 void configurator::level_filter_body(const std::string& tmpl)
@@ -349,6 +397,20 @@ void configurator::oracle_writer_body()
 
 #endif
 
+#if defined(CHUCHO_HAVE_POSTGRES)
+
+void configurator::postgres_writer_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::postgres_writer), typeid(*wrts[0]));
+    auto pwrt = std::static_pointer_cast<chucho::postgres_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(pwrt));
+    EXPECT_EQ(std::string("postgres://test_user:password@192.168.56.101/postgres"), pwrt->get_uri());
+}
+
+#endif
+
 void configurator::remote_writer_body()
 {
     auto wrts = chucho::logger::get("will")->get_writers();
@@ -402,6 +464,21 @@ void configurator::rolling_file_writer_body()
     EXPECT_EQ(5000, strg->get_max_size());
 }
 
+#if defined(CHUCHO_HAVE_RUBY)
+
+void configurator::ruby_evaluator_filter_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    auto flts = wrts[0]->get_filters();
+    ASSERT_EQ(1, flts.size());
+    ASSERT_EQ(typeid(chucho::ruby_evaluator_filter), typeid(*flts[0]));
+    auto rb = std::static_pointer_cast<chucho::ruby_evaluator_filter>(flts[0]);
+    EXPECT_EQ(std::string("$logger == \"will\""), rb->get_expression());
+}
+
+#endif
+
 void configurator::size_file_roll_trigger_body(const std::string& tmpl)
 {
     std::size_t pos = tmpl.find("SIZE");
@@ -443,12 +520,10 @@ void configurator::size_file_roll_trigger_body(const std::string& tmpl)
         { "5Mb", 1024 * 1024 * 5 },
         { "6mB", 1024 * 1024 * 6 },
         { "7MB", 1024 * 1024 * 7 },
-        { "2g", 1024ULL * 1024ULL * 1024ULL * 2ULL },
-        { "3gb", 1024ULL * 1024ULL * 1024ULL * 3ULL },
-        { "4G", 1024ULL * 1024ULL * 1024ULL * 4ULL },
-        { "5Gb", 1024ULL * 1024ULL * 1024ULL * 5ULL },
-        { "6gB", 1024ULL * 1024ULL * 1024ULL * 6ULL },
-        { "7GB", 1024ULL * 1024ULL * 1024ULL * 7ULL },
+        { "1g", 1024ULL * 1024ULL * 1024ULL },
+        { "1Gb", 1024ULL * 1024ULL * 1024ULL },
+        { "1GB", 1024ULL * 1024ULL * 1024ULL },
+        { "1gB", 1024ULL * 1024ULL * 1024ULL },
         { nullptr, 0 }
     };
     i = 0;

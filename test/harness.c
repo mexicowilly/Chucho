@@ -51,9 +51,16 @@
 #if defined(CHUCHO_HAVE_SQLITE)
 #include "sqlite_writer_test.h"
 #endif
+#if defined(CHUCHO_HAVE_POSTGRES)
+#include "postgres_writer_test.h"
+#endif
 #if defined(CHUCHO_WINDOWS)
 #include "windows_event_log_writer_test.h"
 #endif
+#if defined(CHUCHO_HAVE_RUBY)
+#include "ruby_evaluator_filter_test.h"
+#endif
+#include "security_policy_test.h"
 
 sput_struct __sput;
 
@@ -96,9 +103,16 @@ int main()
     #if defined(CHUCHO_HAVE_SQLITE)
     run_sqlite_writer_test();
     #endif
+    #if defined(CHUCHO_HAVE_POSTGRES)
+    run_postgres_writer_test();
+    #endif
     #if defined(CHUCHO_WINDOWS)
     run_windows_event_log_writer_test();
     #endif
+    #if defined(CHUCHO_HAVE_RUBY)
+    run_ruby_evaluator_filter_test();
+    #endif
+    run_security_policy_test();
 
     sput_finish_testing();
     chucho_finalize();

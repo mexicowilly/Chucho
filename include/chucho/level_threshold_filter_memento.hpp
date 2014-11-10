@@ -31,7 +31,7 @@ namespace chucho
 class level_threshold_filter_memento : public memento
 {
 public:
-    level_threshold_filter_memento(const configurator& cfg, memento_key_set ks);
+    level_threshold_filter_memento(configurator& cfg, memento_key_set ks);
 
     std::shared_ptr<level> get_level() const;
 

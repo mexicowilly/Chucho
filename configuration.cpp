@@ -23,6 +23,7 @@
 #include <chucho/garbage_cleaner.hpp>
 #include <chucho/environment.hpp>
 #include <chucho/configurator.hpp>
+#include <chucho/configurable_factory.hpp>
 
 #if defined(CHUCHO_YAML_CONFIG)
 #include <chucho/yaml_parser.hpp>
@@ -54,6 +55,7 @@ struct static_data
     std::string loaded_file_name_;
     bool is_configured_;
     std::size_t max_size_;
+    chucho::security_policy security_policy_;
 };
 
 static_data::static_data()
@@ -67,10 +69,9 @@ static_data::static_data()
     chucho::garbage_cleaner::get().add([this] () { delete this; });
 }
 
-std::once_flag once;
-
 static_data& data()
 {
+    static std::once_flag once;
     // This gets cleaned up in finalize()
     static static_data* sd;
 
@@ -136,7 +137,15 @@ format detect_format(std::istream& stream_1, std::istream& stream_2)
     chucho::yaml_parser prs(stream_1);
     yaml_document_t doc;
     if (yaml_parser_load(prs, &doc))
-        return format::YAML;
+    {
+        yaml_node_type_t tp = yaml_document_get_root_node(&doc)->type;
+        yaml_document_delete(&doc);
+        // A config file format will have one scalar node. A valid
+        // Chucho YAML config will not have any scalar nodes at the
+        // top level.
+        if (tp != YAML_SCALAR_NODE)
+            return format::YAML; 
+    }
 
     #endif
 
@@ -186,7 +195,7 @@ bool configuration::configure_from_file(const std::string& file_name, reporter& 
     if (fmt == format::YAML)
     {
         report.info("The file, " + file_name + ", is in YAML format");
-        cfg.reset(new yaml_configurator);
+        cfg.reset(new yaml_configurator(data().security_policy_));
     }
 
     #endif
@@ -196,7 +205,7 @@ bool configuration::configure_from_file(const std::string& file_name, reporter& 
     if (fmt == format::CONFIG_FILE)
     {
         report.info("The file, " + file_name + ", is in config file format");
-        cfg.reset(new config_file_configurator);
+        cfg.reset(new config_file_configurator(data().security_policy_));
     }
 
     #endif
@@ -229,6 +238,51 @@ bool configuration::configure_from_file(const std::string& file_name, reporter& 
     return result;
 }
 
+bool configuration::configure_from_text(const std::string& cfg, reporter& report)
+{
+    bool result = false;
+    static_data& sd(data());
+    try
+    {
+        format fmt = detect_text_format(cfg);
+
+        #if defined(CHUCHO_YAML_CONFIG)
+
+        if (fmt == format::YAML)
+        {
+            yaml_configurator yam(sd.security_policy_);
+            std::istringstream in(cfg);
+            yam.configure(in);
+            report.info("Using the YAML format configuration"); 
+        }
+
+        #endif
+
+        #if defined(CHUCHO_CONFIG_FILE_CONFIG)
+
+        if (fmt == format::CONFIG_FILE)
+        {
+            config_file_configurator cnf(sd.security_policy_);
+            std::istringstream in(cfg);
+            cnf.configure(in);
+            report.info("Using the config file format configuration"); 
+        }
+
+        #endif
+
+        if (fmt == format::DONT_KNOW)
+            report.warning("Unable to detect the format of the configuration");
+        else
+            result = true;
+    }
+    catch (std::exception& e)
+    {
+        logger::remove_unused_loggers();
+        report.error("Error setting configuration: " + exception::nested_whats(e));
+    }
+    return result;
+}
+
 const std::string& configuration::get_environment_variable()
 {
     return data().environment_variable_;
@@ -254,6 +308,14 @@ std::size_t configuration::get_max_size()
     return data().max_size_;
 }
 
+security_policy& configuration::get_security_policy()
+{
+    static std::once_flag once;
+
+    std::call_once(once, initialize_security_policy);
+    return data().security_policy_;
+}
+
 configuration::style configuration::get_style()
 {
     return data().style_;
@@ -262,6 +324,32 @@ configuration::style configuration::get_style()
 configuration::unknown_handler_type configuration::get_unknown_handler()
 {
     return data().unknown_handler_;
+}
+
+void configuration::initialize_security_policy()
+{
+    #if defined(CHUCHO_YAML_CONFIG) || defined(CHUCHO_CONFIG_FILE_CONFIG)
+
+    #if defined(CHUCHO_YAML_CONFIG)
+
+    yaml_configurator cnf(data().security_policy_);
+
+    #elif defined(CHUCHO_CONFIG_FILE_CONFIG)
+
+    config_file_configurator cnf(data().security_policy_);
+
+    #else
+
+    return;
+
+    #endif
+    // The mementos are where each configurable configures
+    // its security policy.
+    auto& facts(configurator::get_factories());
+    for (auto fact : facts)
+        fact.second->create_memento(cnf);
+
+    #endif
 }
 
 void configuration::perform(std::shared_ptr<logger> root_logger)
@@ -311,45 +399,9 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
     }
     if (!sd.is_configured_ && !sd.fallback_.empty())
     {
-        try
-        {
-            format fmt = detect_text_format(sd.fallback_);
-
-            #if defined(CHUCHO_YAML_CONFIG)
-
-            if (fmt == format::YAML)
-            {
-                yaml_configurator yam; 
-                // this is already validated UTF-8
-                std::istringstream fb_in(sd.fallback_);
-                yam.configure(fb_in);
-                sd.is_configured_ = true;
-                report.info("Using the YAML format fallback configuration"); 
-            }
-
-            #endif
-
-            #if defined(CHUCHO_CONFIG_FILE_CONFIG)
-
-            if (fmt == format::CONFIG_FILE)
-            {
-                config_file_configurator cnf;
-                std::istringstream fb_in(sd.fallback_);
-                cnf.configure(fb_in);
-                sd.is_configured_ = true;
-                report.info("Using the config file format fallback configuration"); 
-            }
-
-            #endif
-
-            if (fmt == format::DONT_KNOW)
-                report.warning("Unable to detect the format of the fallback configuration");
-        }
-        catch (std::exception& e)
-        {
+        sd.is_configured_ = configure_from_text(sd.fallback_, report);
+        if (!sd.is_configured_)
             logger::remove_unused_loggers();
-            report.error("Error setting fallback configuration: " + exception::nested_whats(e));
-        }
     }
 
     #endif
@@ -412,6 +464,38 @@ bool configuration::reconfigure()
 void configuration::set_allow_default(bool allow)
 {
     data().allow_default_config_ = allow;
+}
+
+bool configuration::set(const std::string& cfg)
+{
+    reporter report;
+    bool result = false;
+    if (cfg.length() > data().max_size_)
+    {
+        report.error("The configuration size is " + std::to_string(cfg.length()) +
+            ", but the maximum allowed is " + std::to_string(data().max_size_));
+    }
+    else
+    {
+        auto loggers = logger::get_existing_loggers();
+        std::vector<logger_state> states;
+        for (auto lgr : loggers)
+        {
+            states.emplace_back(lgr);
+            lgr->reset();
+        }
+        configurator::initialize();
+        if (configure_from_text(cfg, report))
+        {
+            result = true;
+        }
+        else
+        {
+            for (unsigned i = 0; i < loggers.size(); i++)
+                states[i].restore(loggers[i]);
+        }
+    }
+    return result;
 }
 
 void configuration::set_environment_variable(const std::string& var)

@@ -28,6 +28,8 @@ static void oracle_writer_test(void)
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
     rc = chucho_create_oracle_writer(&wrt, fmt, "test_user", "password", "192.168.56.102/pdb1");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create oracle writer");
+    if (rc != CHUCHO_NO_ERROR)
+        return;
     rc = chucho_owrt_get_database(wrt, &text);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_owrt_get_database");
     sput_fail_unless(strcmp(text, "192.168.56.102/pdb1") == 0, text);

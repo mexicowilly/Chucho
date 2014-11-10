@@ -41,7 +41,7 @@ std::shared_ptr<configurable> cerr_writer_factory::create_configurable(std::shar
     return cnf;
 }
 
-std::shared_ptr<memento> cerr_writer_factory::create_memento(const configurator& cfg)
+std::shared_ptr<memento> cerr_writer_factory::create_memento(configurator& cfg)
 {
     std::shared_ptr<memento> mnto(new cerr_writer_memento(cfg));
     return mnto;

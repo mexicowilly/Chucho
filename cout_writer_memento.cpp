@@ -19,7 +19,7 @@
 namespace chucho
 {
 
-cout_writer_memento::cout_writer_memento(const configurator& cfg)
+cout_writer_memento::cout_writer_memento(configurator& cfg)
     : writer_memento(cfg)
 {
 }

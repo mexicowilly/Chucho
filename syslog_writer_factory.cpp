@@ -64,7 +64,7 @@ std::shared_ptr<configurable> syslog_writer_factory::create_configurable(std::sh
     return cnf;
 }
 
-std::shared_ptr<memento> syslog_writer_factory::create_memento(const configurator& cfg)
+std::shared_ptr<memento> syslog_writer_factory::create_memento(configurator& cfg)
 {
     std::shared_ptr<memento> mnto(new syslog_writer_memento(cfg));
     return mnto;

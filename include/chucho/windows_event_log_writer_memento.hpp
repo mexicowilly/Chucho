@@ -30,7 +30,7 @@ namespace chucho
 class windows_event_log_writer_memento : public writer_memento
 {
 public:
-    windows_event_log_writer_memento(const configurator& cfg, memento_key_set ks);
+    windows_event_log_writer_memento(configurator& cfg, memento_key_set ks);
 
     const std::string& get_host() const;
     const std::string& get_log() const;

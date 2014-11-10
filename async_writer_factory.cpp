@@ -46,7 +46,7 @@ std::shared_ptr<configurable> async_writer_factory::create_configurable(std::sha
     return aw;
 }
 
-std::shared_ptr<memento> async_writer_factory::create_memento(const configurator& cfg)
+std::shared_ptr<memento> async_writer_factory::create_memento(configurator& cfg)
 {
     auto mnto = std::make_shared<async_writer_memento>(cfg);
     return mnto;

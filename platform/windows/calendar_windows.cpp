@@ -39,6 +39,11 @@ pieces get_utc(std::time_t t)
     return result;
 }
 
+std::time_t to_time_t(const pieces& cal)
+{
+    return cal.is_utc ? _mkgmtime(&const_cast<pieces&>(cal)) : mktime(&const_cast<pieces&>(cal));
+}
+
 }
 
 }

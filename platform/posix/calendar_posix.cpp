@@ -17,6 +17,7 @@
 #include <chucho/calendar.hpp>
 #include <chucho/garbage_cleaner.hpp>
 #include <mutex>
+#include <cstdlib>
 
 #if !defined(CHUCHO_HAVE_GMTIME_R) || !defined(CHUCHO_HAVE_LOCALTIME_R)
 
@@ -30,7 +31,7 @@ std::mutex& calendar_guard()
     static std::mutex* guard;
 
     std::call_once(once, [&] () { guard = new std::mutex();
-                                  chucho::garbage_cleaner::get().add([&] () { delete guard; }) });
+                                  chucho::garbage_cleaner::get().add([&] () { delete guard; }); });
     return *guard;
 }
 
@@ -79,6 +80,36 @@ pieces get_utc(std::time_t t)
     #endif
 
     result.is_utc = true;
+    return result;
+}
+
+std::time_t to_time_t(const pieces& cal)
+{
+    time_t result;
+    if (cal.is_utc)
+    {
+        #if defined(CHUCHO_HAVE_TIMEGM)
+
+        result = timegm(&const_cast<pieces&>(cal));
+
+        #else
+
+        char* tz = std::getenv("TZ");
+        setenv("TZ", "", 1);
+        tzset();
+        result = std::mktime(&const_cast<pieces&>(cal));
+        if (tz != nullptr)
+            setenv("TZ", tz, 1);
+        else
+            unsetenv("TZ");
+        tzset();
+
+        #endif
+    }
+    else
+    {
+        result = std::mktime(&const_cast<pieces&>(cal));
+    }
     return result;
 }
 

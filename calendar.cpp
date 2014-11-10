@@ -15,11 +15,11 @@
  */
 
 #include <chucho/calendar.hpp>
-#include <chucho/garbage_cleaner.hpp>
-#include <chucho/regex.hpp>
-#include <thread>
 #include <iomanip>
 #include <sstream>
+#include <array>
+#include <tuple>
+#include <vector>
 
 namespace
 {
@@ -29,32 +29,6 @@ namespace
 const std::size_t FORMAT_BUF_SIZE_MAX = 20 * 1024;
 
 #endif
-
-struct static_data
-{
-    static_data();
-
-    chucho::regex::expression offset_re_;
-    chucho::regex::expression name_re_;
-};
-
-static_data::static_data()
-    : offset_re_("%+z"),
-      name_re_("%+Z")
-{
-    chucho::garbage_cleaner::get().add([this] () { delete this; });
-}
-
-std::once_flag once;
-
-static_data& data()
-{
-    // This will be cleaned in finalize()
-    static static_data* sd;
-
-    std::call_once(once, [&] () { sd = new static_data(); });
-    return *sd;
-}
 
 }
 
@@ -86,37 +60,25 @@ std::string format_time_zone(const pieces& cal,
 {
     if (!cal.is_utc)
         return pattern;
-    static_data& sd = data(); 
-    regex::iterator itor(pattern, sd.offset_re_);
-    regex::iterator end;
-    std::size_t offset = 0;
     std::string result = pattern;
-    while (itor != end)
+    std::array<std::tuple<const char*, const char*, std::size_t>, 2> tups =
     {
-        const regex::match& m(*itor);
-        if ((m[0].length() & 1) == 0)
-        {
-            result.replace(offset + m[0].begin() + m[0].length() - 2, 2, "+0000");
-            offset += 3;
-        }
-        ++itor;
-    }
-    std::string new_pat = result;
-    // std::regex has a bug in VS2012 where you can't assign
-    // to the already existing iterator.
-    regex::iterator itor2(new_pat, sd.name_re_);
-    offset = 0;
-    while (itor2 != end)
+        std::make_tuple("%z", "+0000", 5),
+        std::make_tuple("%Z", "UTC", 3)
+    };
+    for (const auto& mr : tups)
     {
-        const regex::match& m(*itor2);
-        if ((m[0].length() & 1) == 0)
+        std::string::size_type offset = result.find(std::get<0>(mr));
+        while (offset != std::string::npos)
         {
-            result.replace(offset + m[0].begin() + m[0].length() - 2, 2, "UTC");
-            offset += 1;
+            std::string::size_type beg = result.find_last_not_of('%', offset);
+            beg = (beg == std::string::npos) ? 0 : beg + 1;
+            if (((offset + 1 - beg) & 1) != 0)
+                result.replace(offset, 2, std::get<1>(mr));
+            offset = result.find(std::get<0>(mr), offset + std::get<2>(mr));
         }
-        ++itor2;
     }
-    return result;
+    return result; 
 }
 
 std::string format(const pieces& cal, const std::string& pattern)

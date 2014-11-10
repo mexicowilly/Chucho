@@ -65,7 +65,7 @@ std::shared_ptr<configurable> mysql_writer_factory::create_configurable(std::sha
     return mw;
 }
 
-std::shared_ptr<memento> mysql_writer_factory::create_memento(const configurator& cfg)
+std::shared_ptr<memento> mysql_writer_factory::create_memento(configurator& cfg)
 {
     std::shared_ptr<memento> mnto = std::make_shared<mysql_writer_memento>(cfg);
     return mnto;

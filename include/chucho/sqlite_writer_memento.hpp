@@ -29,7 +29,7 @@ namespace chucho
 class sqlite_writer_memento : public writer_memento
 {
 public:
-    sqlite_writer_memento(const configurator& cfg);
+    sqlite_writer_memento(configurator& cfg);
 
     const std::string& get_file_name() const;
 

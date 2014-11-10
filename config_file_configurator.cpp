@@ -27,8 +27,6 @@
 #include <chucho/level_threshold_filter.hpp>
 #include <assert.h>
 
-#include <iostream>
-
 namespace
 {
 
@@ -57,8 +55,9 @@ chucho::properties get_non_empty_subset(const chucho::properties& props,
 namespace chucho
 {
 
-config_file_configurator::config_file_configurator()
-    : memento_key_set_(memento_key_set::CHUCHO)
+config_file_configurator::config_file_configurator(const security_policy& sec_pol)
+    : configurator(sec_pol),
+      memento_key_set_(memento_key_set::CHUCHO)
 {
     set_status_origin("config_file_configurator");
 }

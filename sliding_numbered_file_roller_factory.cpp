@@ -51,7 +51,7 @@ std::shared_ptr<configurable> sliding_numbered_file_roller_factory::create_confi
     return snfr;
 }
 
-std::shared_ptr<memento> sliding_numbered_file_roller_factory::create_memento(const configurator& cfg)
+std::shared_ptr<memento> sliding_numbered_file_roller_factory::create_memento(configurator& cfg)
 {
     std::shared_ptr<memento> mnto(new sliding_numbered_file_roller_memento(cfg));
     return mnto;

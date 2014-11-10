@@ -18,6 +18,7 @@
 #include <chucho/config_file_configurator.hpp>
 #include <chucho/logger.hpp>
 #include <chucho/level_threshold_filter.hpp>
+#include <chucho/configuration.hpp>
 
 namespace
 {
@@ -25,11 +26,18 @@ namespace
 class chucho_config_file_configurator : public chucho::test::configurator
 {
 protected:
+    chucho_config_file_configurator();
+
     virtual chucho::configurator& get_configurator() override;
 
 private:
     chucho::config_file_configurator cnf_;
 };
+
+chucho_config_file_configurator::chucho_config_file_configurator()
+    : cnf_(chucho::configuration::get_security_policy())
+{
+}
 
 chucho::configurator& chucho_config_file_configurator::get_configurator()
 {
@@ -257,6 +265,24 @@ TEST_F(chucho_config_file_configurator, gzip_file_compressor)
     gzip_file_compressor_body();
 }
 
+TEST_F(chucho_config_file_configurator, interval_file_roll_trigger)
+{
+    std::string tmpl("chucho.logger = will\n"
+                     "chucho.logger.will.writer = rfw\n"
+                     "chucho.writer.rfw = chucho::rolling_file_writer\n"
+                     "chucho.writer.rfw.formatter = pf\n"
+                     "chucho.formatter.pf = chucho::pattern_formatter\n"
+                     "chucho.formatter.pf.pattern = %m%n\n"
+                     "chucho.writer.rfw.file_roller = nfr\n"
+                     "chucho.file_roller.nfr = chucho::numbered_file_roller\n"
+                     "chucho.file_roller.nfr.max_index = 1\n"
+                     "chucho.writer.rfw.file_roll_trigger = ifrt\n"
+                     "chucho.file_roll_trigger.ifrt = chucho::interval_file_roll_trigger\n"
+                     "chucho.file_roll_trigger.ifrt.every = PERIOD\n"
+                     "chucho.writer.rfw.file_name = what.log");
+    interval_file_roll_trigger_body(tmpl);
+}
+
 TEST_F(chucho_config_file_configurator, level_filter)
 {
     std::string tmpl("chucho.logger = will\n"
@@ -386,6 +412,22 @@ TEST_F(chucho_config_file_configurator, oracle_writer)
 
 #endif
 
+#if defined(CHUCHO_HAVE_POSTGRES)
+
+TEST_F(chucho_config_file_configurator, postgres_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = pg\n"
+              "chucho.writer.pg = chucho::postgres_writer\n"
+              "chucho.writer.pg.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.pg.uri = postgres://test_user:password@192.168.56.101/postgres");
+    postgres_writer_body();
+}
+
+#endif
+
 TEST_F(chucho_config_file_configurator, remote_writer)
 {
     configure("chucho.logger = will\n"
@@ -425,6 +467,24 @@ TEST_F(chucho_config_file_configurator, rolling_file_writer)
               "chucho.writer.rfw.flush = false");
     rolling_file_writer_body();
 }
+
+#if defined(CHUCHO_HAVE_RUBY)
+
+TEST_F(chucho_config_file_configurator, ruby_evaluator_filter)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = co\n"
+              "chucho.writer.co = chucho::cout_writer\n"
+              "chucho.writer.co.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m%n\n"
+              "chucho.writer.co.filter = ref\n"
+              "chucho.filter.ref = chucho::ruby_evaluator_filter\n"
+              "chucho.filter.ref.expression = $logger == \"will\"");
+    ruby_evaluator_filter_body();
+}
+
+#endif
 
 TEST_F(chucho_config_file_configurator, size_file_roll_trigger)
 {

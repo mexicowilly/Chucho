@@ -32,7 +32,7 @@ public:
     level_filter_factory();
 
     virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
-    virtual std::shared_ptr<memento> create_memento(const configurator& cfg) override;
+    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
 };
 
 }

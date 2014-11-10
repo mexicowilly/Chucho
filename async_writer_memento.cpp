@@ -20,13 +20,14 @@
 namespace chucho
 {
 
-async_writer_memento::async_writer_memento(const configurator& cfg)
+async_writer_memento::async_writer_memento(configurator& cfg)
     : memento(cfg)
 {
     set_status_origin("async_writer_memento");
-    set_handler("discard_threshold", [this] (const std::string& name) { discard_threshold_ = level::from_text(name); });
-    set_handler("queue_capacity", [this] (const std::string& cap) { queue_capacity_ = std::stoul(cap); });
-    set_handler("flush_on_destruct", [this] (const std::string& val) { flush_on_destruct_ = boolean_value(val); });
+    cfg.get_security_policy().set_integer("async_writer::queue_capacity", 10, 32 * 1024);
+    set_handler("discard_threshold", [this] (const std::string& name) { discard_threshold_ = level::from_text(validate("async_writer::discard_threshold", name)); });
+    set_handler("queue_capacity", [this] (const std::string& cap) { queue_capacity_ = validate("async_writer::queue_capacity", std::stoul(validate("async_writer::queue_capacity(text)", cap))); });
+    set_handler("flush_on_destruct", [this] (const std::string& val) { flush_on_destruct_ = boolean_value(validate("async_writer::flush_on_destruct", val)); });
 }
 
 void async_writer_memento::handle(std::shared_ptr<configurable> cnf)

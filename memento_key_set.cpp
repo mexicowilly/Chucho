@@ -22,7 +22,7 @@
 namespace chucho
 {
 
-memento_key_set get_memento_key_set(const configurator& cfg)
+memento_key_set get_memento_key_set(configurator& cfg)
 {
     memento_key_set ks = memento_key_set::CHUCHO;
 

@@ -75,6 +75,14 @@ chucho_rc chucho_lgr_get_level(const chucho_logger* lgr, const chucho_level** lv
     return CHUCHO_NO_ERROR;
 }
 
+chucho_rc chucho_lgr_get_name(const chucho_logger* lgr, const char** nm)
+{
+    if (lgr == nullptr || nm == nullptr)
+        return CHUCHO_NULL_POINTER;
+    *nm = lgr->logger_->get_name().c_str();
+    return CHUCHO_NO_ERROR;
+}
+
 chucho_rc chucho_lgr_get_writers(const chucho_logger* lgr, chucho_writer** buf, size_t buf_size, size_t* count)
 {
     if (lgr == nullptr || count == nullptr)

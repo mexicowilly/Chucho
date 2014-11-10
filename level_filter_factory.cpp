@@ -45,7 +45,7 @@ std::shared_ptr<configurable> level_filter_factory::create_configurable(std::sha
     return cnf;
 }
 
-std::shared_ptr<memento> level_filter_factory::create_memento(const configurator& cfg)
+std::shared_ptr<memento> level_filter_factory::create_memento(configurator& cfg)
 {
     std::shared_ptr<memento> mnto = std::make_shared<level_filter_memento>(cfg, get_memento_key_set(cfg));
     return mnto;

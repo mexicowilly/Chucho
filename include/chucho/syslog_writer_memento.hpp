@@ -31,7 +31,7 @@ namespace chucho
 class syslog_writer_memento : public writer_memento
 {
 public:
-    syslog_writer_memento(const configurator& cfg);
+    syslog_writer_memento(configurator& cfg);
 
     const optional<syslog::facility>& get_facility() const;
     const std::string& get_host_name() const;

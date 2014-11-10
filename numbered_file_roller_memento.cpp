@@ -19,12 +19,14 @@
 namespace chucho
 {
 
-numbered_file_roller_memento::numbered_file_roller_memento(const configurator& cfg)
+numbered_file_roller_memento::numbered_file_roller_memento(configurator& cfg)
     : file_roller_memento(cfg)
 {
     set_status_origin("numbered_file_roller_memento");
-    set_handler("min_index", [this](const std::string& idx) {min_index_ = std::stoi(idx);}); 
-    set_handler("max_index", [this] (const std::string& idx) { max_index_ = std::stoi(idx); });
+    cfg.get_security_policy().set_integer("numbered_file_roller::min_index", -1000, 1000);
+    cfg.get_security_policy().set_integer("numbered_file_roller::max_index", -1000, 1000);
+    set_handler("min_index", [this](const std::string& idx) {min_index_ = validate("numbered_file_roller::min_index", std::stoi(validate("numbered_file_roller::min_index(text)", idx))); }); 
+    set_handler("max_index", [this](const std::string& idx) {max_index_ = validate("numbered_file_roller::max_index", std::stoi(validate("numbered_file_roller::max_index(text)", idx))); }); 
 }
 
 }

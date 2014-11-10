@@ -30,7 +30,7 @@ namespace chucho
 class mysql_writer_memento : public writer_memento
 {
 public:
-    mysql_writer_memento(const configurator& cfg);
+    mysql_writer_memento(configurator& cfg);
 
     const std::string& get_database() const;
     std::shared_ptr<level> get_discard_threshold() const;

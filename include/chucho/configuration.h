@@ -25,8 +25,7 @@
  * @ingroup c_configuration 
  */
 
-#include <chucho/return_code.h>
-#include <stddef.h>
+#include <chucho/security_policy.h>
 
 #if defined(__cplusplus)
 extern "C"
@@ -120,6 +119,21 @@ CHUCHO_EXPORT chucho_rc chucho_cnf_get_loaded_file_name(const char** name);
  * @sa chucho_cnf_set_max_size
  */
 CHUCHO_EXPORT chucho_rc chucho_cnf_get_max_size(size_t* sz);
+/**
+ * Return the security policy. The security policy is used to 
+ * control the range of user inputs that can be found in a 
+ * configuration. 
+ *  
+ * @post Ownership of the pol parameter is returned to the 
+ *       caller, and must be released with @ref
+ *       chucho_release_security_policy.
+ * 
+ * @param pol the security policy
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ * @sa security_policy.h
+ */
+CHUCHO_EXPORT chucho_rc chucho_cnf_get_security_policy(chucho_security_policy** pol);
 /**
  * Return the configuration style. 
  * CHUCHO_CONFIGURATION_STYLE_AUTOMATIC is the default style. 

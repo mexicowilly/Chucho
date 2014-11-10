@@ -57,16 +57,24 @@ ENDIF()
 
 IF(YAML_CONFIG)
     SET(CHUCHO_CONFIGURATOR_TESTS yaml_configurator_test.cpp utf8_test.cpp)
+    SET(CHUCHO_CONFIGURATION_TEST_DEFS CHUCHO_YAML_CONFIG)
 ENDIF()
 
 IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
     LIST(APPEND CHUCHO_CONFIGURATOR_TESTS properties_test.cpp)
     IF(CONFIG_FILE_CONFIG)
         LIST(APPEND CHUCHO_CONFIGURATOR_TESTS chucho_config_file_configurator_test.cpp)
+        LIST(APPEND CHUCHO_CONFIGURATION_TEST_DEFS CHUCHO_CONFIG_FILE_CONFIG)
     ENDIF()
     IF(LOG4CPLUS_CONFIG)
         LIST(APPEND CHUCHO_CONFIGURATOR_TESTS log4cplus_config_file_configurator_test.cpp)
+        LIST(APPEND CHUCHO_CONFIGURATION_TEST_DEFS CHUCHO_LOG4CPLUS_CONFIG)
     ENDIF()
+ENDIF()
+
+IF(DEFINED CHUCHO_CONFIGURATION_TEST_DEFS)
+    SET_SOURCE_FILES_PROPERTIES(configuration_test.cpp PROPERTIES
+                                COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATION_TEST_DEFS}")
 ENDIF()
 
 IF(CHUCHO_HAVE_MYSQL)
@@ -81,9 +89,19 @@ IF(CHUCHO_HAVE_SQLITE)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_SQLITE)
 ENDIF()
 
+IF(CHUCHO_HAVE_POSTGRES)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_POSTGRES)
+ENDIF()
+
+IF(CHUCHO_HAVE_RUBY)
+    LIST(APPEND CHUCHO_TEST_EVALUATOR_SOURCES ruby_evaluator_filter_test.cpp)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_RUBY)
+ENDIF()
+
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
                calendar_test.cpp
+               configuration_test.cpp
                configurator_test.cpp
                configurator_test.hpp
                diagnostic_context_test.cpp
@@ -91,6 +109,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                file_test.cpp
                file_writer_test.cpp
                harness.cpp
+               interval_file_roll_trigger_test.cpp
                level_test.cpp
                level_filter_test.cpp
                level_threshold_filter_test.cpp
@@ -103,10 +122,12 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                pattern_formatter_test.cpp
                regex_test.cpp
                rolling_file_writer_test.cpp
+               security_policy_test.cpp
                size_file_roll_trigger_test.cpp
                utf8_test.cpp
                ${CHUCHO_TEST_COMPRESSION_SOURCES}
-               ${CHUCHO_CONFIGURATOR_TESTS})
+               ${CHUCHO_CONFIGURATOR_TESTS}
+               ${CHUCHO_TEST_EVALUATOR_SOURCES})
 TARGET_LINK_LIBRARIES(unit-test chucho gtest ${CHUCHO_THREAD_LIB})
 IF(CHUCHO_SOLARIS)
     TARGET_LINK_LIBRARIES(unit-test socket nsl)
@@ -122,6 +143,14 @@ ENDIF()
 
 IF(CHUCHO_HAVE_SQLITE)
     TARGET_LINK_LIBRARIES(unit-test "${SQLITE_CLIENT_LIB}")
+ENDIF()
+
+IF(CHUCHO_HAVE_POSTGRES)
+    TARGET_LINK_LIBRARIES(unit-test "${POSTGRES_CLIENT_LIB}")
+ENDIF()
+
+IF(CHUCHO_HAVE_RUBY AND NOT RUBY_FRAMEWORK)
+    TARGET_LINK_LIBRARIES(unit-test "${RUBY_LIB}")
 ENDIF()
 
 IF(MSVC)
@@ -163,6 +192,18 @@ IF(C_API)
         LIST(APPEND CHUCHO_DB_C_SOURCES
              sqlite_writer_test.c
              sqlite_writer_test.h)
+    ENDIF()
+
+    IF(CHUCHO_HAVE_POSTGRES)
+        LIST(APPEND CHUCHO_DB_C_SOURCES
+             postgres_writer_test.c
+             postgres_writer_test.h)
+    ENDIF()
+
+    IF(CHUCHO_HAVE_RUBY)
+        LIST(APPEND CHUCHO_EVALUATOR_C_SOURCES
+             ruby_evaluator_filter_test.c
+             ruby_evaluator_filter_test.h)
     ENDIF()
 
     IF(CHUCHO_WINDOWS)
@@ -215,6 +256,8 @@ IF(C_API)
                    remote_writer_test.h
                    rolling_file_writer_test.c
                    rolling_file_writer_test.h
+                   security_policy_test.c
+                   security_policy_test.h
                    size_file_roll_trigger_test.c
                    size_file_roll_trigger_test.h
                    sliding_numbered_file_roller_test.c
@@ -229,6 +272,7 @@ IF(C_API)
                    writer_test.h
                    ${CHUCHO_TEST_COMPRESSION_C_SOURCES}
                    ${CHUCHO_DB_C_SOURCES}
+                   ${CHUCHO_EVALUATOR_C_SOURCES}
                    ${CHUCHO_PLATFORM_C_SOURCES})
     TARGET_LINK_LIBRARIES(c-unit-test chucho ${CHUCHO_THREAD_LIB})
 
@@ -242,6 +286,14 @@ IF(C_API)
 
     IF(CHUCHO_HAVE_SQLITE)
         TARGET_LINK_LIBRARIES(c-unit-test "${SQLITE_CLIENT_LIB}")
+    ENDIF()
+
+    IF(CHUCHO_HAVE_POSTGRES)
+        TARGET_LINK_LIBRARIES(c-unit-test "${POSTGRES_CLIENT_LIB}")
+    ENDIF()
+
+    IF(CHUCHO_HAVE_RUBY AND NOT RUBY_FRAMEWORK)
+        TARGET_LINK_LIBRARIES(c-unit-test "${RUBY_LIB}")
     ENDIF()
 
     IF(CHUCHO_SOLARIS)
@@ -303,6 +355,13 @@ IF(CHUCHO_HAVE_SQLITE)
                    harness.cpp
                    sqlite_writer_test.cpp)
     TARGET_LINK_LIBRARIES(sqlite-writer-test chucho "${SQLITE_CLIENT_LIB}" gtest ${CHUCHO_THREAD_LIB})
+ENDIF()
+
+IF(CHUCHO_HAVE_POSTGRES)
+    ADD_EXECUTABLE(postgres-writer-test EXCLUDE_FROM_ALL
+                   harness.cpp
+                   postgres_writer_test.cpp)
+    TARGET_LINK_LIBRARIES(postgres-writer-test chucho ${POSTGRES_CLIENT_LIB} gtest ${CHUCHO_THREAD_LIB})
 ENDIF()
 
 ADD_EXECUTABLE(configuration-off EXCLUDE_FROM_ALL

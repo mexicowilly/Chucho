@@ -44,10 +44,9 @@ static_data::static_data()
     chucho::garbage_cleaner::get().add([this] () { delete this; });
 }
 
-std::once_flag once;
-
 static_data& data()
 {
+    static std::once_flag once;
     // This will be cleaned in finalize()
     static static_data* sd;
 
@@ -149,12 +148,6 @@ std::vector<std::shared_ptr<logger>> logger::get_existing_loggers()
     return result;
 }
 
-std::shared_ptr<level> logger::get_level()
-{
-    std::lock_guard<std::recursive_mutex> lg(guard_);
-    return level_;
-}
-
 std::shared_ptr<logger> logger::get_impl(const std::string& name)
 {
     static_data& sd(data());
@@ -166,6 +159,12 @@ std::shared_ptr<logger> logger::get_impl(const std::string& name)
         found = sd.all_loggers_.insert(std::make_pair(name, lgr)).first;
     }
     return found->second;
+}
+
+std::shared_ptr<level> logger::get_level()
+{
+    std::lock_guard<std::recursive_mutex> lg(guard_);
+    return level_;
 }
 
 std::vector<std::shared_ptr<writer>> logger::get_writers()

@@ -67,7 +67,7 @@ std::shared_ptr<configurable> file_writer_factory::create_configurable(std::shar
     return cnf;
 }
 
-std::shared_ptr<memento> file_writer_factory::create_memento(const configurator& cfg)
+std::shared_ptr<memento> file_writer_factory::create_memento(configurator& cfg)
 {
     std::shared_ptr<memento> mnto = std::make_shared<file_writer_memento>(cfg, get_memento_key_set(cfg));
     return mnto;

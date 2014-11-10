@@ -32,7 +32,7 @@ namespace chucho
 class level_filter_memento : public memento
 {
 public:
-    level_filter_memento(const configurator& cfg, memento_key_set ks);
+    level_filter_memento(configurator& cfg, memento_key_set ks);
 
     std::shared_ptr<level> get_level() const;
     const optional<filter::result>& get_on_match() const;

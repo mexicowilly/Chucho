@@ -31,7 +31,7 @@ namespace chucho
 class size_file_roll_trigger_memento : public memento
 {
 public:
-    size_file_roll_trigger_memento(const configurator& cfg);
+    size_file_roll_trigger_memento(configurator& cfg);
 
     const optional<std::uintmax_t>& get_max_size() const;
 

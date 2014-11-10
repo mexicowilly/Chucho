@@ -16,25 +16,31 @@
 
 #include <chucho/configurator.hpp>
 #include <chucho/exception.hpp>
+#include <chucho/garbage_cleaner.hpp>
+#include <chucho/environment.hpp>
+#include <chucho/regex.hpp>
+
+#include <chucho/async_writer_factory.hpp>
+#include <chucho/bzip2_file_compressor_factory.hpp>
 #include <chucho/cerr_writer_factory.hpp>
 #include <chucho/cout_writer_factory.hpp>
+#include <chucho/duplicate_message_filter_factory.hpp>
 #include <chucho/file_writer_factory.hpp>
-#include <chucho/syslog_writer_factory.hpp>
+#include <chucho/gzip_file_compressor_factory.hpp>
+#include <chucho/interval_file_roll_trigger_factory.hpp>
 #include <chucho/level_filter_factory.hpp>
 #include <chucho/level_threshold_filter_factory.hpp>
 #include <chucho/logger_factory.hpp>
 #include <chucho/numbered_file_roller_factory.hpp>
 #include <chucho/pattern_formatter_factory.hpp>
+#include <chucho/remote_writer_factory.hpp>
 #include <chucho/rolling_file_writer_factory.hpp>
 #include <chucho/size_file_roll_trigger_factory.hpp>
-#include <chucho/time_file_roller_factory.hpp>
-#include <chucho/duplicate_message_filter_factory.hpp>
-#include <chucho/remote_writer_factory.hpp>
-#include <chucho/bzip2_file_compressor_factory.hpp>
-#include <chucho/gzip_file_compressor_factory.hpp>
-#include <chucho/zip_file_compressor_factory.hpp>
-#include <chucho/async_writer_factory.hpp>
 #include <chucho/sliding_numbered_file_roller_factory.hpp>
+#include <chucho/syslog_writer_factory.hpp>
+#include <chucho/time_file_roller_factory.hpp>
+#include <chucho/zip_file_compressor_factory.hpp>
+
 #if defined(CHUCHO_WINDOWS)
 #include <chucho/windows_event_log_writer_factory.hpp>
 #endif
@@ -47,42 +53,46 @@
 #if defined(CHUCHO_HAVE_SQLITE)
 #include <chucho/sqlite_writer_factory.hpp>
 #endif
-#include <chucho/regex.hpp>
-#include <chucho/garbage_cleaner.hpp>
-#include <chucho/environment.hpp>
+#if defined(CHUCHO_HAVE_POSTGRES)
+#include <chucho/postgres_writer_factory.hpp>
+#endif
+#if defined(CHUCHO_HAVE_RUBY)
+#include <chucho/ruby_evaluator_filter_factory.hpp>
+#endif
 #include <cstring>
 #include <mutex>
-
-namespace
-{
-
-std::once_flag once;
-// This will be cleaned at finalize()
-std::map<std::string, std::shared_ptr<chucho::configurable_factory>>* factories;
-
-void init_factories()
-{
-    factories = new std::map<std::string, std::shared_ptr<chucho::configurable_factory>>();
-    chucho::garbage_cleaner::get().add([&] () { delete factories; });
-}
-
-}
 
 namespace chucho
 {
 
-configurator::configurator()
+configurator::configurator(const security_policy& sec_pol)
+    : security_policy_(sec_pol)
 {
     set_status_origin("configurator");
 }
 
 std::map<std::string, std::shared_ptr<configurable_factory>>& configurator::get_factories()
 {
-    std::call_once(once, init_factories);
+    static std::once_flag once;
+    // This will be cleaned at finalize()
+    static std::map<std::string, std::shared_ptr<chucho::configurable_factory>>* factories;
+
+    std::call_once(once, [&] ()
+    {
+        factories = new std::map<std::string, std::shared_ptr<chucho::configurable_factory>>();
+        garbage_cleaner::get().add([&] () { delete factories; });
+    });
     return *factories;
 }
 
 void configurator::initialize()
+{
+    static std::once_flag once;
+
+    std::call_once(once, initialize_impl);
+}
+
+void configurator::initialize_impl()
 {
     std::shared_ptr<configurable_factory> fact(new cerr_writer_factory());
     add_configurable_factory("chucho::cerr_writer", fact);
@@ -138,6 +148,16 @@ void configurator::initialize()
     fact.reset(new sqlite_writer_factory());
     add_configurable_factory("chucho::sqlite_writer", fact);
 #endif
+#if defined(CHUCHO_HAVE_POSTGRES)
+    fact.reset(new postgres_writer_factory());
+    add_configurable_factory("chucho::postgres_writer", fact);
+#endif
+#if defined(CHUCHO_HAVE_RUBY)
+    fact.reset(new ruby_evaluator_filter_factory());
+    add_configurable_factory("chucho::ruby_evaluator_filter", fact);
+#endif
+    fact.reset(new interval_file_roll_trigger_factory());
+    add_configurable_factory("chucho::interval_file_roll_trigger", fact);
 }
 
 std::string configurator::resolve_variables(const std::string& val)

@@ -19,11 +19,12 @@
 namespace chucho
 {
 
-file_compressor_memento::file_compressor_memento(const configurator& cfg)
+file_compressor_memento::file_compressor_memento(configurator& cfg)
     : memento(cfg)
 {
     set_status_origin("file_compressor_memento");
-    set_handler("min_index", [this] (const std::string& idx) { min_index_ = std::stoul(idx); });
+    cfg.get_security_policy().set_integer("file_compressor::min_index", 1, 1000);
+    set_handler("min_index", [this] (const std::string& idx) { min_index_ = validate("file_compressor::min_index", std::stoul(validate("file_compressor::min_index(text)", idx))); });
 }
 
 }

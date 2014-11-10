@@ -55,10 +55,9 @@ smgr_wrapper::smgr_wrapper()
     chucho::garbage_cleaner::get().add([this] () { delete this; });
 }
 
-std::once_flag once;
-
 smgr_wrapper& wrap()
 {
+    static std::once_flag once;
     // This gets cleaned in finalize()
     static smgr_wrapper* wrp;
 

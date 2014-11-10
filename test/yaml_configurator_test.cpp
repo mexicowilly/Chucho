@@ -38,6 +38,8 @@ void setenv(const char* var, const char* val)
 class yaml_configurator : public chucho::test::configurator
 {
 protected:
+    yaml_configurator();
+
     virtual chucho::configurator& get_configurator() override;
 
 private:
@@ -47,6 +49,11 @@ private:
 chucho::configurator& yaml_configurator::get_configurator()
 {
     return cnf_;
+}
+
+yaml_configurator::yaml_configurator()
+    : cnf_(chucho::configuration::get_security_policy())
+{
 }
 
 }
@@ -221,6 +228,21 @@ TEST_F(yaml_configurator, gzip_file_compressor)
     gzip_file_compressor_body();
 }
 
+TEST_F(yaml_configurator, interval_file_roll_trigger)
+{
+    std::string tmpl("chucho::logger:\n"
+                     "    name: will\n"
+                     "    chucho::rolling_file_writer:\n"
+                     "        chucho::pattern_formatter:\n"
+                     "            pattern: '%m%n'\n"
+                     "        chucho::numbered_file_roller:\n"
+                     "            max_index: 1\n"
+                     "        chucho::interval_file_roll_trigger:\n"
+                     "            every: PERIOD\n"
+                     "        file_name: what.log\n");
+    interval_file_roll_trigger_body(tmpl);
+}
+
 TEST_F(yaml_configurator, invalid_utf8)
 {
     EXPECT_ANY_THROW(configure("chucho::logger:\n"
@@ -346,6 +368,21 @@ TEST_F(yaml_configurator, oracle_writer)
 
 #endif
 
+#if defined(CHUCHO_HAVE_POSTGRES)
+
+TEST_F(yaml_configurator, postgres_writer)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::postgres_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m'\n"
+              "        uri: 'postgres://test_user:password@192.168.56.101/postgres'");
+    postgres_writer_body();
+}
+
+#endif
+
 TEST_F(yaml_configurator, remote_writer)
 {
     configure("- chucho::logger:\n"
@@ -367,21 +404,37 @@ TEST_F(yaml_configurator, remote_writer)
 
 TEST_F(yaml_configurator, rolling_file_writer)
 {
-        configure("chucho::logger:\n"
-                  "    name: will\n"
-                  "    chucho::rolling_file_writer:\n"
-                  "        chucho::pattern_formatter:\n"
-                  "            pattern: '%m%n'\n"
-                  "        chucho::numbered_file_roller:\n"
-                  "            min_index: 3\n"
-                  "            max_index: 5\n"
-                  "        chucho::size_file_roll_trigger:\n"
-                  "            max_size: 5000\n"
-                  "        file_name: what.log\n"
-                  "        on_start: TruNCAte\n"
-                  "        flush: false");
-        rolling_file_writer_body();
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::rolling_file_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m%n'\n"
+              "        chucho::numbered_file_roller:\n"
+              "            min_index: 3\n"
+              "            max_index: 5\n"
+              "        chucho::size_file_roll_trigger:\n"
+              "            max_size: 5000\n"
+              "        file_name: what.log\n"
+              "        on_start: TruNCAte\n"
+              "        flush: false");
+    rolling_file_writer_body();
 }
+
+#if defined(CHUCHO_HAVE_RUBY)
+
+TEST_F(yaml_configurator, ruby_evaluator_filter)
+{
+    configure("- chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::cout_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m%n'\n"
+              "        chucho::ruby_evaluator_filter:\n"
+              "            expression: '$logger == \"will\"'");
+    ruby_evaluator_filter_body();
+}
+
+#endif
 
 TEST_F(yaml_configurator, size_file_roll_trigger)
 {

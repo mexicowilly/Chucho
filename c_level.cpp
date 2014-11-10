@@ -105,10 +105,9 @@ static_data::static_data()
     levels_[lvl->level_->get_name()] = lvl;
 }
 
-std::once_flag once;
-
 static_data& data()
 {
+    static std::once_flag once;
     // This will be cleaned in finalize()
     static static_data* sd;
 

@@ -52,10 +52,9 @@ static_data::static_data()
     chucho::garbage_cleaner::get().add([this] () { delete this; });
 }
 
-std::once_flag once;
-
 static_data& data()
 {
+    static std::once_flag once;
     // This gets cleaned in finalize()
     static static_data* dt;
 
@@ -140,7 +139,7 @@ void time_file_roller::compute_next_roll(const time_type& now)
             next_cal.tm_min = 0;
             next_cal.tm_sec = 0;
         }
-        next_roll_ = clock_type::from_time_t(std::mktime(&next_cal));
+        next_roll_ = clock_type::from_time_t(calendar::to_time_t(next_cal));
     }
 }
 
@@ -191,7 +190,7 @@ std::string time_file_roller::get_active_file_name()
 bool time_file_roller::is_triggered(const std::string& active_file, const event& e)
 {
     calendar::pieces now_cal = calendar::get_utc(clock_type::to_time_t(clock_type::now()));
-    time_type now = clock_type::from_time_t(std::mktime(&now_cal));
+    time_type now = clock_type::from_time_t(calendar::to_time_t(now_cal));
     return now >= next_roll_;
 }
 
@@ -211,7 +210,7 @@ time_file_roller::time_type time_file_roller::relative(const time_type& t, int p
         cal.tm_mon += period_offset;
     else if (period_ == period::YEAR)
         cal.tm_year += period_offset;
-    st = std::mktime(&cal);
+    st = calendar::to_time_t(cal);
     return clock_type::from_time_t(st);
 }
 
@@ -305,17 +304,15 @@ void time_file_roller::set_period()
         {
             if (!primary_spec.empty())
             {
-                report_error("The file name pattern " + file_name_pattern_ + " can have only one primary date specification. The others must be marked with \",aux\". Found " + primary_spec + " and " + spec + ".");
-                return;
+                throw exception(get_status_origin() + ": The file name pattern " + file_name_pattern_ +
+                    " can have only one primary date specification. The others must be marked with \",aux\". Found " +
+                    primary_spec + " and " + spec + ".");
             }
             primary_spec = spec;
             calendar::pieces epoch = calendar::get_utc(0);
             std::string fmt1 = calendar::format(epoch, spec);
             if (fmt1.empty())
-            {
-                report_error("The date specification \"" + spec + "\" cannot be used to format a date");
-                return;
-            }
+                throw exception(get_status_origin() + ": The date specification \"" + spec + "\" cannot be used to format a date");
             std::array<period, 6> periods =
             {
                 period::MINUTE,
@@ -340,7 +337,7 @@ void time_file_roller::set_period()
                     rolled.tm_mon++;
                 else
                     rolled.tm_year++;
-                rolled = calendar::get_local(std::mktime(&rolled));
+                rolled = calendar::get_utc(calendar::to_time_t(rolled));
                 std::string fmt2 = calendar::format(rolled, spec);
                 if (fmt1 != fmt2) {
                     period_ = p;
@@ -348,15 +345,24 @@ void time_file_roller::set_period()
                 }
             }
             if (period_ == period::UNKNOWN)
-                report_error("The date specification " + spec + " does not contain sufficient information to determine the rolling period");
+            {
+                throw exception(get_status_origin() + ": The date specification " + spec +
+                    " does not contain sufficient information to determine the rolling period");
+            }
         }
     } while (pos != std::string::npos);
     if (period_ == period::UNKNOWN)
     {
         if (found_aux)
-            report_error("No non-auxillary date specifications were found in the pattern \"" + file_name_pattern_ + "\"");
+        {
+            throw exception(get_status_origin() +
+                ": No non-auxillary date specifications were found in the pattern \"" + file_name_pattern_ + "\"");
+        }
         else
-            report_error("No suitable date specifications were found in the pattern \"" + file_name_pattern_ + "\"");
+        {
+            throw exception(get_status_origin() +
+                ": No suitable date specifications were found in the pattern \"" + file_name_pattern_ + "\"");
+        }
     }
 }
 

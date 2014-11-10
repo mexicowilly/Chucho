@@ -26,6 +26,7 @@
 #include <chucho/status_manager.hpp>
 #include <chucho/gzip_file_compressor.hpp>
 #include <chucho/sliding_numbered_file_roller.hpp>
+#include <chucho/exception.hpp>
 #include <array>
 #include <algorithm>
 
@@ -268,7 +269,6 @@ TEST_F(rolling_file_writer_test, time_name_errors)
     for (auto name : names)
     {
         smgr->clear();
-        r.reset(new chucho::time_file_roller(name, 1));
-        EXPECT_GE(smgr->get_count(), 1);
+        EXPECT_THROW(r.reset(new chucho::time_file_roller(name, 1)), chucho::exception);
     }
 }

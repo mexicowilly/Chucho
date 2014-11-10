@@ -15,9 +15,13 @@
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.10)
+IF(POLICY CMP0042)
+    CMAKE_POLICY(SET CMP0042 OLD)
+ENDIF()
+
 PROJECT(chucho CXX C)
 
-SET(CHUCHO_VERSION 1.5)
+SET(CHUCHO_VERSION 1.6)
 SET(CHUCHO_SO_VERSION 1)
 # This is used for release candidate distros
 #SET(CHUCHO_DIST_VERSION try-1)
@@ -41,6 +45,9 @@ ENDIF()
 IF(CHUCHO_HAVE_SQLITE)
     INCLUDE_DIRECTORIES("${SQLITE_INCLUDE_DIR}")
 ENDIF()
+IF(CHUCHO_HAVE_POSTGRES)
+    INCLUDE_DIRECTORIES("${POSTGRES_INCLUDE_DIR}")
+ENDIF()
 
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
@@ -57,13 +64,17 @@ IF(CHUCHO_POSIX)
         platform/posix/text_util_posix.cpp)
 
     IF(CHUCHO_HAVE_GMTIME_R)
-        SET_SOURCE_FILES_PROPERTIES(platform/posix/calendar_posix.cpp PROPERTIES
-                                    COMPILE_DEFINITIONS CHUCHO_HAVE_GMTIME_R)
+        SET(CHUCHO_CALENDAR_DEFS CHUCHO_HAVE_GMTIME_R)
     ENDIF()
     IF(CHUCHO_HAVE_LOCALTIME_R)
-        GET_SOURCE_FILE_PROPERTY(CHUCHO_CALENDAR_DEFS platform/posix/calendar_posix.cpp COMPILE_DEFINITIONS)
+        LIST(APPEND CHUCHO_CALENDAR_DEFS CHUCHO_HAVE_LOCALTIME_R)
+    ENDIF()
+    IF(CHUCHO_HAVE_TIMEGM)
+        LIST(APPEND CHUCHO_CALENDAR_DEFS CHUCHO_HAVE_TIMEGM)
+    ENDIF()
+    IF(CHUCHO_CALENDAR_DEFS)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/calendar_posix.cpp PROPERTIES
-                                    COMPILE_DEFINITIONS "${CHUCHO_CALENDAR_DEFS};CHUCHO_HAVE_LOCALTIME_R")
+                                    COMPILE_DEFINITIONS "${CHUCHO_CALENDAR_DEFS}")
     ENDIF()
     IF(CMAKE_COMPILER_IS_GNUCXX)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
@@ -116,6 +127,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/database_writer.hpp
     include/chucho/diagnostic_context.hpp
     include/chucho/duplicate_message_filter.hpp
+    include/chucho/evaluator_filter.hpp
     include/chucho/event.hpp
     include/chucho/exception.hpp
     "${CMAKE_BINARY_DIR}/chucho/export.hpp"
@@ -129,6 +141,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/filter.hpp
     include/chucho/finalize.hpp
     include/chucho/formatter.hpp
+    include/chucho/interval_file_roll_trigger.hpp
     include/chucho/level.hpp
     include/chucho/level_filter.hpp
     include/chucho/level_threshold_filter.hpp
@@ -144,12 +157,15 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/pattern_formatter.hpp
     include/chucho/remote_writer.hpp
     include/chucho/rolling_file_writer.hpp
+    include/chucho/ruby_evaluator_filter.hpp
+    include/chucho/security_policy.hpp
     include/chucho/size_file_roll_trigger.hpp
     include/chucho/sliding_numbered_file_roller.hpp
     include/chucho/status.hpp
     include/chucho/status_manager.hpp
     include/chucho/status_observer.hpp
     include/chucho/status_reporter.hpp
+    include/chucho/syslog_constants.h
     include/chucho/syslog_constants.hpp
     include/chucho/syslog_writer.hpp
     include/chucho/time_file_roller.hpp
@@ -176,6 +192,7 @@ SET(CHUCHO_C_HEADERS
     include/chucho/filter.h
     include/chucho/finalize.h
     include/chucho/formatter.h
+    include/chucho/interval_file_roll_trigger.h
     include/chucho/level.h
     include/chucho/level_filter.h
     include/chucho/level_threshold_filter.h
@@ -186,11 +203,11 @@ SET(CHUCHO_C_HEADERS
     include/chucho/remote_writer.h
     include/chucho/return_code.h
     include/chucho/rolling_file_writer.h
+    include/chucho/security_policy.h
     include/chucho/size_file_roll_trigger.h
     include/chucho/sliding_numbered_file_roller.h
     include/chucho/status.h
     include/chucho/status_manager.h
-    include/chucho/syslog_constants.h
     include/chucho/syslog_writer.h
     include/chucho/time_file_roller.h
     include/chucho/writer.h)
@@ -212,9 +229,6 @@ IF(CHUCHO_WINDOWS)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
          include/chucho/windows_event_log_writer.hpp)
 ENDIF()
-
-LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
-     include/chucho/windows_event_log_writer.hpp)
 
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.hpp)
@@ -303,6 +317,49 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/sqlite_writer.hpp
      include/chucho/sqlite_writer.h)
 
+IF(CHUCHO_HAVE_POSTGRES)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/postgres_writer.hpp)
+    LIST(APPEND CHUCHO_DATABASE_SOURCES
+         postgres_writer.cpp
+         postgres_writer_factory.cpp
+         postgres_writer_memento.cpp
+         include/chucho/postgres_writer_factory.hpp
+         include/chucho/postgres_writer_memento.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/postgres_writer.h)
+        LIST(APPEND CHUCHO_DATABASE_SOURCES c_postgres_writer.cpp)
+    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/postgres_writer.hpp
+     include/chucho/postgres_writer.h)
+
+IF(CHUCHO_HAVE_RUBY)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/ruby_evaluator_filter.hpp)
+    LIST(APPEND CHUCHO_EVALUATOR_SOURCES
+         ruby_evaluator_filter.cpp
+         ruby_evaluator_filter_factory.cpp
+         ruby_evaluator_filter_memento.cpp
+         include/chucho/ruby_evaluator_filter_factory.hpp
+         include/chucho/ruby_evaluator_filter_memento.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/ruby_evaluator_filter.h)
+        LIST(APPEND CHUCHO_EVALUATOR_SOURCES c_ruby_evaluator_filter.cpp)
+    ENDIF()
+    IF(RUBY_FRAMEWORK)
+        SET_SOURCE_FILES_PROPERTIES(ruby_evaluator_filter.cpp PROPERTIES
+                                    COMPILE_DEFINITIONS CHUCHO_RUBY_FRAMEWORK)
+    ELSEIF(RUBY_INCLUDE_DIR)
+        SET_SOURCE_FILES_PROPERTIES(ruby_evaluator_filter.cpp PROPERTIES
+                                    COMPILE_FLAGS "-I\"${RUBY_INCLUDE_DIR}\" -I\"${CHUCHO_RUBY_CONFIG_DIR}\"")
+    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/ruby_evaluator_filter.hpp
+     include/chucho/ruby_evaluator_filter.h)
+
 # The libyaml sources are required by chuchod
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
     # Update this when you rev libyaml
@@ -389,6 +446,7 @@ IF(C_API)
         c_filter.cpp
         c_finalize.cpp
         c_formatter.cpp
+        c_interval_file_roll_trigger.cpp
         c_level.cpp
         c_level_filter.cpp
         c_level_threshold_filter.cpp
@@ -399,6 +457,7 @@ IF(C_API)
         c_remote_writer.cpp
         c_return_code.cpp
         c_rolling_file_writer.cpp
+        c_security_policy.cpp
         c_size_file_roll_trigger.cpp
         c_sliding_numbered_file_roller.cpp
         c_status_manager.cpp
@@ -414,6 +473,7 @@ IF(C_API)
         include/chucho/c_formatter.hpp
         include/chucho/c_level.hpp
         include/chucho/c_logger.hpp
+        include/chucho/c_security_policy.hpp
         include/chucho/c_util.hpp
         include/chucho/c_writer.hpp)
     IF(CHUCHO_WINDOWS)
@@ -467,6 +527,9 @@ SET(CHUCHO_SOURCES
     garbage_cleaner.cpp
     gzip_file_compressor_factory.cpp
     host.cpp
+    interval_file_roll_trigger.cpp
+    interval_file_roll_trigger_factory.cpp
+    interval_file_roll_trigger_memento.cpp
     level.cpp
     level_filter.cpp
     level_filter_factory.cpp
@@ -495,6 +558,7 @@ SET(CHUCHO_SOURCES
     rolling_file_writer.cpp
     rolling_file_writer_factory.cpp
     rolling_file_writer_memento.cpp
+    security_policy.cpp
     size_file_roll_trigger.cpp
     size_file_roll_trigger_factory.cpp
     size_file_roll_trigger_memento.cpp
@@ -542,6 +606,8 @@ SET(CHUCHO_SOURCES
     include/chucho/garbage_cleaner.hpp
     include/chucho/gzip_file_compressor_factory.hpp
     include/chucho/host.hpp
+    include/chucho/interval_file_roll_trigger_factory.hpp
+    include/chucho/interval_file_roll_trigger_memento.hpp
     include/chucho/level_filter_factory.hpp
     include/chucho/level_filter_memento.hpp
     include/chucho/level_threshold_filter_factory.hpp
@@ -583,7 +649,8 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_EMBEDDED_SOURCES}
     ${CHUCHO_PUBLIC_HEADERS}
     ${CHUCHO_C_SOURCES}
-    ${CHUCHO_DATABASE_SOURCES})
+    ${CHUCHO_DATABASE_SOURCES}
+    ${CHUCHO_EVALUATOR_SOURCES})
 
 IF(CHUCHO_HAVE_PUT_TIME)
     SET_SOURCE_FILES_PROPERTIES(calendar.cpp PROPERTIES
@@ -606,6 +673,14 @@ ENDIF()
 
 IF(CHUCHO_HAVE_SQLITE)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_SQLITE)
+ENDIF()
+
+IF(CHUCHO_HAVE_POSTGRES)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_POSTGRES)
+ENDIF()
+
+IF(CHUCHO_HAVE_RUBY)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RUBY)
 ENDIF()
 
 IF(DEFINED CHUCHO_CONFIGURATOR_DEFS)
@@ -728,13 +803,18 @@ ENDIF()
 IF(ENABLE_SHARED)
     ADD_LIBRARY(chucho SHARED ${CHUCHO_SOURCES})
     SET_TARGET_PROPERTIES(chucho PROPERTIES
-                          COMPILE_FLAGS "${CHUCHO_CXX_SO_FLAGS}"
                           VERSION ${CHUCHO_VERSION}
                           SOVERSION ${CHUCHO_SO_VERSION}
                           PUBLIC_HEADER "${CHUCHO_PUBLIC_HEADERS}"
                           FRAMEWORK ${ENABLE_FRAMEWORK})
     IF(CHUCHO_HAVE_ORACLE)
-        TARGET_LINK_LIBRARIES(chucho ${ORACLE_CLIENT_LIB})
+        TARGET_LINK_LIBRARIES(chucho "${ORACLE_CLIENT_LIB}")
+    ENDIF()
+    IF(CHUCHO_HAVE_POSTGRES)
+        TARGET_LINK_LIBRARIES(chucho "${POSTGRES_CLIENT_LIB}")
+    ENDIF()
+    IF(CHUCHO_HAVE_RUBY)
+        TARGET_LINK_LIBRARIES(chucho "${RUBY_LIB}")
     ENDIF()
     IF(CMAKE_GENERATOR STREQUAL Xcode AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         SET_TARGET_PROPERTIES(chucho PROPERTIES
@@ -795,10 +875,9 @@ ADD_SUBDIRECTORY(log-server)
 IF(DOXYGEN_FOUND)
     SET(CHUCHO_DOXYGEN_INPUT main_page.hpp)
     IF(CHUCHO_DOCUMENT_ALL)
-        FOREACH(HEAD ${CHUCHO_SOURCES})
-            IF(HEAD MATCHES "^include/chucho/.+\\.hpp$")
-                SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
-            ENDIF()
+        FILE(GLOB CHUCHO_ALL_HEADERS RELATIVE "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/include/chucho/*")
+        FOREACH(HEAD ${CHUCHO_ALL_HEADERS})
+            SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
         ENDFOREACH()
         FILE(GLOB CHUCHO_GENERATED_HEADERS RELATIVE "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/chucho/*.hpp")
         FOREACH(HEAD ${CHUCHO_GENERATED_HEADERS})

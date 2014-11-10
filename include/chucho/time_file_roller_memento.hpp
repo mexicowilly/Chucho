@@ -30,7 +30,7 @@ namespace chucho
 class time_file_roller_memento : public file_roller_memento
 {
 public:
-    time_file_roller_memento(const configurator& cfg);
+    time_file_roller_memento(configurator& cfg);
 
     const std::string& get_file_name_pattern() const;
     const optional<std::size_t>& get_max_history() const;
