@@ -53,7 +53,7 @@ chucho_rc chucho_create_interval_file_roll_trigger(chucho_file_roll_trigger** tr
         *trg = new chucho_file_roll_trigger;
         (*trg)->trg_ = std::make_shared<chucho::interval_file_roll_trigger>(c_to_cpp(prd), count);
     }
-    catch (chucho::exception& e)
+    catch (chucho::exception&)
     {
         delete *trg;
         *trg = nullptr;

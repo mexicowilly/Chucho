@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_SECURITY_POLICY_HPP__)
 #define CHUCHO_SECURITY_POLICY_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/exception.hpp>
 #include <chucho/optional.hpp>
 #include <map>
@@ -377,5 +382,9 @@ std::string security_policy::range<int_type>::to_text() const
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

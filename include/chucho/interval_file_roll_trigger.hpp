@@ -14,6 +14,14 @@
  *    limitations under the License.
  */
 
+#if !defined(CHUCHO_INTERVAL_FILE_ROLL_TRIGGER_HPP__)
+#define CHUCHO_INTERVAL_FILE_ROLL_TRIGGER_HPP__
+
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/file_roll_trigger.hpp>
 #include <chrono>
 
@@ -92,3 +100,9 @@ inline interval_file_roll_trigger::clock_type::time_point interval_file_roll_tri
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
+
+#endif
