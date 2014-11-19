@@ -870,6 +870,7 @@ ENDIF()
 
 ADD_SUBDIRECTORY(test)
 ADD_SUBDIRECTORY(log-server)
+ADD_SUBDIRECTORY(config-tool)
 
 # Documentation
 IF(DOXYGEN_FOUND)
