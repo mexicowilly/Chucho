@@ -28,7 +28,7 @@ namespace config_tool
 class properties
 {
 public:
-    properties();
+    properties(int argc, char* argv[]);
 
     std::size_t get_shift_width() const;
     void set_shift_width(std::size_t sw);

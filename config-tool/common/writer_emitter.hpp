@@ -17,7 +17,8 @@
 #if !defined(CHUCHO_WRITER_EMITTER_HPP__)
 #define CHUCHO_WRITER_EMITTER_HPP__
 
-#include "emitter.hpp"
+#include "formatter_emitter.hpp"
+#include "filter_emitter.hpp"
 
 namespace chucho
 {
@@ -27,9 +28,42 @@ namespace config_tool
 
 class writer_emitter : public emitter
 {
+public:
+    void add_filter_emitter(std::shared_ptr<filter_emitter> flt);
+    virtual void emit(std::ostream& stream, std::size_t shifts) override;
+    const std::vector<std::shared_ptr<filter_emitter>>& get_filter_emitters() const;
+    std::shared_ptr<formatter_emitter> get_formatter_emitter() const;
+    void set_formatter_emitter(std::shared_ptr<formatter_emitter> fmt);
+
 protected:
-    writer_emitter(const properties& props);
+    writer_emitter(const properties& props,
+                   std::shared_ptr<formatter_emitter> fmt,
+                   const std::vector<std::shared_ptr<filter_emitter>>& flts);
+
+private:
+    std::shared_ptr<formatter_emitter> fmt_;
+    std::vector<std::shared_ptr<filter_emitter>> flts_;
 };
+
+inline void writer_emitter::add_filter_emitter(std::shared_ptr<filter_emitter> flt)
+{
+    flts_.push_back(flt);
+}
+
+inline const std::vector<std::shared_ptr<filter_emitter>>& writer_emitter::get_filter_emitters() const
+{
+    return flts_;
+}
+
+inline std::shared_ptr<formatter_emitter> writer_emitter::get_formatter_emitter() const
+{
+    return fmt_;
+}
+
+inline void writer_emitter::set_formatter_emitter(std::shared_ptr<formatter_emitter> fmt)
+{
+    fmt_ = fmt;
+}
 
 }
 

@@ -14,32 +14,21 @@
  *    limitations under the License.
  */
 
-#include "writer_emitter.hpp"
+#include "properties.hpp"
+#include <cstdlib>
+#include <exception>
+#include <iostream>
 
-namespace chucho
+int main(int argc, char* argv[])
 {
-
-namespace config_tool
-{
-
-writer_emitter::writer_emitter(const properties& props,
-                               std::shared_ptr<formatter_emitter> fmt,
-                               const std::vector<std::shared_ptr<filter_emitter>>& flts)
-    : emitter(props),
-      fmt_(fmt),
-      flts_(flts)
-{
-}
-
-void writer_emitter::emit(std::ostream& stream, std::size_t shifts)
-{
-    std::size_t new_shifts = shifts + 1;
-    if (fmt_)
-        fmt_->emit(stream, new_shifts);
-    for (auto flt : flts_)
-        flt->emit(stream, new_shifts);
-}
-
-}
-
+    try
+    {
+        chucho::config_tool::properties props(argc, argv);
+    }
+    catch (std::exception& e)
+    {
+        std::cout << "Unexpected error: " << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
 }

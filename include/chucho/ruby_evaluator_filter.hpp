@@ -48,7 +48,10 @@ namespace chucho
  *     <tr><td>marker</td><td>String</td>
  *         <td>The marker or nil if there is no marker</td></tr>
  * </table>
- * The Ruby expression must return a true or false value.
+ * The Ruby expression must return a true or false value. If the 
+ * value returned is true, then the filter result becomes @ref 
+ * filter::result::NEUTRAL. Otherwise, the filter result is @ref
+ * filter::result::DENY. 
  * 
  * @ingroup filters
  */

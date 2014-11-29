@@ -14,7 +14,11 @@
  *    limitations under the License.
  */
 
-#include "writer_emitter.hpp"
+#if !defined(CHUCHO_CONTROLLER_HPP__)
+#define CHUCHO_CONTROLLER_HPP__
+
+#include "properties.hpp"
+#include "chucho_curses.h"
 
 namespace chucho
 {
@@ -22,24 +26,21 @@ namespace chucho
 namespace config_tool
 {
 
-writer_emitter::writer_emitter(const properties& props,
-                               std::shared_ptr<formatter_emitter> fmt,
-                               const std::vector<std::shared_ptr<filter_emitter>>& flts)
-    : emitter(props),
-      fmt_(fmt),
-      flts_(flts)
+class controller
 {
-}
+public:
+    controller(const properties& props);
+    ~controller();
 
-void writer_emitter::emit(std::ostream& stream, std::size_t shifts)
-{
-    std::size_t new_shifts = shifts + 1;
-    if (fmt_)
-        fmt_->emit(stream, new_shifts);
-    for (auto flt : flts_)
-        flt->emit(stream, new_shifts);
-}
+    void run();
 
-}
+private:
+    const properties& props_;
+    WINDOW* title_;
+};
 
 }
+
+}
+
+#endif

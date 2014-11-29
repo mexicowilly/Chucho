@@ -15,6 +15,24 @@
  */
 
 #include "properties.hpp"
+#include <string>
+#include <iostream>
+#include <unistd.h>
+
+namespace
+{
+
+const char* opts = "t:h";
+
+void usage()
+{
+    std::cout << "Options:" << std::endl;
+    std::cout << "    -t <number>: The number of spaces for indentation (default 4)" << std::endl;
+    std::cout << "    -h         : Show this helpful information" << std::endl;
+    std::exit(EXIT_SUCCESS);
+}
+
+}
 
 namespace chucho
 {
@@ -22,9 +40,25 @@ namespace chucho
 namespace config_tool
 {
 
-properties::properties()
+properties::properties(int argc, char* argv[])
     : shift_width_(4)
 {
+    int ch = getopt(argc, argv, opts);
+    while (ch != -1)
+    {
+        switch (ch)
+        {
+        case 't':
+            shift_width_ = std::stoul(optarg);
+            break;
+
+        case 'h':
+        case '?':
+        default:
+            usage();
+        }
+        ch = getopt(argc, argv, opts);
+    }
 }
 
 }

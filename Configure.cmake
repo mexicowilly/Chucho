@@ -304,7 +304,16 @@ IF(CHUCHO_POSIX)
         CHUCHO_REQUIRE_SYMBOLS(time.h tzset)
     ENDIF()
 
+    # curses
+    FIND_PACKAGE(Curses)
+
+    # getopt
+    IF(CURSES_FOUND)
+        CHUCHO_REQUIRE_SYMBOLS(unistd.h getopt)
+    ENDIF()
+
 ELSEIF(CHUCHO_WINDOWS)
+
     FOREACH(HEAD windows.h winsock2.h io.h process.h ws2tcpip.h time.h assert.h)
         STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
         STRING(TOUPPER ${CHUCHO_HEAD_VAR_NAME} CHUCHO_HEAD_VAR_NAME)
@@ -324,6 +333,7 @@ ELSEIF(CHUCHO_WINDOWS)
     IF(NOT CHUCHO_SC)
         MESSAGE(FATAL_ERROR "sc is required")
     ENDIF()
+
 ENDIF()
 
 # Nested exceptions

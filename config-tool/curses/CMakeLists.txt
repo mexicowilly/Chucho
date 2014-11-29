@@ -14,9 +14,21 @@
 #    limitations under the License.
 #
 
-IF(CURSES_FOUND)
-    ADD_SUBDIRECTORY(common)
-    ADD_SUBDIRECTORY(curses)
-ELSE()
-    MESSAGE(STATUS "The curses library was not found, so the tool chucho-config cannot be built")
+IF(CURSES_HAVE_CURSES_H)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_CURSES_H)
+ELSEIF(CURSES_HAVE_NCURSES_CURSES_H)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_NCURSES_CURSES_H)
+ELSEIF(CURSES_HAVE_NCURSES_H)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_NCURSES_H)
+ELSEIF(CURSES_HAVE_NCURSES_NCURSES_H)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_NCURSES_NCURSES_H)
 ENDIF()
+
+INCLUDE_DIRECTORIES(../common)
+
+ADD_EXECUTABLE(chucho-config
+               chucho_curses.h
+               controller.cpp
+               controller.hpp
+               main.cpp)
+TARGET_LINK_LIBRARIES(chucho-config common-config ${CURSES_LIBRARIES})

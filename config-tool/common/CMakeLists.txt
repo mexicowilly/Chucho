@@ -15,17 +15,24 @@
 #
 
 ADD_LIBRARY(common-config STATIC
+            cout_writer_emitter.cpp
+            cout_writer_emitter.hpp
             duplicate_message_filter_emitter.cpp
             duplicate_message_filter_emitter.hpp
             emitter.cpp
             emitter.hpp
             filter_emitter.cpp
             filter_emitter.hpp
+            formatter_emitter.cpp
+            formatter_emitter.hpp
+            level_filter_emitter.cpp
+            level_filter_emitter.hpp
             logger_emitter.cpp
             logger_emitter.hpp
             pattern_formatter_emitter.cpp
             pattern_formatter_emitter.hpp
             properties.cpp
             properties.hpp
+            writer_emitter.cpp
             writer_emitter.hpp)
 TARGET_LINK_LIBRARIES(common-config chucho)

@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_PATTERN_FORMATTER_EMITTER_HPP__)
 #define CHUCHO_PATTERN_FORMATTER_EMITTER_HPP__
 
-#include "emitter.hpp"
+#include "formatter_emitter.hpp"
 
 namespace chucho
 {
@@ -25,7 +25,7 @@ namespace chucho
 namespace config_tool
 {
 
-class pattern_formatter_emitter : public emitter
+class pattern_formatter_emitter : public formatter_emitter
 {
 public:
     pattern_formatter_emitter(const properties& props);

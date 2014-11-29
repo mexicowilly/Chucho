@@ -23,7 +23,7 @@ namespace config_tool
 {
 
 pattern_formatter_emitter::pattern_formatter_emitter(const properties& props)
-    : emitter(props)
+    : formatter_emitter(props)
 {
 }
 

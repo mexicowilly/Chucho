@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "writer_emitter.hpp"
+#include "cout_writer_emitter.hpp"
 
 namespace chucho
 {
@@ -22,22 +22,17 @@ namespace chucho
 namespace config_tool
 {
 
-writer_emitter::writer_emitter(const properties& props,
-                               std::shared_ptr<formatter_emitter> fmt,
-                               const std::vector<std::shared_ptr<filter_emitter>>& flts)
-    : emitter(props),
-      fmt_(fmt),
-      flts_(flts)
+cout_writer_emitter::cout_writer_emitter(const properties& props,
+                                         std::shared_ptr<formatter_emitter> fmt,
+                                         const std::vector<std::shared_ptr<filter_emitter>>& flts)
+    : writer_emitter(props, fmt, flts)
 {
 }
 
-void writer_emitter::emit(std::ostream& stream, std::size_t shifts)
+void cout_writer_emitter::emit(std::ostream& stream, std::size_t shifts)
 {
-    std::size_t new_shifts = shifts + 1;
-    if (fmt_)
-        fmt_->emit(stream, new_shifts);
-    for (auto flt : flts_)
-        flt->emit(stream, new_shifts);
+    indent(stream, shifts) << "- chucho::cout_writer:" << std::endl;
+    writer_emitter::emit(stream, shifts);
 }
 
 }
