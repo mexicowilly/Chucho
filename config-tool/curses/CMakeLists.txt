@@ -30,5 +30,7 @@ ADD_EXECUTABLE(chucho-config
                chucho_curses.h
                controller.cpp
                controller.hpp
-               main.cpp)
+               main.cpp
+               scrollable.cpp
+               scrollable.hpp)
 TARGET_LINK_LIBRARIES(chucho-config common-config ${CURSES_LIBRARIES})

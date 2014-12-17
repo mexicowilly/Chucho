@@ -26,8 +26,11 @@ controller::controller(const properties& props)
     : props_(props)
 {
     initscr();
-    title_ = newwin(1, COLS, 0, 0);
+    noecho();
+    cbreak();
+    title_ = newwin(2, COLS, 0, 0);
     wprintw(title_, "Loggers");
+    mvwhline(title_, 1, 0, 0, COLS);
 }
 
 controller::~controller()
