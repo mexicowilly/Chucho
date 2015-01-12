@@ -116,7 +116,9 @@ void scrollable::remove(const std::string& item)
         displayed_.first = items_.begin();
         if (current_ != items_.begin())
             std::advance(displayed_.first, disp_idx); 
-        set_displayed_second();
+        if (displayed_.first > current_)
+            displayed_.first = current_;
+        set_displayed_second(); 
         update(refresh_status::should_refresh);
     }
 }

@@ -33,12 +33,6 @@ namespace config_tool
 class scrollable : protected loggable<scrollable>
 {
 public:
-    enum class exit_status
-    {
-        should_exit,
-        should_not_exit
-    };
-
     scrollable(unsigned x,
                unsigned y,
                std::size_t width,
@@ -51,6 +45,12 @@ public:
     void run();
 
 protected:
+    enum class exit_status
+    {
+        should_exit,
+        should_not_exit
+    };
+
     const std::string& get_current() const;
     virtual exit_status selected();
     virtual exit_status unknown(chtype ch);
