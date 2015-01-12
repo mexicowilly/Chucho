@@ -14,11 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CONTROLLER_HPP__)
-#define CHUCHO_CONTROLLER_HPP__
-
-#include "properties.hpp"
-#include "loggers_win.hpp"
+#include "scrollable.hpp"
+#include "logger_emitter.hpp"
 
 namespace chucho
 {
@@ -26,22 +23,21 @@ namespace chucho
 namespace config_tool
 {
 
-class controller
+class loggers_win : public scrollable
 {
 public:
-    controller(const properties& props);
-    ~controller();
+    loggers_win(unsigned x,
+                unsigned y,
+                std::size_t width,
+                std::size_t height);
 
-    void run();
+protected:
+    virtual exit_status selected() override;
+    virtual exit_status unknown(chtype ch) override;
 
 private:
-    const properties& props_;
-    WINDOW* title_;
-    loggers_win* loggers_;
+    std::vector<logger_emitter> lgr_ems_;
 };
-
 }
 
 }
-
-#endif

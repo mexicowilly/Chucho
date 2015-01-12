@@ -15,7 +15,11 @@
  */
 
 #include "scrollable.hpp"
+#include "win_size.hpp"
+#include "chucho_keys.hpp"
 #include <chucho/exception.hpp>
+#include <chucho/log.hpp>
+#include <cstdlib>
 
 namespace chucho
 {
@@ -25,18 +29,18 @@ namespace config_tool
 
 scrollable::scrollable(unsigned x,
                        unsigned y,
-                       std::size_t height,
                        std::size_t width,
-                       const std::vector<std::string>& items,
-                       std::function<bool(const std::string&)> selected,
-                       std::function<bool(chtype)> unknown)
+                       std::size_t height,
+                       const std::vector<std::string>& items)
     : items_(items),
-      win_(newwin(height, width, y, x)),
-      selected_(selected),
-      unknown_(unknown)
+      win_(newwin(height, width, y, x))
 {
-    if (height < 3 || width < 5)
-        throw exception("Height must be three or greater and width must be five or greater");
+    if (height < 4 || width < 5)
+    {
+        delwin(win_);
+        throw exception("Height must be four or greater and width must be five or greater");
+    }
+    keypad(win_, TRUE);
     populate();
 }
 
@@ -47,40 +51,74 @@ scrollable::~scrollable()
 
 void scrollable::display_arrows() const
 {
-    std::size_t width;
-    std::size_t height;
-    getmaxyx(win_, height, width);
-    mvwvline(win_, 1, 1, ' ', height - 2);
+    win_size dim(win_);
+    mvwvline(win_, 1, 1, ' ', dim.get_height() - 2);
+    // ACS_UARROW and ACS_DARROW don't come out right on my Macintosh,
+    // so I just hard code ^ and v.
     if (displayed_.first != items_.begin())
-        mvwaddch(win_, 1, 1, ACS_UARROW);
-    if (displayed_.second != items_.end() - 1)
-        mvwaddch(win_, height - 1, 1, ACS_DARROW);
+        mvwaddch(win_, 1, 1, '^');
+    if (std::distance(displayed_.second, items_.end()) > 1)
+        mvwaddch(win_, dim.get_height() - 2, 1, 'v');
+    // For some reason drawing the line can erase a piece of the box,
+    // even though the line never touches the box character
+    mvwhline(win_, 0, 1, ACS_HLINE, 2);
+    mvwhline(win_, dim.get_height() - 1, 1, ACS_HLINE, 2);
 }
 
-void scrollable::highlight_current(bool state)
+void scrollable::highlight_current(bool state) const
 {
-    auto idx = current_ - displayed_.first;
-    std::size_t width;
-    std::size_t height;
-    getmaxyx(win_, height, width);
-    mvwchgat(win_, idx + 1, 1, width - 2, (state ? A_STANDOUT : A_NORMAL), 0, nullptr);
+    auto idx = std::distance(displayed_.first, current_);
+    win_size dim(win_);
+    mvwchgat(win_, idx + 1, 1, dim.get_width() - 2, (state ? A_STANDOUT : A_NORMAL), 0, nullptr);
 }
 
 void scrollable::populate()
 {
-    std::size_t width;
-    std::size_t height;
-    getmaxyx(win_, height, width);
-    box(win_, 0, 0);
-    std::size_t limit = std::min(height, items_.size()) - 2;
-    for (std::size_t i = 1; i < limit; i++)
-        mvwprintw(win_, i, 0, "  %s", items_[i - 1].c_str());
-    displayed_.first = items_.begin();
-    displayed_.second = displayed_.first + limit;
-    current_ = displayed_.first;
-    display_arrows();
-    highlight_current(true);
-    wrefresh(win_);
+    win_size dim(win_);
+    std::size_t limit = std::min(dim.get_height() - 2, items_.size()) - 1;
+    current_ = items_.begin();
+    displayed_.first = current_;
+    displayed_.second = displayed_.first;
+    std::advance(displayed_.second, std::min(dim.get_height() - 2, items_.size()) - 1);
+    update(refresh_status::should_refresh);
+}
+
+void scrollable::push_before_back(const std::string& item)
+{
+    if (items_.empty())
+    {
+        CHUCHO_ERROR_LGBL("You cannot push_before_back to an empty scrollable");
+    }
+    else
+    {
+        auto disp_idx = std::distance(items_.cbegin(), displayed_.first);
+        current_ = items_.insert(items_.end() - 1, item);
+        displayed_.first = items_.begin();
+        std::advance(displayed_.first, disp_idx);
+        set_displayed_second();
+        update(refresh_status::should_refresh);
+    }
+}
+
+void scrollable::remove(const std::string& item)
+{
+    auto found = std::find(items_.begin(), items_.end(), item);
+    if (found == items_.end())
+    {
+        CHUCHO_INFO_LGBL(item << " was not found for removal");
+    }
+    else
+    {
+        auto disp_idx = std::distance(items_.cbegin(), displayed_.first);
+        current_ = items_.erase(found);
+        if (!items_.empty() && current_ != items_.begin())
+            current_--;
+        displayed_.first = items_.begin();
+        if (current_ != items_.begin())
+            std::advance(displayed_.first, disp_idx); 
+        set_displayed_second();
+        update(refresh_status::should_refresh);
+    }
 }
 
 void scrollable::run()
@@ -88,61 +126,99 @@ void scrollable::run()
     while (true)
     {
         int ch = wgetch(win_);
+        CHUCHO_INFO_LGBL("Got key " << ch);
         switch (ch)
         {
         case KEY_DOWN:
-            if (current_ == displayed_.second &&
-                current_ + 1 != items_.end())
+            if (current_ + 1 != items_.end())
             {
-                scroll_(-1);
+                if (current_ == displayed_.second)
+                {
+                    scroll_(-1);
+                }
+                else
+                {
+                    highlight_current(false);
+                    current_++;
+                    highlight_current(true);
+                }
+                wrefresh(win_);
             }
-            else
-            {
-                highlight_current(false);
-                current_++;
-                highlight_current(true);
-            }
-            wrefresh(win_);
             break; 
 
         case KEY_UP:
-            if (current_ == displayed_.first &&
-                current_ != items_.end())
+            if (current_ != items_.begin())
             {
-                scroll_(1);
+                if (current_ == displayed_.first)
+                {
+                    scroll_(1);
+                }
+                else
+                {
+                    highlight_current(false);
+                    current_--;
+                    highlight_current(true);
+                }
+                wrefresh(win_);
             }
-            else
-            {
-                highlight_current(false);
-                current_--;
-                highlight_current(true);
-            }
-            wrefresh(win_);
             break; 
 
         case KEY_ENTER:
-            if (selected_(*current_))
+        case static_cast<int>(key::ENTER):
+            if (selected() == exit_status::should_exit)
                 return;
             break; 
 
         default:
-            if (unknown_(ch))
+            if (unknown(ch) == exit_status::should_exit)
                 return;
             break;
         }
-        ch = wgetch(win_);
     }
 }
 
 void scrollable::scroll_(int num)
 {
-    highlight_current(false);
-    wscrl(win_, num);
-    current_ += num;
-    displayed_.first += num;
-    displayed_.second += num;
-    display_arrows();
+    if (num == 0)
+        return;
+    // This method only gets called after bounds checking has been
+    // performed, so there is no need to check validity here
+    current_ -= num;
+    displayed_.first -= num;
+    set_displayed_second();
+    update(refresh_status::should_not_refresh);
+}
+
+void scrollable::set_displayed_second()
+{
+    displayed_.second = displayed_.first;
+    win_size dim(win_);
+    std::advance(displayed_.second,
+                 std::min(std::distance(displayed_.first, items_.cend()),
+                          std::distance(displayed_.first, displayed_.first + (dim.get_height() - 2))) - 1);
+}
+
+scrollable::exit_status scrollable::selected()
+{
+    return exit_status::should_not_exit;
+}
+
+scrollable::exit_status scrollable::unknown(chtype ch)
+{
+    return exit_status::should_not_exit;
+}
+
+void scrollable::update(refresh_status refresh) const
+{
+    wclear(win_);
+    for (auto i = displayed_.first; i <= displayed_.second; i++)
+        mvwprintw(win_, std::distance(displayed_.first, i) + 1, 1, "  %s", (*i).c_str());
+    // Don't draw the box first. Things can get weird.
+    box(win_, 0, 0);
+    display_arrows(); 
     highlight_current(true);
+    if (refresh == refresh_status::should_refresh)
+        wrefresh(win_);
 }
 
 }

@@ -39,10 +39,9 @@ private:
     pthread_key_t key_;
 };
 
-std::once_flag once;
-
 key_manager& kmgr()
 {
+    static std::once_flag once;
     // This will be cleaned at finalize time
     static key_manager* km;
 

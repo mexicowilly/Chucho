@@ -14,34 +14,18 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CONTROLLER_HPP__)
-#define CHUCHO_CONTROLLER_HPP__
-
-#include "properties.hpp"
-#include "loggers_win.hpp"
-
 namespace chucho
 {
 
 namespace config_tool
 {
 
-class controller
+enum class key
 {
-public:
-    controller(const properties& props);
-    ~controller();
-
-    void run();
-
-private:
-    const properties& props_;
-    WINDOW* title_;
-    loggers_win* loggers_;
+    ENTER = 10,
+    ESC = 27
 };
 
 }
 
 }
-
-#endif

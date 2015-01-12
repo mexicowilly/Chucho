@@ -113,11 +113,9 @@ inline DWORD key_manager::get_key()
     return key_;
 }
 
-std::once_flag konce;
-std::once_flag tonce;
-
 key_manager& kmgr()
 {
+    static std::once_flag konce;
     // This is cleaned at finalize time
     static key_manager* km;
 
@@ -127,6 +125,7 @@ key_manager& kmgr()
 
 thread_exit_manager& temgr()
 {
+    static std::once_flag tonce;
     static thread_exit_manager* tem;
 
     std::call_once(tonce, [&] () { tem = new thread_exit_manager(); });

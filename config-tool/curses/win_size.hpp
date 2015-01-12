@@ -14,11 +14,11 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CONTROLLER_HPP__)
-#define CHUCHO_CONTROLLER_HPP__
 
-#include "properties.hpp"
-#include "loggers_win.hpp"
+#if !defined(CHUCHO_WIN_SIZE_HPP__)
+#define CHUCHO_WIN_SIZE_HPP__
+
+#include "chucho_curses.h"
 
 namespace chucho
 {
@@ -26,19 +26,33 @@ namespace chucho
 namespace config_tool
 {
 
-class controller
+class win_size
 {
 public:
-    controller(const properties& props);
-    ~controller();
+    win_size(WINDOW* w);
 
-    void run();
+    std::size_t get_height() const;
+    std::size_t get_width() const;
 
 private:
-    const properties& props_;
-    WINDOW* title_;
-    loggers_win* loggers_;
+    std::size_t height_;
+    std::size_t width_;
 };
+
+inline win_size::win_size(WINDOW* w)
+{
+    getmaxyx(w, height_, width_);
+}
+
+inline std::size_t win_size::get_height() const
+{
+    return height_;
+}
+
+inline std::size_t win_size::get_width() const
+{
+    return width_;
+}
 
 }
 

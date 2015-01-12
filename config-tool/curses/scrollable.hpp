@@ -18,6 +18,7 @@
 #define CHUCHO_SCROLLABLE_HPP__
 
 #include "chucho_curses.h"
+#include <chucho/loggable.hpp>
 #include <cstddef>
 #include <vector>
 #include <functional>
@@ -29,33 +30,55 @@ namespace chucho
 namespace config_tool
 {
 
-class scrollable
+class scrollable : protected loggable<scrollable>
 {
 public:
+    enum class exit_status
+    {
+        should_exit,
+        should_not_exit
+    };
+
     scrollable(unsigned x,
                unsigned y,
-               std::size_t height,
                std::size_t width,
-               const std::vector<std::string>& items,
-               std::function<bool(const std::string&)> selected,
-               std::function<bool(chtype)> unknown);
+               std::size_t height,
+               const std::vector<std::string>& items);
     ~scrollable();
 
+    void push_before_back(const std::string& item);
+    void remove(const std::string& item);
     void run();
 
+protected:
+    const std::string& get_current() const;
+    virtual exit_status selected();
+    virtual exit_status unknown(chtype ch);
+
 private:
+    enum class refresh_status
+    {
+        should_refresh,
+        should_not_refresh
+    };
+
     void display_arrows() const;
-    void highlight_current(bool state);
+    void set_displayed_second();
+    void highlight_current(bool state) const;
     void populate();
     void scroll_(int num);
+    void update(refresh_status refresh) const;
 
     std::vector<std::string> items_;
     WINDOW* win_;
-    std::function<bool(const std::string&)> selected_;
-    std::function<bool(chtype)> unknown_;
     std::vector<std::string>::const_iterator current_;
     std::pair<std::vector<std::string>::const_iterator, std::vector<std::string>::const_iterator> displayed_;
 };
+
+inline const std::string& scrollable::get_current() const
+{
+    return *current_;
+}
 
 }
 
