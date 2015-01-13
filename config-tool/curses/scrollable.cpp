@@ -27,25 +27,44 @@ namespace chucho
 namespace config_tool
 {
 
-scrollable::scrollable(unsigned x,
+scrollable::scrollable(const std::string& title,
+                       unsigned x,
                        unsigned y,
                        std::size_t width,
                        std::size_t height,
                        const std::vector<std::string>& items)
     : items_(items),
-      win_(newwin(height, width, y, x))
+      win_(nullptr),
+      title_(nullptr)
 {
     if (height < 4 || width < 5)
-    {
-        delwin(win_);
         throw exception("Height must be four or greater and width must be five or greater");
+    if (!title.empty())
+    {
+        title_ = newwin(1, width, y, x);
+        waddstr(title_, title.c_str());
+        wrefresh(title_);
+        y += 1;
+        height -= 1;
     }
+    win_ = newwin(height, width, y, x);
     keypad(win_, TRUE);
     populate();
 }
 
+scrollable::scrollable(unsigned x,
+                       unsigned y,
+                       std::size_t width,
+                       std::size_t height,
+                       const std::vector<std::string>& items)
+    : scrollable("", x, y, width, height, items)
+{
+}
+
 scrollable::~scrollable()
 {
+    if (title_ != nullptr)
+        delwin(title_);
     delwin(win_);
 }
 

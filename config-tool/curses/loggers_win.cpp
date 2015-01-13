@@ -30,7 +30,7 @@ loggers_win::loggers_win(unsigned x,
                          unsigned y,
                          std::size_t width,
                          std::size_t height)
-    : scrollable(x, y, width, height, std::vector<std::string>(1, "+"))
+    : scrollable("Chucho Loggers", x, y, width, height, std::vector<std::string>(1, "+"))
 {
     rename_logger(typeid(*this));
 }

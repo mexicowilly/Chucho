@@ -28,15 +28,11 @@ controller::controller(const properties& props)
     initscr();
     noecho();
     cbreak();
-    title_ = newwin(1, COLS, 0, 0);
-    wprintw(title_, "Chucho Loggers");
-    wrefresh(title_);
-    loggers_ = new loggers_win(0, 1, COLS, 5);
+    loggers_ = new loggers_win(0, 0, COLS, LINES);
 }
 
 controller::~controller()
 {
-    delwin(title_);
     delete loggers_;
     endwin();
 }

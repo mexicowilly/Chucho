@@ -31,7 +31,7 @@ void configure_logging()
     chucho::configuration::set_style(chucho::configuration::style::OFF);
     auto fmt = std::make_shared<chucho::pattern_formatter>("%D{%y/%m/%d %H:%M:%S} %p %c %m%n");
     auto wrt = std::make_shared<chucho::file_writer>(fmt,
-                                                     "./chucho-config.log",
+                                                     "chucho-config.log",
                                                      chucho::file_writer::on_start::TRUNCATE);
     chucho::logger::get("")->add_writer(wrt);
 }

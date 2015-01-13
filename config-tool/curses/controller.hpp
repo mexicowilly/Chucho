@@ -36,7 +36,6 @@ public:
 
 private:
     const properties& props_;
-    WINDOW* title_;
     loggers_win* loggers_;
 };
 

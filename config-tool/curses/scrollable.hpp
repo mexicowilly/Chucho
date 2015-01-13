@@ -33,6 +33,12 @@ namespace config_tool
 class scrollable : protected loggable<scrollable>
 {
 public:
+    scrollable(const std::string& title,
+               unsigned x,
+               unsigned y,
+               std::size_t width,
+               std::size_t height,
+               const std::vector<std::string>& items);
     scrollable(unsigned x,
                unsigned y,
                std::size_t width,
@@ -63,14 +69,15 @@ private:
     };
 
     void display_arrows() const;
-    void set_displayed_second();
     void highlight_current(bool state) const;
     void populate();
     void scroll_(int num);
+    void set_displayed_second();
     void update(refresh_status refresh) const;
 
     std::vector<std::string> items_;
     WINDOW* win_;
+    WINDOW* title_;
     std::vector<std::string>::const_iterator current_;
     std::pair<std::vector<std::string>::const_iterator, std::vector<std::string>::const_iterator> displayed_;
 };
