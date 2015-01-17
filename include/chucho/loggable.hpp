@@ -81,6 +81,27 @@ protected:
      * so that everyone gets a logger. Subclasses of shape don't 
      * want their loggers to be named shape, so they rename the 
      * logger in the subclass' constructor. 
+     *  
+     * @note If the new_type parameter is a pointer, then the 
+     *       pointer will be removed for the purposes of creating
+     *       the logger name.
+     *  
+     * @param new_type the type on which to base the new name
+     */
+    template <typename new_type>
+    void rename_logger();
+    /**
+     * Rename the logger. This method is meant to be used in cases 
+     * where a subclass of a subclass of loggable needs a different 
+     * logger name. Say you have a class hierarchy built off the 
+     * abstract class shape. You make shape a subclass of loggable, 
+     * so that everyone gets a logger. Subclasses of shape don't 
+     * want their loggers to be named shape, so they rename the 
+     * logger in the subclass' constructor. 
+     *  
+     * @note If you pass the type_info for a pointer type, your 
+     *       logger name will end with "*". You probably don't want
+     *       this. Consider using @ref rename_logger().
      * 
      * @param new_type the type on which to base the new name
      */
@@ -118,6 +139,16 @@ template <typename type>
 inline std::shared_ptr<logger> loggable<type>::get_logger() const
 {
     return logger_;
+}
+
+template <typename type>
+template <typename new_type>
+void loggable<type>::rename_logger()
+{
+    if (std::is_pointer<new_type>::value)
+        rename_logger(typeid(typename std::remove_pointer<new_type>::type));
+    else
+        rename_logger(typeid(new_type));
 }
 
 template <typename type>

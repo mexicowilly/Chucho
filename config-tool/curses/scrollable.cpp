@@ -91,6 +91,10 @@ void scrollable::highlight_current(bool state) const
     mvwchgat(win_, idx + 1, 1, dim.get_width() - 2, (state ? A_STANDOUT : A_NORMAL), 0, nullptr);
 }
 
+void scrollable::highlighted()
+{
+}
+
 void scrollable::populate()
 {
     win_size dim(win_);
@@ -164,6 +168,7 @@ void scrollable::run()
                     highlight_current(true);
                 }
                 wrefresh(win_);
+                highlighted();
             }
             break; 
 
@@ -181,6 +186,7 @@ void scrollable::run()
                     highlight_current(true);
                 }
                 wrefresh(win_);
+                highlighted();
             }
             break; 
 

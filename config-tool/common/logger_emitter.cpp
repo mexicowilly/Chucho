@@ -23,22 +23,27 @@ namespace chucho
 namespace config_tool
 {
 
-logger_emitter::logger_emitter(const properties& props, const std::string& name)
-    : emitter(props),
-      name_(name)
+logger_emitter::logger_emitter(const properties& props)
+    : emitter(props)
 {
-    rename_logger(get_logger()->get_name() + ":" + name);
+    rename_logger(typeid(*this));
 }
 
 void logger_emitter::emit(std::ostream& stream, std::size_t shifts)
 {
     indent(stream, shifts) << "- chucho::logger:" << std::endl;
     std::size_t new_shifts = shifts + 1;
-    indent(stream, new_shifts) << "- name: " << name_ << std::endl;
-    indent(stream, new_shifts) << "- level: " << level_->get_name() << std::endl;
+    indent(stream, new_shifts) << "- name: " << *name_ << std::endl;
+    if (level_)
+        indent(stream, new_shifts) << "- level: " << (*level_)->get_name() << std::endl; 
     indent(stream, new_shifts) << "- writes_to_ancestors: " << std::boolalpha << writes_to_ancestors_ << std::endl;
     for (auto we : writer_emitters_)
         we->emit(stream, new_shifts);
+}
+
+bool logger_emitter::is_valid() const
+{
+    return name_;
 }
 
 void logger_emitter::remove_writer_emitter(unsigned index)

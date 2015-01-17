@@ -16,6 +16,7 @@
 
 #include "scrollable.hpp"
 #include "logger_emitter.hpp"
+#include "properties.hpp"
 
 namespace chucho
 {
@@ -26,7 +27,8 @@ namespace config_tool
 class loggers_win : public scrollable
 {
 public:
-    loggers_win(unsigned x,
+    loggers_win(const properties& props,
+                unsigned x,
                 unsigned y,
                 std::size_t width,
                 std::size_t height);
@@ -37,7 +39,9 @@ protected:
 
 private:
     std::vector<logger_emitter> lgr_ems_;
+    const properties& props_;
 };
+
 }
 
 }

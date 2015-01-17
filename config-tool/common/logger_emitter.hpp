@@ -19,6 +19,7 @@
 
 #include "writer_emitter.hpp"
 #include <chucho/loggable.hpp>
+#include <chucho/optional.hpp>
 #include <vector>
 
 namespace chucho
@@ -30,20 +31,23 @@ namespace config_tool
 class logger_emitter : loggable<logger_emitter>, public emitter
 {
 public:
-    logger_emitter(const properties& props, const std::string& name);
+    logger_emitter(const properties& props);
 
     void add_writer_emitter(std::shared_ptr<writer_emitter> we);
     virtual void emit(std::ostream& stream, std::size_t shifts) override;
-    std::shared_ptr<level> get_level() const;
+    optional<std::shared_ptr<level>> get_level() const;
+    const optional<std::string>& get_name() const;
     bool get_writes_to_ancestors() const;
+    virtual bool is_valid() const override;
     void remove_writer_emitter(unsigned index);
     void set_level(std::shared_ptr<level> lvl);
+    void set_name(const std::string& name);
     void set_writes_to_ancestors(bool state);
 
 private:
-    std::string name_;
+    optional<std::string> name_;
     bool writes_to_ancestors_;
-    std::shared_ptr<level> level_;
+    optional<std::shared_ptr<level>> level_;
     std::vector<std::shared_ptr<writer_emitter>> writer_emitters_;
 };
 
@@ -52,9 +56,14 @@ inline void logger_emitter::add_writer_emitter(std::shared_ptr<writer_emitter> w
     writer_emitters_.push_back(we);
 }
 
-inline std::shared_ptr<level> logger_emitter::get_level() const
+inline optional<std::shared_ptr<level>> logger_emitter::get_level() const
 {
     return level_;
+}
+
+inline const optional<std::string>& logger_emitter::get_name() const
+{
+    return name_;
 }
 
 inline bool logger_emitter::get_writes_to_ancestors() const
@@ -65,6 +74,11 @@ inline bool logger_emitter::get_writes_to_ancestors() const
 inline void logger_emitter::set_level(std::shared_ptr<level> lvl)
 {
     level_ = lvl;
+}
+
+inline void logger_emitter::set_name(const std::string& name)
+{
+    name_ = name;
 }
 
 inline void logger_emitter::set_writes_to_ancestors(bool state)

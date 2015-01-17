@@ -28,7 +28,7 @@ controller::controller(const properties& props)
     initscr();
     noecho();
     cbreak();
-    loggers_ = new loggers_win(0, 0, COLS, LINES);
+    loggers_ = new loggers_win(props_, 0, 0, COLS, LINES);
 }
 
 controller::~controller()

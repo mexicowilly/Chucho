@@ -58,6 +58,7 @@ protected:
     };
 
     const std::string& get_current() const;
+    virtual void highlighted();
     virtual exit_status selected();
     virtual exit_status unknown(chtype ch);
 
