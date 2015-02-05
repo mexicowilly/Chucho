@@ -14,7 +14,10 @@
  *    limitations under the License.
  */
 
-#include "controller.hpp"
+#if !defined(CHUCHO_CANCELLABLE_HPP__)
+#define CHUCHO_CANCELLABLE_HPP__
+
+#include "scrollable.hpp"
 
 namespace chucho
 {
@@ -22,25 +25,35 @@ namespace chucho
 namespace config_tool
 {
 
-controller::controller(const properties& props)
-    : props_(props)
+class cancellable : public scrollable
 {
-    initscr();
-    noecho();
-    cbreak();
-    loggers_.reset(new loggers_win(props_, 0, 0, COLS, LINES));
-}
+public:
+    cancellable(const std::string& title,
+                unsigned x,
+                unsigned y,
+                std::size_t width,
+                std::size_t height);
+    cancellable(unsigned x,
+                unsigned y,
+                std::size_t width,
+                std::size_t height);
 
-controller::~controller()
+    bool cancelled() const;
+
+protected:
+    virtual exit_status unknown(chtype ch) override;
+
+private:
+    bool cancelled_;
+};
+
+inline bool cancellable::cancelled() const
 {
-    endwin();
-}
-
-void controller::run()
-{
-    loggers_->run();
+    return cancelled_;
 }
 
 }
 
 }
+
+#endif

@@ -14,11 +14,12 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CONTROLLER_HPP__)
-#define CHUCHO_CONTROLLER_HPP__
+#if !defined(CHUCHO_LOGGER_WIN_HPP__)
+#define CHUCHO_LOGGER_WIN_HPP__
 
-#include "properties.hpp"
-#include "loggers_win.hpp"
+#include "cancellable.hpp"
+#include "logger_emitter.hpp"
+#include <chucho/optional.hpp>
 
 namespace chucho
 {
@@ -26,18 +27,29 @@ namespace chucho
 namespace config_tool
 {
 
-class controller
+class logger_win : public cancellable
 {
 public:
-    controller(const properties& props);
-    ~controller();
+    logger_win(const logger_emitter& emitter,
+               unsigned x,
+               unsigned y,
+               std::size_t width,
+               std::size_t height);
 
-    void run();
+    const optional<logger_emitter>& get_logger_emitter() const;
+
+protected:
+    virtual exit_status selected() override;
+    virtual exit_status unknown(chtype ch) override;
 
 private:
-    const properties& props_;
-    std::unique_ptr<loggers_win> loggers_;
+    optional<logger_emitter> emitter_;
 };
+
+inline const optional<logger_emitter>& logger_win::get_logger_emitter() const
+{
+    return emitter_;
+}
 
 }
 

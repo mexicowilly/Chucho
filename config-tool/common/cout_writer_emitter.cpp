@@ -35,6 +35,11 @@ void cout_writer_emitter::emit(std::ostream& stream, std::size_t shifts)
     writer_emitter::emit(stream, shifts);
 }
 
+const char* cout_writer_emitter::get_name() const
+{
+    return "Stdout Writer";
+}
+
 }
 
 }

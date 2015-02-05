@@ -35,7 +35,7 @@ void logger_emitter::emit(std::ostream& stream, std::size_t shifts)
     std::size_t new_shifts = shifts + 1;
     indent(stream, new_shifts) << "- name: " << *name_ << std::endl;
     if (level_)
-        indent(stream, new_shifts) << "- level: " << (*level_)->get_name() << std::endl; 
+        indent(stream, new_shifts) << "- level: " << level_->get_name() << std::endl; 
     indent(stream, new_shifts) << "- writes_to_ancestors: " << std::boolalpha << writes_to_ancestors_ << std::endl;
     for (auto we : writer_emitters_)
         we->emit(stream, new_shifts);

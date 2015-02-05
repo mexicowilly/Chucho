@@ -14,7 +14,11 @@
  *    limitations under the License.
  */
 
-#include "controller.hpp"
+#if !defined(CHUCHO_CONFIG_TOOL_UTIL_HPP__)
+#define CHUCHO_CONFIG_TOOL_UTIL_HPP__
+
+#include <vector>
+#include <string>
 
 namespace chucho
 {
@@ -22,25 +26,15 @@ namespace chucho
 namespace config_tool
 {
 
-controller::controller(const properties& props)
-    : props_(props)
+namespace util
 {
-    initscr();
-    noecho();
-    cbreak();
-    loggers_.reset(new loggers_win(props_, 0, 0, COLS, LINES));
-}
 
-controller::~controller()
-{
-    endwin();
-}
+std::vector<std::string> word_break(const std::string& text, std::size_t len);
 
-void controller::run()
-{
-    loggers_->run();
 }
 
 }
 
 }
+
+#endif

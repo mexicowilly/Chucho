@@ -14,11 +14,8 @@
  *    limitations under the License.
  */
 
-#include "loggers_win.hpp"
-
-namespace
-{
-}
+#include "cancellable.hpp"
+#include "chucho_keys.hpp"
 
 namespace chucho
 {
@@ -26,40 +23,34 @@ namespace chucho
 namespace config_tool
 {
 
-loggers_win::loggers_win(const properties& props,
+cancellable::cancellable(const std::string& title,
                          unsigned x,
                          unsigned y,
                          std::size_t width,
                          std::size_t height)
-    : scrollable("Chucho Loggers", x, y, width, height),
-      props_(props)
+    : scrollable(title, x, y, width, height),
+      cancelled_(false)
 {
-    rename_logger(typeid(*this));
-    set_items(std::vector<item>(1, "+"));
 }
 
-loggers_win::exit_status loggers_win::selected()
+cancellable::cancellable(unsigned x,
+                         unsigned y,
+                         std::size_t width,
+                         std::size_t height)
+    : scrollable(x, y, width, height),
+      cancelled_(false)
 {
-    static unsigned num = 1;
-
-    if (get_current().text_ == "+")
-        push_before_back(std::to_string(num++));
-    return exit_status::should_not_exit; 
 }
 
-loggers_win::exit_status loggers_win::unknown(chtype ch)
+cancellable::exit_status cancellable::unknown(chtype ch)
 {
     exit_status st = exit_status::should_not_exit;
     switch (ch)
     {
-    case 'q':
+    case static_cast<chtype>(key::ESC):
         st = exit_status::should_exit;
+        cancelled_ = true;
         break;
-
-    case 'r':
-        if (get_current().text_ != "+")
-            remove_current();
-        break; 
     }
     return st;
 }

@@ -15,7 +15,6 @@
  */
 
 #include "scrollable.hpp"
-#include "win_size.hpp"
 #include "chucho_keys.hpp"
 #include <chucho/exception.hpp>
 #include <chucho/log.hpp>
@@ -31,10 +30,8 @@ scrollable::scrollable(const std::string& title,
                        unsigned x,
                        unsigned y,
                        std::size_t width,
-                       std::size_t height,
-                       const std::vector<std::string>& items)
-    : items_(items),
-      win_(nullptr),
+                       std::size_t height)
+    : win_(nullptr),
       title_(nullptr)
 {
     if (height < 4 || width < 5)
@@ -49,15 +46,13 @@ scrollable::scrollable(const std::string& title,
     }
     win_ = newwin(height, width, y, x);
     keypad(win_, TRUE);
-    populate();
 }
 
 scrollable::scrollable(unsigned x,
                        unsigned y,
                        std::size_t width,
-                       std::size_t height,
-                       const std::vector<std::string>& items)
-    : scrollable("", x, y, width, height, items)
+                       std::size_t height)
+    : scrollable("", x, y, width, height)
 {
 }
 
@@ -68,7 +63,7 @@ scrollable::~scrollable()
     delwin(win_);
 }
 
-void scrollable::display_arrows() const
+void scrollable::display_arrows()
 {
     win_size dim(win_);
     mvwvline(win_, 1, 1, ' ', dim.get_height() - 2);
@@ -106,7 +101,7 @@ void scrollable::populate()
     update(refresh_status::should_refresh);
 }
 
-void scrollable::push_before_back(const std::string& item)
+void scrollable::push_before_back(const item& itm)
 {
     if (items_.empty())
     {
@@ -114,8 +109,8 @@ void scrollable::push_before_back(const std::string& item)
     }
     else
     {
-        auto disp_idx = std::distance(items_.cbegin(), displayed_.first);
-        current_ = items_.insert(items_.end() - 1, item);
+        auto disp_idx = std::distance(items_.begin(), displayed_.first);
+        current_ = items_.insert(items_.end() - 1, itm);
         displayed_.first = items_.begin();
         std::advance(displayed_.first, disp_idx);
         set_displayed_second();
@@ -123,27 +118,25 @@ void scrollable::push_before_back(const std::string& item)
     }
 }
 
-void scrollable::remove(const std::string& item)
+void scrollable::remove_current()
 {
-    auto found = std::find(items_.begin(), items_.end(), item);
-    if (found == items_.end())
-    {
-        CHUCHO_INFO_LGBL(item << " was not found for removal");
-    }
-    else
-    {
-        auto disp_idx = std::distance(items_.cbegin(), displayed_.first);
-        current_ = items_.erase(found);
-        if (!items_.empty() && current_ != items_.begin())
-            current_--;
-        displayed_.first = items_.begin();
-        if (current_ != items_.begin())
-            std::advance(displayed_.first, disp_idx); 
-        if (displayed_.first > current_)
-            displayed_.first = current_;
-        set_displayed_second(); 
-        update(refresh_status::should_refresh);
-    }
+    auto disp_idx = std::distance(items_.begin(), displayed_.first);
+    current_ = items_.erase(current_);
+    if (!items_.empty() && current_ != items_.begin())
+        current_--;
+    displayed_.first = items_.begin();
+    if (current_ != items_.begin())
+        std::advance(displayed_.first, disp_idx); 
+    if (displayed_.first > current_)
+        displayed_.first = current_;
+    set_displayed_second(); 
+    update(refresh_status::should_refresh);
+}
+
+void scrollable::replace_current(const item& itm)
+{
+    *current_ = itm;
+    update(refresh_status::should_refresh);
 }
 
 void scrollable::run()
@@ -221,8 +214,14 @@ void scrollable::set_displayed_second()
     displayed_.second = displayed_.first;
     win_size dim(win_);
     std::advance(displayed_.second,
-                 std::min(std::distance(displayed_.first, items_.cend()),
+                 std::min(std::distance(displayed_.first, items_.end()),
                           std::distance(displayed_.first, displayed_.first + (dim.get_height() - 2))) - 1);
+}
+
+void scrollable::set_items(const std::vector<item>& items)
+{
+    items_ = items;
+    populate();
 }
 
 scrollable::exit_status scrollable::selected()
@@ -235,17 +234,29 @@ scrollable::exit_status scrollable::unknown(chtype ch)
     return exit_status::should_not_exit;
 }
 
-void scrollable::update(refresh_status refresh) const
+void scrollable::update(refresh_status refresh)
 {
     wclear(win_);
     for (auto i = displayed_.first; i <= displayed_.second; i++)
-        mvwprintw(win_, std::distance(displayed_.first, i) + 1, 1, "  %s", (*i).c_str());
+        mvwprintw(win_, std::distance(displayed_.first, i) + 1, 1, "  %s", (*i).text_.c_str());
     // Don't draw the box first. Things can get weird.
     box(win_, 0, 0);
     display_arrows(); 
     highlight_current(true);
     if (refresh == refresh_status::should_refresh)
         wrefresh(win_);
+}
+
+scrollable::item::item(const std::string& text, std::shared_ptr<emitter> emit)
+    : text_(text),
+      emitter_(emit)
+{
+}
+
+scrollable::item::item(const char* const text, std::shared_ptr<emitter> emit)
+    : text_(text),
+      emitter_(emit)
+{
 }
 
 }

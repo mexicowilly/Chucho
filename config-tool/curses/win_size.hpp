@@ -19,6 +19,7 @@
 #define CHUCHO_WIN_SIZE_HPP__
 
 #include "chucho_curses.h"
+#include <cstddef>
 
 namespace chucho
 {
@@ -33,8 +34,12 @@ public:
 
     std::size_t get_height() const;
     std::size_t get_width() const;
+    unsigned get_x() const;
+    unsigned get_y() const;
 
 private:
+    unsigned x_;
+    unsigned y_;
     std::size_t height_;
     std::size_t width_;
 };
@@ -42,6 +47,7 @@ private:
 inline win_size::win_size(WINDOW* w)
 {
     getmaxyx(w, height_, width_);
+    getyx(w, y_, x_);
 }
 
 inline std::size_t win_size::get_height() const
@@ -52,6 +58,16 @@ inline std::size_t win_size::get_height() const
 inline std::size_t win_size::get_width() const
 {
     return width_;
+}
+
+inline unsigned win_size::get_x() const
+{
+    return x_;
+}
+
+inline unsigned win_size::get_y() const
+{
+    return y_;
 }
 
 }

@@ -18,6 +18,8 @@
 #define CHUCHO_SCROLLABLE_HPP__
 
 #include "chucho_curses.h"
+#include "win_size.hpp"
+#include "emitter.hpp"
 #include <chucho/loggable.hpp>
 #include <cstddef>
 #include <vector>
@@ -33,22 +35,31 @@ namespace config_tool
 class scrollable : protected loggable<scrollable>
 {
 public:
+    struct item
+    {
+        item(const std::string& text, std::shared_ptr<emitter> emit = std::shared_ptr<emitter>());
+        item(const char* const text, std::shared_ptr<emitter> emit = std::shared_ptr<emitter>());
+
+        std::string text_;
+        std::shared_ptr<emitter> emitter_;
+    };
+
     scrollable(const std::string& title,
                unsigned x,
                unsigned y,
                std::size_t width,
-               std::size_t height,
-               const std::vector<std::string>& items);
+               std::size_t height);
     scrollable(unsigned x,
                unsigned y,
                std::size_t width,
-               std::size_t height,
-               const std::vector<std::string>& items);
+               std::size_t height);
     ~scrollable();
 
-    void push_before_back(const std::string& item);
-    void remove(const std::string& item);
+    void push_before_back(const item& itm);
+    void remove_current();
+    void replace_current(const item& itm);
     void run();
+    void set_items(const std::vector<item>& items);
 
 protected:
     enum class exit_status
@@ -57,7 +68,8 @@ protected:
         should_not_exit
     };
 
-    const std::string& get_current() const;
+    const item& get_current() const;
+    win_size get_win_size();
     virtual void highlighted();
     virtual exit_status selected();
     virtual exit_status unknown(chtype ch);
@@ -69,23 +81,28 @@ private:
         should_not_refresh
     };
 
-    void display_arrows() const;
+    void display_arrows();
     void highlight_current(bool state) const;
     void populate();
     void scroll_(int num);
     void set_displayed_second();
-    void update(refresh_status refresh) const;
+    void update(refresh_status refresh);
 
-    std::vector<std::string> items_;
+    std::vector<item> items_;
     WINDOW* win_;
     WINDOW* title_;
-    std::vector<std::string>::const_iterator current_;
-    std::pair<std::vector<std::string>::const_iterator, std::vector<std::string>::const_iterator> displayed_;
+    std::vector<item>::iterator current_;
+    std::pair<std::vector<item>::iterator, std::vector<item>::iterator> displayed_;
 };
 
-inline const std::string& scrollable::get_current() const
+inline const scrollable::item& scrollable::get_current() const
 {
     return *current_;
+}
+
+inline win_size scrollable::get_win_size()
+{
+    return win_size(win_);
 }
 
 }

@@ -33,6 +33,7 @@ public:
     virtual void emit(std::ostream& stream, std::size_t shifts) override;
     const std::vector<std::shared_ptr<filter_emitter>>& get_filter_emitters() const;
     std::shared_ptr<formatter_emitter> get_formatter_emitter() const;
+    virtual const char* get_name() const = 0;
     void set_formatter_emitter(std::shared_ptr<formatter_emitter> fmt);
 
 protected:

@@ -27,14 +27,20 @@ ENDIF()
 INCLUDE_DIRECTORIES(../common)
 
 ADD_EXECUTABLE(chucho-config
+               cancellable.cpp
+               cancellable.hpp
                chucho_curses.h
                chucho_keys.hpp
                controller.cpp
                controller.hpp
+               logger_win.cpp
+               logger_win.hpp
                loggers_win.cpp
                loggers_win.hpp
                main.cpp
                scrollable.cpp
                scrollable.hpp
+               util.cpp
+               util.hpp
                win_size.hpp)
 TARGET_LINK_LIBRARIES(chucho-config common-config ${CURSES_LIBRARIES})

@@ -33,6 +33,7 @@ public:
                         const std::vector<std::shared_ptr<filter_emitter>>& flts);
 
     virtual void emit(std::ostream& stream, std::size_t shifts) override;
+    virtual const char* get_name() const override;
 };
 
 }

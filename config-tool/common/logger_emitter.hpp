@@ -35,8 +35,9 @@ public:
 
     void add_writer_emitter(std::shared_ptr<writer_emitter> we);
     virtual void emit(std::ostream& stream, std::size_t shifts) override;
-    optional<std::shared_ptr<level>> get_level() const;
+    std::shared_ptr<level> get_level() const;
     const optional<std::string>& get_name() const;
+    const std::vector<std::shared_ptr<writer_emitter>>& get_writer_emitters() const;
     bool get_writes_to_ancestors() const;
     virtual bool is_valid() const override;
     void remove_writer_emitter(unsigned index);
@@ -47,7 +48,7 @@ public:
 private:
     optional<std::string> name_;
     bool writes_to_ancestors_;
-    optional<std::shared_ptr<level>> level_;
+    std::shared_ptr<level> level_;
     std::vector<std::shared_ptr<writer_emitter>> writer_emitters_;
 };
 
@@ -56,7 +57,7 @@ inline void logger_emitter::add_writer_emitter(std::shared_ptr<writer_emitter> w
     writer_emitters_.push_back(we);
 }
 
-inline optional<std::shared_ptr<level>> logger_emitter::get_level() const
+inline std::shared_ptr<level> logger_emitter::get_level() const
 {
     return level_;
 }
@@ -64,6 +65,11 @@ inline optional<std::shared_ptr<level>> logger_emitter::get_level() const
 inline const optional<std::string>& logger_emitter::get_name() const
 {
     return name_;
+}
+
+inline const std::vector<std::shared_ptr<writer_emitter>>& logger_emitter::get_writer_emitters() const
+{
+    return writer_emitters_;
 }
 
 inline bool logger_emitter::get_writes_to_ancestors() const
