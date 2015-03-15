@@ -53,7 +53,7 @@ public:
                unsigned y,
                std::size_t width,
                std::size_t height);
-    ~scrollable();
+    virtual ~scrollable();
 
     void push_before_back(const item& itm);
     void remove_current();
