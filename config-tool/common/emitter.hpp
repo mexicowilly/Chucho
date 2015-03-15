@@ -31,7 +31,7 @@ class emitter
 {
 public:
     virtual void emit(std::ostream& stream, std::size_t shifts) = 0;
-    virtual bool is_valid() const = 0;
+    virtual std::pair<bool, std::string> is_valid() const = 0;
 
 protected:
     emitter(const properties& props);

@@ -15,6 +15,7 @@
  */
 
 #include "logger_win.hpp"
+#include "pop_up_win.hpp"
 #include <map>
 
 namespace
@@ -157,13 +158,16 @@ logger_win::exit_status logger_win::unknown(chtype ch)
     }
     else if (ch == 's')
     {
-        if (emitter_->is_valid())
+        auto p = emitter_->is_valid();
+        if (p.first)
         {
             st = exit_status::should_exit;
         }
         else
         {
-            // Pop up warning
+            std::size_t w = COLS / 2;
+            pop_up_win pop(w - (w / 2), (LINES / 2) - 5, w, p.second);
+            pop.run();
         }
     }
     return st; 

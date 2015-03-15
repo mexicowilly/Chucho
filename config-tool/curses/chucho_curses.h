@@ -14,6 +14,9 @@
  *    limitations under the License.
  */
 
+#if !defined(CHUCHO_CURSES_H)
+#define CHUCHO_CURSES_H
+
 #if defined(CHUCHO_HAVE_CURSES_H)
 #include <curses.h>
 #elif defined(CHUCHO_HAVE_NCURSES_CURSES_H)
@@ -22,4 +25,6 @@
 #include <ncurses.h>
 #elif defined(CHUCHO_HAVE_NCURSES_NCURSES_H)
 #include <ncurses/ncurses.h>
+#endif
+
 #endif

@@ -14,10 +14,10 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CONFIG_TOOL_UTIL_HPP__)
-#define CHUCHO_CONFIG_TOOL_UTIL_HPP__
+#if !defined(CHUCHO_POP_UP_WIN_HPP__)
+#define CHUCHO_POP_UP_WIN_HPP__
 
-#include <vector>
+#include "chucho_curses.h"
 #include <string>
 
 namespace chucho
@@ -26,12 +26,17 @@ namespace chucho
 namespace config_tool
 {
 
-namespace util
+class pop_up_win
 {
+public:
+    pop_up_win(unsigned x, unsigned y, std::size_t width, const std::string& text);
+    ~pop_up_win();
 
-std::vector<std::string> line_break(const std::string& text, std::size_t len);
+    void run();
 
-}
+private:
+    WINDOW* win_;
+};
 
 }
 

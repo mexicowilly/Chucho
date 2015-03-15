@@ -38,6 +38,8 @@ ADD_EXECUTABLE(chucho-config
                loggers_win.cpp
                loggers_win.hpp
                main.cpp
+               pop_up_win.cpp
+               pop_up_win.hpp
                scrollable.cpp
                scrollable.hpp
                util.cpp

@@ -45,7 +45,7 @@ namespace config_tool
 namespace util
 {
 
-std::vector<std::string> word_break(const std::string& text, std::size_t len)
+std::vector<std::string> line_break(const std::string& text, std::size_t len)
 {
     std::string line;
     std::vector<std::string> result;
@@ -64,7 +64,9 @@ std::vector<std::string> word_break(const std::string& text, std::size_t len)
             line += w; 
         }
     }
-    return result;
+    if (!line.empty())
+        result.push_back(" " + line);
+    return result; 
 }
 
 }

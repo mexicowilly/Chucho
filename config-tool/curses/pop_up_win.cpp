@@ -14,11 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CONFIG_TOOL_UTIL_HPP__)
-#define CHUCHO_CONFIG_TOOL_UTIL_HPP__
-
-#include <vector>
-#include <string>
+#include "pop_up_win.hpp"
+#include "util.hpp"
 
 namespace chucho
 {
@@ -26,15 +23,27 @@ namespace chucho
 namespace config_tool
 {
 
-namespace util
+pop_up_win::pop_up_win(unsigned x, unsigned y, std::size_t width, const std::string& text)
 {
+    auto lines = util::line_break(text, width - 2);
+    win_ = newwin(lines.size() + 2, width, y, x);
+    box(win_, 0, 0);
+    for (unsigned i = 0; i < lines.size(); i++)
+        mvwaddstr(win_, i + 1, 1, lines[i].c_str());
+    wrefresh(win_);
+    keypad(win_, TRUE);
+}
 
-std::vector<std::string> line_break(const std::string& text, std::size_t len);
+pop_up_win::~pop_up_win()
+{
+    delwin(win_);
+}
 
+void pop_up_win::run()
+{
+    wgetch(win_);
 }
 
 }
 
 }
-
-#endif

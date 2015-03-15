@@ -39,7 +39,7 @@ public:
     const optional<std::string>& get_name() const;
     const std::vector<std::shared_ptr<writer_emitter>>& get_writer_emitters() const;
     bool get_writes_to_ancestors() const;
-    virtual bool is_valid() const override;
+    virtual std::pair<bool, std::string> is_valid() const override;
     void remove_writer_emitter(unsigned index);
     void set_level(std::shared_ptr<level> lvl);
     void set_name(const std::string& name);

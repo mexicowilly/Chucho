@@ -41,9 +41,9 @@ void logger_emitter::emit(std::ostream& stream, std::size_t shifts)
         we->emit(stream, new_shifts);
 }
 
-bool logger_emitter::is_valid() const
+std::pair<bool, std::string> logger_emitter::is_valid() const
 {
-    return name_;
+    return name_ ? std::make_pair(true, "") : std::make_pair(false, "The logger name is required");
 }
 
 void logger_emitter::remove_writer_emitter(unsigned index)
