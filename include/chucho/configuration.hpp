@@ -82,7 +82,7 @@ public:
      * @note The unknown element handler is only supported in YAML 
      *       configurations.
      */
-    typedef std::function<bool(const std::string&, const std::string&)> unknown_handler_type;
+    typedef std::function<void(const std::string&, const std::string&)> unknown_handler_type;
 
     /**
      * The style of configuration. AUTOMATIC is the default, which 

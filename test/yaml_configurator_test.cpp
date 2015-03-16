@@ -537,7 +537,7 @@ TEST_F(yaml_configurator, unknown)
 {
     std::map<std::string, std::string> unknowns;
     chucho::configuration::set_unknown_handler(
-        std::bind([&] (std::map<std::string, std::string> u, const std::string& k, const std::string& v) { unknowns[k] = v; return true; },
+        std::bind([&] (std::map<std::string, std::string> u, const std::string& k, const std::string& v) { unknowns[k] = v; },
         std::ref(unknowns),
         std::placeholders::_1,
         std::placeholders::_2));
