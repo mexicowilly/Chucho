@@ -37,6 +37,16 @@ class CHUCHO_EXPORT formatter : public status_reporter,
                                 public configurable
 {
 public:
+	/**
+	 * @name Destructor
+	 * @{
+	 */
+	/**
+	 * Destroy the formatter.
+	 */
+	virtual ~formatter() { };
+	/** @} */
+
     /**
      * Format the event. The given event is turned into a piece of 
      * text. The encoding of the resulting piece of text is 

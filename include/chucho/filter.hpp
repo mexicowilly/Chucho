@@ -63,6 +63,15 @@ public:
     };
 
     /**
+     * @name Destructor
+     * @{
+     */
+    /**
+     * Destory the filter.
+     */
+    virtual ~filter() { };
+
+    /**
      * Evaluate the filter. Determine how this filter feels about 
      * this event. 
      * 

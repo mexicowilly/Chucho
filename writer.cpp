@@ -29,6 +29,10 @@ writer::writer(std::shared_ptr<formatter> fmt)
         throw std::invalid_argument("The formatter cannot be a nullptr");
 }
 
+writer::~writer()
+{
+}
+
 void writer::add_filter(std::shared_ptr<filter> flt)
 {
     std::lock_guard<std::recursive_mutex> lg(guard_);

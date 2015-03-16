@@ -48,6 +48,10 @@ namespace chucho
 class CHUCHO_EXPORT memento : public status_reporter
 {
 public:
+	/**
+	 * @name Constructor and Destructor
+	 * @{
+	 */
     /**
      * Create a memento for the given @ref configurator. A memento 
      * will usually register its handlers at creation time. A 
@@ -58,6 +62,11 @@ public:
      * @param cfg the configurator that is performing configuration
      */
     memento(configurator& cfg);
+    /**
+     * Destroy the memento.
+     */
+    virtual ~memento();
+    /** @} */
 
     /**
      * Handle a key-value pair from the configuration file. A 

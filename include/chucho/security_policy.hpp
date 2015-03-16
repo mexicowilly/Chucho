@@ -284,6 +284,8 @@ private:
     class CHUCHO_NO_EXPORT basic_range
     {
     public:
+    	virtual ~basic_range() { };
+
         virtual std::pair<std::intmax_t, std::intmax_t> get_range() const = 0;
         virtual bool in_range(std::uintmax_t val) const = 0;
         virtual std::string to_text() const = 0;

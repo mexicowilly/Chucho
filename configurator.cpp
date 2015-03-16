@@ -71,6 +71,10 @@ configurator::configurator(const security_policy& sec_pol)
     set_status_origin("configurator");
 }
 
+configurator::~configurator()
+{
+}
+
 std::map<std::string, std::shared_ptr<configurable_factory>>& configurator::get_factories()
 {
     static std::once_flag once;

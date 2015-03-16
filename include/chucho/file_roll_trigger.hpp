@@ -36,6 +36,16 @@ class CHUCHO_EXPORT file_roll_trigger : public virtual status_reporter,
                                         public virtual configurable
 {
 public:
+	/**
+	 * @name Destructor
+	 * @{
+	 */
+	/**
+	 * Destroy the trigger.
+	 */
+	virtual ~file_roll_trigger() { };
+	/** @} */
+
     /**
      * Return whether now is a good time to roll a log file.
      *

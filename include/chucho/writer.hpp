@@ -49,7 +49,7 @@ class CHUCHO_EXPORT writer : non_copyable,
 {
 public:
     /**
-     * @name Constructors
+     * @name Constructor and Destructor
      */
     //@{
     /**
@@ -61,6 +61,10 @@ public:
      *        std::shared_ptr
      */
     writer(std::shared_ptr<formatter> fmt);
+    /**
+     * Destroy a writer.
+     */
+    virtual ~writer();
     //@}
 
     /**

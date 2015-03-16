@@ -48,14 +48,18 @@ class CHUCHO_EXPORT file_roller : non_copyable,
 {
 public:
     /**
-     * @name Constructor
+     * @name Constructor and Destructor
+     * @{
      */
-    //@{
     /**
      * Construct a file roller.
      */
     file_roller(std::shared_ptr<file_compressor> cmp = std::shared_ptr<file_compressor>());
-    //@}
+    /**
+     * Destroy the file roller.
+     */
+    virtual ~file_roller();
+    /** @} */
 
     /**
      * Return this roller's currently active file name. This is the 

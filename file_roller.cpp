@@ -26,6 +26,10 @@ file_roller::file_roller(std::shared_ptr<file_compressor> cmp)
 {
 }
 
+file_roller::~file_roller()
+{
+}
+
 void file_roller::set_file_writer(file_writer& file_writer)
 {
     if (file_writer_ != nullptr)

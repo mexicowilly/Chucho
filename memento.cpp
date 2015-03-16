@@ -28,6 +28,10 @@ memento::memento(configurator& cfg)
     set_status_origin("memento");
 }
 
+memento::~memento()
+{
+}
+
 bool memento::boolean_value(const std::string& value)
 {
     static const std::string zero("0");
