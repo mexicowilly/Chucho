@@ -175,31 +175,31 @@ optional<type>& optional<type>::operator= (const optional<type>& opt)
 }
 
 template <typename type>
-inline optional<type>::operator bool () const
+optional<type>::operator bool () const
 {
     return initialized_;
 }
 
 template <typename type>
-inline type& optional<type>::operator* ()
+type& optional<type>::operator* ()
 {
     return reinterpret_cast<type&>(data_);
 }
 
 template <typename type>
-inline const type& optional<type>::operator* () const
+const type& optional<type>::operator* () const
 {
     return reinterpret_cast<const type&>(data_);
 }
 
 template <typename type>
-inline type* optional<type>::operator-> ()
+type* optional<type>::operator-> ()
 {
     return reinterpret_cast<type*>(&data_);
 }
 
 template <typename type>
-inline const type* optional<type>::operator-> () const
+const type* optional<type>::operator-> () const
 {
     return reinterpret_cast<const type*>(&data_);
 }
