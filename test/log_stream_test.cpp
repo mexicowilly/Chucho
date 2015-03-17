@@ -29,6 +29,11 @@ public:
     string_writer(std::shared_ptr<chucho::formatter> fmt)
         : writer(fmt) { }
     
+    void clear()
+    {
+        stream_.str("");
+    }
+    
     std::string get_text()
     {
         return stream_.str();
@@ -123,6 +128,9 @@ TEST_F(stream_test, set_marker)
     lgr_->set_level(chucho::level::INFO_());
     CHUCHO_M(ls) << chucho::info << chucho::set_marker(chucho::marker("marky")) << chucho::endm;
     EXPECT_EQ(std::string("marky"), get_text());
+    std::dynamic_pointer_cast<string_writer>(wrt_)->clear();
+    CHUCHO_M(ls) << chucho::set_marker("marky 2") << chucho::endm;
+    EXPECT_EQ(std::string("marky 2"), get_text());
 }
 
 TEST_F(stream_test, trace)

@@ -31,6 +31,7 @@ public:
     log_streambuf(std::shared_ptr<logger> lgr);
 
     void flush_message();
+    std::shared_ptr<level> get_level() const;
     virtual int_type overflow(int_type ch) override;
     void set_level(std::shared_ptr<level> lvl);
     void set_location(const char* const file_name,
@@ -47,6 +48,11 @@ private:
     unsigned line_number_;
     const char* function_name_;
 };
+
+inline std::shared_ptr<level> log_streambuf::get_level() const
+{
+    return level_;
+}
 
 inline void log_streambuf::set_level(std::shared_ptr<level> lvl)
 {

@@ -36,8 +36,22 @@ protected:
 class log_stream : public log_stream_base, public std::ostream
 {
 public:
-    log_stream(std::shared_ptr<logger> lgr);
+    log_stream(std::shared_ptr<logger> lgr,
+               std::shared_ptr<level> lvl = std::shared_ptr<level>());
+    
+    std::shared_ptr<level> get_level() const;
+    void set_level(std::shared_ptr<level> lvl);
 };
+
+inline std::shared_ptr<level> log_stream::get_level() const
+{
+    return buf_.get_level();
+}
+
+inline void log_stream::set_level(std::shared_ptr<level> lvl)
+{
+    buf_.set_level(lvl);
+}
 
 #define CHUCHO_M(stream) \
     static_cast<::chucho::log_streambuf*>((stream).rdbuf())->set_location(__FILE__, __LINE__, CHUCHO_FUNCTION_NAME); \
@@ -73,6 +87,11 @@ struct set_marker_type
 inline set_marker_type set_marker(const marker& mrk)
 {
     return set_marker_type(mrk);
+}
+    
+inline set_marker_type set_marker(const std::string& mrk)
+{
+    return set_marker_type(marker(mrk));
 }
     
 std::ostream& operator<< (std::ostream& stream, set_marker_type sm);

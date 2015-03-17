@@ -31,11 +31,7 @@ log_streambuf::log_streambuf(std::shared_ptr<logger> lgr)
     
 void log_streambuf::flush_message()
 {
-    if (message_.empty() && !marker_)
-    {
-        report_info("Not writing the message because it is empty");
-    }
-    else if (!level_)
+    if (!level_)
     {
         report_warning("Cannot write the message because the level has not been set");
     }

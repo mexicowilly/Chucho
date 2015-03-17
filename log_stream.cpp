@@ -24,10 +24,11 @@ log_stream_base::log_stream_base(std::shared_ptr<logger> lgr)
 {
 }
     
-log_stream::log_stream(std::shared_ptr<logger> lgr)
+log_stream::log_stream(std::shared_ptr<logger> lgr, std::shared_ptr<level> lvl)
     : log_stream_base(lgr),
       std::ostream(&buf_)
 {
+    buf_.set_level(lvl);
 }
 
 std::ostream& trace(std::ostream& ls)
