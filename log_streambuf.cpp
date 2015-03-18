@@ -16,6 +16,7 @@
 
 #include <chucho/log_streambuf.hpp>
 #include <chucho/event.hpp>
+#include <chucho/exception.hpp>
 
 namespace chucho
 {
@@ -26,7 +27,9 @@ log_streambuf::log_streambuf(std::shared_ptr<logger> lgr)
       line_number_(0),
       function_name_("")
 {
-    set_status_origin("log_streambuf");
+    if (!lgr)
+        throw exception("log_streambuf: The logger is empty");
+    set_status_origin("log_streambuf"); 
 }
     
 void log_streambuf::flush_message()

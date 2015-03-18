@@ -129,6 +129,11 @@
  * chucho. 
  */
 
+ /**
+  * @defgroup streams
+  * Classes and macros used for logging to streams.
+  */
+
 /**
  * @defgroup syslog 
  * Classes and enumerations related to writing to syslog. 

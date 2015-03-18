@@ -24,19 +24,81 @@
 namespace chucho
 {
 
+/**
+ * @class log_streambuf log_streambuf.hpp chucho/log_streambuf.hpp 
+ * A standard streambuf that writes to a @ref logger. This 
+ * streambuf is only suitable for output, and does not support 
+ * any input functionality. It is intended for use with @ref 
+ * log_stream and the associated I/O manipulators, but it may 
+ * have some limited use outside of that context. 
+ *  
+ * @ingroup streams 
+ */
 class log_streambuf : public std::streambuf,
                       public status_reporter
 {
 public:
+    /**
+     * @name Constructor 
+     * @{ 
+     */
+    /**
+     * Construct a streambuf.
+     * 
+     * @param lgr the logger to which to write
+     */
     log_streambuf(std::shared_ptr<logger> lgr);
+    /** @}  */
 
+    /**
+     * Flush the buffer to the @ref logger. This method is invoked 
+     * by the I/O manipulator @ref endm. If no level has been set 
+     * for this streambuf, then the message is dropped. 
+     *  
+     * This method also resets the message, the location information 
+     * and the marker. 
+     */
     void flush_message();
+    /**
+     * Return the level of this streambuf.
+     * 
+     * @return the level
+     */
     std::shared_ptr<level> get_level() const;
+    /**
+     * Used internally by the stream to add characters to a message. 
+     * You don't use this method. Don't even look at it.
+     * 
+     * @param ch the character to add
+     * @return the same character of the argument ch
+     */
     virtual int_type overflow(int_type ch) override;
+    /**
+     * Set the level of this streambuf. This is invoked by the @ref 
+     * log_stream method and by all of the I/O manipulators that can 
+     * set the level. 
+     * 
+     * @param lvl the level 
+     * @sa trace, debug, info, warn, error, fatal, chucho::set_level
+     */
     void set_level(std::shared_ptr<level> lvl);
+    /**
+     * Set the location of the current message. This is invoked by 
+     * the macro @ref CHUCHO_M. 
+     * 
+     * @param file_name the file
+     * @param line_number the line
+     * @param function_name the function
+     */
     void set_location(const char* const file_name,
                       unsigned line_number,
                       const char* const function_name);
+    /**
+     * Set the marker. This is invoked by the I/O manipulator @ref 
+     * chucho::set_marker. 
+     * 
+     * @param mrk the marker
+     */
     void set_marker(const marker& mrk);
     
 private:

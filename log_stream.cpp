@@ -31,54 +31,6 @@ log_stream::log_stream(std::shared_ptr<logger> lgr, std::shared_ptr<level> lvl)
     buf_.set_level(lvl);
 }
 
-std::ostream& trace(std::ostream& ls)
-{
-    auto lsb = dynamic_cast<log_streambuf*>(ls.rdbuf());
-    if (lsb != nullptr)
-        lsb->set_level(level::TRACE_());
-    return ls;
-}
-    
-std::ostream& debug(std::ostream& ls)
-{
-    auto lsb = dynamic_cast<log_streambuf*>(ls.rdbuf());
-    if (lsb != nullptr)
-        lsb->set_level(level::DEBUG_());
-    return ls;
-}
-    
-std::ostream& info(std::ostream& ls)
-{
-    auto lsb = dynamic_cast<log_streambuf*>(ls.rdbuf());
-    if (lsb != nullptr)
-        lsb->set_level(level::INFO_());
-    return ls;
-}
-    
-std::ostream& warn(std::ostream& ls)
-{
-    auto lsb = dynamic_cast<log_streambuf*>(ls.rdbuf());
-    if (lsb != nullptr)
-        lsb->set_level(level::WARN_());
-    return ls;
-}
-    
-std::ostream& error(std::ostream& ls)
-{
-    auto lsb = dynamic_cast<log_streambuf*>(ls.rdbuf());
-    if (lsb != nullptr)
-        lsb->set_level(level::ERROR_());
-    return ls;
-}
-    
-std::ostream& fatal(std::ostream& ls)
-{
-    auto lsb = dynamic_cast<log_streambuf*>(ls.rdbuf());
-    if (lsb != nullptr)
-        lsb->set_level(level::FATAL_());
-    return ls;
-}
-
 std::ostream& endm(std::ostream& ls)
 {
     auto lsb = dynamic_cast<log_streambuf*>(ls.rdbuf());
