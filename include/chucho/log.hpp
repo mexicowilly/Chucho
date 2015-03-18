@@ -26,15 +26,10 @@
  */
 
 #include <chucho/logger.hpp>
+#include <chucho/function_name.hpp>
 #include <sstream>
 
 #if !defined(CHUCHO_DONT_DOCUMENT)
-
-#if defined(__GNUC__) || defined(__clang__) || defined(__SUNPRO_CC)
-#define CHUCHO_FUNCTION_NAME __PRETTY_FUNCTION__
-#else
-#define CHUCHO_FUNCTION_NAME __FUNCTION__
-#endif
 
 #define CHUCHO_LOG(lvl, lg, fl, ln, fnc, msg) \
     do \

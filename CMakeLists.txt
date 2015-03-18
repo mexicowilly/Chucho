@@ -141,10 +141,13 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/filter.hpp
     include/chucho/finalize.hpp
     include/chucho/formatter.hpp
+    include/chucho/function_name.hpp
     include/chucho/interval_file_roll_trigger.hpp
     include/chucho/level.hpp
     include/chucho/level_filter.hpp
     include/chucho/level_threshold_filter.hpp
+    include/chucho/log_stream.hpp
+    include/chucho/log_streambuf.hpp
     include/chucho/log.hpp
     include/chucho/loggable.hpp
     include/chucho/logger.hpp
@@ -537,6 +540,8 @@ SET(CHUCHO_SOURCES
     level_threshold_filter.cpp
     level_threshold_filter_factory.cpp
     level_threshold_filter_memento.cpp
+    log_stream.cpp
+    log_streambuf.cpp
     logger.cpp
     logger_factory.cpp
     logger_memento.cpp
