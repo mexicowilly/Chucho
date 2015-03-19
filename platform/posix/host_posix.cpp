@@ -16,6 +16,7 @@
 
 #include <chucho/host.hpp>
 #include <sys/utsname.h>
+#include <sys/socket.h>
 #include <netdb.h>
 #include <cstring>
 
