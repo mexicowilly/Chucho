@@ -276,7 +276,9 @@ IF(CHUCHO_POSIX)
     CHUCHO_REQUIRE_SYMBOLS(pwd.h getpwuid)
 
     # signal stuff
+    SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
     CHUCHO_REQUIRE_SYMBOLS(signal.h raise sigemptyset sigaddset sigwait sigaction kill sigpending sigismember pthread_sigmask)
+    UNSET(CMAKE_REQUIRED_LIBRARIES)
 
     # open/fcntl
     CHUCHO_REQUIRE_SYMBOLS(fcntl.h open fcntl)
