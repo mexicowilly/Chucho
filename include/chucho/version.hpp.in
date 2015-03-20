@@ -17,6 +17,14 @@
 #if !defined(CHUCHO_VERSION_HPP__)
 #define CHUCHO_VERSION_HPP__
 
+#if defined(major)
+#undef major
+#endif
+
+#if defined(minor)
+#undef minor
+#endif
+
 /**
  * @file 
  * Chucho's version functions

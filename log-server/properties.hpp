@@ -32,7 +32,7 @@ class properties
 public:
     properties();
 
-    bool handle_config_value(const std::string& key, const std::string& value);
+    void handle_config_value(const std::string& key, const std::string& value);
 
     bool console_mode() const;
     std::uint16_t port() const;

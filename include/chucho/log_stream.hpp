@@ -155,8 +155,10 @@ std::ostream& operator<< (std::ostream& stream, set_marker_type sm);
  * CHUCHO_M(stream) << chucho::info << "My dog has fleas." << chucho::endm; 
  * @endcode 
  */
+// IMPORTANT: Leave the spaces around the type below. Gcc 4.7
+// chokes when it sees <:.
 #define CHUCHO_M(stream) \
-    static_cast<::chucho::log_streambuf*>((stream).rdbuf())->set_location(__FILE__, __LINE__, CHUCHO_FUNCTION_NAME); \
+    static_cast< ::chucho::log_streambuf* >((stream).rdbuf())->set_location(__FILE__, __LINE__, CHUCHO_FUNCTION_NAME); \
     (stream)
 
 /**

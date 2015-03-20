@@ -129,7 +129,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                ${CHUCHO_TEST_COMPRESSION_SOURCES}
                ${CHUCHO_CONFIGURATOR_TESTS}
                ${CHUCHO_TEST_EVALUATOR_SOURCES})
-TARGET_LINK_LIBRARIES(unit-test chucho gtest ${CHUCHO_THREAD_LIB})
+TARGET_LINK_LIBRARIES(unit-test chucho gtest ${CMAKE_THREAD_LIBS_INIT})
 IF(CHUCHO_SOLARIS)
     TARGET_LINK_LIBRARIES(unit-test socket nsl)
 ENDIF()
@@ -275,7 +275,7 @@ IF(C_API)
                    ${CHUCHO_DB_C_SOURCES}
                    ${CHUCHO_EVALUATOR_C_SOURCES}
                    ${CHUCHO_PLATFORM_C_SOURCES})
-    TARGET_LINK_LIBRARIES(c-unit-test chucho ${CHUCHO_THREAD_LIB})
+    TARGET_LINK_LIBRARIES(c-unit-test chucho ${CMAKE_THREAD_LIBS_INIT})
 
     IF(CHUCHO_HAVE_ORACLE)
         TARGET_LINK_LIBRARIES(c-unit-test "${ORACLE_CLIENT_LIB}")
@@ -308,7 +308,7 @@ ENDIF()
 ADD_EXECUTABLE(time-rolling-file-test EXCLUDE_FROM_ALL
                harness.cpp
                time_rolling_file_test.cpp)
-TARGET_LINK_LIBRARIES(time-rolling-file-test chucho gtest ${CHUCHO_THREAD_LIB})
+TARGET_LINK_LIBRARIES(time-rolling-file-test chucho gtest ${CMAKE_THREAD_LIBS_INIT})
 IF(CHUCHO_SOLARIS)
     TARGET_LINK_LIBRARIES(time-rolling-file-test socket nsl)
 ENDIF()
@@ -316,14 +316,14 @@ ENDIF()
 ADD_EXECUTABLE(syslog-writer-test EXCLUDE_FROM_ALL
                harness.cpp
                syslog_writer_test.cpp)
-TARGET_LINK_LIBRARIES(syslog-writer-test chucho gtest ${CHUCHO_THREAD_LIB})
+TARGET_LINK_LIBRARIES(syslog-writer-test chucho gtest ${CMAKE_THREAD_LIBS_INIT})
 IF(CHUCHO_SOLARIS)
     TARGET_LINK_LIBRARIES(syslog-writer-test socket nsl)
 ENDIF()
 
 ADD_EXECUTABLE(remote-writer-test EXCLUDE_FROM_ALL
                remote_writer_test.cpp)
-TARGET_LINK_LIBRARIES(remote-writer-test chucho ${CHUCHO_THREAD_LIB})
+TARGET_LINK_LIBRARIES(remote-writer-test chucho ${CMAKE_THREAD_LIBS_INIT})
 IF(CHUCHO_SOLARIS)
     TARGET_LINK_LIBRARIES(remote-writer-test socket nsl)
 ENDIF()
@@ -334,40 +334,40 @@ IF(CHUCHO_WINDOWS)
                    windows_event_log_writer_test.cpp)
     SET_SOURCE_FILES_PROPERTIES(windows_event_log_writer_test.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_EVENT_LOG_DLL="${CHUCHO_EVENT_LOG_DLL}")
-    TARGET_LINK_LIBRARIES(windows-event-log-writer-test chucho gtest ${CHUCHO_THREAD_LIB})
+    TARGET_LINK_LIBRARIES(windows-event-log-writer-test chucho gtest ${CMAKE_THREAD_LIBS_INIT})
 ENDIF()
 
 IF(CHUCHO_HAVE_ORACLE)
     ADD_EXECUTABLE(oracle-writer-test EXCLUDE_FROM_ALL
                    harness.cpp
                    oracle_writer_test.cpp)
-    TARGET_LINK_LIBRARIES(oracle-writer-test chucho ${ORACLE_CLIENT_LIB} gtest ${CHUCHO_THREAD_LIB})
+    TARGET_LINK_LIBRARIES(oracle-writer-test chucho ${ORACLE_CLIENT_LIB} gtest ${CMAKE_THREAD_LIBS_INIT})
 ENDIF()
 
 IF(CHUCHO_HAVE_MYSQL)
     ADD_EXECUTABLE(mysql-writer-test EXCLUDE_FROM_ALL
                    harness.cpp
                    mysql_writer_test.cpp)
-    TARGET_LINK_LIBRARIES(mysql-writer-test chucho "${MYSQL_CLIENT_LIB}" gtest ${CHUCHO_THREAD_LIB})
+    TARGET_LINK_LIBRARIES(mysql-writer-test chucho "${MYSQL_CLIENT_LIB}" gtest ${CMAKE_THREAD_LIBS_INIT})
 ENDIF()
 
 IF(CHUCHO_HAVE_SQLITE)
     ADD_EXECUTABLE(sqlite-writer-test EXCLUDE_FROM_ALL
                    harness.cpp
                    sqlite_writer_test.cpp)
-    TARGET_LINK_LIBRARIES(sqlite-writer-test chucho "${SQLITE_CLIENT_LIB}" gtest ${CHUCHO_THREAD_LIB})
+    TARGET_LINK_LIBRARIES(sqlite-writer-test chucho "${SQLITE_CLIENT_LIB}" gtest ${CMAKE_THREAD_LIBS_INIT})
 ENDIF()
 
 IF(CHUCHO_HAVE_POSTGRES)
     ADD_EXECUTABLE(postgres-writer-test EXCLUDE_FROM_ALL
                    harness.cpp
                    postgres_writer_test.cpp)
-    TARGET_LINK_LIBRARIES(postgres-writer-test chucho ${POSTGRES_CLIENT_LIB} gtest ${CHUCHO_THREAD_LIB})
+    TARGET_LINK_LIBRARIES(postgres-writer-test chucho ${POSTGRES_CLIENT_LIB} gtest ${CMAKE_THREAD_LIBS_INIT})
 ENDIF()
 
 ADD_EXECUTABLE(configuration-off EXCLUDE_FROM_ALL
                configuration_off.cpp)
-TARGET_LINK_LIBRARIES(configuration-off chucho ${CHUCHO_THREAD_LIB})
+TARGET_LINK_LIBRARIES(configuration-off chucho ${CMAKE_THREAD_LIBS_INIT})
 
 ADD_CUSTOM_TARGET(check-config
                   COMMAND "${CMAKE_COMMAND}" "-DCHUCHO_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P "${CMAKE_CURRENT_SOURCE_DIR}/CheckAllConfigs.cmake")

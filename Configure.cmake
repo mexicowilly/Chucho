@@ -245,21 +245,8 @@ IF(CHUCHO_POSIX)
     # realpath
     CHUCHO_REQUIRE_SYMBOLS(stdlib.h realpath)
 
-    # whether linking to libpthread is required
-    SET(CHUCHO_PTHREAD_SOURCE "#include <pthread.h>\npthread_key_t k; void d(void*) { }; int main() { pthread_key_create(&k, d); return 0; }")
-    CHECK_CXX_SOURCE_RUNS("${CHUCHO_PTHREAD_SOURCE}" CHUCHO_PTHREAD_LINK)
-    IF(NOT CHUCHO_PTHREAD_LINK)
-        UNSET(CHUCHO_PTHREAD_LINK)
-        UNSET(CHUCHO_PTHREAD_LINK CACHE)
-        SET(CMAKE_REQUIRED_LIBRARIES pthread)
-        CHECK_CXX_SOURCE_RUNS("${CHUCHO_PTHREAD_SOURCE}" CHUCHO_PTHREAD_LINK)
-        IF(CHUCHO_PTHREAD_LINK)
-            MESSAGE(STATUS "linking with libpthread is required")
-        ELSE()
-            MESSAGE(FATAL_ERROR "can't build a program with threads at all")
-        ENDIF()
-        SET(CHUCHO_THREAD_LIB pthread CACHE STRING "The threading library")
-    ENDIF()
+    # Figure out the threads
+    FIND_PACKAGE(Threads)
 
     # getaddrinfo/freeaddrinfo/gai_strerror/getnameinfo
     IF(CHUCHO_SOLARIS)
@@ -289,7 +276,9 @@ IF(CHUCHO_POSIX)
     CHUCHO_REQUIRE_SYMBOLS(pwd.h getpwuid)
 
     # signal stuff
+    SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
     CHUCHO_REQUIRE_SYMBOLS(signal.h raise sigemptyset sigaddset sigwait sigaction kill sigpending sigismember pthread_sigmask)
+    UNSET(CMAKE_REQUIRED_LIBRARIES)
 
     # open/fcntl
     CHUCHO_REQUIRE_SYMBOLS(fcntl.h open fcntl)
