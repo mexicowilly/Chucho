@@ -245,9 +245,6 @@ IF(CHUCHO_POSIX)
     # realpath
     CHUCHO_REQUIRE_SYMBOLS(stdlib.h realpath)
 
-    # Figure out the threads
-    FIND_PACKAGE(Threads)
-
     # getaddrinfo/freeaddrinfo/gai_strerror/getnameinfo
     IF(CHUCHO_SOLARIS)
         SET(CMAKE_REQUIRED_LIBRARIES socket nsl)
@@ -315,6 +312,9 @@ ELSEIF(CHUCHO_WINDOWS)
     ENDIF()
 ENDIF()
 
+# Figure out the threads
+FIND_PACKAGE(Threads REQUIRED)
+
 # Nested exceptions
 CHECK_CXX_SOURCE_COMPILES("#include <exception>\nint main() { std::exception e; std::throw_with_nested(e); std::rethrow_if_nested(e); return 0; }"
                           CHUCHO_HAVE_NESTED_EXCEPTIONS)
@@ -358,7 +358,7 @@ int main()
     return EXIT_SUCCESS;
 }" CHUCHO_HAVE_PUT_TIME_RUNS)
     IF(CHUCHO_HAVE_PUT_TIME_RUNS)
-        SET(CHUCHO_HAVE_PUT_TIME TRUE)
+        SET(CHUCHO_HAVE_PUT_TIME TRUE CACHE INTERNAL "Whether std::put_time runs")
     ENDIF()
     IF(CHUCHO_WINDOWS)
         UNSET(CMAKE_REQUIRED_DEFINITIONS)
@@ -400,7 +400,7 @@ int main()
     IF(CHUCHO_HAVE_STD_REGEX_RUNS)
         FILE(READ "${CMAKE_BINARY_DIR}/std-regex-result" CHUCHO_STD_REGEX_RESULT)
         IF(CHUCHO_STD_REGEX_RESULT STREQUAL good)
-            SET(CHUCHO_HAVE_STD_REGEX TRUE)
+            SET(CHUCHO_HAVE_STD_REGEX TRUE CACHE INTERNAL "Whether std::regex actually works")
         ELSE()
             MESSAGE(STATUS "Although std::regex is available, it has bugs")
         ENDIF()
@@ -458,7 +458,7 @@ int main()
     # shared object. So, we need to figure out where the C++
     # runtime is and add it to the target link libraries of the
     # C unit test app.
-    IF(ENABLE_SHARED AND CHUCHO_SOLARIS AND CMAKE_COMPILER_IS_GNUCXX)
+    IF(ENABLE_SHARED AND CHUCHO_SOLARIS AND CMAKE_COMPILER_IS_GNUCXX AND NOT DEFINED CHUCHO_LIBSTDCXX)
         CHUCHO_FIND_PROGRAM(CHUCHO_LDD ldd)
         IF(NOT CHUCHO_LDD)
             MESSAGE(FATAL_ERROR "Could not find ldd")
@@ -495,6 +495,7 @@ int main()
         IF(NOT CHUCHO_LIBSTDCXX)
             MESSAGE(FATAL_ERROR "Could not determine the location of libstdc++")
         ENDIF()
+        SET(CHUCHO_LIBSTDCXX "${CHUCHO_LIBSTDCXX}" CACHE INTERNAL "The location of the standard C++ runtime library")
         MESSAGE(STATUS "Looking for libstdc++ - ${CHUCHO_LIBSTDCXX}")
     ENDIF()
 ENDIF()
@@ -516,7 +517,7 @@ IF(ORACLE_INCLUDE_DIR)
     ENDIF()
     UNSET(CMAKE_REQUIRED_INCLUDES)
     UNSET(CMAKE_REQUIRED_LIBRARIES)
-    SET(CHUCHO_HAVE_ORACLE TRUE)
+    SET(CHUCHO_HAVE_ORACLE TRUE CACHE INTERNAL "Whether we have Oracle client software")
 ENDIF()
 
 # MySQL
@@ -536,7 +537,7 @@ IF(MYSQL_INCLUDE_DIR)
     ENDIF()
     UNSET(CMAKE_REQUIRED_INCLUDES)
     UNSET(CMAKE_REQUIRED_LIBRARIES)
-    SET(CHUCHO_HAVE_MYSQL TRUE)
+    SET(CHUCHO_HAVE_MYSQL TRUE CACHE INTERNAL "Whether we have MySQL client software")
 ENDIF()
 
 # SQLite
@@ -557,7 +558,7 @@ IF(SQLITE_INCLUDE_DIR)
     ENDIF()
     UNSET(CMAKE_REQUIRED_INCLUDES)
     UNSET(CMAKE_REQUIRED_LIBRARIES)
-    SET(CHUCHO_HAVE_SQLITE TRUE)
+    SET(CHUCHO_HAVE_SQLITE TRUE CACHE INTERNAL "Whether we have SQLite client software")
 ENDIF()
 
 # PostgreSQL
@@ -577,7 +578,7 @@ IF(POSTGRES_INCLUDE_DIR)
     ENDIF()
     UNSET(CMAKE_REQUIRED_INCLUDES)
     UNSET(CMAKE_REQUIRED_LIBRARIES)
-    SET(CHUCHO_HAVE_POSTGRES TRUE)
+    SET(CHUCHO_HAVE_POSTGRES TRUE CACHE INTERNAL "Whether we have PostgreSQL client software")
 ENDIF()
 
 # Ruby
@@ -609,7 +610,7 @@ IF(RUBY_INCLUDE_DIR)
     ENDIF()
     UNSET(CMAKE_REQUIRED_INCLUDES)
     UNSET(CMAKE_REQUIRED_LIBRARIES)
-    SET(CHUCHO_HAVE_RUBY TRUE)
+    SET(CHUCHO_HAVE_RUBY TRUE CACHE INTERNAL "Whether we have Ruby client software")
 ELSEIF(RUBY_FRAMEWORK)
     IF(CHUCHO_MACINTOSH)
         SET(CMAKE_REQUIRED_FLAGS "-framework Ruby")
@@ -617,7 +618,7 @@ ELSEIF(RUBY_FRAMEWORK)
         SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${CMAKE_REQUIRED_FLAGS}")
         SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_REQUIRED_FLAGS}")
         UNSET(CMAKE_REQUIRED_FLAGS)
-        SET(CHUCHO_HAVE_RUBY TRUE)
+        SET(CHUCHO_HAVE_RUBY TRUE CACHE INTERNAL "Whether we have a Ruby framework")
     ELSE()
         MESSAGE(WARNING "RUBY_FRAMEWORK can only take effect on Macintosh")
     ENDIF()
@@ -659,7 +660,7 @@ ENDIF()
 # External projects
 #
 ADD_CUSTOM_TARGET(external)
-SET(CHUCHO_EXTERNAL_PREFIX "${CMAKE_BINARY_DIR}")
+SET(CHUCHO_EXTERNAL_PREFIX "${CMAKE_BINARY_DIR}" CACHE STRING "The path to Chucho external projects")
 SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX "${CHUCHO_EXTERNAL_PREFIX}")
 
 # Gtest
@@ -715,6 +716,8 @@ SET_TARGET_PROPERTIES(gtest-external PROPERTIES
                       EXCLUDE_FROM_ALL TRUE)
 ADD_DEPENDENCIES(external gtest-external)
 
+# This macro is used to download the possbile compression libraries
+# specified by the _URL settings.
 MACRO(CHUCHO_DOWNLOAD CHUCHO_DL_URL CHUCHO_DL_PKG_VAR)
     FILE(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/packages")
     GET_FILENAME_COMPONENT(CHUCHO_DL_BASE_FILE "${CHUCHO_DL_URL}" NAME)
