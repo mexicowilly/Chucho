@@ -26,7 +26,7 @@
 #include <exception>
 #include <string>
 
-#if defined(_MSC_VER) && (_MSC_VER <= 1700)
+#if defined(_MSC_VER) && (_MSC_VER <= 1800)
 #define CHUCHO_NOEXCEPT throw()
 #else
 #define CHUCHO_NOEXCEPT noexcept

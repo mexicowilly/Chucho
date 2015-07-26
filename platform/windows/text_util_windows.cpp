@@ -16,6 +16,7 @@
 
 #include <chucho/text_util.hpp>
 #include <vector>
+#include <algorithm>
 // Windows does not include the vsnprintf-style functions in
 // cstdio.
 #include <stdio.h>
