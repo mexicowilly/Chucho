@@ -17,6 +17,7 @@
 #include <chucho/text_util.hpp>
 #include <cctype>
 #include <algorithm>
+#include <iterator>
 
 namespace chucho
 {

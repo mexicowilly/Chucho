@@ -18,6 +18,7 @@
 #include <chucho/file_exception.hpp>
 #include "error_util.hpp"
 #include <vector>
+#include <iterator>
 #include <io.h>
 
 namespace chucho
