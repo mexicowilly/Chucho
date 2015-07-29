@@ -23,6 +23,7 @@ INCLUDE(CheckCSourceCompiles)
 INCLUDE(CheckIncludeFile)
 INCLUDE(CheckIncludeFileCXX)
 INCLUDE(ExternalProject)
+INCLUDE(CheckTypeSize)
 
 # static and shared
 OPTION(ENABLE_SHARED "Whether to build a shared object" FALSE)
@@ -648,6 +649,17 @@ IF(CHUCHO_MACINTOSH AND INSTALL_SERVICE)
     IF(NOT CHUCHO_LAUNCHCTL)
         MESSAGE(FATAL_ERROR "launchctl is required")
     ENDIF()
+    CHUCHO_REQUIRE_SYMBOLS(sys/event.h kqueue kevent EV_SET EVFILT_READ EV_ADD)
+    CHUCHO_REQUIRE_SYMBOLS(launch.h launch_data_new_string LAUNCH_KEY_CHECKIN
+                           launch_msg launch_data_free launch_data_get_type launch_data_get_errno
+                           launch_data_dict_lookup LAUNCH_JOBKEY_SOCKETS launch_data_array_get_count
+                           launch_data_array_get_index launch_data_get_fd)
+    SET(CMAKE_EXTRA_INCLUDE_FILES launch.h)
+    CHECK_TYPE_SIZE(launch_data_t CHUCHO_LAUNCH_DATA_T_SIZE)
+    IF(CHUCHO_LAUNCH_DATA_T_SIZE STREQUAL "")
+        MESSAGE(FATAL_ERROR "The launch_data_t type could not be found")
+    ENDIF()
+    UNSET(CMAKE_EXTRA_INCLUDE_FILES)
 ENDIF()
 
 # zip

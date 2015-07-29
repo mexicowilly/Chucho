@@ -64,6 +64,11 @@ IF(CHUCHO_POSIX)
     IF(CHUCHO_MACINTOSH AND INSTALL_SERVICE)
         SET(CHUCHOD_POSIX_DAEMON platform/macintosh/daemon_macintosh.cpp)
         SET(CHUCHOD_POSIX_LISTENER platform/macintosh/socket_listener_macintosh.cpp)
+        IF(CMAKE_SYSTEM_VERSION VERSION_GREATER 13)
+            SET_SOURCE_FILES_PROPERTIES(platform/macintosh/socket_listener_macintosh.cpp
+                                        PROPERTIES
+                                        COMPILE_FLAGS -Wno-deprecated-declarations)
+        ENDIF()
     ELSE()
         SET(CHUCHOD_POSIX_DAEMON platform/posix/daemon_posix.cpp)
         SET(CHUCHOD_POSIX_LISTENER platform/posix/socket_listener_posix.cpp)

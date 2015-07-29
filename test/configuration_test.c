@@ -19,9 +19,8 @@
 
 #include <stdio.h>
 
-static int my_unknown_handler(const char* key, const char* val)
+static void my_unknown_handler(const char* key, const char* val)
 {
-    return 1;
 }
 
 static void configuration_test(void)
