@@ -28,7 +28,7 @@ extern "C"
 {
 #endif
 
-extern unsigned CHUCHO_DEFAULT_SYSLOG_PORT; /**< @copydoc chucho::syslog::DEFAULT_PORT */
+extern unsigned CHUCHO_DEFAULT_SYSLOG_PORT; /**< The default syslog port, which is 514. */
 
 /**
  * The syslog facility.

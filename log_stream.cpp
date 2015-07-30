@@ -15,6 +15,7 @@
  */
 
 #include <chucho/log_stream.hpp>
+#include <chucho/line_ending.hpp>
 
 namespace chucho
 {
@@ -29,6 +30,12 @@ log_stream::log_stream(std::shared_ptr<logger> lgr, std::shared_ptr<level> lvl)
       std::ostream(&buf_)
 {
     buf_.set_level(lvl);
+}
+
+std::ostream& endl(std::ostream& ls)
+{
+    ls << line_ending::EOL;
+    return ls;
 }
 
 std::ostream& endm(std::ostream& ls)

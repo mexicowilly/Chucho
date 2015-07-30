@@ -207,6 +207,21 @@ inline std::ostream& debug(std::ostream& ls)
 }
 
 /**
+ * An I/O manipulator to write a line ending to a @ref log_stream.
+ * This differs from std::endl in that a platform-appropriate line
+ * ending is always written and the stream is not flushed.
+ *
+ * There is no need to call this function directly. Typical 
+ * usage is: 
+ * @code 
+ * chucho::log_stream stream(lgr); 
+ * CHUCHO_M(stream) << chucho::debug << "My dog has fleas." << chucho::endl << chucho::endm;
+ * @endcode 
+ *
+ */
+CHUCHO_EXPORT std::ostream& endl(std::ostream& ls);
+
+/**
  * An I/O manipulator to flush a message to a @ref log_stream.
  * There is no need to call this function directly. Typical 
  * usage is: 

@@ -86,6 +86,18 @@ TEST_F(stream_test, debug)
     EXPECT_EQ(std::string("hello"), get_text());
 }
 
+TEST_F(stream_test, endl)
+{
+    chucho::log_stream ls(lgr_);
+    CHUCHO_M(ls) << chucho::info << "yo" << chucho::endl << chucho::endm;
+#if defined(CHUCHO_WINDOWS)
+    std::string exp = "yo\r\n";
+#else
+    std::string exp = "yo\n";
+#endif
+    EXPECT_EQ(exp, get_text());
+}
+
 TEST_F(stream_test, error)
 {
     chucho::log_stream ls(lgr_);
