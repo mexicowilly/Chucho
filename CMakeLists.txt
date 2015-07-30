@@ -812,6 +812,10 @@ IF(ENABLE_SHARED)
                           SOVERSION ${CHUCHO_SO_VERSION}
                           PUBLIC_HEADER "${CHUCHO_PUBLIC_HEADERS}"
                           FRAMEWORK ${ENABLE_FRAMEWORK})
+    IF(DEFINED CHUCHO_SO_FLAGS)
+        SET_TARGET_PROPERTIES(chucho PROPERTIES
+                              COMPILE_FLAGS "${CHUCHO_SO_FLAGS}")
+    ENDIF()
     IF(CHUCHO_HAVE_ORACLE)
         TARGET_LINK_LIBRARIES(chucho "${ORACLE_CLIENT_LIB}")
     ENDIF()
