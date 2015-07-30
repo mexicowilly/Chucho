@@ -310,9 +310,11 @@ ELSEIF(CHUCHO_WINDOWS)
     ENDIF()
 
     # sc
-    CHUCHO_FIND_PROGRAM(CHUCHO_SC sc)
-    IF(NOT CHUCHO_SC)
-        MESSAGE(FATAL_ERROR "sc is required")
+    IF(INSTALL_SERVICE)
+        CHUCHO_FIND_PROGRAM(CHUCHO_SC sc)
+        IF(NOT CHUCHO_SC)
+            MESSAGE(FATAL_ERROR "sc is required")
+        ENDIF()
     ENDIF()
 ENDIF()
 

@@ -21,6 +21,11 @@
 #include <chucho/marker.hpp>
 #include <streambuf>
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 namespace chucho
 {
 
@@ -34,8 +39,8 @@ namespace chucho
  *  
  * @ingroup streams 
  */
-class log_streambuf : public std::streambuf,
-                      public status_reporter
+class CHUCHO_EXPORT log_streambuf : public std::streambuf,
+                                    public status_reporter
 {
 public:
     /**
@@ -127,5 +132,9 @@ inline void log_streambuf::set_marker(const marker& mrk)
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

@@ -20,7 +20,13 @@
 #include <chucho/log_streambuf.hpp>
 #include <chucho/level.hpp>
 #include <chucho/function_name.hpp>
+#include <chucho/non_copyable.hpp>
 #include <ostream>
+
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
 
 /**
  * @file 
@@ -42,7 +48,7 @@ namespace chucho
  *
  * @ingroup streams
  */
-class log_stream_base
+class log_stream_base : non_copyable
 {
 protected:
     log_stream_base(std::shared_ptr<logger> lgr);
@@ -86,7 +92,8 @@ protected:
  * 
  * @ingroup streams
  */
-class log_stream : public log_stream_base, public std::ostream
+class CHUCHO_EXPORT log_stream : public log_stream_base,
+                                 public std::ostream
 {
 public:
     /**
@@ -126,21 +133,21 @@ public:
 
 #if !defined(CHUCHO_DONT_DOCUMENT)
 
-struct set_level_type
+struct CHUCHO_EXPORT set_level_type
 {
     set_level_type(std::shared_ptr<level> lvl) : level_(lvl) { }
     std::shared_ptr<level> level_;
 };
 
-std::ostream& operator<< (std::ostream& stream, set_level_type sl);
+CHUCHO_EXPORT std::ostream& operator<< (std::ostream& stream, set_level_type sl);
 
-struct set_marker_type
+struct CHUCHO_EXPORT set_marker_type
 {
     set_marker_type(const marker& mrk) : marker_(mrk) { }
     marker marker_;
 };
 
-std::ostream& operator<< (std::ostream& stream, set_marker_type sm);
+CHUCHO_EXPORT std::ostream& operator<< (std::ostream& stream, set_marker_type sm);
 
 #endif
 
@@ -211,7 +218,7 @@ inline std::ostream& debug(std::ostream& ls)
  * @param ls the log stream
  * @return the log stream
  */
-std::ostream& endm(std::ostream& ls);
+CHUCHO_EXPORT std::ostream& endm(std::ostream& ls);
 
 /**
  * An I/O manipulator to set the level of a @ref log_stream to 
@@ -347,5 +354,9 @@ inline void log_stream::set_level(std::shared_ptr<level> lvl)
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

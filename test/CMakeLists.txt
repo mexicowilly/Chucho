@@ -162,7 +162,8 @@ IF(MSVC)
 ENDIF()
 
 ADD_CUSTOM_TARGET(check
-                  COMMAND unit-test)
+                  COMMAND unit-test
+                  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
 
 IF(CHUCHO_WINDOWS)
     FILE(TO_NATIVE_PATH "${CMAKE_BINARY_DIR}" CHUCHO_EVENT_LOG_DLL)
@@ -302,7 +303,8 @@ IF(C_API)
     ENDIF()
 
     ADD_CUSTOM_TARGET(c-check
-                      COMMAND c-unit-test)
+                      COMMAND c-unit-test
+                      WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
 ENDIF()
 
 ADD_EXECUTABLE(time-rolling-file-test EXCLUDE_FROM_ALL
