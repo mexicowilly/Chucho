@@ -316,11 +316,9 @@ ELSEIF(CHUCHO_WINDOWS)
     ENDIF()
 
     # sc
-    IF(INSTALL_SERVICE)
-        CHUCHO_FIND_PROGRAM(CHUCHO_SC sc)
-        IF(NOT CHUCHO_SC)
-            MESSAGE(FATAL_ERROR "sc is required")
-        ENDIF()
+    CHUCHO_FIND_PROGRAM(CHUCHO_SC sc)
+    IF(NOT CHUCHO_SC)
+        MESSAGE(FATAL_ERROR "sc is required")
     ENDIF()
 ENDIF()
 
@@ -640,7 +638,7 @@ FIND_PACKAGE(Doxygen)
 CHUCHO_FIND_PROGRAM(CHUCHO_CPPCHECK cppcheck)
 
 # Solaris service stuff
-IF(CHUCHO_SOLARIS AND INSTALL_SERVICE)
+IF(CHUCHO_SOLARIS)
     CHUCHO_FIND_PROGRAM(CHUCHO_SVCCFG svccfg)
     IF(NOT CHUCHO_SVCCFG)
         MESSAGE(FATAL_ERROR "svccfg is required")
@@ -652,22 +650,24 @@ IF(CHUCHO_SOLARIS AND INSTALL_SERVICE)
 ENDIF()
 
 # Macintosh launchd stuff
-IF(CHUCHO_MACINTOSH AND INSTALL_SERVICE)
+IF(CHUCHO_MACINTOSH)
     CHUCHO_FIND_PROGRAM(CHUCHO_LAUNCHCTL launchctl)
     IF(NOT CHUCHO_LAUNCHCTL)
         MESSAGE(FATAL_ERROR "launchctl is required")
     ENDIF()
-    CHUCHO_REQUIRE_SYMBOLS(sys/event.h kqueue kevent EV_SET EVFILT_READ EV_ADD)
-    CHUCHO_REQUIRE_SYMBOLS(launch.h launch_data_new_string LAUNCH_KEY_CHECKIN
-                           launch_msg launch_data_free launch_data_get_type launch_data_get_errno
-                           launch_data_dict_lookup LAUNCH_JOBKEY_SOCKETS launch_data_array_get_count
-                           launch_data_array_get_index launch_data_get_fd)
-    SET(CMAKE_EXTRA_INCLUDE_FILES launch.h)
-    CHECK_TYPE_SIZE(launch_data_t CHUCHO_LAUNCH_DATA_T_SIZE)
-    IF(CHUCHO_LAUNCH_DATA_T_SIZE STREQUAL "")
-        MESSAGE(FATAL_ERROR "The launch_data_t type could not be found")
+    IF(INSTALL_SERVICE)
+        CHUCHO_REQUIRE_SYMBOLS(sys/event.h kqueue kevent EV_SET EVFILT_READ EV_ADD)
+        CHUCHO_REQUIRE_SYMBOLS(launch.h launch_data_new_string LAUNCH_KEY_CHECKIN
+                               launch_msg launch_data_free launch_data_get_type launch_data_get_errno
+                               launch_data_dict_lookup LAUNCH_JOBKEY_SOCKETS launch_data_array_get_count
+                               launch_data_array_get_index launch_data_get_fd)
+        SET(CMAKE_EXTRA_INCLUDE_FILES launch.h)
+        CHECK_TYPE_SIZE(launch_data_t CHUCHO_LAUNCH_DATA_T_SIZE)
+        IF(CHUCHO_LAUNCH_DATA_T_SIZE STREQUAL "")
+            MESSAGE(FATAL_ERROR "The launch_data_t type could not be found")
+        ENDIF()
+        UNSET(CMAKE_EXTRA_INCLUDE_FILES)
     ENDIF()
-    UNSET(CMAKE_EXTRA_INCLUDE_FILES)
 ENDIF()
 
 # zip
