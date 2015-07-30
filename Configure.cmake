@@ -187,6 +187,9 @@ IF(NOT CHUCHO_HAVE_STDLIB_H)
     MESSAGE(FATAL_ERROR "The header stdlib.h is required")
 ENDIF()
 
+# Figure out the threads
+FIND_PACKAGE(Threads REQUIRED)
+
 IF(CHUCHO_POSIX)
     # headers
     FOREACH(HEAD arpa/inet.h assert.h fcntl.h limits.h netdb.h poll.h pthread.h pwd.h signal.h
@@ -312,9 +315,6 @@ ELSEIF(CHUCHO_WINDOWS)
         MESSAGE(FATAL_ERROR "sc is required")
     ENDIF()
 ENDIF()
-
-# Figure out the threads
-FIND_PACKAGE(Threads REQUIRED)
 
 # Nested exceptions
 CHECK_CXX_SOURCE_COMPILES("#include <exception>\nint main() { std::exception e; std::throw_with_nested(e); std::rethrow_if_nested(e); return 0; }"
