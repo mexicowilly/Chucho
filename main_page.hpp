@@ -72,7 +72,7 @@
  * href="https://groups.google.com/forum/?fromgroups#!forum/chucho-logging" 
  * target="_blank">Google group</a>. 
  *  
- * @copyright &copy; 2013-2014 Will Mason 
+ * @copyright &copy; 2013-2015 Will Mason 
  */
 
 /**
