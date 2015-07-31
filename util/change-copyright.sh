@@ -26,3 +26,4 @@ do
     echo "Changed ${FILE}"
 done
 echo "# Don't forget to change the scripts in the util directory"
+echo "# Also, don't forget to change the main_page.hpp file"
