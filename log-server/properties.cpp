@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Will Mason
+ * Copyright 2013-2015 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -52,9 +52,8 @@ properties::properties()
 {
 }
 
-bool properties::handle_config_value(const std::string& key, const std::string& value)
+void properties::handle_config_value(const std::string& key, const std::string& value)
 {
-    bool resolved = true;
     if (key == "worker_threads")
     {
         try
@@ -95,11 +94,6 @@ bool properties::handle_config_value(const std::string& key, const std::string& 
         if (is_service_)
             console_mode_ = false;
     }
-    else
-    {
-        resolved = false;
-    }
-    return resolved;
 }
 
 }

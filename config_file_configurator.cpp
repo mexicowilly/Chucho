@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Will Mason
+ * Copyright 2013-2015 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -81,6 +81,7 @@ void config_file_configurator::configure(std::istream& in)
         id.reset(new properties(props.get_subset("log4cplus.")));
         if (id->empty())
             throw exception("Found neither Chucho nor log4cplus keys in the configuration");
+        // Valgrind says this pointer is leaking, but it is confused
         proc.reset(new log4cplus_properties_processor(*this));
         memento_key_set_ = memento_key_set::LOG4CPLUS;
 

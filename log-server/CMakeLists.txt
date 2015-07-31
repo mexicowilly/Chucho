@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2014 Will Mason
+# Copyright 2013-2015 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -64,6 +64,11 @@ IF(CHUCHO_POSIX)
     IF(CHUCHO_MACINTOSH AND INSTALL_SERVICE)
         SET(CHUCHOD_POSIX_DAEMON platform/macintosh/daemon_macintosh.cpp)
         SET(CHUCHOD_POSIX_LISTENER platform/macintosh/socket_listener_macintosh.cpp)
+        IF(CMAKE_SYSTEM_VERSION VERSION_GREATER 13)
+            SET_SOURCE_FILES_PROPERTIES(platform/macintosh/socket_listener_macintosh.cpp
+                                        PROPERTIES
+                                        COMPILE_FLAGS -Wno-deprecated-declarations)
+        ENDIF()
     ELSE()
         SET(CHUCHOD_POSIX_DAEMON platform/posix/daemon_posix.cpp)
         SET(CHUCHOD_POSIX_LISTENER platform/posix/socket_listener_posix.cpp)
@@ -133,7 +138,7 @@ IF(CHUCHO_HAVE_WINSOCK2_H)
                                 COMPILE_DEFINITIONS "${CHUCHO_SUZERAIN_DEFS};CHUCHO_HAVE_WINSOCK2_H")
 ENDIF()
 
-TARGET_LINK_LIBRARIES(chuchod chucho ${CHUCHO_THREAD_LIB})
+TARGET_LINK_LIBRARIES(chuchod chucho ${CMAKE_THREAD_LIBS_INIT})
 IF(CHUCHO_SOLARIS)
     TARGET_LINK_LIBRARIES(chuchod socket nsl)
 ENDIF()

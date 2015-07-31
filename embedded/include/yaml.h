@@ -34,12 +34,8 @@ extern "C" {
 #   else
 #       define  YAML_DECLARE(type)  __declspec(dllimport) type
 #   endif
-#elif defined(__clang__) || (defined(__GNUC__) && __GNUC__ >= 4)
-#   if defined(YAML_DECLARE_EXPORT)
-#       define YAML_DECLARE(type) __attribute__ ((visibility ("default"))) type
-#   else
-#       define  YAML_DECLARE(type)  type
-#   endif
+#else
+#   define  YAML_DECLARE(type)  type
 #endif
 
 /** @} */

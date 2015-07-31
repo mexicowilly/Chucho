@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2014 Will Mason
+# Copyright 2013-2015 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ INCLUDE(CheckCSourceCompiles)
 INCLUDE(CheckIncludeFile)
 INCLUDE(CheckIncludeFileCXX)
 INCLUDE(ExternalProject)
+INCLUDE(CheckTypeSize)
 
 # static and shared
 OPTION(ENABLE_SHARED "Whether to build a shared object" FALSE)
@@ -111,9 +112,12 @@ IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     ELSEIF(CHUCHO_MACINTOSH)
         MESSAGE(FATAL_ERROR "C++11 compatibility is required")
     ENDIF()
-    CHECK_CXX_COMPILER_FLAG(-fvisibility=hidden CHUCHO_VIS_FLAG)
-    IF(CHUCHO_VIS_FLAG)
-        SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fvisibility=hidden")
+    IF(ENABLE_SHARED)
+        CHECK_CXX_COMPILER_FLAG(-fvisibility=hidden CHUCHO_VIS_FLAG)
+        IF(CHUCHO_VIS_FLAG)
+            SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fvisibility=hidden")
+            SET(CHUCHO_SO_FLAGS "-fvisibility=hidden")
+        ENDIF()
     ENDIF()
     IF(CMAKE_GENERATOR STREQUAL Xcode)
         SET(CMAKE_EXE_LINKER_FLAGS "-std=c++11 -stdlib=libc++")
@@ -133,9 +137,12 @@ ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
     ELSE()
         MESSAGE(FATAL_ERROR "-std=c++11 is required")
     ENDIF()
-    CHECK_CXX_COMPILER_FLAG(-fvisibility=hidden CHUCHO_VIS_FLAG)
-    IF(CHUCHO_VIS_FLAG)
-        SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fvisibility=hidden")
+    IF(ENABLE_SHARED)
+        CHECK_CXX_COMPILER_FLAG(-fvisibility=hidden CHUCHO_VIS_FLAG)
+        IF(CHUCHO_VIS_FLAG)
+            SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fvisibility=hidden")
+            SET(CHUCHO_SO_FLAGS "-fvisibility=hidden")
+        ENDIF()
     ENDIF()
     CHECK_C_COMPILER_FLAG(-std=c99 CHUCHO_HAVE_STDC99)
     IF(NOT CHUCHO_HAVE_STDC99)
@@ -185,6 +192,9 @@ CHECK_INCLUDE_FILE_CXX(stdlib.h CHUCHO_HAVE_STDLIB_H)
 IF(NOT CHUCHO_HAVE_STDLIB_H)
     MESSAGE(FATAL_ERROR "The header stdlib.h is required")
 ENDIF()
+
+# Figure out the threads
+FIND_PACKAGE(Threads REQUIRED)
 
 IF(CHUCHO_POSIX)
     # headers
@@ -245,22 +255,6 @@ IF(CHUCHO_POSIX)
     # realpath
     CHUCHO_REQUIRE_SYMBOLS(stdlib.h realpath)
 
-    # whether linking to libpthread is required
-    SET(CHUCHO_PTHREAD_SOURCE "#include <pthread.h>\npthread_key_t k; void d(void*) { }; int main() { pthread_key_create(&k, d); return 0; }")
-    CHECK_CXX_SOURCE_RUNS("${CHUCHO_PTHREAD_SOURCE}" CHUCHO_PTHREAD_LINK)
-    IF(NOT CHUCHO_PTHREAD_LINK)
-        UNSET(CHUCHO_PTHREAD_LINK)
-        UNSET(CHUCHO_PTHREAD_LINK CACHE)
-        SET(CMAKE_REQUIRED_LIBRARIES pthread)
-        CHECK_CXX_SOURCE_RUNS("${CHUCHO_PTHREAD_SOURCE}" CHUCHO_PTHREAD_LINK)
-        IF(CHUCHO_PTHREAD_LINK)
-            MESSAGE(STATUS "linking with libpthread is required")
-        ELSE()
-            MESSAGE(FATAL_ERROR "can't build a program with threads at all")
-        ENDIF()
-        SET(CHUCHO_THREAD_LIB pthread CACHE STRING "The threading library")
-    ENDIF()
-
     # getaddrinfo/freeaddrinfo/gai_strerror/getnameinfo
     IF(CHUCHO_SOLARIS)
         SET(CMAKE_REQUIRED_LIBRARIES socket nsl)
@@ -289,7 +283,9 @@ IF(CHUCHO_POSIX)
     CHUCHO_REQUIRE_SYMBOLS(pwd.h getpwuid)
 
     # signal stuff
+    SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
     CHUCHO_REQUIRE_SYMBOLS(signal.h raise sigemptyset sigaddset sigwait sigaction kill sigpending sigismember pthread_sigmask)
+    UNSET(CMAKE_REQUIRED_LIBRARIES)
 
     # open/fcntl
     CHUCHO_REQUIRE_SYMBOLS(fcntl.h open fcntl)
@@ -369,7 +365,7 @@ int main()
     return EXIT_SUCCESS;
 }" CHUCHO_HAVE_PUT_TIME_RUNS)
     IF(CHUCHO_HAVE_PUT_TIME_RUNS)
-        SET(CHUCHO_HAVE_PUT_TIME TRUE)
+        SET(CHUCHO_HAVE_PUT_TIME TRUE CACHE INTERNAL "Whether std::put_time runs")
     ENDIF()
     IF(CHUCHO_WINDOWS)
         UNSET(CMAKE_REQUIRED_DEFINITIONS)
@@ -411,7 +407,7 @@ int main()
     IF(CHUCHO_HAVE_STD_REGEX_RUNS)
         FILE(READ "${CMAKE_BINARY_DIR}/std-regex-result" CHUCHO_STD_REGEX_RESULT)
         IF(CHUCHO_STD_REGEX_RESULT STREQUAL good)
-            SET(CHUCHO_HAVE_STD_REGEX TRUE)
+            SET(CHUCHO_HAVE_STD_REGEX TRUE CACHE INTERNAL "Whether std::regex actually works")
         ELSE()
             MESSAGE(STATUS "Although std::regex is available, it has bugs")
         ENDIF()
@@ -469,7 +465,7 @@ int main()
     # shared object. So, we need to figure out where the C++
     # runtime is and add it to the target link libraries of the
     # C unit test app.
-    IF(ENABLE_SHARED AND CHUCHO_SOLARIS AND CMAKE_COMPILER_IS_GNUCXX)
+    IF(ENABLE_SHARED AND CHUCHO_SOLARIS AND CMAKE_COMPILER_IS_GNUCXX AND NOT DEFINED CHUCHO_LIBSTDCXX)
         CHUCHO_FIND_PROGRAM(CHUCHO_LDD ldd)
         IF(NOT CHUCHO_LDD)
             MESSAGE(FATAL_ERROR "Could not find ldd")
@@ -506,6 +502,7 @@ int main()
         IF(NOT CHUCHO_LIBSTDCXX)
             MESSAGE(FATAL_ERROR "Could not determine the location of libstdc++")
         ENDIF()
+        SET(CHUCHO_LIBSTDCXX "${CHUCHO_LIBSTDCXX}" CACHE INTERNAL "The location of the standard C++ runtime library")
         MESSAGE(STATUS "Looking for libstdc++ - ${CHUCHO_LIBSTDCXX}")
     ENDIF()
 ENDIF()
@@ -527,7 +524,7 @@ IF(ORACLE_INCLUDE_DIR)
     ENDIF()
     UNSET(CMAKE_REQUIRED_INCLUDES)
     UNSET(CMAKE_REQUIRED_LIBRARIES)
-    SET(CHUCHO_HAVE_ORACLE TRUE)
+    SET(CHUCHO_HAVE_ORACLE TRUE CACHE INTERNAL "Whether we have Oracle client software")
 ENDIF()
 
 # MySQL
@@ -547,7 +544,7 @@ IF(MYSQL_INCLUDE_DIR)
     ENDIF()
     UNSET(CMAKE_REQUIRED_INCLUDES)
     UNSET(CMAKE_REQUIRED_LIBRARIES)
-    SET(CHUCHO_HAVE_MYSQL TRUE)
+    SET(CHUCHO_HAVE_MYSQL TRUE CACHE INTERNAL "Whether we have MySQL client software")
 ENDIF()
 
 # SQLite
@@ -568,7 +565,7 @@ IF(SQLITE_INCLUDE_DIR)
     ENDIF()
     UNSET(CMAKE_REQUIRED_INCLUDES)
     UNSET(CMAKE_REQUIRED_LIBRARIES)
-    SET(CHUCHO_HAVE_SQLITE TRUE)
+    SET(CHUCHO_HAVE_SQLITE TRUE CACHE INTERNAL "Whether we have SQLite client software")
 ENDIF()
 
 # PostgreSQL
@@ -588,7 +585,7 @@ IF(POSTGRES_INCLUDE_DIR)
     ENDIF()
     UNSET(CMAKE_REQUIRED_INCLUDES)
     UNSET(CMAKE_REQUIRED_LIBRARIES)
-    SET(CHUCHO_HAVE_POSTGRES TRUE)
+    SET(CHUCHO_HAVE_POSTGRES TRUE CACHE INTERNAL "Whether we have PostgreSQL client software")
 ENDIF()
 
 # Ruby
@@ -620,7 +617,7 @@ IF(RUBY_INCLUDE_DIR)
     ENDIF()
     UNSET(CMAKE_REQUIRED_INCLUDES)
     UNSET(CMAKE_REQUIRED_LIBRARIES)
-    SET(CHUCHO_HAVE_RUBY TRUE)
+    SET(CHUCHO_HAVE_RUBY TRUE CACHE INTERNAL "Whether we have Ruby client software")
 ELSEIF(RUBY_FRAMEWORK)
     IF(CHUCHO_MACINTOSH)
         SET(CMAKE_REQUIRED_FLAGS "-framework Ruby")
@@ -628,7 +625,7 @@ ELSEIF(RUBY_FRAMEWORK)
         SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${CMAKE_REQUIRED_FLAGS}")
         SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_REQUIRED_FLAGS}")
         UNSET(CMAKE_REQUIRED_FLAGS)
-        SET(CHUCHO_HAVE_RUBY TRUE)
+        SET(CHUCHO_HAVE_RUBY TRUE CACHE INTERNAL "Whether we have a Ruby framework")
     ELSE()
         MESSAGE(WARNING "RUBY_FRAMEWORK can only take effect on Macintosh")
     ENDIF()
@@ -641,7 +638,7 @@ FIND_PACKAGE(Doxygen)
 CHUCHO_FIND_PROGRAM(CHUCHO_CPPCHECK cppcheck)
 
 # Solaris service stuff
-IF(CHUCHO_SOLARIS AND INSTALL_SERVICE)
+IF(CHUCHO_SOLARIS)
     CHUCHO_FIND_PROGRAM(CHUCHO_SVCCFG svccfg)
     IF(NOT CHUCHO_SVCCFG)
         MESSAGE(FATAL_ERROR "svccfg is required")
@@ -653,10 +650,23 @@ IF(CHUCHO_SOLARIS AND INSTALL_SERVICE)
 ENDIF()
 
 # Macintosh launchd stuff
-IF(CHUCHO_MACINTOSH AND INSTALL_SERVICE)
+IF(CHUCHO_MACINTOSH)
     CHUCHO_FIND_PROGRAM(CHUCHO_LAUNCHCTL launchctl)
     IF(NOT CHUCHO_LAUNCHCTL)
         MESSAGE(FATAL_ERROR "launchctl is required")
+    ENDIF()
+    IF(INSTALL_SERVICE)
+        CHUCHO_REQUIRE_SYMBOLS(sys/event.h kqueue kevent EV_SET EVFILT_READ EV_ADD)
+        CHUCHO_REQUIRE_SYMBOLS(launch.h launch_data_new_string LAUNCH_KEY_CHECKIN
+                               launch_msg launch_data_free launch_data_get_type launch_data_get_errno
+                               launch_data_dict_lookup LAUNCH_JOBKEY_SOCKETS launch_data_array_get_count
+                               launch_data_array_get_index launch_data_get_fd)
+        SET(CMAKE_EXTRA_INCLUDE_FILES launch.h)
+        CHECK_TYPE_SIZE(launch_data_t CHUCHO_LAUNCH_DATA_T_SIZE)
+        IF(CHUCHO_LAUNCH_DATA_T_SIZE STREQUAL "")
+            MESSAGE(FATAL_ERROR "The launch_data_t type could not be found")
+        ENDIF()
+        UNSET(CMAKE_EXTRA_INCLUDE_FILES)
     ENDIF()
 ENDIF()
 
@@ -670,7 +680,7 @@ ENDIF()
 # External projects
 #
 ADD_CUSTOM_TARGET(external)
-SET(CHUCHO_EXTERNAL_PREFIX "${CMAKE_BINARY_DIR}")
+SET(CHUCHO_EXTERNAL_PREFIX "${CMAKE_BINARY_DIR}" CACHE STRING "The path to Chucho external projects")
 SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX "${CHUCHO_EXTERNAL_PREFIX}")
 
 # Gtest
@@ -726,6 +736,8 @@ SET_TARGET_PROPERTIES(gtest-external PROPERTIES
                       EXCLUDE_FROM_ALL TRUE)
 ADD_DEPENDENCIES(external gtest-external)
 
+# This macro is used to download the possbile compression libraries
+# specified by the _URL settings.
 MACRO(CHUCHO_DOWNLOAD CHUCHO_DL_URL CHUCHO_DL_PKG_VAR)
     FILE(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/packages")
     GET_FILENAME_COMPONENT(CHUCHO_DL_BASE_FILE "${CHUCHO_DL_URL}" NAME)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Will Mason
+ * Copyright 2013-2015 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -339,7 +339,8 @@ void time_file_roller::set_period()
                     rolled.tm_year++;
                 rolled = calendar::get_utc(calendar::to_time_t(rolled));
                 std::string fmt2 = calendar::format(rolled, spec);
-                if (fmt1 != fmt2) {
+                if (fmt1 != fmt2)
+                {
                     period_ = p;
                     break;
                 }

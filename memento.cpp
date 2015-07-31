@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Will Mason
+ * Copyright 2013-2015 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,6 +26,10 @@ memento::memento(configurator& cfg)
     : cfg_(cfg)
 {
     set_status_origin("memento");
+}
+
+memento::~memento()
+{
 }
 
 bool memento::boolean_value(const std::string& value)

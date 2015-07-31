@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Will Mason
+ * Copyright 2013-2015 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ public:
      * @note The unknown element handler is only supported in YAML 
      *       configurations.
      */
-    typedef std::function<bool(const std::string&, const std::string&)> unknown_handler_type;
+    typedef std::function<void(const std::string&, const std::string&)> unknown_handler_type;
 
     /**
      * The style of configuration. AUTOMATIC is the default, which 

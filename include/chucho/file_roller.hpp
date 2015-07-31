@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Will Mason
+ * Copyright 2013-2015 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -48,14 +48,18 @@ class CHUCHO_EXPORT file_roller : non_copyable,
 {
 public:
     /**
-     * @name Constructor
+     * @name Constructor and Destructor
+     * @{
      */
-    //@{
     /**
      * Construct a file roller.
      */
     file_roller(std::shared_ptr<file_compressor> cmp = std::shared_ptr<file_compressor>());
-    //@}
+    /**
+     * Destroy the file roller.
+     */
+    virtual ~file_roller();
+    /** @} */
 
     /**
      * Return this roller's currently active file name. This is the 

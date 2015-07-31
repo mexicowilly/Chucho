@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Will Mason
+ * Copyright 2013-2015 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ class CHUCHO_EXPORT writer : non_copyable,
 {
 public:
     /**
-     * @name Constructors
+     * @name Constructor and Destructor
      */
     //@{
     /**
@@ -61,6 +61,10 @@ public:
      *        std::shared_ptr
      */
     writer(std::shared_ptr<formatter> fmt);
+    /**
+     * Destroy a writer.
+     */
+    virtual ~writer();
     //@}
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Will Mason
+ * Copyright 2013-2015 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ typedef enum
  * @copydoc chucho::configuration::unknown_handler_type
  * @return a non-zero value if the handler was successful
  */
-typedef int (*chucho_unknown_handler_type)(const char* const key, const char* const val);
+typedef void (*chucho_unknown_handler_type)(const char* const key, const char* const val);
 /**
  * Whether the default configuration is allowed. In the absence 
  * of a configuration file, chucho can establish a default 

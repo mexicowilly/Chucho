@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2014 Will Mason
+# Copyright 2013-2015 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ ENDIF()
 
 PROJECT(chucho CXX C)
 
-SET(CHUCHO_VERSION 1.6)
+SET(CHUCHO_VERSION 1.7)
 SET(CHUCHO_SO_VERSION 1)
 # This is used for release candidate distros
 #SET(CHUCHO_DIST_VERSION try-1)
@@ -141,10 +141,13 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/filter.hpp
     include/chucho/finalize.hpp
     include/chucho/formatter.hpp
+    include/chucho/function_name.hpp
     include/chucho/interval_file_roll_trigger.hpp
     include/chucho/level.hpp
     include/chucho/level_filter.hpp
     include/chucho/level_threshold_filter.hpp
+    include/chucho/log_stream.hpp
+    include/chucho/log_streambuf.hpp
     include/chucho/log.hpp
     include/chucho/loggable.hpp
     include/chucho/logger.hpp
@@ -365,7 +368,7 @@ MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
     # Update this when you rev libyaml
     SET(CHUCHO_LIBYAML_VERSION_MAJOR 0)
     SET(CHUCHO_LIBYAML_VERSION_MINOR 1)
-    SET(CHUCHO_LIBYAML_VERSION_PATCH 4)
+    SET(CHUCHO_LIBYAML_VERSION_PATCH 5)
 
     SET(${CHUCHO_YAML_SOURCE_VAR}
         "${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c"
@@ -537,6 +540,8 @@ SET(CHUCHO_SOURCES
     level_threshold_filter.cpp
     level_threshold_filter_factory.cpp
     level_threshold_filter_memento.cpp
+    log_stream.cpp
+    log_streambuf.cpp
     logger.cpp
     logger_factory.cpp
     logger_memento.cpp
@@ -807,6 +812,10 @@ IF(ENABLE_SHARED)
                           SOVERSION ${CHUCHO_SO_VERSION}
                           PUBLIC_HEADER "${CHUCHO_PUBLIC_HEADERS}"
                           FRAMEWORK ${ENABLE_FRAMEWORK})
+    IF(DEFINED CHUCHO_SO_FLAGS)
+        SET_TARGET_PROPERTIES(chucho PROPERTIES
+                              COMPILE_FLAGS "${CHUCHO_SO_FLAGS}")
+    ENDIF()
     IF(CHUCHO_HAVE_ORACLE)
         TARGET_LINK_LIBRARIES(chucho "${ORACLE_CLIENT_LIB}")
     ENDIF()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Will Mason
+ * Copyright 2013-2015 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -103,31 +103,31 @@ private:
 };
 
 template <typename type>
-inline loggable<type>::loggable()
+loggable<type>::loggable()
     : logger_(logger::get(logger::type_to_logger_name(typeid(type))))
 {
 }
 
 template <typename type>
-inline loggable<type>::loggable(const std::string& name)
+loggable<type>::loggable(const std::string& name)
     : logger_(logger::get(name))
 {
 }
 
 template <typename type>
-inline std::shared_ptr<logger> loggable<type>::get_logger() const
+std::shared_ptr<logger> loggable<type>::get_logger() const
 {
     return logger_;
 }
 
 template <typename type>
-inline void loggable<type>::rename_logger(const std::type_info& new_type)
+void loggable<type>::rename_logger(const std::type_info& new_type)
 {
     logger_ = logger::get(logger::type_to_logger_name(new_type));
 }
 
 template <typename type>
-inline void loggable<type>::rename_logger(const std::string& name)
+void loggable<type>::rename_logger(const std::string& name)
 {
     logger_ = logger::get(name);
 }

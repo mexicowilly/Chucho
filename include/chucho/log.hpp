@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Will Mason
+ * Copyright 2013-2015 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,15 +26,10 @@
  */
 
 #include <chucho/logger.hpp>
+#include <chucho/function_name.hpp>
 #include <sstream>
 
 #if !defined(CHUCHO_DONT_DOCUMENT)
-
-#if defined(__GNUC__) || defined(__clang__) || defined(__SUNPRO_CC)
-#define CHUCHO_FUNCTION_NAME __PRETTY_FUNCTION__
-#else
-#define CHUCHO_FUNCTION_NAME __FUNCTION__
-#endif
 
 #define CHUCHO_LOG(lvl, lg, fl, ln, fnc, msg) \
     do \

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Will Mason
+ * Copyright 2013-2015 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -64,13 +64,17 @@ public:
                                          std::shared_ptr<configurable_factory> fact);
 
     /**
-     * @name Constructor
+     * @name Constructor and Destructor
      */
     //@{
     /**
      * Make a configurator.
      */
     configurator(const security_policy& sec_pol);
+	/**
+	 * Destroy a configurator.
+	 */
+	virtual ~configurator();
     //@}
 
     /**

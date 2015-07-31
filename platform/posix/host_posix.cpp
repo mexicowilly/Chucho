@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Will Mason
+ * Copyright 2013-2015 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 #include <chucho/host.hpp>
 #include <sys/utsname.h>
+#include <sys/socket.h>
 #include <netdb.h>
 #include <cstring>
 

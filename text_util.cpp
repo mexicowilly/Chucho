@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Will Mason
+ * Copyright 2013-2015 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #include <chucho/text_util.hpp>
 #include <cctype>
 #include <algorithm>
+#include <iterator>
 
 namespace chucho
 {

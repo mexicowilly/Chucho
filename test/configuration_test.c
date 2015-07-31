@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Will Mason
+ * Copyright 2013-2015 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,9 +19,8 @@
 
 #include <stdio.h>
 
-static int my_unknown_handler(const char* key, const char* val)
+static void my_unknown_handler(const char* key, const char* val)
 {
-    return 1;
 }
 
 static void configuration_test(void)

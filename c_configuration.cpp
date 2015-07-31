@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Will Mason
+ * Copyright 2013-2015 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -45,11 +45,10 @@ static_data& data()
     return *sd;
 }
 
-bool c_unknown_handler(const std::string& key, const std::string& val)
+void c_unknown_handler(const std::string& key, const std::string& val)
 {
     if (data().handler_ != nullptr) 
-        return (*data().handler_)(key.c_str(), val.c_str()) == 0 ? false : true;
-    return false;
+        (*data().handler_)(key.c_str(), val.c_str());
 }
 
 }

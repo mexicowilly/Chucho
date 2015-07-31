@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Will Mason
+ * Copyright 2013-2015 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -61,6 +61,15 @@ public:
          */
         ACCEPT
     };
+
+    /**
+     * @name Destructor
+     * @{
+     */
+    /**
+     * Destory the filter.
+     */
+    virtual ~filter() { };
 
     /**
      * Evaluate the filter. Determine how this filter feels about 

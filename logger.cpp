@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Will Mason
+ * Copyright 2013-2015 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -203,7 +203,6 @@ void logger::remove_unused_loggers()
 {
     static_data& sd(data());
     std::lock_guard<std::recursive_mutex> lg(sd.loggers_guard_);
-    auto itor = sd.all_loggers_.begin();
     std::set<std::string> to_erase;
     for (std::map<std::string, std::shared_ptr<logger>>::iterator itor = sd.all_loggers_.begin();
          itor != sd.all_loggers_.end();

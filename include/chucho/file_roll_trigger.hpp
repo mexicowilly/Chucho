@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Will Mason
+ * Copyright 2013-2015 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -36,6 +36,16 @@ class CHUCHO_EXPORT file_roll_trigger : public virtual status_reporter,
                                         public virtual configurable
 {
 public:
+	/**
+	 * @name Destructor
+	 * @{
+	 */
+	/**
+	 * Destroy the trigger.
+	 */
+	virtual ~file_roll_trigger() { };
+	/** @} */
+
     /**
      * Return whether now is a good time to roll a log file.
      *

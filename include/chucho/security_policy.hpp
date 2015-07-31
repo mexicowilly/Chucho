@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Will Mason
+ * Copyright 2013-2015 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -284,6 +284,8 @@ private:
     class CHUCHO_NO_EXPORT basic_range
     {
     public:
+    	virtual ~basic_range() { };
+
         virtual std::pair<std::intmax_t, std::intmax_t> get_range() const = 0;
         virtual bool in_range(std::uintmax_t val) const = 0;
         virtual std::string to_text() const = 0;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Will Mason
+ * Copyright 2013-2015 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,6 +27,10 @@ writer::writer(std::shared_ptr<formatter> fmt)
 {
     if (!formatter_)
         throw std::invalid_argument("The formatter cannot be a nullptr");
+}
+
+writer::~writer()
+{
 }
 
 void writer::add_filter(std::shared_ptr<filter> flt)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Will Mason
+ * Copyright 2013-2015 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -537,7 +537,7 @@ TEST_F(yaml_configurator, unknown)
 {
     std::map<std::string, std::string> unknowns;
     chucho::configuration::set_unknown_handler(
-        std::bind([&] (std::map<std::string, std::string> u, const std::string& k, const std::string& v) { unknowns[k] = v; return true; },
+        std::bind([&] (std::map<std::string, std::string> u, const std::string& k, const std::string& v) { unknowns[k] = v; },
         std::ref(unknowns),
         std::placeholders::_1,
         std::placeholders::_2));
