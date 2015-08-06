@@ -48,6 +48,9 @@ ENDIF()
 IF(CHUCHO_HAVE_POSTGRES)
     INCLUDE_DIRECTORIES("${POSTGRES_INCLUDE_DIR}")
 ENDIF()
+IF(CHUCHO_CURL_INCLUDE_DIR)
+    INCLUDE_DIRECTORIES("${CHUCHO_CURL_INCLUDE_DIR}")
+ENDIF()
 
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
@@ -71,6 +74,12 @@ IF(CHUCHO_POSIX)
     ENDIF()
     IF(CHUCHO_HAVE_TIMEGM)
         LIST(APPEND CHUCHO_CALENDAR_DEFS CHUCHO_HAVE_TIMEGM)
+    ENDIF()
+    IF(CHUCHO_HAVE_TM_GMTOFF)
+        LIST(APPEND CHUCHO_CALENDAR_DEFS CHUCHO_HAVE_TM_GMTOFF)
+    ENDIF()
+    IF(CHUCHO_HAVE_TIMEZONE)
+        LIST(APPEND CHUCHO_CALENDAR_DEFS CHUCHO_HAVE_TIMEZONE)
     ENDIF()
     IF(CHUCHO_CALENDAR_DEFS)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/calendar_posix.cpp PROPERTIES
@@ -362,6 +371,21 @@ ENDIF()
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/ruby_evaluator_filter.hpp
      include/chucho/ruby_evaluator_filter.h)
+
+IF(CURL_FOUND)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/email_trigger.hpp
+         include/chucho/email_writer.hpp
+         include/chucho/error_level_email_trigger.hpp)
+    LIST(APPEND CHUCHO_EMAIL_SOURCES
+         email_writer.cpp
+         error_level_email_trigger.cpp)
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/email_trigger.hpp
+     include/chucho/email_writer.hpp
+     include/chucho/error_level_email_trigger.hpp)
 
 # The libyaml sources are required by chuchod
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
@@ -655,7 +679,8 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_PUBLIC_HEADERS}
     ${CHUCHO_C_SOURCES}
     ${CHUCHO_DATABASE_SOURCES}
-    ${CHUCHO_EVALUATOR_SOURCES})
+    ${CHUCHO_EVALUATOR_SOURCES}
+    ${CHUCHO_EMAIL_SOURCES})
 
 IF(CHUCHO_HAVE_PUT_TIME)
     SET_SOURCE_FILES_PROPERTIES(calendar.cpp PROPERTIES
@@ -825,6 +850,10 @@ IF(ENABLE_SHARED)
     IF(CHUCHO_HAVE_RUBY)
         TARGET_LINK_LIBRARIES(chucho "${RUBY_LIB}")
     ENDIF()
+    IF(CURL_FOUND)
+        TARGET_LINK_LIBRARIES(chucho ${CURL_LIBRARIES})
+    ENDIF()
+
     IF(CMAKE_GENERATOR STREQUAL Xcode AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         SET_TARGET_PROPERTIES(chucho PROPERTIES
                               LINK_FLAGS "-std=c++11 -stdlib=libc++")

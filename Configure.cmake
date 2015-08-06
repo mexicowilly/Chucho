@@ -24,6 +24,8 @@ INCLUDE(CheckIncludeFile)
 INCLUDE(CheckIncludeFileCXX)
 INCLUDE(ExternalProject)
 INCLUDE(CheckTypeSize)
+INCLUDE(FindCURL)
+INCLUDE(CheckStructHasMember)
 
 # static and shared
 OPTION(ENABLE_SHARED "Whether to build a shared object" FALSE)
@@ -300,6 +302,12 @@ IF(CHUCHO_POSIX)
         CHUCHO_REQUIRE_SYMBOLS(time.h tzset)
     ENDIF()
 
+    # timezone stuff
+    CHECK_STRUCT_HAS_MEMBER(tm tm_gmtoff time.h CHUCHO_HAVE_TM_GMTOFF)
+    IF(NOT CHUCHO_HAVE_TM_GMTOFF)
+        CHECK_CXX_SYMBOL_EXISTS(timezone time.h CHUCHO_HAVE_TIMEZONE)
+    ENDIF()
+
 ELSEIF(CHUCHO_WINDOWS)
     FOREACH(HEAD windows.h winsock2.h io.h process.h ws2tcpip.h time.h assert.h)
         STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
@@ -320,6 +328,21 @@ ELSEIF(CHUCHO_WINDOWS)
     IF(NOT CHUCHO_SC)
         MESSAGE(FATAL_ERROR "sc is required")
     ENDIF()
+ENDIF()
+
+# See if we can do the email writer
+FIND_PACKAGE(CURL)
+IF(CURL_FOUND)
+    CHECK_INCLUDE_FILE_CXX(curl/curl.h CHUCHO_HAVE_CURL_INCLUDE)
+    IF(NOT CHUCHO_HAVE_CURL_INCLUDE)
+        SET(CHUCHO_CURL_INCLUDE_DIR ${CURL_INCLUDE_DIRS} CACHE INTERNAL "Checked include dirs for curl.h")
+    ENDIF()
+    SET(CMAKE_REQUIRED_INCLUDES ${CURL_INCLUDE_DIRS})
+    SET(CMAKE_REQUIRED_LIBRARIES ${CURL_LIBRARIES})
+    CHUCHO_REQUIRE_SYMBOLS(curl/curl.h curl_global_init curl_easy_init curl_easy_cleanup
+                           curl_easy_setopt curl_easy_perform)
+    UNSET(CMAKE_REQUIRED_INCLUDES)
+    UNSET(CMAKE_REQUIRED_LIBRARIES)
 ENDIF()
 
 # Nested exceptions
