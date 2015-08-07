@@ -15,7 +15,6 @@
  */
 
 #include <chucho/email_writer.hpp>
-#include <chucho/exception.hpp>
 #include <chucho/calendar.hpp>
 #include <chucho/pattern_formatter.hpp>
 #include <sstream>
@@ -23,14 +22,6 @@
 
 namespace
 {
-
-std::once_flag once;
-
-class curl_exception : public chucho::exception
-{
-public:
-    curl_exception(CURLcode err, const std::string& msg);
-};
 
 struct read_data
 {
@@ -53,11 +44,6 @@ inline std::ostream& smtpl(std::ostream& stream)
 {
     stream << "\r\n";
     return stream;
-}
-
-curl_exception::curl_exception(CURLcode err, const std::string& msg)
-    : chucho::exception(msg + ": " + curl_easy_strerror(err))
-{
 }
 
 }
@@ -93,57 +79,32 @@ email_writer::email_writer(std::shared_ptr<formatter> fmt,
       port_(port),
       subject_(subject)
 {
-    std::call_once(once, curl_global_init, CURL_GLOBAL_ALL);
-    set_status_origin("email_writer");
-    curl_ = curl_easy_init();
-    if (curl_ == nullptr)
-        throw exception("Could not initialize the CURL library");
-    try
-    {
-        std::ostringstream stream;
-        stream << "smtp://" << host_ << ':' << port_;
-        CURLcode rc = curl_easy_setopt(curl_, CURLOPT_URL, stream.str().c_str());
-        if (rc != CURLE_OK)
-            throw curl_exception(rc, "Could not set CURL URL");
-        rc = curl_easy_setopt(curl_, CURLOPT_MAIL_FROM, from_.c_str());
-        if (rc != CURLE_OK)
-            throw curl_exception(rc, "Could not set CURL mail from field");
-        struct curl_slist* rcpts = nullptr;
-        for (auto one : to_)
-            rcpts = curl_slist_append(rcpts, one.c_str());
-        rc = curl_easy_setopt(curl_, CURLOPT_MAIL_RCPT, rcpts);
-        if (rc != CURLE_OK)
-            throw curl_exception(rc, "Could not set CURL mail to field");
-        rc = curl_easy_setopt(curl_, CURLOPT_UPLOAD, 1);
-        if (rc != CURLE_OK)
-            throw curl_exception(rc, "Could not set CURL upload option");
-        rc = curl_easy_setopt(curl_, CURLOPT_READFUNCTION, curl_read_cb);
-        if (rc != CURLE_OK)
-            throw curl_exception(rc, "Could not set CURL read callback");
+    init();
+}
 
-        #if !defined(NDEBUG)
-
-        rc = curl_easy_setopt(curl_, CURLOPT_DEBUGFUNCTION, curl_debug_callback);
-        if (rc != CURLE_OK)
-            throw curl_exception(rc, "Could not set CURL debug callback");
-        rc = curl_easy_setopt(curl_, CURLOPT_DEBUGDATA, this);
-        if (rc != CURLE_OK)
-            throw curl_exception(rc, "Could not set CURL debug user data pointer");
-        rc = curl_easy_setopt(curl_, CURLOPT_VERBOSE, 1);
-        if (rc != CURLE_OK)
-            throw curl_exception(rc, "Could not set CURL verbose output");
-
-        #endif
-    }
-    catch (exception&)
-    {
-        if (curl_ != nullptr)
-        {
-            curl_easy_cleanup(curl_);
-            curl_ = nullptr;
-        }
-        throw;
-    }
+email_writer::email_writer(std::shared_ptr<formatter> fmt,
+                           const std::string& host,
+                           const std::vector<std::string>& to,
+                           const std::string& from,
+                           const std::string& subject,
+                           std::shared_ptr<email_trigger> trigger,
+                           const std::string& user,
+                           const std::string& password,
+                           std::uint16_t port,
+                           std::size_t buffer_size)
+    : writer(fmt),
+      evts_(buffer_size),
+      curl_(nullptr),
+      trigger_(trigger),
+      from_(from),
+      to_(to),
+      host_(host),
+      port_(port),
+      subject_(subject),
+      user_(user),
+      password_(password)
+{
+    init();
 }
 
 email_writer::~email_writer()
@@ -166,8 +127,8 @@ std::string email_writer::format_date() const
 
     calendar::pieces p = calendar::get_local(std::time(nullptr));
     std::ostringstream stream;
-    stream << std::setfill('0') << ENG_DAY[p.tm_wday] << ", " << p.tm_mday <<
-        ENG_MON[p.tm_mon] << ' ' << (p.tm_year + 1900) << std::setw(2) << p.tm_hour <<
+    stream << std::setfill('0') << ENG_DAY[p.tm_wday] << ", " << p.tm_mday << ' ' <<
+        ENG_MON[p.tm_mon] << ' ' << (p.tm_year + 1900) << ' ' << std::setw(2) << p.tm_hour <<
         ':' << std::setw(2) << p.tm_min << ':' << std::setw(2) << p.tm_sec << ' ';
     long tz = calendar::get_time_zone_offset_in_minutes();
     if (tz < 0)
@@ -208,6 +169,54 @@ std::string email_writer::format_message(const event& evt)
     return stream.str();
 }
 
+void email_writer::init()
+{
+    static std::once_flag once;
+
+    std::call_once(once, curl_global_init, CURL_GLOBAL_ALL);
+    set_status_origin("email_writer");
+    curl_ = curl_easy_init();
+    if (curl_ == nullptr)
+        throw exception("Could not initialize the CURL library");
+    try
+    {
+        std::ostringstream stream;
+        stream << "smtp://" << host_ << ':' << port_;
+        set_curl_option(CURLOPT_URL, stream.str().c_str(), "URL");
+        set_curl_option(CURLOPT_MAIL_FROM, from_.c_str(), "mail from field");
+        struct curl_slist* rcpts = nullptr;
+        for (auto one : to_)
+            rcpts = curl_slist_append(rcpts, one.c_str());
+        set_curl_option(CURLOPT_MAIL_RCPT, rcpts, "mail to");
+        set_curl_option(CURLOPT_UPLOAD, 1, "upload");
+        set_curl_option(CURLOPT_READFUNCTION, curl_read_cb, "read callback");
+        if (user_)
+            set_curl_option(CURLOPT_USERNAME, user_->c_str(), "user name");
+        if (password_)
+            set_curl_option(CURLOPT_PASSWORD, password_->c_str(), "password");
+        set_curl_option(CURLOPT_USE_SSL, CURLUSESSL_ALL, "use SSL (for STARTTLS connection type");
+        set_curl_option(CURLOPT_SSL_VERIFYPEER, 0, "not to verify the peer certificate");
+        set_curl_option(CURLOPT_SSL_VERIFYHOST, 0, "not to verify the host");
+
+        #if !defined(NDEBUG)
+
+        set_curl_option(CURLOPT_DEBUGFUNCTION, curl_debug_callback, "debug callback");
+        set_curl_option(CURLOPT_DEBUGDATA, this, "debug user data pointer");
+        set_curl_option(CURLOPT_VERBOSE, 1, "verbose output");
+
+        #endif
+    }
+    catch (exception&)
+    {
+        if (curl_ != nullptr)
+        {
+            curl_easy_cleanup(curl_);
+            curl_ = nullptr;
+        }
+        throw;
+    }
+}
+
 void email_writer::write_impl(const event& evt)
 {
     evts_.push(evt);
@@ -221,7 +230,7 @@ void email_writer::write_impl(const event& evt)
             throw curl_exception(rc, "Could not set CURL read data");
         rc = curl_easy_perform(curl_);
         if (rc != CURLE_OK)
-            throw curl_exception(rc, "Could not set send email");
+            throw curl_exception(rc, "Could not send email");
     }
 }
 
@@ -235,6 +244,11 @@ void email_writer::fixed_size_queue::push(const event& evt)
     while (q_.size() >= max_)
         q_.pop();
     q_.push(evt);
+}
+
+email_writer::curl_exception::curl_exception(CURLcode err, const std::string& msg)
+    : chucho::exception(msg + ": " + curl_easy_strerror(err))
+{
 }
 
 }

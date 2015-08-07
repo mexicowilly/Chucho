@@ -367,6 +367,16 @@ IF(CHUCHO_HAVE_POSTGRES)
     TARGET_LINK_LIBRARIES(postgres-writer-test chucho ${POSTGRES_CLIENT_LIB} gtest ${CMAKE_THREAD_LIBS_INIT})
 ENDIF()
 
+IF(CURL_FOUND)
+    ADD_EXECUTABLE(email-writer-test EXCLUDE_FROM_ALL
+                   harness.cpp
+                   email_writer_test.cpp)
+    TARGET_LINK_LIBRARIES(email-writer-test chucho ${CURL_LIBRARIES} gtest ${CMAKE_THREAD_LIBS_INIT})
+    IF(CHUCHO_SOLARIS)
+        TARGET_LINK_LIBRARIES(email-writer-test socket nsl)
+    ENDIF()
+ENDIF()
+
 ADD_EXECUTABLE(configuration-off EXCLUDE_FROM_ALL
                configuration_off.cpp)
 TARGET_LINK_LIBRARIES(configuration-off chucho ${CMAKE_THREAD_LIBS_INIT})

@@ -19,13 +19,15 @@
 
 #include <chucho/writer.hpp>
 #include <chucho/email_trigger.hpp>
+#include <chucho/optional.hpp>
+#include <chucho/exception.hpp>
 #include <queue>
 #include <curl/curl.h>
 
 namespace chucho
 {
 
-class email_writer : public writer
+class CHUCHO_EXPORT email_writer : public writer
 {
 public:
     email_writer(std::shared_ptr<formatter> fmt,
@@ -36,16 +38,28 @@ public:
                  std::shared_ptr<email_trigger> trigger,
                  std::uint16_t port = 25,
                  std::size_t buffer_capacity = 256);
+    email_writer(std::shared_ptr<formatter> fmt,
+                 const std::string& host,
+                 const std::vector<std::string>& to,
+                 const std::string& from,
+                 const std::string& subject,
+                 std::shared_ptr<email_trigger> trigger,
+                 const std::string& user,
+                 const std::string& password,
+                 std::uint16_t port = 25,
+                 std::size_t buffer_capacity = 256);
     virtual ~email_writer();
 
     std::size_t get_buffer_capacity() const;
     std::size_t get_buffer_size() const;
     const std::string& get_from() const;
     const std::string& get_host() const;
+    const optional<std::string>& get_password() const;
     std::uint16_t get_port() const;
     const std::string& get_subject() const;
     const std::vector<std::string>& get_to() const;
     std::shared_ptr<email_trigger> get_trigger() const;
+    const optional<std::string>& get_user() const;
 
 protected:
     friend CHUCHO_NO_EXPORT int curl_debug_callback(CURL* curl,
@@ -74,8 +88,17 @@ private:
         std::size_t max_;
     };
 
+    CHUCHO_NO_EXPORT class curl_exception : public chucho::exception
+    {
+    public:
+        curl_exception(CURLcode err, const std::string& msg);
+    };
+
     CHUCHO_NO_EXPORT std::string format_date() const;
     CHUCHO_NO_EXPORT std::string format_message(const event& evt);
+    CHUCHO_NO_EXPORT void init();
+    template<typename arg_type>
+    CHUCHO_NO_EXPORT void set_curl_option(CURLoption opt, arg_type arg, const char* const err_msg);
 
     fixed_size_queue evts_;
     CURL* curl_;
@@ -85,6 +108,8 @@ private:
     std::string host_;
     std::uint16_t port_;
     std::string subject_;
+    optional<std::string> user_;
+    optional<std::string> password_;
 };
 
 inline std::size_t email_writer::get_buffer_capacity() const
@@ -107,6 +132,11 @@ inline const std::string& email_writer::get_host() const
     return host_;
 }
 
+inline const optional<std::string>& email_writer::get_password() const
+{
+    return password_;
+}
+
 inline std::uint16_t email_writer::get_port() const
 {
     return port_;
@@ -125,6 +155,19 @@ inline const std::string& email_writer::get_subject() const
 inline std::shared_ptr<email_trigger> email_writer::get_trigger() const
 {
     return trigger_;
+}
+
+inline const optional<std::string>& email_writer::get_user() const
+{
+    return user_;
+}
+
+template<typename arg_type>
+void email_writer::set_curl_option(CURLoption opt, arg_type arg, const char* const err_msg)
+{
+    CURLcode rc = curl_easy_setopt(curl_, opt, arg);
+    if (rc != CURLE_OK)
+        throw curl_exception(rc, std::string("Could not set CURL option ") + err_msg);
 }
 
 inline std::size_t email_writer::fixed_size_queue::capacity() const
