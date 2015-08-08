@@ -24,15 +24,16 @@ TEST(email_writer_test, send_one)
 {
     chucho::logger::remove_unused_loggers();
     std::vector<std::string> to;
-    to.push_back("willchido@gmail.com");
+    to.push_back("mexicowilly@mac.com");
     auto wrt = std::make_shared<chucho::email_writer>(std::make_shared<chucho::pattern_formatter>("%m%n"),
-                                                      "mail.chucho-log.org",
+                                                      "smtp.gmail.com",
+                                                      chucho::email_writer::connection_type::STARTTLS,
                                                       to,
-                                                      "email.writer@chucho-log.org",
+                                                      "willchido@gmail.com",
                                                       "%c",
                                                       std::make_shared<chucho::error_level_email_trigger>(),
-                                                      "email.writer@chucho-log.org",
-                                                      "emailwriter1",
+                                                      "willchido@gmail.com",
+                                                      "ValeVerga",
                                                       587);
     auto log = chucho::logger::get("email.writer.logger");
     log->add_writer(wrt);

@@ -30,8 +30,16 @@ namespace chucho
 class CHUCHO_EXPORT email_writer : public writer
 {
 public:
+    enum class connection_type
+    {
+        CLEAR,
+        STARTTLS,
+        SSL
+    };
+
     email_writer(std::shared_ptr<formatter> fmt,
                  const std::string& host,
+                 connection_type connect,
                  const std::vector<std::string>& to,
                  const std::string& from,
                  const std::string& subject,
@@ -40,6 +48,7 @@ public:
                  std::size_t buffer_capacity = 256);
     email_writer(std::shared_ptr<formatter> fmt,
                  const std::string& host,
+                 connection_type connect,
                  const std::vector<std::string>& to,
                  const std::string& from,
                  const std::string& subject,
@@ -96,7 +105,7 @@ private:
 
     CHUCHO_NO_EXPORT std::string format_date() const;
     CHUCHO_NO_EXPORT std::string format_message(const event& evt);
-    CHUCHO_NO_EXPORT void init();
+    CHUCHO_NO_EXPORT void init(connection_type connect);
     template<typename arg_type>
     CHUCHO_NO_EXPORT void set_curl_option(CURLoption opt, arg_type arg, const char* const err_msg);
 

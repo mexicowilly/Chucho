@@ -63,6 +63,7 @@ int curl_debug_callback(CURL* curl,
 
 email_writer::email_writer(std::shared_ptr<formatter> fmt,
                            const std::string& host,
+                           connection_type connect,
                            const std::vector<std::string>& to,
                            const std::string& from,
                            const std::string& subject,
@@ -79,11 +80,12 @@ email_writer::email_writer(std::shared_ptr<formatter> fmt,
       port_(port),
       subject_(subject)
 {
-    init();
+    init(connect);
 }
 
 email_writer::email_writer(std::shared_ptr<formatter> fmt,
                            const std::string& host,
+                           connection_type connect,
                            const std::vector<std::string>& to,
                            const std::string& from,
                            const std::string& subject,
@@ -104,7 +106,7 @@ email_writer::email_writer(std::shared_ptr<formatter> fmt,
       user_(user),
       password_(password)
 {
-    init();
+    init(connect);
 }
 
 email_writer::~email_writer()
@@ -151,12 +153,12 @@ std::string email_writer::format_message(const event& evt)
     stream << "To: ";
     for (unsigned i = 0; i < to_.size(); i++)
     {
-        stream << to_[i];
+        stream << '<' << to_[i] << '>';
         if (i != to_.size() - 1)
             stream << ',';
     }
     stream << smtpl;
-    stream << "From: " << from_ << smtpl;
+    stream << "From: <" << from_ << '>' << smtpl;
     stream << "Message-ID: 1" << smtpl;
     pattern_formatter sub_fmt(subject_);
     stream << "Subject: " << sub_fmt.format(evt) << smtpl;
@@ -169,7 +171,7 @@ std::string email_writer::format_message(const event& evt)
     return stream.str();
 }
 
-void email_writer::init()
+void email_writer::init(connection_type connect)
 {
     static std::once_flag once;
 
@@ -181,12 +183,22 @@ void email_writer::init()
     try
     {
         std::ostringstream stream;
-        stream << "smtp://" << host_ << ':' << port_;
+        if (connect == connection_type::SSL)
+            stream << "smtps";
+        else
+            stream << "smtp";
+        stream << "://" << host_ << ':' << port_;
         set_curl_option(CURLOPT_URL, stream.str().c_str(), "URL");
-        set_curl_option(CURLOPT_MAIL_FROM, from_.c_str(), "mail from field");
+        stream.str("");
+        stream << '<' << from_ << '>';
+        set_curl_option(CURLOPT_MAIL_FROM, stream.str().c_str(), "mail from field");
         struct curl_slist* rcpts = nullptr;
         for (auto one : to_)
-            rcpts = curl_slist_append(rcpts, one.c_str());
+        {
+            stream.str("");
+            stream << '<' << one << '>';
+            rcpts = curl_slist_append(rcpts, stream.str().c_str());
+        }
         set_curl_option(CURLOPT_MAIL_RCPT, rcpts, "mail to");
         set_curl_option(CURLOPT_UPLOAD, 1, "upload");
         set_curl_option(CURLOPT_READFUNCTION, curl_read_cb, "read callback");
@@ -194,9 +206,13 @@ void email_writer::init()
             set_curl_option(CURLOPT_USERNAME, user_->c_str(), "user name");
         if (password_)
             set_curl_option(CURLOPT_PASSWORD, password_->c_str(), "password");
-        set_curl_option(CURLOPT_USE_SSL, CURLUSESSL_ALL, "use SSL (for STARTTLS connection type");
-        set_curl_option(CURLOPT_SSL_VERIFYPEER, 0, "not to verify the peer certificate");
-        set_curl_option(CURLOPT_SSL_VERIFYHOST, 0, "not to verify the host");
+        if (connect == connection_type::STARTTLS)
+            set_curl_option(CURLOPT_USE_SSL, CURLUSESSL_ALL, "use SSL (for STARTTLS connection type");
+        if (connect == connection_type::STARTTLS || connect == connection_type::SSL)
+        {
+            set_curl_option(CURLOPT_SSL_VERIFYPEER, 0, "not to verify the peer certificate");
+            set_curl_option(CURLOPT_SSL_VERIFYHOST, 0, "not to verify the host");
+        }
 
         #if !defined(NDEBUG)
 
