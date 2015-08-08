@@ -170,10 +170,13 @@ std::string email_writer::format_message(const event& evt)
         stream << formatter_->format(evts_.front()) << smtpl;
         evts_.pop();
     }
-    Fnv64_t fnv = fnv_64a_str(const_cast<char*>(stream.str().c_str()), FNV1A_64_INIT);
+    std::string msg = stream.str();
+    Fnv64_t fnv = fnv_64a_str(const_cast<char*>(msg.c_str()), FNV1A_64_INIT);
+    stream.str("");
     stream << "Message-ID: " << std::setfill('0') << std::hex << std::setw(16) <<
-        fnv << '-' << std::setw(16) << std::time(nullptr);
-    return stream.str();
+        fnv << '-' << std::setw(16) << std::time(nullptr) << smtpl;
+    msg.insert(0, stream.str());
+    return msg;
 }
 
 void email_writer::init()
