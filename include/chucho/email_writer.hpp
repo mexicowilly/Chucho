@@ -61,6 +61,7 @@ public:
 
     std::size_t get_buffer_capacity() const;
     std::size_t get_buffer_size() const;
+    connection_type get_connection_type() const;
     const std::string& get_from() const;
     const std::string& get_host() const;
     const optional<std::string>& get_password() const;
@@ -105,7 +106,7 @@ private:
 
     CHUCHO_NO_EXPORT std::string format_date() const;
     CHUCHO_NO_EXPORT std::string format_message(const event& evt);
-    CHUCHO_NO_EXPORT void init(connection_type connect);
+    CHUCHO_NO_EXPORT void init();
     template<typename arg_type>
     CHUCHO_NO_EXPORT void set_curl_option(CURLoption opt, arg_type arg, const char* const err_msg);
 
@@ -119,6 +120,7 @@ private:
     std::string subject_;
     optional<std::string> user_;
     optional<std::string> password_;
+    connection_type connection_type_;
 };
 
 inline std::size_t email_writer::get_buffer_capacity() const
@@ -129,6 +131,11 @@ inline std::size_t email_writer::get_buffer_capacity() const
 inline std::size_t email_writer::get_buffer_size() const
 {
     return evts_.size();
+}
+
+inline email_writer::connection_type email_writer::get_connection_type() const
+{
+    return connection_type_;
 }
 
 inline const std::string& email_writer::get_from() const

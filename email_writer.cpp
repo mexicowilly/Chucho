@@ -17,6 +17,7 @@
 #include <chucho/email_writer.hpp>
 #include <chucho/calendar.hpp>
 #include <chucho/pattern_formatter.hpp>
+#include "fnv.h"
 #include <sstream>
 #include <iomanip>
 
@@ -32,7 +33,7 @@ struct read_data
 std::size_t curl_read_cb(char* buf, std::size_t sz, std::size_t nitems, void* data)
 {
     read_data* rd = static_cast<read_data*>(data);
-    if (rd->pos == rd->message.length())
+    if (rd->pos >= rd->message.length())
         return 0;
     std::size_t to_copy = std::min(rd->message.length() - rd->pos, sz * nitems);
     rd->message.copy(buf, to_copy, rd->pos);
@@ -78,9 +79,10 @@ email_writer::email_writer(std::shared_ptr<formatter> fmt,
       to_(to),
       host_(host),
       port_(port),
-      subject_(subject)
+      subject_(subject),
+      connection_type_(connect)
 {
-    init(connect);
+    init();
 }
 
 email_writer::email_writer(std::shared_ptr<formatter> fmt,
@@ -104,9 +106,10 @@ email_writer::email_writer(std::shared_ptr<formatter> fmt,
       port_(port),
       subject_(subject),
       user_(user),
-      password_(password)
+      password_(password),
+      connection_type_(connect)
 {
-    init(connect);
+    init();
 }
 
 email_writer::~email_writer()
@@ -159,7 +162,6 @@ std::string email_writer::format_message(const event& evt)
     }
     stream << smtpl;
     stream << "From: <" << from_ << '>' << smtpl;
-    stream << "Message-ID: 1" << smtpl;
     pattern_formatter sub_fmt(subject_);
     stream << "Subject: " << sub_fmt.format(evt) << smtpl;
     stream << smtpl; // Empty line required to separate header from body
@@ -168,10 +170,13 @@ std::string email_writer::format_message(const event& evt)
         stream << formatter_->format(evts_.front()) << smtpl;
         evts_.pop();
     }
+    Fnv64_t fnv = fnv_64a_str(const_cast<char*>(stream.str().c_str()), FNV1A_64_INIT);
+    stream << "Message-ID: " << std::setfill('0') << std::hex << std::setw(16) <<
+        fnv << '-' << std::setw(16) << std::time(nullptr);
     return stream.str();
 }
 
-void email_writer::init(connection_type connect)
+void email_writer::init()
 {
     static std::once_flag once;
 
@@ -183,7 +188,7 @@ void email_writer::init(connection_type connect)
     try
     {
         std::ostringstream stream;
-        if (connect == connection_type::SSL)
+        if (connection_type_ == connection_type::SSL)
             stream << "smtps";
         else
             stream << "smtp";
@@ -206,9 +211,9 @@ void email_writer::init(connection_type connect)
             set_curl_option(CURLOPT_USERNAME, user_->c_str(), "user name");
         if (password_)
             set_curl_option(CURLOPT_PASSWORD, password_->c_str(), "password");
-        if (connect == connection_type::STARTTLS)
+        if (connection_type_ == connection_type::STARTTLS)
             set_curl_option(CURLOPT_USE_SSL, CURLUSESSL_ALL, "use SSL (for STARTTLS connection type");
-        if (connect == connection_type::STARTTLS || connect == connection_type::SSL)
+        if (connection_type_ == connection_type::STARTTLS || connection_type_ == connection_type::SSL)
         {
             set_curl_option(CURLOPT_SSL_VERIFYPEER, 0, "not to verify the peer certificate");
             set_curl_option(CURLOPT_SSL_VERIFYHOST, 0, "not to verify the host");
@@ -241,10 +246,8 @@ void email_writer::write_impl(const event& evt)
         read_data rd;
         rd.message = format_message(evt);
         rd.pos = 0;
-        CURLcode rc = curl_easy_setopt(curl_, CURLOPT_READDATA, &rd);
-        if (rc != CURLE_OK)
-            throw curl_exception(rc, "Could not set CURL read data");
-        rc = curl_easy_perform(curl_);
+        set_curl_option(CURLOPT_READDATA, &rd, "read user data");
+        CURLcode rc = curl_easy_perform(curl_);
         if (rc != CURLE_OK)
             throw curl_exception(rc, "Could not send email");
     }

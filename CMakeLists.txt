@@ -377,6 +377,8 @@ IF(CURL_FOUND)
          include/chucho/email_trigger.hpp
          include/chucho/email_writer.hpp
          include/chucho/error_level_email_trigger.hpp)
+    LIST(APPEND CHUCHO_EMBEDDED_SOURCES
+         "${CMAKE_SOURCE_DIR}/embedded/fnv/hash_64a.c")
     LIST(APPEND CHUCHO_EMAIL_SOURCES
          email_writer.cpp
          error_level_email_trigger.cpp)
@@ -394,7 +396,7 @@ MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
     SET(CHUCHO_LIBYAML_VERSION_MINOR 1)
     SET(CHUCHO_LIBYAML_VERSION_PATCH 5)
 
-    SET(${CHUCHO_YAML_SOURCE_VAR}
+    LIST(APPEND ${CHUCHO_YAML_SOURCE_VAR}
         "${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c"
         "${CMAKE_SOURCE_DIR}/embedded/libyaml/loader.c"
         "${CMAKE_SOURCE_DIR}/embedded/libyaml/parser.c"
