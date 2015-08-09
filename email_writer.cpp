@@ -179,12 +179,24 @@ std::string email_writer::format_message(const event& evt)
     return msg;
 }
 
+void email_writer::global_setup()
+{
+    curl_global_init(CURL_GLOBAL_ALL);
+    curl_version_info_data* ver = curl_version_info(CURLVERSION_NOW);
+    if ((ver->features & CURL_VERSION_SSL) == 0)
+    {
+        report_warning("The current version of libcurl does not support SSL, so the SSL and STARTTLS connection modes are not supported");
+    }
+}
+
 void email_writer::init()
 {
     static std::once_flag once;
 
-    std::call_once(once, curl_global_init, CURL_GLOBAL_ALL);
+    // This goes first, because the global setup might want to report status
     set_status_origin("email_writer");
+    // It's okay to bind to this because it's is only called once.
+    std::call_once(once, std::bind(&email_writer::global_setup, this));
     curl_ = curl_easy_init();
     if (curl_ == nullptr)
         throw exception("Could not initialize the CURL library");

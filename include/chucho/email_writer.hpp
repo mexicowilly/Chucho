@@ -98,7 +98,7 @@ private:
         std::size_t max_;
     };
 
-    CHUCHO_NO_EXPORT class curl_exception : public chucho::exception
+    class CHUCHO_NO_EXPORT curl_exception : public chucho::exception
     {
     public:
         curl_exception(CURLcode err, const std::string& msg);
@@ -106,6 +106,7 @@ private:
 
     CHUCHO_NO_EXPORT std::string format_date() const;
     CHUCHO_NO_EXPORT std::string format_message(const event& evt);
+    CHUCHO_NO_EXPORT void global_setup();
     CHUCHO_NO_EXPORT void init();
     template<typename arg_type>
     CHUCHO_NO_EXPORT void set_curl_option(CURLoption opt, arg_type arg, const char* const err_msg);
