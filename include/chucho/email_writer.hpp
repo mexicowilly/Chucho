@@ -70,6 +70,8 @@ public:
     const std::vector<std::string>& get_to() const;
     std::shared_ptr<email_trigger> get_trigger() const;
     const optional<std::string>& get_user() const;
+    bool get_verbose() const;
+    void set_verbose(bool state);
 
 protected:
     friend CHUCHO_NO_EXPORT int curl_debug_callback(CURL* curl,
@@ -122,6 +124,7 @@ private:
     optional<std::string> user_;
     optional<std::string> password_;
     connection_type connection_type_;
+    bool verbose_;
 };
 
 inline std::size_t email_writer::get_buffer_capacity() const
@@ -177,6 +180,11 @@ inline std::shared_ptr<email_trigger> email_writer::get_trigger() const
 inline const optional<std::string>& email_writer::get_user() const
 {
     return user_;
+}
+
+inline bool email_writer::get_verbose() const
+{
+    return verbose_;
 }
 
 template<typename arg_type>

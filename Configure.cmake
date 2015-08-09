@@ -46,6 +46,9 @@ OPTION(LOG4CPLUS_CONFIG "Whether to support reading log4cplus configuration file
 # whether to build the C API
 OPTION(C_API "Whether the C API should be built into this Chucho" FALSE)
 
+# whether we should check for the presence of libcurl or not
+OPTION(ENABLE_CURL "Whether libcurl should be checked so that email_writer will be enabled (default ON)" TRUE)
+
 # We'll want this later
 MACRO(CHUCHO_FIND_PROGRAM CHUCHO_FIND_VAR CHUCHO_PROGRAM)
     MESSAGE(STATUS "Looking for ${CHUCHO_PROGRAM}")
@@ -331,18 +334,20 @@ ELSEIF(CHUCHO_WINDOWS)
 ENDIF()
 
 # See if we can do the email writer
-FIND_PACKAGE(CURL)
-IF(CURL_FOUND)
-    CHECK_INCLUDE_FILE_CXX(curl/curl.h CHUCHO_HAVE_CURL_INCLUDE)
-    IF(NOT CHUCHO_HAVE_CURL_INCLUDE)
-        SET(CHUCHO_CURL_INCLUDE_DIR ${CURL_INCLUDE_DIRS} CACHE INTERNAL "Checked include dirs for curl.h")
+IF(ENABLE_CURL)
+    FIND_PACKAGE(CURL)
+    IF(CURL_FOUND)
+        CHECK_INCLUDE_FILE_CXX(curl/curl.h CHUCHO_HAVE_CURL_INCLUDE)
+        IF(NOT CHUCHO_HAVE_CURL_INCLUDE)
+            SET(CHUCHO_CURL_INCLUDE_DIR ${CURL_INCLUDE_DIRS} CACHE INTERNAL "Checked include dirs for curl.h")
+        ENDIF()
+        SET(CMAKE_REQUIRED_INCLUDES ${CURL_INCLUDE_DIRS})
+        SET(CMAKE_REQUIRED_LIBRARIES ${CURL_LIBRARIES})
+        CHUCHO_REQUIRE_SYMBOLS(curl/curl.h curl_global_init curl_easy_init curl_easy_cleanup
+                               curl_easy_setopt curl_easy_perform curl_version_info curl_easy_strerror)
+        UNSET(CMAKE_REQUIRED_INCLUDES)
+        UNSET(CMAKE_REQUIRED_LIBRARIES)
     ENDIF()
-    SET(CMAKE_REQUIRED_INCLUDES ${CURL_INCLUDE_DIRS})
-    SET(CMAKE_REQUIRED_LIBRARIES ${CURL_LIBRARIES})
-    CHUCHO_REQUIRE_SYMBOLS(curl/curl.h curl_global_init curl_easy_init curl_easy_cleanup
-                           curl_easy_setopt curl_easy_perform)
-    UNSET(CMAKE_REQUIRED_INCLUDES)
-    UNSET(CMAKE_REQUIRED_LIBRARIES)
 ENDIF()
 
 # Nested exceptions

@@ -80,7 +80,8 @@ email_writer::email_writer(std::shared_ptr<formatter> fmt,
       host_(host),
       port_(port),
       subject_(subject),
-      connection_type_(connect)
+      connection_type_(connect),
+      verbose_(false)
 {
     init();
 }
@@ -107,7 +108,8 @@ email_writer::email_writer(std::shared_ptr<formatter> fmt,
       subject_(subject),
       user_(user),
       password_(password),
-      connection_type_(connect)
+      connection_type_(connect),
+      verbose_(false)
 {
     init();
 }
@@ -236,9 +238,7 @@ void email_writer::init()
 
         #if !defined(NDEBUG)
 
-        set_curl_option(CURLOPT_DEBUGFUNCTION, curl_debug_callback, "debug callback");
-        set_curl_option(CURLOPT_DEBUGDATA, this, "debug user data pointer");
-        set_curl_option(CURLOPT_VERBOSE, 1, "verbose output");
+        set_verbose(true);
 
         #endif
     }
@@ -251,6 +251,23 @@ void email_writer::init()
         }
         throw;
     }
+}
+
+void email_writer::set_verbose(bool state)
+{
+    if (state && !verbose_)
+    {
+        set_curl_option(CURLOPT_DEBUGFUNCTION, curl_debug_callback, "debug callback");
+        set_curl_option(CURLOPT_DEBUGDATA, this, "debug user data pointer");
+        set_curl_option(CURLOPT_VERBOSE, 1, "verbose output");
+    }
+    else if (!state && verbose_)
+    {
+        set_curl_option(CURLOPT_DEBUGFUNCTION, nullptr, "debug callback");
+        set_curl_option(CURLOPT_DEBUGDATA, nullptr, "debug user data pointer");
+        set_curl_option(CURLOPT_VERBOSE, 0, "verbose output");
+    }
+    verbose_ = state;
 }
 
 void email_writer::write_impl(const event& evt)
