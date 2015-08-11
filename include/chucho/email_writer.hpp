@@ -37,6 +37,11 @@ public:
         SSL
     };
 
+    static const std::uint16_t DEFAULT_PORT;
+    static const std::size_t DEFAULT_BUFFER_SIZE;
+
+    static bool get_ssl_supported();
+
     email_writer(std::shared_ptr<formatter> fmt,
                  const std::string& host,
                  connection_type connect,
@@ -44,8 +49,8 @@ public:
                  const std::string& from,
                  const std::string& subject,
                  std::shared_ptr<email_trigger> trigger,
-                 std::uint16_t port = 25,
-                 std::size_t buffer_capacity = 256);
+                 std::uint16_t port = DEFAULT_PORT,
+                 std::size_t buffer_capacity = DEFAULT_BUFFER_SIZE);
     email_writer(std::shared_ptr<formatter> fmt,
                  const std::string& host,
                  connection_type connect,
@@ -55,8 +60,8 @@ public:
                  std::shared_ptr<email_trigger> trigger,
                  const std::string& user,
                  const std::string& password,
-                 std::uint16_t port = 25,
-                 std::size_t buffer_capacity = 256);
+                 std::uint16_t port = DEFAULT_PORT,
+                 std::size_t buffer_capacity = DEFAULT_BUFFER_SIZE);
     virtual ~email_writer();
 
     std::size_t get_buffer_capacity() const;
@@ -108,7 +113,6 @@ private:
 
     CHUCHO_NO_EXPORT std::string format_date() const;
     CHUCHO_NO_EXPORT std::string format_message(const event& evt);
-    CHUCHO_NO_EXPORT void global_setup();
     CHUCHO_NO_EXPORT void init();
     template<typename arg_type>
     CHUCHO_NO_EXPORT void set_curl_option(CURLoption opt, arg_type arg, const char* const err_msg);

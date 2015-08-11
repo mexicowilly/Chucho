@@ -14,31 +14,16 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_TEXT_UTIL_HPP__)
-#define CHUCHO_TEXT_UTIL_HPP__
-
-#if !defined(CHUCHO_BUILD)
-#error "This header is private"
-#endif
-
-#include <string>
-#include <vector>
-#include <cstdarg>
+#include <chucho/level_threshold_email_trigger_memento.hpp>
 
 namespace chucho
 {
 
-namespace text_util
+level_threshold_email_trigger_memento::level_threshold_email_trigger_memento(configurator& cfg)
+    : memento(cfg)
 {
-
-const std::size_t MAX_MESSAGE_SIZE = 500 * 1024;
-
-std::string format(const char* const fmt, va_list args);
-std::string to_lower(const std::string& text);
-std::vector<std::string> tokenize(const std::string& text, char delim);
-
+    set_status_origin("level_threshold_filter_memento");
+    set_handler("level", [this] (const std::string& name) { level_ = level::from_text(validate("level_threshold_email_trigger::level", name)); });
 }
 
 }
-
-#endif

@@ -14,29 +14,33 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_TEXT_UTIL_HPP__)
-#define CHUCHO_TEXT_UTIL_HPP__
+#if !defined(CHUCHO_LEVEL_THRESHOLD_EMAIL_TRIGGER_MEMENTO_HPP__)
+#define CHUCHO_LEVEL_THRESHOLD_EMAIL_TRIGGER_MEMENTO_HPP__
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"
 #endif
 
-#include <string>
-#include <vector>
-#include <cstdarg>
+#include <chucho/memento.hpp>
+#include <chucho/level.hpp>
 
 namespace chucho
 {
 
-namespace text_util
+class level_threshold_email_trigger_memento : public memento
 {
+public:
+    level_threshold_email_trigger_memento(configurator& cfg);
 
-const std::size_t MAX_MESSAGE_SIZE = 500 * 1024;
+    std::shared_ptr<level> get_level() const;
 
-std::string format(const char* const fmt, va_list args);
-std::string to_lower(const std::string& text);
-std::vector<std::string> tokenize(const std::string& text, char delim);
+private:
+    std::shared_ptr<level> level_;
+};
 
+inline std::shared_ptr<level> level_threshold_email_trigger_memento::get_level() const
+{
+    return level_;
 }
 
 }

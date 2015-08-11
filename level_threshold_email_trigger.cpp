@@ -14,20 +14,23 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_ERROR_LEVEL_EMAIL_TRIGGER_HPP__)
-#define CHUCHO_ERROR_LEVEL_EMAIL_TRIGGER_HPP__
-
-#include <chucho/email_trigger.hpp>
+#include <chucho/level_threshold_email_trigger.hpp>
 
 namespace chucho
 {
 
-class CHUCHO_EXPORT error_level_email_trigger : public email_trigger
+level_threshold_email_trigger::level_threshold_email_trigger(std::shared_ptr<level> lvl)
+    : level_(lvl)
 {
-public:
-    virtual bool is_triggered(const event& evt) override;
-};
+    set_status_origin("level_threshold_email_trigger");
+    if (!level_)
+        throw std::invalid_argument("The level is unset");
+}
+
+bool level_threshold_email_trigger::is_triggered(const event& evt)
+{
+    return level_ && *evt.get_level() >= *level_;
+}
 
 }
 
-#endif

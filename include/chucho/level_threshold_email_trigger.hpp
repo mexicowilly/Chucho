@@ -14,14 +14,27 @@
  *    limitations under the License.
  */
 
-#include <chucho/error_level_email_trigger.hpp>
+#if !defined(CHUCHO_LEVEL_THRESHOLD_EMAIL_TRIGGER_HPP__)
+#define CHUCHO_LEVEL_THRESHOLD_EMAIL_TRIGGER_HPP__
+
+#include <chucho/email_trigger.hpp>
+#include <chucho/level.hpp>
 
 namespace chucho
 {
 
-bool error_level_email_trigger::is_triggered(const event& evt)
+class CHUCHO_EXPORT level_threshold_email_trigger : public email_trigger
 {
-    return *evt.get_level() >= *level::ERROR_();
-}
+public:
+    level_threshold_email_trigger(std::shared_ptr<level> lvl);
+
+    virtual bool is_triggered(const event& evt) override;
+
+private:
+    std::shared_ptr<level> level_;
+};
 
 }
+
+#endif
+

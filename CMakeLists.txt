@@ -376,12 +376,20 @@ IF(CURL_FOUND)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
          include/chucho/email_trigger.hpp
          include/chucho/email_writer.hpp
-         include/chucho/error_level_email_trigger.hpp)
+         include/chucho/level_threshold_email_trigger.hpp)
     LIST(APPEND CHUCHO_EMBEDDED_SOURCES
          "${CMAKE_SOURCE_DIR}/embedded/fnv/hash_64a.c")
     LIST(APPEND CHUCHO_EMAIL_SOURCES
          email_writer.cpp
-         error_level_email_trigger.cpp)
+         email_writer_factory.cpp
+         email_writer_memento.cpp
+         level_threshold_email_trigger.cpp
+         level_threshold_email_trigger_factory.cpp
+         level_threshold_email_trigger_memento.cpp
+         include/chucho/email_writer_factory.hpp
+         include/chucho/email_writer_memento.hpp
+         include/chucho/level_threshold_email_trigger_factory.hpp
+         include/chucho/level_threshold_email_trigger_memento.hpp)
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
@@ -713,6 +721,10 @@ ENDIF()
 
 IF(CHUCHO_HAVE_RUBY)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RUBY)
+ENDIF()
+
+IF(CURL_FOUND)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_EMAIL_WRITER)
 ENDIF()
 
 IF(DEFINED CHUCHO_CONFIGURATOR_DEFS)

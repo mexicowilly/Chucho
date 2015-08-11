@@ -20,9 +20,13 @@
 #include "fnv.h"
 #include <sstream>
 #include <iomanip>
+#include <atomic>
 
 namespace
 {
+
+std::atomic_bool ssl_supported(false);
+std::once_flag global_once;
 
 struct read_data
 {
@@ -39,6 +43,14 @@ std::size_t curl_read_cb(char* buf, std::size_t sz, std::size_t nitems, void* da
     rd->message.copy(buf, to_copy, rd->pos);
     rd->pos += to_copy;
     return to_copy;
+}
+
+void global_setup()
+{
+    curl_global_init(CURL_GLOBAL_ALL);
+    curl_version_info_data* ver = curl_version_info(CURLVERSION_NOW);
+    if ((ver->features & CURL_VERSION_SSL) != 0)
+        ssl_supported = true;
 }
 
 inline std::ostream& smtpl(std::ostream& stream)
@@ -61,6 +73,9 @@ int curl_debug_callback(CURL* curl,
     static_cast<email_writer*>(user_data)->report_info(std::string(text, num));
     return 0;
 }
+
+const std::uint16_t email_writer::DEFAULT_PORT(25);
+const std::size_t email_writer::DEFAULT_BUFFER_SIZE(256);
 
 email_writer::email_writer(std::shared_ptr<formatter> fmt,
                            const std::string& host,
@@ -181,24 +196,23 @@ std::string email_writer::format_message(const event& evt)
     return msg;
 }
 
-void email_writer::global_setup()
+bool email_writer::get_ssl_supported()
 {
-    curl_global_init(CURL_GLOBAL_ALL);
-    curl_version_info_data* ver = curl_version_info(CURLVERSION_NOW);
-    if ((ver->features & CURL_VERSION_SSL) == 0)
-    {
-        report_warning("The current version of libcurl does not support SSL, so the SSL and STARTTLS connection modes are not supported");
-    }
+    std::call_once(global_once, global_setup);
+    return ssl_supported;
 }
 
 void email_writer::init()
 {
-    static std::once_flag once;
-
-    // This goes first, because the global setup might want to report status
     set_status_origin("email_writer");
-    // It's okay to bind to this because it's is only called once.
-    std::call_once(once, std::bind(&email_writer::global_setup, this));
+    std::call_once(global_once, global_setup);
+    if (!ssl_supported && connection_type_ != connection_type::CLEAR)
+    {
+        std::string type_text = (connection_type_ == connection_type::SSL) ?
+            "SSL" : "STARTTLS";
+        report_error("The connection type " + type_text + " is not supported because the CURL library on the system does not support SSL");
+        throw exception("[email_writer] Unsupported connection type: " + type_text);
+    }
     curl_ = curl_easy_init();
     if (curl_ == nullptr)
         throw exception("Could not initialize the CURL library");

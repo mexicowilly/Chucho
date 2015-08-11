@@ -14,30 +14,26 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_TEXT_UTIL_HPP__)
-#define CHUCHO_TEXT_UTIL_HPP__
+#if !defined(CHUCHO_EMAIL_WRITER_FACTORY_HPP__)
+#define CHUCHO_EMAIL_WRITER_FACTORY_HPP__
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"
 #endif
 
-#include <string>
-#include <vector>
-#include <cstdarg>
+#include <chucho/writer_factory.hpp>
 
 namespace chucho
 {
 
-namespace text_util
+class email_writer_factory : public writer_factory
 {
+public:
+    email_writer_factory();
 
-const std::size_t MAX_MESSAGE_SIZE = 500 * 1024;
-
-std::string format(const char* const fmt, va_list args);
-std::string to_lower(const std::string& text);
-std::vector<std::string> tokenize(const std::string& text, char delim);
-
-}
+    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
+    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
+};
 
 }
 

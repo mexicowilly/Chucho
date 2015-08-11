@@ -18,11 +18,14 @@
 #define CHUCHO_EMAIL_TRIGGER_HPP__
 
 #include <chucho/event.hpp>
+#include <chucho/status_reporter.hpp>
+#include <chucho/configurable.hpp>
 
 namespace chucho
 {
 
-class CHUCHO_EXPORT email_trigger
+class CHUCHO_EXPORT email_trigger : public status_reporter,
+                                    public configurable
 {
 public:
     virtual ~email_trigger() { }
