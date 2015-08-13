@@ -390,6 +390,17 @@ IF(CURL_FOUND)
          include/chucho/email_writer_memento.hpp
          include/chucho/level_threshold_email_trigger_factory.hpp
          include/chucho/level_threshold_email_trigger_memento.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS
+             include/chucho/email_trigger.h
+             include/chucho/email_writer.h
+             include/chucho/level_threshold_email_trigger.h)
+        LIST(APPEND CHUCHO_EMAIL_SOURCES
+             c_email_trigger.cpp
+             c_email_writer.cpp
+             c_level_threshold_email_trigger.cpp
+             include/chucho/c_email_trigger.hpp)
+    ENDIF()
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS

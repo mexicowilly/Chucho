@@ -38,7 +38,7 @@ public:
     };
 
     static const std::uint16_t DEFAULT_PORT;
-    static const std::size_t DEFAULT_BUFFER_SIZE;
+    static const std::size_t DEFAULT_BUFFER_CAPACITY;
 
     static bool get_ssl_supported();
 
@@ -50,7 +50,7 @@ public:
                  const std::string& subject,
                  std::shared_ptr<email_trigger> trigger,
                  std::uint16_t port = DEFAULT_PORT,
-                 std::size_t buffer_capacity = DEFAULT_BUFFER_SIZE);
+                 std::size_t buffer_capacity = DEFAULT_BUFFER_CAPACITY);
     email_writer(std::shared_ptr<formatter> fmt,
                  const std::string& host,
                  connection_type connect,
@@ -61,7 +61,7 @@ public:
                  const std::string& user,
                  const std::string& password,
                  std::uint16_t port = DEFAULT_PORT,
-                 std::size_t buffer_capacity = DEFAULT_BUFFER_SIZE);
+                 std::size_t buffer_capacity = DEFAULT_BUFFER_CAPACITY);
     virtual ~email_writer();
 
     std::size_t get_buffer_capacity() const;

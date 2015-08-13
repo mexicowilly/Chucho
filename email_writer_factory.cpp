@@ -48,7 +48,7 @@ std::shared_ptr<configurable> email_writer_factory::create_configurable(std::sha
     if (ewm->get_to().empty()) 
         throw exception("email_writer_factory: At least one recipient in the to field must be set");
     std::uint16_t port = ewm->get_port() ? *ewm->get_port() : email_writer::DEFAULT_PORT;
-    std::size_t buf_size = ewm->get_buffer_size() ? *ewm->get_buffer_size() : email_writer::DEFAULT_BUFFER_SIZE;
+    std::size_t buf_size = ewm->get_buffer_size() ? *ewm->get_buffer_size() : email_writer::DEFAULT_BUFFER_CAPACITY;
     std::shared_ptr<email_writer> wrt;
     if (ewm->get_user().empty() && ewm->get_password().empty())
     {

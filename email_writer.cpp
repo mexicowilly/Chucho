@@ -75,7 +75,7 @@ int curl_debug_callback(CURL* curl,
 }
 
 const std::uint16_t email_writer::DEFAULT_PORT(25);
-const std::size_t email_writer::DEFAULT_BUFFER_SIZE(256);
+const std::size_t email_writer::DEFAULT_BUFFER_CAPACITY(256);
 
 email_writer::email_writer(std::shared_ptr<formatter> fmt,
                            const std::string& host,

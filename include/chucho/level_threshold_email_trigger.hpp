@@ -28,11 +28,17 @@ class CHUCHO_EXPORT level_threshold_email_trigger : public email_trigger
 public:
     level_threshold_email_trigger(std::shared_ptr<level> lvl);
 
+    std::shared_ptr<level> get_level() const;
     virtual bool is_triggered(const event& evt) override;
 
 private:
     std::shared_ptr<level> level_;
 };
+
+inline std::shared_ptr<level> level_threshold_email_trigger::get_level() const
+{
+    return level_;
+}
 
 }
 
