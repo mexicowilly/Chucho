@@ -66,16 +66,12 @@ private:
         virtual void process(const properties& props) override;
 
     private:
-        std::shared_ptr<configurable> create_file_compressor(const std::string& name,
-                                                             const properties& props);
+        std::shared_ptr<configurable> create_configurable(const std::string& type,
+                                                          const std::string& name,
+                                                          const properties& props);
+
         std::shared_ptr<configurable> create_file_roller(const std::string& name,
                                                          const properties& props);
-        std::shared_ptr<configurable> create_file_roll_trigger(const std::string& name,
-                                                               const properties& props);
-        std::shared_ptr<configurable> create_filter(const std::string& name,
-                                                    const properties& props);
-        std::shared_ptr<configurable> create_formatter(const std::string& name,
-                                                       const properties& props);
         std::shared_ptr<configurable> create_writer(const std::string& name,
                                                     const properties& props);
         std::shared_ptr<configurable_factory> get_factory(const std::string& type,

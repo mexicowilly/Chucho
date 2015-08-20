@@ -61,6 +61,10 @@ std::string security_policy::validate(const std::string& key, const std::string&
             val_cp += "...";
             chopped = true;
         }
+        else
+        {
+            val_cp = val;
+        }
         std::ostringstream stream;
         stream << "The value, ";
         if (chopped)

@@ -98,6 +98,10 @@ IF(CHUCHO_HAVE_RUBY)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_RUBY)
 ENDIF()
 
+IF(CURL_FOUND)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_EMAIL_WRITER)
+ENDIF()
+
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
                calendar_test.cpp
@@ -125,11 +129,12 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                rolling_file_writer_test.cpp
                security_policy_test.cpp
                size_file_roll_trigger_test.cpp
+               text_util_test.cpp
                utf8_test.cpp
                ${CHUCHO_TEST_COMPRESSION_SOURCES}
                ${CHUCHO_CONFIGURATOR_TESTS}
                ${CHUCHO_TEST_EVALUATOR_SOURCES})
-TARGET_LINK_LIBRARIES(unit-test chucho gtest ${CMAKE_THREAD_LIBS_INIT})
+TARGET_LINK_LIBRARIES(unit-test chucho gtest ${CURL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 IF(CHUCHO_SOLARIS)
     TARGET_LINK_LIBRARIES(unit-test socket nsl)
 ENDIF()

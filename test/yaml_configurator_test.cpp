@@ -176,6 +176,31 @@ TEST_F(yaml_configurator, duplicate_message_filter)
     duplicate_message_filter_body();
 }
 
+#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+
+TEST_F(yaml_configurator, email_writer)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::email_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            pattern: '%m'\n"
+              "        - chucho::level_threshold_email_trigger:\n"
+              "            level: error\n"
+              "        - host: mail.dummy.com\n"
+              "        - port: 123\n"
+              "        - from: whistler@mctweaky.com\n"
+              "        - to: one@blubbery.com,two@humid.org\n"
+              "        - subject: '%c'\n"
+              "        - connection_type: starttls\n"
+              "        - user: scrumpy\n"
+              "        - password: lumpy\n"
+              "        - buffer_size: 7000\n");
+    email_writer_body();
+}
+
+#endif
+
 TEST_F(yaml_configurator, file_writer)
 {
     configure("chucho::logger:\n"

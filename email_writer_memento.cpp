@@ -24,6 +24,18 @@ email_writer_memento::email_writer_memento(configurator& cfg)
     : writer_memento(cfg)
 {
     set_status_origin("email_writer_memento");
+    cfg.get_security_policy().set_text("email_writer::from", 320);
+    cfg.get_security_policy().set_text("email_writer::host", 253);
+    cfg.get_security_policy().set_integer("email_writer::port", static_cast<std::uint16_t>(1), static_cast<uint16_t>(65535));
+    cfg.get_security_policy().set_text("email_writer::port(text)", 5);
+    cfg.get_security_policy().set_text("email_writer::subject", 989);
+    cfg.get_security_policy().set_text("email_writer::connection_type", 8);
+    cfg.get_security_policy().set_integer("email_writer::buffer_size", 1U, 65536U);
+    cfg.get_security_policy().set_text("email_writer::buffer_size(text)", 5);
+    cfg.get_security_policy().set_text("email_writer::user", 320);
+    cfg.get_security_policy().set_integer("email_writer::to(count)", 1U, 100U);
+    cfg.get_security_policy().set_text("email_writer::to(text)", 320 * 100 + 100);
+    cfg.get_security_policy().set_text("email_writer::to(address)", 320);
     set_handler("from", [this] (const std::string& from) { from_ = validate("email_writer::from", from); });
     set_handler("to", std::bind(&email_writer_memento::set_to, this, std::placeholders::_1));
     set_handler("host", [this] (const std::string& host) { host_ = validate("email_writer::host", host); });
