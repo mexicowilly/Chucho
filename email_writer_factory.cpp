@@ -79,6 +79,8 @@ std::shared_ptr<configurable> email_writer_factory::create_configurable(std::sha
 
     }
     set_filters(wrt, ewm);
+    if (ewm->get_verbose())
+        wrt->set_verbose(*ewm->get_verbose());
     report_info("Created a " + demangle::get_demangled_name(typeid(*wrt)));
     return wrt;
 }

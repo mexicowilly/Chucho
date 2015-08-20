@@ -42,6 +42,7 @@ public:
     const std::string& get_subject() const;
     const std::vector<std::string>& get_to() const;
     const std::string& get_user() const;
+    const optional<bool>& get_verbose() const;
     virtual void handle(std::shared_ptr<configurable> cnf) override;
 
 private:
@@ -58,6 +59,7 @@ private:
     std::string password_;
     optional<email_writer::connection_type> connection_type_;
     optional<std::size_t> buffer_size_;
+    optional<bool> verbose_;
 };
 
 inline const optional<std::size_t>& email_writer_memento::get_buffer_size() const
@@ -108,6 +110,11 @@ inline const std::vector<std::string>& email_writer_memento::get_to() const
 inline const std::string& email_writer_memento::get_user() const
 {
     return user_;
+}
+
+inline const optional<bool>& email_writer_memento::get_verbose() const
+{
+    return verbose_;
 }
 
 }

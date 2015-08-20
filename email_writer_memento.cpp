@@ -36,6 +36,7 @@ email_writer_memento::email_writer_memento(configurator& cfg)
     cfg.get_security_policy().set_integer("email_writer::to(count)", 1U, 100U);
     cfg.get_security_policy().set_text("email_writer::to(text)", 320 * 100 + 100);
     cfg.get_security_policy().set_text("email_writer::to(address)", 320);
+    cfg.get_security_policy().set_text("email_writer::verbose", 5);
     set_handler("from", [this] (const std::string& from) { from_ = validate("email_writer::from", from); });
     set_handler("to", std::bind(&email_writer_memento::set_to, this, std::placeholders::_1));
     set_handler("host", [this] (const std::string& host) { host_ = validate("email_writer::host", host); });
@@ -45,6 +46,7 @@ email_writer_memento::email_writer_memento(configurator& cfg)
     set_handler("password", [this] (const std::string& pass) { password_ = validate("email_writer::password", pass); });
     set_handler("connection_type", std::bind(&email_writer_memento::set_connection_type, this, std::placeholders::_1));
     set_handler("buffer_size", [this] (const std::string& bs) { buffer_size_ = validate("email_writer::buffer_size", std::stoul(validate("email_writer::buffer_size(text)", bs))); });
+    set_handler("verbose", [this] (const std::string& val) { verbose_ = boolean_value(validate("email_writer::verbose", val)); });
 }
 
 void email_writer_memento::handle(std::shared_ptr<configurable> cnf)
