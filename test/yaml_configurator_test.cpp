@@ -192,7 +192,7 @@ TEST_F(yaml_configurator, email_writer)
               "        - from: whistler@mctweaky.com\n"
               "        - to: one@blubbery.com,two@humid.org\n"
               "        - subject: '%c'\n"
-              "        - connection_type: starttls\n"
+              "        - connection_type: clear\n"
               "        - user: scrumpy\n"
               "        - password: lumpy\n"
               "        - buffer_size: 7000\n");

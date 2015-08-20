@@ -152,7 +152,7 @@ TEST_F(chucho_config_file_configurator, email_writer)
               "chucho.writer.em.from = whistler@mctweaky.com\n"
               "chucho.writer.em.to = one@blubbery.com,two@humid.org\n"
               "chucho.writer.em.subject = %c\n"
-              "chucho.writer.em.connection_type = starttls\n"
+              "chucho.writer.em.connection_type = clear\n"
               "chucho.writer.em.user = scrumpy\n"
               "chucho.writer.em.password = lumpy\n"
               "chucho.writer.em.buffer_size = 7000");

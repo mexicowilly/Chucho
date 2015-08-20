@@ -184,7 +184,7 @@ void configurator::email_writer_body()
     ASSERT_TRUE(static_cast<bool>(ewrt));
     EXPECT_EQ(7000, ewrt->get_buffer_capacity());
     EXPECT_EQ(0, ewrt->get_buffer_size());
-    EXPECT_EQ(chucho::email_writer::connection_type::STARTTLS, ewrt->get_connection_type());
+    EXPECT_EQ(chucho::email_writer::connection_type::CLEAR, ewrt->get_connection_type());
     EXPECT_STREQ("whistler@mctweaky.com", ewrt->get_from().c_str());
     EXPECT_STREQ("mail.dummy.com", ewrt->get_host().c_str());
     ASSERT_TRUE(ewrt->get_password());

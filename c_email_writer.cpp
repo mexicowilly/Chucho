@@ -21,6 +21,8 @@
 #include <chucho/c_email_trigger.hpp>
 #include <chucho/exception.hpp>
 
+#include <iostream>
+
 extern "C"
 {
 
@@ -214,7 +216,7 @@ chucho_rc chucho_ewrt_get_to(const chucho_writer* wrt,
         if (rcpts == nullptr) 
             return CHUCHO_NULL_POINTER;
         for (unsigned i = 0; i < *num; i++)
-            *rcpts[i] = tos[i].c_str();
+            (*rcpts)[i] = tos[i].c_str();
     }
     catch (...) 
     {
