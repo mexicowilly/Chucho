@@ -17,6 +17,13 @@
 #if !defined(CHUCHO_LEVEL_THRESHOLD_EMAIL_TRIGGER_H__)
 #define CHUCHO_LEVEL_THRESHOLD_EMAIL_TRIGGER_H__
 
+/**
+ * @file level_threshold_email_trigger.h
+ * @copydoc chucho::level_threshold_email_trigger
+ * 
+ * @ingroup c_email
+ */
+
 #include <chucho/email_trigger.h>
 #include <chucho/level.h>
 
@@ -25,9 +32,37 @@ extern "C"
 {
 #endif
 
+/**
+ * @name Creation
+ * @{
+ */
+/**
+ * Creat a level threshold email trigger.
+ * 
+ * @post Ownership of the trg parameter is transferred to the
+ *       caller, and trg must be released with the @ref
+ *       chucho_release_email_trigger function.
+ * 
+ * @param[out] trg the email trigger to create
+ * @param[in] lvl the level threshold that causes email to be sent
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_create_level_threshold_email_trigger(chucho_email_trigger** trg,
                                                                     const chucho_level* lvl);
-CHUCHO_EXPORT chucho_rc chucho_ltetrg_get_level(const chucho_email_trigger* flt, const chucho_level** lvl);
+/**
+ * @}
+ */
+
+/**
+ * Return the threshold level of the given level threshold trigger
+ * 
+ * @param[in] trg the level threshold email trigger
+ * @param[out] lvl the threshold level
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
+CHUCHO_EXPORT chucho_rc chucho_ltetrg_get_level(const chucho_email_trigger* trg, const chucho_level** lvl);
 
 #if defined(__cplusplus)
 }

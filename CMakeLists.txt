@@ -406,7 +406,10 @@ ENDIF()
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/email_trigger.hpp
      include/chucho/email_writer.hpp
-     include/chucho/error_level_email_trigger.hpp)
+     include/chucho/level_threshold_email_trigger.hpp
+     include/chucho/email_writer.h
+     include/chucho/email_trigger.h
+     include/chucho/level_threshold_email_trigger.h)
 
 # The libyaml sources are required by chuchod
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)

@@ -24,16 +24,29 @@
 namespace chucho
 {
 
+/**
+ * @class email_trigger email_trigger.hpp chucho/email_trigger.hpp
+ * An email trigger is used by @ref email_writer to tell it when
+ * email should be sent.
+ * 
+ * @ingroup email
+ */
 class CHUCHO_EXPORT email_trigger : public status_reporter,
                                     public configurable
 {
 public:
     virtual ~email_trigger() { }
 
+    /**
+     * Return true if the given event should cause an email
+     * to be sent.
+     * 
+     * @param evt the event
+     * @return true if this event inspires an email
+     */
     virtual bool is_triggered(const event& evt) = 0;
 };
 
 }
 
 #endif
-

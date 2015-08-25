@@ -23,12 +23,45 @@
 namespace chucho
 {
 
+/**
+ * @class level_threshold_email_trigger level_threshold_email_trigger.hpp chucho/level_threshold_email_trigger.hpp
+ * An email trigger that fires whenever an event reaches a certain
+ * log level. If the @ref level of the event is greater than or
+ * equal to the @ref level of the trigger, then the trigger fires.
+ * 
+ * @ingroup email
+ */
 class CHUCHO_EXPORT level_threshold_email_trigger : public email_trigger
 {
 public:
+    /**
+     * @name Constructor
+     * @{
+     */
+    /**
+     * Construct a trigger.
+     * 
+     * @param lvl the level to which event levels will be compared
+     */
     level_threshold_email_trigger(std::shared_ptr<level> lvl);
+    /**
+     * @}
+     */
 
+    /**
+     * Return the level of this trigger.
+     * 
+     * @return the level
+     */
     std::shared_ptr<level> get_level() const;
+    /**
+     * Return true if the @ref level of evt is greater than or
+     * equal to the @ref level of this trigger.
+     * 
+     * @param evt the event to examine
+     * @return true if the level of the event is greater than or
+     * equal to the level of this trigger
+     */
     virtual bool is_triggered(const event& evt) override;
 
 private:
