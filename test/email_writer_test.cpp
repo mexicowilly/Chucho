@@ -53,7 +53,7 @@ public:
             connect = chucho::email_writer::connection_type::SSL;
         else if (*connect_text == "starttls")
             connect = chucho::email_writer::connection_type::STARTTLS;
-        auto fmt = std::make_shared<chucho::pattern_formatter>("%m%n");
+        auto fmt = std::make_shared<chucho::pattern_formatter>("%m");
         wrt_ = std::make_shared<chucho::email_writer>(fmt,
                                                       *host,
                                                       connect,
