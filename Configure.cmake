@@ -307,7 +307,10 @@ IF(CHUCHO_POSIX)
 
     # timezone stuff
     CHECK_CXX_SYMBOL_EXISTS(timezone time.h CHUCHO_HAVE_TIMEZONE)
-    IF(NOT CHUCHO_HAVE_TIMEZONE)
+    IF(CHUCHO_HAVE_TIMEZONE)
+        CHECK_CXX_SOURCE_COMPILES("#include <time.h>\nint main() { long doggies = timezone / 60; return 0; }" CHUCHO_TIMEZONE_IS_INTEGRAL)
+    ENDIF()
+    IF(NOT CHUCHO_HAVE_TIMEZONE OR NOT CHUCHO_TIMEZONE_IS_INTEGRAL)
         CHECK_STRUCT_HAS_MEMBER("struct tm" tm_gmtoff time.h CHUCHO_HAVE_TM_GMTOFF)
     ENDIF()
 
