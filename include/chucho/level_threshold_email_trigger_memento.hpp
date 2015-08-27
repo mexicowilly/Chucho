@@ -14,44 +14,35 @@
  *    limitations under the License.
  */
 
-#include <chucho/calendar.hpp>
-#include <time.h>
-#include <windows.h>
+#if !defined(CHUCHO_LEVEL_THRESHOLD_EMAIL_TRIGGER_MEMENTO_HPP__)
+#define CHUCHO_LEVEL_THRESHOLD_EMAIL_TRIGGER_MEMENTO_HPP__
+
+#if !defined(CHUCHO_BUILD)
+#error "This header is private"
+#endif
+
+#include <chucho/memento.hpp>
+#include <chucho/level.hpp>
 
 namespace chucho
 {
 
-namespace calendar
+class level_threshold_email_trigger_memento : public memento
 {
+public:
+    level_threshold_email_trigger_memento(configurator& cfg);
 
-pieces get_local(std::time_t t)
+    std::shared_ptr<level> get_level() const;
+
+private:
+    std::shared_ptr<level> level_;
+};
+
+inline std::shared_ptr<level> level_threshold_email_trigger_memento::get_level() const
 {
-    pieces result;
-    localtime_s(&result, &t);
-    result.is_utc = false;
-    return result;
-}
-
-long get_time_zone_offset_in_minutes()
-{
-    TIME_ZONE_INFORMATION info;
-    GetTimeZoneInformation(&info);
-    return -info.Bias;
-}
-
-pieces get_utc(std::time_t t)
-{
-    pieces result;
-    gmtime_s(&result, &t);
-    result.is_utc = true;
-    return result;
-}
-
-std::time_t to_time_t(const pieces& cal)
-{
-    return cal.is_utc ? _mkgmtime(&const_cast<pieces&>(cal)) : mktime(&const_cast<pieces&>(cal));
+    return level_;
 }
 
 }
 
-}
+#endif

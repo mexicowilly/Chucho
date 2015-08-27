@@ -72,7 +72,7 @@
  * href="https://groups.google.com/forum/?fromgroups#!forum/chucho-logging" 
  * target="_blank">Google group</a>. 
  *  
- * @copyright &copy; 2013-2014 Will Mason 
+ * @copyright &copy; 2013-2015 Will Mason 
  */
 
 /**
@@ -88,6 +88,11 @@
 /**
  * @defgroup database 
  * Classes that write to databases. 
+ */
+
+/**
+ * @defgroup email
+ * Classes that handle writing to email.
  */
 
 /**
@@ -168,6 +173,13 @@
  * Functions that help manage database writers.
  *  
  * @ingroup c 
+ */
+
+/**
+ * @defgroup c_email Email
+ * Functions that manage email writers.
+ * 
+ * @ingroup c
  */
 
 /**

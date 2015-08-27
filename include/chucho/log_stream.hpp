@@ -79,7 +79,7 @@ protected:
  * Typical usage is as follows. 
  * @code 
  * chucho::log_stream stream(my_logger); 
- * CHUCHO_M(stream) << chucho::info << "My dog has fleas." << chucho::endm; 
+ * CHUCHO_M(stream) << chucho::info << "My dog has fleas." << chucho::endl << chucho::endm; 
  * @endcode 
  *  
  * Bear in mind that the performance of streaming to a log can 

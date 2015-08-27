@@ -53,7 +53,7 @@ public:
     /**
      * The default MySQL port, which is 3306.
      */
-    static std::uint16_t DEFAULT_PORT;
+    static const std::uint16_t DEFAULT_PORT;
     /**
      * @name Constructor
      */

@@ -134,6 +134,33 @@ TEST_F(chucho_config_file_configurator, duplicate_message_filter)
     duplicate_message_filter_body();
 }
 
+#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+
+TEST_F(chucho_config_file_configurator, email_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = em\n"
+              "chucho.writer.em = chucho::email_writer\n"
+              "chucho.writer.em.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.em.email_trigger = trg\n"
+              "chucho.email_trigger.trg = chucho::level_threshold_email_trigger\n"
+              "chucho.email_trigger.trg.level = error\n"
+              "chucho.writer.em.host = mail.dummy.com\n"
+              "chucho.writer.em.port = 123\n"
+              "chucho.writer.em.from = whistler@mctweaky.com\n"
+              "chucho.writer.em.to = one@blubbery.com,two@humid.org\n"
+              "chucho.writer.em.subject = %c\n"
+              "chucho.writer.em.connection_type = clear\n"
+              "chucho.writer.em.user = scrumpy\n"
+              "chucho.writer.em.password = lumpy\n"
+              "chucho.writer.em.buffer_size = 7000");
+    email_writer_body();
+}
+
+#endif
+
 TEST_F(chucho_config_file_configurator, file_writer)
 {
     configure("chucho.logger = will\n"

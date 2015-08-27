@@ -14,31 +14,20 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_TEXT_UTIL_HPP__)
-#define CHUCHO_TEXT_UTIL_HPP__
+#include <gtest/gtest.h>
+#include <chucho/text_util.hpp>
 
-#if !defined(CHUCHO_BUILD)
-#error "This header is private"
-#endif
-
-#include <string>
-#include <vector>
-#include <cstdarg>
-
-namespace chucho
+TEST(text_util, tokenize)
 {
-
-namespace text_util
-{
-
-const std::size_t MAX_MESSAGE_SIZE = 500 * 1024;
-
-std::string format(const char* const fmt, va_list args);
-std::string to_lower(const std::string& text);
-std::vector<std::string> tokenize(const std::string& text, char delim);
-
+    auto tokes = chucho::text_util::tokenize("one,two,three", ',');
+    ASSERT_EQ(3, tokes.size());
+    EXPECT_STREQ("one", tokes[0].c_str());
+    EXPECT_STREQ("two", tokes[1].c_str());
+    EXPECT_STREQ("three", tokes[2].c_str());
+    tokes = chucho::text_util::tokenize("@@@@@@my@dog@@has@@@fleas@@@@@@@@@@@@@@@@", '@');
+    ASSERT_EQ(4, tokes.size());
+    EXPECT_STREQ("my", tokes[0].c_str());
+    EXPECT_STREQ("dog", tokes[1].c_str());
+    EXPECT_STREQ("has", tokes[2].c_str());
+    EXPECT_STREQ("fleas", tokes[3].c_str());
 }
-
-}
-
-#endif

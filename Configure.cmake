@@ -24,6 +24,8 @@ INCLUDE(CheckIncludeFile)
 INCLUDE(CheckIncludeFileCXX)
 INCLUDE(ExternalProject)
 INCLUDE(CheckTypeSize)
+INCLUDE(FindCURL)
+INCLUDE(CheckStructHasMember)
 
 # static and shared
 OPTION(ENABLE_SHARED "Whether to build a shared object" FALSE)
@@ -43,6 +45,9 @@ OPTION(LOG4CPLUS_CONFIG "Whether to support reading log4cplus configuration file
 
 # whether to build the C API
 OPTION(C_API "Whether the C API should be built into this Chucho" FALSE)
+
+# whether we should check for the presence of libcurl or not
+OPTION(ENABLE_CURL "Whether libcurl should be checked so that email_writer will be enabled (default ON)" TRUE)
 
 # We'll want this later
 MACRO(CHUCHO_FIND_PROGRAM CHUCHO_FIND_VAR CHUCHO_PROGRAM)
@@ -300,6 +305,19 @@ IF(CHUCHO_POSIX)
         CHUCHO_REQUIRE_SYMBOLS(time.h tzset)
     ENDIF()
 
+    # timezone stuff
+    CHECK_CXX_SYMBOL_EXISTS(timezone time.h CHUCHO_HAVE_TIMEZONE)
+    IF(CHUCHO_HAVE_TIMEZONE)
+        CHECK_CXX_SOURCE_COMPILES("#include <time.h>\nint main() { long doggies = timezone / 60; return 0; }" CHUCHO_TIMEZONE_IS_INTEGRAL)
+        IF(NOT CHUCHO_TIMEZONE_IS_INTEGRAL)
+            UNSET(CHUCHO_HAVE_TIMEZONE)
+	    UNSET(CHUCHO_HAVE_TIMEZONE CACHE)
+        ENDIF()
+    ENDIF()
+    IF(NOT CHUCHO_HAVE_TIMEZONE)
+        CHECK_STRUCT_HAS_MEMBER("struct tm" tm_gmtoff time.h CHUCHO_HAVE_TM_GMTOFF)
+    ENDIF()
+
 ELSEIF(CHUCHO_WINDOWS)
     FOREACH(HEAD windows.h winsock2.h io.h process.h ws2tcpip.h time.h assert.h)
         STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
@@ -319,6 +337,23 @@ ELSEIF(CHUCHO_WINDOWS)
     CHUCHO_FIND_PROGRAM(CHUCHO_SC sc)
     IF(NOT CHUCHO_SC)
         MESSAGE(FATAL_ERROR "sc is required")
+    ENDIF()
+ENDIF()
+
+# See if we can do the email writer
+IF(ENABLE_CURL)
+    FIND_PACKAGE(CURL)
+    IF(CURL_FOUND)
+        CHECK_INCLUDE_FILE_CXX(curl/curl.h CHUCHO_HAVE_CURL_INCLUDE)
+        IF(NOT CHUCHO_HAVE_CURL_INCLUDE)
+            SET(CHUCHO_CURL_INCLUDE_DIR ${CURL_INCLUDE_DIRS} CACHE INTERNAL "Checked include dirs for curl.h")
+        ENDIF()
+        SET(CMAKE_REQUIRED_INCLUDES ${CURL_INCLUDE_DIRS})
+        SET(CMAKE_REQUIRED_LIBRARIES ${CURL_LIBRARIES})
+        CHUCHO_REQUIRE_SYMBOLS(curl/curl.h curl_global_init curl_easy_init curl_easy_cleanup
+                               curl_easy_setopt curl_easy_perform curl_version_info curl_easy_strerror)
+        UNSET(CMAKE_REQUIRED_INCLUDES)
+        UNSET(CMAKE_REQUIRED_LIBRARIES)
     ENDIF()
 ENDIF()
 

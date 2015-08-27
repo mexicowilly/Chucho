@@ -62,6 +62,10 @@
 #if defined(CHUCHO_HAVE_RUBY)
 #include <chucho/ruby_evaluator_filter.hpp>
 #endif
+#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+#include <chucho/email_writer.hpp>
+#include <chucho/level_threshold_email_trigger.hpp>
+#endif
 #include <sstream>
 #if defined(CHUCHO_WINDOWS)
 #include <windows.h>
@@ -168,6 +172,37 @@ void configurator::duplicate_message_filter_body()
     ASSERT_EQ(1, flts.size());
     ASSERT_EQ(typeid(chucho::duplicate_message_filter), typeid(*flts[0]));
 }
+
+#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+
+void configurator::email_writer_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::email_writer), typeid(*wrts[0]));
+    auto ewrt = std::static_pointer_cast<chucho::email_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(ewrt));
+    EXPECT_EQ(7000, ewrt->get_buffer_capacity());
+    EXPECT_EQ(0, ewrt->get_buffer_size());
+    EXPECT_EQ(chucho::email_writer::connection_type::CLEAR, ewrt->get_connection_type());
+    EXPECT_STREQ("whistler@mctweaky.com", ewrt->get_from().c_str());
+    EXPECT_STREQ("mail.dummy.com", ewrt->get_host().c_str());
+    ASSERT_TRUE(ewrt->get_password());
+    EXPECT_STREQ("lumpy", ewrt->get_password()->c_str());
+    EXPECT_EQ(123, ewrt->get_port());
+    EXPECT_STREQ("%c", ewrt->get_subject().c_str());
+    ASSERT_EQ(2, ewrt->get_to().size());
+    EXPECT_STREQ("one@blubbery.com", ewrt->get_to()[0].c_str());
+    EXPECT_STREQ("two@humid.org", ewrt->get_to()[1].c_str());
+    ASSERT_EQ(typeid(chucho::level_threshold_email_trigger), typeid(*ewrt->get_trigger()));
+    auto ltet = std::static_pointer_cast<chucho::level_threshold_email_trigger>(ewrt->get_trigger());
+    ASSERT_TRUE(static_cast<bool>(ltet));
+    EXPECT_EQ(*chucho::level::ERROR_(), *ltet->get_level());
+    ASSERT_TRUE(ewrt->get_user());
+    EXPECT_STREQ("scrumpy", ewrt->get_user()->c_str());
+}
+
+#endif
 
 void configurator::file_writer_body()
 {

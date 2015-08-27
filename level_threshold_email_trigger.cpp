@@ -14,44 +14,23 @@
  *    limitations under the License.
  */
 
-#include <chucho/calendar.hpp>
-#include <time.h>
-#include <windows.h>
+#include <chucho/level_threshold_email_trigger.hpp>
 
 namespace chucho
 {
 
-namespace calendar
+level_threshold_email_trigger::level_threshold_email_trigger(std::shared_ptr<level> lvl)
+    : level_(lvl)
 {
+    set_status_origin("level_threshold_email_trigger");
+    if (!level_)
+        throw std::invalid_argument("The level is unset");
+}
 
-pieces get_local(std::time_t t)
+bool level_threshold_email_trigger::is_triggered(const event& evt)
 {
-    pieces result;
-    localtime_s(&result, &t);
-    result.is_utc = false;
-    return result;
-}
-
-long get_time_zone_offset_in_minutes()
-{
-    TIME_ZONE_INFORMATION info;
-    GetTimeZoneInformation(&info);
-    return -info.Bias;
-}
-
-pieces get_utc(std::time_t t)
-{
-    pieces result;
-    gmtime_s(&result, &t);
-    result.is_utc = true;
-    return result;
-}
-
-std::time_t to_time_t(const pieces& cal)
-{
-    return cal.is_utc ? _mkgmtime(&const_cast<pieces&>(cal)) : mktime(&const_cast<pieces&>(cal));
+    return level_ && *evt.get_level() >= *level_;
 }
 
 }
 
-}

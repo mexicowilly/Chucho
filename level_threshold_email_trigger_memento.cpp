@@ -14,44 +14,16 @@
  *    limitations under the License.
  */
 
-#include <chucho/calendar.hpp>
-#include <time.h>
-#include <windows.h>
+#include <chucho/level_threshold_email_trigger_memento.hpp>
 
 namespace chucho
 {
 
-namespace calendar
+level_threshold_email_trigger_memento::level_threshold_email_trigger_memento(configurator& cfg)
+    : memento(cfg)
 {
-
-pieces get_local(std::time_t t)
-{
-    pieces result;
-    localtime_s(&result, &t);
-    result.is_utc = false;
-    return result;
-}
-
-long get_time_zone_offset_in_minutes()
-{
-    TIME_ZONE_INFORMATION info;
-    GetTimeZoneInformation(&info);
-    return -info.Bias;
-}
-
-pieces get_utc(std::time_t t)
-{
-    pieces result;
-    gmtime_s(&result, &t);
-    result.is_utc = true;
-    return result;
-}
-
-std::time_t to_time_t(const pieces& cal)
-{
-    return cal.is_utc ? _mkgmtime(&const_cast<pieces&>(cal)) : mktime(&const_cast<pieces&>(cal));
-}
-
+    set_status_origin("level_threshold_filter_memento");
+    set_handler("level", [this] (const std::string& name) { level_ = level::from_text(validate("level_threshold_email_trigger::level", name)); });
 }
 
 }

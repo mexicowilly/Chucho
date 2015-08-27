@@ -48,6 +48,9 @@ ENDIF()
 IF(CHUCHO_HAVE_POSTGRES)
     INCLUDE_DIRECTORIES("${POSTGRES_INCLUDE_DIR}")
 ENDIF()
+IF(CHUCHO_CURL_INCLUDE_DIR)
+    INCLUDE_DIRECTORIES("${CHUCHO_CURL_INCLUDE_DIR}")
+ENDIF()
 
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
@@ -71,6 +74,12 @@ IF(CHUCHO_POSIX)
     ENDIF()
     IF(CHUCHO_HAVE_TIMEGM)
         LIST(APPEND CHUCHO_CALENDAR_DEFS CHUCHO_HAVE_TIMEGM)
+    ENDIF()
+    IF(CHUCHO_HAVE_TM_GMTOFF)
+        LIST(APPEND CHUCHO_CALENDAR_DEFS CHUCHO_HAVE_TM_GMTOFF)
+    ENDIF()
+    IF(CHUCHO_HAVE_TIMEZONE)
+        LIST(APPEND CHUCHO_CALENDAR_DEFS CHUCHO_HAVE_TIMEZONE)
     ENDIF()
     IF(CHUCHO_CALENDAR_DEFS)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/calendar_posix.cpp PROPERTIES
@@ -363,6 +372,45 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/ruby_evaluator_filter.hpp
      include/chucho/ruby_evaluator_filter.h)
 
+IF(CURL_FOUND)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/email_trigger.hpp
+         include/chucho/email_writer.hpp
+         include/chucho/level_threshold_email_trigger.hpp)
+    LIST(APPEND CHUCHO_EMBEDDED_SOURCES
+         "${CMAKE_SOURCE_DIR}/embedded/fnv/hash_64a.c")
+    LIST(APPEND CHUCHO_EMAIL_SOURCES
+         email_writer.cpp
+         email_writer_factory.cpp
+         email_writer_memento.cpp
+         level_threshold_email_trigger.cpp
+         level_threshold_email_trigger_factory.cpp
+         level_threshold_email_trigger_memento.cpp
+         include/chucho/email_writer_factory.hpp
+         include/chucho/email_writer_memento.hpp
+         include/chucho/level_threshold_email_trigger_factory.hpp
+         include/chucho/level_threshold_email_trigger_memento.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS
+             include/chucho/email_trigger.h
+             include/chucho/email_writer.h
+             include/chucho/level_threshold_email_trigger.h)
+        LIST(APPEND CHUCHO_EMAIL_SOURCES
+             c_email_trigger.cpp
+             c_email_writer.cpp
+             c_level_threshold_email_trigger.cpp
+             include/chucho/c_email_trigger.hpp)
+    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/email_trigger.hpp
+     include/chucho/email_writer.hpp
+     include/chucho/level_threshold_email_trigger.hpp
+     include/chucho/email_writer.h
+     include/chucho/email_trigger.h
+     include/chucho/level_threshold_email_trigger.h)
+
 # The libyaml sources are required by chuchod
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
     # Update this when you rev libyaml
@@ -370,7 +418,7 @@ MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
     SET(CHUCHO_LIBYAML_VERSION_MINOR 1)
     SET(CHUCHO_LIBYAML_VERSION_PATCH 5)
 
-    SET(${CHUCHO_YAML_SOURCE_VAR}
+    LIST(APPEND ${CHUCHO_YAML_SOURCE_VAR}
         "${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c"
         "${CMAKE_SOURCE_DIR}/embedded/libyaml/loader.c"
         "${CMAKE_SOURCE_DIR}/embedded/libyaml/parser.c"
@@ -427,6 +475,9 @@ IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
     IF(LOG4CPLUS_CONFIG)
         LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_LOG4CPLUS_FILE)
         MESSAGE(STATUS "Chucho has log4cplus configuration parsing enabled")
+    ENDIF()
+    IF(CURL_FOUND)
+        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_EMAIL_WRITER)
     ENDIF()
     SET_SOURCE_FILES_PROPERTIES(config_file_configurator.cpp PROPERTIES
                                 COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATOR_DEFS}")
@@ -655,7 +706,8 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_PUBLIC_HEADERS}
     ${CHUCHO_C_SOURCES}
     ${CHUCHO_DATABASE_SOURCES}
-    ${CHUCHO_EVALUATOR_SOURCES})
+    ${CHUCHO_EVALUATOR_SOURCES}
+    ${CHUCHO_EMAIL_SOURCES})
 
 IF(CHUCHO_HAVE_PUT_TIME)
     SET_SOURCE_FILES_PROPERTIES(calendar.cpp PROPERTIES
@@ -686,6 +738,13 @@ ENDIF()
 
 IF(CHUCHO_HAVE_RUBY)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RUBY)
+ENDIF()
+
+IF(CURL_FOUND)
+    LIST(FIND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_EMAIL_WRITER CHUCHO_HEW_INDEX)
+    IF(CHUCHO_HEW_INDEX EQUAL -1)
+        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_EMAIL_WRITER)
+    ENDIF()
 ENDIF()
 
 IF(DEFINED CHUCHO_CONFIGURATOR_DEFS)
@@ -825,6 +884,10 @@ IF(ENABLE_SHARED)
     IF(CHUCHO_HAVE_RUBY)
         TARGET_LINK_LIBRARIES(chucho "${RUBY_LIB}")
     ENDIF()
+    IF(CURL_FOUND)
+        TARGET_LINK_LIBRARIES(chucho ${CURL_LIBRARIES})
+    ENDIF()
+
     IF(CMAKE_GENERATOR STREQUAL Xcode AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         SET_TARGET_PROPERTIES(chucho PROPERTIES
                               LINK_FLAGS "-std=c++11 -stdlib=libc++")

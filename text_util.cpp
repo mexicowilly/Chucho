@@ -35,6 +35,19 @@ std::string to_lower(const std::string& text)
     return low;
 }
 
+std::vector<std::string> tokenize(const std::string& text, char delim)
+{
+    std::vector<std::string> result;
+    std::size_t start = text.find_first_not_of(delim);
+    while (start != std::string::npos)
+    {
+        std::size_t end = text.find_first_of(delim, start);
+        result.push_back(text.substr(start, end - start));
+        start = text.find_first_not_of(delim, end);
+    }
+    return result;
+}
+
 }
 
 }

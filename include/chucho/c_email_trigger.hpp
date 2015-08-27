@@ -14,30 +14,18 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_TEXT_UTIL_HPP__)
-#define CHUCHO_TEXT_UTIL_HPP__
+#if !defined(CHUCHO_C_EMAIL_TRIGGER_HPP__)
+#define CHUCHO_C_EMAIL_TRIGGER_HPP__
 
-#if !defined(CHUCHO_BUILD)
-#error "This header is private"
-#endif
+#include <chucho/email_trigger.hpp>
 
-#include <string>
-#include <vector>
-#include <cstdarg>
-
-namespace chucho
+extern "C"
 {
 
-namespace text_util
+struct chucho_email_trigger
 {
-
-const std::size_t MAX_MESSAGE_SIZE = 500 * 1024;
-
-std::string format(const char* const fmt, va_list args);
-std::string to_lower(const std::string& text);
-std::vector<std::string> tokenize(const std::string& text, char delim);
-
-}
+    std::shared_ptr<chucho::email_trigger> trg_;
+};
 
 }
 

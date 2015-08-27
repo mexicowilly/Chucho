@@ -14,44 +14,27 @@
  *    limitations under the License.
  */
 
-#include <chucho/calendar.hpp>
-#include <time.h>
-#include <windows.h>
+#if !defined(CHUCHO_LEVEL_THRESHOLD_EMAIL_TRIGGER_FACTORY_HPP__)
+#define CHUCHO_LEVEL_THRESHOLD_EMAIL_TRIGGER_FACTORY_HPP__
+
+#if !defined(CHUCHO_BUILD)
+#error "This header is private"
+#endif
+
+#include <chucho/configurable_factory.hpp>
 
 namespace chucho
 {
 
-namespace calendar
+class level_threshold_email_trigger_factory : public configurable_factory
 {
+public:
+    level_threshold_email_trigger_factory();
 
-pieces get_local(std::time_t t)
-{
-    pieces result;
-    localtime_s(&result, &t);
-    result.is_utc = false;
-    return result;
-}
-
-long get_time_zone_offset_in_minutes()
-{
-    TIME_ZONE_INFORMATION info;
-    GetTimeZoneInformation(&info);
-    return -info.Bias;
-}
-
-pieces get_utc(std::time_t t)
-{
-    pieces result;
-    gmtime_s(&result, &t);
-    result.is_utc = true;
-    return result;
-}
-
-std::time_t to_time_t(const pieces& cal)
-{
-    return cal.is_utc ? _mkgmtime(&const_cast<pieces&>(cal)) : mktime(&const_cast<pieces&>(cal));
-}
+    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
+    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
+};
 
 }
 
-}
+#endif

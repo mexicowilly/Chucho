@@ -98,6 +98,10 @@ IF(CHUCHO_HAVE_RUBY)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_RUBY)
 ENDIF()
 
+IF(CURL_FOUND)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_EMAIL_WRITER)
+ENDIF()
+
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
                calendar_test.cpp
@@ -125,15 +129,12 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                rolling_file_writer_test.cpp
                security_policy_test.cpp
                size_file_roll_trigger_test.cpp
+               text_util_test.cpp
                utf8_test.cpp
                ${CHUCHO_TEST_COMPRESSION_SOURCES}
                ${CHUCHO_CONFIGURATOR_TESTS}
                ${CHUCHO_TEST_EVALUATOR_SOURCES})
 TARGET_LINK_LIBRARIES(unit-test chucho gtest ${CMAKE_THREAD_LIBS_INIT})
-IF(CHUCHO_SOLARIS)
-    TARGET_LINK_LIBRARIES(unit-test socket nsl)
-ENDIF()
-
 IF(CHUCHO_HAVE_MYSQL)
     TARGET_LINK_LIBRARIES(unit-test "${MYSQL_CLIENT_LIB}")
 ENDIF()
@@ -152,6 +153,14 @@ ENDIF()
 
 IF(CHUCHO_HAVE_RUBY AND NOT RUBY_FRAMEWORK)
     TARGET_LINK_LIBRARIES(unit-test "${RUBY_LIB}")
+ENDIF()
+
+IF(CURL_FOUND)
+    TARGET_LINK_LIBRARIES(unit-test ${CURL_LIBRARIES})
+ENDIF()
+
+IF(CHUCHO_SOLARIS)
+    TARGET_LINK_LIBRARIES(unit-test socket nsl)
 ENDIF()
 
 IF(MSVC)
@@ -206,6 +215,12 @@ IF(C_API)
         LIST(APPEND CHUCHO_EVALUATOR_C_SOURCES
              ruby_evaluator_filter_test.c
              ruby_evaluator_filter_test.h)
+    ENDIF()
+
+    IF(CURL_FOUND)
+        LIST(APPEND CHUCHO_EMAIL_WRITER_C_SOURCES
+             email_writer_test.c
+             email_writer_test.h)
     ENDIF()
 
     IF(CHUCHO_WINDOWS)
@@ -275,7 +290,8 @@ IF(C_API)
                    ${CHUCHO_TEST_COMPRESSION_C_SOURCES}
                    ${CHUCHO_DB_C_SOURCES}
                    ${CHUCHO_EVALUATOR_C_SOURCES}
-                   ${CHUCHO_PLATFORM_C_SOURCES})
+                   ${CHUCHO_PLATFORM_C_SOURCES}
+                   ${CHUCHO_EMAIL_WRITER_C_SOURCES})
     TARGET_LINK_LIBRARIES(c-unit-test chucho ${CMAKE_THREAD_LIBS_INIT})
 
     IF(CHUCHO_HAVE_ORACLE)
@@ -296,6 +312,10 @@ IF(C_API)
 
     IF(CHUCHO_HAVE_RUBY AND NOT RUBY_FRAMEWORK)
         TARGET_LINK_LIBRARIES(c-unit-test "${RUBY_LIB}")
+    ENDIF()
+
+    IF(CURL_FOUND)
+        TARGET_LINK_LIBRARIES(c-unit-test ${CURL_LIBRARIES})
     ENDIF()
 
     IF(CHUCHO_SOLARIS)
@@ -365,6 +385,16 @@ IF(CHUCHO_HAVE_POSTGRES)
                    harness.cpp
                    postgres_writer_test.cpp)
     TARGET_LINK_LIBRARIES(postgres-writer-test chucho ${POSTGRES_CLIENT_LIB} gtest ${CMAKE_THREAD_LIBS_INIT})
+ENDIF()
+
+IF(CURL_FOUND)
+    ADD_EXECUTABLE(email-writer-test EXCLUDE_FROM_ALL
+                   harness.cpp
+                   email_writer_test.cpp)
+    TARGET_LINK_LIBRARIES(email-writer-test chucho ${CURL_LIBRARIES} gtest ${CMAKE_THREAD_LIBS_INIT})
+    IF(CHUCHO_SOLARIS)
+        TARGET_LINK_LIBRARIES(email-writer-test socket nsl)
+    ENDIF()
 ENDIF()
 
 ADD_EXECUTABLE(configuration-off EXCLUDE_FROM_ALL

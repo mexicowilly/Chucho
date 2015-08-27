@@ -14,31 +14,9 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_TEXT_UTIL_HPP__)
-#define CHUCHO_TEXT_UTIL_HPP__
+#if !defined(CHUCHO_EMAIL_WRITER_TEST_H__)
+#define CHUCHO_EMAIL_WRITER_TEST_H__
 
-#if !defined(CHUCHO_BUILD)
-#error "This header is private"
-#endif
-
-#include <string>
-#include <vector>
-#include <cstdarg>
-
-namespace chucho
-{
-
-namespace text_util
-{
-
-const std::size_t MAX_MESSAGE_SIZE = 500 * 1024;
-
-std::string format(const char* const fmt, va_list args);
-std::string to_lower(const std::string& text);
-std::vector<std::string> tokenize(const std::string& text, char delim);
-
-}
-
-}
+void run_email_writer_test(void);
 
 #endif
