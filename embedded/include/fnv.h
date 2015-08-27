@@ -79,8 +79,10 @@
 #include <sys/types.h>
 /*
  * Chucho addition
- * #include <stdint.h>
  */
+#if !defined(_WIN32)
+#include <stdint.h>
+#endif
 typedef uint32_t u_int32_t;
 typedef uint64_t u_int64_t;
 
