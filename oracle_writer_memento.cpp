@@ -23,6 +23,9 @@ oracle_writer_memento::oracle_writer_memento(configurator& cfg)
     : writer_memento(cfg)
 {
     set_status_origin("oracle_writer_memento");
+    cfg.get_security_policy().set_text("oracle_writer::database", 512);
+    cfg.get_security_policy().set_text("oracle_writer::user", 30);
+    cfg.get_security_policy().set_text("oracle_writer::password", 30);
     set_handler("user", [this] (const std::string& user) { user_ = validate("oracle_writer::user", user); });
     set_handler("password", [this] (const std::string& password) { password_ = validate("oracle_writer::password", password); });
     set_handler("database", [this] (const std::string& database) { database_ = validate("oracle_writer::database", database); });

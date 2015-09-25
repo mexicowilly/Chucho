@@ -24,6 +24,7 @@ remote_writer_memento::remote_writer_memento(configurator& cfg, memento_key_set 
 {
     set_status_origin("remote_writer_memento");
     cfg.get_security_policy().set_integer("remote_writer::port", 1, 65535);
+    cfg.get_security_policy().set_text("remote_writer::port(text)", 5);
     set_handler("host", [this] (const std::string& name) { host_ = name; });
     set_handler("port", [this] (const std::string& port) { port_ = validate("remote_writer::port", static_cast<std::uint16_t>(std::stoul(validate("remote_writer::port(text)", port)))); });
     if (ks == memento_key_set::CHUCHO)
