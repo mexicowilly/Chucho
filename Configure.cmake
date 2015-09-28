@@ -705,6 +705,26 @@ IF(CHUCHO_MACINTOSH)
     ENDIF()
 ENDIF()
 
+# Linux service stuff
+IF(CHUCHO_LINUX)
+    FILE(READ /proc/1/cmdline CHUCHO_PROC1_CMDLINE)
+    # TODO: check for systemd
+    STRING(REGEX MATCH "^.+/init$" CHUCHO_INIT_MATCH "${CHUCHO_PROC1_CMDLINE}")
+    IF(CHUCHO_INIT_MATCH)
+        EXECUTE_PROCESS(COMMAND "${CHUCHO_PROC1_CMDLINE}" --version
+                        OUTPUT_VARIABLE CHUCHO_INIT_OUT)
+        STRING(REGEX MATCH upstart CHUCHO_UPSTART_MATCH "${CHUCHO_INIT_OUT}")
+        IF(CHUCHO_UPSTART_MATCH)
+            CHUCHO_FIND_PROGRAM(CHUCHO_INITCTL initctl)
+            IF(NOT CHUCHO_INITCTL)
+                MESSAGE(FATAL_ERROR "initctl is required when using the Upstart init system")
+            ENDIF()
+            MESSAGE(STATUS "This Linux is using the Upstart init system")
+            SET(CHUCHO_UPSTART_INIT TRUE)
+        ENDIF()
+    ENDIF()
+ENDIF()
+
 # zip
 CHUCHO_FIND_PROGRAM(CHUCHO_ZIP zip)
 IF(NOT CHUCHO_ZIP)
