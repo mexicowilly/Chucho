@@ -59,6 +59,15 @@ ELSEIF(CHUCHO_UPSTART_INIT)
     ENDIF()
     CONFIGURE_FILE(platform/linux/UninstallUpstartService.cmake.in
                    "${CMAKE_CURRENT_BINARY_DIR}/UninstallService.cmake")
+ELSEIF(CHUCHO_SYSTEMD_INIT)
+    IF(INSTALL_SERVICE)
+        CONFIGURE_FILE(platform/linux/systemd.service.in
+                       "${CMAKE_CURRENT_BINARY_DIR}/chuchod.service")
+        CONFIGURE_FILE(platform/linux/InstallSystemdService.cmake.in
+                       "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
+    ENDIF()
+    CONFIGURE_FILE(platform/linux/UninstallSystemdService.cmake.in
+                   "${CMAKE_CURRENT_BINARY_DIR}/UninstallService.cmake")
 ENDIF()
 
 IF(CHUCHO_POSIX)
@@ -177,6 +186,9 @@ IF(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
     ELSEIF(CHUCHO_UPSTART_INIT)
         INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/chuchod.conf"
                 DESTINATION /etc/init)
+    ELSEIF(CHUCHO_SYSTEMD_INIT)
+        INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/chuchod.service"
+                DESTINATION /etc/systemd/system)
     ENDIF()
     INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
 ENDIF()

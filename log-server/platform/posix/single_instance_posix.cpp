@@ -66,6 +66,7 @@ void ensure()
         if (pid_file.is_open())
         {
             pid_file << getpid();
+            CHUCHO_INFO(lgr, "Wrote PID " << getpid() << " to the file " << PID_FILE_NAME);
         }
         else
         {
