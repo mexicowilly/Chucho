@@ -27,6 +27,9 @@ syslog_writer_memento::syslog_writer_memento(configurator& cfg)
 {
     set_status_origin("syslog_writer_memento");
     cfg.get_security_policy().set_integer("syslog_writer::port", static_cast<std::uint16_t>(1), static_cast<std::uint16_t>(65535));
+    cfg.get_security_policy().set_text("syslog_writer::port(text)", 5);
+    cfg.get_security_policy().set_text("syslog_writer::facility", 8);
+    cfg.get_security_policy().set_text("syslog_writer::host_name", 253);
     set_handler("facility", std::bind(&syslog_writer_memento::set_facility, this, std::placeholders::_1));
     set_handler("host_name", [this] (const std::string& name) { host_name_ = validate("syslog_writer::host_name", name); });
     set_alias("host_name", "host");

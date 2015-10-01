@@ -50,6 +50,34 @@ ELSEIF(CHUCHO_MACINTOSH)
     ENDIF()
     CONFIGURE_FILE(platform/macintosh/UninstallService.cmake.in
                    "${CMAKE_CURRENT_BINARY_DIR}/UninstallService.cmake")
+ELSEIF(CHUCHO_UPSTART_INIT)
+    IF(INSTALL_SERVICE)
+        CONFIGURE_FILE(platform/linux/upstart.conf.in
+                       "${CMAKE_CURRENT_BINARY_DIR}/chuchod.conf")
+        CONFIGURE_FILE(platform/linux/InstallUpstartService.cmake.in
+                       "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
+    ENDIF()
+    CONFIGURE_FILE(platform/linux/UninstallUpstartService.cmake.in
+                   "${CMAKE_CURRENT_BINARY_DIR}/UninstallService.cmake")
+ELSEIF(CHUCHO_SYSTEMD_INIT)
+    IF(INSTALL_SERVICE)
+        CONFIGURE_FILE(platform/linux/systemd.service.in
+                       "${CMAKE_CURRENT_BINARY_DIR}/chuchod.service")
+        CONFIGURE_FILE(platform/linux/InstallSystemdService.cmake.in
+                       "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
+    ENDIF()
+    CONFIGURE_FILE(platform/linux/UninstallSystemdService.cmake.in
+                   "${CMAKE_CURRENT_BINARY_DIR}/UninstallService.cmake")
+ELSEIF(CHUCHO_RC_INIT)
+    IF(INSTALL_SERVICE)
+        CONFIGURE_FILE(platform/bsd/chuchod.in
+                       "${CMAKE_CURRENT_BINARY_DIR}/rc.d/chuchod"
+                       @ONLY)
+        CONFIGURE_FILE(platform/bsd/InstallService.cmake.in
+                       "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
+    ENDIF()
+    CONFIGURE_FILE(platform/bsd/UninstallService.cmake.in
+                   "${CMAKE_CURRENT_BINARY_DIR}/UninstallService.cmake")
 ENDIF()
 
 IF(CHUCHO_POSIX)
@@ -138,6 +166,9 @@ IF(CHUCHO_HAVE_WINSOCK2_H)
                                 COMPILE_DEFINITIONS "${CHUCHO_SUZERAIN_DEFS};CHUCHO_HAVE_WINSOCK2_H")
 ENDIF()
 
+IF(CURL_FOUND)
+    TARGET_LINK_LIBRARIES(chuchod ${CURL_LIBRARIES})
+ENDIF()
 TARGET_LINK_LIBRARIES(chuchod chucho ${CMAKE_THREAD_LIBS_INIT})
 IF(CHUCHO_SOLARIS)
     TARGET_LINK_LIBRARIES(chuchod socket nsl)
@@ -148,23 +179,30 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
                                 COMPILE_FLAGS "-Wno-unused-result")
 ENDIF()
 
-IF(CHUCHO_WINDOWS OR CHUCHO_SOLARIS OR CHUCHO_MACINTOSH)
+IF(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/UninstallService.cmake")
     INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/UninstallService.cmake")
 ENDIF()
 INSTALL(TARGETS chuchod
         RUNTIME DESTINATION bin)
 INSTALL(FILES chuchod.yaml.sample
         DESTINATION etc)
-IF(INSTALL_SERVICE)
-    IF(CHUCHO_WINDOWS)
-        INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
-    ELSEIF(CHUCHO_SOLARIS)
-        INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
+IF(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
+    IF(CHUCHO_SOLARIS)
         INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/chucho.xml"
                 DESTINATION /var/svc/manifest/application)
     ELSEIF(CHUCHO_MACINTOSH)
         INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/org.chucho-log.chuchod.plist"
                 DESTINATION /Library/LaunchDaemons)
-        INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
+    ELSEIF(CHUCHO_UPSTART_INIT)
+        INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/chuchod.conf"
+                DESTINATION /etc/init)
+    ELSEIF(CHUCHO_SYSTEMD_INIT)
+        INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/chuchod.service"
+                DESTINATION /etc/systemd/system)
+    ELSEIF(CHUCHO_RC_INIT)
+        INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/rc.d/chuchod"
+                DESTINATION /etc/rc.d
+                PERMISSIONS OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
     ENDIF()
+    INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/InstallService.cmake")
 ENDIF()

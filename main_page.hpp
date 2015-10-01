@@ -91,6 +91,11 @@
  */
 
 /**
+ * @defgroup email
+ * Classes that handle writing to email.
+ */
+
+/**
  * @defgroup filters 
  * Filters are attached to @ref writers, and they can be used to 
  * refine log filtering beyond the basic level check. 
@@ -168,6 +173,13 @@
  * Functions that help manage database writers.
  *  
  * @ingroup c 
+ */
+
+/**
+ * @defgroup c_email Email
+ * Functions that manage email writers.
+ * 
+ * @ingroup c
  */
 
 /**

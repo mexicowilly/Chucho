@@ -22,6 +22,7 @@
 #endif
 
 #include <string>
+#include <vector>
 #include <cstdarg>
 
 namespace chucho
@@ -34,6 +35,7 @@ const std::size_t MAX_MESSAGE_SIZE = 500 * 1024;
 
 std::string format(const char* const fmt, va_list args);
 std::string to_lower(const std::string& text);
+std::vector<std::string> tokenize(const std::string& text, char delim);
 
 }
 

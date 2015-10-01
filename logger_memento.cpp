@@ -24,6 +24,7 @@ logger_memento::logger_memento(configurator& cfg)
     : memento(cfg)
 {
     set_status_origin("logger_memento");
+    cfg.get_security_policy().set_text("logger::writes_to_ancestors", 5);
     set_handler("level", [this] (const std::string& name) { level_ = level::from_text(validate("logger::level", name)); });
     set_handler("name", [this] (const std::string& name) {  name_ = validate("logger::name", name); });
     set_handler("writes_to_ancestors", [this] (const std::string& name) { writes_to_ancestors_ = boolean_value(validate("logger::writer_to_ancestors", name)); });

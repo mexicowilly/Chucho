@@ -39,6 +39,9 @@ protected:
     void configure_with_error(const char* const cnf);
     void cout_writer_body();
     void duplicate_message_filter_body();
+#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+    void email_writer_body();
+#endif
     void file_writer_body();
     void gzip_file_compressor_body();
     void interval_file_roll_trigger_body(const std::string& tmpl);

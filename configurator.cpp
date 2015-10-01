@@ -59,6 +59,11 @@
 #if defined(CHUCHO_HAVE_RUBY)
 #include <chucho/ruby_evaluator_filter_factory.hpp>
 #endif
+#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+#include <chucho/email_writer_factory.hpp>
+#include <chucho/level_threshold_email_trigger_factory.hpp>
+#endif
+
 #include <cstring>
 #include <mutex>
 
@@ -136,6 +141,8 @@ void configurator::initialize_impl()
     add_configurable_factory("chucho::async_writer", fact);
     fact.reset(new sliding_numbered_file_roller_factory());
     add_configurable_factory("chucho::sliding_numbered_file_roller", fact);
+    fact.reset(new interval_file_roll_trigger_factory());
+    add_configurable_factory("chucho::interval_file_roll_trigger", fact);
 #if defined(CHUCHO_WINDOWS)
     fact.reset(new windows_event_log_writer_factory());
     add_configurable_factory("chucho::windows_event_log_writer", fact);
@@ -160,8 +167,12 @@ void configurator::initialize_impl()
     fact.reset(new ruby_evaluator_filter_factory());
     add_configurable_factory("chucho::ruby_evaluator_filter", fact);
 #endif
-    fact.reset(new interval_file_roll_trigger_factory());
-    add_configurable_factory("chucho::interval_file_roll_trigger", fact);
+#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+    fact.reset(new email_writer_factory());
+    add_configurable_factory("chucho::email_writer", fact);
+    fact.reset(new level_threshold_email_trigger_factory());
+    add_configurable_factory("chucho::level_threshold_email_trigger", fact);
+#endif
 }
 
 std::string configurator::resolve_variables(const std::string& val)
