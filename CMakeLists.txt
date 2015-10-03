@@ -963,9 +963,29 @@ IF(DOXYGEN_FOUND)
         SET(CHUCHO_DOXYGEN_EXTRACT_ALL NO)
     ENDIF()
     CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/doxygen.conf.in" "${CMAKE_BINARY_DIR}/doxygen.conf")
-    ADD_CUSTOM_TARGET(doc
-                      COMMAND "${DOXYGEN_EXECUTABLE}" "${CMAKE_BINARY_DIR}/doxygen.conf"
-                      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+    MESSAGE(STATUS "Generating HTML header for API documentation")
+    EXECUTE_PROCESS(COMMAND "${DOXYGEN_EXECUTABLE}" -w html "${CMAKE_BINARY_DIR}/doc_header.html" "${CMAKE_BINARY_DIR}/doc_footer.html" "${CMAKE_BINARY_DIR}/doc_stylesheet.html" "${CMAKE_BINARY_DIR}/doxygen.conf"
+                    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+    FILE(STRINGS "${CMAKE_BINARY_DIR}/doc_header.html" CHUCHO_HTML_HEADER)
+    FILE(REMOVE "${CMAKE_BINARY_DIR}/doc_header.html" "${CMAKE_BINARY_DIR}/doc_footer.html" "${CMAKE_BINARY_DIR}/doc_stylesheet.html")
+    LIST(FIND CHUCHO_HTML_HEADER <head> CHUCHO_HEAD_INDEX)
+    IF(CHUCHO_HEAD_INDEX EQUAL -1)
+        MESSAGE(FATAL_ERROR "The <head> section of the HTML header could not be found")
+    ENDIF()
+    MATH(EXPR CHUCHO_FAVICON_INDEX "${CHUCHO_HEAD_INDEX} + 1")
+    LIST(INSERT CHUCHO_HTML_HEADER ${CHUCHO_FAVICON_INDEX} "<link rel=\"shortcut icon\" href=\"$relpath^itzcuintli.ico\" type=\"image/x-icon\"/>")
+    FOREACH(LINE ${CHUCHO_HTML_HEADER})
+        FILE(APPEND "${CMAKE_BINARY_DIR}/doc_header.html" ${LINE})
+        FILE(APPEND "${CMAKE_BINARY_DIR}/doc_header.html" "\n")
+    ENDFOREACH()
+    IF(C_API)
+        ADD_CUSTOM_TARGET(doc
+                          COMMAND "${DOXYGEN_EXECUTABLE}" "${CMAKE_BINARY_DIR}/doxygen.conf"
+                          WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+    ELSE()
+        ADD_CUSTOM_TARGET(doc
+                          COMMAND "${CMAKE_COMMAND}" -E echo "C_API must be enabled in order to generate documentation")
+    ENDIF()
 ELSE()
     ADD_CUSTOM_TARGET(doc
                       COMMAND "${CMAKE_COMMAND}" -E echo "Doxygen was not found on this system, so the documentation cannot be generated")
