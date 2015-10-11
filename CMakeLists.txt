@@ -57,10 +57,13 @@ IF(CHUCHO_POSIX)
         platform/posix/calendar_posix.cpp
         platform/posix/diagnostic_context_posix.cpp
         platform/posix/environment_posix.cpp
+        platform/posix/file_descriptor_writer_posix.cpp
         platform/posix/file_posix.cpp
         platform/posix/host_posix.cpp
         platform/posix/line_ending_posix.cpp
+        platform/posix/named_pipe_writer_posix.cpp
         platform/posix/pattern_formatter_posix.cpp
+        platform/posix/pipe_writer_posix.cpp
         platform/posix/socket_connector_posix.cpp
         platform/posix/socket_exception_posix.cpp
         platform/posix/syslog_writer_posix.cpp
@@ -143,6 +146,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/file_compressor.hpp
     include/chucho/file_compressor_factory.hpp
     include/chucho/file_compressor_memento.hpp
+    include/chucho/file_descriptor_writer.hpp
     include/chucho/file_roller.hpp
     include/chucho/file_roller_memento.hpp
     include/chucho/file_roll_trigger.hpp
@@ -162,11 +166,13 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/logger.hpp
     include/chucho/marker.hpp
     include/chucho/memento.hpp
+    include/chucho/named_pipe_writer.hpp
     include/chucho/non_copyable.hpp
     include/chucho/noop_file_compressor.hpp
     include/chucho/numbered_file_roller.hpp
     include/chucho/optional.hpp
     include/chucho/pattern_formatter.hpp
+    include/chucho/pipe_writer.hpp
     include/chucho/remote_writer.hpp
     include/chucho/rolling_file_writer.hpp
     include/chucho/ruby_evaluator_filter.hpp
@@ -571,6 +577,7 @@ SET(CHUCHO_SOURCES
     exception.cpp
     file_compressor_factory.cpp
     file_compressor_memento.cpp
+    file_descriptor_writer.cpp
     file_exception.cpp
     file_roller.cpp
     file_roller_memento.cpp
@@ -599,6 +606,7 @@ SET(CHUCHO_SOURCES
     marker.cpp
     memento.cpp
     memento_key_set.cpp
+    named_pipe_writer.cpp
     noop_file_compressor.cpp
     numbered_file_roller.cpp
     numbered_file_roller_factory.cpp
