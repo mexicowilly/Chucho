@@ -14,32 +14,23 @@
  *    limitations under the License.
  */
 
-#include <chucho/file_descriptor_writer.hpp>
-#include <algorithm>
+#include <chucho/named_pipe_writer.hpp>
 
 namespace chucho
 {
 
-file_descriptor_writer::~file_descriptor_writer()
+std::string named_pipe_writer::normalize_name(const std::string& name)
 {
-    close();
-}
-
-void file_descriptor_writer::write_impl(const event& evt)
-{
-    std::string msg = formatter_->format(evt);
-    std::size_t left = msg.length();
-    while (left > 0)
+    if (name.find("\\\\.\\pipe\\") != 0)
     {
-        std::size_t to_copy = std::min(left, buf_.size() - num_);
-        msg.copy(buf_.data() + num_, to_copy, msg.length() - left);
-        left -= to_copy;
-        num_ += to_copy;
-        if (num_ == buf_.size())
-            flush();
+        std::string loc(name);
+        auto ns = loc.find_first_not_of('\\');
+        if (ns != std::string::npos)
+            loc.erase(0, ns);
+        return "\\\\.\\pipe\\" + loc;
     }
-    if (flush_ && num_ > 0)
-        flush();
+    return name;
 }
 
 }
+

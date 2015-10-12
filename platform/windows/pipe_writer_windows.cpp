@@ -14,32 +14,36 @@
  *    limitations under the License.
  */
 
-#include <chucho/file_descriptor_writer.hpp>
-#include <algorithm>
+#include <chucho/pipe_writer.hpp>
+#include <chucho/exception.hpp>
+#include "error_util.hpp"
 
 namespace chucho
 {
 
-file_descriptor_writer::~file_descriptor_writer()
+pipe_writer::pipe_writer(std::shared_ptr<formatter> fmt,
+                         bool flsh)
+    : file_descriptor_writer(fmt, flsh),
+      input_(INVALID_HANDLE_VALUE),
+      output_(INVALID_HANDLE_VALUE)
 {
-    close();
+    if (CreatePipe(&input_,
+                   &output_,
+                   NULL,
+                   0))
+    {
+        set_file_handle(output_);
+    }
+    else
+    {
+        throw exception("Could not create pipes: " + error_util::message(GetLastError()));
+    }
 }
 
-void file_descriptor_writer::write_impl(const event& evt)
+pipe_writer::~pipe_writer()
 {
-    std::string msg = formatter_->format(evt);
-    std::size_t left = msg.length();
-    while (left > 0)
-    {
-        std::size_t to_copy = std::min(left, buf_.size() - num_);
-        msg.copy(buf_.data() + num_, to_copy, msg.length() - left);
-        left -= to_copy;
-        num_ += to_copy;
-        if (num_ == buf_.size())
-            flush();
-    }
-    if (flush_ && num_ > 0)
-        flush();
+    close();
+    CloseHandle(input_);
 }
 
 }

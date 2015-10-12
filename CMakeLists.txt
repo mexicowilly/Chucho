@@ -59,6 +59,7 @@ IF(CHUCHO_POSIX)
         platform/posix/environment_posix.cpp
         platform/posix/file_descriptor_writer_posix.cpp
         platform/posix/file_posix.cpp
+        platform/posix/file_writer_posix.cpp
         platform/posix/host_posix.cpp
         platform/posix/line_ending_posix.cpp
         platform/posix/named_pipe_writer_posix.cpp
@@ -108,10 +109,14 @@ ELSEIF(CHUCHO_WINDOWS)
         platform/windows/environment_windows.cpp
         platform/windows/error_util.cpp
         platform/windows/error_util.hpp
+        platform/windows/file_descriptor_writer_windows.cpp
         platform/windows/file_windows.cpp
+        platform/windows/file_writer_windows.cpp
         platform/windows/host_windows.cpp
         platform/windows/line_ending_windows.cpp
+        platform/windows/named_pipe_writer_windows.cpp
         platform/windows/pattern_formatter_windows.cpp
+        platform/windows/pipe_writer_windows.cpp
         platform/windows/socket_connector_windows.cpp
         platform/windows/socket_exception_windows.cpp
         platform/windows/syslog_writer_windows.cpp
@@ -726,6 +731,12 @@ IF(CHUCHO_WINDOWS)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_WINDOWS)
     SET_SOURCE_FILES_PROPERTIES(configurator.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_WINDOWS)
+    SET_SOURCE_FILES_PROPERTIES(file_descriptor_writer.cpp PROPERTIES
+                                COMPILE_DEFINITIONS "NOMINMAX;_SCL_SECURE_NO_WARNINGS")
+    SET_SOURCE_FILES_PROPERTIES(sliding_numbered_file_roller.cpp
+                                time_file_roller.cpp
+                                PROPERTIES
+                                COMPILE_DEFINITIONS NOMINMAX)
 ENDIF()
 
 IF(CHUCHO_HAVE_MYSQL)
