@@ -612,6 +612,8 @@ SET(CHUCHO_SOURCES
     memento.cpp
     memento_key_set.cpp
     named_pipe_writer.cpp
+    named_pipe_writer_factory.cpp
+    named_pipe_writer_memento.cpp
     noop_file_compressor.cpp
     numbered_file_roller.cpp
     numbered_file_roller_factory.cpp
@@ -619,6 +621,8 @@ SET(CHUCHO_SOURCES
     pattern_formatter.cpp
     pattern_formatter_factory.cpp
     pattern_formatter_memento.cpp
+    pipe_writer_factory.cpp
+    pipe_writer_memento.cpp
     regex.cpp
     regex_exception.cpp
     remote_writer.cpp
@@ -685,10 +689,14 @@ SET(CHUCHO_SOURCES
     include/chucho/logger_factory.hpp
     include/chucho/logger_memento.hpp
     include/chucho/memento_key_set.hpp
+    include/chucho/named_pipe_writer_factory.hpp
+    include/chucho/named_pipe_writer_memento.hpp
     include/chucho/numbered_file_roller_factory.hpp
     include/chucho/numbered_file_roller_memento.hpp
     include/chucho/pattern_formatter_factory.hpp
     include/chucho/pattern_formatter_memento.hpp
+    include/chucho/pipe_writer_factory.hpp
+    include/chucho/pipe_writer_memento.hpp
     include/chucho/regex.hpp
     include/chucho/regex_exception.hpp
     include/chucho/remote_writer_factory.hpp

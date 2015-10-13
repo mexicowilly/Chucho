@@ -120,25 +120,29 @@ void file_writer::ensure_access()
 
 void file_writer::open(const std::string& file_name)
 {
-    file_name_ = file_name;
-    try
+    if (file_name_ != file_name)
     {
-        file::create_directories(file::directory_name(file_name));
-        open_impl(file_name);
-        if (is_open_)
+        has_been_opened_ = false;
+        file_name_ = file_name;
+        try
         {
-            next_access_check_ = std::chrono::steady_clock::now() + std::chrono::seconds(3);
-            writeability_ = to_int(file::writeability::WRITEABLE);
-            has_been_opened_ = true;
+            file::create_directories(file::directory_name(file_name));
+            open_impl(file_name);
+            if (is_open_)
+            {
+                next_access_check_ = std::chrono::steady_clock::now() + std::chrono::seconds(3);
+                writeability_ = to_int(file::writeability::WRITEABLE);
+                has_been_opened_ = true;
+            }
+                else
+            {
+                report_error("Could not open " + file_name + " for writing");
+            }
         }
-            else
+        catch (std::exception& e)
         {
-            report_error("Could not open " + file_name + " for writing");
+            report_error("Error creating parent directories of " + file_name + ": " + e.what());
         }
-    }
-    catch (std::exception& e)
-    {
-        report_error("Error creating parent directories of " + file_name + ": " + e.what());
     }
 }
 
