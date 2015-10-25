@@ -14,38 +14,15 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_COUT_WRITER_HPP__)
-#define CHUCHO_COUT_WRITER_HPP__
-
-#include <chucho/file_descriptor_writer.hpp>
+#include <chucho/cerr_writer.hpp>
+#include <unistd.h>
 
 namespace chucho
 {
 
-/**
- * @class cout_writer cout_writer.hpp chucho/cout_writer.hpp 
- * A @ref console_writer that writes to std::cout. 
- * 
- * @ingroup writers
- */
-class CHUCHO_EXPORT cout_writer : public file_descriptor_writer
+cerr_writer::cerr_writer(std::shared_ptr<formatter> fmt)
+    : file_descriptor_writer(fmt, STDERR_FILENO, true)
 {
-public:
-    /**
-     * @name Constructor
-     */
-    //@{
-    /**
-     * Construct a cout_writer.
-     * 
-     * @param fmt the formatter
-     * @throw std::invalid_argument if fmt is an uninitialized 
-     *        std::shared_ptr
-     */
-    cout_writer(std::shared_ptr<formatter> fmt);
-    //@}
-};
-
 }
 
-#endif
+}

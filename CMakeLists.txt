@@ -55,6 +55,8 @@ ENDIF()
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
         platform/posix/calendar_posix.cpp
+        platform/posix/cerr_writer_posix.cpp
+        platform/posix/cout_writer_posix.cpp
         platform/posix/diagnostic_context_posix.cpp
         platform/posix/environment_posix.cpp
         platform/posix/file_descriptor_writer_posix.cpp
@@ -105,6 +107,8 @@ IF(CHUCHO_POSIX)
 ELSEIF(CHUCHO_WINDOWS)
     SET(CHUCHO_PLATFORM_SOURCES
         platform/windows/calendar_windows.cpp
+        platform/windows/cerr_writer_windows.cpp
+        platform/windows/cout_writer_windows.cpp
         platform/windows/diagnostic_context_windows.cpp
         platform/windows/environment_windows.cpp
         platform/windows/error_util.cpp
@@ -139,7 +143,6 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/configurable_factory.hpp
     include/chucho/configuration.hpp
     include/chucho/configurator.hpp
-    include/chucho/console_writer.hpp
     include/chucho/cout_writer.hpp
     include/chucho/database_writer.hpp
     include/chucho/diagnostic_context.hpp
@@ -560,7 +563,6 @@ SET(CHUCHO_SOURCES
     async_writer_memento.cpp
     bzip2_file_compressor_factory.cpp
     calendar.cpp
-    cerr_writer.cpp
     cerr_writer_factory.cpp
     cerr_writer_memento.cpp
     clock_util.cpp
@@ -568,8 +570,6 @@ SET(CHUCHO_SOURCES
     configurable_factory.cpp
     configuration.cpp
     configurator.cpp
-    console_writer.cpp
-    cout_writer.cpp
     cout_writer_factory.cpp
     cout_writer_memento.cpp
     demangle.cpp

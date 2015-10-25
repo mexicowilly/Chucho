@@ -14,16 +14,14 @@
  *    limitations under the License.
  */
 
-#include <chucho/cout_writer.hpp>
-#include <iostream>
+#include <chucho/cerr_writer.hpp>
 
 namespace chucho
 {
 
-cout_writer::cout_writer(std::shared_ptr<formatter> fmt)
-    : console_writer(fmt, std::cout)
+cerr_writer::cerr_writer(std::shared_ptr<formatter> fmt)
+    : file_descriptor_writer(fmt, GetStdHandle(STD_ERROR_HANDLE), true)
 {
-    set_status_origin("cout_writer");
 }
 
 }

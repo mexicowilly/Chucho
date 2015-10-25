@@ -14,23 +14,15 @@
  *    limitations under the License.
  */
 
-#include <chucho/console_writer.hpp>
-#include <iostream>
+#include <chucho/cout_writer.hpp>
+#include <unistd.h>
 
 namespace chucho
 {
 
-console_writer::console_writer(std::shared_ptr<formatter> fmt,
-                               std::ostream& stream)
-    : writer(fmt),
-      stream_(stream)
+cout_writer::cout_writer(std::shared_ptr<formatter> fmt)
+    : file_descriptor_writer(fmt, STDOUT_FILENO, true)
 {
-}
-
-void console_writer::write_impl(const event& evt)
-{
-    stream_ << formatter_->format(evt);
-    stream_.flush();
 }
 
 }
