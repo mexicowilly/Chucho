@@ -40,6 +40,15 @@ public:
         if (fd_ == -1)
             throw chucho::exception("Could not open " + file_name_ + " for writing");
 #elif defined(CHUCHO_WINDOWS)
+        fd_ = CreateFileA(file_name_.c_str(),
+                          GENERIC_WRITE,
+                          FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                          NULL,
+                          CREATE_ALWAYS,
+                          FILE_ATTRIBUTE_NORMAL,
+                          NULL);
+        if (fd_ == INVALID_HANDLE_VALUE)
+            throw chucho::exception("Could not open " + file_name_ + " for writing");
 #endif
     }
 
