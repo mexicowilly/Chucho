@@ -23,6 +23,7 @@ namespace chucho
 cerr_writer::cerr_writer(std::shared_ptr<formatter> fmt)
     : file_descriptor_writer(fmt, STDERR_FILENO, true)
 {
+    set_allow_close(false);
 }
 
 }

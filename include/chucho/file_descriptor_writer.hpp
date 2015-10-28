@@ -55,6 +55,7 @@ protected:
     file_descriptor_writer(std::shared_ptr<formatter> fmt,
                            bool flsh = true);
 
+    void set_allow_close(bool state);
     void set_file_descriptor(int fd);
     #if defined(_WIN32)
     void set_file_handle(HANDLE hnd);
@@ -62,7 +63,7 @@ protected:
     virtual void write_impl(const event& evt) override;
 
 private:
-    void flush();
+    CHUCHO_NO_EXPORT void flush();
 
     std::array<char, 8 * 1024> buf_;
     std::size_t num_;
@@ -72,11 +73,17 @@ private:
     int fd_;
     #endif
     bool flush_;
+    bool allow_close_;
 };
 
 inline bool file_descriptor_writer::get_flush() const
 {
     return flush_;
+}
+
+inline void file_descriptor_writer::set_allow_close(bool state)
+{
+    allow_close_ = state;
 }
 
 }

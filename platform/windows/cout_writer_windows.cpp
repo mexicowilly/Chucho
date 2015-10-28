@@ -22,6 +22,7 @@ namespace chucho
 cout_writer::cout_writer(std::shared_ptr<formatter> fmt)
     : file_descriptor_writer(fmt, GetStdHandle(STD_OUTPUT_HANDLE), true)
 {
+    set_allow_close(false);
 }
 
 }

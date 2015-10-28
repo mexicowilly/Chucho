@@ -29,7 +29,8 @@ file_descriptor_writer::file_descriptor_writer(std::shared_ptr<formatter> fmt,
     : writer(fmt),
       num_(0),
       fd_(-1),
-      flush_(flsh)
+      flush_(flsh),
+      allow_close_(true)
 {
     set_status_origin("file_descriptor_writer");
 }
@@ -40,7 +41,8 @@ file_descriptor_writer::file_descriptor_writer(std::shared_ptr<formatter> fmt,
     : writer(fmt),
       num_(0),
       fd_(fd),
-      flush_(flsh)
+      flush_(flsh),
+      allow_close_(true)
 {
     set_status_origin("file_descriptor_writer");
 }
@@ -58,7 +60,8 @@ void file_descriptor_writer::close()
         {
             report_error(std::string("An error occurred while flushing on close: ") + e.what());
         }
-        ::close(fd_);
+        if (allow_close_)
+            ::close(fd_);
         fd_ = -1;
     }
 }

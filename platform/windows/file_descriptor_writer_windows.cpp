@@ -28,7 +28,8 @@ file_descriptor_writer::file_descriptor_writer(std::shared_ptr<formatter> fmt,
     : writer(fmt),
       num_(0),
       handle_(INVALID_HANDLE_VALUE),
-      flush_(flsh)
+      flush_(flsh),
+      allow_close_(true)
 {
     set_status_origin("file_descriptor_writer");
 }
@@ -39,7 +40,8 @@ file_descriptor_writer::file_descriptor_writer(std::shared_ptr<formatter> fmt,
     : writer(fmt),
       num_(0),
       handle_(reinterpret_cast<HANDLE>(_get_osfhandle(fd))),
-      flush_(flsh)
+      flush_(flsh),
+      allow_close_(true)
 {
     set_status_origin("file_descriptor_writer");
 }
@@ -50,7 +52,8 @@ file_descriptor_writer::file_descriptor_writer(std::shared_ptr<formatter> fmt,
     : writer(fmt),
       num_(0),
       handle_(hnd),
-      flush_(flsh)
+      flush_(flsh),
+      allow_close_(true)
 {
     set_status_origin("file_descriptor_writer");
 }
@@ -68,7 +71,8 @@ void file_descriptor_writer::close()
         {
             report_error(std::string("An error occurred while flushing on close: ") + e.what());
         }
-        CloseHandle(handle_);
+        if (allow_close_)
+            CloseHandle(handle_);
         handle_ = INVALID_HANDLE_VALUE;
     }
 }
