@@ -42,7 +42,6 @@ pipe_writer::pipe_writer(std::shared_ptr<formatter> fmt,
 
 pipe_writer::~pipe_writer()
 {
-    close();
     CloseHandle(input_);
 }
 

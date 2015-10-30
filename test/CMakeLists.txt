@@ -126,6 +126,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                multithread_test.cpp
                optional_test.cpp
                pattern_formatter_test.cpp
+               pipe_writer_test.cpp
                regex_test.cpp
                rolling_file_writer_test.cpp
                security_policy_test.cpp
