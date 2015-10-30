@@ -18,6 +18,7 @@
 #include <chucho/pipe_writer.hpp>
 #include <chucho/pattern_formatter.hpp>
 #include <chucho/logger.hpp>
+#include <vector>
 #if defined(CHUCHO_POSIX)
 #include <unistd.h>
 #endif
@@ -36,13 +37,15 @@ public:
 
     std::string read(std::size_t num)
     {
-        char buf[num];
+        std::vector<char> buf(num);
         #if defined(CHUCHO_POSIX)
-        auto actual = ::read(writer_->get_input(), buf, num);
+        auto actual = ::read(writer_->get_input(), &buf[0], num);
         #elif defined(CHUCHO_WINDOWS)
+        DWORD actual;
+        EXPECT_NE(0, ReadFile(writer_->get_input(), &buf[0], num, &actual, NULL));
         #endif
         EXPECT_EQ(num, actual);
-        return std::string(buf, num);
+        return std::string(&buf[0], num);
     }
 
     void write(const std::string& str)
