@@ -224,7 +224,7 @@ IF(CHUCHO_POSIX)
     CHUCHO_REQUIRE_SYMBOLS(unistd.h getpid access getuid fork close setsid dup2 chdir _exit write pipe read)
 
     # stat/mkdir
-    CHUCHO_REQUIRE_SYMBOLS(sys/stat.h stat mkdir)
+    CHUCHO_REQUIRE_SYMBOLS(sys/stat.h stat mkdir mkfifo)
 
     # gmtime_r/localtime_r
     FOREACH(SYM gmtime_r localtime_r)

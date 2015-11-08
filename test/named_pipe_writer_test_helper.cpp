@@ -15,22 +15,25 @@
  */
 
 #include <chucho/named_pipe_writer.hpp>
+#include <chucho/pattern_formatter.hpp>
+#include <chucho/logger.hpp>
+#include <cstdlib>
 
-namespace chucho
+int main(int argc, char* argv[])
 {
-
-std::string named_pipe_writer::normalize_name(const std::string& name)
-{
-    if (name.find("\\\\") != 0)
+    try
     {
-        std::string loc(name);
-        auto ns = loc.find_first_not_of('\\');
-        if (ns != std::string::npos)
-            loc.erase(0, ns);
-        return "\\\\.\\pipe\\" + loc;
+        if (argc != 3)
+            return EXIT_FAILURE;
+        auto fmt = std::make_shared<chucho::pattern_formatter>("%m");
+        auto wrt = std::make_shared<chucho::named_pipe_writer>(fmt, argv[1]);
+        std::shared_ptr<chucho::logger> log = chucho::logger::get("named_pipe_writer_test");
+        chucho::event evt(log, chucho::level::INFO_(), argv[2], __FILE__, __LINE__, __FUNCTION__);
+        wrt->write(evt);
     }
-    return name;
+    catch (...)
+    {
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
 }
-
-}
-
