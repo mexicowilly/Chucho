@@ -23,6 +23,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#elif defined(CHUCHO_WINDOWS)
+#include <windows.h>
 #endif
 
 namespace
@@ -44,12 +46,18 @@ public:
         // file one or one that puts the output where we expect.
         if (!chucho::file::exists(helper_name_))
             helper_name_.clear();
+        #if defined(CHUCHO_POSIX)
         chucho::file::remove(file_name_);
+        #endif
     }
 
     ~named_pipe_writer_test()
     {
+        #if defined(CHUCHO_POSIX)
         chucho::file::remove(file_name_);
+        #elif defined(CHUCHO_WINDOWS)
+        CloseHandle(read_handle_);
+        #endif
     }
 
     void make_pipe()
@@ -57,21 +65,47 @@ public:
         #if defined(CHUCHO_POSIX)
         if (mkfifo(file_name_.c_str(), 0644) != 0)
             throw chucho::exception("Could not create named pipe " + file_name_);
+        #elif defined(CHUCHO_WINDOWS)
+        std::string pipe_name = "\\\\.\\pipe\\" + file_name_;
+        read_handle_ = CreateNamedPipeA(pipe_name.c_str(),
+                                        PIPE_ACCESS_INBOUND,
+                                        PIPE_TYPE_BYTE | PIPE_WAIT,
+                                        1,
+                                        1024,
+                                        1024,
+                                        0,
+                                        NULL);
+
+        if (read_handle_ == INVALID_HANDLE_VALUE)
+            throw chucho::exception("Could not create named pipe " + pipe_name);
         #endif
     }
 
-    std::string read(std::size_t num)
+    void read(std::size_t num)
     {
         read_text_.clear();
+        std::vector<char> buf(num);
         #if defined(CHUCHO_POSIX)
         int fd = ::open(file_name_.c_str(), O_RDONLY);
         EXPECT_GT(fd, 0);
-        std::vector<char> buf(num);
         auto num_read = ::read(fd, &buf[0], num);
         EXPECT_EQ(num, num_read);
         ::close(fd);
-        read_text_.assign(&buf[0], buf.size());
+        #elif defined(CHUCHO_WINDOWS)
+        if (ConnectNamedPipe(read_handle_, NULL))
+        {
+            DWORD num_read = 0;
+            if (ReadFile(read_handle_,
+                         &buf[0],
+                         num,
+                         &num_read,
+                         NULL))
+            {
+                EXPECT_EQ(num, num_read);
+            }
+        }
         #endif
+        read_text_.assign(&buf[0], buf.size());
     }
 
     void write(const std::string& str)
@@ -88,6 +122,9 @@ protected:
     // This is necessary to work around a bug in g++ 4.9.2 where it crashes
     // when evaluating a lambda with capture of [&, this]
     std::string read_text_;
+    #if defined(CHUCHO_WINDOWS)
+    HANDLE read_handle_;
+    #endif
 };
 
 }

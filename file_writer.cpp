@@ -127,7 +127,8 @@ void file_writer::open(const std::string& file_name)
     }
     try
     {
-        file::create_directories(file::directory_name(file_name));
+        if (allow_creation_)
+            file::create_directories(file::directory_name(file_name));
         open_impl(file_name);
         if (is_open_)
         {
