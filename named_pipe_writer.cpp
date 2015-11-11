@@ -25,7 +25,7 @@ named_pipe_writer::named_pipe_writer(std::shared_ptr<formatter> fmt,
     : file_writer(fmt, on_start::APPEND, flsh)
 {
     set_status_origin("named_pipe_writer");
-    allow_creation_ = false;
+    set_allow_creation(false);
     open(normalize_name(name));
 }
 

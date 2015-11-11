@@ -212,6 +212,7 @@ SET(CHUCHO_C_HEADERS
     include/chucho/duplicate_message_filter.h
     "${CMAKE_BINARY_DIR}/chucho/export.h"
     include/chucho/file_compressor.h
+    include/chucho/file_descriptor_writer.h
     include/chucho/file_roll_trigger.h
     include/chucho/file_roller.h
     include/chucho/file_writer.h
@@ -224,8 +225,10 @@ SET(CHUCHO_C_HEADERS
     include/chucho/level_threshold_filter.h
     include/chucho/log.h
     include/chucho/logger.h
+    include/chucho/named_pipe_writer.h
     include/chucho/numbered_file_roller.h
     include/chucho/pattern_formatter.h
+    include/chucho/pipe_writer.h
     include/chucho/remote_writer.h
     include/chucho/return_code.h
     include/chucho/rolling_file_writer.h
@@ -508,6 +511,7 @@ IF(C_API)
         c_diagnostic_context.cpp
         c_duplicate_message_filter.cpp
         c_file_compressor.cpp
+        c_file_descriptor_writer.cpp
         c_file_roll_trigger.cpp
         c_file_roller.cpp
         c_file_writer.cpp
@@ -520,8 +524,10 @@ IF(C_API)
         c_level_threshold_filter.cpp
         c_log.cpp
         c_logger.cpp
+        c_named_pipe_writer.cpp
         c_numbered_file_roller.cpp
         c_pattern_formatter.cpp
+        c_pipe_writer.cpp
         c_remote_writer.cpp
         c_return_code.cpp
         c_rolling_file_writer.cpp

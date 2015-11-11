@@ -128,9 +128,8 @@ protected:
      * @param file_name the name of the new file
      */
     void open(const std::string& file_name);
+    void set_allow_creation(bool allow);
     virtual void write_impl(const event& evt) override;
-
-    bool allow_creation_;
 
 private:
     void ensure_access();
@@ -143,6 +142,7 @@ private:
     optional<int> writeability_;
     bool is_open_;
     bool has_been_opened_;
+    bool allow_creation_;
 };
 
 inline const std::string& file_writer::get_file_name() const
@@ -158,6 +158,11 @@ inline const std::string& file_writer::get_initial_file_name() const
 inline file_writer::on_start file_writer::get_on_start() const
 {
     return start_;
+}
+
+inline void file_writer::set_allow_creation(bool allow)
+{
+    allow_creation_ = allow;
 }
 
 }

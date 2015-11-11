@@ -44,7 +44,7 @@ public:
      */
     void close();
     /**
-     * Whether this writer flushes the flie stream after each event 
+     * Whether this writer flushes the buffer after each event 
      * is written. 
      * 
      * @return true if flush is enabled

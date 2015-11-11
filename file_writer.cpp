@@ -35,11 +35,11 @@ file_writer::file_writer(std::shared_ptr<formatter> fmt,
                          on_start start,
                          bool flsh)
     : file_descriptor_writer(fmt, flsh),
-      allow_creation_(true),
       start_(start),
       next_access_check_(std::chrono::steady_clock::now()),
       is_open_(false),
-      has_been_opened_(false)
+      has_been_opened_(false),
+      allow_creation_(true)
 {
     set_status_origin("file_writer");
 }
@@ -49,12 +49,12 @@ file_writer::file_writer(std::shared_ptr<formatter> fmt,
                          on_start start,
                          bool flsh)
     : file_descriptor_writer(fmt, flsh),
-      allow_creation_(true),
       initial_file_name_(file_name),
       start_(start),
       next_access_check_(std::chrono::steady_clock::now()),
       is_open_(false),
-      has_been_opened_(false)
+      has_been_opened_(false),
+      allow_creation_(true)
 {
     set_status_origin("file_writer");
     open(file_name);
