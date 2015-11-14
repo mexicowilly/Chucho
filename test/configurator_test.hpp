@@ -53,10 +53,12 @@ protected:
     void mysql_writer_full_body();
     void mysql_writer_minimal_body();
 #endif
+    void named_pipe_writer_body();
     void numbered_file_roller_body();
 #if defined(CHUCHO_HAVE_ORACLE)
     void oracle_writer_body();
 #endif
+    void pipe_writer_body();
 #if defined(CHUCHO_HAVE_POSTGRES)
     void postgres_writer_body();
 #endif

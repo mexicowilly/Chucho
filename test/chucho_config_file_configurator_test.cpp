@@ -402,6 +402,19 @@ TEST_F(chucho_config_file_configurator, multiple_writer)
     multiple_writer_body();
 }
 
+TEST_F(chucho_config_file_configurator, named_pipe_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = npw\n"
+              "chucho.writer.npw = chucho::named_pipe_writer\n"
+              "chucho.writer.npw.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m%n\n"
+              "chucho.writer.npw.name = monkeyballs\n"
+              "chucho.writer.npw.flush = false");
+    named_pipe_writer_body();
+}
+
 TEST_F(chucho_config_file_configurator, numbered_file_roller)
 {
     configure("chucho.logger = will\n"
@@ -438,6 +451,18 @@ TEST_F(chucho_config_file_configurator, oracle_writer)
 }
 
 #endif
+
+TEST_F(chucho_config_file_configurator, pipe_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = pw\n"
+              "chucho.writer.pw = chucho::pipe_writer\n"
+              "chucho.writer.pw.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m%n\n"
+              "chucho.writer.pw.flush = false");
+    pipe_writer_body();
+}
 
 #if defined(CHUCHO_HAVE_POSTGRES)
 
