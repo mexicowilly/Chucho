@@ -19,7 +19,7 @@
 
 /**
  * @file 
- * Functions for file writers. 
+ * @copydoc chucho::file_writer
  *  
  * @ingroup c_writers 
  */

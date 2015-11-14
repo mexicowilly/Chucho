@@ -231,6 +231,8 @@ IF(C_API)
                    diagnostic_context_test.h
                    duplicate_message_filter_test.c
                    duplicate_message_filter_test.h
+                   file_descriptor_writer_test.c
+                   file_descriptor_writer_test.h
                    file_roller_test.c
                    file_roller_test.h
                    file_writer_test.c
@@ -246,10 +248,14 @@ IF(C_API)
                    log_macro_test.h
                    logger_test.c
                    logger_test.h
+                   named_pipe_writer_test.c
+                   named_pipe_writer_test.h
                    numbered_file_roller_test.c
                    numbered_file_roller_test.h
                    pattern_formatter_test.c
                    pattern_formatter_test.h
+                   pipe_writer_test.c
+                   pipe_writer_test.h
                    remote_writer_test.c
                    remote_writer_test.h
                    rolling_file_writer_test.c

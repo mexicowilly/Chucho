@@ -19,7 +19,7 @@
 
 /**
  * @file 
- * Functions for file descriptor writers. 
+ * @copydoc chucho::file_descriptor_writer
  *  
  * @ingroup c_writers 
  */
@@ -31,6 +31,24 @@ extern "C"
 {
 #endif
 
+/**
+ * Create a file descriptor writer.
+ * 
+ * @post Ownership of the wrt parameter is transferred to the 
+ *       caller, and it must be released with the @ref
+ *       chucho_release_writer() function.
+ *  
+ * @post Ownership of the fmt parameter is transferred to the 
+ *       callee.
+ * 
+ * @param[out] wrt the writer to create
+ * @param[in] fmt the formatter
+ * @param[in] fd the file descriptor
+ * @param[in] flush if non-zero, the file will be flushed after 
+ *       every write
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_create_file_descriptor_writer(chucho_writer** wrt,
                                                              chucho_formatter* fmt,
                                                              int fd,

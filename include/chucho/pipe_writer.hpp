@@ -22,20 +22,65 @@
 namespace chucho
 {
 
+/**
+ * @class pipe_writer pipe_writer.hpp chucho/pipe_writer.hpp
+ * The pipe writer creates a pipe and attaches itself to the
+ * output end of it. The input end of the pipe can be retrieved
+ * with the @ref get_input() method. When the pipe writer is
+ * destroyed, both the input and output ends of it are closed.
+ * 
+ * @ingroup writers
+ */
 class CHUCHO_EXPORT pipe_writer : public file_descriptor_writer
 {
 public:
-    #if defined(_WIN32)
+    /**
+     * A platform-dependent type for holding a pipe descriptor.
+     * This is HANDLE on Windows and int on other operating
+     * systems.
+     */
+    #if defined(CHUCHO_DOXYGEN_SPECIAL)
+    typedef <platform dependent> pipe_type;
+    #elif defined(_WIN32)
     typedef HANDLE pipe_type;
     #else
     typedef int pipe_type;
     #endif
 
+    /**
+     * @name Constructor and Destructor
+     * @{
+     */
+    /**
+     * Construct a pipe writer. The constructor creates the
+     * pipe and attaches itself to the output end.
+     * 
+     * @param fmt the formatter
+     * @param flsh whether to flush the buffer after writing
+     * each event
+     */
     pipe_writer(std::shared_ptr<formatter> fmt,
                 bool flsh = true);
+    /**
+     * Destroy the pipe, closing both the input and output
+     * ends of it.
+     */
     virtual ~pipe_writer();
+    /**
+     * @}
+     */
 
+    /**
+     * Return the input end of the pipe.
+     * 
+     * @return the input
+     */
     pipe_type get_input() const;
+    /**
+     * Return the output end of the pipe.
+     * 
+     * @return the output
+     */
     pipe_type get_output() const;
 
 private:

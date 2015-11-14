@@ -22,12 +22,47 @@
 namespace chucho
 {
 
+/**
+ * @class named_pipe_writer named_pipe_writer.hpp chucho/named_pipe_writer.hpp
+ * A writer for writing to named pipes. This class works just as
+ * @ref file_writer but with two important differences. This class will
+ * never try to create the named pipe. The named pipe must exist for this
+ * writer to be able to write. Just as a @ref file_writer will, this
+ * class will check for access every three seconds and open the file as
+ * needed. But this class will never try to create the file in question
+ * or any of the parent directories that may be part of its name.
+ * 
+ * On Windows, you may pass an unadorned name as the name of the pipe.
+ * For example, if the name passed in the constructor here is
+ * my_dog_has_fleas, then the name will be fleshed out completely as
+ * \\.\pipe\my_dog_has_fleas. On POSIX systems, you must pass the
+ * file system name associated with the pipe, which may be a relative
+ * path if you know your current working directory.
+ * 
+ * @ingroup writers
+ */
 class CHUCHO_EXPORT named_pipe_writer : public file_writer
 {
 public:
+    /**
+     * @name Constructor
+     * @{
+     */
+    /**
+     * Construct a named pipe writer.
+     * 
+     * @param fmt the formatter
+     * @param name the name of the writer, which can be an unadorned
+     * name on Windows
+     * @param flsh whether to flush the buffer after every event
+     * is written
+     */
     named_pipe_writer(std::shared_ptr<formatter> fmt,
                       const std::string& name,
                       bool flsh = true);
+    /**
+     * @}
+     */
 
 private:
     std::string normalize_name(const std::string& name);
