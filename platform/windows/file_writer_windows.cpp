@@ -43,6 +43,12 @@ void file_writer::open_impl(const std::string& file_name)
     {
         set_file_handle(hnd);
         is_open_ = true;
+        if (start_ == on_start::APPEND)
+        {
+            LARGE_INTEGER zero;
+            zero.QuadPart = 0;
+            SetFilePointerEx(hnd, zero, NULL, FILE_END);
+        }
     }
 }
 
