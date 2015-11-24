@@ -15,7 +15,7 @@
  */
 
 #if !defined(CHUCHO_NAMED_PIPE_WRITER_HPP__)
-#define NAMED_CHUCHO_PIPE_WRITER_HPP__
+#define CHUCHO_NAMED_PIPE_WRITER_HPP__
 
 #include <chucho/file_writer.hpp>
 
