@@ -31,8 +31,10 @@
 #include <chucho/level_filter_factory.hpp>
 #include <chucho/level_threshold_filter_factory.hpp>
 #include <chucho/logger_factory.hpp>
+#include <chucho/named_pipe_writer_factory.hpp>
 #include <chucho/numbered_file_roller_factory.hpp>
 #include <chucho/pattern_formatter_factory.hpp>
+#include <chucho/pipe_writer_factory.hpp>
 #include <chucho/remote_writer_factory.hpp>
 #include <chucho/rolling_file_writer_factory.hpp>
 #include <chucho/size_file_roll_trigger_factory.hpp>
@@ -117,10 +119,14 @@ void configurator::initialize_impl()
     add_configurable_factory("chucho::level_threshold_filter", fact);
     fact.reset(new logger_factory());
     add_configurable_factory("chucho::logger", fact);
+    fact.reset(new named_pipe_writer_factory());
+    add_configurable_factory("chucho::named_pipe_writer", fact);
     fact.reset(new numbered_file_roller_factory());
     add_configurable_factory("chucho::numbered_file_roller", fact);
     fact.reset(new pattern_formatter_factory());
     add_configurable_factory("chucho::pattern_formatter", fact);
+    fact.reset(new pipe_writer_factory());
+    add_configurable_factory("chucho::pipe_writer", fact);
     fact.reset(new rolling_file_writer_factory());
     add_configurable_factory("chucho::rolling_file_writer", fact);
     fact.reset(new size_file_roll_trigger_factory());

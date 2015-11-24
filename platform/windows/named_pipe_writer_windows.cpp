@@ -14,27 +14,23 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_FILE_WRITER_FACTORY_HPP__)
-#define CHUCHO_FILE_WRITER_FACTORY_HPP__
-
-#if !defined(CHUCHO_BUILD)
-#error "This header is private"
-#endif
-
-#include <chucho/writer_factory.hpp>
+#include <chucho/named_pipe_writer.hpp>
 
 namespace chucho
 {
 
-class file_writer_factory : public writer_factory
+std::string named_pipe_writer::normalize_name(const std::string& name)
 {
-public:
-    file_writer_factory();
-
-    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
-    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
-};
+    if (name.find("\\\\") != 0)
+    {
+        std::string loc(name);
+        auto ns = loc.find_first_not_of('\\');
+        if (ns != std::string::npos)
+            loc.erase(0, ns);
+        return "\\\\.\\pipe\\" + loc;
+    }
+    return name;
+}
 
 }
 
-#endif

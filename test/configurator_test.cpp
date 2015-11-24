@@ -66,6 +66,8 @@
 #include <chucho/email_writer.hpp>
 #include <chucho/level_threshold_email_trigger.hpp>
 #endif
+#include <chucho/pipe_writer.hpp>
+#include <chucho/named_pipe_writer.hpp>
 #include <sstream>
 #if defined(CHUCHO_WINDOWS)
 #include <windows.h>
@@ -401,6 +403,23 @@ void configurator::mysql_writer_minimal_body()
 
 #endif
 
+void configurator::named_pipe_writer_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::named_pipe_writer), typeid(*wrts[0]));
+    auto npwrt = std::static_pointer_cast<chucho::named_pipe_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(npwrt));
+    EXPECT_FALSE(npwrt->get_flush());
+    #if defined(CHUCHO_WINDOWS)
+    std::string pname("\\\\.\\pipe\\monkeyballs");
+    #else
+    std::string pname("monkeyballs");
+    #endif
+    EXPECT_EQ(pname, npwrt->get_file_name());
+    chucho::status_manager::get()->clear();
+}
+
 void configurator::numbered_file_roller_body()
 {
     auto wrts = chucho::logger::get("will")->get_writers();
@@ -431,6 +450,16 @@ void configurator::oracle_writer_body()
 }
 
 #endif
+
+void configurator::pipe_writer_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::pipe_writer), typeid(*wrts[0]));
+    auto pwrt = std::static_pointer_cast<chucho::pipe_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(pwrt));
+    EXPECT_FALSE(pwrt->get_flush());
+}
 
 #if defined(CHUCHO_HAVE_POSTGRES)
 

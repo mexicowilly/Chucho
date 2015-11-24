@@ -14,17 +14,35 @@
  *    limitations under the License.
  */
 
-#include <chucho/cerr_writer.hpp>
-#include <iostream>
+#include <chucho/pipe_writer.hpp>
+#include <chucho/exception.hpp>
+#include <cstring>
+#include <errno.h>
+#include <unistd.h>
 
 namespace chucho
 {
 
-cerr_writer::cerr_writer(std::shared_ptr<formatter> fmt)
-    : console_writer(fmt, std::cerr)
+pipe_writer::pipe_writer(std::shared_ptr<formatter> fmt,
+                         bool flsh)
+    : file_descriptor_writer(fmt, flsh),
+      input_(-1),
+      output_(-1)
 {
-    set_status_origin("cerr_writer");
+    int fds[2];
+    if (pipe(fds) == -1)
+    {
+        int err = errno;
+        throw exception(std::string("Could not create pipes: ") + std::strerror(err));
+    }
+    input_ = fds[0];
+    output_ = fds[1];
+    set_file_descriptor(output_);
+}
+
+pipe_writer::~pipe_writer()
+{
+    ::close(input_);
 }
 
 }
-

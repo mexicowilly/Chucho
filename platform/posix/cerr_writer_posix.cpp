@@ -14,27 +14,16 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_FILE_WRITER_FACTORY_HPP__)
-#define CHUCHO_FILE_WRITER_FACTORY_HPP__
-
-#if !defined(CHUCHO_BUILD)
-#error "This header is private"
-#endif
-
-#include <chucho/writer_factory.hpp>
+#include <chucho/cerr_writer.hpp>
+#include <unistd.h>
 
 namespace chucho
 {
 
-class file_writer_factory : public writer_factory
+cerr_writer::cerr_writer(std::shared_ptr<formatter> fmt)
+    : file_descriptor_writer(fmt, STDERR_FILENO, true)
 {
-public:
-    file_writer_factory();
-
-    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
-    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
-};
-
+    set_allow_close(false);
 }
 
-#endif
+}

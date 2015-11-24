@@ -14,27 +14,9 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_FILE_WRITER_FACTORY_HPP__)
-#define CHUCHO_FILE_WRITER_FACTORY_HPP__
+#if !defined(CHUCHO_PIPE_WRITER_TEST_H__)
+#define CHUCHO_PIPE_WRITER_TEST_H__
 
-#if !defined(CHUCHO_BUILD)
-#error "This header is private"
-#endif
-
-#include <chucho/writer_factory.hpp>
-
-namespace chucho
-{
-
-class file_writer_factory : public writer_factory
-{
-public:
-    file_writer_factory();
-
-    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
-    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
-};
-
-}
+void run_pipe_writer_test(void);
 
 #endif

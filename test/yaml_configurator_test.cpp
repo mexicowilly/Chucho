@@ -360,6 +360,18 @@ TEST_F(yaml_configurator, mysql_writer_minimal)
 
 #endif
 
+TEST_F(yaml_configurator, named_pipe_writer)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::named_pipe_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m%n'\n"
+              "        name: monkeyballs\n"
+              "        flush: false");
+    named_pipe_writer_body();
+}
+
 TEST_F(yaml_configurator, numbered_file_roller)
 {
     configure("chucho::logger:\n"
@@ -392,6 +404,17 @@ TEST_F(yaml_configurator, oracle_writer)
 }
 
 #endif
+
+TEST_F(yaml_configurator, pipe_writer)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::pipe_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m%n'\n"
+              "        flush: false");
+    pipe_writer_body();
+}
 
 #if defined(CHUCHO_HAVE_POSTGRES)
 

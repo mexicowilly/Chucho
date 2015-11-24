@@ -14,17 +14,20 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_FILE_WRITER_H__)
-#define CHUCHO_FILE_WRITER_H__
+#if !defined(CHUCHO_PIPE_WRITER_H__)
+#define CHUCHO_PIPE_WRITER_H__
 
 /**
  * @file 
- * @copydoc chucho::file_writer
+ * @copydoc chucho::pipe_writer
  *  
  * @ingroup c_writers 
  */
 
 #include <chucho/writer.h>
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 #if defined(__cplusplus)
 extern "C"
@@ -32,20 +35,21 @@ extern "C"
 #endif
 
 /**
- * The starting behavior of a file writer.
+ * A platform-dependent type for holding a pipe descriptor.
+ * This is HANDLE on Windows and int on other operating
+ * systems.
  */
-typedef enum
-{
-    CHUCHO_ON_START_APPEND,     /**< Append to the file on start. */
-    CHUCHO_ON_START_TRUNCATE    /**< Truncate the file on start. */
-} chucho_on_start;
+#if defined(CHUCHO_DOXYGEN_SPECIAL)
+typedef <platform dependent> pipe_type;
+#elif defined(_WIN32)
+typedef HANDLE pipe_writer_pipe_type;
+#else
+typedef int pipe_writer_pipe_type;
+#endif
 
 /**
- * @name Creation
- * @{
- */
-/**
- * Create a file writer.
+ * Create a pipe writer. This function creates a pipe and
+ * attaches the returned writer to the output end of it.
  * 
  * @post Ownership of the wrt parameter is transferred to the 
  *       caller, and it must be released with the @ref
@@ -56,49 +60,43 @@ typedef enum
  * 
  * @param[out] wrt the writer to create
  * @param[in] fmt the formatter
- * @param[in] file_name the name of the file to which to write
- * @param[in] on_start the starting behavior of the writer
- * @param[in] flush if non-zero, the file will be flushed after 
+ * @param[in] flush if non-zero, the buffer will be flushed after 
  *       every write
  * @return a value from @ref return_code.h indicating success or
  *         failure
  */
-CHUCHO_EXPORT chucho_rc chucho_create_file_writer(chucho_writer** wrt,
+CHUCHO_EXPORT chucho_rc chucho_create_pipe_writer(chucho_writer** wrt,
                                                   chucho_formatter* fmt,
-                                                  const char* const file_name,
-                                                  chucho_on_start on_start,
                                                   int flush);
-/** @} */
 
 /**
- * Return the name of the file.
+ * Return whether the writer flushes the buffer after every write.
  * 
  * @param[in] wrt the file writer
- * @param[out] name the name of the writer's file
- * @return a value from @ref return_code.h indicating success or
- *         failure
- */
-CHUCHO_EXPORT chucho_rc chucho_fwrt_get_file_name(const chucho_writer* wrt, const char** name);
-/**
- * Return whether the writer flushes the file after every write.
- * 
- * @param[in] wrt the file writer
- * @param[out] flush non-zero if the writer flushes the file 
+ * @param[out] flush non-zero if the writer flushes the buffer 
  *       after every write
  * @return a value from @ref return_code.h indicating success or
  *         failure
  */
-CHUCHO_EXPORT chucho_rc chucho_fwrt_get_flush(const chucho_writer* wrt, int* flush);
+CHUCHO_EXPORT chucho_rc chucho_pwrt_get_flush(const chucho_writer* wrt, int* flush);
 /**
- * Return behavior of the writer when it starts writing to a 
- * file. 
+ * Return the input end of the pipe.
  * 
  * @param[in] wrt the file writer
- * @param[out] on_start the starting behavior
+ * @param[out] p the input end of the pipe
  * @return a value from @ref return_code.h indicating success or
  *         failure
  */
-CHUCHO_EXPORT chucho_rc chucho_fwrt_get_on_start(const chucho_writer* wrt, chucho_on_start* on_start);
+CHUCHO_EXPORT chucho_rc chucho_pwrt_get_input(const chucho_writer* wrt, pipe_writer_pipe_type* p);
+/**
+ * Return the output end of the pipe.
+ * 
+ * @param[in] wrt the file writer
+ * @param[out] p the output end of the pipe
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
+CHUCHO_EXPORT chucho_rc chucho_pwrt_get_output(const chucho_writer* wrt, pipe_writer_pipe_type* p);
 
 #if defined(__cplusplus)
 }

@@ -220,11 +220,11 @@ IF(CHUCHO_POSIX)
     # host name functions
     CHUCHO_REQUIRE_SYMBOLS(sys/utsname.h uname)
 
-    # getpid/access/getuid/fork/close/setsid/dup2/chdir/_exit
-    CHUCHO_REQUIRE_SYMBOLS(unistd.h getpid access getuid fork close setsid dup2 chdir _exit)
+    # getpid/access/getuid/fork/close/setsid/dup2/chdir/_exit/write/pipe/read
+    CHUCHO_REQUIRE_SYMBOLS(unistd.h getpid access getuid fork close setsid dup2 chdir _exit write pipe read)
 
     # stat/mkdir
-    CHUCHO_REQUIRE_SYMBOLS(sys/stat.h stat mkdir)
+    CHUCHO_REQUIRE_SYMBOLS(sys/stat.h stat mkdir mkfifo)
 
     # gmtime_r/localtime_r
     FOREACH(SYM gmtime_r localtime_r)

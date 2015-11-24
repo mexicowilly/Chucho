@@ -14,23 +14,14 @@
  *    limitations under the License.
  */
 
-#include <chucho/console_writer.hpp>
-#include <iostream>
+#include <chucho/named_pipe_writer.hpp>
 
 namespace chucho
 {
 
-console_writer::console_writer(std::shared_ptr<formatter> fmt,
-                               std::ostream& stream)
-    : writer(fmt),
-      stream_(stream)
+std::string named_pipe_writer::normalize_name(const std::string& name)
 {
-}
-
-void console_writer::write_impl(const event& evt)
-{
-    stream_ << formatter_->format(evt);
-    stream_.flush();
+    return name;
 }
 
 }

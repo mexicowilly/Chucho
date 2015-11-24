@@ -22,7 +22,7 @@
 #pragma warning(disable:4251)
 #endif
 
-#include <chucho/console_writer.hpp>
+#include <chucho/file_descriptor_writer.hpp>
 
 namespace chucho
 {
@@ -33,7 +33,7 @@ namespace chucho
  * 
  * @ingroup writers
  */
-class CHUCHO_EXPORT cerr_writer : public console_writer
+class CHUCHO_EXPORT cerr_writer : public file_descriptor_writer
 {
 public:
     /**

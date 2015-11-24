@@ -29,6 +29,7 @@
 #include <chucho/exception.hpp>
 #include <array>
 #include <algorithm>
+#include <fstream>
 
 class rolling_file_writer_test : public ::testing::Test
 {

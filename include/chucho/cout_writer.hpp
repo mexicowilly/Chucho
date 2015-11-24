@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_COUT_WRITER_HPP__)
 #define CHUCHO_COUT_WRITER_HPP__
 
-#include <chucho/console_writer.hpp>
+#include <chucho/file_descriptor_writer.hpp>
 
 namespace chucho
 {
@@ -28,7 +28,7 @@ namespace chucho
  * 
  * @ingroup writers
  */
-class CHUCHO_EXPORT cout_writer : public console_writer
+class CHUCHO_EXPORT cout_writer : public file_descriptor_writer
 {
 public:
     /**

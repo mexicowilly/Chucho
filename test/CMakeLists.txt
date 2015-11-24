@@ -111,6 +111,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                diagnostic_context_test.cpp
                duplicate_message_filter_test.cpp
                file_test.cpp
+               file_descriptor_writer_test.cpp
                file_writer_test.cpp
                harness.cpp
                interval_file_roll_trigger_test.cpp
@@ -123,8 +124,10 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                logger_test.cpp
                marker_test.cpp
                multithread_test.cpp
+               named_pipe_writer_test.cpp
                optional_test.cpp
                pattern_formatter_test.cpp
+               pipe_writer_test.cpp
                regex_test.cpp
                rolling_file_writer_test.cpp
                security_policy_test.cpp
@@ -134,34 +137,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                ${CHUCHO_TEST_COMPRESSION_SOURCES}
                ${CHUCHO_CONFIGURATOR_TESTS}
                ${CHUCHO_TEST_EVALUATOR_SOURCES})
-TARGET_LINK_LIBRARIES(unit-test chucho gtest ${CMAKE_THREAD_LIBS_INIT})
-IF(CHUCHO_HAVE_MYSQL)
-    TARGET_LINK_LIBRARIES(unit-test "${MYSQL_CLIENT_LIB}")
-ENDIF()
-
-IF(CHUCHO_HAVE_ORACLE)
-    TARGET_LINK_LIBRARIES(unit-test "${ORACLE_CLIENT_LIB}")
-ENDIF()
-
-IF(CHUCHO_HAVE_SQLITE)
-    TARGET_LINK_LIBRARIES(unit-test "${SQLITE_CLIENT_LIB}")
-ENDIF()
-
-IF(CHUCHO_HAVE_POSTGRES)
-    TARGET_LINK_LIBRARIES(unit-test "${POSTGRES_CLIENT_LIB}")
-ENDIF()
-
-IF(CHUCHO_HAVE_RUBY AND NOT RUBY_FRAMEWORK)
-    TARGET_LINK_LIBRARIES(unit-test "${RUBY_LIB}")
-ENDIF()
-
-IF(CURL_FOUND)
-    TARGET_LINK_LIBRARIES(unit-test ${CURL_LIBRARIES})
-ENDIF()
-
-IF(CHUCHO_SOLARIS)
-    TARGET_LINK_LIBRARIES(unit-test socket nsl)
-ENDIF()
+TARGET_LINK_LIBRARIES(unit-test chucho gtest)
 
 IF(MSVC)
     SET_SOURCE_FILES_PROPERTIES(pattern_formatter_test.cpp PROPERTIES
@@ -169,6 +145,11 @@ IF(MSVC)
     SET_SOURCE_FILES_PROPERTIES(rolling_file_writer_test.cpp PROPERTIES
                                 COMPILE_FLAGS /wd4018)
 ENDIF()
+
+ADD_EXECUTABLE(named-pipe-writer-test-helper EXCLUDE_FROM_ALL
+               named_pipe_writer_test_helper.cpp)
+TARGET_LINK_LIBRARIES(named-pipe-writer-test-helper chucho)
+ADD_DEPENDENCIES(unit-test named-pipe-writer-test-helper)
 
 ADD_CUSTOM_TARGET(check
                   COMMAND unit-test
@@ -250,6 +231,8 @@ IF(C_API)
                    diagnostic_context_test.h
                    duplicate_message_filter_test.c
                    duplicate_message_filter_test.h
+                   file_descriptor_writer_test.c
+                   file_descriptor_writer_test.h
                    file_roller_test.c
                    file_roller_test.h
                    file_writer_test.c
@@ -265,10 +248,14 @@ IF(C_API)
                    log_macro_test.h
                    logger_test.c
                    logger_test.h
+                   named_pipe_writer_test.c
+                   named_pipe_writer_test.h
                    numbered_file_roller_test.c
                    numbered_file_roller_test.h
                    pattern_formatter_test.c
                    pattern_formatter_test.h
+                   pipe_writer_test.c
+                   pipe_writer_test.h
                    remote_writer_test.c
                    remote_writer_test.h
                    rolling_file_writer_test.c
@@ -292,34 +279,10 @@ IF(C_API)
                    ${CHUCHO_EVALUATOR_C_SOURCES}
                    ${CHUCHO_PLATFORM_C_SOURCES}
                    ${CHUCHO_EMAIL_WRITER_C_SOURCES})
-    TARGET_LINK_LIBRARIES(c-unit-test chucho ${CMAKE_THREAD_LIBS_INIT})
-
-    IF(CHUCHO_HAVE_ORACLE)
-        TARGET_LINK_LIBRARIES(c-unit-test "${ORACLE_CLIENT_LIB}")
-    ENDIF()
-
-    IF(CHUCHO_HAVE_MYSQL)
-        TARGET_LINK_LIBRARIES(c-unit-test "${MYSQL_CLIENT_LIB}")
-    ENDIF()
-
-    IF(CHUCHO_HAVE_SQLITE)
-        TARGET_LINK_LIBRARIES(c-unit-test "${SQLITE_CLIENT_LIB}")
-    ENDIF()
-
-    IF(CHUCHO_HAVE_POSTGRES)
-        TARGET_LINK_LIBRARIES(c-unit-test "${POSTGRES_CLIENT_LIB}")
-    ENDIF()
-
-    IF(CHUCHO_HAVE_RUBY AND NOT RUBY_FRAMEWORK)
-        TARGET_LINK_LIBRARIES(c-unit-test "${RUBY_LIB}")
-    ENDIF()
-
-    IF(CURL_FOUND)
-        TARGET_LINK_LIBRARIES(c-unit-test ${CURL_LIBRARIES})
-    ENDIF()
+    TARGET_LINK_LIBRARIES(c-unit-test chucho)
 
     IF(CHUCHO_SOLARIS)
-        TARGET_LINK_LIBRARIES(c-unit-test socket nsl "${CHUCHO_LIBSTDCXX}")
+        TARGET_LINK_LIBRARIES(c-unit-test "${CHUCHO_LIBSTDCXX}")
     ENDIF()
 
     ADD_CUSTOM_TARGET(c-check
@@ -330,25 +293,16 @@ ENDIF()
 ADD_EXECUTABLE(time-rolling-file-test EXCLUDE_FROM_ALL
                harness.cpp
                time_rolling_file_test.cpp)
-TARGET_LINK_LIBRARIES(time-rolling-file-test chucho gtest ${CMAKE_THREAD_LIBS_INIT})
-IF(CHUCHO_SOLARIS)
-    TARGET_LINK_LIBRARIES(time-rolling-file-test socket nsl)
-ENDIF()
+TARGET_LINK_LIBRARIES(time-rolling-file-test chucho gtest)
 
 ADD_EXECUTABLE(syslog-writer-test EXCLUDE_FROM_ALL
                harness.cpp
                syslog_writer_test.cpp)
-TARGET_LINK_LIBRARIES(syslog-writer-test chucho gtest ${CMAKE_THREAD_LIBS_INIT})
-IF(CHUCHO_SOLARIS)
-    TARGET_LINK_LIBRARIES(syslog-writer-test socket nsl)
-ENDIF()
+TARGET_LINK_LIBRARIES(syslog-writer-test chucho gtest)
 
 ADD_EXECUTABLE(remote-writer-test EXCLUDE_FROM_ALL
                remote_writer_test.cpp)
-TARGET_LINK_LIBRARIES(remote-writer-test chucho ${CMAKE_THREAD_LIBS_INIT})
-IF(CHUCHO_SOLARIS)
-    TARGET_LINK_LIBRARIES(remote-writer-test socket nsl)
-ENDIF()
+TARGET_LINK_LIBRARIES(remote-writer-test chucho)
 
 IF(CHUCHO_WINDOWS)
     ADD_EXECUTABLE(windows-event-log-writer-test EXCLUDE_FROM_ALL
@@ -356,50 +310,47 @@ IF(CHUCHO_WINDOWS)
                    windows_event_log_writer_test.cpp)
     SET_SOURCE_FILES_PROPERTIES(windows_event_log_writer_test.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_EVENT_LOG_DLL="${CHUCHO_EVENT_LOG_DLL}")
-    TARGET_LINK_LIBRARIES(windows-event-log-writer-test chucho gtest ${CMAKE_THREAD_LIBS_INIT})
+    TARGET_LINK_LIBRARIES(windows-event-log-writer-test chucho gtest)
 ENDIF()
 
 IF(CHUCHO_HAVE_ORACLE)
     ADD_EXECUTABLE(oracle-writer-test EXCLUDE_FROM_ALL
                    harness.cpp
                    oracle_writer_test.cpp)
-    TARGET_LINK_LIBRARIES(oracle-writer-test chucho ${ORACLE_CLIENT_LIB} gtest ${CMAKE_THREAD_LIBS_INIT})
+    TARGET_LINK_LIBRARIES(oracle-writer-test chucho gtest)
 ENDIF()
 
 IF(CHUCHO_HAVE_MYSQL)
     ADD_EXECUTABLE(mysql-writer-test EXCLUDE_FROM_ALL
                    harness.cpp
                    mysql_writer_test.cpp)
-    TARGET_LINK_LIBRARIES(mysql-writer-test chucho "${MYSQL_CLIENT_LIB}" gtest ${CMAKE_THREAD_LIBS_INIT})
+    TARGET_LINK_LIBRARIES(mysql-writer-test chucho gtest)
 ENDIF()
 
 IF(CHUCHO_HAVE_SQLITE)
     ADD_EXECUTABLE(sqlite-writer-test EXCLUDE_FROM_ALL
                    harness.cpp
                    sqlite_writer_test.cpp)
-    TARGET_LINK_LIBRARIES(sqlite-writer-test chucho "${SQLITE_CLIENT_LIB}" gtest ${CMAKE_THREAD_LIBS_INIT})
+    TARGET_LINK_LIBRARIES(sqlite-writer-test chucho gtest)
 ENDIF()
 
 IF(CHUCHO_HAVE_POSTGRES)
     ADD_EXECUTABLE(postgres-writer-test EXCLUDE_FROM_ALL
                    harness.cpp
                    postgres_writer_test.cpp)
-    TARGET_LINK_LIBRARIES(postgres-writer-test chucho ${POSTGRES_CLIENT_LIB} gtest ${CMAKE_THREAD_LIBS_INIT})
+    TARGET_LINK_LIBRARIES(postgres-writer-test chucho gtest)
 ENDIF()
 
 IF(CURL_FOUND)
     ADD_EXECUTABLE(email-writer-test EXCLUDE_FROM_ALL
                    harness.cpp
                    email_writer_test.cpp)
-    TARGET_LINK_LIBRARIES(email-writer-test chucho ${CURL_LIBRARIES} gtest ${CMAKE_THREAD_LIBS_INIT})
-    IF(CHUCHO_SOLARIS)
-        TARGET_LINK_LIBRARIES(email-writer-test socket nsl)
-    ENDIF()
+    TARGET_LINK_LIBRARIES(email-writer-test chucho gtest)
 ENDIF()
 
 ADD_EXECUTABLE(configuration-off EXCLUDE_FROM_ALL
                configuration_off.cpp)
-TARGET_LINK_LIBRARIES(configuration-off chucho ${CMAKE_THREAD_LIBS_INIT})
+TARGET_LINK_LIBRARIES(configuration-off chucho)
 
 ADD_CUSTOM_TARGET(check-config
                   COMMAND "${CMAKE_COMMAND}" "-DCHUCHO_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P "${CMAKE_CURRENT_SOURCE_DIR}/CheckAllConfigs.cmake")

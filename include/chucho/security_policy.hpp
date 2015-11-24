@@ -147,6 +147,10 @@ namespace chucho
  *         <td><i>default</i></td></tr>
  *     <tr><td>mysql_writer::flush_on_destruct</td>
  *         <td>5</td></tr>
+ *     <tr><td>named_pipe_writer::flush</td>
+ *         <td>5</td></tr>
+ *     <tr><td>named_pipe_writer::name</td>
+ *         <td><i>default</i></td></tr>
  *     <tr><td>numbered_file_roller::min_index</td>
  *         <td>[-1000, 1000]</td></tr>
  *     <tr><td>numbered_file_roller::min_index(text)</td>
@@ -163,6 +167,8 @@ namespace chucho
  *         <td>512</td></tr>
  *     <tr><td>pattern_formatter::pattern</td>
  *         <td><i>default</i></td></tr>
+ *     <tr><td>pipe_writer::flush</td>
+ *         <td>5</td></tr>
  *     <tr><td>postgres_writer::uri</td>
  *         <td>8000</td></tr>
  *     <tr><td>remote_writer::port</td>

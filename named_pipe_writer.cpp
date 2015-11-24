@@ -14,16 +14,19 @@
  *    limitations under the License.
  */
 
-#include <chucho/cout_writer.hpp>
-#include <iostream>
+#include <chucho/named_pipe_writer.hpp>
 
 namespace chucho
 {
 
-cout_writer::cout_writer(std::shared_ptr<formatter> fmt)
-    : console_writer(fmt, std::cout)
+named_pipe_writer::named_pipe_writer(std::shared_ptr<formatter> fmt,
+                                     const std::string& name,
+                                     bool flsh)
+    : file_writer(fmt, on_start::APPEND, flsh)
 {
-    set_status_origin("cout_writer");
+    set_status_origin("named_pipe_writer");
+    set_allow_creation(false);
+    open(normalize_name(name));
 }
 
 }

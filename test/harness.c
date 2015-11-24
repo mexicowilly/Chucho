@@ -64,6 +64,9 @@
 #if defined(CHUCHO_HAVE_EMAIL_WRITER)
 #include "email_writer_test.h"
 #endif
+#include "file_descriptor_writer_test.h"
+#include "pipe_writer_test.h"
+#include "named_pipe_writer_test.h"
 
 sput_struct __sput;
 
@@ -119,6 +122,9 @@ int main()
     #if defined(CHUCHO_HAVE_EMAIL_WRITER)
     run_email_writer_test();
     #endif
+    run_file_descriptor_writer_test();
+    run_pipe_writer_test();
+    run_named_pipe_writer_test();
 
     sput_finish_testing();
     chucho_finalize();

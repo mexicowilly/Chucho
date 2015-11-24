@@ -218,6 +218,9 @@ inline std::ostream& debug(std::ostream& ls)
  * CHUCHO_M(stream) << chucho::debug << "My dog has fleas." << chucho::endl << chucho::endm;
  * @endcode 
  *
+ * @deprecated There should be no need to use this manipulator. The
+ * newline can be inserted into the message as it normally would with
+ * the %%n @ref pattern_formatter token.
  */
 CHUCHO_EXPORT std::ostream& endl(std::ostream& ls);
 

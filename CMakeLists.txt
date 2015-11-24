@@ -55,12 +55,18 @@ ENDIF()
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
         platform/posix/calendar_posix.cpp
+        platform/posix/cerr_writer_posix.cpp
+        platform/posix/cout_writer_posix.cpp
         platform/posix/diagnostic_context_posix.cpp
         platform/posix/environment_posix.cpp
+        platform/posix/file_descriptor_writer_posix.cpp
         platform/posix/file_posix.cpp
+        platform/posix/file_writer_posix.cpp
         platform/posix/host_posix.cpp
         platform/posix/line_ending_posix.cpp
+        platform/posix/named_pipe_writer_posix.cpp
         platform/posix/pattern_formatter_posix.cpp
+        platform/posix/pipe_writer_posix.cpp
         platform/posix/socket_connector_posix.cpp
         platform/posix/socket_exception_posix.cpp
         platform/posix/syslog_writer_posix.cpp
@@ -101,14 +107,20 @@ IF(CHUCHO_POSIX)
 ELSEIF(CHUCHO_WINDOWS)
     SET(CHUCHO_PLATFORM_SOURCES
         platform/windows/calendar_windows.cpp
+        platform/windows/cerr_writer_windows.cpp
+        platform/windows/cout_writer_windows.cpp
         platform/windows/diagnostic_context_windows.cpp
         platform/windows/environment_windows.cpp
         platform/windows/error_util.cpp
         platform/windows/error_util.hpp
+        platform/windows/file_descriptor_writer_windows.cpp
         platform/windows/file_windows.cpp
+        platform/windows/file_writer_windows.cpp
         platform/windows/host_windows.cpp
         platform/windows/line_ending_windows.cpp
+        platform/windows/named_pipe_writer_windows.cpp
         platform/windows/pattern_formatter_windows.cpp
+        platform/windows/pipe_writer_windows.cpp
         platform/windows/socket_connector_windows.cpp
         platform/windows/socket_exception_windows.cpp
         platform/windows/syslog_writer_windows.cpp
@@ -131,7 +143,6 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/configurable_factory.hpp
     include/chucho/configuration.hpp
     include/chucho/configurator.hpp
-    include/chucho/console_writer.hpp
     include/chucho/cout_writer.hpp
     include/chucho/database_writer.hpp
     include/chucho/diagnostic_context.hpp
@@ -143,6 +154,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/file_compressor.hpp
     include/chucho/file_compressor_factory.hpp
     include/chucho/file_compressor_memento.hpp
+    include/chucho/file_descriptor_writer.hpp
     include/chucho/file_roller.hpp
     include/chucho/file_roller_memento.hpp
     include/chucho/file_roll_trigger.hpp
@@ -162,11 +174,13 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/logger.hpp
     include/chucho/marker.hpp
     include/chucho/memento.hpp
+    include/chucho/named_pipe_writer.hpp
     include/chucho/non_copyable.hpp
     include/chucho/noop_file_compressor.hpp
     include/chucho/numbered_file_roller.hpp
     include/chucho/optional.hpp
     include/chucho/pattern_formatter.hpp
+    include/chucho/pipe_writer.hpp
     include/chucho/remote_writer.hpp
     include/chucho/rolling_file_writer.hpp
     include/chucho/ruby_evaluator_filter.hpp
@@ -198,6 +212,7 @@ SET(CHUCHO_C_HEADERS
     include/chucho/duplicate_message_filter.h
     "${CMAKE_BINARY_DIR}/chucho/export.h"
     include/chucho/file_compressor.h
+    include/chucho/file_descriptor_writer.h
     include/chucho/file_roll_trigger.h
     include/chucho/file_roller.h
     include/chucho/file_writer.h
@@ -210,8 +225,10 @@ SET(CHUCHO_C_HEADERS
     include/chucho/level_threshold_filter.h
     include/chucho/log.h
     include/chucho/logger.h
+    include/chucho/named_pipe_writer.h
     include/chucho/numbered_file_roller.h
     include/chucho/pattern_formatter.h
+    include/chucho/pipe_writer.h
     include/chucho/remote_writer.h
     include/chucho/return_code.h
     include/chucho/rolling_file_writer.h
@@ -494,6 +511,7 @@ IF(C_API)
         c_diagnostic_context.cpp
         c_duplicate_message_filter.cpp
         c_file_compressor.cpp
+        c_file_descriptor_writer.cpp
         c_file_roll_trigger.cpp
         c_file_roller.cpp
         c_file_writer.cpp
@@ -506,8 +524,10 @@ IF(C_API)
         c_level_threshold_filter.cpp
         c_log.cpp
         c_logger.cpp
+        c_named_pipe_writer.cpp
         c_numbered_file_roller.cpp
         c_pattern_formatter.cpp
+        c_pipe_writer.cpp
         c_remote_writer.cpp
         c_return_code.cpp
         c_rolling_file_writer.cpp
@@ -549,7 +569,6 @@ SET(CHUCHO_SOURCES
     async_writer_memento.cpp
     bzip2_file_compressor_factory.cpp
     calendar.cpp
-    cerr_writer.cpp
     cerr_writer_factory.cpp
     cerr_writer_memento.cpp
     clock_util.cpp
@@ -557,8 +576,6 @@ SET(CHUCHO_SOURCES
     configurable_factory.cpp
     configuration.cpp
     configurator.cpp
-    console_writer.cpp
-    cout_writer.cpp
     cout_writer_factory.cpp
     cout_writer_memento.cpp
     demangle.cpp
@@ -571,6 +588,7 @@ SET(CHUCHO_SOURCES
     exception.cpp
     file_compressor_factory.cpp
     file_compressor_memento.cpp
+    file_descriptor_writer.cpp
     file_exception.cpp
     file_roller.cpp
     file_roller_memento.cpp
@@ -599,6 +617,9 @@ SET(CHUCHO_SOURCES
     marker.cpp
     memento.cpp
     memento_key_set.cpp
+    named_pipe_writer.cpp
+    named_pipe_writer_factory.cpp
+    named_pipe_writer_memento.cpp
     noop_file_compressor.cpp
     numbered_file_roller.cpp
     numbered_file_roller_factory.cpp
@@ -606,6 +627,8 @@ SET(CHUCHO_SOURCES
     pattern_formatter.cpp
     pattern_formatter_factory.cpp
     pattern_formatter_memento.cpp
+    pipe_writer_factory.cpp
+    pipe_writer_memento.cpp
     regex.cpp
     regex_exception.cpp
     remote_writer.cpp
@@ -672,10 +695,14 @@ SET(CHUCHO_SOURCES
     include/chucho/logger_factory.hpp
     include/chucho/logger_memento.hpp
     include/chucho/memento_key_set.hpp
+    include/chucho/named_pipe_writer_factory.hpp
+    include/chucho/named_pipe_writer_memento.hpp
     include/chucho/numbered_file_roller_factory.hpp
     include/chucho/numbered_file_roller_memento.hpp
     include/chucho/pattern_formatter_factory.hpp
     include/chucho/pattern_formatter_memento.hpp
+    include/chucho/pipe_writer_factory.hpp
+    include/chucho/pipe_writer_memento.hpp
     include/chucho/regex.hpp
     include/chucho/regex_exception.hpp
     include/chucho/remote_writer_factory.hpp
@@ -718,6 +745,12 @@ IF(CHUCHO_WINDOWS)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_WINDOWS)
     SET_SOURCE_FILES_PROPERTIES(configurator.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_WINDOWS)
+    SET_SOURCE_FILES_PROPERTIES(file_descriptor_writer.cpp PROPERTIES
+                                COMPILE_DEFINITIONS "NOMINMAX;_SCL_SECURE_NO_WARNINGS")
+    SET_SOURCE_FILES_PROPERTIES(sliding_numbered_file_roller.cpp
+                                time_file_roller.cpp
+                                PROPERTIES
+                                COMPILE_DEFINITIONS NOMINMAX)
 ENDIF()
 
 IF(CHUCHO_HAVE_MYSQL)
@@ -912,8 +945,28 @@ ELSE()
             PUBLIC_HEADER DESTINATION include/chucho)
 ENDIF()
 
-IF(CHUCHO_WINDOWS)
-    TARGET_LINK_LIBRARIES(chucho ws2_32)
+IF(CHUCHO_HAVE_MYSQL)
+    TARGET_LINK_LIBRARIES(chucho "${MYSQL_CLIENT_LIB}")
+ENDIF()
+
+IF(CHUCHO_HAVE_ORACLE)
+    TARGET_LINK_LIBRARIES(chucho "${ORACLE_CLIENT_LIB}")
+ENDIF()
+
+IF(CHUCHO_HAVE_SQLITE)
+    TARGET_LINK_LIBRARIES(chucho "${SQLITE_CLIENT_LIB}")
+ENDIF()
+
+IF(CHUCHO_HAVE_POSTGRES)
+    TARGET_LINK_LIBRARIES(chucho "${POSTGRES_CLIENT_LIB}")
+ENDIF()
+
+IF(CHUCHO_HAVE_RUBY AND NOT RUBY_FRAMEWORK)
+    TARGET_LINK_LIBRARIES(chucho "${RUBY_LIB}")
+ENDIF()
+
+IF(CURL_FOUND)
+    TARGET_LINK_LIBRARIES(chucho ${CURL_LIBRARIES})
 ENDIF()
 
 IF(ZLIB_LIB_DIR)
@@ -924,6 +977,16 @@ ENDIF()
 IF(BZIP2_LIB_DIR)
     LINK_DIRECTORIES("${BZIP2_LIB_DIR}")
     TARGET_LINK_LIBRARIES(chucho bz2)
+ENDIF()
+
+TARGET_LINK_LIBRARIES(chucho ${CMAKE_THREAD_LIBS_INIT})
+
+IF(CHUCHO_SOLARIS)
+    TARGET_LINK_LIBRARIES(chucho socket nsl)
+ENDIF()
+
+IF(CHUCHO_WINDOWS)
+    TARGET_LINK_LIBRARIES(chucho ws2_32)
 ENDIF()
 
 IF(CHUCHO_WINDOWS)

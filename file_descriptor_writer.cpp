@@ -14,27 +14,32 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_FILE_WRITER_FACTORY_HPP__)
-#define CHUCHO_FILE_WRITER_FACTORY_HPP__
-
-#if !defined(CHUCHO_BUILD)
-#error "This header is private"
-#endif
-
-#include <chucho/writer_factory.hpp>
+#include <chucho/file_descriptor_writer.hpp>
+#include <algorithm>
 
 namespace chucho
 {
 
-class file_writer_factory : public writer_factory
+file_descriptor_writer::~file_descriptor_writer()
 {
-public:
-    file_writer_factory();
-
-    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
-    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
-};
-
+    close();
 }
 
-#endif
+void file_descriptor_writer::write_impl(const event& evt)
+{
+    std::string msg = formatter_->format(evt);
+    std::size_t left = msg.length();
+    while (left > 0)
+    {
+        std::size_t to_copy = std::min(left, buf_.size() - num_);
+        msg.copy(buf_.data() + num_, to_copy, msg.length() - left);
+        left -= to_copy;
+        num_ += to_copy;
+        if (num_ == buf_.size())
+            flush();
+    }
+    if (flush_ && num_ > 0)
+        flush();
+}
+
+}

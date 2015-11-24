@@ -14,27 +14,35 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_FILE_WRITER_FACTORY_HPP__)
-#define CHUCHO_FILE_WRITER_FACTORY_HPP__
-
-#if !defined(CHUCHO_BUILD)
-#error "This header is private"
-#endif
-
-#include <chucho/writer_factory.hpp>
+#include <chucho/pipe_writer.hpp>
+#include <chucho/exception.hpp>
+#include "error_util.hpp"
 
 namespace chucho
 {
 
-class file_writer_factory : public writer_factory
+pipe_writer::pipe_writer(std::shared_ptr<formatter> fmt,
+                         bool flsh)
+    : file_descriptor_writer(fmt, flsh),
+      input_(INVALID_HANDLE_VALUE),
+      output_(INVALID_HANDLE_VALUE)
 {
-public:
-    file_writer_factory();
-
-    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
-    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
-};
-
+    if (CreatePipe(&input_,
+                   &output_,
+                   NULL,
+                   0))
+    {
+        set_file_handle(output_);
+    }
+    else
+    {
+        throw exception("Could not create pipes: " + error_util::message(GetLastError()));
+    }
 }
 
-#endif
+pipe_writer::~pipe_writer()
+{
+    CloseHandle(input_);
+}
+
+}
