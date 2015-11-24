@@ -321,6 +321,20 @@ IF(CHUCHO_POSIX)
         CHECK_STRUCT_HAS_MEMBER("struct tm" tm_gmtoff time.h CHUCHO_HAVE_TM_GMTOFF)
     ENDIF()
 
+    # large file support for platform/posix/file_posix.cpp
+    CHUCHO_FIND_PROGRAM(CHUCHO_GETCONF getconf)
+    IF(CHUCHO_GETCONF)
+        EXECUTE_PROCESS(COMMAND "${CHUCHO_GETCONF}" LFS_CFLAGS
+                        RESULT_VARIABLE CHUCHO_GETCONF_RESULT
+                        OUTPUT_VARIABLE CHUCHO_GETCONF_OUTPUT
+                        OUTPUT_STRIP_TRAILING_WHITESPACE)
+        IF(CHUCHO_GETCONF_RESULT EQUAL 0)
+            STRING(REPLACE -D "" CHUCHO_POSIX_FILE_DEFS "${CHUCHO_GETCONF_OUTPUT}")
+            SEPARATE_ARGUMENTS(CHUCHO_POSIX_FILE_DEFS)
+            MESSAGE(STATUS "Using large file flags ${CHUCHO_POSIX_FILE_DEFS}")
+        ENDIF()
+    ENDIF()
+
 ELSEIF(CHUCHO_WINDOWS)
     FOREACH(HEAD windows.h winsock2.h io.h process.h ws2tcpip.h time.h assert.h)
         STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
