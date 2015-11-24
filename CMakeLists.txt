@@ -107,6 +107,10 @@ IF(CHUCHO_POSIX)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
                                     COMPILE_DEFINITIONS "${CHUCHO_POSIX_FILE_DEFS}")
     ENDIF()
+    IF(CHUCHO_HAVE_O_LARGEFILE)
+        SET_SOURCE_FILES_PROPERTIES(platform/posix/file_writer_posix.cpp PROPERTIES
+                                    COMPILE_DEFINITIONS CHUCHO_HAVE_O_LARGEFILE)
+    ENDIF()
 ELSEIF(CHUCHO_WINDOWS)
     SET(CHUCHO_PLATFORM_SOURCES
         platform/windows/calendar_windows.cpp

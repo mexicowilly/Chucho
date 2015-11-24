@@ -24,7 +24,10 @@ namespace chucho
 
 void file_writer::open_impl(const std::string& file_name)
 {
-    int flag = O_WRONLY | O_LARGEFILE;
+    int flag = O_WRONLY;
+    #if defined(CHUCHO_HAVE_O_LARGEFILE)
+    flag |= O_LARGEFILE;
+    #endif
     if (allow_creation_)
         flag |= O_CREAT;
     if (has_been_opened_ || start_ == on_start::APPEND)

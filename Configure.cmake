@@ -321,7 +321,7 @@ IF(CHUCHO_POSIX)
         CHECK_STRUCT_HAS_MEMBER("struct tm" tm_gmtoff time.h CHUCHO_HAVE_TM_GMTOFF)
     ENDIF()
 
-    # large file support for platform/posix/file_posix.cpp
+    # large file support for platform/posix/file_posix.cpp and platform/posix/file_writer_posix.cpp
     CHUCHO_FIND_PROGRAM(CHUCHO_GETCONF getconf)
     IF(CHUCHO_GETCONF)
         EXECUTE_PROCESS(COMMAND "${CHUCHO_GETCONF}" LFS_CFLAGS
@@ -334,6 +334,7 @@ IF(CHUCHO_POSIX)
             MESSAGE(STATUS "Using large file flags ${CHUCHO_POSIX_FILE_DEFS}")
         ENDIF()
     ENDIF()
+    CHECK_CXX_SYMBOL_EXISTS(O_LARGEFILE fcntl.h CHUCHO_HAVE_O_LARGEFILE)
 
 ELSEIF(CHUCHO_WINDOWS)
     FOREACH(HEAD windows.h winsock2.h io.h process.h ws2tcpip.h time.h assert.h)
