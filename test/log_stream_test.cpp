@@ -89,6 +89,7 @@ TEST_F(stream_test, debug)
 TEST_F(stream_test, endl)
 {
     chucho::log_stream ls(lgr_);
+    lgr_->set_level(chucho::level::INFO_());
     CHUCHO_M(ls) << chucho::info << "yo" << chucho::endl << chucho::endm;
 #if defined(CHUCHO_WINDOWS)
     std::string exp = "yo\r\n";
