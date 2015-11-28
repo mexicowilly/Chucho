@@ -54,6 +54,9 @@ ENDIF()
 IF(PROTOBUF_INCLUDE_DIR)
     INCLUDE_DIRECTORIES("${PROTOBUF_INCLUDE_DIR}")
 ENDIF()
+IF(ZEROMQ_INCLUDE_DIR)
+    INCLUDE_DIRECTORIES("${ZEROMQ_INCLUDE_DIR}")
+ENDIF()
 
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
@@ -184,6 +187,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/logger.hpp
     include/chucho/marker.hpp
     include/chucho/memento.hpp
+    include/chucho/message_queue_writer.hpp
     include/chucho/named_pipe_writer.hpp
     include/chucho/non_copyable.hpp
     include/chucho/noop_file_compressor.hpp
@@ -449,6 +453,16 @@ ENDIF()
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/protobuf_serializer.hpp)
 
+IF(CHUCHO_HAVE_ZEROMQ)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/zeromq_message_queue_writer.hpp)
+    LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
+         zeromq_message_queue_writer.cpp)
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/zeromq_message_queue_writer.hpp)
+
 # The libyaml sources are required by chuchod
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
     # Update this when you rev libyaml
@@ -638,6 +652,7 @@ SET(CHUCHO_SOURCES
     marker.cpp
     memento.cpp
     memento_key_set.cpp
+    message_queue_writer.cpp
     named_pipe_writer.cpp
     named_pipe_writer_factory.cpp
     named_pipe_writer_memento.cpp
@@ -756,7 +771,8 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_DATABASE_SOURCES}
     ${CHUCHO_EVALUATOR_SOURCES}
     ${CHUCHO_EMAIL_SOURCES}
-    ${CHUCHO_PROTOBUF_SOURCES})
+    ${CHUCHO_PROTOBUF_SOURCES}
+    ${CHUCHO_MESSAGE_QUEUE_SOURCES})
 
 IF(CHUCHO_HAVE_PUT_TIME)
     SET_SOURCE_FILES_PROPERTIES(calendar.cpp PROPERTIES
@@ -993,6 +1009,10 @@ ENDIF()
 
 IF(CHUCHO_HAVE_PROTOBUF)
     TARGET_LINK_LIBRARIES(chucho "${PROTOBUF_LIB}")
+ENDIF()
+
+IF(CHUCHO_HAVE_ZEROMQ)
+    TARGET_LINK_LIBRARIES(chucho "${ZEROMQ_LIB}")
 ENDIF()
 
 IF(ZLIB_LIB_DIR)
