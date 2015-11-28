@@ -20,6 +20,7 @@
 #include <chucho/event.hpp>
 #include <chucho/status_reporter.hpp>
 #include <chucho/configurable.hpp>
+#include <chucho/formatter.hpp>
 #include <vector>
 #include <cstdint>
 
@@ -30,8 +31,9 @@ class CHUCHO_EXPORT serializer : public status_reporter,
                                  public configurable
 {
 public:
-    virtual ~serializer();
-    virtual std::vector<std::uint8_t> serialize(const event& evt) = 0;
+    virtual ~serializer() { };
+    virtual std::vector<std::uint8_t> serialize(const event& evt,
+                                                std::shared_ptr<formatter> fmt) = 0;
 };
 
 }

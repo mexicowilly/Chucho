@@ -25,7 +25,8 @@ namespace chucho
 class CHUCHO_EXPORT protobuf_serializer : public serializer
 {
 public:
-    virtual std::vector<std::uint8_t> serialize(const event& evt) override;
+    virtual std::vector<std::uint8_t> serialize(const event& evt,
+                                                std::shared_ptr<formatter> fmt) override;
 };
 
 }

@@ -51,6 +51,9 @@ ENDIF()
 IF(CHUCHO_CURL_INCLUDE_DIR)
     INCLUDE_DIRECTORIES("${CHUCHO_CURL_INCLUDE_DIR}")
 ENDIF()
+IF(PROTOBUF_INCLUDE_DIR)
+    INCLUDE_DIRECTORIES("${PROTOBUF_INCLUDE_DIR}")
+ENDIF()
 
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
@@ -192,6 +195,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/rolling_file_writer.hpp
     include/chucho/ruby_evaluator_filter.hpp
     include/chucho/security_policy.hpp
+    include/chucho/serializer.hpp
     include/chucho/size_file_roll_trigger.hpp
     include/chucho/sliding_numbered_file_roller.hpp
     include/chucho/status.hpp
@@ -434,6 +438,16 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/email_writer.h
      include/chucho/email_trigger.h
      include/chucho/level_threshold_email_trigger.h)
+
+IF(CHUCHO_HAVE_PROTOBUF)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/protobuf_serializer.hpp)
+    LIST(APPEND CHUCHO_PROTOBUF_SOURCES
+         protobuf_serializer.cpp)
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/protobuf_serializer.hpp)
 
 # The libyaml sources are required by chuchod
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
@@ -741,7 +755,8 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_C_SOURCES}
     ${CHUCHO_DATABASE_SOURCES}
     ${CHUCHO_EVALUATOR_SOURCES}
-    ${CHUCHO_EMAIL_SOURCES})
+    ${CHUCHO_EMAIL_SOURCES}
+    ${CHUCHO_PROTOBUF_SOURCES})
 
 IF(CHUCHO_HAVE_PUT_TIME)
     SET_SOURCE_FILES_PROPERTIES(calendar.cpp PROPERTIES
@@ -974,6 +989,10 @@ ENDIF()
 
 IF(CURL_FOUND)
     TARGET_LINK_LIBRARIES(chucho ${CURL_LIBRARIES})
+ENDIF()
+
+IF(CHUCHO_HAVE_PROTOBUF)
+    TARGET_LINK_LIBRARIES(chucho "${PROTOBUF_LIB}")
 ENDIF()
 
 IF(ZLIB_LIB_DIR)
