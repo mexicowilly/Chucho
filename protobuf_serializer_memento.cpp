@@ -14,36 +14,15 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_MESSAGE_QUEUE_WRITER_HPP__)
-#define CHUCHO_MESSAGE_QUEUE_WRITER_HPP__
-
-#include <chucho/writer.hpp>
-#include <chucho/serializer.hpp>
+#include <chucho/protobuf_serializer_memento.hpp>
 
 namespace chucho
 {
 
-class CHUCHO_EXPORT message_queue_writer : public writer
+protobuf_serializer_memento::protobuf_serializer_memento(configurator& cfg)
+    : memento(cfg)
 {
-public:
-    std::shared_ptr<serializer> get_serializer() const;
-
-protected:
-    /**
-     * @name Constructor
-     */
-    message_queue_writer(std::shared_ptr<formatter> fmt,
-                         std::shared_ptr<serializer> ser);
-    //@}
-
-    std::shared_ptr<serializer> serializer_;
-};
-
-inline std::shared_ptr<serializer> message_queue_writer::get_serializer() const
-{
-    return serializer_;
 }
 
 }
 
-#endif

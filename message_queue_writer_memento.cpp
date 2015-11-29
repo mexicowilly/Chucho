@@ -14,36 +14,27 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_MESSAGE_QUEUE_WRITER_HPP__)
-#define CHUCHO_MESSAGE_QUEUE_WRITER_HPP__
-
-#include <chucho/writer.hpp>
-#include <chucho/serializer.hpp>
+#include <chucho/message_queue_writer_memento.hpp>
+#include <chucho/demangle.hpp>
+#include <chucho/exception.hpp>
 
 namespace chucho
 {
 
-class CHUCHO_EXPORT message_queue_writer : public writer
+message_queue_writer_memento::message_queue_writer_memento(configurator& cfg)
+    : writer_memento(cfg)
 {
-public:
-    std::shared_ptr<serializer> get_serializer() const;
+    set_status_origin("message_queue_writer_memento");
+}
 
-protected:
-    /**
-     * @name Constructor
-     */
-    message_queue_writer(std::shared_ptr<formatter> fmt,
-                         std::shared_ptr<serializer> ser);
-    //@}
-
-    std::shared_ptr<serializer> serializer_;
-};
-
-inline std::shared_ptr<serializer> message_queue_writer::get_serializer() const
+void message_queue_writer_memento::handle(std::shared_ptr<configurable> cnf)
 {
-    return serializer_;
+    auto ser = std::dynamic_pointer_cast<serializer>(cnf);
+    if (ser)
+        serializer_ = ser;
+    else
+        writer_memento::handle(cnf);
 }
 
 }
 
-#endif

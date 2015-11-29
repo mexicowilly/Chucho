@@ -14,36 +14,28 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_MESSAGE_QUEUE_WRITER_HPP__)
-#define CHUCHO_MESSAGE_QUEUE_WRITER_HPP__
+#if !defined(CHUCHO_ZEROMQ_MESSAGE_QUEUE_WRITER_FACTORY_HPP__)
+#define CHUCHO_ZEROMQ_MESSAGE_QUEUE_WRITER_FACTORY_HPP__
 
-#include <chucho/writer.hpp>
-#include <chucho/serializer.hpp>
+#if !defined(CHUCHO_BUILD)
+#error "This header is private"
+#endif
+
+#include <chucho/writer_factory.hpp>
 
 namespace chucho
 {
 
-class CHUCHO_EXPORT message_queue_writer : public writer
+class zeromq_message_queue_writer_factory : public writer_factory
 {
 public:
-    std::shared_ptr<serializer> get_serializer() const;
+    zeromq_message_queue_writer_factory();
 
-protected:
-    /**
-     * @name Constructor
-     */
-    message_queue_writer(std::shared_ptr<formatter> fmt,
-                         std::shared_ptr<serializer> ser);
-    //@}
-
-    std::shared_ptr<serializer> serializer_;
+    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
+    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
 };
-
-inline std::shared_ptr<serializer> message_queue_writer::get_serializer() const
-{
-    return serializer_;
-}
 
 }
 
 #endif
+

@@ -65,6 +65,12 @@
 #include <chucho/email_writer_factory.hpp>
 #include <chucho/level_threshold_email_trigger_factory.hpp>
 #endif
+#if defined(CHUCHO_HAVE_PROTOBUF)
+#include <chucho/protobuf_serializer_factory.hpp>
+#endif
+#if defined(CHUCHO_HAVE_ZEROMQ)
+#include <chucho/zeromq_message_queue_writer_factory.hpp>
+#endif
 
 #include <cstring>
 #include <mutex>
@@ -178,6 +184,14 @@ void configurator::initialize_impl()
     add_configurable_factory("chucho::email_writer", fact);
     fact.reset(new level_threshold_email_trigger_factory());
     add_configurable_factory("chucho::level_threshold_email_trigger", fact);
+#endif
+#if defined(CHUCHO_HAVE_PROTOBUF)
+    fact.reset(new protobuf_serializer_factory());
+    add_configurable_factory("chucho::protobuf_serializer", fact);
+#endif
+#if defined(CHUCHO_HAVE_ZEROMQ)
+    fact.reset(new zeromq_message_queue_writer_factory());
+    add_configurable_factory("chucho::zeromq_message_queue_writer", fact);
 #endif
 }
 

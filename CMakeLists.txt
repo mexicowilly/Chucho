@@ -447,7 +447,11 @@ IF(CHUCHO_HAVE_PROTOBUF)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
          include/chucho/protobuf_serializer.hpp)
     LIST(APPEND CHUCHO_PROTOBUF_SOURCES
-         protobuf_serializer.cpp)
+         protobuf_serializer.cpp
+         protobuf_serializer_factory.cpp
+         include/chucho/protobuf_serializer_factory.hpp
+         protobuf_serializer_memento.cpp
+         include/chucho/protobuf_serializer_memento.hpp)
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
@@ -457,7 +461,11 @@ IF(CHUCHO_HAVE_ZEROMQ)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
          include/chucho/zeromq_message_queue_writer.hpp)
     LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
-         zeromq_message_queue_writer.cpp)
+         zeromq_message_queue_writer.cpp
+         zeromq_message_queue_writer_factory.cpp
+         include/chucho/zeromq_message_queue_writer_factory.hpp
+         zeromq_message_queue_writer_memento.cpp
+         include/chucho/zeromq_message_queue_writer_memento.hpp)
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
@@ -653,6 +661,7 @@ SET(CHUCHO_SOURCES
     memento.cpp
     memento_key_set.cpp
     message_queue_writer.cpp
+    message_queue_writer_memento.cpp
     named_pipe_writer.cpp
     named_pipe_writer_factory.cpp
     named_pipe_writer_memento.cpp
@@ -731,6 +740,7 @@ SET(CHUCHO_SOURCES
     include/chucho/logger_factory.hpp
     include/chucho/logger_memento.hpp
     include/chucho/memento_key_set.hpp
+    include/chucho/message_queue_writer_memento.hpp
     include/chucho/named_pipe_writer_factory.hpp
     include/chucho/named_pipe_writer_memento.hpp
     include/chucho/numbered_file_roller_factory.hpp
@@ -816,6 +826,14 @@ IF(CURL_FOUND)
     IF(CHUCHO_HEW_INDEX EQUAL -1)
         LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_EMAIL_WRITER)
     ENDIF()
+ENDIF()
+
+IF(CHUCHO_HAVE_PROTOBUF)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_PROTOBUF)
+ENDIF()
+
+IF(CHUCHO_HAVE_ZEROMQ)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ZEROMQ)
 ENDIF()
 
 IF(DEFINED CHUCHO_CONFIGURATOR_DEFS)
