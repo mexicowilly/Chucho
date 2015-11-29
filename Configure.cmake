@@ -709,13 +709,9 @@ IF(PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIB AND PROTOC_DIR)
     IF(NOT EXISTS "${PROTOBUF_LIB}")
         MESSAGE(FATAL_ERROR "The variable PROTOBUF_LIB was provided as ${PROTOBUF_LIB}, but it does not refer to an existing file")
     ENDIF()
-    EXECUTE_PROCESS(COMMAND "${CHUCHO_PROTOC}" "--cpp_out=${CMAKE_BINARY_DIR}" chucho.proto
-                    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/protobuf"
-                    RESULT_VARIABLE CHUCHO_PROTOC_RESULT)
-    IF(NOT CHUCHO_PROTOC_RESULT EQUAL 0)
-        MESSAGE(FATAL_ERROR "Execution of protoc failed")
-    ENDIF()
-    SET(CHUCHO_PROTOBUF_SOURCES "${CMAKE_BINARY_DIR}/chucho.pb.cc")
+    SET(CHUCHO_PROTOBUF_SOURCES
+        "${CMAKE_BINARY_DIR}/chucho.pb.cc"
+        "${CMAKE_BINARY_DIR}/chucho.pb.h")
     SET(CHUCHO_HAVE_PROTOBUF TRUE CACHE INTERNAL "Whether we have protobuf")
 ELSEIF(PROTOBUF_INCLUDE_DIR OR PROTOBUF_LIB OR PROTOC_DIR)
     MESSAGE(WARNING "If any of the variables PROTOBUF_INCLUDE_DIR, PROTOBUF_LIB or PROTOC_DIR have been set, then they must all be set for protobuf support to be included")

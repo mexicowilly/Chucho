@@ -1049,6 +1049,13 @@ IF(CHUCHO_WINDOWS)
             RUNTIME DESTINATION bin)
 ENDIF()
 
+IF(CHUCHO_HAVE_PROTOBUF)
+    ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/chucho.pb.cc" "${CMAKE_BINARY_DIR}/chucho.pb.h"
+                       COMMAND "${CHUCHO_PROTOC}" "--cpp_out=${CMAKE_BINARY_DIR}" chucho.proto
+                       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/protobuf"
+                       DEPENDS "${CMAKE_SOURCE_DIR}/protobuf/chucho.proto")
+ENDIF()
+
 ADD_SUBDIRECTORY(test)
 ADD_SUBDIRECTORY(log-server)
 

@@ -67,28 +67,31 @@ zeromq_message_queue_writer::~zeromq_message_queue_writer()
 
 void zeromq_message_queue_writer::write_impl(const event& evt)
 {
-    int rc;
-    if (!prefix_.empty())
+    if (socket_ != nullptr)
     {
-        zmq_msg_t pre;
-        zmq_msg_init_size(&pre, prefix_.size());
-        std::memcpy(zmq_msg_data(&pre), &prefix_[0], prefix_.size());
-        rc = zmq_msg_send(&pre, socket_, ZMQ_SNDMORE);
-        if (rc != prefix_.size())
+        int rc;
+        if (!prefix_.empty())
         {
-            zmq_msg_close(&pre);
-            throw exception(std::string("Error sending zeromq message prefix: ") + zmq_strerror(rc));
+            zmq_msg_t pre;
+            zmq_msg_init_size(&pre, prefix_.size());
+            std::memcpy(zmq_msg_data(&pre), &prefix_[0], prefix_.size());
+            rc = zmq_msg_send(&pre, socket_, ZMQ_SNDMORE);
+            if (rc != prefix_.size())
+            {
+                zmq_msg_close(&pre);
+                throw exception(std::string("Error sending zeromq message prefix: ") + zmq_strerror(rc));
+            }
         }
-    }
-    auto bytes = serializer_->serialize(evt, formatter_);
-    zmq_msg_t msg;
-    zmq_msg_init_size(&msg, bytes.size());
-    std::memcpy(zmq_msg_data(&msg), &bytes[0], bytes.size());
-    rc = zmq_msg_send(&msg, socket_, 0);
-    if (rc != bytes.size())
-    {
-        zmq_msg_close(&msg);
-        throw exception(std::string("Error sending zeromq message: ") + zmq_strerror(rc));
+        auto bytes = serializer_->serialize(evt, formatter_);
+        zmq_msg_t msg;
+        zmq_msg_init_size(&msg, bytes.size());
+        std::memcpy(zmq_msg_data(&msg), &bytes[0], bytes.size());
+        rc = zmq_msg_send(&msg, socket_, 0);
+        if (rc != bytes.size())
+        {
+            zmq_msg_close(&msg);
+            throw exception(std::string("Error sending zeromq message: ") + zmq_strerror(rc));
+        }
     }
 }
 
