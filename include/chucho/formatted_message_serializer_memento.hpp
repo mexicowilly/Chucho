@@ -14,14 +14,24 @@
  *    limitations under the License.
  */
 
-#include <chucho/protobuf_serializer_memento.hpp>
+#if !defined(CHUCHO_FORMATTED_MESSAGE_SERIALIZER_MEMENTO_HPP__)
+#define CHUCHO_FORMATTED_MESSAGE_SERIALIZER_MEMENTO_HPP__
+
+#if !defined(CHUCHO_BUILD)
+#error "This header is private"
+#endif
+
+#include <chucho/memento.hpp>
 
 namespace chucho
 {
 
-protobuf_serializer_memento::protobuf_serializer_memento(configurator& cfg)
-    : memento(cfg)
+class formatted_message_serializer_memento : public memento
 {
-}
+public:
+    formatted_message_serializer_memento(configurator& cfg);
+};
 
 }
+
+#endif

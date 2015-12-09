@@ -14,9 +14,9 @@
  *    limitations under the License.
  */
 
-#include <chucho/zeromq_message_queue_writer_factory.hpp>
-#include <chucho/zeromq_message_queue_writer_memento.hpp>
-#include <chucho/zeromq_message_queue_writer.hpp>
+#include <chucho/zeromq_writer_factory.hpp>
+#include <chucho/zeromq_writer_memento.hpp>
+#include <chucho/zeromq_writer.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
 #include <assert.h>
@@ -24,22 +24,22 @@
 namespace chucho
 {
 
-zeromq_message_queue_writer_factory::zeromq_message_queue_writer_factory()
+zeromq_writer_factory::zeromq_writer_factory()
 {
-    set_status_origin("zeromq_message_queue_writer_factory");
+    set_status_origin("zeromq_writer_factory");
 }
 
-std::shared_ptr<configurable> zeromq_message_queue_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::shared_ptr<configurable> zeromq_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
 {
-    auto zm = std::dynamic_pointer_cast<zeromq_message_queue_writer_memento>(mnto);
+    auto zm = std::dynamic_pointer_cast<zeromq_writer_memento>(mnto);
     assert(zm);
     if (!zm->get_formatter())
-        throw exception("zeromq_message_queue_writer_factory: The writer's formatter is not set");
+        throw exception("zeromq_writer_factory: The writer's formatter is not set");
     if (!zm->get_serializer())
-        throw exception("zeromq_message_queue_writer_factory: The writer's serializer is not set");
+        throw exception("zeromq_writer_factory: The writer's serializer is not set");
     if (zm->get_endpoint().empty())
-        throw exception("zeromq_message_queue_writer_factory: The endpoint is not set");
-    auto zw = std::make_shared<zeromq_message_queue_writer>(zm->get_formatter(),
+        throw exception("zeromq_writer_factory: The endpoint is not set");
+    auto zw = std::make_shared<zeromq_writer>(zm->get_formatter(),
                                                             zm->get_serializer(),
                                                             zm->get_endpoint(),
                                                             zm->get_prefix());
@@ -48,9 +48,9 @@ std::shared_ptr<configurable> zeromq_message_queue_writer_factory::create_config
     return zw;
 }
 
-std::shared_ptr<memento> zeromq_message_queue_writer_factory::create_memento(configurator& cfg)
+std::shared_ptr<memento> zeromq_writer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto = std::make_shared<zeromq_message_queue_writer_memento>(cfg);
+    std::shared_ptr<memento> mnto = std::make_shared<zeromq_writer_memento>(cfg);
     return mnto;
 }
 

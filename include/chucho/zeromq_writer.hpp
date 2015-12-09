@@ -14,22 +14,22 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_ZEROMQ_MESSAGE_QUEUE_WRITER_HPP__)
-#define CHUCHO_ZEROMQ_MESSAGE_QUEUE_WRITER_HPP__
+#if !defined(CHUCHO_ZEROMQ_WRITER_HPP__)
+#define CHUCHO_ZEROMQ_WRITER_HPP__
 
 #include <chucho/message_queue_writer.hpp>
 
 namespace chucho
 {
 
-class CHUCHO_EXPORT zeromq_message_queue_writer : public message_queue_writer
+class CHUCHO_EXPORT zeromq_writer : public message_queue_writer
 {
 public:
-    zeromq_message_queue_writer(std::shared_ptr<formatter> fmt,
-                                std::shared_ptr<serializer> ser,
-                                const std::string& endpoint,
-                                const std::vector<std::uint8_t>& prefix = std::vector<std::uint8_t>());
-    ~zeromq_message_queue_writer();
+    zeromq_writer(std::shared_ptr<formatter> fmt,
+                  std::shared_ptr<serializer> ser,
+                  const std::string& endpoint,
+                  const std::vector<std::uint8_t>& prefix = std::vector<std::uint8_t>());
+    ~zeromq_writer();
 
     const std::string& get_endpoint() const;
     const std::vector<std::uint8_t>& get_prefix() const;
@@ -43,12 +43,12 @@ private:
     void* socket_;
 };
 
-inline const std::string& zeromq_message_queue_writer::get_endpoint() const
+inline const std::string& zeromq_writer::get_endpoint() const
 {
     return endpoint_;
 }
 
-inline const std::vector<std::uint8_t>& zeromq_message_queue_writer::get_prefix() const
+inline const std::vector<std::uint8_t>& zeromq_writer::get_prefix() const
 {
     return prefix_;
 }

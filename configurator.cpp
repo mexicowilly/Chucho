@@ -26,6 +26,7 @@
 #include <chucho/cout_writer_factory.hpp>
 #include <chucho/duplicate_message_filter_factory.hpp>
 #include <chucho/file_writer_factory.hpp>
+#include <chucho/formatted_message_serializer_factory.hpp>
 #include <chucho/gzip_file_compressor_factory.hpp>
 #include <chucho/interval_file_roll_trigger_factory.hpp>
 #include <chucho/level_filter_factory.hpp>
@@ -69,7 +70,7 @@
 #include <chucho/protobuf_serializer_factory.hpp>
 #endif
 #if defined(CHUCHO_HAVE_ZEROMQ)
-#include <chucho/zeromq_message_queue_writer_factory.hpp>
+#include <chucho/zeromq_writer_factory.hpp>
 #endif
 
 #include <cstring>
@@ -155,6 +156,8 @@ void configurator::initialize_impl()
     add_configurable_factory("chucho::sliding_numbered_file_roller", fact);
     fact.reset(new interval_file_roll_trigger_factory());
     add_configurable_factory("chucho::interval_file_roll_trigger", fact);
+    fact.reset(new formatted_message_serializer_factory());
+    add_configurable_factory("chucho::formatted_message_serializer", fact);
 #if defined(CHUCHO_WINDOWS)
     fact.reset(new windows_event_log_writer_factory());
     add_configurable_factory("chucho::windows_event_log_writer", fact);
@@ -190,8 +193,8 @@ void configurator::initialize_impl()
     add_configurable_factory("chucho::protobuf_serializer", fact);
 #endif
 #if defined(CHUCHO_HAVE_ZEROMQ)
-    fact.reset(new zeromq_message_queue_writer_factory());
-    add_configurable_factory("chucho::zeromq_message_queue_writer", fact);
+    fact.reset(new zeromq_writer_factory());
+    add_configurable_factory("chucho::zeromq_writer", fact);
 #endif
 }
 

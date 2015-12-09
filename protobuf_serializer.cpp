@@ -46,9 +46,7 @@ std::vector<std::uint8_t> protobuf_serializer::serialize(const event& evt,
     tstream << std::this_thread::get_id();
     pevt.set_thread(utf8::escape_invalid(tstream.str()));
     std::string tmp = pevt.SerializeAsString();
-    std::vector<std::uint8_t> result(tmp.length());
-    std::memcpy(&result[0], tmp.data(), tmp.length());
-    return result;
+    return std::vector<std::uint8_t>(tmp.begin(), tmp.end());
 }
 
 }

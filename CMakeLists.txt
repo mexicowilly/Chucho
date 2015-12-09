@@ -174,6 +174,9 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/file_writer.hpp
     include/chucho/filter.hpp
     include/chucho/finalize.hpp
+    include/chucho/formatted_message_serializer.hpp
+    include/chucho/formatted_message_serializer_factory.hpp
+    include/chucho/formatted_message_serializer_memento.hpp
     include/chucho/formatter.hpp
     include/chucho/function_name.hpp
     include/chucho/interval_file_roll_trigger.hpp
@@ -459,17 +462,17 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
 
 IF(CHUCHO_HAVE_ZEROMQ)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
-         include/chucho/zeromq_message_queue_writer.hpp)
+         include/chucho/zeromq_writer.hpp)
     LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
-         zeromq_message_queue_writer.cpp
-         zeromq_message_queue_writer_factory.cpp
-         include/chucho/zeromq_message_queue_writer_factory.hpp
-         zeromq_message_queue_writer_memento.cpp
-         include/chucho/zeromq_message_queue_writer_memento.hpp)
+         zeromq_writer.cpp
+         zeromq_writer_factory.cpp
+         include/chucho/zeromq_writer_factory.hpp
+         zeromq_writer_memento.cpp
+         include/chucho/zeromq_writer_memento.hpp)
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
-     include/chucho/zeromq_message_queue_writer.hpp)
+     include/chucho/zeromq_writer.hpp)
 
 # The libyaml sources are required by chuchod
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
@@ -639,6 +642,9 @@ SET(CHUCHO_SOURCES
     file_writer_factory.cpp
     file_writer_memento.cpp
     finalize.cpp
+    formatted_message_serializer.cpp
+    formatted_message_serializer_factory.cpp
+    formatted_message_serializer_memento.cpp
     garbage_cleaner.cpp
     gzip_file_compressor_factory.cpp
     host.cpp

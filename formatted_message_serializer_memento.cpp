@@ -14,12 +14,12 @@
  *    limitations under the License.
  */
 
-#include <chucho/protobuf_serializer_memento.hpp>
+#include <chucho/formatted_message_serializer_memento.hpp>
 
 namespace chucho
 {
 
-protobuf_serializer_memento::protobuf_serializer_memento(configurator& cfg)
+formatted_message_serializer_memento::formatted_message_serializer_memento(configurator& cfg)
     : memento(cfg)
 {
 }

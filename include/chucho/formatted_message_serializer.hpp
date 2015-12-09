@@ -14,14 +14,21 @@
  *    limitations under the License.
  */
 
-#include <chucho/protobuf_serializer_memento.hpp>
+#if !defined(CHUCHO_FORMATTED_MESSAGE_SERIALIZER_HPP__)
+#define CHUCHO_FORMATTED_MESSAGE_SERIALIZER_HPP__
+
+#include <chucho/serializer.hpp>
 
 namespace chucho
 {
 
-protobuf_serializer_memento::protobuf_serializer_memento(configurator& cfg)
-    : memento(cfg)
+class CHUCHO_EXPORT formatted_message_serializer : public serializer
 {
-}
+public:
+    virtual std::vector<std::uint8_t> serialize(const event& evt,
+                                                std::shared_ptr<formatter> fmt) override;
+};
 
 }
+
+#endif

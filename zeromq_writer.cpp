@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include <chucho/zeromq_message_queue_writer.hpp>
+#include <chucho/zeromq_writer.hpp>
 #include <chucho/garbage_cleaner.hpp>
 #include <chucho/exception.hpp>
 #include <thread>
@@ -39,7 +39,7 @@ void* get_zmq_context()
 namespace chucho
 {
 
-zeromq_message_queue_writer::zeromq_message_queue_writer(std::shared_ptr<formatter> fmt,
+zeromq_writer::zeromq_writer(std::shared_ptr<formatter> fmt,
                                                          std::shared_ptr<serializer> ser,
                                                          const std::string& endpoint,
                                                          const std::vector<std::uint8_t>& prefix)
@@ -54,18 +54,18 @@ zeromq_message_queue_writer::zeromq_message_queue_writer(std::shared_ptr<formatt
     }
     else
     {
-        int rc = zmq_connect(socket_, endpoint.c_str());
+        int rc = zmq_bind(socket_, endpoint.c_str());
         if (rc != 0)
-            throw exception("Could not conect to zeromq endpoint " + endpoint + ": " + zmq_strerror(rc));
+            throw exception("Could not bind to zeromq endpoint " + endpoint + ": " + zmq_strerror(rc));
     }
 }
 
-zeromq_message_queue_writer::~zeromq_message_queue_writer()
+zeromq_writer::~zeromq_writer()
 {
     zmq_close(socket_);
 }
 
-void zeromq_message_queue_writer::write_impl(const event& evt)
+void zeromq_writer::write_impl(const event& evt)
 {
     if (socket_ != nullptr)
     {

@@ -14,20 +14,20 @@
  *    limitations under the License.
  */
 
-#include <chucho/zeromq_message_queue_writer_memento.hpp>
+#include <chucho/zeromq_writer_memento.hpp>
 #include <cstring>
 
 namespace chucho
 {
 
-zeromq_message_queue_writer_memento::zeromq_message_queue_writer_memento(configurator& cfg)
+zeromq_writer_memento::zeromq_writer_memento(configurator& cfg)
     : message_queue_writer_memento(cfg)
 {
-    set_status_origin("zeromq_message_queue_writer_memento");
-    set_handler("endpoint", [this] (const std::string& ep) { endpoint_ = validate("zeromq_message_queue_writer::endpoint", ep); });
+    set_status_origin("zeromq_writer_memento");
+    set_handler("endpoint", [this] (const std::string& ep) { endpoint_ = validate("zeromq_writer::endpoint", ep); });
     set_handler("prefix", [this] (const std::string& arg)
                 {
-                    std::string pf = validate("zeromq_message_queue_writer::prefix", arg);
+                    std::string pf = validate("zeromq_writer::prefix", arg);
                     prefix_.resize(pf.length());
                     std::memcpy(&prefix_[0], pf.data(), pf.length());
                 });

@@ -14,28 +14,41 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_ZEROMQ_MESSAGE_QUEUE_WRITER_FACTORY_HPP__)
-#define CHUCHO_ZEROMQ_MESSAGE_QUEUE_WRITER_FACTORY_HPP__
+#if !defined(CHUCHO_ZEROMQ_WRITER_MEMENTO_HPP__)
+#define CHUCHO_ZEROMQ_WRITER_MEMENTO_HPP__
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"
 #endif
 
-#include <chucho/writer_factory.hpp>
+#include <chucho/message_queue_writer_memento.hpp>
 
 namespace chucho
 {
 
-class zeromq_message_queue_writer_factory : public writer_factory
+class zeromq_writer_memento : public message_queue_writer_memento
 {
 public:
-    zeromq_message_queue_writer_factory();
+    zeromq_writer_memento(configurator& cfg);
 
-    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
-    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
+    const std::string& get_endpoint() const;
+    const std::vector<std::uint8_t>& get_prefix() const;
+
+private:
+    std::string endpoint_;
+    std::vector<std::uint8_t> prefix_;
 };
+
+inline const std::string& zeromq_writer_memento::get_endpoint() const
+{
+    return endpoint_;
+}
+
+inline const std::vector<std::uint8_t>& zeromq_writer_memento::get_prefix() const
+{
+    return prefix_;
+}
 
 }
 
 #endif
-
