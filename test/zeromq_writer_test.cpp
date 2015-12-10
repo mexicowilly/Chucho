@@ -18,6 +18,7 @@
 #include <chucho/file.hpp>
 #include <zmq.h>
 #include <thread>
+#include <cstring>
 
 namespace
 {
@@ -44,7 +45,7 @@ public:
 
     virtual void SetUp() override
     {
-        helper_ = std::string("test") + chucho::file::dir_sep + "named-pipe-writer-test-helper";
+        helper_ = std::string("test") + chucho::file::dir_sep + "zeromq-writer-test-helper";
         #if defined(CHUCHO_WINDOWS)
         helper_ += ".exe";
         #endif

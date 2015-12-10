@@ -18,8 +18,10 @@
 #include <chucho/formatted_message_serializer.hpp>
 #include <chucho/pattern_formatter.hpp>
 #include <chucho/logger.hpp>
+#include <chucho/configuration.hpp>
 #include <cstdlib>
 #include <iostream>
+#include <thread>
 
 int main(int argc, char* argv[])
 {
@@ -28,6 +30,7 @@ int main(int argc, char* argv[])
         std::cout << "ZeroMQ helper requires three arguments: endpoint, topic and message" << std::endl;
         return EXIT_FAILURE;
     }
+    chucho::configuration::set_style(chucho::configuration::style::OFF);
     std::string topic(argv[2]);
     std::vector<std::uint8_t> pfx(topic.begin(), topic.end());
     auto fmt = std::make_shared<chucho::pattern_formatter>("%m");
@@ -39,6 +42,10 @@ int main(int argc, char* argv[])
                       __FILE__,
                       __LINE__,
                       __FUNCTION__);
+    // Wait for the client to establish connection
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     wrt.write(evt);
+    // Wait for client to receive message
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     return EXIT_SUCCESS;
 }
