@@ -175,8 +175,6 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/filter.hpp
     include/chucho/finalize.hpp
     include/chucho/formatted_message_serializer.hpp
-    include/chucho/formatted_message_serializer_factory.hpp
-    include/chucho/formatted_message_serializer_memento.hpp
     include/chucho/formatter.hpp
     include/chucho/function_name.hpp
     include/chucho/interval_file_roll_trigger.hpp
@@ -236,6 +234,7 @@ SET(CHUCHO_C_HEADERS
     include/chucho/file_writer.h
     include/chucho/filter.h
     include/chucho/finalize.h
+    include/chucho/formatted_message_serializer.h
     include/chucho/formatter.h
     include/chucho/interval_file_roll_trigger.h
     include/chucho/level.h
@@ -251,6 +250,7 @@ SET(CHUCHO_C_HEADERS
     include/chucho/return_code.h
     include/chucho/rolling_file_writer.h
     include/chucho/security_policy.h
+    include/chucho/serializer.h
     include/chucho/size_file_roll_trigger.h
     include/chucho/sliding_numbered_file_roller.h
     include/chucho/status.h
@@ -469,10 +469,17 @@ IF(CHUCHO_HAVE_ZEROMQ)
          include/chucho/zeromq_writer_factory.hpp
          zeromq_writer_memento.cpp
          include/chucho/zeromq_writer_memento.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS
+             include/chucho/zeromq_writer.h)
+        LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
+             c_zeromq_writer.cpp)
+    ENDIF()
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
-     include/chucho/zeromq_writer.hpp)
+     include/chucho/zeromq_writer.hpp
+     include/chucho/zeromq_writer.h)
 
 # The libyaml sources are required by chuchod
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
@@ -563,6 +570,7 @@ IF(C_API)
         c_file_writer.cpp
         c_filter.cpp
         c_finalize.cpp
+        c_formatted_message_serializer.cpp
         c_formatter.cpp
         c_interval_file_roll_trigger.cpp
         c_level.cpp
@@ -578,6 +586,7 @@ IF(C_API)
         c_return_code.cpp
         c_rolling_file_writer.cpp
         c_security_policy.cpp
+        c_serializer.cpp
         c_size_file_roll_trigger.cpp
         c_sliding_numbered_file_roller.cpp
         c_status_manager.cpp
@@ -594,6 +603,7 @@ IF(C_API)
         include/chucho/c_level.hpp
         include/chucho/c_logger.hpp
         include/chucho/c_security_policy.hpp
+        include/chucho/c_serializer.hpp
         include/chucho/c_util.hpp
         include/chucho/c_writer.hpp)
     IF(CHUCHO_WINDOWS)
@@ -733,6 +743,8 @@ SET(CHUCHO_SOURCES
     include/chucho/file_exception.hpp
     include/chucho/file_writer_factory.hpp
     include/chucho/file_writer_memento.hpp
+    include/chucho/formatted_message_serializer_factory.hpp
+    include/chucho/formatted_message_serializer_memento.hpp
     include/chucho/garbage_cleaner.hpp
     include/chucho/gzip_file_compressor_factory.hpp
     include/chucho/host.hpp

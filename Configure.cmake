@@ -732,7 +732,7 @@ IF(ZEROMQ_INCLUDE_DIR AND ZEROMQ_LIB)
         SET(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES};socket;nsl")
     ENDIF()
     CHUCHO_REQUIRE_SYMBOLS(zmq.h zmq_ctx_new zmq_ctx_destroy zmq_socket zmq_close zmq_connect zmq_msg_send
-                           zmq_msg_init_size zmq_msg_data zmq_strerror zmq_msg_close)
+                           zmq_msg_init_size zmq_msg_data zmq_strerror zmq_msg_close zmq_bind)
     UNSET(CMAKE_REQUIRED_INCLUDES)
     UNSET(CMAKE_REQUIRED_LIBRARIES)
     SET(CHUCHO_HAVE_ZEROMQ TRUE CACHE INTERNAL "Whether we have zeromq")
