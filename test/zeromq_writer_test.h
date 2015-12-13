@@ -14,9 +14,9 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_ORACLE_WRITER_TEST_H__)
-#define CHUCHO_ORACLE_WRITER_TEST_H__
+#if !defined(CHUCHO_ZEROMQ_WRITER_TEST_H__)
+#define CHUCHO_ZEROMQ_WRITER_TEST_H__
 
-void run_oracle_writer_test(void);
+void run_zeromq_writer_test(void);
 
 #endif

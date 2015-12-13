@@ -49,4 +49,3 @@ void run_oracle_writer_test(void)
     sput_run_test(oracle_writer_test);
     sput_leave_suite();
 }
-

@@ -110,6 +110,10 @@ IF(CURL_FOUND)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_EMAIL_WRITER)
 ENDIF()
 
+IF(CHUCHO_HAVE_ZEROMQ)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_ZEROMQ)
+ENDIF()
+
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
                calendar_test.cpp
@@ -222,6 +226,12 @@ IF(C_API)
              email_writer_test.h)
     ENDIF()
 
+    IF(CHUCHO_HAVE_ZEROMQ)
+        LIST(APPEND CHUCHO_MQ_C_SOURCES
+             zeromq_writer_test.c
+             zeromq_writer_test.h)
+    ENDIF()
+
     IF(CHUCHO_WINDOWS)
         SET_SOURCE_FILES_PROPERTIES(windows_event_log_writer_test.c PROPERTIES
                                     COMPILE_DEFINITIONS CHUCHO_EVENT_LOG_DLL="${CHUCHO_EVENT_LOG_DLL}")
@@ -296,7 +306,8 @@ IF(C_API)
                    ${CHUCHO_DB_C_SOURCES}
                    ${CHUCHO_EVALUATOR_C_SOURCES}
                    ${CHUCHO_PLATFORM_C_SOURCES}
-                   ${CHUCHO_EMAIL_WRITER_C_SOURCES})
+                   ${CHUCHO_EMAIL_WRITER_C_SOURCES}
+                   ${CHUCHO_MQ_C_SOURCES})
     TARGET_LINK_LIBRARIES(c-unit-test chucho)
 
     IF(CHUCHO_SOLARIS)
