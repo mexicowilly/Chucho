@@ -22,9 +22,26 @@
 namespace chucho
 {
 
+/**
+ * @class formatted_message_serializer formatted_message_serializer.hpp chucho/formatted_message_serializer.hpp
+ * A serializer that simply turns the text of a formatted message
+ * into a blob. This class is meant for a simple case where the full context
+ * of the log event is not necessary. If you need all the event data
+ * for your message, please consider using the @ref protobuf_serializer.
+ * 
+ * @ingroup mq
+ */
 class CHUCHO_EXPORT formatted_message_serializer : public serializer
 {
 public:
+    /**
+     * Format the message of the event using the given @ref formatter and
+     * put copy those bytes into the returned blob.
+     * 
+     * @param evt the event
+     * @param fmt the formatter
+     * @return the blob containing only the formatted message
+     */
     virtual std::vector<std::uint8_t> serialize(const event& evt,
                                                 std::shared_ptr<formatter> fmt) override;
 };

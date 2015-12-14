@@ -27,11 +27,36 @@
 namespace chucho
 {
 
+/**
+ * @class serializer serializer.hpp chucho/serializer.hpp
+ * Message queues treat messages as blobs. Serializers
+ * are used by message queue writers to turn events into blobs
+ * before they are sent.
+ * 
+ * @ingroup mq
+ */
 class CHUCHO_EXPORT serializer : public status_reporter,
                                  public configurable
 {
 public:
+    /**
+     * @name Destructor
+     * @{
+     */
+    /**
+     * Destroy a serializer
+     */
     virtual ~serializer() { };
+    /**
+     * @}
+     */
+    /**
+     * Turn an event into a blob.
+     * 
+     * @param evt the event to blobify
+     * @param fmt the formatter used to create the formatted message
+     * @return the blob
+     */
     virtual std::vector<std::uint8_t> serialize(const event& evt,
                                                 std::shared_ptr<formatter> fmt) = 0;
 };

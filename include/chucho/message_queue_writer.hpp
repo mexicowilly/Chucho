@@ -23,19 +23,47 @@
 namespace chucho
 {
 
+/**
+ * @class message_queue_writer message_queue_writer.hpp chucho/message_queue_writer.hpp
+ * A base class for writing to a message queue. The principal
+ * service provided by this base class is to require the presence
+ * of a @ref serializer and to provide access to it.
+ * 
+ * Message queues treat messages as blobs. The @ref serializer is
+ * responsible for converting the @ref event into a blob.
+ * 
+ * @ingroup mq writers
+ */
 class CHUCHO_EXPORT message_queue_writer : public writer
 {
 public:
+    /**
+     * Return the serializer.
+     * 
+     * @return the serializer
+     */
     std::shared_ptr<serializer> get_serializer() const;
 
 protected:
     /**
      * @name Constructor
+     * @{
+     */
+    /**
+     * Construct a message queue writer.
+     * 
+     * @param fmt the formatter
+     * @param ser the serializer
      */
     message_queue_writer(std::shared_ptr<formatter> fmt,
                          std::shared_ptr<serializer> ser);
-    //@}
+    /**
+     * @}
+     */
 
+    /**
+     * The serializer
+     */
     std::shared_ptr<serializer> serializer_;
 };
 

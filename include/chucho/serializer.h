@@ -22,7 +22,7 @@
  * Functions that can be used with any serializer. 
  * @copydoc chucho::serializer
  *  
- * @ingroup c_serializers 
+ * @ingroup c_mq 
  */
 
 #include <chucho/return_code.h>

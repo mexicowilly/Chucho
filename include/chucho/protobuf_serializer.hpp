@@ -22,9 +22,26 @@
 namespace chucho
 {
 
+/**
+ * @class protobuf_serializer protobuf_serializer.hpp chucho/protobuf_serializer.hpp
+ * A @ref serializer that creates a <a href="https://developers.google.com/protocol-buffers/?hl=en">protobuf</a>
+ * message. The definintion of the message is in the file @c protobuf/chucho.proto.
+ * All of the event data, including the formatted message, will appear in the
+ * resulting message. If you only need the formatted message, then please consider
+ * using the @ref formatted_message_serializer instead.
+ * 
+ * @ingroup mq
+ */
 class CHUCHO_EXPORT protobuf_serializer : public serializer
 {
 public:
+    /**
+     * Serialize the event into a protobuf message.
+     * 
+     * @param evt the event
+     * @param fmt the formatter
+     * @return the blob containing only the formatted message
+     */
     virtual std::vector<std::uint8_t> serialize(const event& evt,
                                                 std::shared_ptr<formatter> fmt) override;
 };

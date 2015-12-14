@@ -118,6 +118,11 @@
  */
 
 /**
+ * @defgroup mq Message Queues
+ * Classes for writing to message queues.
+ */
+
+/**
  * @defgroup miscellaneous
  * Stuff that has no relatives.
  */
@@ -208,6 +213,13 @@
  * @defgroup c_loggers Loggers 
  * Types, functions and macros for writing filtered log events. 
  *  
+ * @ingroup c
+ */
+
+/**
+ * @defgroup c_mq Message Queues
+ * Functions for writing to message queues.
+ * 
  * @ingroup c
  */
 

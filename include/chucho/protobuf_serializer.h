@@ -14,12 +14,12 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_FORMATTED_MESSAGE_SERIALIZER_H__)
-#define CHUCHO_FORMATTED_MESSAGE_SERIALIZER_H__
+#if !defined(CHUCHO_PROTOBUF_SERIALIZER_H__)
+#define CHUCHO_PROTOBUF_SERIALIZER_H__
 
 /**
  * @file 
- * @copydoc chucho::formatted_message_serializer 
+ * @copydoc chucho::protobuf_serializer 
  *  
  * @ingroup c_mq 
  */
@@ -32,9 +32,7 @@ extern "C"
 #endif
 
 /**
- * Create a formatted message serializer. A formatted message serializer
- * is a simple serializer that only wraps the formatted message of
- * an event into the resulting blob.
+ * Create a protobuf serializer.
  * 
  * @post Ownership of the ser paramter is transferred to the 
  *       caller, and it must be released with the @ref
@@ -44,7 +42,7 @@ extern "C"
  * @return a value from @ref return_code.h indicating success or
  *         failure
  */
-CHUCHO_EXPORT chucho_rc chucho_create_formatted_message_serializer(chucho_serializer** ser);
+CHUCHO_EXPORT chucho_rc chucho_create_protobuf_serializer(chucho_serializer** ser);
 
 #if defined(__cplusplus)
 }

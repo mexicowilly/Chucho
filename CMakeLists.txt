@@ -261,10 +261,10 @@ SET(CHUCHO_C_HEADERS
 IF(CHUCHO_WINDOWS)
     LIST(APPEND CHUCHO_C_HEADERS
          include/chucho/windows_event_log_writer.h)
-ELSE()
-    LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
-         include/chucho/windows_event_log_writer.h)
 ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/windows_event_log_writer.h)
 
 IF(C_API)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS ${CHUCHO_C_HEADERS})
@@ -276,6 +276,9 @@ IF(CHUCHO_WINDOWS)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
          include/chucho/windows_event_log_writer.hpp)
 ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/windows_event_log_writer.hpp)
 
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.hpp)
@@ -455,9 +458,14 @@ IF(CHUCHO_HAVE_PROTOBUF)
          include/chucho/protobuf_serializer_factory.hpp
          protobuf_serializer_memento.cpp
          include/chucho/protobuf_serializer_memento.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/protobuf_serializer.h)
+        LIST(APPEND CHUCHO_PROTOBUF_SOURCES c_protobuf_serializer.cpp)
+    ENDIF()
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/protobuf_serializer.h
      include/chucho/protobuf_serializer.hpp)
 
 IF(CHUCHO_HAVE_ZEROMQ)
