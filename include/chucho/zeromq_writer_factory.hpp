@@ -14,19 +14,28 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_C_FORMATTER_HPP__)
-#define CHUCHO_C_FORMATTER_HPP__
+#if !defined(CHUCHO_ZEROMQ_WRITER_FACTORY_HPP__)
+#define CHUCHO_ZEROMQ_WRITER_FACTORY_HPP__
 
-#include <chucho/formatter.hpp>
+#if !defined(CHUCHO_BUILD)
+#error "This header is private"
+#endif
 
-extern "C"
+#include <chucho/writer_factory.hpp>
+
+namespace chucho
 {
 
-struct chucho_formatter
+class zeromq_writer_factory : public writer_factory
 {
-    std::shared_ptr<chucho::formatter> fmt_;
+public:
+    zeromq_writer_factory();
+
+    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
+    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
 };
 
 }
 
 #endif
+

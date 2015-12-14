@@ -14,17 +14,25 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_C_FORMATTER_HPP__)
-#define CHUCHO_C_FORMATTER_HPP__
+#if !defined(CHUCHO_PROTOBUF_SERIALIZER_FACTORY_HPP__)
+#define CHUCHO_PROTOBUF_SERIALIZER_FACTORY_HPP__
 
-#include <chucho/formatter.hpp>
+#if !defined(CHUCHO_BUILD)
+#error "This header is private"
+#endif
 
-extern "C"
+#include <chucho/configurable_factory.hpp>
+
+namespace chucho
 {
 
-struct chucho_formatter
+class protobuf_serializer_factory : public configurable_factory
 {
-    std::shared_ptr<chucho::formatter> fmt_;
+public:
+    protobuf_serializer_factory();
+
+    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
+    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
 };
 
 }

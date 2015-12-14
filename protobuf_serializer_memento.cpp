@@ -14,19 +14,14 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_C_FORMATTER_HPP__)
-#define CHUCHO_C_FORMATTER_HPP__
+#include <chucho/protobuf_serializer_memento.hpp>
 
-#include <chucho/formatter.hpp>
-
-extern "C"
+namespace chucho
 {
 
-struct chucho_formatter
+protobuf_serializer_memento::protobuf_serializer_memento(configurator& cfg)
+    : memento(cfg)
 {
-    std::shared_ptr<chucho::formatter> fmt_;
-};
-
 }
 
-#endif
+}

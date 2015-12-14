@@ -14,17 +14,17 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_PATTERN_FORMATTER_H__)
-#define CHUCHO_PATTERN_FORMATTER_H__
+#if !defined(CHUCHO_FORMATTED_MESSAGE_SERIALIZER_H__)
+#define CHUCHO_FORMATTED_MESSAGE_SERIALIZER_H__
 
 /**
  * @file 
- * @copydoc chucho::pattern_formatter 
+ * @copydoc chucho::formatted_message_serializer 
  *  
- * @ingroup c_formatters 
+ * @ingroup c_mq 
  */
 
-#include <chucho/formatter.h>
+#include <chucho/serializer.h>
 
 #if defined(__cplusplus)
 extern "C"
@@ -32,18 +32,19 @@ extern "C"
 #endif
 
 /**
- * Create a pattern formatter.
+ * Create a formatted message serializer. A formatted message serializer
+ * is a simple serializer that only wraps the formatted message of
+ * an event into the resulting blob.
  * 
- * @post Ownership of the fmt paramter is transferred to the 
+ * @post Ownership of the ser paramter is transferred to the 
  *       caller, and it must be released with the @ref
- *       chucho_release_formatter() function.
+ *       chucho_release_serializer() function.
  * 
- * @param fmt the formatter to create
- * @param pattern the pattern
+ * @param ser the serializer to create
  * @return a value from @ref return_code.h indicating success or
  *         failure
  */
-CHUCHO_EXPORT chucho_rc chucho_create_pattern_formatter(chucho_formatter** fmt, const char* const pattern);
+CHUCHO_EXPORT chucho_rc chucho_create_formatted_message_serializer(chucho_serializer** ser);
 
 #if defined(__cplusplus)
 }

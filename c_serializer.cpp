@@ -14,34 +14,15 @@
  *    limitations under the License.
  */
 
-#include <chucho/pattern_formatter.hpp>
-#include <chucho/pattern_formatter.h>
-#include <chucho/exception.hpp>
-#include <chucho/c_formatter.hpp>
+#include <chucho/c_serializer.hpp>
+#include <chucho/serializer.h>
 
 extern "C"
 {
 
-chucho_rc chucho_create_pattern_formatter(chucho_formatter** fmt, const char* const pattern)
+chucho_rc chucho_release_serializer(chucho_serializer* ser)
 {
-    if (fmt == nullptr || pattern == nullptr)
-        return CHUCHO_NULL_POINTER;
-    chucho_formatter* loc = new chucho_formatter();
-    try
-    {
-        loc->fmt_ = std::make_shared<chucho::pattern_formatter>(pattern);
-        *fmt = loc;
-    }
-    catch (chucho::exception&) 
-    {
-        delete loc;
-        return CHUCHO_INVALID_PATTERN;
-    }
-    catch (...)
-    {
-        delete loc;
-        return CHUCHO_OUT_OF_MEMORY;
-    }
+    delete ser;
     return CHUCHO_NO_ERROR;
 }
 

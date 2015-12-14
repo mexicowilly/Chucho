@@ -14,19 +14,16 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_C_FORMATTER_HPP__)
-#define CHUCHO_C_FORMATTER_HPP__
+#include <chucho/message_queue_writer.hpp>
 
-#include <chucho/formatter.hpp>
-
-extern "C"
+namespace chucho
 {
 
-struct chucho_formatter
+message_queue_writer::message_queue_writer(std::shared_ptr<formatter> fmt,
+                                           std::shared_ptr<serializer> ser)
+    : writer(fmt),
+      serializer_(ser)
 {
-    std::shared_ptr<chucho::formatter> fmt_;
-};
-
 }
 
-#endif
+}

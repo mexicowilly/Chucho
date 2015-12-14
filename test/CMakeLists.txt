@@ -40,6 +40,14 @@ IF(CHUCHO_SOLARIS)
     ADD_DEFINITIONS(-DCHUCHO_SOLARIS)
 ENDIF()
 
+IF(CHUCHO_HAVE_PROTOBUF)
+    LIST(APPEND CHUCHO_TEST_PROTOBUF_SOURCES protobuf_serializer_test.cpp)
+ENDIF()
+
+IF(CHUCHO_HAVE_ZEROMQ)
+    LIST(APPEND CHUCHO_TEST_MQ_SOURCES zeromq_writer_test.cpp)
+ENDIF()
+
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_TEST_COMPRESSION_SOURCES gzip_file_compressor_test.cpp)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_ZLIB)
@@ -102,6 +110,10 @@ IF(CURL_FOUND)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_EMAIL_WRITER)
 ENDIF()
 
+IF(CHUCHO_HAVE_ZEROMQ)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_ZEROMQ)
+ENDIF()
+
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
                calendar_test.cpp
@@ -113,6 +125,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                file_test.cpp
                file_descriptor_writer_test.cpp
                file_writer_test.cpp
+               formatted_message_serializer_test.cpp
                harness.cpp
                interval_file_roll_trigger_test.cpp
                level_test.cpp
@@ -136,7 +149,9 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                utf8_test.cpp
                ${CHUCHO_TEST_COMPRESSION_SOURCES}
                ${CHUCHO_CONFIGURATOR_TESTS}
-               ${CHUCHO_TEST_EVALUATOR_SOURCES})
+               ${CHUCHO_TEST_EVALUATOR_SOURCES}
+               ${CHUCHO_TEST_PROTOBUF_SOURCES}
+               ${CHUCHO_TEST_MQ_SOURCES})
 TARGET_LINK_LIBRARIES(unit-test chucho gtest)
 
 IF(MSVC)
@@ -150,6 +165,13 @@ ADD_EXECUTABLE(named-pipe-writer-test-helper EXCLUDE_FROM_ALL
                named_pipe_writer_test_helper.cpp)
 TARGET_LINK_LIBRARIES(named-pipe-writer-test-helper chucho)
 ADD_DEPENDENCIES(unit-test named-pipe-writer-test-helper)
+
+IF(CHUCHO_HAVE_ZEROMQ)
+    ADD_EXECUTABLE(zeromq-writer-test-helper EXCLUDE_FROM_ALL
+                   zeromq_writer_test_helper.cpp)
+    TARGET_LINK_LIBRARIES(zeromq-writer-test-helper chucho)
+    ADD_DEPENDENCIES(unit-test zeromq-writer-test-helper)
+ENDIF()
 
 ADD_CUSTOM_TARGET(check
                   COMMAND unit-test
@@ -202,6 +224,12 @@ IF(C_API)
         LIST(APPEND CHUCHO_EMAIL_WRITER_C_SOURCES
              email_writer_test.c
              email_writer_test.h)
+    ENDIF()
+
+    IF(CHUCHO_HAVE_ZEROMQ)
+        LIST(APPEND CHUCHO_MQ_C_SOURCES
+             zeromq_writer_test.c
+             zeromq_writer_test.h)
     ENDIF()
 
     IF(CHUCHO_WINDOWS)
@@ -278,7 +306,8 @@ IF(C_API)
                    ${CHUCHO_DB_C_SOURCES}
                    ${CHUCHO_EVALUATOR_C_SOURCES}
                    ${CHUCHO_PLATFORM_C_SOURCES}
-                   ${CHUCHO_EMAIL_WRITER_C_SOURCES})
+                   ${CHUCHO_EMAIL_WRITER_C_SOURCES}
+                   ${CHUCHO_MQ_C_SOURCES})
     TARGET_LINK_LIBRARIES(c-unit-test chucho)
 
     IF(CHUCHO_SOLARIS)

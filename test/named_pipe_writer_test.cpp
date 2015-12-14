@@ -75,7 +75,6 @@ public:
                                         1024,
                                         0,
                                         NULL);
-
         if (read_handle_ == INVALID_HANDLE_VALUE)
             throw chucho::exception("Could not create named pipe " + pipe_name);
         #endif

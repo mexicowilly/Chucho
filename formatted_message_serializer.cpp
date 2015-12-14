@@ -14,19 +14,16 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_C_FORMATTER_HPP__)
-#define CHUCHO_C_FORMATTER_HPP__
+#include <chucho/formatted_message_serializer.hpp>
 
-#include <chucho/formatter.hpp>
-
-extern "C"
+namespace chucho
 {
 
-struct chucho_formatter
+std::vector<std::uint8_t> formatted_message_serializer::serialize(const event& evt,
+                                                                  std::shared_ptr<formatter> fmt)
 {
-    std::shared_ptr<chucho::formatter> fmt_;
-};
-
+    std::string msg = fmt->format(evt);
+    return std::vector<std::uint8_t>(msg.begin(), msg.end());
 }
 
-#endif
+}

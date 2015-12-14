@@ -691,6 +691,55 @@ ELSEIF(RUBY_FRAMEWORK)
     ENDIF()
 ENDIF()
 
+# protobuf
+IF(PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIB AND PROTOC_DIR)
+    FIND_PROGRAM(CHUCHO_PROTOC
+                 protoc
+                 PATHS "${PROTOC_DIR}"
+                 NO_DEFAULT_PATH)
+    IF(NOT CHUCHO_PROTOC)
+        MESSAGE(FATAL_ERROR "The variable PROTOC_DIR was provided as ${PROTOC_DIR}, but it does not contain the protoc program")
+    ENDIF()
+    SET(CMAKE_REQUIRED_INCLUDES "${PROTOBUF_INCLUDE_DIR}")
+    CHECK_INCLUDE_FILE_CXX(google/protobuf/message.h CHUCHO_GOOGLE_PROTOBUF_MESSAGE_H)
+    IF(NOT CHUCHO_GOOGLE_PROTOBUF_MESSAGE_H)
+        MESSAGE(FATAL_ERROR "The variable PROTOBUF_INCLUDE_DIR was provided as ${PROTOBUF_INCLUDE_DIR}, but it does not contain the protobuf headers")
+    ENDIF()
+    UNSET(CMAKE_REQUIRED_INCLUDES)
+    IF(NOT EXISTS "${PROTOBUF_LIB}")
+        MESSAGE(FATAL_ERROR "The variable PROTOBUF_LIB was provided as ${PROTOBUF_LIB}, but it does not refer to an existing file")
+    ENDIF()
+    SET(CHUCHO_PROTOBUF_SOURCES
+        "${CMAKE_BINARY_DIR}/chucho.pb.cc"
+        "${CMAKE_BINARY_DIR}/chucho.pb.h")
+    SET(CHUCHO_HAVE_PROTOBUF TRUE CACHE INTERNAL "Whether we have protobuf")
+ELSEIF(PROTOBUF_INCLUDE_DIR OR PROTOBUF_LIB OR PROTOC_DIR)
+    MESSAGE(WARNING "If any of the variables PROTOBUF_INCLUDE_DIR, PROTOBUF_LIB or PROTOC_DIR have been set, then they must all be set for protobuf support to be included")
+ENDIF()
+
+# zeromq
+IF(ZEROMQ_INCLUDE_DIR AND ZEROMQ_LIB)
+    SET(CMAKE_REQUIRED_INCLUDES "${ZEROMQ_INCLUDE_DIR}")
+    CHECK_INCLUDE_FILE_CXX(zmq.h CHUCHO_ZMQ_H)
+    IF(NOT CHUCHO_ZMQ_H)
+        MESSAGE(FATAL_ERROR "The variable ZEROMQ_INCLUDE_DIR was provided as ${ZEROMQ_INCLUDE_DIR}, but it does not contain the zeromq headers")
+    ENDIF()
+    IF(NOT EXISTS "${ZEROMQ_LIB}")
+        MESSAGE(FATAL_ERROR "The variable ZEROMQ_LIB was provided as ${ZEROMQ_LIB}, but it does not refer to an existing file")
+    ENDIF()
+    SET(CMAKE_REQUIRED_LIBRARIES "${ZEROMQ_LIB}" ${CMAKE_THREAD_LIBS_INIT})
+    IF(CHUCHO_SOLARIS)
+        SET(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES};socket;nsl")
+    ENDIF()
+    CHUCHO_REQUIRE_SYMBOLS(zmq.h zmq_ctx_new zmq_ctx_destroy zmq_socket zmq_close zmq_connect zmq_msg_send
+                           zmq_msg_init_size zmq_msg_data zmq_strerror zmq_msg_close zmq_bind)
+    UNSET(CMAKE_REQUIRED_INCLUDES)
+    UNSET(CMAKE_REQUIRED_LIBRARIES)
+    SET(CHUCHO_HAVE_ZEROMQ TRUE CACHE INTERNAL "Whether we have zeromq")
+ELSEIF(ZEROMQ_INCLUDE_DIR OR ZEROMQ_LIB)
+    MESSAGE(WARNING "If either of the variables ZEROMQ_INCLUDE_DIR or ZEROMQ_LIB has been set, then they must both be set for zeromq support to be included")
+ENDIF()
+
 # doxygen
 FIND_PACKAGE(Doxygen)
 

@@ -14,19 +14,27 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_C_FORMATTER_HPP__)
-#define CHUCHO_C_FORMATTER_HPP__
+#include <chucho/message_queue_writer_memento.hpp>
+#include <chucho/demangle.hpp>
+#include <chucho/exception.hpp>
 
-#include <chucho/formatter.hpp>
-
-extern "C"
+namespace chucho
 {
 
-struct chucho_formatter
+message_queue_writer_memento::message_queue_writer_memento(configurator& cfg)
+    : writer_memento(cfg)
 {
-    std::shared_ptr<chucho::formatter> fmt_;
-};
+    set_status_origin("message_queue_writer_memento");
+}
+
+void message_queue_writer_memento::handle(std::shared_ptr<configurable> cnf)
+{
+    auto ser = std::dynamic_pointer_cast<serializer>(cnf);
+    if (ser)
+        serializer_ = ser;
+    else
+        writer_memento::handle(cnf);
+}
 
 }
 
-#endif

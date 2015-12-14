@@ -51,6 +51,12 @@ ENDIF()
 IF(CHUCHO_CURL_INCLUDE_DIR)
     INCLUDE_DIRECTORIES("${CHUCHO_CURL_INCLUDE_DIR}")
 ENDIF()
+IF(PROTOBUF_INCLUDE_DIR)
+    INCLUDE_DIRECTORIES("${PROTOBUF_INCLUDE_DIR}")
+ENDIF()
+IF(ZEROMQ_INCLUDE_DIR)
+    INCLUDE_DIRECTORIES("${ZEROMQ_INCLUDE_DIR}")
+ENDIF()
 
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
@@ -168,6 +174,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/file_writer.hpp
     include/chucho/filter.hpp
     include/chucho/finalize.hpp
+    include/chucho/formatted_message_serializer.hpp
     include/chucho/formatter.hpp
     include/chucho/function_name.hpp
     include/chucho/interval_file_roll_trigger.hpp
@@ -181,6 +188,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/logger.hpp
     include/chucho/marker.hpp
     include/chucho/memento.hpp
+    include/chucho/message_queue_writer.hpp
     include/chucho/named_pipe_writer.hpp
     include/chucho/non_copyable.hpp
     include/chucho/noop_file_compressor.hpp
@@ -192,6 +200,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/rolling_file_writer.hpp
     include/chucho/ruby_evaluator_filter.hpp
     include/chucho/security_policy.hpp
+    include/chucho/serializer.hpp
     include/chucho/size_file_roll_trigger.hpp
     include/chucho/sliding_numbered_file_roller.hpp
     include/chucho/status.hpp
@@ -225,6 +234,7 @@ SET(CHUCHO_C_HEADERS
     include/chucho/file_writer.h
     include/chucho/filter.h
     include/chucho/finalize.h
+    include/chucho/formatted_message_serializer.h
     include/chucho/formatter.h
     include/chucho/interval_file_roll_trigger.h
     include/chucho/level.h
@@ -240,6 +250,7 @@ SET(CHUCHO_C_HEADERS
     include/chucho/return_code.h
     include/chucho/rolling_file_writer.h
     include/chucho/security_policy.h
+    include/chucho/serializer.h
     include/chucho/size_file_roll_trigger.h
     include/chucho/sliding_numbered_file_roller.h
     include/chucho/status.h
@@ -250,10 +261,10 @@ SET(CHUCHO_C_HEADERS
 IF(CHUCHO_WINDOWS)
     LIST(APPEND CHUCHO_C_HEADERS
          include/chucho/windows_event_log_writer.h)
-ELSE()
-    LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
-         include/chucho/windows_event_log_writer.h)
 ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/windows_event_log_writer.h)
 
 IF(C_API)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS ${CHUCHO_C_HEADERS})
@@ -265,6 +276,9 @@ IF(CHUCHO_WINDOWS)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
          include/chucho/windows_event_log_writer.hpp)
 ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/windows_event_log_writer.hpp)
 
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.hpp)
@@ -435,6 +449,46 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/email_trigger.h
      include/chucho/level_threshold_email_trigger.h)
 
+IF(CHUCHO_HAVE_PROTOBUF)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/protobuf_serializer.hpp)
+    LIST(APPEND CHUCHO_PROTOBUF_SOURCES
+         protobuf_serializer.cpp
+         protobuf_serializer_factory.cpp
+         include/chucho/protobuf_serializer_factory.hpp
+         protobuf_serializer_memento.cpp
+         include/chucho/protobuf_serializer_memento.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/protobuf_serializer.h)
+        LIST(APPEND CHUCHO_PROTOBUF_SOURCES c_protobuf_serializer.cpp)
+    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/protobuf_serializer.h
+     include/chucho/protobuf_serializer.hpp)
+
+IF(CHUCHO_HAVE_ZEROMQ)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/zeromq_writer.hpp)
+    LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
+         zeromq_writer.cpp
+         zeromq_writer_factory.cpp
+         include/chucho/zeromq_writer_factory.hpp
+         zeromq_writer_memento.cpp
+         include/chucho/zeromq_writer_memento.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS
+             include/chucho/zeromq_writer.h)
+        LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
+             c_zeromq_writer.cpp)
+    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/zeromq_writer.hpp
+     include/chucho/zeromq_writer.h)
+
 # The libyaml sources are required by chuchod
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
     # Update this when you rev libyaml
@@ -524,6 +578,7 @@ IF(C_API)
         c_file_writer.cpp
         c_filter.cpp
         c_finalize.cpp
+        c_formatted_message_serializer.cpp
         c_formatter.cpp
         c_interval_file_roll_trigger.cpp
         c_level.cpp
@@ -539,6 +594,7 @@ IF(C_API)
         c_return_code.cpp
         c_rolling_file_writer.cpp
         c_security_policy.cpp
+        c_serializer.cpp
         c_size_file_roll_trigger.cpp
         c_sliding_numbered_file_roller.cpp
         c_status_manager.cpp
@@ -555,6 +611,7 @@ IF(C_API)
         include/chucho/c_level.hpp
         include/chucho/c_logger.hpp
         include/chucho/c_security_policy.hpp
+        include/chucho/c_serializer.hpp
         include/chucho/c_util.hpp
         include/chucho/c_writer.hpp)
     IF(CHUCHO_WINDOWS)
@@ -603,6 +660,9 @@ SET(CHUCHO_SOURCES
     file_writer_factory.cpp
     file_writer_memento.cpp
     finalize.cpp
+    formatted_message_serializer.cpp
+    formatted_message_serializer_factory.cpp
+    formatted_message_serializer_memento.cpp
     garbage_cleaner.cpp
     gzip_file_compressor_factory.cpp
     host.cpp
@@ -624,6 +684,8 @@ SET(CHUCHO_SOURCES
     marker.cpp
     memento.cpp
     memento_key_set.cpp
+    message_queue_writer.cpp
+    message_queue_writer_memento.cpp
     named_pipe_writer.cpp
     named_pipe_writer_factory.cpp
     named_pipe_writer_memento.cpp
@@ -689,6 +751,8 @@ SET(CHUCHO_SOURCES
     include/chucho/file_exception.hpp
     include/chucho/file_writer_factory.hpp
     include/chucho/file_writer_memento.hpp
+    include/chucho/formatted_message_serializer_factory.hpp
+    include/chucho/formatted_message_serializer_memento.hpp
     include/chucho/garbage_cleaner.hpp
     include/chucho/gzip_file_compressor_factory.hpp
     include/chucho/host.hpp
@@ -702,6 +766,7 @@ SET(CHUCHO_SOURCES
     include/chucho/logger_factory.hpp
     include/chucho/logger_memento.hpp
     include/chucho/memento_key_set.hpp
+    include/chucho/message_queue_writer_memento.hpp
     include/chucho/named_pipe_writer_factory.hpp
     include/chucho/named_pipe_writer_memento.hpp
     include/chucho/numbered_file_roller_factory.hpp
@@ -741,7 +806,9 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_C_SOURCES}
     ${CHUCHO_DATABASE_SOURCES}
     ${CHUCHO_EVALUATOR_SOURCES}
-    ${CHUCHO_EMAIL_SOURCES})
+    ${CHUCHO_EMAIL_SOURCES}
+    ${CHUCHO_PROTOBUF_SOURCES}
+    ${CHUCHO_MESSAGE_QUEUE_SOURCES})
 
 IF(CHUCHO_HAVE_PUT_TIME)
     SET_SOURCE_FILES_PROPERTIES(calendar.cpp PROPERTIES
@@ -785,6 +852,14 @@ IF(CURL_FOUND)
     IF(CHUCHO_HEW_INDEX EQUAL -1)
         LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_EMAIL_WRITER)
     ENDIF()
+ENDIF()
+
+IF(CHUCHO_HAVE_PROTOBUF)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_PROTOBUF)
+ENDIF()
+
+IF(CHUCHO_HAVE_ZEROMQ)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ZEROMQ)
 ENDIF()
 
 IF(DEFINED CHUCHO_CONFIGURATOR_DEFS)
@@ -976,6 +1051,14 @@ IF(CURL_FOUND)
     TARGET_LINK_LIBRARIES(chucho ${CURL_LIBRARIES})
 ENDIF()
 
+IF(CHUCHO_HAVE_PROTOBUF)
+    TARGET_LINK_LIBRARIES(chucho "${PROTOBUF_LIB}")
+ENDIF()
+
+IF(CHUCHO_HAVE_ZEROMQ)
+    TARGET_LINK_LIBRARIES(chucho "${ZEROMQ_LIB}")
+ENDIF()
+
 IF(ZLIB_LIB_DIR)
     LINK_DIRECTORIES("${ZLIB_LIB_DIR}")
     TARGET_LINK_LIBRARIES(chucho z)
@@ -1008,6 +1091,13 @@ IF(CHUCHO_WINDOWS)
     ADD_DEPENDENCIES(chucho event_log)
     INSTALL(TARGETS event_log
             RUNTIME DESTINATION bin)
+ENDIF()
+
+IF(CHUCHO_HAVE_PROTOBUF)
+    ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/chucho.pb.cc" "${CMAKE_BINARY_DIR}/chucho.pb.h"
+                       COMMAND "${CHUCHO_PROTOC}" "--cpp_out=${CMAKE_BINARY_DIR}" chucho.proto
+                       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/protobuf"
+                       DEPENDS "${CMAKE_SOURCE_DIR}/protobuf/chucho.proto")
 ENDIF()
 
 ADD_SUBDIRECTORY(test)

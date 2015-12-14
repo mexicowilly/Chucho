@@ -14,17 +14,17 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_C_FORMATTER_HPP__)
-#define CHUCHO_C_FORMATTER_HPP__
+#if !defined(CHUCHO_C_SERIALIZER_HPP__)
+#define CHUCHO_C_SERIALIZER_HPP__
 
-#include <chucho/formatter.hpp>
+#include <chucho/serializer.hpp>
 
 extern "C"
 {
 
-struct chucho_formatter
+struct chucho_serializer
 {
-    std::shared_ptr<chucho::formatter> fmt_;
+    std::shared_ptr<chucho::serializer> ser_;
 };
 
 }

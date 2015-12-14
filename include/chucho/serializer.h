@@ -14,17 +14,18 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_PATTERN_FORMATTER_H__)
-#define CHUCHO_PATTERN_FORMATTER_H__
+#if !defined(CHUCHO_SERIALIZER_H__)
+#define CHUCHO_SERIALIZER_H__
 
 /**
  * @file 
- * @copydoc chucho::pattern_formatter 
+ * Functions that can be used with any serializer. 
+ * @copydoc chucho::serializer
  *  
- * @ingroup c_formatters 
+ * @ingroup c_mq 
  */
 
-#include <chucho/formatter.h>
+#include <chucho/return_code.h>
 
 #if defined(__cplusplus)
 extern "C"
@@ -32,18 +33,21 @@ extern "C"
 #endif
 
 /**
- * Create a pattern formatter.
- * 
- * @post Ownership of the fmt paramter is transferred to the 
- *       caller, and it must be released with the @ref
- *       chucho_release_formatter() function.
- * 
- * @param fmt the formatter to create
- * @param pattern the pattern
+ * An opaque structure that you don't care about.
+ */
+typedef struct chucho_serializer chucho_serializer;
+
+/**
+ * Release a serializer.
+ *  
+ * @post Ownership of the ser parameter is transferred to the 
+ *       callee.
+ *
+ * @param ser the serializer
  * @return a value from @ref return_code.h indicating success or
  *         failure
  */
-CHUCHO_EXPORT chucho_rc chucho_create_pattern_formatter(chucho_formatter** fmt, const char* const pattern);
+CHUCHO_EXPORT chucho_rc chucho_release_serializer(chucho_serializer* ser);
 
 #if defined(__cplusplus)
 }
