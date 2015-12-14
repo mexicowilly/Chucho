@@ -28,8 +28,7 @@ zeromq_writer_memento::zeromq_writer_memento(configurator& cfg)
     set_handler("prefix", [this] (const std::string& arg)
                 {
                     std::string pf = validate("zeromq_writer::prefix", arg);
-                    prefix_.resize(pf.length());
-                    std::memcpy(&prefix_[0], pf.data(), pf.length());
+                    prefix_.assign(pf.begin(), pf.end());
                 });
 }
 

@@ -205,6 +205,10 @@ namespace chucho
  *         <td>[1, 1000]</td></tr>
  *     <tr><td>time_file_roller::max_history(text)</td>
  *         <td>4</td></tr>
+ *     <tr><td>zeromq_writer::endpoint</td>
+ *         <td><i>default</i></td></tr>
+ *     <tr><td>zeromq_writer::prefix</td>
+ *         <td><i>default</i></td></tr>
  * </table>
  * 
  * @ingroup miscellaneous
