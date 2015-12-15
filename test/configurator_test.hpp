@@ -80,6 +80,13 @@ protected:
     void windows_event_log_writer_body();
     void windows_event_log_writer_no_log_body();
 #endif
+#if defined(CHUCHO_HAVE_ZEROMQ)
+    void zeromq_writer_body();
+    void zeromq_writer_no_prefix_body();
+#if defined(CHUCHO_HAVE_PROTOBUF)
+    void zeromq_writer_protobuf_body();
+#endif
+#endif
     void zip_file_compressor_body();
 };
 

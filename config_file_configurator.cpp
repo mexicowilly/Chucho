@@ -161,6 +161,7 @@ std::shared_ptr<configurable> config_file_configurator::chucho_properties_proces
     generics.push_back("filter");
     generics.push_back("formatter");
     generics.push_back("file_roll_trigger");
+    generics.push_back("serializer");
     #if defined(CHUCHO_HAVE_EMAIL_WRITER)
     generics.push_back("email_trigger");
     #endif

@@ -646,6 +646,52 @@ TEST_F(yaml_configurator, windows_event_log_writer_no_log)
 }
 #endif
 
+#if defined(CHUCHO_HAVE_ZEROMQ)
+
+TEST_F(yaml_configurator, zeromq_writer)
+{
+    configure("- chucho::logger:\n"
+              "    - name: will\n"
+              "    - chucho::zeromq_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            - pattern: '%m'\n"
+              "        - chucho::formatted_message_serializer\n"
+              "        - endpoint: 'tcp://127.0.0.1:7777'\n"
+              "        - prefix: Hi");
+    zeromq_writer_body();
+}
+
+TEST_F(yaml_configurator, zeromq_writer_no_prefix)
+{
+    configure("- chucho::logger:\n"
+              "    - name: will\n"
+              "    - chucho::zeromq_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            - pattern: '%m'\n"
+              "        - chucho::formatted_message_serializer\n"
+              "        - endpoint: 'tcp://127.0.0.1:7778'\n");
+    zeromq_writer_no_prefix_body();
+}
+
+#if defined(CHUCHO_HAVE_PROTOBUF)
+
+TEST_F(yaml_configurator, zeromq_writer_protobuf)
+{
+    configure("- chucho::logger:\n"
+              "    - name: will\n"
+              "    - chucho::zeromq_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            - pattern: '%m'\n"
+              "        - chucho::protobuf_serializer:\n"
+              "        - endpoint: 'tcp://127.0.0.1:7779'\n"
+              "        - prefix: Hi");
+    zeromq_writer_protobuf_body();
+}
+
+#endif
+
+#endif
+
 TEST_F(yaml_configurator, zip_file_compressor)
 {
     configure("chucho::logger:\n"
