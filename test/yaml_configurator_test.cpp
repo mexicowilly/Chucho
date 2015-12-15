@@ -682,7 +682,7 @@ TEST_F(yaml_configurator, zeromq_writer_protobuf)
               "    - chucho::zeromq_writer:\n"
               "        - chucho::pattern_formatter:\n"
               "            - pattern: '%m'\n"
-              "        - chucho::protobuf_serializer:\n"
+              "        - chucho::protobuf_serializer\n"
               "        - endpoint: 'tcp://127.0.0.1:7779'\n"
               "        - prefix: Hi");
     zeromq_writer_protobuf_body();
