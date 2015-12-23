@@ -27,27 +27,8 @@ INCLUDE(CheckTypeSize)
 INCLUDE(FindCURL)
 INCLUDE(CheckStructHasMember)
 
-# static and shared
-OPTION(ENABLE_SHARED "Whether to build a shared object" FALSE)
-
 # framework or not
-OPTION(ENABLE_FRAMEWORK "Whether to build as a framework on Macintosh" TRUE)
 SET(CHUCHO_NEEDS_TO_USE_THE_FRAMEWORK_VARIABLE_OR_CMAKE_COMPLAINS ${ENABLE_FRAMEWORK})
-
-# whether to install chuchod as a service or not on platforms that have
-# services.
-OPTION(INSTALL_SERVICE "Whether to install chuchod as a system service" FALSE)
-
-# what kinds of configurations will we support
-OPTION(YAML_CONFIG "Whether to include the YAML configuration parser" TRUE)
-OPTION(CONFIG_FILE_CONFIG "Whether to include the config file configuration parser that uses Chucho keys" FALSE)
-OPTION(LOG4CPLUS_CONFIG "Whether to support reading log4cplus configuration files" FALSE)
-
-# whether to build the C API
-OPTION(C_API "Whether the C API should be built into this Chucho" FALSE)
-
-# whether we should check for the presence of libcurl or not
-OPTION(ENABLE_CURL "Whether libcurl should be checked so that email_writer will be enabled (default ON)" TRUE)
 
 # We'll want this later
 MACRO(CHUCHO_FIND_PROGRAM CHUCHO_FIND_VAR CHUCHO_PROGRAM)
