@@ -21,6 +21,7 @@
 #error "This header is private"
 #endif
 
+#include <chucho/export.hpp>
 #include <string>
 #include <vector>
 #include <cstdarg>
@@ -33,9 +34,9 @@ namespace text_util
 
 const std::size_t MAX_MESSAGE_SIZE = 500 * 1024;
 
-std::string format(const char* const fmt, va_list args);
-std::string to_lower(const std::string& text);
-std::vector<std::string> tokenize(const std::string& text, char delim);
+CHUCHO_PRIV_EXPORT std::string format(const char* const fmt, va_list args);
+CHUCHO_PRIV_EXPORT std::string to_lower(const std::string& text);
+CHUCHO_PRIV_EXPORT std::vector<std::string> tokenize(const std::string& text, char delim);
 
 }
 

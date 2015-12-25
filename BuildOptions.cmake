@@ -84,10 +84,10 @@ OPTION(C_API "Whether the C API should be built into this Chucho" OFF)
 
 # CONFIGURATION FORMATS
 # ================================================================================
-# Chucho is able to parse configuration files using three different formats, YAML,
-# config file and Log4cplus. Any or all may be included in the build, and Chucho
-# will figure out the format of the file being used at run time. For examples
-# showing how each of these formats works, please refer to the files:
+#     Chucho is able to parse configuration files using three different formats,
+# YAML, config file and Log4cplus. Any or all may be included in the build, and
+# Chucho will figure out the format of the file being used at run time. For
+# examples showing how each of these formats works, please refer to the files:
 #     test/yaml_configurator_test.cpp
 #     test/chucho_config_file_configurator_test.cpp
 #     test/log4cplus_config_file_configurator_test.cpp
