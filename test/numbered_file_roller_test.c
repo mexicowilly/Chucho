@@ -34,6 +34,8 @@ static void numbered_file_roller_test(void)
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "release file roller");
     rc = chucho_create_numbered_file_roller(&rlr, 5, 0, NULL);
     sput_fail_unless(rc == CHUCHO_INVALID_ARGUMENT, "create invalid numbered file roller");
+    rc = chucho_release_file_roller(rlr);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "release file roller");
 }
 
 void run_numbered_file_roller_test(void)

@@ -25,18 +25,19 @@ extern "C"
 {
 
 chucho_rc chucho_create_rolling_file_writer(chucho_writer** wrt,
-                                      chucho_formatter* fmt,
-                                      chucho_file_roller* rlr,
-                                      chucho_file_roll_trigger* trg,
-                                      const char* const name,
-                                      chucho_on_start on_start,
-                                      int flush)
+                                            chucho_formatter* fmt,
+                                            chucho_file_roller* rlr,
+                                            chucho_file_roll_trigger* trg,
+                                            const char* const name,
+                                            chucho_on_start on_start,
+                                            int flush)
 {
     if (wrt == nullptr || fmt == nullptr || rlr == nullptr) 
         return CHUCHO_NULL_POINTER;
+    chucho_writer* loc = nullptr;
     try
     {
-        chucho_writer* loc = new chucho_writer;
+        loc = new chucho_writer;
         chucho::file_writer::on_start ons = on_start == CHUCHO_ON_START_APPEND ?
             chucho::file_writer::on_start::APPEND : chucho::file_writer::on_start::TRUNCATE;
         std::shared_ptr<chucho::file_roll_trigger> cpptrg = trg == nullptr ?
@@ -68,6 +69,7 @@ chucho_rc chucho_create_rolling_file_writer(chucho_writer** wrt,
     }
     catch (std::invalid_argument&) 
     {
+        delete loc;
         return CHUCHO_INVALID_ARGUMENT;
     }
     catch (...) 

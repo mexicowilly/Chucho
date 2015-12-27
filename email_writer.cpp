@@ -96,7 +96,8 @@ email_writer::email_writer(std::shared_ptr<formatter> fmt,
       port_(port),
       subject_(subject),
       connection_type_(connect),
-      verbose_(false)
+      verbose_(false),
+      rcpts_(nullptr)
 {
     init();
 }
@@ -124,13 +125,16 @@ email_writer::email_writer(std::shared_ptr<formatter> fmt,
       user_(user),
       password_(password),
       connection_type_(connect),
-      verbose_(false)
+      verbose_(false),
+      rcpts_(nullptr)
 {
     init();
 }
 
 email_writer::~email_writer()
 {
+    if (rcpts_ != nullptr)
+        curl_slist_free_all(rcpts_);
     if (curl_ != nullptr)
         curl_easy_cleanup(curl_);
 }
@@ -228,14 +232,13 @@ void email_writer::init()
         stream.str("");
         stream << '<' << from_ << '>';
         set_curl_option(CURLOPT_MAIL_FROM, stream.str().c_str(), "mail from field");
-        struct curl_slist* rcpts = nullptr;
         for (auto one : to_)
         {
             stream.str("");
             stream << '<' << one << '>';
-            rcpts = curl_slist_append(rcpts, stream.str().c_str());
+            rcpts_ = curl_slist_append(rcpts_, stream.str().c_str());
         }
-        set_curl_option(CURLOPT_MAIL_RCPT, rcpts, "mail to");
+        set_curl_option(CURLOPT_MAIL_RCPT, rcpts_, "mail to");
         set_curl_option(CURLOPT_UPLOAD, 1, "upload");
         set_curl_option(CURLOPT_READFUNCTION, curl_read_cb, "read callback");
         if (user_)
@@ -260,6 +263,11 @@ void email_writer::init()
     {
         if (curl_ != nullptr)
         {
+            if (rcpts_ != nullptr)
+            {
+                curl_slist_free_all(rcpts_);
+                rcpts_ = nullptr;
+            }
             curl_easy_cleanup(curl_);
             curl_ = nullptr;
         }

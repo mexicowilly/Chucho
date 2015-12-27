@@ -308,6 +308,7 @@ private:
     optional<std::string> password_;
     connection_type connection_type_;
     bool verbose_;
+    struct curl_slist* rcpts_;
 };
 
 inline std::size_t email_writer::get_buffer_capacity() const

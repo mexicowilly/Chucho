@@ -114,13 +114,17 @@ static void expect(const chucho_level* lvl, const char* mark)
     if (strcmp(nm, "OFF") == 0) 
     {
         sput_fail_unless(lines[0] == NULL, "got no lines");
+        free(lines);
         return;
     }
     else
     {
         sput_fail_if(lines[0] == NULL, "got lines");
         if (lines[0] == NULL)
+        {
+            free(lines);
             return;
+        }
     }
     rc = chucho_lvl_get_value(lvl, &tgt_val);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "get level value");

@@ -357,7 +357,8 @@ IF(ENABLE_CURL)
         SET(CMAKE_REQUIRED_INCLUDES ${CURL_INCLUDE_DIRS})
         SET(CMAKE_REQUIRED_LIBRARIES ${CURL_LIBRARIES})
         CHUCHO_REQUIRE_SYMBOLS(curl/curl.h curl_global_init curl_easy_init curl_easy_cleanup
-                               curl_easy_setopt curl_easy_perform curl_version_info curl_easy_strerror)
+                               curl_easy_setopt curl_easy_perform curl_version_info curl_easy_strerror
+                               curl_slist_free_all)
         UNSET(CMAKE_REQUIRED_INCLUDES)
         UNSET(CMAKE_REQUIRED_LIBRARIES)
     ENDIF()

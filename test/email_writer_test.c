@@ -101,6 +101,8 @@ static void email_writer_test(void)
     rc = chucho_ewrt_get_user(wrt, &text);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_ewrt_get_user");
     sput_fail_unless(strcmp(text, "scrumpy") == 0, text);
+    rc = chucho_release_writer(wrt);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_release_writer");
 }
 
 void run_email_writer_test(void)
