@@ -25,15 +25,13 @@ chucho_rc chucho_create_protobuf_serializer(chucho_serializer** ser)
 {
     if (ser == nullptr)
         return CHUCHO_NULL_POINTER;
-    chucho_serializer* loc = new chucho_serializer();
     try
     {
-        loc->ser_ = std::make_shared<chucho::protobuf_serializer>();
-        *ser = loc;
+        *ser = new chucho_serializer();
+        *ser->ser_ = std::make_shared<chucho::protobuf_serializer>();
     }
     catch (...)
     {
-        delete loc;
         return CHUCHO_OUT_OF_MEMORY;
     }
     return CHUCHO_NO_ERROR;

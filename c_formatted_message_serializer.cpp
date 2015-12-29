@@ -25,15 +25,14 @@ chucho_rc chucho_create_formatted_message_serializer(chucho_serializer** ser)
 {
     if (ser == nullptr)
         return CHUCHO_NULL_POINTER;
-    chucho_serializer* loc = new chucho_serializer();
     try
     {
+        chucho_serializer* loc = new chucho_serializer();
         loc->ser_ = std::make_shared<chucho::formatted_message_serializer>();
         *ser = loc;
     }
     catch (...)
     {
-        delete loc;
         return CHUCHO_OUT_OF_MEMORY;
     }
     return CHUCHO_NO_ERROR;

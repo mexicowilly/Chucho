@@ -37,14 +37,14 @@ chucho_rc chucho_create_rolling_file_writer(chucho_writer** wrt,
     chucho_writer* loc = nullptr;
     try
     {
-        loc = new chucho_writer;
+        *wrt = new chucho_writer();
         chucho::file_writer::on_start ons = on_start == CHUCHO_ON_START_APPEND ?
             chucho::file_writer::on_start::APPEND : chucho::file_writer::on_start::TRUNCATE;
         std::shared_ptr<chucho::file_roll_trigger> cpptrg = trg == nullptr ?
             std::shared_ptr<chucho::file_roll_trigger>() : trg->trg_;
         if (name == nullptr) 
         {
-            loc->writer_ = std::shared_ptr<chucho::rolling_file_writer>(
+            (*wrt)->writer_ = std::shared_ptr<chucho::rolling_file_writer>(
                 new chucho::rolling_file_writer(fmt->fmt_,
                                                 ons,
                                                 flush == 0 ? false : true,
@@ -54,7 +54,7 @@ chucho_rc chucho_create_rolling_file_writer(chucho_writer** wrt,
         else
         {
             // Visual Studio 2012 will not allow std::make_shared here
-            loc->writer_ = std::shared_ptr<chucho::rolling_file_writer>(
+            (*wrt)->writer_ = std::shared_ptr<chucho::rolling_file_writer>(
                 new chucho::rolling_file_writer(fmt->fmt_,
                                                 name,
                                                 ons,
@@ -62,14 +62,14 @@ chucho_rc chucho_create_rolling_file_writer(chucho_writer** wrt,
                                                 rlr->rlr_,
                                                 cpptrg));
         }
-        *wrt = loc;
         chucho_release_formatter(fmt);
         chucho_release_file_roller(rlr);
         chucho_release_file_roll_trigger(trg);
     }
     catch (std::invalid_argument&) 
     {
-        delete loc;
+        delete *wrt;
+        *wrt = nullptr;
         return CHUCHO_INVALID_ARGUMENT;
     }
     catch (...) 

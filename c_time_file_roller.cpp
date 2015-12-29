@@ -36,7 +36,7 @@ chucho_rc chucho_create_time_file_roller(chucho_file_roller** rlr,
     {
         if (cmp != nullptr) 
             cpp_cmp = cmp->compressor_;
-        *rlr = new chucho_file_roller;
+        *rlr = new chucho_file_roller();
         (*rlr)->rlr_ = std::make_shared<chucho::time_file_roller>(file_name_pattern,
                                                                   max_history,
                                                                   cpp_cmp);
@@ -44,6 +44,8 @@ chucho_rc chucho_create_time_file_roller(chucho_file_roller** rlr,
     }
     catch (std::invalid_argument&) 
     {
+        delete *rlr;
+        *rlr = nullptr;
         return CHUCHO_INVALID_ARGUMENT;
     }
     catch (...) 

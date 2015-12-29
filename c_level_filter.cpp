@@ -61,7 +61,6 @@ chucho_rc chucho_create_level_filter(chucho_filter** flt,
     }
     catch (...) 
     {
-        delete *flt;
         return CHUCHO_OUT_OF_MEMORY;
     }
     return CHUCHO_NO_ERROR;
