@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_MESSAGE_QUEUE_WRITER_HPP__)
 #define CHUCHO_MESSAGE_QUEUE_WRITER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/writer.hpp>
 #include <chucho/serializer.hpp>
 
@@ -73,5 +78,9 @@ inline std::shared_ptr<serializer> message_queue_writer::get_serializer() const
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

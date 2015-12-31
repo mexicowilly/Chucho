@@ -51,6 +51,14 @@ public:
      */
     /**
      * Construct a writer.
+     *
+     * @warning On Windows this constructor is not thread safe.
+     * In order to safely convert the file descriptor to a
+     * HANDLE, the C library's invalid parameter handler must be
+     * temporarily reset. Therefore, any threads calling C
+     * library functions that rely on the invalid parameter
+     * handler to be untouched must not do so while this
+     * constructor is running.
      * 
      * @param fmt the formatter
      * @param fd the file descriptor
@@ -125,6 +133,14 @@ protected:
     /**
      * Set the file descriptor to which the writer should write.
      * 
+     * @warning On Windows this function is not thread safe.
+     * In order to safely convert the file descriptor to a
+     * HANDLE, the C library's invalid parameter handler must be
+     * temporarily reset. Therefore, any threads calling C
+     * library functions that rely on the invalid parameter
+     * handler to be untouched must not do so while this
+     * constructor is running.
+     * 
      * @param fd the file descriptor
      */
     void set_file_descriptor(int fd);
@@ -147,9 +163,8 @@ private:
     std::size_t num_;
     #if defined(_WIN32)
     HANDLE handle_;
-    #else
-    int fd_;
     #endif
+    int fd_;
     bool flush_;
     bool allow_close_;
 };

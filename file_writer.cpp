@@ -158,7 +158,7 @@ void file_writer::write_impl(const event& evt)
 #if defined(CHUCHO_HAVE_NESTED_EXCEPTIONS)
         std::throw_with_nested(file_exception("Could not write to " + file_name_));
 #else
-        throw file_exception("Could not write to " + file_name_ ": " + e.what());
+        throw file_exception("Could not write to " + file_name_ + ": " + e.what());
 #endif
     }
 }

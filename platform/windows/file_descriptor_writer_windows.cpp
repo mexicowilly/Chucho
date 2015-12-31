@@ -20,6 +20,27 @@
 #include <stdexcept>
 #include <io.h>
 
+namespace
+{
+
+void noop_invalid_parameter(const wchar_t*,
+                            const wchar_t*,
+                            const wchar_t*,
+                            unsigned int,
+                            uintptr_t)
+{
+}
+
+HANDLE get_handle_from_fd(int fd)
+{
+    _invalid_parameter_handler hnd = _set_invalid_parameter_handler(noop_invalid_parameter);
+    HANDLE result = reinterpret_cast<HANDLE>(_get_osfhandle(fd));
+    _set_invalid_parameter_handler(hnd);
+    return result;
+}
+
+}
+
 namespace chucho
 {
 
@@ -28,6 +49,7 @@ file_descriptor_writer::file_descriptor_writer(std::shared_ptr<formatter> fmt,
     : writer(fmt),
       num_(0),
       handle_(INVALID_HANDLE_VALUE),
+      fd_(-1),
       flush_(flsh),
       allow_close_(true)
 {
@@ -39,7 +61,8 @@ file_descriptor_writer::file_descriptor_writer(std::shared_ptr<formatter> fmt,
                                                bool flsh)
     : writer(fmt),
       num_(0),
-      handle_(reinterpret_cast<HANDLE>(_get_osfhandle(fd))),
+      handle_(get_handle_from_fd(fd)),
+      fd_(fd),
       flush_(flsh),
       allow_close_(true)
 {
@@ -52,6 +75,7 @@ file_descriptor_writer::file_descriptor_writer(std::shared_ptr<formatter> fmt,
     : writer(fmt),
       num_(0),
       handle_(hnd),
+      fd_(-1),
       flush_(flsh),
       allow_close_(true)
 {
@@ -72,8 +96,14 @@ void file_descriptor_writer::close()
             report_error(std::string("An error occurred while flushing on close: ") + e.what());
         }
         if (allow_close_)
-            CloseHandle(handle_);
+        {
+            if (fd_ == -1)
+                CloseHandle(handle_);
+            else
+                _close(fd_);
+        }
         handle_ = INVALID_HANDLE_VALUE;
+        fd_ = -1;
     }
 }
 
@@ -103,7 +133,8 @@ void file_descriptor_writer::flush()
 
 void file_descriptor_writer::set_file_descriptor(int fd)
 {
-    set_file_handle(reinterpret_cast<HANDLE>(_get_osfhandle(fd)));
+    fd_ = fd;
+    set_file_handle(get_handle_from_fd(fd));
 }
 
 void file_descriptor_writer::set_file_handle(HANDLE hnd)
