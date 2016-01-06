@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,11 +24,10 @@
 namespace
 {
 
-std::once_flag once;
-
 std::mutex& calendar_guard()
 {
     static std::mutex* guard;
+    static std::once_flag once;
 
     std::call_once(once, [&] () { guard = new std::mutex();
                                   chucho::garbage_cleaner::get().add([&] () { delete guard; }); });
@@ -62,6 +61,30 @@ pieces get_local(std::time_t t)
 
     result.is_utc = false;
     return result;
+}
+
+long get_time_zone_offset_in_minutes()
+{
+    #if defined(CHUCHO_HAVE_TM_GMTOFF)
+
+    pieces broke = get_local(0);
+    return broke.tm_gmtoff / 60;
+
+    #elif defined(CHUCHO_HAVE_TIMEZONE)
+
+    static std::once_flag once;
+
+    std::call_once(once, tzset);
+    return -(timezone / 60);
+
+    #else
+
+    const std::time_t whatever = 1000000;
+    pieces broke = get_utc(whatever);
+    std::time_t loc = std::mktime(&broke);
+    return (whatever - loc) / 60;
+
+    #endif
 }
 
 pieces get_utc(std::time_t t)

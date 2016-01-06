@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ extern "C"
 {
 
 chucho_rc chucho_create_file_writer(chucho_writer** wrt,
-                              chucho_formatter* fmt,
-                              const char* const file_name,
-                              chucho_on_start on_start,
-                              int flush)
+                                    chucho_formatter* fmt,
+                                    const char* const file_name,
+                                    chucho_on_start on_start,
+                                    int flush)
 {
     if (wrt == nullptr || fmt == nullptr || file_name == nullptr) 
         return CHUCHO_NULL_POINTER;

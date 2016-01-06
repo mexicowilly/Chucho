@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -39,6 +39,9 @@ protected:
     void configure_with_error(const char* const cnf);
     void cout_writer_body();
     void duplicate_message_filter_body();
+#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+    void email_writer_body();
+#endif
     void file_writer_body();
     void gzip_file_compressor_body();
     void interval_file_roll_trigger_body(const std::string& tmpl);
@@ -50,10 +53,12 @@ protected:
     void mysql_writer_full_body();
     void mysql_writer_minimal_body();
 #endif
+    void named_pipe_writer_body();
     void numbered_file_roller_body();
 #if defined(CHUCHO_HAVE_ORACLE)
     void oracle_writer_body();
 #endif
+    void pipe_writer_body();
 #if defined(CHUCHO_HAVE_POSTGRES)
     void postgres_writer_body();
 #endif
@@ -74,6 +79,13 @@ protected:
 #if defined(CHUCHO_WINDOWS)
     void windows_event_log_writer_body();
     void windows_event_log_writer_no_log_body();
+#endif
+#if defined(CHUCHO_HAVE_ZEROMQ)
+    void zeromq_writer_body();
+    void zeromq_writer_no_prefix_body();
+#if defined(CHUCHO_HAVE_PROTOBUF)
+    void zeromq_writer_protobuf_body();
+#endif
 #endif
     void zip_file_compressor_body();
 };

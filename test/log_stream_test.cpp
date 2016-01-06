@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -89,6 +89,7 @@ TEST_F(stream_test, debug)
 TEST_F(stream_test, endl)
 {
     chucho::log_stream ls(lgr_);
+    lgr_->set_level(chucho::level::INFO_());
     CHUCHO_M(ls) << chucho::info << "yo" << chucho::endl << chucho::endm;
 #if defined(CHUCHO_WINDOWS)
     std::string exp = "yo\r\n";

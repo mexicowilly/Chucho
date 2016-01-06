@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,16 +14,24 @@
  *    limitations under the License.
  */
 
-#include <chucho/cout_writer.hpp>
-#include <iostream>
+#if !defined(CHUCHO_PROTOBUF_SERIALIZER_MEMENTO_HPP__)
+#define CHUCHO_PROTOBUF_SERIALIZER_MEMENTO_HPP__
+
+#if !defined(CHUCHO_BUILD)
+#error "This header is private"
+#endif
+
+#include <chucho/memento.hpp>
 
 namespace chucho
 {
 
-cout_writer::cout_writer(std::shared_ptr<formatter> fmt)
-    : console_writer(fmt, std::cout)
+class protobuf_serializer_memento : public memento
 {
-    set_status_origin("cout_writer");
-}
+public:
+    protobuf_serializer_memento(configurator& cfg);
+};
 
 }
+
+#endif

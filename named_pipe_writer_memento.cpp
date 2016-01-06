@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,17 +14,18 @@
  *    limitations under the License.
  */
 
-#include <chucho/cerr_writer.hpp>
-#include <iostream>
+#include <chucho/named_pipe_writer_memento.hpp>
 
 namespace chucho
 {
 
-cerr_writer::cerr_writer(std::shared_ptr<formatter> fmt)
-    : console_writer(fmt, std::cerr)
+named_pipe_writer_memento::named_pipe_writer_memento(configurator& cfg)
+    : writer_memento(cfg)
 {
-    set_status_origin("cerr_writer");
+    set_status_origin("named_pipe_writer_memento");
+    cfg.get_security_policy().set_text("named_pipe_writer::flush", 5);
+    set_handler("flush", [this] (const std::string& val) { flush_ = boolean_value(validate("named_pipe_writer::flush", val)); });
+    set_handler("name", [this] (const std::string& val) { name_ = validate("named_pipe_writer::name", val); });
 }
 
 }
-

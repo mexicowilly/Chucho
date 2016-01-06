@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ level_filter_memento::level_filter_memento(configurator& cfg, memento_key_set ks
     : memento(cfg)
 {
     set_status_origin("level_filter_memento");
+    cfg.get_security_policy().set_text("level_filter::on_match", 7);
+    cfg.get_security_policy().set_text("level_filter::on_mismatch", 7);
     handler lvl_hnd = [this] (const std::string& name) { level_ = level::from_text(validate("level_filter::level", name)); };
     if (ks == memento_key_set::CHUCHO)
     {

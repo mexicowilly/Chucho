@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,8 +22,7 @@
 #pragma warning(disable:4251)
 #endif
 
-#include <chucho/writer.hpp>
-#include <fstream>
+#include <chucho/file_descriptor_writer.hpp>
 #include <string>
 #include <chrono>
 
@@ -36,7 +35,7 @@ namespace chucho
  *  
  * @ingroup writers
  */
-class CHUCHO_EXPORT file_writer : public writer
+class CHUCHO_EXPORT file_writer : public file_descriptor_writer
 {
 public:
     /**
@@ -64,15 +63,15 @@ public:
      * @param fmt the formatter
      * @param file_name the name of the file
      * @param start action to take at the start
-     * @param flush whether to flush the file stream after each 
-     *              event is written
+     * @param flsh whether to flush the file stream after each 
+     *             event is written
      * @throw std::invalid_argument if fmt is an uninitialized 
      *        std::shared_ptr
      */
     file_writer(std::shared_ptr<formatter> fmt,
                 const std::string& file_name,
                 on_start start = on_start::APPEND,
-                bool flush = true);
+                bool flsh = true);
     //@}
 
     /**
@@ -81,13 +80,6 @@ public:
      * @return the file name
      */
     const std::string& get_file_name() const;
-    /**
-     * Whether this writer flushes the flie stream after each event 
-     * is written. 
-     * 
-     * @return true if flush is enabled
-     */
-    bool get_flush() const;
     /**
      * Return the initial name of this file. 
      *  
@@ -120,53 +112,42 @@ protected:
      * 
      * @param fmt the formatter
      * @param start action to take at the start
-     * @param flush whether to flush the file stream after each
-     *              event is written
+     * @param flsh whether to flush the file stream after each
+     *             event is written
      * @throw std::invalid_argument if fmt is an uninitialized 
      *        std::shared_ptr
      */
     file_writer(std::shared_ptr<formatter> fmt,
                 on_start start,
-                bool flush);
+                bool flsh);
     //@}
 
-    /**
-     * Close the file.
-     */
-    void close();
     /**
      * Open a file of a new name.
      * 
      * @param file_name the name of the new file
      */
     void open(const std::string& file_name);
+    void set_allow_creation(bool allow);
     virtual void write_impl(const event& evt) override;
 
 private:
     void ensure_access();
+    void open_impl(const std::string& file_name);
 
     std::string initial_file_name_;
     std::string file_name_;
-    std::ofstream file_;
     on_start start_;
-    bool flush_;
     std::chrono::steady_clock::time_point next_access_check_;
     optional<int> writeability_;
+    bool is_open_;
+    bool has_been_opened_;
+    bool allow_creation_;
 };
-
-inline void file_writer::close()
-{
-    file_.close();
-}
 
 inline const std::string& file_writer::get_file_name() const
 {
     return file_name_;
-}
-
-inline bool file_writer::get_flush() const
-{
-    return flush_;
 }
 
 inline const std::string& file_writer::get_initial_file_name() const
@@ -177,6 +158,11 @@ inline const std::string& file_writer::get_initial_file_name() const
 inline file_writer::on_start file_writer::get_on_start() const
 {
     return start_;
+}
+
+inline void file_writer::set_allow_creation(bool allow)
+{
+    allow_creation_ = allow;
 }
 
 }

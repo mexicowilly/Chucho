@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ file_compressor_memento::file_compressor_memento(configurator& cfg)
 {
     set_status_origin("file_compressor_memento");
     cfg.get_security_policy().set_integer("file_compressor::min_index", 1, 1000);
+    cfg.get_security_policy().set_text("file_compressor::min_index(text)", 4);
     set_handler("min_index", [this] (const std::string& idx) { min_index_ = validate("file_compressor::min_index", std::stoul(validate("file_compressor::min_index(text)", idx))); });
 }
 

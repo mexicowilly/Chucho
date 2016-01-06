@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -61,6 +61,15 @@
 #include "ruby_evaluator_filter_test.h"
 #endif
 #include "security_policy_test.h"
+#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+#include "email_writer_test.h"
+#endif
+#include "file_descriptor_writer_test.h"
+#include "pipe_writer_test.h"
+#include "named_pipe_writer_test.h"
+#if defined(CHUCHO_HAVE_ZEROMQ)
+#include "zeromq_writer_test.h"
+#endif
 
 sput_struct __sput;
 
@@ -113,6 +122,15 @@ int main()
     run_ruby_evaluator_filter_test();
     #endif
     run_security_policy_test();
+    #if defined(CHUCHO_HAVE_EMAIL_WRITER)
+    run_email_writer_test();
+    #endif
+    run_file_descriptor_writer_test();
+    run_pipe_writer_test();
+    run_named_pipe_writer_test();
+    #if defined(CHUCHO_HAVE_ZEROMQ)
+    run_zeromq_writer_test();
+    #endif
 
     sput_finish_testing();
     chucho_finalize();

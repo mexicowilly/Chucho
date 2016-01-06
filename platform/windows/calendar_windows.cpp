@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 #include <chucho/calendar.hpp>
 #include <time.h>
+#include <windows.h>
 
 namespace chucho
 {
@@ -29,6 +30,13 @@ pieces get_local(std::time_t t)
     localtime_s(&result, &t);
     result.is_utc = false;
     return result;
+}
+
+long get_time_zone_offset_in_minutes()
+{
+    TIME_ZONE_INFORMATION info;
+    GetTimeZoneInformation(&info);
+    return -info.Bias;
 }
 
 pieces get_utc(std::time_t t)

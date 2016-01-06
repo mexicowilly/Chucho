@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -133,6 +133,33 @@ TEST_F(chucho_config_file_configurator, duplicate_message_filter)
               "chucho.formatter.pf.pattern = %m%n");
     duplicate_message_filter_body();
 }
+
+#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+
+TEST_F(chucho_config_file_configurator, email_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = em\n"
+              "chucho.writer.em = chucho::email_writer\n"
+              "chucho.writer.em.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.em.email_trigger = trg\n"
+              "chucho.email_trigger.trg = chucho::level_threshold_email_trigger\n"
+              "chucho.email_trigger.trg.level = error\n"
+              "chucho.writer.em.host = mail.dummy.com\n"
+              "chucho.writer.em.port = 123\n"
+              "chucho.writer.em.from = whistler@mctweaky.com\n"
+              "chucho.writer.em.to = one@blubbery.com,two@humid.org\n"
+              "chucho.writer.em.subject = %c\n"
+              "chucho.writer.em.connection_type = clear\n"
+              "chucho.writer.em.user = scrumpy\n"
+              "chucho.writer.em.password = lumpy\n"
+              "chucho.writer.em.buffer_size = 7000");
+    email_writer_body();
+}
+
+#endif
 
 TEST_F(chucho_config_file_configurator, file_writer)
 {
@@ -375,6 +402,19 @@ TEST_F(chucho_config_file_configurator, multiple_writer)
     multiple_writer_body();
 }
 
+TEST_F(chucho_config_file_configurator, named_pipe_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = npw\n"
+              "chucho.writer.npw = chucho::named_pipe_writer\n"
+              "chucho.writer.npw.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m%n\n"
+              "chucho.writer.npw.name = monkeyballs\n"
+              "chucho.writer.npw.flush = false");
+    named_pipe_writer_body();
+}
+
 TEST_F(chucho_config_file_configurator, numbered_file_roller)
 {
     configure("chucho.logger = will\n"
@@ -411,6 +451,18 @@ TEST_F(chucho_config_file_configurator, oracle_writer)
 }
 
 #endif
+
+TEST_F(chucho_config_file_configurator, pipe_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = pw\n"
+              "chucho.writer.pw = chucho::pipe_writer\n"
+              "chucho.writer.pw.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m%n\n"
+              "chucho.writer.pw.flush = false");
+    pipe_writer_body();
+}
 
 #if defined(CHUCHO_HAVE_POSTGRES)
 
@@ -620,6 +672,58 @@ TEST_F(chucho_config_file_configurator, windows_event_log_writer_no_log)
               "chucho.writer.welw.source = what");
     windows_event_log_writer_no_log_body();
 }
+#endif
+
+#if defined(CHUCHO_HAVE_ZEROMQ)
+
+TEST_F(chucho_config_file_configurator, zeromq_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = zw\n"
+              "chucho.writer.zw = chucho::zeromq_writer\n"
+              "chucho.writer.zw.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.zw.serializer = fms\n"
+              "chucho.serializer.fms = chucho::formatted_message_serializer\n"
+              "chucho.writer.zw.endpoint = tcp://127.0.0.1:7777\n"
+              "chucho.writer.zw.prefix = Hi");
+    zeromq_writer_body();
+}
+
+TEST_F(chucho_config_file_configurator, zeromq_writer_no_prefix)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = zw\n"
+              "chucho.writer.zw = chucho::zeromq_writer\n"
+              "chucho.writer.zw.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.zw.serializer = fms\n"
+              "chucho.serializer.fms = chucho::formatted_message_serializer\n"
+              "chucho.writer.zw.endpoint = tcp://127.0.0.1:7778\n");
+    zeromq_writer_no_prefix_body();
+}
+
+#if defined(CHUCHO_HAVE_PROTOBUF)
+
+TEST_F(chucho_config_file_configurator, zeromq_writer_protobuf)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = zw\n"
+              "chucho.writer.zw = chucho::zeromq_writer\n"
+              "chucho.writer.zw.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.zw.serializer = ps\n"
+              "chucho.serializer.fms = chucho::protobuf_serializer\n"
+              "chucho.writer.zw.endpoint = tcp://127.0.0.1:7777\n"
+              "chucho.writer.zw.prefix = Hi");
+    zeromq_writer_body();
+}
+
+#endif
+
 #endif
 
 TEST_F(chucho_config_file_configurator, zip_file_compressor)

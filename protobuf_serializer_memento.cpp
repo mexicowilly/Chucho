@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,23 +14,14 @@
  *    limitations under the License.
  */
 
-#include <chucho/console_writer.hpp>
-#include <iostream>
+#include <chucho/protobuf_serializer_memento.hpp>
 
 namespace chucho
 {
 
-console_writer::console_writer(std::shared_ptr<formatter> fmt,
-                               std::ostream& stream)
-    : writer(fmt),
-      stream_(stream)
+protobuf_serializer_memento::protobuf_serializer_memento(configurator& cfg)
+    : memento(cfg)
 {
-}
-
-void console_writer::write_impl(const event& evt)
-{
-    stream_ << formatter_->format(evt);
-    stream_.flush();
 }
 
 }

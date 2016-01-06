@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ async_writer::async_writer(std::shared_ptr<writer> wrt,
       flush_on_destruct_(flush_on_destruct)
 {
     set_status_origin("async_writer");
-    if (writer_)
+    if (writer_.get() != nullptr)
         worker_.reset(new std::thread(std::bind(&async_writer::thread_main, this)));
 }
 
@@ -70,7 +70,7 @@ async_writer::async_writer(std::shared_ptr<writer> wrt,
       flush_on_destruct_(flush_on_destruct)
 {
     set_status_origin("async_writer");
-    if (writer_)
+    if (writer_.get() != nullptr)
         worker_.reset(new std::thread(std::bind(&async_writer::thread_main, this)));
 }
 
@@ -120,7 +120,7 @@ void async_writer::thread_main()
 void async_writer::write_impl(const event& evt)
 {
     std::unique_lock<std::mutex> ul(guard_);
-    full_condition_.wait(ul, [this]{ return queue_.size() <= capacity_; });
+    full_condition_.wait(ul, [this] () { return queue_.size() <= capacity_; });
     queue_.push_back(evt);
     empty_condition_.notify_one();
 }

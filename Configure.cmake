@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2015 Will Mason
+# Copyright 2013-2016 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -24,25 +24,11 @@ INCLUDE(CheckIncludeFile)
 INCLUDE(CheckIncludeFileCXX)
 INCLUDE(ExternalProject)
 INCLUDE(CheckTypeSize)
-
-# static and shared
-OPTION(ENABLE_SHARED "Whether to build a shared object" FALSE)
+INCLUDE(FindCURL)
+INCLUDE(CheckStructHasMember)
 
 # framework or not
-OPTION(ENABLE_FRAMEWORK "Whether to build as a framework on Macintosh" TRUE)
 SET(CHUCHO_NEEDS_TO_USE_THE_FRAMEWORK_VARIABLE_OR_CMAKE_COMPLAINS ${ENABLE_FRAMEWORK})
-
-# whether to install chuchod as a service or not on platforms that have
-# services.
-OPTION(INSTALL_SERVICE "Whether to install chuchod as a system service" FALSE)
-
-# what kinds of configurations will we support
-OPTION(YAML_CONFIG "Whether to include the YAML configuration parser" TRUE)
-OPTION(CONFIG_FILE_CONFIG "Whether to include the config file configuration parser that uses Chucho keys" FALSE)
-OPTION(LOG4CPLUS_CONFIG "Whether to support reading log4cplus configuration files" FALSE)
-
-# whether to build the C API
-OPTION(C_API "Whether the C API should be built into this Chucho" FALSE)
 
 # We'll want this later
 MACRO(CHUCHO_FIND_PROGRAM CHUCHO_FIND_VAR CHUCHO_PROGRAM)
@@ -89,6 +75,9 @@ ELSEIF(CMAKE_SYSTEM_NAME STREQUAL Darwin)
 ELSEIF(CMAKE_SYSTEM_NAME STREQUAL AIX)
     SET(CHUCHO_AIX TRUE)
 ENDIF()
+IF(CMAKE_SYSTEM_NAME MATCHES "^.+BSD$")
+    SET(CHUCHO_BSD TRUE)
+ENDIF()
 IF(NOT CHUCHO_WINDOWS)
     SET(CHUCHO_POSIX TRUE)
 ENDIF()
@@ -127,6 +116,12 @@ IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         MESSAGE(FATAL_ERROR "-std=c99 is required")
     ENDIF()
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
+    IF(CHUCHO_MACINTOSH)
+        CHECK_CXX_COMPILER_FLAG(-Wno-potentially-evaluated-expression CHUCHO_HAVE_NO_POT_EVAL_EXP)
+        IF(CHUCHO_HAVE_NO_POT_EVAL_EXP)
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-potentially-evaluated-expression")
+        ENDIF()
+    ENDIF()
 ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
     IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.7)
         MESSAGE(FATAL_ERROR "g++ version 4.7 or later is required")
@@ -212,11 +207,11 @@ IF(CHUCHO_POSIX)
     # host name functions
     CHUCHO_REQUIRE_SYMBOLS(sys/utsname.h uname)
 
-    # getpid/access/getuid/fork/close/setsid/dup2/chdir/_exit
-    CHUCHO_REQUIRE_SYMBOLS(unistd.h getpid access getuid fork close setsid dup2 chdir _exit)
+    # getpid/access/getuid/fork/close/setsid/dup2/chdir/_exit/write/pipe/read
+    CHUCHO_REQUIRE_SYMBOLS(unistd.h getpid access getuid fork close setsid dup2 chdir _exit write pipe read)
 
     # stat/mkdir
-    CHUCHO_REQUIRE_SYMBOLS(sys/stat.h stat mkdir)
+    CHUCHO_REQUIRE_SYMBOLS(sys/stat.h stat mkdir mkfifo)
 
     # gmtime_r/localtime_r
     FOREACH(SYM gmtime_r localtime_r)
@@ -300,6 +295,35 @@ IF(CHUCHO_POSIX)
         CHUCHO_REQUIRE_SYMBOLS(time.h tzset)
     ENDIF()
 
+    # timezone stuff
+    CHECK_CXX_SYMBOL_EXISTS(timezone time.h CHUCHO_HAVE_TIMEZONE)
+    IF(CHUCHO_HAVE_TIMEZONE)
+        CHECK_CXX_SOURCE_COMPILES("#include <time.h>\nint main() { long doggies = timezone / 60; return 0; }" CHUCHO_TIMEZONE_IS_INTEGRAL)
+        IF(NOT CHUCHO_TIMEZONE_IS_INTEGRAL)
+            UNSET(CHUCHO_HAVE_TIMEZONE)
+	    UNSET(CHUCHO_HAVE_TIMEZONE CACHE)
+        ENDIF()
+    ENDIF()
+    IF(NOT CHUCHO_HAVE_TIMEZONE)
+        CHECK_STRUCT_HAS_MEMBER("struct tm" tm_gmtoff time.h CHUCHO_HAVE_TM_GMTOFF)
+    ENDIF()
+
+    # large file support for platform/posix/file_posix.cpp and platform/posix/file_writer_posix.cpp
+    CHUCHO_FIND_PROGRAM(CHUCHO_GETCONF getconf)
+    IF(CHUCHO_GETCONF)
+        EXECUTE_PROCESS(COMMAND "${CHUCHO_GETCONF}" LFS_CFLAGS
+                        RESULT_VARIABLE CHUCHO_GETCONF_RESULT
+                        OUTPUT_VARIABLE CHUCHO_GETCONF_OUTPUT
+                        OUTPUT_STRIP_TRAILING_WHITESPACE
+                        ERROR_QUIET)
+        IF(CHUCHO_GETCONF_RESULT EQUAL 0)
+            STRING(REPLACE -D "" CHUCHO_POSIX_FILE_DEFS "${CHUCHO_GETCONF_OUTPUT}")
+            SEPARATE_ARGUMENTS(CHUCHO_POSIX_FILE_DEFS)
+            MESSAGE(STATUS "Using large file flags ${CHUCHO_POSIX_FILE_DEFS}")
+        ENDIF()
+    ENDIF()
+    CHECK_CXX_SYMBOL_EXISTS(O_LARGEFILE fcntl.h CHUCHO_HAVE_O_LARGEFILE)
+
 ELSEIF(CHUCHO_WINDOWS)
     FOREACH(HEAD windows.h winsock2.h io.h process.h ws2tcpip.h time.h assert.h)
         STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
@@ -319,6 +343,24 @@ ELSEIF(CHUCHO_WINDOWS)
     CHUCHO_FIND_PROGRAM(CHUCHO_SC sc)
     IF(NOT CHUCHO_SC)
         MESSAGE(FATAL_ERROR "sc is required")
+    ENDIF()
+ENDIF()
+
+# See if we can do the email writer
+IF(ENABLE_CURL)
+    FIND_PACKAGE(CURL)
+    IF(CURL_FOUND)
+        CHECK_INCLUDE_FILE_CXX(curl/curl.h CHUCHO_HAVE_CURL_INCLUDE)
+        IF(NOT CHUCHO_HAVE_CURL_INCLUDE)
+            SET(CHUCHO_CURL_INCLUDE_DIR ${CURL_INCLUDE_DIRS} CACHE INTERNAL "Checked include dirs for curl.h")
+        ENDIF()
+        SET(CMAKE_REQUIRED_INCLUDES ${CURL_INCLUDE_DIRS})
+        SET(CMAKE_REQUIRED_LIBRARIES ${CURL_LIBRARIES})
+        CHUCHO_REQUIRE_SYMBOLS(curl/curl.h curl_global_init curl_easy_init curl_easy_cleanup
+                               curl_easy_setopt curl_easy_perform curl_version_info curl_easy_strerror
+                               curl_slist_free_all)
+        UNSET(CMAKE_REQUIRED_INCLUDES)
+        UNSET(CMAKE_REQUIRED_LIBRARIES)
     ENDIF()
 ENDIF()
 
@@ -631,6 +673,55 @@ ELSEIF(RUBY_FRAMEWORK)
     ENDIF()
 ENDIF()
 
+# protobuf
+IF(PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIB AND PROTOC_DIR)
+    FIND_PROGRAM(CHUCHO_PROTOC
+                 protoc
+                 PATHS "${PROTOC_DIR}"
+                 NO_DEFAULT_PATH)
+    IF(NOT CHUCHO_PROTOC)
+        MESSAGE(FATAL_ERROR "The variable PROTOC_DIR was provided as ${PROTOC_DIR}, but it does not contain the protoc program")
+    ENDIF()
+    SET(CMAKE_REQUIRED_INCLUDES "${PROTOBUF_INCLUDE_DIR}")
+    CHECK_INCLUDE_FILE_CXX(google/protobuf/message.h CHUCHO_GOOGLE_PROTOBUF_MESSAGE_H)
+    IF(NOT CHUCHO_GOOGLE_PROTOBUF_MESSAGE_H)
+        MESSAGE(FATAL_ERROR "The variable PROTOBUF_INCLUDE_DIR was provided as ${PROTOBUF_INCLUDE_DIR}, but it does not contain the protobuf headers")
+    ENDIF()
+    UNSET(CMAKE_REQUIRED_INCLUDES)
+    IF(NOT EXISTS "${PROTOBUF_LIB}")
+        MESSAGE(FATAL_ERROR "The variable PROTOBUF_LIB was provided as ${PROTOBUF_LIB}, but it does not refer to an existing file")
+    ENDIF()
+    SET(CHUCHO_PROTOBUF_SOURCES
+        "${CMAKE_BINARY_DIR}/chucho.pb.cc"
+        "${CMAKE_BINARY_DIR}/chucho.pb.h")
+    SET(CHUCHO_HAVE_PROTOBUF TRUE CACHE INTERNAL "Whether we have protobuf")
+ELSEIF(PROTOBUF_INCLUDE_DIR OR PROTOBUF_LIB OR PROTOC_DIR)
+    MESSAGE(WARNING "If any of the variables PROTOBUF_INCLUDE_DIR, PROTOBUF_LIB or PROTOC_DIR have been set, then they must all be set for protobuf support to be included")
+ENDIF()
+
+# zeromq
+IF(ZEROMQ_INCLUDE_DIR AND ZEROMQ_LIB)
+    SET(CMAKE_REQUIRED_INCLUDES "${ZEROMQ_INCLUDE_DIR}")
+    CHECK_INCLUDE_FILE_CXX(zmq.h CHUCHO_ZMQ_H)
+    IF(NOT CHUCHO_ZMQ_H)
+        MESSAGE(FATAL_ERROR "The variable ZEROMQ_INCLUDE_DIR was provided as ${ZEROMQ_INCLUDE_DIR}, but it does not contain the zeromq headers")
+    ENDIF()
+    IF(NOT EXISTS "${ZEROMQ_LIB}")
+        MESSAGE(FATAL_ERROR "The variable ZEROMQ_LIB was provided as ${ZEROMQ_LIB}, but it does not refer to an existing file")
+    ENDIF()
+    SET(CMAKE_REQUIRED_LIBRARIES "${ZEROMQ_LIB}" ${CMAKE_THREAD_LIBS_INIT})
+    IF(CHUCHO_SOLARIS)
+        SET(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES};socket;nsl")
+    ENDIF()
+    CHUCHO_REQUIRE_SYMBOLS(zmq.h zmq_ctx_new zmq_ctx_destroy zmq_socket zmq_close zmq_connect zmq_msg_send
+                           zmq_msg_init_size zmq_msg_data zmq_strerror zmq_msg_close zmq_bind)
+    UNSET(CMAKE_REQUIRED_INCLUDES)
+    UNSET(CMAKE_REQUIRED_LIBRARIES)
+    SET(CHUCHO_HAVE_ZEROMQ TRUE CACHE INTERNAL "Whether we have zeromq")
+ELSEIF(ZEROMQ_INCLUDE_DIR OR ZEROMQ_LIB)
+    MESSAGE(WARNING "If either of the variables ZEROMQ_INCLUDE_DIR or ZEROMQ_LIB has been set, then they must both be set for zeromq support to be included")
+ENDIF()
+
 # doxygen
 FIND_PACKAGE(Doxygen)
 
@@ -668,6 +759,45 @@ IF(CHUCHO_MACINTOSH)
         ENDIF()
         UNSET(CMAKE_EXTRA_INCLUDE_FILES)
     ENDIF()
+ENDIF()
+
+# Linux service stuff
+IF(CHUCHO_LINUX)
+    FILE(READ /proc/1/cmdline CHUCHO_PROC1_CMDLINE)
+    STRING(REGEX MATCH systemd CHUCHO_SYSTEMD_MATCH "${CHUCHO_PROC1_CMDLINE}")
+    IF(CHUCHO_SYSTEMD_MATCH)
+        CHUCHO_FIND_PROGRAM(CHUCHO_SYSTEMCTL systemctl)
+        IF(NOT CHUCHO_SYSTEMCTL)
+            MESSAGE(FATAL_ERROR "systemctl is required when using the systemd init system")
+        ENDIF()
+        MESSAGE(STATUS "This Linux is using the systemd init system")
+        SET(CHUCHO_SYSTEMD_INIT TRUE)
+    ELSE()
+        STRING(REGEX MATCH "^.+/init$" CHUCHO_INIT_MATCH "${CHUCHO_PROC1_CMDLINE}")
+        IF(CHUCHO_INIT_MATCH)
+            EXECUTE_PROCESS(COMMAND "${CHUCHO_PROC1_CMDLINE}" --version
+                            OUTPUT_VARIABLE CHUCHO_INIT_OUT)
+            STRING(REGEX MATCH upstart CHUCHO_UPSTART_MATCH "${CHUCHO_INIT_OUT}")
+            IF(CHUCHO_UPSTART_MATCH)
+                CHUCHO_FIND_PROGRAM(CHUCHO_INITCTL initctl)
+                IF(NOT CHUCHO_INITCTL)
+                    MESSAGE(FATAL_ERROR "initctl is required when using the Upstart init system")
+                ENDIF()
+                MESSAGE(STATUS "This Linux is using the Upstart init system")
+                SET(CHUCHO_UPSTART_INIT TRUE)
+            ENDIF()
+        ENDIF()
+    ENDIF()
+ENDIF()
+
+# BSD service stuff
+IF(CHUCHO_BSD AND EXISTS /etc/rc AND EXISTS /etc/rc.conf AND EXISTS /etc/rc.subr AND IS_DIRECTORY /etc/rc.d)
+    CHUCHO_FIND_PROGRAM(CHUCHO_SED sed)
+    IF(NOT CHUCHO_SED)
+        MESSAGE(FATAL_ERROR "sed is required when using the rc.d init system")
+    ENDIF()
+    MESSAGE(STATUS "This ${CMAKE_SYSTEM_NAME} is using the rc.d init system")
+    SET(CHUCHO_RC_INIT TRUE)
 ENDIF()
 
 # zip

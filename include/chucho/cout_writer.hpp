@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_COUT_WRITER_HPP__)
 #define CHUCHO_COUT_WRITER_HPP__
 
-#include <chucho/console_writer.hpp>
+#include <chucho/file_descriptor_writer.hpp>
 
 namespace chucho
 {
@@ -28,7 +28,7 @@ namespace chucho
  * 
  * @ingroup writers
  */
-class CHUCHO_EXPORT cout_writer : public console_writer
+class CHUCHO_EXPORT cout_writer : public file_descriptor_writer
 {
 public:
     /**

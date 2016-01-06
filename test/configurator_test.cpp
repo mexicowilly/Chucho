@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -62,9 +62,22 @@
 #if defined(CHUCHO_HAVE_RUBY)
 #include <chucho/ruby_evaluator_filter.hpp>
 #endif
+#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+#include <chucho/email_writer.hpp>
+#include <chucho/level_threshold_email_trigger.hpp>
+#endif
+#include <chucho/pipe_writer.hpp>
+#include <chucho/named_pipe_writer.hpp>
 #include <sstream>
 #if defined(CHUCHO_WINDOWS)
 #include <windows.h>
+#endif
+#if defined(CHUCHO_HAVE_ZEROMQ)
+#include <chucho/zeromq_writer.hpp>
+#endif
+#include <chucho/formatted_message_serializer.hpp>
+#if defined(CHUCHO_HAVE_PROTOBUF)
+#include <chucho/protobuf_serializer.hpp>
 #endif
 
 namespace chucho
@@ -168,6 +181,37 @@ void configurator::duplicate_message_filter_body()
     ASSERT_EQ(1, flts.size());
     ASSERT_EQ(typeid(chucho::duplicate_message_filter), typeid(*flts[0]));
 }
+
+#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+
+void configurator::email_writer_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::email_writer), typeid(*wrts[0]));
+    auto ewrt = std::static_pointer_cast<chucho::email_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(ewrt));
+    EXPECT_EQ(7000, ewrt->get_buffer_capacity());
+    EXPECT_EQ(0, ewrt->get_buffer_size());
+    EXPECT_EQ(chucho::email_writer::connection_type::CLEAR, ewrt->get_connection_type());
+    EXPECT_STREQ("whistler@mctweaky.com", ewrt->get_from().c_str());
+    EXPECT_STREQ("mail.dummy.com", ewrt->get_host().c_str());
+    ASSERT_TRUE(ewrt->get_password());
+    EXPECT_STREQ("lumpy", ewrt->get_password()->c_str());
+    EXPECT_EQ(123, ewrt->get_port());
+    EXPECT_STREQ("%c", ewrt->get_subject().c_str());
+    ASSERT_EQ(2, ewrt->get_to().size());
+    EXPECT_STREQ("one@blubbery.com", ewrt->get_to()[0].c_str());
+    EXPECT_STREQ("two@humid.org", ewrt->get_to()[1].c_str());
+    ASSERT_EQ(typeid(chucho::level_threshold_email_trigger), typeid(*ewrt->get_trigger()));
+    auto ltet = std::static_pointer_cast<chucho::level_threshold_email_trigger>(ewrt->get_trigger());
+    ASSERT_TRUE(static_cast<bool>(ltet));
+    EXPECT_EQ(*chucho::level::ERROR_(), *ltet->get_level());
+    ASSERT_TRUE(ewrt->get_user());
+    EXPECT_STREQ("scrumpy", ewrt->get_user()->c_str());
+}
+
+#endif
 
 void configurator::file_writer_body()
 {
@@ -366,6 +410,23 @@ void configurator::mysql_writer_minimal_body()
 
 #endif
 
+void configurator::named_pipe_writer_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::named_pipe_writer), typeid(*wrts[0]));
+    auto npwrt = std::static_pointer_cast<chucho::named_pipe_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(npwrt));
+    EXPECT_FALSE(npwrt->get_flush());
+    #if defined(CHUCHO_WINDOWS)
+    std::string pname("\\\\.\\pipe\\monkeyballs");
+    #else
+    std::string pname("monkeyballs");
+    #endif
+    EXPECT_EQ(pname, npwrt->get_file_name());
+    chucho::status_manager::get()->clear();
+}
+
 void configurator::numbered_file_roller_body()
 {
     auto wrts = chucho::logger::get("will")->get_writers();
@@ -396,6 +457,16 @@ void configurator::oracle_writer_body()
 }
 
 #endif
+
+void configurator::pipe_writer_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::pipe_writer), typeid(*wrts[0]));
+    auto pwrt = std::static_pointer_cast<chucho::pipe_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(pwrt));
+    EXPECT_FALSE(pwrt->get_flush());
+}
 
 #if defined(CHUCHO_HAVE_POSTGRES)
 
@@ -707,6 +778,60 @@ void configurator::windows_event_log_writer_no_log_body()
     EXPECT_EQ(std::string("Application"), welw->get_log());
     chucho::status_manager::get()->clear();
 }
+
+#endif
+
+#if defined(CHUCHO_HAVE_ZEROMQ)
+
+void configurator::zeromq_writer_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::zeromq_writer), typeid(*wrts[0]));
+    auto zw = std::static_pointer_cast<chucho::zeromq_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(zw));
+    auto ser = zw->get_serializer();
+    ASSERT_TRUE(static_cast<bool>(ser));
+    EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(*ser));
+    EXPECT_EQ(std::string("tcp://127.0.0.1:7777"), zw->get_endpoint());
+    std::string pfx_str("Hi");
+    std::vector<std::uint8_t> pfx(pfx_str.begin(), pfx_str.end());
+    EXPECT_EQ(pfx, zw->get_prefix());
+}
+
+void configurator::zeromq_writer_no_prefix_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::zeromq_writer), typeid(*wrts[0]));
+    auto zw = std::static_pointer_cast<chucho::zeromq_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(zw));
+    auto ser = zw->get_serializer();
+    ASSERT_TRUE(static_cast<bool>(ser));
+    EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(*ser));
+    EXPECT_EQ(std::string("tcp://127.0.0.1:7778"), zw->get_endpoint());
+    EXPECT_TRUE(zw->get_prefix().empty());
+}
+
+#if defined(CHUCHO_HAVE_PROTOBUF)
+
+void configurator::zeromq_writer_protobuf_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::zeromq_writer), typeid(*wrts[0]));
+    auto zw = std::static_pointer_cast<chucho::zeromq_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(zw));
+    auto ser = zw->get_serializer();
+    ASSERT_TRUE(static_cast<bool>(ser));
+    EXPECT_EQ(typeid(chucho::protobuf_serializer), typeid(*ser));
+    EXPECT_EQ(std::string("tcp://127.0.0.1:7779"), zw->get_endpoint());
+    std::string pfx_str("Hi");
+    std::vector<std::uint8_t> pfx(pfx_str.begin(), pfx_str.end());
+    EXPECT_EQ(pfx, zw->get_prefix());
+}
+
+#endif
 
 #endif
 

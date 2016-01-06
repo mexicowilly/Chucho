@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -66,6 +66,7 @@ void ensure()
         if (pid_file.is_open())
         {
             pid_file << getpid();
+            CHUCHO_INFO(lgr, "Wrote PID " << getpid() << " to the file " << PID_FILE_NAME);
         }
         else
         {

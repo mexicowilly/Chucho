@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -176,6 +176,31 @@ TEST_F(yaml_configurator, duplicate_message_filter)
     duplicate_message_filter_body();
 }
 
+#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+
+TEST_F(yaml_configurator, email_writer)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::email_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            pattern: '%m'\n"
+              "        - chucho::level_threshold_email_trigger:\n"
+              "            level: error\n"
+              "        - host: mail.dummy.com\n"
+              "        - port: 123\n"
+              "        - from: whistler@mctweaky.com\n"
+              "        - to: one@blubbery.com,two@humid.org\n"
+              "        - subject: '%c'\n"
+              "        - connection_type: clear\n"
+              "        - user: scrumpy\n"
+              "        - password: lumpy\n"
+              "        - buffer_size: 7000\n");
+    email_writer_body();
+}
+
+#endif
+
 TEST_F(yaml_configurator, file_writer)
 {
     configure("chucho::logger:\n"
@@ -335,6 +360,18 @@ TEST_F(yaml_configurator, mysql_writer_minimal)
 
 #endif
 
+TEST_F(yaml_configurator, named_pipe_writer)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::named_pipe_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m%n'\n"
+              "        name: monkeyballs\n"
+              "        flush: false");
+    named_pipe_writer_body();
+}
+
 TEST_F(yaml_configurator, numbered_file_roller)
 {
     configure("chucho::logger:\n"
@@ -367,6 +404,17 @@ TEST_F(yaml_configurator, oracle_writer)
 }
 
 #endif
+
+TEST_F(yaml_configurator, pipe_writer)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::pipe_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m%n'\n"
+              "        flush: false");
+    pipe_writer_body();
+}
 
 #if defined(CHUCHO_HAVE_POSTGRES)
 
@@ -596,6 +644,52 @@ TEST_F(yaml_configurator, windows_event_log_writer_no_log)
               "        source: what");
     windows_event_log_writer_no_log_body();
 }
+#endif
+
+#if defined(CHUCHO_HAVE_ZEROMQ)
+
+TEST_F(yaml_configurator, zeromq_writer)
+{
+    configure("- chucho::logger:\n"
+              "    - name: will\n"
+              "    - chucho::zeromq_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            - pattern: '%m'\n"
+              "        - chucho::formatted_message_serializer\n"
+              "        - endpoint: 'tcp://127.0.0.1:7777'\n"
+              "        - prefix: Hi");
+    zeromq_writer_body();
+}
+
+TEST_F(yaml_configurator, zeromq_writer_no_prefix)
+{
+    configure("- chucho::logger:\n"
+              "    - name: will\n"
+              "    - chucho::zeromq_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            - pattern: '%m'\n"
+              "        - chucho::formatted_message_serializer\n"
+              "        - endpoint: 'tcp://127.0.0.1:7778'\n");
+    zeromq_writer_no_prefix_body();
+}
+
+#if defined(CHUCHO_HAVE_PROTOBUF)
+
+TEST_F(yaml_configurator, zeromq_writer_protobuf)
+{
+    configure("- chucho::logger:\n"
+              "    - name: will\n"
+              "    - chucho::zeromq_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            - pattern: '%m'\n"
+              "        - chucho::protobuf_serializer\n"
+              "        - endpoint: 'tcp://127.0.0.1:7779'\n"
+              "        - prefix: Hi");
+    zeromq_writer_protobuf_body();
+}
+
+#endif
+
 #endif
 
 TEST_F(yaml_configurator, zip_file_compressor)

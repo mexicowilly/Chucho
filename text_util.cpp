@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -33,6 +33,19 @@ std::string to_lower(const std::string& text)
                    std::back_inserter(low),
                    [] (char c) { return std::tolower(c); });
     return low;
+}
+
+std::vector<std::string> tokenize(const std::string& text, char delim)
+{
+    std::vector<std::string> result;
+    std::size_t start = text.find_first_not_of(delim);
+    while (start != std::string::npos)
+    {
+        std::size_t end = text.find_first_of(delim, start);
+        result.push_back(text.substr(start, end - start));
+        start = text.find_first_not_of(delim, end);
+    }
+    return result;
 }
 
 }

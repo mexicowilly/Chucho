@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <chucho/text_util.hpp>
 #include <chucho/file_writer_memento.hpp>
 #include <chucho/level_threshold_filter.hpp>
+#include <algorithm>
 #include <assert.h>
 
 namespace
@@ -119,16 +120,16 @@ config_file_configurator::chucho_properties_processor::chucho_properties_process
     cfg_.report_info("Using Chucho-style config file configuration");
 }
 
-std::shared_ptr<configurable> config_file_configurator::chucho_properties_processor::create_file_compressor(const std::string& name,
-                                                                                                            const properties& props)
+std::shared_ptr<configurable> config_file_configurator::chucho_properties_processor::create_configurable(const std::string& type,
+                                                                                                         const std::string& name,
+                                                                                                         const properties& props)
 {
-    std::string type("file_compressor");
     auto fact = get_factory(type, name, props);
     auto mnto = fact->create_memento(cfg_);
     auto cur_props = props.get_subset(type + '.' + name + '.');
     for (auto cur : cur_props)
         mnto->handle(cur.first, cur.second);
-    return fact->create_configurable(mnto); 
+    return fact->create_configurable(mnto);
 }
 
 std::shared_ptr<configurable> config_file_configurator::chucho_properties_processor::create_file_roller(const std::string& name,
@@ -141,46 +142,10 @@ std::shared_ptr<configurable> config_file_configurator::chucho_properties_proces
     for (auto cur : cur_props)
     {
         if (cur.first == "file_compressor")
-            mnto->handle(create_file_compressor(cur.second, props));
+            mnto->handle(create_configurable(cur.first, cur.second, props));
         else 
             mnto->handle(cur.first, cur.second);
     }
-    return fact->create_configurable(mnto); 
-}
-
-std::shared_ptr<configurable> config_file_configurator::chucho_properties_processor::create_file_roll_trigger(const std::string& name,
-                                                                                                              const properties& props)
-{
-    std::string type("file_roll_trigger");
-    auto fact = get_factory(type, name, props);
-    auto mnto = fact->create_memento(cfg_);
-    auto cur_props = props.get_subset(type + '.' + name + '.');
-    for (auto cur : cur_props)
-        mnto->handle(cur.first, cur.second);
-    return fact->create_configurable(mnto); 
-}
-
-std::shared_ptr<configurable> config_file_configurator::chucho_properties_processor::create_filter(const std::string& name,
-                                                                                                   const properties& props)
-{
-    std::string type("filter");
-    auto fact = get_factory(type, name, props);
-    auto mnto = fact->create_memento(cfg_);
-    auto cur_props = props.get_subset(type + '.' + name + '.');
-    for (auto cur : cur_props)
-        mnto->handle(cur.first, cur.second);
-    return fact->create_configurable(mnto); 
-}
-
-std::shared_ptr<configurable> config_file_configurator::chucho_properties_processor::create_formatter(const std::string& name,
-                                                                                                      const properties& props)
-{
-    std::string type("formatter");
-    auto fact = get_factory(type, name, props);
-    auto mnto = fact->create_memento(cfg_);
-    auto cur_props = props.get_subset(type + '.' + name + '.');
-    for (auto cur : cur_props)
-        mnto->handle(cur.first, cur.second);
     return fact->create_configurable(mnto); 
 }
 
@@ -191,18 +156,23 @@ std::shared_ptr<configurable> config_file_configurator::chucho_properties_proces
     auto fact = get_factory(type, name, props); 
     auto mnto = fact->create_memento(cfg_);
     auto cur_props = props.get_subset(type + '.' + name + '.');
+    std::vector<std::string> generics;
+    // VS2012 does not support initializer lists. Piece of shit.
+    generics.push_back("filter");
+    generics.push_back("formatter");
+    generics.push_back("file_roll_trigger");
+    generics.push_back("serializer");
+    #if defined(CHUCHO_HAVE_EMAIL_WRITER)
+    generics.push_back("email_trigger");
+    #endif
     for (auto cur : cur_props)
     {
-        if (cur.first == "filter")
-            mnto->handle(create_filter(cur.second, props));
-        else if (cur.first == "formatter")
-            mnto->handle(create_formatter(cur.second, props));
-        else if (cur.first == "file_roller")
+        if (cur.first == "file_roller")
             mnto->handle(create_file_roller(cur.second, props));
-        else if (cur.first == "file_roll_trigger")
-            mnto->handle(create_file_roll_trigger(cur.second, props));
         else if (cur.first == "writer")
             mnto->handle(create_writer(cur.second, props));
+        else if (std::count(generics.begin(), generics.end(), cur.first) > 0)
+            mnto->handle(create_configurable(cur.first, cur.second, props));
         else if (cur.first.find('.') == std::string::npos)
             mnto->handle(cur.first, cur.second); 
     }

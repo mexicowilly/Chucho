@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,13 +26,16 @@
 #include <chucho/cout_writer_factory.hpp>
 #include <chucho/duplicate_message_filter_factory.hpp>
 #include <chucho/file_writer_factory.hpp>
+#include <chucho/formatted_message_serializer_factory.hpp>
 #include <chucho/gzip_file_compressor_factory.hpp>
 #include <chucho/interval_file_roll_trigger_factory.hpp>
 #include <chucho/level_filter_factory.hpp>
 #include <chucho/level_threshold_filter_factory.hpp>
 #include <chucho/logger_factory.hpp>
+#include <chucho/named_pipe_writer_factory.hpp>
 #include <chucho/numbered_file_roller_factory.hpp>
 #include <chucho/pattern_formatter_factory.hpp>
+#include <chucho/pipe_writer_factory.hpp>
 #include <chucho/remote_writer_factory.hpp>
 #include <chucho/rolling_file_writer_factory.hpp>
 #include <chucho/size_file_roll_trigger_factory.hpp>
@@ -59,6 +62,17 @@
 #if defined(CHUCHO_HAVE_RUBY)
 #include <chucho/ruby_evaluator_filter_factory.hpp>
 #endif
+#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+#include <chucho/email_writer_factory.hpp>
+#include <chucho/level_threshold_email_trigger_factory.hpp>
+#endif
+#if defined(CHUCHO_HAVE_PROTOBUF)
+#include <chucho/protobuf_serializer_factory.hpp>
+#endif
+#if defined(CHUCHO_HAVE_ZEROMQ)
+#include <chucho/zeromq_writer_factory.hpp>
+#endif
+
 #include <cstring>
 #include <mutex>
 
@@ -112,10 +126,14 @@ void configurator::initialize_impl()
     add_configurable_factory("chucho::level_threshold_filter", fact);
     fact.reset(new logger_factory());
     add_configurable_factory("chucho::logger", fact);
+    fact.reset(new named_pipe_writer_factory());
+    add_configurable_factory("chucho::named_pipe_writer", fact);
     fact.reset(new numbered_file_roller_factory());
     add_configurable_factory("chucho::numbered_file_roller", fact);
     fact.reset(new pattern_formatter_factory());
     add_configurable_factory("chucho::pattern_formatter", fact);
+    fact.reset(new pipe_writer_factory());
+    add_configurable_factory("chucho::pipe_writer", fact);
     fact.reset(new rolling_file_writer_factory());
     add_configurable_factory("chucho::rolling_file_writer", fact);
     fact.reset(new size_file_roll_trigger_factory());
@@ -136,6 +154,10 @@ void configurator::initialize_impl()
     add_configurable_factory("chucho::async_writer", fact);
     fact.reset(new sliding_numbered_file_roller_factory());
     add_configurable_factory("chucho::sliding_numbered_file_roller", fact);
+    fact.reset(new interval_file_roll_trigger_factory());
+    add_configurable_factory("chucho::interval_file_roll_trigger", fact);
+    fact.reset(new formatted_message_serializer_factory());
+    add_configurable_factory("chucho::formatted_message_serializer", fact);
 #if defined(CHUCHO_WINDOWS)
     fact.reset(new windows_event_log_writer_factory());
     add_configurable_factory("chucho::windows_event_log_writer", fact);
@@ -160,8 +182,20 @@ void configurator::initialize_impl()
     fact.reset(new ruby_evaluator_filter_factory());
     add_configurable_factory("chucho::ruby_evaluator_filter", fact);
 #endif
-    fact.reset(new interval_file_roll_trigger_factory());
-    add_configurable_factory("chucho::interval_file_roll_trigger", fact);
+#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+    fact.reset(new email_writer_factory());
+    add_configurable_factory("chucho::email_writer", fact);
+    fact.reset(new level_threshold_email_trigger_factory());
+    add_configurable_factory("chucho::level_threshold_email_trigger", fact);
+#endif
+#if defined(CHUCHO_HAVE_PROTOBUF)
+    fact.reset(new protobuf_serializer_factory());
+    add_configurable_factory("chucho::protobuf_serializer", fact);
+#endif
+#if defined(CHUCHO_HAVE_ZEROMQ)
+    fact.reset(new zeromq_writer_factory());
+    add_configurable_factory("chucho::zeromq_writer", fact);
+#endif
 }
 
 std::string configurator::resolve_variables(const std::string& val)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,20 +26,19 @@ chucho_rc chucho_create_pattern_formatter(chucho_formatter** fmt, const char* co
 {
     if (fmt == nullptr || pattern == nullptr)
         return CHUCHO_NULL_POINTER;
-    chucho_formatter* loc = new chucho_formatter();
     try
     {
-        loc->fmt_ = std::make_shared<chucho::pattern_formatter>(pattern);
-        *fmt = loc;
+        *fmt = new chucho_formatter();
+        (*fmt)->fmt_ = std::make_shared<chucho::pattern_formatter>(pattern);
     }
     catch (chucho::exception&) 
     {
-        delete loc;
+        delete *fmt;
+        *fmt = nullptr;
         return CHUCHO_INVALID_PATTERN;
     }
     catch (...)
     {
-        delete loc;
         return CHUCHO_OUT_OF_MEMORY;
     }
     return CHUCHO_NO_ERROR;

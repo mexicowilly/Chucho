@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ postgres_writer_memento::postgres_writer_memento(configurator& cfg)
     : writer_memento(cfg)
 {
     set_status_origin("postgres_writer_memento");
+    cfg.get_security_policy().set_text("postgres_writer::uri", 8000);
     set_handler("uri", [this] (const std::string& uri) { uri_ = validate("postgres_writer::uri", uri); });
 }
 

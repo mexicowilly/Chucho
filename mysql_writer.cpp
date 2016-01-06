@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -206,7 +206,7 @@ void real_mysql_writer::write_impl(const chucho::event& evt)
 namespace chucho
 {
 
-std::uint16_t mysql_writer::DEFAULT_PORT = 3306;
+const std::uint16_t mysql_writer::DEFAULT_PORT = 3306;
 
 mysql_writer::mysql_writer(std::shared_ptr<formatter> fmt,
                            const std::string& host,

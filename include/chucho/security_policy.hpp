@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -64,32 +64,60 @@ namespace chucho
  * <table> 
  *     <tr><th>Key</th><th>Value</th></tr>
  *     <tr><td>async_writer::queue_capacity</td>
- *         <td>(10, 32K)</td></tr>
+ *         <td>[10, 32768]</td></tr>
  *     <tr><td>async_writer::queue_capacity(text)</td>
- *         <td><i>default</i></td></tr>
+ *         <td>5</td></tr>
  *     <tr><td>async_writer::discard_threshold</td>
  *         <td><i>default</i></td></tr>
  *     <tr><td>async_writer::flush_on_destruct</td>
- *         <td><i>default</i></td></tr>
+ *         <td>5</td></tr>
+ *     <tr><td>email_writer::buffer_size</td>
+ *         <td>[1, 65536]</td></tr>
+ *     <tr><td>email_writer::buffer_size(text)</td>
+ *         <td>5</td></tr>
+ *     <tr><td>%email_writer::connection_type</td>
+ *         <td>8</td></tr>
+ *     <tr><td>email_writer::from</td>
+ *         <td>320</td></tr>
+ *     <tr><td>email_writer::host</td>
+ *         <td>253</td></tr>
+ *     <tr><td>email_writer::port</td>
+ *         <td>[1, 65535]</td></tr>
+ *     <tr><td>email_writer::port(text)</td>
+ *         <td>5</td></tr>
+ *     <tr><td>email_writer::subject</td>
+ *         <td>989</td></tr>
+ *     <tr><td>email_writer::to(address)</td>
+ *         <td>[1, 320]</td></tr>
+ *     <tr><td>email_writer::to(count)</td>
+ *         <td>[1, 100]</td></tr>
+ *     <tr><td>email_writer::to(text)</td>
+ *         <td>32100</td></tr>
+ *     <tr><td>email_writer::user</td>
+ *         <td>320</td></tr>
+ *     <tr><td>email_writer::verbose</td>
+ *         <td>5</td></tr>
  *     <tr><td>file_compressor::min_index</td>
- *         <td>(1, 1000)</td></tr>
+ *         <td>[1, 1000]</td></tr>
  *     <tr><td>file_compressor::min_index(text)</td>
- *         <td><i>default</i></td></tr>
+ *         <td>4</td></tr>
  *     <tr><td>file_writer::file_name</td>
  *         <td><i>default</i></td></tr>
  *     <tr><td>file_writer::flush</td>
- *         <td><i>default</i></td></tr>
- *     <tr><td>file_writer::on_start</td>
- *         <td><i>default</i></td></tr>
+ *         <td>5</td></tr>
+ *     <tr><td>%file_writer::on_start</td>
+ *         <td>8</td></tr>
  *     <tr><td>interval_file_roll_trigger::count</td>
- *         <td>(1, 5000)</td></tr>
+ *         <td>[1, 5000]</td></tr>
  *     <tr><td>interval_file_roll_trigger::period(text)</td>
  *         <td>12</td></tr>
  *     <tr><td>level_filter::level</td>
  *         <td><i>default</i></td></tr>
  *     <tr><td>level_filter::on_match</td>
- *         <td><i>default</i></td></tr>
+ *         <td>7</td></tr>
  *     <tr><td>level_filter::on_mismatch</td>
+ *         <td>7</td></tr>
+ *     <tr><td>level_threshold_email_trigger::level</td>
  *         <td><i>default</i></td></tr>
  *     <tr><td>level_threshold_filter::level</td>
  *         <td><i>default</i></td></tr>
@@ -98,72 +126,88 @@ namespace chucho
  *     <tr><td>logger::name</td>
  *         <td><i>default</i></td></tr>
  *     <tr><td>%logger::writes_to_ancestors</td>
- *         <td><i>default</i></td></tr>
+ *         <td>5</td></tr>
  *     <tr><td>mysql_writer::host</td>
- *         <td><i>default</i></td></tr>
+ *         <td>253</td></tr>
  *     <tr><td>mysql_writer::user</td>
- *         <td>(1, 16)</td></tr>
+ *         <td>16</td></tr>
  *     <tr><td>mysql_writer::password</td>
  *         <td><i>default</i></td></tr>
  *     <tr><td>mysql_writer::database</td>
- *         <td>(1, 64)</td></tr>
+ *         <td>64</td></tr>
  *     <tr><td>mysql_writer::port</td>
- *         <td>(1, 65535)</td></tr>
+ *         <td>[1, 65535]</td></tr>
  *     <tr><td>mysql_writer::port(text)</td>
- *         <td><i>default</i></td></tr>
+ *         <td>5</td></tr>
  *     <tr><td>mysql_writer::queue_capacity</td>
- *         <td>(10, 32K)</td></tr>
+ *         <td>[10, 32768]</td></tr>
  *     <tr><td>mysql_writer::queue_capacity(text)</td>
- *         <td><i>default</i></td></tr>
+ *         <td>5</td></tr>
  *     <tr><td>mysql_writer::discard_threshold</td>
  *         <td><i>default</i></td></tr>
  *     <tr><td>mysql_writer::flush_on_destruct</td>
+ *         <td>5</td></tr>
+ *     <tr><td>named_pipe_writer::flush</td>
+ *         <td>5</td></tr>
+ *     <tr><td>named_pipe_writer::name</td>
  *         <td><i>default</i></td></tr>
  *     <tr><td>numbered_file_roller::min_index</td>
- *         <td>(-1000, 1000)</td></tr>
+ *         <td>[-1000, 1000]</td></tr>
+ *     <tr><td>numbered_file_roller::min_index(text)</td>
+ *         <td>5</td></tr>
  *     <tr><td>numbered_file_roller::max_index</td>
- *         <td>(-1000, 1000)</td></tr>
+ *         <td>[-1000, 1000]</td></tr>
+ *     <tr><td>numbered_file_roller::max_index(text)</td>
+ *         <td>5</td></tr>
  *     <tr><td>oracle_writer::user</td>
- *         <td><i>default</i></td></tr>
+ *         <td>30</td></tr>
  *     <tr><td>oracle_writer::password</td>
- *         <td><i>default</i></td></tr>
+ *         <td>30</td></tr>
  *     <tr><td>oracle_writer::database</td>
- *         <td><i>default</i></td></tr>
+ *         <td>512</td></tr>
  *     <tr><td>pattern_formatter::pattern</td>
  *         <td><i>default</i></td></tr>
+ *     <tr><td>pipe_writer::flush</td>
+ *         <td>5</td></tr>
  *     <tr><td>postgres_writer::uri</td>
- *         <td><i>default</i></td></tr>
+ *         <td>8000</td></tr>
  *     <tr><td>remote_writer::port</td>
- *         <td>(1, 65535)</td></tr>
+ *         <td>[1, 65535]</td></tr>
  *     <tr><td>remote_writer::port(text)</td>
- *         <td><i>default</i></td></tr>
+ *         <td>5</td></tr>
  *     <tr><td>ruby_evaluator_filter::expression</td>
  *         <td><i>default</i></td></tr>
  *     <tr><td>size_file_roll_trigger::max_size</td>
- *         <td>(1, 1G)</td></tr>
+ *         <td>[1, 1G]</td></tr>
+ *     <tr><td>size_file_roll_trigger::max_size(text)</td>
+ *         <td>50</td></tr>
  *     <tr><td>sliding_numbered_file_roller::min_index</td>
- *         <td>(-1000, 1000)</td></tr>
+ *         <td>[-1000, 1000]</td></tr>
  *     <tr><td>sliding_numbered_file_roller::min_index(text)</td>
- *         <td><i>default</i></td></tr>
+ *         <td>5</td></tr>
  *     <tr><td>sliding_numbered_file_roller::max_count</td>
- *         <td>(1, 1000)</td></tr>
+ *         <td>[1, 1000]</td></tr>
  *     <tr><td>sliding_numbered_file_roller::max_count(text)</td>
- *         <td><i>default</i></td></tr>
+ *         <td>4</td></tr>
  *     <tr><td>sqlite_writer::file_name</td>
  *         <td><i>default</i></td></tr>
  *     <tr><td>syslog_writer::facility</td>
- *         <td><i>default</i></td></tr>
+ *         <td>8</td></tr>
  *     <tr><td>syslog_writer::host_name</td>
- *         <td><i>default</i></td></tr>
+ *         <td>253</td></tr>
  *     <tr><td>syslog_writer::port</td>
- *         <td>(1, 65535)</td></tr>
+ *         <td>[1, 65535]</td></tr>
  *     <tr><td>syslog_writer::port(text)</td>
- *         <td><i>default</i></td></tr>
+ *         <td>5</td></tr>
  *     <tr><td>time_file_roller::file_name_pattern</td>
  *         <td><i>default</i></td></tr>
  *     <tr><td>time_file_roller::max_history</td>
- *         <td>(1, 1000)</td></tr>
+ *         <td>[1, 1000]</td></tr>
  *     <tr><td>time_file_roller::max_history(text)</td>
+ *         <td>4</td></tr>
+ *     <tr><td>zeromq_writer::endpoint</td>
+ *         <td><i>default</i></td></tr>
+ *     <tr><td>zeromq_writer::prefix</td>
  *         <td><i>default</i></td></tr>
  * </table>
  * 
@@ -177,7 +221,10 @@ public:
      * @{ 
      */
     /**
-     * Construct a security policy.
+     * Construct a security policy. Using this constructor will
+     * accomplish nothing. If you need to query or modify the
+     * security policy, you may retrieve the one in use by calling
+     * @ref configuration::get_security_policy.
      */
     security_policy();
     /** @}  */

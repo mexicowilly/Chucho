@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -60,6 +60,10 @@ std::string security_policy::validate(const std::string& key, const std::string&
             val_cp = val.substr(0, 50);
             val_cp += "...";
             chopped = true;
+        }
+        else
+        {
+            val_cp = val;
         }
         std::ostringstream stream;
         stream << "The value, ";

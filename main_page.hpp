@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@
  * href="https://groups.google.com/forum/?fromgroups#!forum/chucho-logging" 
  * target="_blank">Google group</a>. 
  *  
- * @copyright &copy; 2013-2015 Will Mason 
+ * @copyright &copy; 2013-2016 Will Mason 
  */
 
 /**
@@ -88,6 +88,11 @@
 /**
  * @defgroup database 
  * Classes that write to databases. 
+ */
+
+/**
+ * @defgroup email
+ * Classes that handle writing to email.
  */
 
 /**
@@ -110,6 +115,11 @@
 /**
  * @defgroup loggers
  * The logger class and macros for writing filtered log events. 
+ */
+
+/**
+ * @defgroup mq Message Queues
+ * Classes for writing to message queues.
  */
 
 /**
@@ -171,6 +181,13 @@
  */
 
 /**
+ * @defgroup c_email Email
+ * Functions that manage email writers.
+ * 
+ * @ingroup c
+ */
+
+/**
  * @defgroup c_filters Filters
  * Filters are attached to @ref chucho_writer, and they can be 
  * used to refine log filtering beyond the basic level check. 
@@ -196,6 +213,13 @@
  * @defgroup c_loggers Loggers 
  * Types, functions and macros for writing filtered log events. 
  *  
+ * @ingroup c
+ */
+
+/**
+ * @defgroup c_mq Message Queues
+ * Functions for writing to message queues.
+ * 
  * @ingroup c
  */
 

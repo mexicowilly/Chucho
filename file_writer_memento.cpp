@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Will Mason
+ * Copyright 2013-2016 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@ file_writer_memento::file_writer_memento(configurator& cfg, memento_key_set ks)
       flush_(true)
 {
     set_status_origin("file_writer_memento");
+    cfg.get_security_policy().set_text("file_writer::flush", 5);
+    cfg.get_security_policy().set_text("file_writer::on_start", 8);
     handler fn_hnd = [this] (const std::string& name) { file_name_ = validate("file_writer::file_name", name); };
     handler flsh_hnd = [this] (const std::string& val) { flush_ = boolean_value(validate("file_writer::flush", val)); };
     if (ks == memento_key_set::CHUCHO)
