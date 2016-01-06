@@ -42,7 +42,6 @@ chucho_rc chucho_create_async_writer(chucho_writer** async,
     }
     catch (...) 
     {
-        delete *async;
         return CHUCHO_OUT_OF_MEMORY;
     }
     chucho_release_writer(wrt);

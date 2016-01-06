@@ -22,13 +22,13 @@ extern "C"
 {
 
 chucho_rc chucho_create_size_file_roll_trigger(chucho_file_roll_trigger** trg,
-                                         off_t max_size)
+                                               off_t max_size)
 {
     if (trg == nullptr) 
         return CHUCHO_NULL_POINTER;
     try
     {
-        *trg = new chucho_file_roll_trigger;
+        *trg = new chucho_file_roll_trigger();
         (*trg)->trg_ = std::make_shared<chucho::size_file_roll_trigger>(max_size);
     }
     catch (...) 

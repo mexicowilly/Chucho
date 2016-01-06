@@ -25,19 +25,21 @@ unsigned CHUCHO_DEFAULT_REMOTE_WRITER_PORT = chucho::remote_writer::DEFAULT_PORT
 size_t CHUCHO_DEFAULT_REMOTE_UNSENT_CACHE_MAX = chucho::remote_writer::DEFAULT_UNSENT_CACHE_MAX;
 
 chucho_rc chucho_create_remote_writer(chucho_writer** wrt,
-                                const char* const host,
-                                unsigned port,
-                                size_t unsent_cache_max)
+                                      const char* const host,
+                                      unsigned port,
+                                      size_t unsent_cache_max)
 {
     if (wrt == nullptr || host == nullptr) 
         return CHUCHO_NULL_POINTER;
     try
     {
-        *wrt = new chucho_writer;
+        *wrt = new chucho_writer();
         (*wrt)->writer_ = std::make_shared<chucho::remote_writer>(host, port, unsent_cache_max);
     }
     catch (std::invalid_argument&) 
     {
+        delete *wrt;
+        *wrt = nullptr;
         return CHUCHO_INVALID_ARGUMENT;
     }
     catch (...) 

@@ -24,14 +24,14 @@ extern "C"
 {
 
 chucho_rc chucho_create_local_syslog_writer(chucho_writer** wrt,
-                                      chucho_formatter* fmt,
-                                      chucho_syslog_facility fcl)
+                                            chucho_formatter* fmt,
+                                            chucho_syslog_facility fcl)
 {
     if (wrt == nullptr || fmt == nullptr) 
         return CHUCHO_NULL_POINTER;
     try
     {
-        *wrt = new chucho_writer;
+        *wrt = new chucho_writer();
         (*wrt)->writer_ = std::make_shared<chucho::syslog_writer>(fmt->fmt_,
                                                                   static_cast<chucho::syslog::facility>(fcl));
         chucho_release_formatter(fmt);
@@ -39,6 +39,7 @@ chucho_rc chucho_create_local_syslog_writer(chucho_writer** wrt,
     catch (chucho::exception&) 
     {
         delete *wrt;
+        *wrt = nullptr;
         return CHUCHO_CONNECTION_ERROR;
     }
     catch (...) 
@@ -49,16 +50,16 @@ chucho_rc chucho_create_local_syslog_writer(chucho_writer** wrt,
 }
 
 chucho_rc chucho_create_remote_syslog_writer(chucho_writer** wrt,
-                                       chucho_formatter* fmt,
-                                       chucho_syslog_facility fcl,
-                                       const char* const host,
-                                       unsigned port)
+                                             chucho_formatter* fmt,
+                                             chucho_syslog_facility fcl,
+                                             const char* const host,
+                                             unsigned port)
 {
     if (wrt == nullptr || fmt == nullptr || host == nullptr)
         return CHUCHO_NULL_POINTER;
     try
     {
-        *wrt = new chucho_writer;
+        *wrt = new chucho_writer();
         (*wrt)->writer_ = std::make_shared<chucho::syslog_writer>(fmt->fmt_,
                                                                   static_cast<chucho::syslog::facility>(fcl),
                                                                   host,
@@ -67,6 +68,8 @@ chucho_rc chucho_create_remote_syslog_writer(chucho_writer** wrt,
     }
     catch (chucho::exception&) 
     {
+        delete *wrt;
+        *wrt = nullptr;
         return CHUCHO_CONNECTION_ERROR;
     }
     catch (...) 

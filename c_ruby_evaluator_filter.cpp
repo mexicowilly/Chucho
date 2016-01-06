@@ -33,7 +33,6 @@ chucho_rc chucho_create_ruby_evaluator_filter(chucho_filter** flt,
     }
     catch (...) 
     {
-        delete *flt;
         return CHUCHO_OUT_OF_MEMORY;
     }
     return CHUCHO_NO_ERROR;

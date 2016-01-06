@@ -91,6 +91,7 @@ chucho_rc chucho_create_email_writer(chucho_writer** wrt,
     catch (chucho::exception&)
     {
         delete *wrt;
+        *wrt = nullptr;
         return CHUCHO_INVALID_ARGUMENT;
     }
     catch (...)

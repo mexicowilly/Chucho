@@ -42,6 +42,7 @@ chucho_rc chucho_create_oracle_writer(chucho_writer** wrt,
     catch (chucho::exception&) 
     {
         delete *wrt;
+        *wrt = nullptr;
         return CHUCHO_CONNECTION_ERROR;
     }
     catch (...) 

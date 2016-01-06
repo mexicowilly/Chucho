@@ -33,8 +33,9 @@ chucho_rc chucho_create_zeromq_writer(chucho_writer** wrt,
 {
     if (wrt == nullptr || fmt == nullptr || ser == nullptr || endpoint == nullptr ||
         (prefix_len > 0 && prefix == nullptr))
-
+    {
         return CHUCHO_NULL_POINTER;
+    }
     try
     {
         *wrt = new chucho_writer();
@@ -49,6 +50,7 @@ chucho_rc chucho_create_zeromq_writer(chucho_writer** wrt,
     catch (chucho::exception&) 
     {
         delete *wrt;
+        *wrt = nullptr;
         return CHUCHO_CONNECTION_ERROR;
     }
     catch (...) 

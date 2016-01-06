@@ -23,7 +23,7 @@ extern "C"
 {
 
 chucho_rc chucho_create_level_threshold_filter(chucho_filter** flt,
-                                         const chucho_level* lvl)
+                                               const chucho_level* lvl)
 {
     if (flt == nullptr || lvl == nullptr) 
         return CHUCHO_NULL_POINTER;
@@ -34,7 +34,6 @@ chucho_rc chucho_create_level_threshold_filter(chucho_filter** flt,
     }
     catch (...) 
     {
-        delete *flt;
         return CHUCHO_OUT_OF_MEMORY;
     }
     return CHUCHO_NO_ERROR;

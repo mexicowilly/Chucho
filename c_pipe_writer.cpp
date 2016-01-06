@@ -30,10 +30,9 @@ chucho_rc chucho_create_pipe_writer(chucho_writer** wrt,
         return CHUCHO_NULL_POINTER;
     try
     {
-        chucho_writer* loc = new chucho_writer();
-        loc->writer_ = std::make_shared<chucho::pipe_writer>(fmt->fmt_,
-                                                             flush == 0 ? false : true);
-        *wrt = loc;
+        *wrt = new chucho_writer();
+        (*wrt)->writer_ = std::make_shared<chucho::pipe_writer>(fmt->fmt_,
+                                                                flush == 0 ? false : true);
         chucho_release_formatter(fmt);
     }
     catch (...) 

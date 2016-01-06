@@ -33,7 +33,6 @@ chucho_rc chucho_create_cerr_writer(chucho_writer** wrt, chucho_formatter* fmt)
     }
     catch (...) 
     {
-        delete *wrt;
         return CHUCHO_OUT_OF_MEMORY;
     }
     chucho_release_formatter(fmt);

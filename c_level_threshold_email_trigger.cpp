@@ -34,7 +34,6 @@ chucho_rc chucho_create_level_threshold_email_trigger(chucho_email_trigger** trg
     }
     catch (...) 
     {
-        delete *trg;
         return CHUCHO_OUT_OF_MEMORY;
     }
     return CHUCHO_NO_ERROR;

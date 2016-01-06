@@ -80,7 +80,7 @@ OPTION(INSTALL_SERVICE "Whether to install chuchod as a system service" OFF)
 # normally disabled, as it will increase the size of the Chucho library
 # significantly.
 
-OPTION(C_API "Whether the C API should be built into this Chucho" ON)
+OPTION(C_API "Whether the C API should be built into this Chucho" OFF)
 
 # CONFIGURATION FORMATS
 # ================================================================================
