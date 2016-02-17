@@ -63,6 +63,7 @@ IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
         platform/posix/calendar_posix.cpp
         platform/posix/cerr_writer_posix.cpp
+        platform/posix/compressing_writer_posix.cpp
         platform/posix/cout_writer_posix.cpp
         platform/posix/diagnostic_context_posix.cpp
         platform/posix/environment_posix.cpp
@@ -153,6 +154,8 @@ ENDIF()
 SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/async_writer.hpp
     include/chucho/cerr_writer.hpp
+    include/chucho/compressing_writer.hpp
+    include/chucho/compressor.hpp
     include/chucho/configurable.hpp
     include/chucho/configurable_factory.hpp
     include/chucho/configuration.hpp
@@ -192,6 +195,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/message_queue_writer.hpp
     include/chucho/named_pipe_writer.hpp
     include/chucho/non_copyable.hpp
+    include/chucho/noop_compressor.hpp
     include/chucho/noop_file_compressor.hpp
     include/chucho/numbered_file_roller.hpp
     include/chucho/optional.hpp
@@ -282,7 +286,9 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/windows_event_log_writer.hpp)
 
 IF(CHUCHO_HAVE_ZLIB)
-    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.hpp)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/gzip_file_compressor.hpp
+         include/chucho/zlib_compressor.hpp)
     IF(C_API)
         LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.h)
     ENDIF()
@@ -290,7 +296,8 @@ ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/gzip_file_compressor.hpp
-     include/chucho/gzip_file_compressor.h)
+     include/chucho/gzip_file_compressor.h
+     include/chucho/zlib_compressor.hpp)
 
 IF(CHUCHO_HAVE_BZIP2)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/bzip2_file_compressor.hpp)
@@ -637,6 +644,7 @@ SET(CHUCHO_SOURCES
     cerr_writer_factory.cpp
     cerr_writer_memento.cpp
     clock_util.cpp
+    compressing_writer.cpp
     configurable.cpp
     configurable_factory.cpp
     configuration.cpp
@@ -690,6 +698,7 @@ SET(CHUCHO_SOURCES
     named_pipe_writer.cpp
     named_pipe_writer_factory.cpp
     named_pipe_writer_memento.cpp
+    noop_compressor.cpp
     noop_file_compressor.cpp
     numbered_file_roller.cpp
     numbered_file_roller_factory.cpp
@@ -895,6 +904,7 @@ ENDIF()
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_SOURCES
          gzip_file_compressor.cpp
+         zlib_compressor.cpp
          ${CHUCHO_ZLIB_SOURCES})
     IF(C_API)
         LIST(APPEND CHUCHO_SOURCES c_gzip_file_compressor.cpp)
