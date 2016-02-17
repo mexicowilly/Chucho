@@ -15,6 +15,7 @@
  */
 
 #include <chucho/compressing_writer.hpp>
+#include <stdexcept>
 
 namespace chucho
 {
@@ -23,13 +24,20 @@ compressing_writer::compressing_writer(std::shared_ptr<formatter> fmt,
                                        std::ostream& stream,
                                        std::shared_ptr<compressor> cmp,
                                        std::shared_ptr<serializer> ser,
-                                       std::size_t max_cached_events)
+                                       const optional<std::size_t>& max_cache_kb,
+                                       const optional<std::size_t>& max_cached_events)
     : writer(fmt),
       stream_(stream),
       max_cached_(max_cached_events),
+      max_bytes_(max_cache_kb),
       serializer_(ser),
       compressor_(cmp)
 {
+    set_status_origin("compressing_writer");
+    if (!max_bytes_ && !max_cached_)
+        throw std::invalid_argument("Either max_cache_kb or max_cached_events must be set");
+    if (max_bytes_)
+        *max_bytes_ *= 1024;
 }
 
 compressing_writer::~compressing_writer()
@@ -66,8 +74,12 @@ void compressing_writer::flush()
 void compressing_writer::write_impl(const event& evt)
 {
     cache(evt);
-    if (++events_in_cache_ >= max_cached_)
+    events_in_cache_++;
+    if ((max_bytes_ && compressed_cache_.size() >= *max_bytes_) ||
+        (max_cached_ && events_in_cache_ >= *max_cached_))
+    {
         flush();
+    }
 }
 
 }

@@ -20,6 +20,7 @@
 #include <chucho/writer.hpp>
 #include <chucho/serializer.hpp>
 #include <chucho/compressor.hpp>
+#include <chucho/optional.hpp>
 
 namespace chucho
 {
@@ -31,7 +32,8 @@ public:
                        std::ostream& stream,
                        std::shared_ptr<compressor> cmp,
                        std::shared_ptr<serializer> ser,
-                       std::size_t max_cached_events);
+                       const optional<std::size_t>& max_cache_in_kb,
+                       const optional<std::size_t>& max_cached_events);
     ~compressing_writer();
 
     std::shared_ptr<compressor> get_compressor() const;
@@ -51,7 +53,8 @@ private:
     std::ostream& stream_;
     std::vector<std::uint8_t> compressed_cache_;
     std::size_t events_in_cache_;
-    std::size_t max_cached_;
+    optional<std::size_t> max_cached_;
+    optional<std::size_t> max_bytes_;
     std::shared_ptr<serializer> serializer_;
     std::shared_ptr<compressor> compressor_;
 };
