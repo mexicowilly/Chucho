@@ -38,7 +38,8 @@ public:
 
     std::shared_ptr<compressor> get_compressor() const;
     std::size_t get_events_in_cache() const;
-    std::size_t get_max_cached_events() const;
+    const optional<std::size_t>& get_max_cached_bytes() const;
+    const optional<std::size_t>& get_max_cached_events() const;
     std::shared_ptr<serializer> get_serializer() const;
     std::ostream& get_stream() const;
 
@@ -69,7 +70,12 @@ inline std::size_t compressing_writer::get_events_in_cache() const
     return events_in_cache_;
 }
 
-inline std::size_t compressing_writer::get_max_cached_events() const
+inline const optional<std::size_t>& compressing_writer::get_max_cached_bytes() const
+{
+    return max_bytes_;
+}
+
+inline const optional<std::size_t>& compressing_writer::get_max_cached_events() const
 {
     return max_cached_;
 }

@@ -107,19 +107,18 @@ void zlib_compressor::finish(std::vector<std::uint8_t>& out)
 {
     if (z_)
     {
-        unsigned pending;
-        int bits;
-        deflatePending(z_.get(), &pending, &bits);
-        if (pending > 0 || bits > 0)
-        {
-            z_->avail_in = 0;
-            z_->next_in = Z_NULL;
-            std::vector<std::uint8_t> buf(pending * 2);
-            z_->avail_out = buf.size();
-            z_->next_out = &buf[0];
-            deflate(z_.get(), Z_FINISH);
-            out.insert(out.end(), buf.begin(), buf.begin() + (buf.size() - z_->avail_out));
-        }
+        z_->avail_in = 0;
+        z_->next_in = Z_NULL;
+        // We have to just wing it here. The function deflatePending() is
+        // not giving the right result, so we have no idea how much data
+        // might come out. I'm just assuming that 4xBUFSIZ will be enough.
+        // BUFSIZ is usually 8K, and I can't imagine that zlib keeps caches
+        // bigger than that.
+        std::vector<std::uint8_t> buf(BUFSIZ * 4);
+        z_->avail_out = buf.size();
+        z_->next_out = &buf[0];
+        deflate(z_.get(), Z_FINISH);
+        out.insert(out.end(), buf.begin(), buf.begin() + (buf.size() - z_->avail_out));
         deflateEnd(z_.get());
         z_.release();
     }

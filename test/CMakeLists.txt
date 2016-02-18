@@ -49,7 +49,9 @@ IF(CHUCHO_HAVE_ZEROMQ)
 ENDIF()
 
 IF(CHUCHO_HAVE_ZLIB)
-    LIST(APPEND CHUCHO_TEST_COMPRESSION_SOURCES gzip_file_compressor_test.cpp)
+    LIST(APPEND CHUCHO_TEST_COMPRESSION_SOURCES
+         gzip_file_compressor_test.cpp
+         zlib_compressor_test.cpp)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_ZLIB)
 ENDIF()
 
@@ -142,6 +144,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                marker_test.cpp
                multithread_test.cpp
                named_pipe_writer_test.cpp
+               noop_compressor_test.cpp
                optional_test.cpp
                pattern_formatter_test.cpp
                pipe_writer_test.cpp
