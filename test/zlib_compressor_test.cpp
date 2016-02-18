@@ -17,6 +17,35 @@
 #include <gtest/gtest.h>
 #include <chucho/zlib_compressor.hpp>
 
+TEST(zlib_compressor, big)
+{
+    chucho::zlib_compressor cmp;
+    std::vector<std::uint8_t> in;
+    for (int i = 0; i < 1000000; i++)
+        in.push_back('a' + (i % 26));
+    std::vector<std::uint8_t> out;
+    cmp.compress(in, out);
+    cmp.finish(out);
+    z_stream z;
+    std::memset(&z, 0, sizeof(z));
+    z.zalloc = Z_NULL;
+    z.zfree = Z_NULL;
+    z.opaque = Z_NULL;
+    int rc = inflateInit(&z);
+    ASSERT_EQ(Z_OK, rc);
+    z.next_in = &out[0];
+    z.avail_in = out.size();
+    std::vector<std::uint8_t> un(in.size());
+    z.next_out = &un[0];
+    z.avail_out = un.size();
+    rc = inflate(&z, Z_FINISH);
+    ASSERT_EQ(Z_STREAM_END, rc);
+    ASSERT_EQ(0, z.avail_out);
+    inflateEnd(&z);
+    ASSERT_EQ(in.size(), un.size());
+    EXPECT_TRUE(std::equal(in.begin(), in.end(), un.begin()));
+}
+
 TEST(zlib_compressor, simple)
 {
     chucho::zlib_compressor cmp;
