@@ -28,20 +28,24 @@ namespace chucho
 class CHUCHO_EXPORT compressing_writer : public writer
 {
 public:
+    static const std::size_t DEFAULT_CACHE_SIZE_IN_KB;
+
     compressing_writer(std::shared_ptr<formatter> fmt,
-                       std::ostream& stream,
+                       std::shared_ptr<std::ostream> stream,
                        std::shared_ptr<compressor> cmp,
                        std::shared_ptr<serializer> ser,
-                       const optional<std::size_t>& max_cache_in_kb,
-                       const optional<std::size_t>& max_cached_events);
+                       const optional<std::size_t>& max_cache_in_kb = DEFAULT_CACHE_SIZE_IN_KB,
+                       const optional<std::size_t>& max_cached_events = optional<std::size_t>());
     ~compressing_writer();
 
+    std::size_t get_cache_size_in_bytes() const;
     std::shared_ptr<compressor> get_compressor() const;
     std::size_t get_events_in_cache() const;
     const optional<std::size_t>& get_max_cached_bytes() const;
     const optional<std::size_t>& get_max_cached_events() const;
     std::shared_ptr<serializer> get_serializer() const;
-    std::ostream& get_stream() const;
+    std::shared_ptr<std::ostream> get_stream();
+    void set_stream(std::shared_ptr<std::ostream> st);
 
 protected:
     virtual void write_impl(const event& evt) override;
@@ -51,14 +55,20 @@ private:
     CHUCHO_NO_EXPORT void flush();
     CHUCHO_NO_EXPORT std::uint32_t to_network(std::uint32_t num) const;
 
-    std::ostream& stream_;
+    std::shared_ptr<std::ostream> stream_;
     std::vector<std::uint8_t> compressed_cache_;
     std::size_t events_in_cache_;
     optional<std::size_t> max_cached_;
     optional<std::size_t> max_bytes_;
     std::shared_ptr<serializer> serializer_;
     std::shared_ptr<compressor> compressor_;
+    std::mutex stream_guard_;
 };
+
+inline std::size_t compressing_writer::get_cache_size_in_bytes() const
+{
+    return compressed_cache_.size();
+}
 
 inline std::shared_ptr<compressor> compressing_writer::get_compressor() const
 {
@@ -83,11 +93,6 @@ inline const optional<std::size_t>& compressing_writer::get_max_cached_events() 
 inline std::shared_ptr<serializer> compressing_writer::get_serializer() const
 {
     return serializer_;
-}
-
-inline std::ostream& compressing_writer::get_stream() const
-{
-    return stream_;
 }
 
 }
