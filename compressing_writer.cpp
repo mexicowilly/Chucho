@@ -37,6 +37,10 @@ compressing_writer::compressing_writer(std::shared_ptr<formatter> fmt,
       compressor_(cmp)
 {
     set_status_origin("compressing_writer");
+    if (!compressor_)
+        throw std::invalid_argument("The compressor must not be empty");
+    if (!serializer_)
+        throw std::invalid_argument("The serializer must not be empty");
     if (!max_bytes_ && !max_cached_)
         throw std::invalid_argument("Either max_cache_kb or max_cached_events must be set");
     if (max_bytes_)
@@ -72,8 +76,15 @@ void compressing_writer::flush()
         // The stream is already protected by the guard_ mutex, since this
         // method is only ever called from top-level write() or the
         // destructor.
-        stream_->write(const_cast<char*>(reinterpret_cast<const char*>(&compressed_cache_[0])),
-                       compressed_cache_.size());
+        if (stream_)
+        {
+            stream_->write(const_cast<char*>(reinterpret_cast<const char*>(&compressed_cache_[0])),
+                           compressed_cache_.size());
+        }
+        else
+        {
+            report_error("The stream has not been set, so cached events are being discarded");
+        }
         compressed_cache_.clear();
         events_in_cache_ = 0;
     }

@@ -196,6 +196,8 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/named_pipe_writer.hpp
     include/chucho/non_copyable.hpp
     include/chucho/noop_compressor.hpp
+    include/chucho/noop_compressor_factory.hpp
+    include/chucho/noop_compressor_memento.hpp
     include/chucho/noop_file_compressor.hpp
     include/chucho/numbered_file_roller.hpp
     include/chucho/optional.hpp
@@ -288,7 +290,9 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
          include/chucho/gzip_file_compressor.hpp
-         include/chucho/zlib_compressor.hpp)
+         include/chucho/zlib_compressor.hpp
+         include/chucho/zlib_compressor_factory.hpp
+         include/chucho/zlib_compressor_memento.hpp)
     IF(C_API)
         LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.h)
     ENDIF()
@@ -699,6 +703,8 @@ SET(CHUCHO_SOURCES
     named_pipe_writer_factory.cpp
     named_pipe_writer_memento.cpp
     noop_compressor.cpp
+    noop_compressor_factory.cpp
+    noop_compressor_memento.cpp
     noop_file_compressor.cpp
     numbered_file_roller.cpp
     numbered_file_roller_factory.cpp
@@ -872,6 +878,10 @@ IF(CHUCHO_HAVE_ZEROMQ)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ZEROMQ)
 ENDIF()
 
+IF(CHUCHO_HAVE_ZLIB)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ZLIB)
+ENDIF()
+
 IF(DEFINED CHUCHO_CONFIGURATOR_DEFS)
     SET_SOURCE_FILES_PROPERTIES(configurator.cpp PROPERTIES
                                 COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATOR_DEFS}")
@@ -905,6 +915,8 @@ IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_SOURCES
          gzip_file_compressor.cpp
          zlib_compressor.cpp
+         zlib_compressor_factory.cpp
+         zlib_compressor_memento.cpp
          ${CHUCHO_ZLIB_SOURCES})
     IF(C_API)
         LIST(APPEND CHUCHO_SOURCES c_gzip_file_compressor.cpp)
