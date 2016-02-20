@@ -23,6 +23,7 @@
 #include <chucho/async_writer_factory.hpp>
 #include <chucho/bzip2_file_compressor_factory.hpp>
 #include <chucho/cerr_writer_factory.hpp>
+#include <chucho/compressing_writer_factory.hpp>
 #include <chucho/cout_writer_factory.hpp>
 #include <chucho/duplicate_message_filter_factory.hpp>
 #include <chucho/file_writer_factory.hpp>
@@ -164,6 +165,8 @@ void configurator::initialize_impl()
     add_configurable_factory("chucho::formatted_message_serializer", fact);
     fact.reset(new noop_compressor_factory());
     add_configurable_factory("chucho::noop_compressor", fact);
+    fact.reset(new compressing_writer_factory());
+    add_configurable_factory("chucho::compressing_writer", fact);
 #if defined(CHUCHO_WINDOWS)
     fact.reset(new windows_event_log_writer_factory());
     add_configurable_factory("chucho::windows_event_log_writer", fact);

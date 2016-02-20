@@ -196,8 +196,6 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/named_pipe_writer.hpp
     include/chucho/non_copyable.hpp
     include/chucho/noop_compressor.hpp
-    include/chucho/noop_compressor_factory.hpp
-    include/chucho/noop_compressor_memento.hpp
     include/chucho/noop_file_compressor.hpp
     include/chucho/numbered_file_roller.hpp
     include/chucho/optional.hpp
@@ -290,9 +288,7 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
          include/chucho/gzip_file_compressor.hpp
-         include/chucho/zlib_compressor.hpp
-         include/chucho/zlib_compressor_factory.hpp
-         include/chucho/zlib_compressor_memento.hpp)
+         include/chucho/zlib_compressor.hpp)
     IF(C_API)
         LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.h)
     ENDIF()
@@ -649,6 +645,8 @@ SET(CHUCHO_SOURCES
     cerr_writer_memento.cpp
     clock_util.cpp
     compressing_writer.cpp
+    compressing_writer_factory.cpp
+    compressing_writer_memento.cpp
     configurable.cpp
     configurable_factory.cpp
     configuration.cpp
@@ -755,6 +753,8 @@ SET(CHUCHO_SOURCES
     include/chucho/cerr_writer_factory.hpp
     include/chucho/cerr_writer_memento.hpp
     include/chucho/clock_util.hpp
+    include/chucho/compressing_writer_factory.hpp
+    include/chucho/compressing_writer_memento.hpp
     include/chucho/configurator.hpp
     include/chucho/cout_writer_factory.hpp
     include/chucho/cout_writer_memento.hpp
@@ -785,6 +785,8 @@ SET(CHUCHO_SOURCES
     include/chucho/message_queue_writer_memento.hpp
     include/chucho/named_pipe_writer_factory.hpp
     include/chucho/named_pipe_writer_memento.hpp
+    include/chucho/noop_compressor_factory.hpp
+    include/chucho/noop_compressor_memento.hpp
     include/chucho/numbered_file_roller_factory.hpp
     include/chucho/numbered_file_roller_memento.hpp
     include/chucho/pattern_formatter_factory.hpp
@@ -917,6 +919,8 @@ IF(CHUCHO_HAVE_ZLIB)
          zlib_compressor.cpp
          zlib_compressor_factory.cpp
          zlib_compressor_memento.cpp
+         include/chucho/zlib_compressor_factory.hpp
+         include/chucho/zlib_compressor_memento.hpp
          ${CHUCHO_ZLIB_SOURCES})
     IF(C_API)
         LIST(APPEND CHUCHO_SOURCES c_gzip_file_compressor.cpp)
