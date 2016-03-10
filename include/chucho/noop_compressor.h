@@ -14,18 +14,17 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_SERIALIZER_H__)
-#define CHUCHO_SERIALIZER_H__
+#if !defined(CHUCHO_NOOP_COMPRESSOR_H__)
+#define CHUCHO_NOOP_COMPRESSOR_H__
 
 /**
  * @file 
- * Functions that can be used with any serializer. 
- * @copydoc chucho::serializer
+ * @copydoc chucho::noop_compressor 
  *  
  * @ingroup c_mq 
  */
 
-#include <chucho/return_code.h>
+#include <chucho/compressor.h>
 
 #if defined(__cplusplus)
 extern "C"
@@ -33,21 +32,17 @@ extern "C"
 #endif
 
 /**
- * An opaque structure that you don't care about.
- */
-typedef struct chucho_serializer chucho_serializer;
-
-/**
- * Release a serializer.
- *  
- * @post Ownership of the ser parameter is transferred to the 
- *       callee.
- *
- * @param ser the serializer
+ * Create a noop compressor.
+ * 
+ * @post Ownership of the cmp paramter is transferred to the 
+ *       caller, and it must be released with the @ref
+ *       chucho_release_compressor() function.
+ * 
+ * @param cmp the compressor to create
  * @return a value from @ref return_code.h indicating success or
  *         failure
  */
-CHUCHO_EXPORT chucho_rc chucho_release_serializer(chucho_serializer* ser);
+CHUCHO_EXPORT chucho_rc chucho_create_noop_compressor(chucho_compressor** ser);
 
 #if defined(__cplusplus)
 }

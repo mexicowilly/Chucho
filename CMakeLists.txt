@@ -63,7 +63,6 @@ IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
         platform/posix/calendar_posix.cpp
         platform/posix/cerr_writer_posix.cpp
-        platform/posix/compressing_writer_posix.cpp
         platform/posix/cout_writer_posix.cpp
         platform/posix/diagnostic_context_posix.cpp
         platform/posix/environment_posix.cpp
@@ -154,7 +153,6 @@ ENDIF()
 SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/async_writer.hpp
     include/chucho/cerr_writer.hpp
-    include/chucho/compressing_writer.hpp
     include/chucho/compressor.hpp
     include/chucho/configurable.hpp
     include/chucho/configurable_factory.hpp
@@ -227,6 +225,7 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS ${CHUCHO_PUBLIC_HEADERS})
 SET(CHUCHO_C_HEADERS
     include/chucho/async_writer.h
     include/chucho/cerr_writer.h
+    include/chucho/compressor.h
     include/chucho/cout_writer.h
     include/chucho/configuration.h
     include/chucho/diagnostic_context.h
@@ -248,6 +247,7 @@ SET(CHUCHO_C_HEADERS
     include/chucho/log.h
     include/chucho/logger.h
     include/chucho/named_pipe_writer.h
+    include/chucho/noop_compressor.h
     include/chucho/numbered_file_roller.h
     include/chucho/pattern_formatter.h
     include/chucho/pipe_writer.h
@@ -290,14 +290,17 @@ IF(CHUCHO_HAVE_ZLIB)
          include/chucho/gzip_file_compressor.hpp
          include/chucho/zlib_compressor.hpp)
     IF(C_API)
-        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.h)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS
+             include/chucho/gzip_file_compressor.h
+             include/chucho/zlib_compressor.h)
     ENDIF()
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/gzip_file_compressor.hpp
      include/chucho/gzip_file_compressor.h
-     include/chucho/zlib_compressor.hpp)
+     include/chucho/zlib_compressor.hpp
+     include/chucho/zlib_compressor.h)
 
 IF(CHUCHO_HAVE_BZIP2)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/bzip2_file_compressor.hpp)
@@ -575,6 +578,7 @@ IF(C_API)
     SET(CHUCHO_C_SOURCES
         c_async_writer.cpp
         c_cerr_writer.cpp
+        c_compressor.cpp
         c_cout_writer.cpp
         c_configuration.cpp
         c_diagnostic_context.cpp
@@ -595,6 +599,7 @@ IF(C_API)
         c_log.cpp
         c_logger.cpp
         c_named_pipe_writer.cpp
+        c_noop_compressor.cpp
         c_numbered_file_roller.cpp
         c_pattern_formatter.cpp
         c_pipe_writer.cpp
@@ -611,6 +616,7 @@ IF(C_API)
         c_time_file_roller.cpp
         c_util.cpp
         c_writer.cpp
+        include/chucho/c_compressor.hpp
         include/chucho/c_file_compressor.hpp
         include/chucho/c_file_roll_trigger.hpp
         include/chucho/c_file_roller.hpp
@@ -644,9 +650,6 @@ SET(CHUCHO_SOURCES
     cerr_writer_factory.cpp
     cerr_writer_memento.cpp
     clock_util.cpp
-    compressing_writer.cpp
-    compressing_writer_factory.cpp
-    compressing_writer_memento.cpp
     configurable.cpp
     configurable_factory.cpp
     configuration.cpp
@@ -753,8 +756,6 @@ SET(CHUCHO_SOURCES
     include/chucho/cerr_writer_factory.hpp
     include/chucho/cerr_writer_memento.hpp
     include/chucho/clock_util.hpp
-    include/chucho/compressing_writer_factory.hpp
-    include/chucho/compressing_writer_memento.hpp
     include/chucho/configurator.hpp
     include/chucho/cout_writer_factory.hpp
     include/chucho/cout_writer_memento.hpp
@@ -923,7 +924,9 @@ IF(CHUCHO_HAVE_ZLIB)
          include/chucho/zlib_compressor_memento.hpp
          ${CHUCHO_ZLIB_SOURCES})
     IF(C_API)
-        LIST(APPEND CHUCHO_SOURCES c_gzip_file_compressor.cpp)
+        LIST(APPEND CHUCHO_SOURCES
+             c_gzip_file_compressor.cpp
+             c_zlib_compressor.cpp)
     ENDIF()
     IF(MSVC)
         SET_SOURCE_FILES_PROPERTIES(gzip_file_compressor.cpp PROPERTIES
@@ -1132,48 +1135,50 @@ ADD_SUBDIRECTORY(log-server)
 
 # Documentation
 IF(DOXYGEN_FOUND)
-    SET(CHUCHO_DOXYGEN_INPUT main_page.hpp)
-    IF(CHUCHO_DOCUMENT_ALL)
-        FILE(GLOB CHUCHO_ALL_HEADERS RELATIVE "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/include/chucho/*")
-        FOREACH(HEAD ${CHUCHO_ALL_HEADERS})
-            SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
-        ENDFOREACH()
-        FILE(GLOB CHUCHO_GENERATED_HEADERS RELATIVE "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/chucho/*.hpp")
-        FOREACH(HEAD ${CHUCHO_GENERATED_HEADERS})
-            SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
-        ENDFOREACH()
-        SET(CHUCHO_DOXYGEN_EXTRACT_ALL YES)
-    ELSE()
-        FOREACH(HEAD ${CHUCHO_DOCUMENTABLE_HEADERS})
-            SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
-        ENDFOREACH()
-        SET(CHUCHO_DOXYGEN_EXTRACT_ALL NO)
-    ENDIF()
-    CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/doxygen.conf.in" "${CMAKE_BINARY_DIR}/doxygen.conf")
-    MESSAGE(STATUS "Generating HTML header for API documentation")
-    EXECUTE_PROCESS(COMMAND "${DOXYGEN_EXECUTABLE}" -w html "${CMAKE_BINARY_DIR}/doc_header.html" "${CMAKE_BINARY_DIR}/doc_footer.html" "${CMAKE_BINARY_DIR}/doc_stylesheet.html" "${CMAKE_BINARY_DIR}/doxygen.conf"
-                    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-    FILE(STRINGS "${CMAKE_BINARY_DIR}/doc_header.html" CHUCHO_HTML_HEADER)
-    FILE(REMOVE "${CMAKE_BINARY_DIR}/doc_header.html" "${CMAKE_BINARY_DIR}/doc_footer.html" "${CMAKE_BINARY_DIR}/doc_stylesheet.html")
-    LIST(FIND CHUCHO_HTML_HEADER <head> CHUCHO_HEAD_INDEX)
-    IF(CHUCHO_HEAD_INDEX EQUAL -1)
-        MESSAGE(FATAL_ERROR "The <head> section of the HTML header could not be found")
-    ENDIF()
-    MATH(EXPR CHUCHO_FAVICON_INDEX "${CHUCHO_HEAD_INDEX} + 1")
-    LIST(INSERT CHUCHO_HTML_HEADER ${CHUCHO_FAVICON_INDEX} "<link rel=\"shortcut icon\" href=\"$relpath^itzcuintli.ico\" type=\"image/x-icon\"/>")
-    FOREACH(LINE ${CHUCHO_HTML_HEADER})
-        FILE(APPEND "${CMAKE_BINARY_DIR}/doc_header.html" ${LINE})
-        FILE(APPEND "${CMAKE_BINARY_DIR}/doc_header.html" "\n")
-    ENDFOREACH()
     IF(C_API)
+        SET(CHUCHO_DOXYGEN_INPUT main_page.hpp)
+        IF(CHUCHO_DOCUMENT_ALL)
+            FILE(GLOB CHUCHO_ALL_HEADERS RELATIVE "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/include/chucho/*")
+            FOREACH(HEAD ${CHUCHO_ALL_HEADERS})
+                SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
+            ENDFOREACH()
+            FILE(GLOB CHUCHO_GENERATED_HEADERS RELATIVE "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/chucho/*.hpp")
+            FOREACH(HEAD ${CHUCHO_GENERATED_HEADERS})
+                SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
+            ENDFOREACH()
+            SET(CHUCHO_DOXYGEN_EXTRACT_ALL YES)
+        ELSE()
+            FOREACH(HEAD ${CHUCHO_DOCUMENTABLE_HEADERS})
+                SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
+            ENDFOREACH()
+            SET(CHUCHO_DOXYGEN_EXTRACT_ALL NO)
+        ENDIF()
+        CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/doxygen.conf.in" "${CMAKE_BINARY_DIR}/doxygen.conf")
+        MESSAGE(STATUS "Generating HTML header for API documentation")
+        EXECUTE_PROCESS(COMMAND "${DOXYGEN_EXECUTABLE}" -w html "${CMAKE_BINARY_DIR}/doc_header.html" "${CMAKE_BINARY_DIR}/doc_footer.html" "${CMAKE_BINARY_DIR}/doc_stylesheet.html" "${CMAKE_BINARY_DIR}/doxygen.conf"
+                        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+        FILE(STRINGS "${CMAKE_BINARY_DIR}/doc_header.html" CHUCHO_HTML_HEADER)
+        FILE(REMOVE "${CMAKE_BINARY_DIR}/doc_header.html" "${CMAKE_BINARY_DIR}/doc_footer.html" "${CMAKE_BINARY_DIR}/doc_stylesheet.html")
+        LIST(FIND CHUCHO_HTML_HEADER <head> CHUCHO_HEAD_INDEX)
+        IF(CHUCHO_HEAD_INDEX EQUAL -1)
+            MESSAGE(FATAL_ERROR "The <head> section of the HTML header could not be found")
+        ENDIF()
+        MATH(EXPR CHUCHO_FAVICON_INDEX "${CHUCHO_HEAD_INDEX} + 1")
+        LIST(INSERT CHUCHO_HTML_HEADER ${CHUCHO_FAVICON_INDEX} "<link rel=\"shortcut icon\" href=\"$relpath^itzcuintli.ico\" type=\"image/x-icon\"/>")
+        FOREACH(LINE ${CHUCHO_HTML_HEADER})
+            FILE(APPEND "${CMAKE_BINARY_DIR}/doc_header.html" ${LINE})
+            FILE(APPEND "${CMAKE_BINARY_DIR}/doc_header.html" "\n")
+        ENDFOREACH()
         ADD_CUSTOM_TARGET(doc
                           COMMAND "${DOXYGEN_EXECUTABLE}" "${CMAKE_BINARY_DIR}/doxygen.conf"
                           WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
     ELSE()
+        MESSAGE(STATUS "The C API must be enabled in order to generate Doxygen documentation")
         ADD_CUSTOM_TARGET(doc
                           COMMAND "${CMAKE_COMMAND}" -E echo "C_API must be enabled in order to generate documentation")
     ENDIF()
 ELSE()
+    MESSAGE(STATUS "The C API must be enabled in order to generate Doxygen documentation")
     ADD_CUSTOM_TARGET(doc
                       COMMAND "${CMAKE_COMMAND}" -E echo "Doxygen was not found on this system, so the documentation cannot be generated")
 ENDIF()

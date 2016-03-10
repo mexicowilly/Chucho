@@ -14,18 +14,18 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_SERIALIZER_H__)
-#define CHUCHO_SERIALIZER_H__
+#if !defined(CHUCHO_ZLIB_COMPRESSOR_H__)
+#define CHUCHO_ZLIB_COMPRESSOR_H__
 
 /**
  * @file 
- * Functions that can be used with any serializer. 
- * @copydoc chucho::serializer
+ * @copydoc chucho::zlib_compressor 
  *  
  * @ingroup c_mq 
  */
 
-#include <chucho/return_code.h>
+#include <chucho/compressor.h>
+#include <zlib.h>
 
 #if defined(__cplusplus)
 extern "C"
@@ -33,21 +33,20 @@ extern "C"
 #endif
 
 /**
- * An opaque structure that you don't care about.
- */
-typedef struct chucho_serializer chucho_serializer;
-
-/**
- * Release a serializer.
- *  
- * @post Ownership of the ser parameter is transferred to the 
- *       callee.
- *
- * @param ser the serializer
+ * Create a zlib compressor.
+ * 
+ * @post Ownership of the cmp paramter is transferred to the 
+ *       caller, and it must be released with the @ref
+ *       chucho_release_compressor() function.
+ * 
+ * @param[out] cmp the compressor to create
+ * @param[in] compression_level the level of compression in the range
+ * [0, 9]
  * @return a value from @ref return_code.h indicating success or
  *         failure
  */
-CHUCHO_EXPORT chucho_rc chucho_release_serializer(chucho_serializer* ser);
+CHUCHO_EXPORT chucho_rc chucho_create_zlib_compressor(chucho_compressor** ser,
+                                                      int compression_level = Z_DEFAULT_COMPRESSION);
 
 #if defined(__cplusplus)
 }

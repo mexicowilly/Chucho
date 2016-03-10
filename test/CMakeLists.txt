@@ -123,7 +123,6 @@ ENDIF()
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
                calendar_test.cpp
-               compressing_writer_test.cpp
                configuration_test.cpp
                configurator_test.cpp
                configurator_test.hpp

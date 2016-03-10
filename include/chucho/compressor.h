@@ -14,13 +14,13 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_SERIALIZER_H__)
-#define CHUCHO_SERIALIZER_H__
+#if !defined(CHUCHO_COMPRESSOR_H__)
+#define CHUCHO_COMPRESSOR_H__
 
 /**
  * @file 
- * Functions that can be used with any serializer. 
- * @copydoc chucho::serializer
+ * Functions that can be used with any compressor. 
+ * @copydoc chucho::compressor
  *  
  * @ingroup c_mq 
  */
@@ -35,19 +35,19 @@ extern "C"
 /**
  * An opaque structure that you don't care about.
  */
-typedef struct chucho_serializer chucho_serializer;
+typedef struct chucho_compressor chucho_compressor;
 
 /**
- * Release a serializer.
+ * Release a compressor.
  *  
- * @post Ownership of the ser parameter is transferred to the 
+ * @post Ownership of the cmp parameter is transferred to the 
  *       callee.
  *
- * @param ser the serializer
+ * @param cmp the compressor
  * @return a value from @ref return_code.h indicating success or
  *         failure
  */
-CHUCHO_EXPORT chucho_rc chucho_release_serializer(chucho_serializer* ser);
+CHUCHO_EXPORT chucho_rc chucho_release_compressor(chucho_compressor* cmp);
 
 #if defined(__cplusplus)
 }

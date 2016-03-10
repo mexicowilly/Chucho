@@ -14,27 +14,28 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_COMPRESSING_WRITER_FACTORY_HPP__)
-#define CHUCHO_COMPRESSING_WRITER_FACTORY_HPP__
+#include <chucho/noop_compressor.hpp>
+#include <chucho/noop_compressor.h>
+#include <chucho/c_compressor.hpp>
 
-#if !defined(CHUCHO_BUILD)
-#error "This header is private"
-#endif
-
-#include <chucho/writer_factory.hpp>
-
-namespace chucho
+extern "C"
 {
 
-class compressing_writer_factory : public writer_factory
+chucho_rc chucho_create_noop_compressor(chucho_compressor** cmp)
 {
-public:
-    compressing_writer_factory();
-
-    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
-    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
-};
-
+    if (cmp == nullptr)
+        return CHUCHO_NULL_POINTER;
+    try
+    {
+        chucho_compressor* loc = new chucho_compressor();
+        loc->cmp_ = std::make_shared<chucho::noop_compressor>();
+        *cmp = loc;
+    }
+    catch (...)
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
+    return CHUCHO_NO_ERROR;
 }
 
-#endif
+}

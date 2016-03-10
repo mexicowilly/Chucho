@@ -14,15 +14,15 @@
  *    limitations under the License.
  */
 
-#include <chucho/c_serializer.hpp>
-#include <chucho/serializer.h>
+#include <chucho/c_compressor.hpp>
+#include <chucho/compressor.h>
 
 extern "C"
 {
 
-chucho_rc chucho_release_serializer(chucho_serializer* ser)
+chucho_rc chucho_release_compressor(chucho_compressor* cmp)
 {
-    delete ser;
+    delete cmp;
     return CHUCHO_NO_ERROR;
 }
 

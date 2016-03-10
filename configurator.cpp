@@ -23,7 +23,6 @@
 #include <chucho/async_writer_factory.hpp>
 #include <chucho/bzip2_file_compressor_factory.hpp>
 #include <chucho/cerr_writer_factory.hpp>
-#include <chucho/compressing_writer_factory.hpp>
 #include <chucho/cout_writer_factory.hpp>
 #include <chucho/duplicate_message_filter_factory.hpp>
 #include <chucho/file_writer_factory.hpp>
@@ -34,7 +33,6 @@
 #include <chucho/level_threshold_filter_factory.hpp>
 #include <chucho/logger_factory.hpp>
 #include <chucho/named_pipe_writer_factory.hpp>
-#include <chucho/noop_compressor_factory.hpp>
 #include <chucho/numbered_file_roller_factory.hpp>
 #include <chucho/pattern_formatter_factory.hpp>
 #include <chucho/pipe_writer_factory.hpp>
@@ -73,9 +71,6 @@
 #endif
 #if defined(CHUCHO_HAVE_ZEROMQ)
 #include <chucho/zeromq_writer_factory.hpp>
-#endif
-#if defined(CHUCHO_HAVE_ZLIB)
-#include <chucho/zlib_compressor_factory.hpp>
 #endif
 
 #include <cstring>
@@ -163,10 +158,6 @@ void configurator::initialize_impl()
     add_configurable_factory("chucho::interval_file_roll_trigger", fact);
     fact.reset(new formatted_message_serializer_factory());
     add_configurable_factory("chucho::formatted_message_serializer", fact);
-    fact.reset(new noop_compressor_factory());
-    add_configurable_factory("chucho::noop_compressor", fact);
-    fact.reset(new compressing_writer_factory());
-    add_configurable_factory("chucho::compressing_writer", fact);
 #if defined(CHUCHO_WINDOWS)
     fact.reset(new windows_event_log_writer_factory());
     add_configurable_factory("chucho::windows_event_log_writer", fact);
@@ -204,10 +195,6 @@ void configurator::initialize_impl()
 #if defined(CHUCHO_HAVE_ZEROMQ)
     fact.reset(new zeromq_writer_factory());
     add_configurable_factory("chucho::zeromq_writer", fact);
-#endif
-#if defined(CHUCHO_HAVE_ZLIB)
-    fact.reset(new zlib_compressor_factory());
-    add_configurable_factory("chucho::zlib_compressor", fact);
 #endif
 }
 

@@ -23,7 +23,7 @@ zlib_compressor_memento::zlib_compressor_memento(configurator& cfg)
     : memento(cfg)
 {
     set_status_origin("zlib_compressor_memento");
-    cfg.get_security_policy().set_integer("zlib_compressor::compression_level", 1, 9);
+    cfg.get_security_policy().set_integer("zlib_compressor::compression_level", 0, 9);
     cfg.get_security_policy().set_text("zlib_compressor::compression_level(text)", 1);
     set_handler("compression_level", [this] (const std::string& lvl) { compression_level_ = validate("zlib_compressor::compression_level", std::stoi(validate("zlib_compressor::compression_level(text)", lvl))); });
 }

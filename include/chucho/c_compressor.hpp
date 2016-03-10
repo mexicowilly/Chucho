@@ -14,15 +14,19 @@
  *    limitations under the License.
  */
 
-#include <chucho/compressing_writer.hpp>
-#include <arpa/inet.h>
+#if !defined(CHUCHO_C_COMPRESSOR_HPP__)
+#define CHUCHO_C_COMPRESSOR_HPP__
 
-namespace chucho
+#include <chucho/compressor.hpp>
+
+extern "C"
 {
 
-std::uint32_t compressing_writer::to_network(std::uint32_t num) const
+struct chucho_compressor
 {
-    return htonl(num);
-}
+    std::shared_ptr<chucho::compressor> cmp_;
+};
 
 }
+
+#endif
