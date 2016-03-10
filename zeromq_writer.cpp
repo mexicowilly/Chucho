@@ -82,7 +82,7 @@ void zeromq_writer::write_impl(const event& evt)
                 throw exception(std::string("Error sending zeromq message prefix: ") + zmq_strerror(rc));
             }
         }
-        auto bytes = serializer_->serialize(evt, formatter_);
+        auto bytes = serialize_and_compress(evt);
         zmq_msg_t msg;
         zmq_msg_init_size(&msg, bytes.size());
         std::memcpy(zmq_msg_data(&msg), &bytes[0], bytes.size());

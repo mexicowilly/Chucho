@@ -25,9 +25,7 @@ namespace chucho
 class CHUCHO_EXPORT noop_compressor : public compressor
 {
 public:
-    virtual void compress(const std::vector<std::uint8_t>& in,
-                          std::vector<std::uint8_t>& out) override;
-    virtual void finish(std::vector<std::uint8_t>& out) override;
+    virtual std::vector<std::uint8_t> compress(const std::vector<std::uint8_t>& in) override;
 };
 
 }

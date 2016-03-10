@@ -23,9 +23,7 @@ TEST(zlib_compressor, big)
     std::vector<std::uint8_t> in;
     for (int i = 0; i < 1000000; i++)
         in.push_back('a' + (i % 26));
-    std::vector<std::uint8_t> out;
-    cmp.compress(in, out);
-    cmp.finish(out);
+    auto out = cmp.compress(in);
     z_stream z;
     std::memset(&z, 0, sizeof(z));
     z.zalloc = Z_NULL;
@@ -54,14 +52,7 @@ TEST(zlib_compressor, simple)
     in.push_back(1);
     in.push_back(2);
     in.push_back(3);
-    std::vector<std::uint8_t> out;
-    cmp.compress(in, out);
-    in.clear();
-    in.push_back(4);
-    in.push_back(5);
-    in.push_back(6);
-    cmp.compress(in, out);
-    cmp.finish(out);
+    auto out = cmp.compress(in);
     ASSERT_GT(out.size(), 0);
     // Can't use the convenience function uncompress() here because when
     // zlib is packaged into the Chucho library, the convenience functions
@@ -82,11 +73,8 @@ TEST(zlib_compressor, simple)
     ASSERT_EQ(Z_STREAM_END, rc);
     std::size_t written = sizeof(un) - z.avail_out;
     inflateEnd(&z);
-    ASSERT_EQ(6, written);
+    ASSERT_EQ(3, written);
     EXPECT_EQ(1, un[0]);
     EXPECT_EQ(2, un[1]);
     EXPECT_EQ(3, un[2]);
-    EXPECT_EQ(4, un[3]);
-    EXPECT_EQ(5, un[4]);
-    EXPECT_EQ(6, un[5]);
 }

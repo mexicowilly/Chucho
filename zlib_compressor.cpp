@@ -26,22 +26,20 @@ namespace chucho
 {
 
 zlib_compressor::zlib_compressor(int compression_level)
-    : z_(new z_stream)
+    : compression_level_(compression_level)
 {
     set_status_origin("zlib_compressor");
     if (compression_level != Z_DEFAULT_COMPRESSION && (compression_level < 0 || compression_level > 9))
-    {
-        z_.release();
         throw std::invalid_argument("Compresssion level must be an integer from 0 to 9");
-    }
-    std::memset(z_.get(), 0, sizeof(z_stream));
-    z_->zalloc = Z_NULL;
-    z_->zfree = Z_NULL;
-    z_->opaque = Z_NULL;
-    int rc = deflateInit(z_.get(), compression_level);
+    z_stream z;
+    std::memset(&z, 0, sizeof(z));
+    z.zalloc = Z_NULL;
+    z.zfree = Z_NULL;
+    z.opaque = Z_NULL;
+    int rc = deflateInit(&z, compression_level);
+    deflateEnd(&z);
     if (rc != Z_OK)
     {
-        z_.release();
         if (rc == Z_MEM_ERROR)
         {
             throw std::runtime_error("Out of memory");
@@ -57,75 +55,60 @@ zlib_compressor::zlib_compressor(int compression_level)
     }
 }
 
-zlib_compressor::~zlib_compressor()
+std::vector<std::uint8_t> zlib_compressor::compress(const std::vector<std::uint8_t>& in)
 {
-    if (z_)
+    std::vector<std::uint8_t> out;
+    if (!in.empty())
     {
-        try
+        z_stream z;
+        std::memset(&z, 0, sizeof(z));
+        z.zalloc = Z_NULL;
+        z.zfree = Z_NULL;
+        z.opaque = Z_NULL;
+        deflateInit(&z, compression_level_);
+        struct sentry
         {
-            deflateEnd(z_.get());
-            z_.release();
-            report_warning("The compressor is closing without finish() having been called. Some data my be lost.");
-        }
-        catch (...)
-        {
-        }
-
-    }
-}
-
-void zlib_compressor::compress(const std::vector<std::uint8_t>& in,
-                               std::vector<std::uint8_t>& out)
-{
-    if (z_ && !in.empty())
-    {
-        z_->avail_in = in.size();
-        z_->next_in = const_cast<std::uint8_t*>(&in[0]);
+            sentry(z_stream* zp) : zp_(zp) { }
+            ~sentry() { deflateEnd(zp_); }
+            z_stream* zp_;
+        } sent(&z);
+        z.avail_in = in.size();
+        z.next_in = const_cast<std::uint8_t*>(&in[0]);
         std::array<std::uint8_t, BUFSIZ> buf;
-        while (z_->avail_in > 0)
+        while (z.avail_in > 0)
         {
-            z_->next_out = buf.data();
-            z_->avail_out = buf.size();
-            int rc = deflate(z_.get(), Z_NO_FLUSH);
+            z.next_out = buf.data();
+            z.avail_out = buf.size();
+            int rc = deflate(&z, Z_NO_FLUSH);
             if (rc == Z_STREAM_ERROR)
             {
                 std::string err_msg("Unknown error");
-                if (z_->msg != nullptr)
-                    err_msg = z_->msg;
+                if (z.msg != nullptr)
+                    err_msg = z.msg;
                 throw exception("Unable to compress data: " + err_msg);
             }
-            out.insert(out.end(), buf.begin(), buf.begin() + (buf.size() - z_->avail_out));
+            out.insert(out.end(), buf.begin(), buf.begin() + (buf.size() - z.avail_out));
         }
-    }
-    else if (!z_)
-    {
-        report_warning("The compressor has been finalized. No further compression can take place.");
-    }
-}
-
-void zlib_compressor::finish(std::vector<std::uint8_t>& out)
-{
-    if (z_)
-    {
-        z_->avail_in = 0;
-        z_->next_in = Z_NULL;
-        std::array<std::uint8_t, BUFSIZ> buf;
+        z.avail_in = 0;
+        z.next_in = Z_NULL;
         int rc = Z_OK;
         while (rc != Z_STREAM_END)
         {
-            z_->avail_out = buf.size();
-            z_->next_out = buf.data();
-            rc = deflate(z_.get(), Z_FINISH);
+            z.avail_out = buf.size();
+            z.next_out = buf.data();
+            rc = deflate(&z, Z_FINISH);
             if (rc != Z_OK && rc != Z_STREAM_END && rc != Z_BUF_ERROR)
             {
                 report_error("Unable to complete stream compression");
-                break;
+                std::string err_msg("Unknown error");
+                if (z.msg != nullptr)
+                    err_msg = z.msg;
+                throw exception("Unable to complete compression: " + err_msg);
             }
-            out.insert(out.end(), buf.begin(), buf.begin() + (buf.size() - z_->avail_out));
+            out.insert(out.end(), buf.begin(), buf.begin() + (buf.size() - z.avail_out));
         }
-        deflateEnd(z_.get());
-        z_.release();
     }
+    return out;
 }
 
 }

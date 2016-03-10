@@ -19,14 +19,9 @@
 namespace chucho
 {
 
-void noop_compressor::compress(const std::vector<std::uint8_t>& in,
-                               std::vector<std::uint8_t>& out)
+std::vector<std::uint8_t> noop_compressor::compress(const std::vector<std::uint8_t>& in)
 {
-    out.insert(out.end(), in.begin(), in.end());
-}
-
-void noop_compressor::finish(std::vector<std::uint8_t>& out)
-{
+    return in;
 }
 
 }

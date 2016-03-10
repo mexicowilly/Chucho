@@ -27,14 +27,11 @@ class CHUCHO_EXPORT zlib_compressor : public compressor
 {
 public:
     zlib_compressor(int compression_level = Z_DEFAULT_COMPRESSION);
-    virtual ~zlib_compressor();
 
-    virtual void compress(const std::vector<std::uint8_t>& in,
-                          std::vector<std::uint8_t>& out) override;
-    virtual void finish(std::vector<std::uint8_t>& out) override;
+    virtual std::vector<std::uint8_t> compress(const std::vector<std::uint8_t>& in) override;
 
 private:
-    std::unique_ptr<z_stream> z_;
+    int compression_level_;
 };
 
 }

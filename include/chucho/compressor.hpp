@@ -30,9 +30,7 @@ class CHUCHO_EXPORT compressor : non_copyable, public configurable, public statu
 public:
     virtual ~compressor() { }
 
-    virtual void compress(const std::vector<std::uint8_t>& in,
-                          std::vector<std::uint8_t>& out) = 0;
-    virtual void finish(std::vector<std::uint8_t>& out) = 0;
+    virtual std::vector<std::uint8_t> compress(const std::vector<std::uint8_t>& in) = 0;
 };
 
 }
