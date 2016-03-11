@@ -14,22 +14,31 @@
  *    limitations under the License.
  */
 
-#include <chucho/formatted_message_serializer.hpp>
-#include <chucho/formatted_message_serializer.h>
-#include <chucho/c_serializer.hpp>
+#include <chucho/zlib_compressor.hpp>
+#include <chucho/zlib_compressor.h>
+#include <chucho/c_compressor.hpp>
+#include <chucho/exception.hpp>
 
 extern "C"
 {
 
-chucho_rc chucho_create_formatted_message_serializer(chucho_serializer** ser)
+chucho_rc chucho_create_zlib_compressor(chucho_compressor** cmp, int compression_level)
 {
-    if (ser == nullptr)
+    if (cmp == nullptr)
         return CHUCHO_NULL_POINTER;
     try
     {
-        chucho_serializer* loc = new chucho_serializer();
-        loc->ser_ = std::make_shared<chucho::formatted_message_serializer>();
-        *ser = loc;
+        chucho_compressor* loc = new chucho_compressor();
+        loc->cmp_ = std::make_shared<chucho::zlib_compressor>(compression_level);
+        *cmp = loc;
+    }
+    catch (chucho::exception&)
+    {
+        return CHUCHO_VERSION_MISMATCH;
+    }
+    catch (std::invalid_argument&)
+    {
+        return CHUCHO_INVALID_ARGUMENT;
     }
     catch (...)
     {

@@ -82,6 +82,7 @@ protected:
 #endif
 #if defined(CHUCHO_HAVE_ZEROMQ)
     void zeromq_writer_body();
+    void zeromq_writer_with_compressor_body();
     void zeromq_writer_no_prefix_body();
 #if defined(CHUCHO_HAVE_PROTOBUF)
     void zeromq_writer_protobuf_body();

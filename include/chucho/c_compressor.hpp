@@ -14,32 +14,19 @@
  *    limitations under the License.
  */
 
-#include <chucho/message_queue_writer_memento.hpp>
+#if !defined(CHUCHO_C_COMPRESSOR_HPP__)
+#define CHUCHO_C_COMPRESSOR_HPP__
 
-namespace chucho
+#include <chucho/compressor.hpp>
+
+extern "C"
 {
 
-message_queue_writer_memento::message_queue_writer_memento(configurator& cfg)
-    : writer_memento(cfg)
+struct chucho_compressor
 {
-    set_status_origin("message_queue_writer_memento");
-}
-
-void message_queue_writer_memento::handle(std::shared_ptr<configurable> cnf)
-{
-    auto ser = std::dynamic_pointer_cast<serializer>(cnf);
-    if (ser)
-    {
-        serializer_ = ser;
-    }
-    else
-    {
-        auto cmp = std::dynamic_pointer_cast<compressor>(cnf);
-        if (cmp)
-            compressor_ = cmp;
-        else
-            writer_memento::handle(cnf);
-    }
-}
+    std::shared_ptr<chucho::compressor> cmp_;
+};
 
 }
+
+#endif

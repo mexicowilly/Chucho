@@ -24,6 +24,7 @@
 
 #include <chucho/writer.hpp>
 #include <chucho/serializer.hpp>
+#include <chucho/compressor.hpp>
 
 namespace chucho
 {
@@ -43,6 +44,12 @@ class CHUCHO_EXPORT message_queue_writer : public writer
 {
 public:
     /**
+     * Return the compressor.
+     * 
+     * @return the compressor
+     */
+    std::shared_ptr<compressor> get_compressor() const;
+    /**
      * Return the serializer.
      * 
      * @return the serializer
@@ -59,18 +66,36 @@ protected:
      * 
      * @param fmt the formatter
      * @param ser the serializer
+     * @param cmp the compressor
      */
     message_queue_writer(std::shared_ptr<formatter> fmt,
-                         std::shared_ptr<serializer> ser);
+                         std::shared_ptr<serializer> ser,
+                         std::shared_ptr<compressor> cmp = std::shared_ptr<compressor>());
     /**
      * @}
      */
+    /**
+     * Convenience function to serialize and compress
+     * 
+     * @param evt the event to send
+     * @return a vector of serialized and compressed bytes
+     */
+    std::vector<std::uint8_t> serialize_and_compress(const event& evt);
 
     /**
      * The serializer
      */
     std::shared_ptr<serializer> serializer_;
+    /**
+     * The compressor
+     */
+     std::shared_ptr<compressor> compressor_;
 };
+
+inline std::shared_ptr<compressor> message_queue_writer::get_compressor() const
+{
+    return compressor_;
+}
 
 inline std::shared_ptr<serializer> message_queue_writer::get_serializer() const
 {

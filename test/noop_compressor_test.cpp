@@ -14,32 +14,28 @@
  *    limitations under the License.
  */
 
-#include <chucho/message_queue_writer_memento.hpp>
+#include <gtest/gtest.h>
+#include <chucho/noop_compressor.hpp>
 
-namespace chucho
+TEST(noop_compressor, simple)
 {
-
-message_queue_writer_memento::message_queue_writer_memento(configurator& cfg)
-    : writer_memento(cfg)
-{
-    set_status_origin("message_queue_writer_memento");
-}
-
-void message_queue_writer_memento::handle(std::shared_ptr<configurable> cnf)
-{
-    auto ser = std::dynamic_pointer_cast<serializer>(cnf);
-    if (ser)
-    {
-        serializer_ = ser;
-    }
-    else
-    {
-        auto cmp = std::dynamic_pointer_cast<compressor>(cnf);
-        if (cmp)
-            compressor_ = cmp;
-        else
-            writer_memento::handle(cnf);
-    }
-}
-
+    chucho::noop_compressor cmp;
+    // VS2012 does not support initializer lists
+    std::vector<std::uint8_t> in;
+    in.push_back(1);
+    in.push_back(2);
+    in.push_back(3);
+    auto out = cmp.compress(in);
+    ASSERT_EQ(3, out.size());
+    EXPECT_EQ(1, out[0]);
+    EXPECT_EQ(2, out[1]);
+    EXPECT_EQ(3, out[2]);
+    in[0] = 4;
+    in[1] = 5;
+    in[2] = 6;
+    out = cmp.compress(in);
+    ASSERT_EQ(3, out.size());
+    EXPECT_EQ(4, out[0]);
+    EXPECT_EQ(5, out[1]);
+    EXPECT_EQ(6, out[2]);
 }

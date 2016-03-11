@@ -14,32 +14,25 @@
  *    limitations under the License.
  */
 
-#include <chucho/message_queue_writer_memento.hpp>
+#if !defined(CHUCHO_COMPRESSOR_HPP__)
+#define CHUCHO_COMPRESSOR_HPP__
+
+#include <chucho/configurable.hpp>
+#include <chucho/status_reporter.hpp>
+#include <chucho/non_copyable.hpp>
+#include <vector>
 
 namespace chucho
 {
 
-message_queue_writer_memento::message_queue_writer_memento(configurator& cfg)
-    : writer_memento(cfg)
+class CHUCHO_EXPORT compressor : non_copyable, public configurable, public status_reporter
 {
-    set_status_origin("message_queue_writer_memento");
-}
+public:
+    virtual ~compressor() { }
 
-void message_queue_writer_memento::handle(std::shared_ptr<configurable> cnf)
-{
-    auto ser = std::dynamic_pointer_cast<serializer>(cnf);
-    if (ser)
-    {
-        serializer_ = ser;
-    }
-    else
-    {
-        auto cmp = std::dynamic_pointer_cast<compressor>(cnf);
-        if (cmp)
-            compressor_ = cmp;
-        else
-            writer_memento::handle(cnf);
-    }
-}
+    virtual std::vector<std::uint8_t> compress(const std::vector<std::uint8_t>& in) = 0;
+};
 
 }
+
+#endif

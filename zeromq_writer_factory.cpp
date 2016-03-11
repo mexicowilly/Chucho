@@ -41,6 +41,7 @@ std::shared_ptr<configurable> zeromq_writer_factory::create_configurable(std::sh
         throw exception("zeromq_writer_factory: The endpoint is not set");
     auto zw = std::make_shared<zeromq_writer>(zm->get_formatter(),
                                                             zm->get_serializer(),
+                                                            zm->get_compressor(),
                                                             zm->get_endpoint(),
                                                             zm->get_prefix());
     set_filters(zw, zm);

@@ -3,3 +3,9 @@ Chucho Installation
 
 Please refer to the file BuildOptions.cmake, where you will find all supported
 build options and documentation.
+
+Then you may run the following commands:
+
+    $ cmake .
+    $ make
+    $ make install

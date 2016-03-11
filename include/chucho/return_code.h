@@ -44,7 +44,9 @@ typedef enum
     CHUCHO_INVALID_ARGUMENT,        /**< Invalid argument */
     CHUCHO_NO_SUCH_VALUE,           /**< No such value */
     CHUCHO_CONNECTION_ERROR,        /**< Connection error */
-    CHUCHO_LEVEL_ALREADY_EXISTS     /**< Level already exists */
+    CHUCHO_LEVEL_ALREADY_EXISTS,    /**< Level already exists */
+    CHUCHO_VERSION_MISMATCH         /**< Incompatible version */
+
 } chucho_rc;
 
 /**

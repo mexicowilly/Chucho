@@ -14,32 +14,26 @@
  *    limitations under the License.
  */
 
-#include <chucho/message_queue_writer_memento.hpp>
+#if !defined(CHUCHO_ZLIB_COMPRESSOR_HPP__)
+#define CHUCHO_ZLIB_COMPRESSOR_HPP__
+
+#include <chucho/compressor.hpp>
+#include <zlib.h>
 
 namespace chucho
 {
 
-message_queue_writer_memento::message_queue_writer_memento(configurator& cfg)
-    : writer_memento(cfg)
+class CHUCHO_EXPORT zlib_compressor : public compressor
 {
-    set_status_origin("message_queue_writer_memento");
-}
+public:
+    zlib_compressor(int compression_level = Z_DEFAULT_COMPRESSION);
 
-void message_queue_writer_memento::handle(std::shared_ptr<configurable> cnf)
-{
-    auto ser = std::dynamic_pointer_cast<serializer>(cnf);
-    if (ser)
-    {
-        serializer_ = ser;
-    }
-    else
-    {
-        auto cmp = std::dynamic_pointer_cast<compressor>(cnf);
-        if (cmp)
-            compressor_ = cmp;
-        else
-            writer_memento::handle(cnf);
-    }
-}
+    virtual std::vector<std::uint8_t> compress(const std::vector<std::uint8_t>& in) override;
+
+private:
+    int compression_level_;
+};
 
 }
+
+#endif

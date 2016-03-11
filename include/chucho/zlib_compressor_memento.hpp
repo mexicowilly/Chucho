@@ -14,32 +14,35 @@
  *    limitations under the License.
  */
 
-#include <chucho/message_queue_writer_memento.hpp>
+#if !defined(CHUCHO_ZLIB_COMPRESSOR_MEMENTO_HPP__)
+#define CHUCHO_ZLIB_COMPRESSOR_MEMENTO_HPP__
+
+#if !defined(CHUCHO_BUILD)
+#error "This header is private"
+#endif
+
+#include <chucho/memento.hpp>
+#include <chucho/optional.hpp>
 
 namespace chucho
 {
 
-message_queue_writer_memento::message_queue_writer_memento(configurator& cfg)
-    : writer_memento(cfg)
+class zlib_compressor_memento : public memento
 {
-    set_status_origin("message_queue_writer_memento");
-}
+public:
+    zlib_compressor_memento(configurator& cfg);
 
-void message_queue_writer_memento::handle(std::shared_ptr<configurable> cnf)
+    const optional<int>& get_compression_level() const;
+
+private:
+    optional<int> compression_level_;
+};
+
+inline const optional<int>& zlib_compressor_memento::get_compression_level() const
 {
-    auto ser = std::dynamic_pointer_cast<serializer>(cnf);
-    if (ser)
-    {
-        serializer_ = ser;
-    }
-    else
-    {
-        auto cmp = std::dynamic_pointer_cast<compressor>(cnf);
-        if (cmp)
-            compressor_ = cmp;
-        else
-            writer_memento::handle(cnf);
-    }
+    return compression_level_;
 }
 
 }
+
+#endif

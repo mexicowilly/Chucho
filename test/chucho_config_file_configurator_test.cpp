@@ -705,6 +705,23 @@ TEST_F(chucho_config_file_configurator, zeromq_writer_no_prefix)
     zeromq_writer_no_prefix_body();
 }
 
+TEST_F(chucho_config_file_configurator, zeromq_writer_with_compressor)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = zw\n"
+              "chucho.writer.zw = chucho::zeromq_writer\n"
+              "chucho.writer.zw.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.zw.serializer = fms\n"
+              "chucho.serializer.fms = chucho::formatted_message_serializer\n"
+              "chucho.writer.zw.endpoint = tcp://127.0.0.1:7776\n"
+              "chucho.writer.zw.prefix = Hi\n"
+              "chucho.writer.zw.compressor = cmp\n"
+              "chucho.compressor.cmp = chucho::noop_compressor");
+    zeromq_writer_with_compressor_body();
+}
+
 #if defined(CHUCHO_HAVE_PROTOBUF)
 
 TEST_F(chucho_config_file_configurator, zeromq_writer_protobuf)
