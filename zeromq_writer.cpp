@@ -45,24 +45,41 @@ zeromq_writer::zeromq_writer(std::shared_ptr<formatter> fmt,
                                                          const std::vector<std::uint8_t>& prefix)
     : message_queue_writer(fmt, ser),
       endpoint_(endpoint),
-      prefix_(prefix),
-      socket_(zmq_socket(get_zmq_context(), ZMQ_PUB))
+      prefix_(prefix)
 {
+    init();
+}
+
+zeromq_writer::zeromq_writer(std::shared_ptr<formatter> fmt,
+                                                         std::shared_ptr<serializer> ser,
+                                                         std::shared_ptr<compressor> cmp,
+                                                         const std::string& endpoint,
+                                                         const std::vector<std::uint8_t>& prefix)
+    : message_queue_writer(fmt, ser, cmp),
+      endpoint_(endpoint),
+      prefix_(prefix)
+{
+    init();
+}
+
+zeromq_writer::~zeromq_writer()
+{
+    zmq_close(socket_);
+}
+
+void zeromq_writer::init()
+{
+    socket_ = zmq_socket(get_zmq_context(), ZMQ_PUB);
     if (socket_ == nullptr)
     {
         throw exception("The zeromq socket could not be created because there are too many zeromq sockets open");
     }
     else
     {
-        int rc = zmq_bind(socket_, endpoint.c_str());
+        int rc = zmq_bind(socket_, endpoint_.c_str());
         if (rc != 0)
-            throw exception("Could not bind to zeromq endpoint " + endpoint + ": " + zmq_strerror(rc));
+            throw exception("Could not bind to zeromq endpoint " + endpoint_ + ": " + zmq_strerror(rc));
     }
-}
-
-zeromq_writer::~zeromq_writer()
-{
-    zmq_close(socket_);
 }
 
 void zeromq_writer::write_impl(const event& evt)

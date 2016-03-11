@@ -23,6 +23,7 @@
 
 #include <chucho/writer_memento.hpp>
 #include <chucho/serializer.hpp>
+#include <chucho/compressor.hpp>
 
 namespace chucho
 {
@@ -32,12 +33,19 @@ class message_queue_writer_memento : public writer_memento
 public:
     message_queue_writer_memento(configurator& cfg);
 
+    std::shared_ptr<compressor> get_compressor() const;
     std::shared_ptr<serializer> get_serializer() const;
     virtual void handle(std::shared_ptr<configurable> cnf) override;
 
 private:
     std::shared_ptr<serializer> serializer_;
+    std::shared_ptr<compressor> compressor_;
 };
+
+inline std::shared_ptr<compressor> message_queue_writer_memento::get_compressor() const
+{
+    return compressor_;
+}
 
 inline std::shared_ptr<serializer> message_queue_writer_memento::get_serializer() const
 {
