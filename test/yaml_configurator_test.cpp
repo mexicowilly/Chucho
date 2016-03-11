@@ -673,6 +673,20 @@ TEST_F(yaml_configurator, zeromq_writer_no_prefix)
     zeromq_writer_no_prefix_body();
 }
 
+TEST_F(yaml_configurator, zeromq_writer_with_compressor)
+{
+    configure("- chucho::logger:\n"
+              "    - name: will\n"
+              "    - chucho::zeromq_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            - pattern: '%m'\n"
+              "        - chucho::formatted_message_serializer\n"
+              "        - endpoint: 'tcp://127.0.0.1:7776'\n"
+              "        - chucho::noop_compressor\n"
+              "        - prefix: Hi\n");
+    zeromq_writer_with_compressor_body();
+}
+
 #if defined(CHUCHO_HAVE_PROTOBUF)
 
 TEST_F(yaml_configurator, zeromq_writer_protobuf)

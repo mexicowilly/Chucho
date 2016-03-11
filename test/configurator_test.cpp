@@ -74,6 +74,7 @@
 #endif
 #if defined(CHUCHO_HAVE_ZEROMQ)
 #include <chucho/zeromq_writer.hpp>
+#include <chucho/noop_compressor.hpp>
 #endif
 #include <chucho/formatted_message_serializer.hpp>
 #if defined(CHUCHO_HAVE_PROTOBUF)
@@ -794,6 +795,25 @@ void configurator::zeromq_writer_body()
     ASSERT_TRUE(static_cast<bool>(ser));
     EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(*ser));
     EXPECT_EQ(std::string("tcp://127.0.0.1:7777"), zw->get_endpoint());
+    std::string pfx_str("Hi");
+    std::vector<std::uint8_t> pfx(pfx_str.begin(), pfx_str.end());
+    EXPECT_EQ(pfx, zw->get_prefix());
+}
+
+void configurator::zeromq_writer_with_compressor_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::zeromq_writer), typeid(*wrts[0]));
+    auto zw = std::static_pointer_cast<chucho::zeromq_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(zw));
+    auto ser = zw->get_serializer();
+    ASSERT_TRUE(static_cast<bool>(ser));
+    EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(*ser));
+    auto cmp = zw->get_compressor();
+    ASSERT_TRUE(static_cast<bool>(cmp));
+    EXPECT_EQ(typeid(chucho::noop_compressor), typeid(*cmp));
+    EXPECT_EQ(std::string("tcp://127.0.0.1:7776"), zw->get_endpoint());
     std::string pfx_str("Hi");
     std::vector<std::uint8_t> pfx(pfx_str.begin(), pfx_str.end());
     EXPECT_EQ(pfx, zw->get_prefix());
