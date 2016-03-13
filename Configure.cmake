@@ -722,6 +722,31 @@ ELSEIF(ZEROMQ_INCLUDE_DIR OR ZEROMQ_LIB)
     MESSAGE(WARNING "If either of the variables ZEROMQ_INCLUDE_DIR or ZEROMQ_LIB has been set, then they must both be set for zeromq support to be included")
 ENDIF()
 
+# ActiveMQ
+IF(ACTIVEMQ_INCLUDE_DIR AND ACTIVEMQ_LIB)
+    SET(CMAKE_REQUIRED_INCLUDES "${ACTIVEMQ_INCLUDE_DIR}")
+    FOREACH(HEAD
+            cms/ConnectionFactory.h
+            cms/Connection.h
+            cms/Session.h)
+        STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
+        STRING(REPLACE / _ CHUCHO_HEAD_VAR_NAME ${CHUCHO_HEAD_VAR_NAME})
+        STRING(TOUPPER ${CHUCHO_HEAD_VAR_NAME} CHUCHO_HEAD_VAR_NAME)
+        CHECK_INCLUDE_FILE_CXX(${HEAD} ${CHUCHO_HEAD_VAR_NAME})
+        IF(NOT ${CHUCHO_HEAD_VAR_NAME})
+            MESSAGE(FATAL_ERROR "The variable ACTIVEMQ_INCLUDE_DIR was provided as ${ACTIVEMQ_INCLUDE_DIR}, but it does not contain the ActiveMQ header ${HEAD}")
+        ENDIF()
+    ENDFOREACH()
+    IF(NOT EXISTS "${ACTIVEMQ_LIB}")
+        MESSAGE(FATAL_ERROR "The variable ACTIVEMQ_LIB was provided as ${ACTIVEMQ_LIB}, but it does not refer to an existing file")
+    ENDIF()
+    UNSET(CMAKE_REQUIRED_INCLUDES)
+    UNSET(CMAKE_REQUIRED_LIBRARIES)
+    SET(CHUCHO_HAVE_ACTIVEMQ TRUE CACHE INTERNAL "Whether we have ActiveMQ")
+ELSEIF(ACTIVEMQ_INCLUDE_DIR OR ACTIVEMQ_LIB)
+    MESSAGE(WARNING "If either of the variables ACTIVEMQ_INCLUDE_DIR or ACTIVEMQ_LIB has been set, then they must both be set for ActiveMQ support to be included")
+ENDIF()
+
 # doxygen
 FIND_PACKAGE(Doxygen)
 

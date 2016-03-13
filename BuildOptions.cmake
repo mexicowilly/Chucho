@@ -195,6 +195,14 @@ OPTION(RUBY_FRAMEWORK "Whether Ruby should be included as a framework (Macintosh
 # for precise information about how Protobuf serialization of Chucho events is
 # accomplished.
 
+# The location of the ActiveMQ header files.
+
+# SET(ACTIVEMQ_INCLUDE_DIR "<My ActiveMQ Include Directory>" CACHE STRING "Include directory of the ActiveMQ library")
+
+# The name of the ActiveMQ library.
+
+# SET(ACTIVEMQ_LIB "<My ActiveMQ Library>" CACHE STRING "ActiveMQ library")
+
 # The location of the ZeroMQ header files.
 
 # SET(ZEROMQ_INCLUDE_DIR "<My ZeroMQ Include Directory>" CACHE STRING "Include directory of the ZeroMQ library")
