@@ -20,11 +20,12 @@
 #include <chucho/message_queue_writer.hpp>
 #include <cms/Connection.h>
 #include <cms/Session.h>
+#include <cms/ExceptionListener.h>
 
 namespace chucho
 {
 
-class activemq_writer : public message_queue_writer
+class activemq_writer : public message_queue_writer, public cms::ExceptionListener
 {
 public:
     enum class consumer_type
@@ -49,6 +50,7 @@ public:
     const std::string& get_broker() const;
     const consumer_type get_consumer_type() const;
     const std::string& get_topic_or_queue() const;
+    virtual void onException(const cms::CMSException& e) override;
 
 protected:
     virtual void write_impl(const event& evt) override;

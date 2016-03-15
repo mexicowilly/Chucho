@@ -15,7 +15,21 @@
  */
 
 #include <chucho/activemq_writer.hpp>
+#include <chucho/garbage_cleaner.hpp>
 #include <cms/ConnectionFactory.h>
+#include <activemq/library/ActiveMQCPP.h>
+#include <thread>
+
+namespace
+{
+
+void init_library()
+{
+    static std::once_flag once; 
+    activemq::library::ActiveMQCPP::initializeLibrary();
+}
+
+}
 
 namespace chucho
 {
@@ -75,8 +89,12 @@ activemq_writer::~activemq_writer()
 void activemq_writer::init()
 {
     set_status_origin("activemq_writer");
+    static std::once_flag once;
+    std::call_once(once, [] () { activemq::library::ActiveMQCPP::initializeLibrary();
+                                 garbage_cleaner::get().add([] () { activemq::library::ActiveMQCPP::shutdownLibrary(); }); });
     std::unique_ptr<cms::ConnectionFactory> fact(cms::ConnectionFactory::createCMSConnectionFactory(broker_));
     connection_ = fact->createConnection();
+    connection_->setExceptionListener(this);
     connection_->start();
     session_ = connection_->createSession(cms::Session::AUTO_ACKNOWLEDGE);
     if (type_ == consumer_type::TOPIC)
@@ -84,6 +102,11 @@ void activemq_writer::init()
     else
         destination_ = session_->createQueue(topic_or_queue_);
     producer_ = session_->createProducer(destination_);
+}
+
+void activemq_writer::onException(const cms::CMSException& e)
+{
+    report_error("ActiveMQ error: " + e.getMessage());
 }
 
 void activemq_writer::write_impl(const event& evt)
