@@ -505,9 +505,13 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
 
 IF(CHUCHO_HAVE_ACTIVEMQ)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
-         include/chucho/activemq_writer.hpp)
+         include/chucho/activemq_writer.hpp
+         include/chucho/activemq_writer_factory.hpp
+         include/chucho/activemq_writer_memento.hpp)
     LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
-         activemq_writer.cpp)
+         activemq_writer.cpp
+         activemq_writer_factory.cpp
+         activemq_writer_memento.cpp)
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS

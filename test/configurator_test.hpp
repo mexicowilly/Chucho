@@ -30,6 +30,10 @@ public:
     ~configurator();
 
 protected:
+#if defined(CHUCHO_HAVE_ACTIVEMQ)
+    void activemq_writer_queue_body();
+    void activemq_writer_topic_body();
+#endif
     void async_writer_body();
     void async_writer_with_opts_body();
     void bzip2_file_compressor_body();
@@ -84,7 +88,7 @@ protected:
     void zeromq_writer_body();
     void zeromq_writer_with_compressor_body();
     void zeromq_writer_no_prefix_body();
-#if defined(CHUCHO_HAVE_PROTOBUF)
+#if defined(CHUCHO_HAVE_PROTOBUF) && defined(CHUCHO_HAVE_ZEROMQ)
     void zeromq_writer_protobuf_body();
 #endif
 #endif

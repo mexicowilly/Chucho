@@ -76,6 +76,9 @@
 #if defined(CHUCHO_HAVE_ZLIB)
 #include <chucho/zlib_compressor_factory.hpp>
 #endif
+#if defined(CHUCHO_HAVE_ACTIVEMQ)
+#include <chucho/activemq_writer_factory.hpp>
+#endif
 
 #include <cstring>
 #include <mutex>
@@ -205,6 +208,10 @@ void configurator::initialize_impl()
 #if defined(CHUCHO_HAVE_ZLIB)
     fact.reset(new zlib_compressor_factory());
     add_configurable_factory("chucho::zlib_compressor", fact);
+#endif
+#if defined(CHUCHO_HAVE_ACTIVEMQ)
+    fact.reset(new activemq_writer_factory());
+    add_configurable_factory("chucho::activemq_writer", fact);
 #endif
 }
 

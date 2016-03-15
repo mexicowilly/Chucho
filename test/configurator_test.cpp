@@ -80,6 +80,9 @@
 #if defined(CHUCHO_HAVE_PROTOBUF)
 #include <chucho/protobuf_serializer.hpp>
 #endif
+#if defined(CHUCHO_HAVE_ACTIVEMQ)
+#include <chucho/activemq_writer.hpp>
+#endif
 
 namespace chucho
 {
@@ -99,6 +102,18 @@ configurator::~configurator()
 {
     EXPECT_LT(chucho::status_manager::get()->get_level(), chucho::status::level::WARNING_);
 }
+
+#if defined(CHUCHO_HAVE_ACTIVEMQ)
+
+void configurator::activemq_writer_queue_body()
+{
+}
+
+void configurator::activemq_writer_topic_body()
+{
+}
+
+#endif
 
 void configurator::async_writer_body()
 {
