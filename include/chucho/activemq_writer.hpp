@@ -25,38 +25,95 @@
 namespace chucho
 {
 
-class activemq_writer : public message_queue_writer, public cms::ExceptionListener
+/**
+ * @class activemq_writer activemq_writer.hpp chucho/activemq_writer.hpp
+ * A writer that publishes <a href="http://activemq.apache.org/">ActiveMQ</a> messages.
+ * You may publish either to a topic or a queue.
+ * 
+ * @ingroup mq writers
+ */
+class CHUCHO_EXPORT activemq_writer : public message_queue_writer, public cms::ExceptionListener
 {
 public:
+    /**
+     * Whether messages will be published to a topic or a queue.
+     */
     enum class consumer_type
     {
-        QUEUE,
-        TOPIC
+        QUEUE,  /**< PUblish to a queue */
+        TOPIC   /**< Publish to a topic */
     };
 
+    /**
+     * @name Constructors and Destructor
+     * @{
+     */
+    /**
+     * Construct an ActiveMQ writer.
+     * 
+     * @param fmt the formatter
+     * @param ser the serializer
+     * @param broker the URI of the ActiveMQ broker
+     * @param tp whether to publish to a topic or queue
+     * @param topic_or_queue the name of the topic or queue
+     */
     activemq_writer(std::shared_ptr<formatter> fmt,
                     std::shared_ptr<serializer> ser,
                     const std::string& broker,
                     consumer_type tp,
                     const std::string& topic_or_queue);
+    /**
+     * Construct an ActiveMQ writer.
+     * 
+     * @param fmt the formatter
+     * @param ser the serializer
+     * @param cmp the compressor
+     * @param broker the URI of the ActiveMQ broker
+     * @param tp whether to publish to a topic or queue
+     * @param topic_or_queue the name of the topic or queue
+     */
     activemq_writer(std::shared_ptr<formatter> fmt,
                     std::shared_ptr<serializer> ser,
                     std::shared_ptr<compressor> cmp,
                     const std::string& broker,
                     consumer_type tp,
                     const std::string& topic_or_queue);
+    /**
+     * Destroy the writer.
+     */
     ~activemq_writer();
+    /**
+     * @}
+     */
 
+    /**
+     * Return the URI of the ActiveMQ broker.
+     * 
+     * @return the broker URI
+     */
     const std::string& get_broker() const;
+    /**
+     * Return whether this writer is publishing to a topic or queue.
+     *
+     * @return the consumer type
+     */
     const consumer_type get_consumer_type() const;
+    /**
+     * Return the name of the topic or queue.
+     * 
+     * @return the topic or queue name
+     */
     const std::string& get_topic_or_queue() const;
+    /**
+     * You don't care what this does.
+     */
     virtual void onException(const cms::CMSException& e) override;
 
 protected:
     virtual void write_impl(const event& evt) override;
 
 private:
-    void init();
+    CHUCHO_NO_EXPORT void init();
 
     std::string broker_;
     consumer_type type_;

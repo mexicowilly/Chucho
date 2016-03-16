@@ -203,6 +203,10 @@ OPTION(RUBY_FRAMEWORK "Whether Ruby should be included as a framework (Macintosh
 
 # SET(ACTIVEMQ_LIB "<My ActiveMQ Library>" CACHE STRING "ActiveMQ library")
 
+# The name of the Apache Portable Runtime library. This is required by the ActiveMQ-CPP library.
+
+# SET(APR_LIB "<My APR Library>" CACHE STRING "APR Library")
+
 # The location of the ZeroMQ header files.
 
 # SET(ZEROMQ_INCLUDE_DIR "<My ZeroMQ Include Directory>" CACHE STRING "Include directory of the ZeroMQ library")

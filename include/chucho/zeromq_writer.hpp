@@ -36,7 +36,7 @@ class CHUCHO_EXPORT zeromq_writer : public message_queue_writer
 {
 public:
     /**
-     * @name Constructor and Destructor
+     * @name Constructors and Destructor
      * @{
      */
     /**
@@ -94,7 +94,7 @@ protected:
     virtual void write_impl(const event& evt) override;
 
 private:
-    void init();
+    CHUCHO_NO_EXPORT void init();
 
     std::string endpoint_;
     std::vector<std::uint8_t> prefix_;
