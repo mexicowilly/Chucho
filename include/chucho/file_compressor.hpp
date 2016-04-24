@@ -50,7 +50,7 @@ namespace chucho
  * my.log.3.gz 
  * @endcode 
  * 
- * @ingroup compressors
+ * @ingroup fcompressors
  */
 class CHUCHO_EXPORT file_compressor : public configurable
 {

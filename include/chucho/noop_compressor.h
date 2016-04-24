@@ -21,7 +21,7 @@
  * @file 
  * @copydoc chucho::noop_compressor 
  *  
- * @ingroup c_mq 
+ * @ingroup c_compressors 
  */
 
 #include <chucho/compressor.h>

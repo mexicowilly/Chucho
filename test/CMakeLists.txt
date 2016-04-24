@@ -254,6 +254,12 @@ IF(C_API)
              zeromq_writer_test.h)
     ENDIF()
 
+    IF(CHUCHO_HAVE_ACTIVEMQ)
+        LIST(APPEND CHUCHO_MQ_C_SOURCES
+             activemq_writer_test.c
+             activemq_writer_test.h)
+    ENDIF()
+
     IF(CHUCHO_WINDOWS)
         SET_SOURCE_FILES_PROPERTIES(windows_event_log_writer_test.c PROPERTIES
                                     COMPILE_DEFINITIONS CHUCHO_EVENT_LOG_DLL="${CHUCHO_EVENT_LOG_DLL}")

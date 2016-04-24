@@ -512,6 +512,12 @@ IF(CHUCHO_HAVE_ACTIVEMQ)
          activemq_writer.cpp
          activemq_writer_factory.cpp
          activemq_writer_memento.cpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS
+             include/chucho/activemq_writer.h)
+        LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
+             c_activemq_writer.cpp)
+    ENDIF()
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS

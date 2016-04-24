@@ -32,7 +32,7 @@ namespace chucho
  * Compress using the bzip2 format and a file name extension of 
  * @c .bz2. 
  * 
- * @ingroup compressors
+ * @ingroup fcompressors
  */
 class CHUCHO_EXPORT bzip2_file_compressor : public file_compressor
 {

@@ -30,7 +30,7 @@ namespace chucho
  * method, however, should serve all subclasses, as it always 
  * returns a @ref file_compressor_memento. 
  * 
- * @ingroup compressors
+ * @ingroup fcompressors
  */
 class CHUCHO_EXPORT file_compressor_factory : public configurable_factory
 {

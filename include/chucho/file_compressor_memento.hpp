@@ -36,7 +36,7 @@ namespace chucho
  * single constructor argument regarding the @ref 
  * file_compressor minimum index. 
  * 
- * @ingroup compressors
+ * @ingroup fcompressors
  */
 class CHUCHO_EXPORT file_compressor_memento : public memento
 {

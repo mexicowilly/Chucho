@@ -27,7 +27,7 @@ namespace chucho
  * Compress using the bzip format and a file name extension of 
  * @c .gz. 
  * 
- * @ingroup compressors
+ * @ingroup fcompressors
  */
 class CHUCHO_EXPORT gzip_file_compressor : public file_compressor
 {

@@ -19,6 +19,7 @@
 #include <chucho/c_formatter.hpp>
 #include <chucho/c_serializer.hpp>
 #include <chucho/c_writer.hpp>
+#include <chucho/c_compressor.hpp>
 #include <chucho/exception.hpp>
 
 extern "C"
@@ -27,6 +28,7 @@ extern "C"
 chucho_rc chucho_create_zeromq_writer(chucho_writer** wrt,
                                       chucho_formatter* fmt,
                                       chucho_serializer* ser,
+                                      chucho_compressor* cmp,
                                       const char* const endpoint,
                                       const unsigned char* const prefix,
                                       size_t prefix_len)
@@ -42,8 +44,12 @@ chucho_rc chucho_create_zeromq_writer(chucho_writer** wrt,
         std::vector<std::uint8_t> pfx;
         if (prefix_len > 0)
             pfx.assign(prefix, prefix + prefix_len);
+        std::shared_ptr<chucho::compressor> pcmp;
+        if (cmp != nullptr)
+            pcmp = cmp->cmp_;
         (*wrt)->writer_ = std::make_shared<chucho::zeromq_writer>(fmt->fmt_,
                                                                   ser->ser_,
+                                                                  pcmp,
                                                                   endpoint,
                                                                   pfx);
     }
@@ -59,6 +65,8 @@ chucho_rc chucho_create_zeromq_writer(chucho_writer** wrt,
     }
     chucho_release_formatter(fmt);
     chucho_release_serializer(ser);
+    if (cmp != nullptr)
+        chucho_release_compressor(cmp);
     return CHUCHO_NO_ERROR;
 }
 

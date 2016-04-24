@@ -77,7 +77,8 @@
 
 /**
  * @defgroup compressors 
- * Classes that can compress rolling files. 
+ * Classes that compress, used optionally with @ref message_queue_writer
+ * "message queue writers".
  */
 
 /**
@@ -93,6 +94,11 @@
 /**
  * @defgroup email
  * Classes that handle writing to email.
+ */
+
+/**
+ * @defgroup fcompressors File Compressors
+ * Classes that can compress rolling files. 
  */
 
 /**
@@ -161,7 +167,7 @@
 
 /**
  * @defgroup c_compressors Compressors 
- * Functions for compressing rolling files.
+ * Functions for compressing, used optionally with message queues.
  *  
  * @ingroup c 
  */
@@ -185,6 +191,13 @@
  * Functions that manage email writers.
  * 
  * @ingroup c
+ */
+
+/**
+ * @defgroup c_fcompressors File Compressors 
+ * Functions for compressing rolling files.
+ *  
+ * @ingroup c 
  */
 
 /**

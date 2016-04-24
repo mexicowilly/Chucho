@@ -21,7 +21,7 @@
  * @file 
  * @copydoc chucho::zip_file_compressor 
  *  
- * @ingroup c_compressors 
+ * @ingroup c_fcompressors 
  */
 
 #include <chucho/file_compressor.h>

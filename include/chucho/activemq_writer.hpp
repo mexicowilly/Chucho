@@ -97,7 +97,7 @@ public:
      *
      * @return the consumer type
      */
-    const consumer_type get_consumer_type() const;
+    consumer_type get_consumer_type() const;
     /**
      * Return the name of the topic or queue.
      * 
@@ -129,7 +129,7 @@ inline const std::string& activemq_writer::get_broker() const
     return broker_;
 }
 
-inline const activemq_writer::consumer_type activemq_writer::get_consumer_type() const
+inline activemq_writer::consumer_type activemq_writer::get_consumer_type() const
 {
     return type_;
 }

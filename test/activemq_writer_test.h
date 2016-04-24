@@ -14,26 +14,9 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_NOOP_COMPRESSOR_HPP__)
-#define CHUCHO_NOOP_COMPRESSOR_HPP__
+#if !defined(CHUCHO_ACTIVEMQ_WRITER_TEST_H__)
+#define CHUCHO_ACTIVEMQ_WRITER_TEST_H__
 
-#include <chucho/compressor.hpp>
-
-namespace chucho
-{
-
-/**
- * @class noop_compressor noop_compressor.hpp chucho/noop_compressor.hpp
- * A compressor that does nothing.
- * 
- * @ingroup compressors
- */
-class CHUCHO_EXPORT noop_compressor : public compressor
-{
-public:
-    virtual std::vector<std::uint8_t> compress(const std::vector<std::uint8_t>& in) override;
-};
-
-}
+void run_activemq_writer_test(void);
 
 #endif

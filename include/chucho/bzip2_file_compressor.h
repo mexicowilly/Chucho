@@ -22,7 +22,7 @@
  * Creation of bzip2 file compressors. 
  * @copydoc chucho::bzip2_file_compressor
  *  
- * @ingroup c_compressors 
+ * @ingroup c_fcompressors 
  */
 
 #include <chucho/file_compressor.h>
