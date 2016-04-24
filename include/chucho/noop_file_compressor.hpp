@@ -32,7 +32,7 @@ namespace chucho
  * where a single configuration file is used across multiple 
  * deployments with possibly differing build options for Chucho.
  * 
- * @ingroup compressors
+ * @ingroup fcompressors
  */
 class CHUCHO_EXPORT noop_file_compressor : public file_compressor
 {

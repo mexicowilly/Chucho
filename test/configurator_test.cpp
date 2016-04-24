@@ -80,6 +80,9 @@
 #if defined(CHUCHO_HAVE_PROTOBUF)
 #include <chucho/protobuf_serializer.hpp>
 #endif
+#if defined(CHUCHO_HAVE_ACTIVEMQ)
+#include <chucho/activemq_writer.hpp>
+#endif
 
 namespace chucho
 {
@@ -99,6 +102,40 @@ configurator::~configurator()
 {
     EXPECT_LT(chucho::status_manager::get()->get_level(), chucho::status::level::WARNING_);
 }
+
+#if defined(CHUCHO_HAVE_ACTIVEMQ)
+
+void configurator::activemq_writer_queue_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::activemq_writer), typeid(*wrts[0]));
+    auto aw = std::static_pointer_cast<chucho::activemq_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(aw));
+    auto ser = aw->get_serializer();
+    ASSERT_TRUE(static_cast<bool>(ser));
+    EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(*ser));
+    EXPECT_EQ(std::string("tcp://127.0.0.1:61616"), aw->get_broker());
+    EXPECT_EQ(activemq_writer::consumer_type::QUEUE, aw->get_consumer_type());
+    EXPECT_EQ(std::string("MonkeyBalls"), aw->get_topic_or_queue());
+}
+
+void configurator::activemq_writer_topic_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::activemq_writer), typeid(*wrts[0]));
+    auto aw = std::static_pointer_cast<chucho::activemq_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(aw));
+    auto ser = aw->get_serializer();
+    ASSERT_TRUE(static_cast<bool>(ser));
+    EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(*ser));
+    EXPECT_EQ(std::string("tcp://127.0.0.1:61616"), aw->get_broker());
+    EXPECT_EQ(activemq_writer::consumer_type::TOPIC, aw->get_consumer_type());
+    EXPECT_EQ(std::string("MonkeyBalls"), aw->get_topic_or_queue());
+}
+
+#endif
 
 void configurator::async_writer_body()
 {

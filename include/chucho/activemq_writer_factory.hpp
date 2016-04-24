@@ -14,24 +14,25 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_NOOP_COMPRESSOR_HPP__)
-#define CHUCHO_NOOP_COMPRESSOR_HPP__
+#if !defined(CHUCHO_ACTIVEMQ_WRITER_FACTORY_HPP__)
+#define CHUCHO_ACTIVEMQ_WRITER_FACTORY_HPP__
 
-#include <chucho/compressor.hpp>
+#if !defined(CHUCHO_BUILD)
+#error "This header is private"
+#endif
+
+#include <chucho/writer_factory.hpp>
 
 namespace chucho
 {
 
-/**
- * @class noop_compressor noop_compressor.hpp chucho/noop_compressor.hpp
- * A compressor that does nothing.
- * 
- * @ingroup compressors
- */
-class CHUCHO_EXPORT noop_compressor : public compressor
+class activemq_writer_factory : public writer_factory
 {
 public:
-    virtual std::vector<std::uint8_t> compress(const std::vector<std::uint8_t>& in) override;
+    activemq_writer_factory();
+
+    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
+    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
 };
 
 }

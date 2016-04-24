@@ -48,6 +48,10 @@ IF(CHUCHO_HAVE_ZEROMQ)
     LIST(APPEND CHUCHO_TEST_MQ_SOURCES zeromq_writer_test.cpp)
 ENDIF()
 
+IF(CHUCHO_HAVE_ACTIVEMQ)
+    LIST(APPEND CHUCHO_TEST_MQ_SOURCES activemq_writer_test.cpp)
+ENDIF()
+
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_TEST_COMPRESSION_SOURCES
          gzip_file_compressor_test.cpp
@@ -120,6 +124,10 @@ IF(CHUCHO_HAVE_PROTOBUF)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_PROTOBUF)
 ENDIF()
 
+IF(CHUCHO_HAVE_ACTIVEMQ)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_ACTIVEMQ)
+ENDIF()
+
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
                calendar_test.cpp
@@ -180,6 +188,13 @@ IF(CHUCHO_HAVE_ZEROMQ)
     ADD_DEPENDENCIES(unit-test zeromq-writer-test-helper)
 ENDIF()
 
+IF(CHUCHO_HAVE_ACTIVEMQ)
+    ADD_EXECUTABLE(activemq-writer-test-helper EXCLUDE_FROM_ALL
+                   activemq_writer_test_helper.cpp)
+    TARGET_LINK_LIBRARIES(activemq-writer-test-helper chucho)
+    ADD_DEPENDENCIES(unit-test activemq-writer-test-helper)
+ENDIF()
+
 ADD_CUSTOM_TARGET(check
                   COMMAND unit-test
                   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
@@ -237,6 +252,12 @@ IF(C_API)
         LIST(APPEND CHUCHO_MQ_C_SOURCES
              zeromq_writer_test.c
              zeromq_writer_test.h)
+    ENDIF()
+
+    IF(CHUCHO_HAVE_ACTIVEMQ)
+        LIST(APPEND CHUCHO_MQ_C_SOURCES
+             activemq_writer_test.c
+             activemq_writer_test.h)
     ENDIF()
 
     IF(CHUCHO_WINDOWS)

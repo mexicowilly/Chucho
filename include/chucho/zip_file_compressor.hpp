@@ -27,7 +27,7 @@ namespace chucho
  * Compress using the zip archive format and a file name extension of 
  * @c .zip. 
  * 
- * @ingroup compressors
+ * @ingroup fcompressors
  */
 class CHUCHO_EXPORT zip_file_compressor : public file_compressor
 {

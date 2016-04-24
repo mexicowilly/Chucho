@@ -58,6 +58,9 @@ ENDIF()
 IF(CHUCHO_HAVE_ZEROMQ)
     INCLUDE_DIRECTORIES("${ZEROMQ_INCLUDE_DIR}")
 ENDIF()
+IF(CHUCHO_HAVE_ACTIVEMQ)
+    INCLUDE_DIRECTORIES("${ACTIVEMQ_INCLUDE_DIR}")
+ENDIF()
 
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
@@ -500,6 +503,26 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/zeromq_writer.hpp
      include/chucho/zeromq_writer.h)
 
+IF(CHUCHO_HAVE_ACTIVEMQ)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/activemq_writer.hpp
+         include/chucho/activemq_writer_factory.hpp
+         include/chucho/activemq_writer_memento.hpp)
+    LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
+         activemq_writer.cpp
+         activemq_writer_factory.cpp
+         activemq_writer_memento.cpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS
+             include/chucho/activemq_writer.h)
+        LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
+             c_activemq_writer.cpp)
+    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/activemq_writer.hpp)
+
 # The libyaml sources are required by chuchod
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
     # Update this when you rev libyaml
@@ -881,6 +904,10 @@ IF(CHUCHO_HAVE_ZEROMQ)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ZEROMQ)
 ENDIF()
 
+IF(CHUCHO_HAVE_ACTIVEMQ)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ACTIVEMQ)
+ENDIF()
+
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ZLIB)
 ENDIF()
@@ -1087,6 +1114,16 @@ ENDIF()
 
 IF(CHUCHO_HAVE_ZEROMQ)
     TARGET_LINK_LIBRARIES(chucho "${ZEROMQ_LIB}")
+ENDIF()
+
+IF(CHUCHO_HAVE_ACTIVEMQ)
+    TARGET_LINK_LIBRARIES(chucho "${ACTIVEMQ_LIB}")
+    IF(APR_LIB)
+        TARGET_LINK_LIBRARIES(chucho "${APR_LIB}")
+    ENDIF()
+    IF(CHUCHO_NEEDS_SENDFILE)
+        TARGET_LINK_LIBRARIES(chucho sendfile)
+    ENDIF()
 ENDIF()
 
 IF(ZLIB_LIB_DIR)

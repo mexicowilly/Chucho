@@ -28,6 +28,7 @@
 #include <chucho/writer.h>
 #include <chucho/formatter.h>
 #include <chucho/serializer.h>
+#include <chucho/compressor.h>
 
 #if defined(__cplusplus)
 extern "C"
@@ -51,9 +52,15 @@ extern "C"
  * @post Ownership of the ser parameter is transferred to the 
  *       callee.
  * 
- * @param[out] wrt the Oracle writer to create
+ * @post Ownership of the cmp parameter is transferred to the 
+ *       callee.
+ * 
+ * @note The cmp parameter may be NULL.
+ * 
+ * @param[out] wrt the ZeroMQ writer to create
  * @param[in] fmt the formatter
  * @param[in] ser the serializer
+ * @param[in] cmp the compressor, which may be NULL
  * @param[in] endpoint the ZeroMQ endpoint to which to publish messages
  * @param[in] prefix the message "topic", which, if provided, will cause
  * all events to be published as two-part messages, first prefix, then
@@ -65,6 +72,7 @@ extern "C"
 CHUCHO_EXPORT chucho_rc chucho_create_zeromq_writer(chucho_writer** wrt,
                                                     chucho_formatter* fmt,
                                                     chucho_serializer* ser,
+                                                    chucho_compressor* cmp,
                                                     const char* const endpoint,
                                                     const unsigned char* const prefix,
                                                     size_t prefix_len);

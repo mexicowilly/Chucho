@@ -25,11 +25,32 @@
 namespace chucho
 {
 
+/**
+ * @class compressor compressor.hpp chucho/compressor.hpp
+ * Compressors that can be used with instances of @ref message_queue_writer.
+ * 
+ * @ingroup compressors
+ */
 class CHUCHO_EXPORT compressor : non_copyable, public configurable, public status_reporter
 {
 public:
+    /**
+     * @name Destructor
+     * @{
+     */
+    /**
+     * Destroy a compressor.
+     */
     virtual ~compressor() { }
+    /**
+     * @}
+     */
 
+    /**
+     * Compress bytes.
+     * @param in the bytes to compress
+     * @return the compressed bytes
+     */
     virtual std::vector<std::uint8_t> compress(const std::vector<std::uint8_t>& in) = 0;
 };
 

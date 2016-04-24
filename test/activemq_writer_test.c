@@ -15,43 +15,46 @@
  */
 
 #include "sput.h"
-#include <chucho/zeromq_writer.h>
+#include <chucho/activemq_writer.h>
 #include <chucho/pattern_formatter.h>
 #include <chucho/formatted_message_serializer.h>
 
-static void zeromq_writer_test(void)
+#include <stdio.h>
+
+static void activemq_writer_test(void)
 {
     chucho_formatter* fmt;
     chucho_serializer* ser;
     chucho_rc rc;
     chucho_writer* wrt;
-    unsigned char prefix[6] = { 1, 2, 3, 4, 5, 6 };
     const char* text;
-    const unsigned char* found_pfx;
-    size_t found_len;
+    chucho_activemq_consumer_type tp;
 
     rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
     rc = chucho_create_formatted_message_serializer(&ser);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create formatted message serializer");
-    rc = chucho_create_zeromq_writer(&wrt, fmt, ser, NULL, "tcp://127.0.0.1:7777", prefix, 6);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create zeromq writer");
+    rc = chucho_create_activemq_writer(&wrt, fmt, ser, NULL, "tcp://127.0.0.1:61616", CHUCHO_ACTIVEMQ_QUEUE, "chunky_monkey");
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create activemq writer");
+    printf("rc %i\n", rc);
     if (rc != CHUCHO_NO_ERROR)
         return;
-    rc = chucho_zmqwrt_get_endpoint(wrt, &text);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_zmqwrt_get_endpoint");
-    sput_fail_unless(strcmp(text, "tcp://127.0.0.1:7777") == 0, text);
-    rc = chucho_zmqwrt_get_prefix(wrt, &found_pfx, &found_len);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_zmqwrt_get_prefix");
-    sput_fail_unless(found_len == 6, "Found prefix length");
-    sput_fail_unless(memcmp(prefix, found_pfx, found_len) == 0, "Found prefix");
+    rc = chucho_amqwrt_get_broker(wrt, &text);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_amqwrt_get_broker");
+    sput_fail_unless(strcmp(text, "tcp://127.0.0.1:61616") == 0, text);
+    rc = chucho_amqwrt_get_consumer_type(wrt, &tp);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_amqwrt_get_consumer_type");
+    sput_fail_unless(tp == CHUCHO_ACTIVEMQ_QUEUE, "Found queue");
+    rc = chucho_amqwrt_get_topic_or_queue(wrt, &text);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_amqwrt_get_topic_or_queue");
+    sput_fail_unless(strcmp(text, "chunky_monkey") == 0, text);
     rc = chucho_release_writer(wrt);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "release owrt writer");
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "release amqwrt writer");
 }
 
-void run_zeromq_writer_test(void)
+void run_activemq_writer_test(void)
 {
-    sput_enter_suite("zeromq_writer");
-    sput_run_test(zeromq_writer_test);
+    sput_enter_suite("activemq_writer");
+    sput_run_test(activemq_writer_test);
     sput_leave_suite();
 }

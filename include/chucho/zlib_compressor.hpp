@@ -23,10 +23,29 @@
 namespace chucho
 {
 
+/**
+ * @class zlib_compressor zlib_compressor.hpp chucho/zlib_compressor.hpp
+ * A compressor that uses zlib.
+ * 
+ * @ingroup compressors
+ */
 class CHUCHO_EXPORT zlib_compressor : public compressor
 {
 public:
+    /**
+     * @name Constructor
+     * @{
+     */
+    /**
+     * Construct a zlib compressor with the given compression level.
+     * Valid compression levels are [0, 9].
+     * 
+     * @param compression_level the level, which can be [0, 9]
+     */
     zlib_compressor(int compression_level = Z_DEFAULT_COMPRESSION);
+    /**
+     * @}
+     */
 
     virtual std::vector<std::uint8_t> compress(const std::vector<std::uint8_t>& in) override;
 

@@ -22,7 +22,7 @@
  * Functions that can be used with any compressor. 
  * @copydoc chucho::compressor
  *  
- * @ingroup c_mq 
+ * @ingroup c_compressors 
  */
 
 #include <chucho/return_code.h>

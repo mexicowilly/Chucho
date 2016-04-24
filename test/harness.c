@@ -70,6 +70,9 @@
 #if defined(CHUCHO_HAVE_ZEROMQ)
 #include "zeromq_writer_test.h"
 #endif
+#if defined(CHUCHO_HAVE_ACTIVEMQ)
+#include "activemq_writer_test.h"
+#endif
 
 sput_struct __sput;
 
@@ -130,6 +133,9 @@ int main()
     run_named_pipe_writer_test();
     #if defined(CHUCHO_HAVE_ZEROMQ)
     run_zeromq_writer_test();
+    #endif
+    #if defined(CHUCHO_HAVE_ACTIVEMQ)
+    run_activemq_writer_test();
     #endif
 
     sput_finish_testing();
