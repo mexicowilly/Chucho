@@ -20,17 +20,6 @@
 #include <activemq/library/ActiveMQCPP.h>
 #include <thread>
 
-namespace
-{
-
-void init_library()
-{
-    static std::once_flag once; 
-    activemq::library::ActiveMQCPP::initializeLibrary();
-}
-
-}
-
 namespace chucho
 {
 
