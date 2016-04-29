@@ -86,6 +86,9 @@ protected:
     virtual void write_impl(const event& evt) override;
 
 private:
+    CHUCHO_NO_EXPORT void allocate_environment() const;
+    CHUCHO_NO_EXPORT std::string get_error_message(SQLSMALLINT handle_type) const;
+
     std::string server_;
     std::string user_;
     std::string password_;

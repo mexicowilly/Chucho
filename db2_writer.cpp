@@ -28,21 +28,6 @@ namespace
 
 SQLHENV db2_env = SQL_NULL_HENV;
 
-void allocate_environment()
-{
-    SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &db2_env);
-    if (!SQL_SUCCEEDED(rc))
-    {
-        // error
-    }
-    rc = SQLSetEnvAttr(db2_env, SQL_ATTR_ODBC_VERSION, reinterpret_cast<SQLPOINTER*>(SQL_OV_ODBC3), 0);
-    if (!SQL_SUCCEEDED(rc))
-    {
-        // error
-    }
-    chucho::garbage_cleaner::get().add([&] { if (db2_env != SQL_NULL_HENV) { SQLFreeHandle(SQL_HANDLE_ENV, db2_env); } });
-}
-
 SQLCHAR* get_sqlchar(const std::string& str)
 {
     return reinterpret_cast<SQLCHAR*>(const_cast<std::string::pointer>(str.c_str()));
@@ -62,13 +47,14 @@ db2_writer::db2_writer(std::shared_ptr<formatter> fmt,
       user_(user),
       password_(password)
 {
+    set_status_origin("db2_writer");
+
     static std::once_flag once;
-    std::call_once(once, allocate_environment);
+    std::call_once(once, std::bind(&db2_writer::allocate_environment, this));
+
     SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_DBC, db2_env, &dbc_);
     if (!SQL_SUCCEEDED(rc))
-    {
-        // error
-    }
+        throw exception("Unable to allocate database handle: " + get_error_message(SQL_HANDLE_DBC));
     rc = SQLConnect(dbc_,
                     get_sqlchar(server_.c_str()),
                     server_.length(),
@@ -77,28 +63,20 @@ db2_writer::db2_writer(std::shared_ptr<formatter> fmt,
                     get_sqlchar(password_.c_str()),
                     password_.length());
     if (!SQL_SUCCEEDED(rc))
-    {
-        // error
-    }
-    rc = SQLAllocHandle(SQL_HANDLE_STMT, dbc_, &stmt_);
-    if (!SQL_SUCCEEDED(rc))
-    {
-        // error
-    }
+        throw exception("Unable to connect to database " + server_ + ": " + get_error_message(SQL_HANDLE_DBC));
     rc = SQLSetConnectAttr(dbc_,
                            SQL_ATTR_AUTOCOMMIT,
                            SQL_AUTOCOMMIT_OFF,
                            SQL_NTS);
     if (!SQL_SUCCEEDED(rc))
-    {
-        // error
-    }
+        throw exception("Unable to turn off autocommit: " + get_error_message(SQL_HANDLE_DBC));
+    rc = SQLAllocHandle(SQL_HANDLE_STMT, dbc_, &stmt_);
+    if (!SQL_SUCCEEDED(rc))
+        throw exception("Unable to allocate statement handle: " + get_error_message(SQL_HANDLE_DBC));
     std::string sql("INSERT INTO chucho_event ( formatted_message, timestmp, file_name, line_number, function_name, logger, level_name, marker, thread ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? );");
     rc = SQLPrepare(stmt_, get_sqlchar(sql.c_str()), sql.length());
     if (!SQL_SUCCEEDED(rc))
-    {
-        // error
-    }
+        throw exception("Unable to prepare SQL statement: " + get_error_message(SQL_HANDLE_STMT));
 }
 
 db2_writer::~db2_writer()
@@ -110,10 +88,67 @@ db2_writer::~db2_writer()
         SQLRETURN rc = SQLDisconnect(dbc_);
         if (!SQL_SUCCEEDED(rc))
         {
-            // error
+            report_warning("Error disconnecting from database " + server_ +
+                ": " + get_error_message(SQL_HANDLE_DBC));
         }
         SQLFreeHandle(SQL_HANDLE_DBC, dbc_);
     }
+}
+
+void db2_writer::allocate_environment() const
+{
+    SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &db2_env);
+    if (!SQL_SUCCEEDED(rc))
+        throw exception("Unable to allocate DB2 environment handle: " + get_error_message(SQL_HANDLE_ENV));
+    rc = SQLSetEnvAttr(db2_env, SQL_ATTR_ODBC_VERSION, reinterpret_cast<SQLPOINTER*>(SQL_OV_ODBC3), 0);
+    if (!SQL_SUCCEEDED(rc))
+        throw exception("Unable to set DB2 environment attribute: " + get_error_message(SQL_HANDLE_ENV));
+    chucho::garbage_cleaner::get().add([&] { if (db2_env != SQL_NULL_HENV) { SQLFreeHandle(SQL_HANDLE_ENV, db2_env); } });
+}
+
+std::string db2_writer::get_error_message(SQLSMALLINT handle_type) const
+{
+    SQLHANDLE hand;
+    if (handle_type == SQL_HANDLE_ENV)
+        hand = db2_env;
+    else if (handle_type == SQL_HANDLE_DBC)
+        hand = dbc_;
+    else if (handle_type == SQL_HANDLE_STMT)
+        hand = stmt_;
+    SQLCHAR state[6];
+    SQLSMALLINT msg_len;
+    std::vector<SQLCHAR> text(1024);
+    SQLINTEGER native;
+    int i = 1;
+    std::ostringstream stream;
+    while (true)
+    {
+        SQLRETURN rc = SQLGetDiagRec(handle_type,
+                                     hand,
+                                     i,
+                                     state,
+                                     &native,
+                                     &text[0],
+                                     text.size(),
+                                     &msg_len);
+        if (rc == SQL_SUCCESS_WITH_INFO)
+        {
+            text.resize(msg_len + 1);
+            rc = SQLGetDiagRec(handle_type,
+                               hand,
+                               i,
+                               state,
+                               &native,
+                               &text[0],
+                               text.size(),
+                               &msg_len);
+        }
+        if (rc != SQL_SUCCESS)
+            break;
+        stream << "{ " << i << ": " << &text[0] << " (state " << state << ") (native " << native << ')' << "} ";
+        i++;
+    }
+    return stream.str();
 }
 
 void db2_writer::write_impl(const event& evt)
@@ -131,9 +166,7 @@ void db2_writer::write_impl(const event& evt)
                                     msg.length(),
                                     &ret_len);
     if (!SQL_SUCCEEDED(rc))
-    {
-        // error
-    }
+        throw exception("Unable to bind formatted message parameter: " + get_error_message(SQL_HANDLE_STMT));
     auto pieces = calendar::get_utc(event::clock_type::to_time_t(evt.get_time()));
     struct TIMESTAMP_STRUCT ts;
     ts.year = pieces.tm_year + 1900;
@@ -154,9 +187,7 @@ void db2_writer::write_impl(const event& evt)
                           sizeof(ts),
                           &ret_len);
     if (!SQL_SUCCEEDED(rc))
-    {
-        // error
-    }
+        throw exception("Unable to bind timestamp parameter: " + get_error_message(SQL_HANDLE_STMT));
     auto slen = std::strlen(evt.get_file_name());
     rc = SQLBindParameter(stmt_,
                           3,
@@ -169,9 +200,7 @@ void db2_writer::write_impl(const event& evt)
                           slen,
                           &ret_len);
     if (!SQL_SUCCEEDED(rc))
-    {
-        // error
-    }
+        throw exception("Unable to bind file name parameter: " + get_error_message(SQL_HANDLE_STMT));
     long ln = evt.get_line_number();
     rc = SQLBindParameter(stmt_,
                           4,
@@ -184,9 +213,7 @@ void db2_writer::write_impl(const event& evt)
                           sizeof(ln),
                           &ret_len);
     if (!SQL_SUCCEEDED(rc))
-    {
-        // error
-    }
+        throw exception("Unable to bind line number parameter: " + get_error_message(SQL_HANDLE_STMT));
     slen = std::strlen(evt.get_function_name());
     rc = SQLBindParameter(stmt_,
                           5,
@@ -199,9 +226,7 @@ void db2_writer::write_impl(const event& evt)
                           slen,
                           &ret_len);
     if (!SQL_SUCCEEDED(rc))
-    {
-        // error
-    }
+        throw exception("Unable to bind function name parameter: " + get_error_message(SQL_HANDLE_STMT));
     rc = SQLBindParameter(stmt_,
                           6,
                           SQL_PARAM_INPUT,
@@ -213,9 +238,7 @@ void db2_writer::write_impl(const event& evt)
                           evt.get_logger()->get_name().length(),
                           &ret_len);
     if (!SQL_SUCCEEDED(rc))
-    {
-        // error
-    }
+        throw exception("Unable to bind logger parameter: " + get_error_message(SQL_HANDLE_STMT));
     slen = std::strlen(evt.get_level()->get_name());
     rc = SQLBindParameter(stmt_,
                           7,
@@ -228,9 +251,7 @@ void db2_writer::write_impl(const event& evt)
                           slen,
                           &ret_len);
     if (!SQL_SUCCEEDED(rc))
-    {
-        // error
-    }
+        throw exception("Unable to bind level parameter: " + get_error_message(SQL_HANDLE_STMT));
     if (evt.get_marker())
     {
         std::ostringstream stream;
@@ -261,9 +282,7 @@ void db2_writer::write_impl(const event& evt)
                               &ret_len);
     }
     if (!SQL_SUCCEEDED(rc))
-    {
-        // error
-    }
+        throw exception("Unable to bind marker parameter: " + get_error_message(SQL_HANDLE_STMT));
     std::ostringstream stream;
     stream << std::this_thread::get_id();
     std::string tname = stream.str();
@@ -278,9 +297,7 @@ void db2_writer::write_impl(const event& evt)
                           tname.length(),
                           &ret_len);
     if (!SQL_SUCCEEDED(rc))
-    {
-        // error
-    }
+        throw exception("Unable to bind thread parameter: " + get_error_message(SQL_HANDLE_STMT));
     SQLSMALLINT disposition = SQL_COMMIT;
     rc = SQLExecute(stmt_);
     if (!SQL_SUCCEEDED(rc))
@@ -290,9 +307,7 @@ void db2_writer::write_impl(const event& evt)
     }
     rc = SQLEndTran(SQL_HANDLE_DBC, dbc_, disposition);
     if (!SQL_SUCCEEDED(rc))
-    {
-        // error
-    }
+        throw exception("Unable to end transaction: " + get_error_message(SQL_HANDLE_DBC));
 }
 
 }
