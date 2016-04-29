@@ -630,6 +630,27 @@ IF(POSTGRES_INCLUDE_DIR)
     SET(CHUCHO_HAVE_POSTGRES TRUE CACHE INTERNAL "Whether we have PostgreSQL client software")
 ENDIF()
 
+# DB2
+IF(DB2_INCLUDE_DIR)
+    SET(CMAKE_REQUIRED_INCLUDES "${DB2_INCLUDE_DIR}")
+    CHECK_INCLUDE_FILE_CXX(sqlcli1.h CHUCHO_DB2_H)
+    IF(CHUCHO_DB2_H)
+        IF(DB2_CLIENT_LIB)
+            SET(CMAKE_REQUIRED_LIBRARIES "${DB2_CLIENT_LIB}")
+            CHUCHO_REQUIRE_SYMBOLS(sqlcli1.h SQLAllocHandle SQLFreeHandle SQLSetEnvAttr
+                                   SQLConnect SQLBindParameter SQLPrepare SQLExecute
+                                   SQLDisconnect SQLSetConnectAttr SQLEndTran)
+        ELSEIF(ENABLE_SHARED)
+            MESSAGE(FATAL_ERROR "You must specify DB2_CLIENT_LIB to build a shared library")
+        ENDIF()
+    ELSE()
+        MESSAGE(FATAL_ERROR "sqlci1.h was not found in DB2_INCLUDE_DIR=${DB2_INCLUDE_DIR}")
+    ENDIF()
+    UNSET(CMAKE_REQUIRED_INCLUDES)
+    UNSET(CMAKE_REQUIRED_LIBRARIES)
+    SET(CHUCHO_HAVE_DB2 TRUE CACHE INTERNAL "Whether we have DB2 client software")
+ENDIF()
+
 # Ruby
 MACRO(CHUCHO_CHECK_RUBY_SYMBOLS CHUCHO_RUBY_HEADER)
     CHUCHO_REQUIRE_SYMBOLS(${CHUCHO_RUBY_HEADER} ruby_init ruby_finalize rb_funcall rb_str_new2

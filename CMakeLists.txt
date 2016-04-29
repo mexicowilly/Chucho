@@ -61,6 +61,9 @@ ENDIF()
 IF(CHUCHO_HAVE_ACTIVEMQ)
     INCLUDE_DIRECTORIES("${ACTIVEMQ_INCLUDE_DIR}")
 ENDIF()
+IF(CHUCHO_HAVE_DB2)
+    INCLUDE_DIRECTORIES("${DB2_INCLUDE_DIR}")
+ENDIF()
 
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
@@ -398,6 +401,24 @@ ENDIF()
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/postgres_writer.hpp
      include/chucho/postgres_writer.h)
+
+IF(CHUCHO_HAVE_DB2)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/db2_writer.hpp)
+    LIST(APPEND CHUCHO_DATABASE_SOURCES
+         db2_writer.cpp)
+#         postgres_writer_factory.cpp
+#         postgres_writer_memento.cpp
+#         include/chucho/postgres_writer_factory.hpp
+#         include/chucho/postgres_writer_memento.hpp)
+#    IF(C_API)
+#        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/postgres_writer.h)
+#        LIST(APPEND CHUCHO_DATABASE_SOURCES c_postgres_writer.cpp)
+#    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/db2_writer.hpp)
+#     include/chucho/postgres_writer.h)
 
 IF(CHUCHO_HAVE_RUBY)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/ruby_evaluator_filter.hpp)
