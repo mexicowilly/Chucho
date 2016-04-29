@@ -639,7 +639,7 @@ IF(DB2_INCLUDE_DIR)
             SET(CMAKE_REQUIRED_LIBRARIES "${DB2_CLIENT_LIB}")
             CHUCHO_REQUIRE_SYMBOLS(sqlcli1.h SQLAllocHandle SQLFreeHandle SQLSetEnvAttr
                                    SQLConnect SQLBindParameter SQLPrepare SQLExecute
-                                   SQLDisconnect SQLSetConnectAttr SQLEndTran SQLGetDiagRec)
+                                   SQLDisconnect SQLGetDiagRec)
         ELSEIF(ENABLE_SHARED)
             MESSAGE(FATAL_ERROR "You must specify DB2_CLIENT_LIB to build a shared library")
         ENDIF()

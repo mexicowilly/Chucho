@@ -64,12 +64,6 @@ db2_writer::db2_writer(std::shared_ptr<formatter> fmt,
                     password_.length());
     if (!SQL_SUCCEEDED(rc))
         throw exception("Unable to connect to database " + server_ + ": " + get_error_message(SQL_HANDLE_DBC));
-    rc = SQLSetConnectAttr(dbc_,
-                           SQL_ATTR_AUTOCOMMIT,
-                           SQL_AUTOCOMMIT_OFF,
-                           SQL_NTS);
-    if (!SQL_SUCCEEDED(rc))
-        throw exception("Unable to turn off autocommit: " + get_error_message(SQL_HANDLE_DBC));
     rc = SQLAllocHandle(SQL_HANDLE_STMT, dbc_, &stmt_);
     if (!SQL_SUCCEEDED(rc))
         throw exception("Unable to allocate statement handle: " + get_error_message(SQL_HANDLE_DBC));
@@ -298,16 +292,9 @@ void db2_writer::write_impl(const event& evt)
                           &ret_len);
     if (!SQL_SUCCEEDED(rc))
         throw exception("Unable to bind thread parameter: " + get_error_message(SQL_HANDLE_STMT));
-    SQLSMALLINT disposition = SQL_COMMIT;
     rc = SQLExecute(stmt_);
     if (!SQL_SUCCEEDED(rc))
-    {
-        // error
-        disposition = SQL_ROLLBACK;
-    }
-    rc = SQLEndTran(SQL_HANDLE_DBC, dbc_, disposition);
-    if (!SQL_SUCCEEDED(rc))
-        throw exception("Unable to end transaction: " + get_error_message(SQL_HANDLE_DBC));
+        throw exception("Unable to execute prepared statement (INSERT): " + get_error_message(SQL_HANDLE_STMT));
 }
 
 }
