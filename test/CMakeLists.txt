@@ -107,6 +107,10 @@ IF(CHUCHO_HAVE_POSTGRES)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_POSTGRES)
 ENDIF()
 
+IF(CHUCHO_HAVE_DB2)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_DB2)
+ENDIF()
+
 IF(CHUCHO_HAVE_RUBY)
     LIST(APPEND CHUCHO_TEST_EVALUATOR_SOURCES ruby_evaluator_filter_test.cpp)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_RUBY)
@@ -396,6 +400,13 @@ IF(CHUCHO_HAVE_POSTGRES)
                    harness.cpp
                    postgres_writer_test.cpp)
     TARGET_LINK_LIBRARIES(postgres-writer-test chucho gtest)
+ENDIF()
+
+IF(CHUCHO_HAVE_DB2)
+    ADD_EXECUTABLE(db2-writer-test EXCLUDE_FROM_ALL
+                   harness.cpp
+                   db2_writer_test.cpp)
+    TARGET_LINK_LIBRARIES(db2-writer-test chucho gtest)
 ENDIF()
 
 IF(CURL_FOUND)

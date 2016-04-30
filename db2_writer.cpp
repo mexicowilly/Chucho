@@ -147,7 +147,6 @@ std::string db2_writer::get_error_message(SQLSMALLINT handle_type) const
 
 void db2_writer::write_impl(const event& evt)
 {
-    SQLLEN ret_len;
     std::string msg = formatter_->format(evt);
     SQLRETURN rc = SQLBindParameter(stmt_,
                                     1,
@@ -158,7 +157,7 @@ void db2_writer::write_impl(const event& evt)
                                     0,
                                     const_cast<std::string::pointer>(msg.data()),
                                     msg.length(),
-                                    &ret_len);
+                                    NULL);
     if (!SQL_SUCCEEDED(rc))
         throw exception("Unable to bind formatted message parameter: " + get_error_message(SQL_HANDLE_STMT));
     auto pieces = calendar::get_utc(event::clock_type::to_time_t(evt.get_time()));
@@ -179,7 +178,7 @@ void db2_writer::write_impl(const event& evt)
                           0,
                           &ts,
                           sizeof(ts),
-                          &ret_len);
+                          NULL);
     if (!SQL_SUCCEEDED(rc))
         throw exception("Unable to bind timestamp parameter: " + get_error_message(SQL_HANDLE_STMT));
     auto slen = std::strlen(evt.get_file_name());
@@ -192,7 +191,7 @@ void db2_writer::write_impl(const event& evt)
                           0,
                           const_cast<char*>(evt.get_file_name()),
                           slen,
-                          &ret_len);
+                          NULL);
     if (!SQL_SUCCEEDED(rc))
         throw exception("Unable to bind file name parameter: " + get_error_message(SQL_HANDLE_STMT));
     long ln = evt.get_line_number();
@@ -205,7 +204,7 @@ void db2_writer::write_impl(const event& evt)
                           0,
                           &ln,
                           sizeof(ln),
-                          &ret_len);
+                          NULL);
     if (!SQL_SUCCEEDED(rc))
         throw exception("Unable to bind line number parameter: " + get_error_message(SQL_HANDLE_STMT));
     slen = std::strlen(evt.get_function_name());
@@ -218,7 +217,7 @@ void db2_writer::write_impl(const event& evt)
                           0,
                           const_cast<char*>(evt.get_function_name()),
                           slen,
-                          &ret_len);
+                          NULL);
     if (!SQL_SUCCEEDED(rc))
         throw exception("Unable to bind function name parameter: " + get_error_message(SQL_HANDLE_STMT));
     rc = SQLBindParameter(stmt_,
@@ -230,7 +229,7 @@ void db2_writer::write_impl(const event& evt)
                           0,
                           const_cast<char*>(evt.get_logger()->get_name().data()),
                           evt.get_logger()->get_name().length(),
-                          &ret_len);
+                          NULL);
     if (!SQL_SUCCEEDED(rc))
         throw exception("Unable to bind logger parameter: " + get_error_message(SQL_HANDLE_STMT));
     slen = std::strlen(evt.get_level()->get_name());
@@ -243,9 +242,11 @@ void db2_writer::write_impl(const event& evt)
                           0,
                           const_cast<char*>(evt.get_level()->get_name()),
                           slen,
-                          &ret_len);
+                          NULL);
     if (!SQL_SUCCEEDED(rc))
         throw exception("Unable to bind level parameter: " + get_error_message(SQL_HANDLE_STMT));
+    // We need this variable in this scope
+    SQLLEN nd = SQL_NULL_DATA;
     if (evt.get_marker())
     {
         std::ostringstream stream;
@@ -260,20 +261,21 @@ void db2_writer::write_impl(const event& evt)
                               0,
                               const_cast<char*>(mrk_text.data()),
                               mrk_text.length(),
-                              &ret_len);
+                              NULL);
     }
     else
     {
         rc = SQLBindParameter(stmt_,
                               8,
                               SQL_PARAM_INPUT,
-                              SQL_C_PTR,
-                              SQL_NULL_DATA,
+                              SQL_C_CHAR,
+                              SQL_VARCHAR,
                               0,
                               0,
-                              nullptr,
+                              NULL,
                               0,
-                              &ret_len);
+                              &nd);
+
     }
     if (!SQL_SUCCEEDED(rc))
         throw exception("Unable to bind marker parameter: " + get_error_message(SQL_HANDLE_STMT));
@@ -289,7 +291,7 @@ void db2_writer::write_impl(const event& evt)
                           0,
                           const_cast<char*>(tname.data()),
                           tname.length(),
-                          &ret_len);
+                          NULL);
     if (!SQL_SUCCEEDED(rc))
         throw exception("Unable to bind thread parameter: " + get_error_message(SQL_HANDLE_STMT));
     rc = SQLExecute(stmt_);
