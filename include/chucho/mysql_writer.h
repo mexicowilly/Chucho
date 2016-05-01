@@ -22,7 +22,7 @@
  * Creation of MySQL writers. 
  * @copydoc chucho::mysql_writer
  *  
- * @ingroup c_writers c_databaes
+ * @ingroup c_writers c_database
  */
 
 #include <chucho/writer.h>

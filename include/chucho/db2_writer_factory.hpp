@@ -14,9 +14,27 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_ORACLE_WRITER_TEST_H__)
-#define CHUCHO_ORACLE_WRITER_TEST_H__
+#if !defined(CHUCHO_DB2_WRITER_FACTORY_HPP__)
+#define CHUCHO_DB2_WRITER_FACTORY_HPP__
 
-void run_oracle_writer_test(void);
+#if !defined(CHUCHO_BUILD)
+#error "This header is private"
+#endif
+
+#include <chucho/writer_factory.hpp>
+
+namespace chucho
+{
+
+class db2_writer_factory : public writer_factory
+{
+public:
+    db2_writer_factory();
+
+    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
+    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
+};
+
+}
 
 #endif

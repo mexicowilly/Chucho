@@ -163,6 +163,17 @@ OPTION(ENABLE_CURL "Whether libcurl should be checked so that email_writer will 
 
 # SET(POSTGRES_CLIENT_LIB "<My PostgresSQL Library>" CACHE STRING "PostgresSQL client library")
 
+# The location of the DB2 header files.
+
+# SET(DB2_INCLUDE_DIR "<My DB2 Include Directory>" CACHE STRING "Include directory of the DB2 client")
+
+# The name of the DB2 library. This variable need not be set for the Chucho
+# library to build successfully with DB2 support. In the context of the
+# Chucho build, this variable is only used for unit test linkage. However, you must
+# link your own application to the DB2 library when linking to Chucho.
+
+# SET(DB2_CLIENT_LIB "<My DB2 Library>" CACHE STRING "DB2 client library")
+
 # RUBY EVALUATOR FILTER
 # ================================================================================
 #     Chucho has a filter that can evaluate any Ruby expression to determine the

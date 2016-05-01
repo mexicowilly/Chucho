@@ -172,6 +172,24 @@ TEST_F(chucho_config_file_configurator, cout_writer)
     cout_writer_body();
 }
 
+#if defined(CHUCHO_HAVE_DB2)
+
+TEST_F(chucho_config_file_configurator, db2_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = or\n"
+              "chucho.writer.or = chucho::db2_writer\n"
+              "chucho.writer.or.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.or.user = db2inst1\n"
+              "chucho.writer.or.password = db2inst1\n"
+              "chucho.writer.or.database = chucho");
+    db2_writer_body();
+}
+
+#endif
+
 TEST_F(chucho_config_file_configurator, duplicate_message_filter)
 {
     configure("chucho.logger = will\n"

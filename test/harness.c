@@ -54,6 +54,9 @@
 #if defined(CHUCHO_HAVE_POSTGRES)
 #include "postgres_writer_test.h"
 #endif
+#if defined(CHUCHO_HAVE_DB2)
+#include "db2_writer_test.h"
+#endif
 #if defined(CHUCHO_WINDOWS)
 #include "windows_event_log_writer_test.h"
 #endif
@@ -136,6 +139,9 @@ int main()
     #endif
     #if defined(CHUCHO_HAVE_ACTIVEMQ)
     run_activemq_writer_test();
+    #endif
+    #if defined(CHUCHO_HAVE_DB2)
+    run_db2_writer_test();
     #endif
 
     sput_finish_testing();

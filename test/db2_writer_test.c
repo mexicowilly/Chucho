@@ -15,10 +15,10 @@
  */
 
 #include "sput.h"
-#include <chucho/oracle_writer.h>
+#include <chucho/db2_writer.h>
 #include <chucho/pattern_formatter.h>
 
-static void oracle_writer_test(void)
+static void db2_writer_test(void)
 {
     chucho_formatter* fmt;
     chucho_rc rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
@@ -26,26 +26,26 @@ static void oracle_writer_test(void)
     const char* text;
 
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
-    rc = chucho_create_oracle_writer(&wrt, fmt, "test_user", "password", "192.168.56.102/pdb1");
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create oracle writer");
+    rc = chucho_create_db2_writer(&wrt, fmt, "chucho", "db2inst1", "db2inst1");
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create db2 writer");
     if (rc != CHUCHO_NO_ERROR)
         return;
-    rc = chucho_owrt_get_database(wrt, &text);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_owrt_get_database");
-    sput_fail_unless(strcmp(text, "192.168.56.102/pdb1") == 0, text);
-    rc = chucho_owrt_get_user(wrt, &text);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_owrt_get_user");
-    sput_fail_unless(strcmp(text, "test_user") == 0, text);
-    rc = chucho_owrt_get_password(wrt, &text);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_owrt_get_password");
-    sput_fail_unless(strcmp(text, "password") == 0, text);
+    rc = chucho_db2wrt_get_database(wrt, &text);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_db2wrt_get_database");
+    sput_fail_unless(strcmp(text, "chucho") == 0, text);
+    rc = chucho_db2wrt_get_user(wrt, &text);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_db2wrt_get_user");
+    sput_fail_unless(strcmp(text, "db2inst1") == 0, text);
+    rc = chucho_db2wrt_get_password(wrt, &text);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_db2wrt_get_password");
+    sput_fail_unless(strcmp(text, "db2inst1") == 0, text);
     rc = chucho_release_writer(wrt);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "release owrt writer");
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "release db2wrt writer");
 }
 
-void run_oracle_writer_test(void)
+void run_db2_writer_test(void)
 {
-    sput_enter_suite("oracle_writer");
-    sput_run_test(oracle_writer_test);
+    sput_enter_suite("db2_writer");
+    sput_run_test(db2_writer_test);
     sput_leave_suite();
 }
