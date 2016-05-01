@@ -210,6 +210,23 @@ TEST_F(yaml_configurator, cout_writer_invalid_2)
                          "    - chucho::cout_writer");
 }
 
+#if defined(CHUCHO_HAVE_DB2)
+
+TEST_F(yaml_configurator, db2_writer)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::db2_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m'\n"
+              "        user: db2inst1\n"
+              "        password: db2inst1\n"
+              "        database: chucho");
+    db2_writer_body();
+}
+
+#endif
+
 TEST_F(yaml_configurator, duplicate_message_filter)
 {
     configure("chucho::logger:\n"

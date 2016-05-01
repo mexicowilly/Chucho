@@ -39,11 +39,11 @@ namespace chucho
 {
 
 db2_writer::db2_writer(std::shared_ptr<formatter> fmt,
-                       const std::string& server,
+                       const std::string& database,
                        const std::string& user,
                        const std::string& password)
     : database_writer(fmt),
-      server_(server),
+      database_(database),
       user_(user),
       password_(password)
 {
@@ -56,14 +56,14 @@ db2_writer::db2_writer(std::shared_ptr<formatter> fmt,
     if (!SQL_SUCCEEDED(rc))
         throw exception("Unable to allocate database handle: " + get_error_message(SQL_HANDLE_DBC));
     rc = SQLConnect(dbc_,
-                    get_sqlchar(server_.c_str()),
-                    server_.length(),
+                    get_sqlchar(database_.c_str()),
+                    database_.length(),
                     get_sqlchar(user_.c_str()),
                     user_.length(),
                     get_sqlchar(password_.c_str()),
                     password_.length());
     if (!SQL_SUCCEEDED(rc))
-        throw exception("Unable to connect to database " + server_ + ": " + get_error_message(SQL_HANDLE_DBC));
+        throw exception("Unable to connect to database " + database_ + ": " + get_error_message(SQL_HANDLE_DBC));
     rc = SQLAllocHandle(SQL_HANDLE_STMT, dbc_, &stmt_);
     if (!SQL_SUCCEEDED(rc))
         throw exception("Unable to allocate statement handle: " + get_error_message(SQL_HANDLE_DBC));
@@ -82,7 +82,7 @@ db2_writer::~db2_writer()
         SQLRETURN rc = SQLDisconnect(dbc_);
         if (!SQL_SUCCEEDED(rc))
         {
-            report_warning("Error disconnecting from database " + server_ +
+            report_warning("Error disconnecting from database " + database_ +
                 ": " + get_error_message(SQL_HANDLE_DBC));
         }
         SQLFreeHandle(SQL_HANDLE_DBC, dbc_);

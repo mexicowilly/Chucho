@@ -60,6 +60,9 @@
 #if defined(CHUCHO_HAVE_POSTGRES)
 #include <chucho/postgres_writer_factory.hpp>
 #endif
+#if defined(CHUCHO_HAVE_DB2)
+#include <chucho/db2_writer_factory.hpp>
+#endif
 #if defined(CHUCHO_HAVE_RUBY)
 #include <chucho/ruby_evaluator_filter_factory.hpp>
 #endif
@@ -186,6 +189,10 @@ void configurator::initialize_impl()
 #if defined(CHUCHO_HAVE_POSTGRES)
     fact.reset(new postgres_writer_factory());
     add_configurable_factory("chucho::postgres_writer", fact);
+#endif
+#if defined(CHUCHO_HAVE_DB2)
+    fact.reset(new db2_writer_factory());
+    add_configurable_factory("chucho::db2_writer", fact);
 #endif
 #if defined(CHUCHO_HAVE_RUBY)
     fact.reset(new ruby_evaluator_filter_factory());

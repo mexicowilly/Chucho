@@ -59,6 +59,9 @@
 #if defined(CHUCHO_HAVE_POSTGRES)
 #include <chucho/postgres_writer.hpp>
 #endif
+#if defined(CHUCHO_HAVE_DB2)
+#include <chucho/db2_writer.hpp>
+#endif
 #if defined(CHUCHO_HAVE_RUBY)
 #include <chucho/ruby_evaluator_filter.hpp>
 #endif
@@ -210,6 +213,22 @@ void configurator::cout_writer_body()
     ASSERT_EQ(1, wrts.size());
     EXPECT_EQ(typeid(chucho::cout_writer), typeid(*wrts[0]));
 }
+
+#if defined(CHUCHO_HAVE_DB2)
+
+void configurator::db2_writer_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::db2_writer), typeid(*wrts[0]));
+    auto owrt = std::static_pointer_cast<chucho::db2_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(owrt));
+    EXPECT_EQ(std::string("chucho"), owrt->get_database());
+    EXPECT_EQ(std::string("db2inst1"), owrt->get_user());
+    EXPECT_EQ(std::string("db2inst1"), owrt->get_password());
+}
+
+#endif
 
 void configurator::duplicate_message_filter_body()
 {

@@ -42,6 +42,9 @@ protected:
     void configure(const char* const cnf);
     void configure_with_error(const char* const cnf);
     void cout_writer_body();
+#if defined(CHUCHO_HAVE_DB2)
+    void db2_writer_body();
+#endif
     void duplicate_message_filter_body();
 #if defined(CHUCHO_HAVE_EMAIL_WRITER)
     void email_writer_body();

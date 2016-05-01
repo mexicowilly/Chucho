@@ -44,7 +44,7 @@ public:
      * Construct a DB2 writer.
      * 
      * @param fmt the formatter
-     * @param server the server to which to connect
+     * @param database the database to which to connect
      * @param user the user name for the database
      * @param password the password of the user for the database
      * 
@@ -54,7 +54,7 @@ public:
      *        database
      */
     db2_writer(std::shared_ptr<formatter> fmt,
-               const std::string& server,
+               const std::string& database,
                const std::string& user,
                const std::string& password);
     /**
@@ -64,17 +64,17 @@ public:
     //@}
 
     /**
+     * Return the name of the database.
+     * 
+     * @return the database name
+     */
+    const std::string& get_database() const;
+    /**
      * Return the password.
      * 
      * @return the password
      */
     const std::string& get_password() const;
-    /**
-     * Return the name of the server.
-     * 
-     * @return the server name
-     */
-    const std::string& get_server() const;
     /**
      * Return the Oracle user name.
      * 
@@ -89,21 +89,21 @@ private:
     CHUCHO_NO_EXPORT void allocate_environment() const;
     CHUCHO_NO_EXPORT std::string get_error_message(SQLSMALLINT handle_type) const;
 
-    std::string server_;
+    std::string database_;
     std::string user_;
     std::string password_;
     SQLHDBC dbc_;
     SQLHSTMT stmt_;
 };
 
+inline const std::string& db2_writer::get_database() const
+{
+    return database_;
+}
+
 inline const std::string& db2_writer::get_password() const
 {
     return password_;
-}
-
-inline const std::string& db2_writer::get_server() const
-{
-    return server_;
 }
 
 inline const std::string& db2_writer::get_user() const

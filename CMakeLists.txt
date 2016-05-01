@@ -405,11 +405,11 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
 IF(CHUCHO_HAVE_DB2)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/db2_writer.hpp)
     LIST(APPEND CHUCHO_DATABASE_SOURCES
-         db2_writer.cpp)
-#         postgres_writer_factory.cpp
-#         postgres_writer_memento.cpp
-#         include/chucho/postgres_writer_factory.hpp
-#         include/chucho/postgres_writer_memento.hpp)
+         db2_writer.cpp
+         db2_writer_factory.cpp
+         db2_writer_memento.cpp
+         include/chucho/db2_writer_factory.hpp
+         include/chucho/db2_writer_memento.hpp)
 #    IF(C_API)
 #        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/postgres_writer.h)
 #        LIST(APPEND CHUCHO_DATABASE_SOURCES c_postgres_writer.cpp)
@@ -904,6 +904,10 @@ ENDIF()
 
 IF(CHUCHO_HAVE_POSTGRES)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_POSTGRES)
+ENDIF()
+
+IF(CHUCHO_HAVE_DB2)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_DB2)
 ENDIF()
 
 IF(CHUCHO_HAVE_RUBY)
