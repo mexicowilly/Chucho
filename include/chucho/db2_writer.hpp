@@ -29,7 +29,10 @@ namespace chucho
 {
 
 /**
- * @class db2_writer db2_writer.hpp chucho/db2_writer.hpp 
+ * @class db2_writer db2_writer.hpp chucho/db2_writer.hpp
+ * A writer that writes log events to a DB2 database. Please
+ * refer to the file @c sql/db2.sql for information about
+ * tables that must exist.
  * 
  * @ingroup writers database
  */
@@ -38,8 +41,8 @@ class CHUCHO_EXPORT db2_writer : public database_writer
 public:
     /**
      * @name Constructor and Destructor
+     * @{
      */
-    //@{
     /**
      * Construct a DB2 writer.
      * 
@@ -61,7 +64,9 @@ public:
      * Destroy a DB2 writer.
      */
     ~db2_writer();
-    //@}
+    /**
+     * @}
+     */
 
     /**
      * Return the name of the database.

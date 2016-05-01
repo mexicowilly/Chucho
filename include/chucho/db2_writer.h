@@ -19,7 +19,7 @@
 
 /**
  * @file 
- * Creation of DB2 writers. 
+ * Functions for DB2 writers. 
  * @copydoc chucho::db2_writer
  *  
  * @ingroup c_writers c_database

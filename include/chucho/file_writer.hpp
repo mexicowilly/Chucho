@@ -128,6 +128,13 @@ protected:
      * @param file_name the name of the new file
      */
     void open(const std::string& file_name);
+    /**
+     * Set whether this writer should ever be allowed to create
+     * files. This is used by @ref named_pipe_writer. The
+     * default behavior is to allow creation.
+     * 
+     * @param allow whether to allow creation or not
+     */
     void set_allow_creation(bool allow);
     virtual void write_impl(const event& evt) override;
 

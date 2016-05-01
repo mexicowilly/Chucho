@@ -417,8 +417,8 @@ IF(CHUCHO_HAVE_DB2)
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
-     include/chucho/db2_writer.hpp)
-#     include/chucho/postgres_writer.h)
+     include/chucho/db2_writer.hpp
+     include/chucho/db2_writer.h)
 
 IF(CHUCHO_HAVE_RUBY)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/ruby_evaluator_filter.hpp)
