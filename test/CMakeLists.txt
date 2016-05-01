@@ -240,6 +240,12 @@ IF(C_API)
              postgres_writer_test.h)
     ENDIF()
 
+    IF(CHUCHO_HAVE_DB2)
+        LIST(APPEND CHUCHO_DB_C_SOURCES
+             db2_writer_test.c
+             db2_writer_test.h)
+    ENDIF()
+
     IF(CHUCHO_HAVE_RUBY)
         LIST(APPEND CHUCHO_EVALUATOR_C_SOURCES
              ruby_evaluator_filter_test.c

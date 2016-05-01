@@ -410,10 +410,10 @@ IF(CHUCHO_HAVE_DB2)
          db2_writer_memento.cpp
          include/chucho/db2_writer_factory.hpp
          include/chucho/db2_writer_memento.hpp)
-#    IF(C_API)
-#        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/postgres_writer.h)
-#        LIST(APPEND CHUCHO_DATABASE_SOURCES c_postgres_writer.cpp)
-#    ENDIF()
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/db2_writer.h)
+        LIST(APPEND CHUCHO_DATABASE_SOURCES c_db2_writer.cpp)
+    ENDIF()
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
