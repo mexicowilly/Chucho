@@ -25,11 +25,8 @@ namespace environment
 
 optional<std::string> get(const std::string& var)
 {
-    optional<std::string> result;
     const char* val = std::getenv(var.c_str());
-    if (val != nullptr)
-        result = val;
-    return result;
+    return (val == nullptr) ? optional<std::string>() : optional<std::string>(std::string(val));
 }
 
 }

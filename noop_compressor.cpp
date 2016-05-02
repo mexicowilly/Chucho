@@ -21,7 +21,7 @@ namespace chucho
 
 std::vector<std::uint8_t> noop_compressor::compress(const std::vector<std::uint8_t>& in)
 {
-    return in;
+    return std::vector<std::uint8_t>(in);
 }
 
 }

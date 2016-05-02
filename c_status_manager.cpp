@@ -27,6 +27,8 @@ namespace
 class c_status_observer : public chucho::status_observer
 {
 public:
+    static bool equal(const std::shared_ptr<c_status_observer> obs, chucho_status_observer pobs);
+
     c_status_observer(chucho_status_observer obs);
 
     chucho_status_observer get_c_observer() const;
@@ -46,6 +48,11 @@ struct static_data
 inline c_status_observer::c_status_observer(chucho_status_observer obs)
     : c_observer_(obs)
 {
+}
+
+inline bool c_status_observer::equal(const std::shared_ptr<c_status_observer> obs, chucho_status_observer pobs)
+{
+    return obs->c_observer_ == pobs;
 }
 
 inline chucho_status_observer c_status_observer::get_c_observer() const
@@ -139,9 +146,10 @@ chucho_rc chucho_status_remove_observer(chucho_status_observer obs)
     if (obs == nullptr) 
         return CHUCHO_NULL_POINTER;
     static_data& sd(data());
+    // I was using a lambda here, but the Sun compiler hated it
     auto found = std::find_if(sd.c_observers_.begin(),
                               sd.c_observers_.end(),
-                              [&] (std::shared_ptr<c_status_observer> cppobs) { return cppobs->get_c_observer() == obs; });
+                              std::bind(c_status_observer::equal, std::placeholders::_1, obs));
     if (found != sd.c_observers_.end()) 
     {
         chucho::status_manager::get()->remove(*found);

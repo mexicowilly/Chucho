@@ -124,6 +124,10 @@ IF(CHUCHO_POSIX)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/file_writer_posix.cpp PROPERTIES
                                     COMPILE_DEFINITIONS CHUCHO_HAVE_O_LARGEFILE)
     ENDIF()
+    IF(CHUCHO_SOLARIS AND CMAKE_CXX_COMPILER_ID STREQUAL SunPro)
+        SET_SOURCE_FILES_PROPERTIES(platform/posix/socket_connector_posix.cpp PROPERTIES
+                                    COMPILE_DEFINITIONS _POSIX_PTHREAD_SEMANTICS)
+    ENDIF()
 ELSEIF(CHUCHO_WINDOWS)
     SET(CHUCHO_PLATFORM_SOURCES
         platform/windows/calendar_windows.cpp
@@ -1172,6 +1176,10 @@ TARGET_LINK_LIBRARIES(chucho ${CMAKE_THREAD_LIBS_INIT})
 
 IF(CHUCHO_SOLARIS)
     TARGET_LINK_LIBRARIES(chucho socket nsl)
+ENDIF()
+
+IF(CMAKE_CXX_COMPILER_ID STREQUAL SunPro)
+    TARGET_LINK_LIBRARIES(chucho demangle)
 ENDIF()
 
 IF(CHUCHO_WINDOWS)
