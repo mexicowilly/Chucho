@@ -527,17 +527,17 @@ int main()
     # calloc/free/malloc
     CHUCHO_REQUIRE_C_SYMBOLS(stdlib.h calloc free malloc)
 
-    # On Solaris with gcc we don't get the transitive linkage
+    # On Solaris we don't get the transitive linkage
     # to the C++ runtime when linking a C program against a Chucho
     # shared object. So, we need to figure out where the C++
     # runtime is and add it to the target link libraries of the
     # C unit test app.
-    IF(ENABLE_SHARED AND CHUCHO_SOLARIS AND CMAKE_COMPILER_IS_GNUCXX AND NOT DEFINED CHUCHO_LIBSTDCXX)
+    IF(C_API AND ENABLE_SHARED AND CHUCHO_SOLARIS AND NOT DEFINED CHUCHO_STD_CXX_LIBS)
         CHUCHO_FIND_PROGRAM(CHUCHO_LDD ldd)
         IF(NOT CHUCHO_LDD)
             MESSAGE(FATAL_ERROR "Could not find ldd")
         ENDIF()
-        MESSAGE(STATUS "Looking for libstdc++")
+        MESSAGE(STATUS "Looking for standard C++ libraries")
         FILE(WRITE "${CMAKE_BINARY_DIR}/libstdc++-check.cpp"
              "#include <string>\nint main() { std::string s; return 0; }")
         TRY_COMPILE(CHUCHO_CXX_RESULT
@@ -563,14 +563,20 @@ int main()
                        "\\1"
                        CHUCHO_LIBSTDCXX
                        "${LINE}")
-                BREAK()
+            ENDIF()
+            IF(LINE MATCHES libCrun)
+                STRING(REGEX REPLACE
+                       "^.+=>[ \\\t]*(.+libCrun.+)$"
+                       "\\1"
+                       CHUCHO_LIBCRUN
+                       "${LINE}")
             ENDIF()
         ENDFOREACH()
-        IF(NOT CHUCHO_LIBSTDCXX)
-            MESSAGE(FATAL_ERROR "Could not determine the location of libstdc++")
+        SET(CHUCHO_STD_CXX_LIBS ${CHUCHO_LIBSTDCXX} ${CHUCHO_LIBCRUN} CACHE INTERNAL "The location of the stdandard C++ runtime library")
+        IF(NOT CHUCHO_STD_CXX_LIBS)
+            MESSAGE(WARNING "Could not determine the location of stdandard C++ runtime libraries. The C unit tests cannot be built.")
         ENDIF()
-        SET(CHUCHO_LIBSTDCXX "${CHUCHO_LIBSTDCXX}" CACHE INTERNAL "The location of the standard C++ runtime library")
-        MESSAGE(STATUS "Looking for libstdc++ - ${CHUCHO_LIBSTDCXX}")
+        MESSAGE(STATUS "Looking for standard C++ libraries - ${CHUCHO_STD_CXX_LIBS}")
     ENDIF()
 ENDIF()
 
