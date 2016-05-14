@@ -16,6 +16,7 @@
 
 #include <gtest/gtest.h>
 #include <chucho/zlib_compressor.hpp>
+#include <cstring>
 
 TEST(zlib_compressor, big)
 {

@@ -997,11 +997,17 @@ IF(CHUCHO_HAVE_ZLIB)
     ENDIF()
     IF(CHUCHO_ZLIB_SOURCES)
         IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_COMPILER_IS_GNUCXX)
+            IF(CHUCHO_PRIV_EXPORT)
+                SET(CHUCHO_ZLIB_FLAGS -fvisibility=default)
+                SET_SOURCE_FILES_PROPERTIES(${CHUCHO_ZLIB_SOURCES}
+                                            PROPERTIES
+                                            COMPILE_FLAGS ${CHUCHO_ZLIB_FLAGS})
+            ENDIF()
             SET_SOURCE_FILES_PROPERTIES("${ZLIB_SOURCE}/gzlib.c"
                                         "${ZLIB_SOURCE}/gzread.c"
                                         "${ZLIB_SOURCE}/gzwrite.c"
                                         PROPERTIES
-                                        COMPILE_FLAGS -Wno-implicit-function-declaration)
+                                        COMPILE_FLAGS "${CHUCHO_ZLIB_FLAGS} -Wno-implicit-function-declaration")
         ELSEIF(MSVC)
             SET_SOURCE_FILES_PROPERTIES("${ZLIB_SOURCE}/gzlib.c"
                                         "${ZLIB_SOURCE}/gzread.c"
