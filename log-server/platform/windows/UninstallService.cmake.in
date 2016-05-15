@@ -25,7 +25,7 @@ MESSAGE(STATUS "Deleting existing service")
 EXECUTE_PROCESS(COMMAND "${CHUCHO_SC}" delete Chucho
                 RESULT_VARIABLE SC_RESULT)
 IF(NOT SC_RESULT EQUAL 0 AND NOT SC_RESULT EQUAL 1060)
-    MESSAGE(FATAL_ERROR "Could delete the service")
+    MESSAGE(FATAL_ERROR "Could not delete the service")
 ENDIF()
 IF(SC_RESULT EQUAL 0)
     MESSAGE(STATUS "Waiting one second, so that the existing Chucho server can shut down")

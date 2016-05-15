@@ -91,7 +91,7 @@ TEST_F(async_writer_test, blocking)
     EXPECT_EQ(chucho::level::INFO_(), as->get_discard_threshold());
     for (int i = 0; i < 20; i++)
         as->write(get_event(std::to_string(i), chucho::level::WARN_()));
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     auto slow = std::dynamic_pointer_cast<slow_writer>(as->get_writer());
     ASSERT_EQ(20, slow->get_events().size());
     for (int i = 0; i < 20; i++)
