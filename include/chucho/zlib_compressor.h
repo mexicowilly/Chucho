@@ -45,7 +45,7 @@ extern "C"
  * @return a value from @ref return_code.h indicating success or
  *         failure
  */
-CHUCHO_EXPORT chucho_rc chucho_create_zlib_compressor(chucho_compressor** ser,
+CHUCHO_EXPORT chucho_rc chucho_create_zlib_compressor(chucho_compressor** cmp,
                                                       int compression_level = Z_DEFAULT_COMPRESSION);
 
 #if defined(__cplusplus)
