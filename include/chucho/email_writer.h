@@ -20,7 +20,7 @@
 /**
  * @file email_writer.h
  * Functions for creating and querying email writers.
- * @copydoc email_writer
+ * @copydoc chucho::email_writer
  * 
  * @ingroup c_email c_writers
  */

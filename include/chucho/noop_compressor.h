@@ -42,7 +42,7 @@ extern "C"
  * @return a value from @ref return_code.h indicating success or
  *         failure
  */
-CHUCHO_EXPORT chucho_rc chucho_create_noop_compressor(chucho_compressor** ser);
+CHUCHO_EXPORT chucho_rc chucho_create_noop_compressor(chucho_compressor** cmp);
 
 #if defined(__cplusplus)
 }

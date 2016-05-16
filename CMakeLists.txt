@@ -21,7 +21,7 @@ ENDIF()
 
 PROJECT(chucho CXX C)
 
-SET(CHUCHO_VERSION 1.8)
+SET(CHUCHO_VERSION 1.9)
 SET(CHUCHO_SO_VERSION 1)
 # This is used for release candidate distros
 #SET(CHUCHO_DIST_VERSION try-1)
