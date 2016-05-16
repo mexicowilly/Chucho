@@ -36,7 +36,7 @@ class CHUCHO_EXPORT zeromq_writer : public message_queue_writer
 {
 public:
     /**
-     * @name Constructor and Destructor
+     * @name Constructors and Destructor
      * @{
      */
     /**
@@ -51,6 +51,22 @@ public:
      */
     zeromq_writer(std::shared_ptr<formatter> fmt,
                   std::shared_ptr<serializer> ser,
+                  const std::string& endpoint,
+                  const std::vector<std::uint8_t>& prefix = std::vector<std::uint8_t>());
+    /**
+     * Construct a ZeroMQ writer.
+     * 
+     * @param fmt the formatter
+     * @param ser the serializer
+     * @param cmp the compressor
+     * @param endpoint the ZeroMQ endpoint to which to bind the publishing socket
+     * @param prefix the message prefix, which will be used as the "topic". If a
+     * prefix is provided, then each event will be published as a two-part message,
+     * first prefix, then event.
+     */
+    zeromq_writer(std::shared_ptr<formatter> fmt,
+                  std::shared_ptr<serializer> ser,
+                  std::shared_ptr<compressor> cmp,
                   const std::string& endpoint,
                   const std::vector<std::uint8_t>& prefix = std::vector<std::uint8_t>());
     /**
@@ -78,6 +94,8 @@ protected:
     virtual void write_impl(const event& evt) override;
 
 private:
+    CHUCHO_NO_EXPORT void init();
+
     std::string endpoint_;
     std::vector<std::uint8_t> prefix_;
     void* socket_;

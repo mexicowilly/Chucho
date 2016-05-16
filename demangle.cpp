@@ -15,9 +15,12 @@
  */
 
 #include <chucho/demangle.hpp>
+#include <typeinfo>
 #if defined(__clang__) || defined(__GNUC__)
 #include <cxxabi.h>
 #include <cstdlib>
+#elif defined(__SUNPRO_CC)
+#include <demangle.h>
 #endif
 
 namespace chucho
@@ -39,6 +42,11 @@ std::string get_demangled_name(const std::type_info& info)
     std::string result(demangled);
     std::free(demangled);
     return result;
+#elif defined(__SUNPRO_CC)
+    char buf[1024];
+    std::string lnm = std::string("_Z") + info.name();
+    return (cplus_demangle(lnm.c_str(), buf, sizeof(buf)) == 0) ?
+        std::string(buf) : info.name();
 #else
     return info.name();
 #endif

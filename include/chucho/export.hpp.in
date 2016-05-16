@@ -36,8 +36,6 @@
 #define CHUCHO_EXPORT __declspec(dllexport)
 #elif defined(__clang__) || (defined(__GNUC__) && __GNUC__ >= 4)
 #define CHUCHO_EXPORT __attribute__ ((visibility ("default")))
-#elif defined(__SUNPRO_CC)
-#define CHUCHO_EXPORT __symbolic
 #else
 #define CHUCHO_EXPORT
 #endif
@@ -48,8 +46,6 @@
 #define CHUCHO_EXPORT __declspec(dllimport)
 #elif defined(__clang__) || (defined(__GNUC__) && __GNUC__ >= 4)
 #define CHUCHO_EXPORT __attribute__ ((visibility ("default")))
-#elif defined(__SUNPRO_CC)
-#define CHUCHO_EXPORT __hidden
 #else
 #define CHUCHO_EXPORT
 #endif

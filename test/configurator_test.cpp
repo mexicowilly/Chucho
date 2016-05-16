@@ -59,6 +59,9 @@
 #if defined(CHUCHO_HAVE_POSTGRES)
 #include <chucho/postgres_writer.hpp>
 #endif
+#if defined(CHUCHO_HAVE_DB2)
+#include <chucho/db2_writer.hpp>
+#endif
 #if defined(CHUCHO_HAVE_RUBY)
 #include <chucho/ruby_evaluator_filter.hpp>
 #endif
@@ -74,10 +77,14 @@
 #endif
 #if defined(CHUCHO_HAVE_ZEROMQ)
 #include <chucho/zeromq_writer.hpp>
+#include <chucho/noop_compressor.hpp>
 #endif
 #include <chucho/formatted_message_serializer.hpp>
 #if defined(CHUCHO_HAVE_PROTOBUF)
 #include <chucho/protobuf_serializer.hpp>
+#endif
+#if defined(CHUCHO_HAVE_ACTIVEMQ)
+#include <chucho/activemq_writer.hpp>
 #endif
 
 namespace chucho
@@ -98,6 +105,40 @@ configurator::~configurator()
 {
     EXPECT_LT(chucho::status_manager::get()->get_level(), chucho::status::level::WARNING_);
 }
+
+#if defined(CHUCHO_HAVE_ACTIVEMQ)
+
+void configurator::activemq_writer_queue_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::activemq_writer), typeid(*wrts[0]));
+    auto aw = std::static_pointer_cast<chucho::activemq_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(aw));
+    auto ser = aw->get_serializer();
+    ASSERT_TRUE(static_cast<bool>(ser));
+    EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(*ser));
+    EXPECT_EQ(std::string("tcp://127.0.0.1:61616"), aw->get_broker());
+    EXPECT_EQ(activemq_writer::consumer_type::QUEUE, aw->get_consumer_type());
+    EXPECT_EQ(std::string("MonkeyBalls"), aw->get_topic_or_queue());
+}
+
+void configurator::activemq_writer_topic_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::activemq_writer), typeid(*wrts[0]));
+    auto aw = std::static_pointer_cast<chucho::activemq_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(aw));
+    auto ser = aw->get_serializer();
+    ASSERT_TRUE(static_cast<bool>(ser));
+    EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(*ser));
+    EXPECT_EQ(std::string("tcp://127.0.0.1:61616"), aw->get_broker());
+    EXPECT_EQ(activemq_writer::consumer_type::TOPIC, aw->get_consumer_type());
+    EXPECT_EQ(std::string("MonkeyBalls"), aw->get_topic_or_queue());
+}
+
+#endif
 
 void configurator::async_writer_body()
 {
@@ -172,6 +213,22 @@ void configurator::cout_writer_body()
     ASSERT_EQ(1, wrts.size());
     EXPECT_EQ(typeid(chucho::cout_writer), typeid(*wrts[0]));
 }
+
+#if defined(CHUCHO_HAVE_DB2)
+
+void configurator::db2_writer_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::db2_writer), typeid(*wrts[0]));
+    auto owrt = std::static_pointer_cast<chucho::db2_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(owrt));
+    EXPECT_EQ(std::string("chucho"), owrt->get_database());
+    EXPECT_EQ(std::string("db2inst1"), owrt->get_user());
+    EXPECT_EQ(std::string("db2inst1"), owrt->get_password());
+}
+
+#endif
 
 void configurator::duplicate_message_filter_body()
 {
@@ -794,6 +851,25 @@ void configurator::zeromq_writer_body()
     ASSERT_TRUE(static_cast<bool>(ser));
     EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(*ser));
     EXPECT_EQ(std::string("tcp://127.0.0.1:7777"), zw->get_endpoint());
+    std::string pfx_str("Hi");
+    std::vector<std::uint8_t> pfx(pfx_str.begin(), pfx_str.end());
+    EXPECT_EQ(pfx, zw->get_prefix());
+}
+
+void configurator::zeromq_writer_with_compressor_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::zeromq_writer), typeid(*wrts[0]));
+    auto zw = std::static_pointer_cast<chucho::zeromq_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(zw));
+    auto ser = zw->get_serializer();
+    ASSERT_TRUE(static_cast<bool>(ser));
+    EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(*ser));
+    auto cmp = zw->get_compressor();
+    ASSERT_TRUE(static_cast<bool>(cmp));
+    EXPECT_EQ(typeid(chucho::noop_compressor), typeid(*cmp));
+    EXPECT_EQ(std::string("tcp://127.0.0.1:7776"), zw->get_endpoint());
     std::string pfx_str("Hi");
     std::vector<std::uint8_t> pfx(pfx_str.begin(), pfx_str.end());
     EXPECT_EQ(pfx, zw->get_prefix());

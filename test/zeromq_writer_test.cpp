@@ -74,9 +74,11 @@ public:
         }
     }
 
-    void write(const std::string& msg)
+    void write(const std::string& msg, const std::string& cmp = std::string())
     {
         std::string cmd = helper_ + ' ' + ENDPOINT + ' ' + TOPIC + ' ' + msg;
+        if (!cmp.empty())
+            cmd += ' ' + cmp;
         int rc = std::system(cmd.c_str());
         EXPECT_EQ(0, rc);
     }
@@ -90,6 +92,21 @@ private:
     zmq_msg_t msg_;
 };
 
+}
+
+TEST_F(zeromq_writer_test, compress)
+{
+    if (helper_.empty())
+    {
+        FAIL() << "This test can only run with a make file CMake generator";
+    }
+    else
+    {
+        std::string msg("MonkeyBalls");
+        std::thread thr([&, this] () { read(msg); });
+        write(msg, "noop");
+        thr.join();
+    }
 }
 
 TEST_F(zeromq_writer_test, simple)

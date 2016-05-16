@@ -151,6 +151,31 @@ ELSEIF(MSVC)
     IF(ENABLE_SHARED)
         SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4275 /EHsc")
     ENDIF()
+ELSEIF(CMAKE_CXX_COMPILER_ID STREQUAL SunPro)
+    IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.14.0)
+        MESSAGE(FATAL_ERROR "CC version 5.14.0 or later is required (the compiler that ships with Solaris Studio 12.5)")
+    ENDIF()
+    CHECK_CXX_COMPILER_FLAG(-std=c++11 CHUCHO_HAVE_STD)
+    IF(CHUCHO_HAVE_STD)
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    ELSE()
+        MESSAGE(FATAL_ERROR "-std=c++11 is required")
+    ENDIF()
+    CHECK_CXX_COMPILER_FLAG(-errtags=yes CHUCHO_HAVE_ERRTAGS)
+    IF(CHUCHO_HAVE_ERRTAGS)
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -errtags=yes")
+    ENDIF()
+    CHECK_C_COMPILER_FLAG(-errtags=yes CHUCHO_HAVE_C_ERRTAGS)
+    IF(CHUCHO_HAVE_ERRTAGS)
+        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -errtags=yes")
+    ENDIF()
+    SET(CHUCHO_SUNPRO_DISABLED_WARNINGS nonewline,wbadlkginit)
+    CHECK_CXX_COMPILER_FLAG(-erroff=${CHUCHO_SUNPRO_DISABLED_WARNINGS} CHUCHO_HAVE_ERROFF)
+    IF(CHUCHO_HAVE_ERRTAGS)
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -erroff=${CHUCHO_SUNPRO_DISABLED_WARNINGS}")
+    ELSE()
+        MESSAGE(FATAL_ERROR "-erroff=${CHUCHO_SUNPRO_DISABLED_WARNINGS} is required")
+    ENDIF()
 ENDIF()
 
 # We are building Chucho
@@ -502,17 +527,17 @@ int main()
     # calloc/free/malloc
     CHUCHO_REQUIRE_C_SYMBOLS(stdlib.h calloc free malloc)
 
-    # On Solaris with gcc we don't get the transitive linkage
+    # On Solaris we don't get the transitive linkage
     # to the C++ runtime when linking a C program against a Chucho
     # shared object. So, we need to figure out where the C++
     # runtime is and add it to the target link libraries of the
     # C unit test app.
-    IF(ENABLE_SHARED AND CHUCHO_SOLARIS AND CMAKE_COMPILER_IS_GNUCXX AND NOT DEFINED CHUCHO_LIBSTDCXX)
+    IF(C_API AND ENABLE_SHARED AND CHUCHO_SOLARIS AND NOT DEFINED CHUCHO_STD_CXX_LIBS)
         CHUCHO_FIND_PROGRAM(CHUCHO_LDD ldd)
         IF(NOT CHUCHO_LDD)
             MESSAGE(FATAL_ERROR "Could not find ldd")
         ENDIF()
-        MESSAGE(STATUS "Looking for libstdc++")
+        MESSAGE(STATUS "Looking for standard C++ libraries")
         FILE(WRITE "${CMAKE_BINARY_DIR}/libstdc++-check.cpp"
              "#include <string>\nint main() { std::string s; return 0; }")
         TRY_COMPILE(CHUCHO_CXX_RESULT
@@ -538,14 +563,20 @@ int main()
                        "\\1"
                        CHUCHO_LIBSTDCXX
                        "${LINE}")
-                BREAK()
+            ENDIF()
+            IF(LINE MATCHES libCrun)
+                STRING(REGEX REPLACE
+                       "^.+=>[ \\\t]*(.+libCrun.+)$"
+                       "\\1"
+                       CHUCHO_LIBCRUN
+                       "${LINE}")
             ENDIF()
         ENDFOREACH()
-        IF(NOT CHUCHO_LIBSTDCXX)
-            MESSAGE(FATAL_ERROR "Could not determine the location of libstdc++")
+        SET(CHUCHO_STD_CXX_LIBS ${CHUCHO_LIBSTDCXX} ${CHUCHO_LIBCRUN} CACHE INTERNAL "The location of the stdandard C++ runtime library")
+        IF(NOT CHUCHO_STD_CXX_LIBS)
+            MESSAGE(WARNING "Could not determine the location of stdandard C++ runtime libraries. The C unit tests cannot be built.")
         ENDIF()
-        SET(CHUCHO_LIBSTDCXX "${CHUCHO_LIBSTDCXX}" CACHE INTERNAL "The location of the standard C++ runtime library")
-        MESSAGE(STATUS "Looking for libstdc++ - ${CHUCHO_LIBSTDCXX}")
+        MESSAGE(STATUS "Looking for standard C++ libraries - ${CHUCHO_STD_CXX_LIBS}")
     ENDIF()
 ENDIF()
 
@@ -628,6 +659,27 @@ IF(POSTGRES_INCLUDE_DIR)
     UNSET(CMAKE_REQUIRED_INCLUDES)
     UNSET(CMAKE_REQUIRED_LIBRARIES)
     SET(CHUCHO_HAVE_POSTGRES TRUE CACHE INTERNAL "Whether we have PostgreSQL client software")
+ENDIF()
+
+# DB2
+IF(DB2_INCLUDE_DIR)
+    SET(CMAKE_REQUIRED_INCLUDES "${DB2_INCLUDE_DIR}")
+    CHECK_INCLUDE_FILE_CXX(sqlcli1.h CHUCHO_DB2_H)
+    IF(CHUCHO_DB2_H)
+        IF(DB2_CLIENT_LIB)
+            SET(CMAKE_REQUIRED_LIBRARIES "${DB2_CLIENT_LIB}")
+            CHUCHO_REQUIRE_SYMBOLS(sqlcli1.h SQLAllocHandle SQLFreeHandle SQLSetEnvAttr
+                                   SQLConnect SQLBindParameter SQLPrepare SQLExecute
+                                   SQLDisconnect SQLGetDiagRec)
+        ELSEIF(ENABLE_SHARED)
+            MESSAGE(FATAL_ERROR "You must specify DB2_CLIENT_LIB to build a shared library")
+        ENDIF()
+    ELSE()
+        MESSAGE(FATAL_ERROR "sqlci1.h was not found in DB2_INCLUDE_DIR=${DB2_INCLUDE_DIR}")
+    ENDIF()
+    UNSET(CMAKE_REQUIRED_INCLUDES)
+    UNSET(CMAKE_REQUIRED_LIBRARIES)
+    SET(CHUCHO_HAVE_DB2 TRUE CACHE INTERNAL "Whether we have DB2 client software")
 ENDIF()
 
 # Ruby
@@ -720,6 +772,58 @@ IF(ZEROMQ_INCLUDE_DIR AND ZEROMQ_LIB)
     SET(CHUCHO_HAVE_ZEROMQ TRUE CACHE INTERNAL "Whether we have zeromq")
 ELSEIF(ZEROMQ_INCLUDE_DIR OR ZEROMQ_LIB)
     MESSAGE(WARNING "If either of the variables ZEROMQ_INCLUDE_DIR or ZEROMQ_LIB has been set, then they must both be set for zeromq support to be included")
+ENDIF()
+
+# ActiveMQ
+IF(ACTIVEMQ_INCLUDE_DIR AND ACTIVEMQ_LIB)
+    SET(CMAKE_REQUIRED_INCLUDES "${ACTIVEMQ_INCLUDE_DIR}")
+    FOREACH(HEAD
+            cms/ConnectionFactory.h
+            cms/Connection.h
+            cms/Session.h
+            activemq/library/ActiveMQCPP.h
+            cms/ExceptionListener.h)
+        STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
+        STRING(REPLACE / _ CHUCHO_HEAD_VAR_NAME ${CHUCHO_HEAD_VAR_NAME})
+        STRING(TOUPPER ${CHUCHO_HEAD_VAR_NAME} CHUCHO_HEAD_VAR_NAME)
+        CHECK_INCLUDE_FILE_CXX(${HEAD} ${CHUCHO_HEAD_VAR_NAME})
+        IF(NOT ${CHUCHO_HEAD_VAR_NAME})
+            MESSAGE(FATAL_ERROR "The variable ACTIVEMQ_INCLUDE_DIR was provided as ${ACTIVEMQ_INCLUDE_DIR}, but it does not contain the ActiveMQ header ${HEAD}")
+        ENDIF()
+    ENDFOREACH()
+    IF(NOT EXISTS "${ACTIVEMQ_LIB}")
+        MESSAGE(FATAL_ERROR "The variable ACTIVEMQ_LIB was provided as ${ACTIVEMQ_LIB}, but it does not refer to an existing file")
+    ENDIF()
+    IF(APR_LIB)
+        IF(NOT EXISTS "${APR_LIB}")
+            MESSAGE(WARNING "The variable APR_LIB was provided as ${APR_LIB}, but it does not refer to an existing file. The unit tests cannot be built.")
+            UNSET(APR_LIB)
+            UNSET(APR_LIB CACHE)
+        ELSE()
+            SET(CMAKE_REQUIRED_LIBRARIES "${ACTIVEMQ_LIB}" "${APR_LIB}")
+            IF(CHUCHO_SOLARIS)
+                SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} socket nsl)
+            ENDIF()
+            SET(CHUCHO_LINK_ACTIVEMQ_SOURCE "#include <cms/ConnectionFactory.h>\nint main() { cms::ConnectionFactory::createCMSConnectionFactory(\"127.0.0.1:6131\"); return 0; }")
+            CHECK_CXX_SOURCE_COMPILES("${CHUCHO_LINK_ACTIVEMQ_SOURCE}" CHUCHO_LINK_ACTIVEMQ)
+            IF(NOT CHUCHO_LINK_ACTIVEMQ)
+                SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} sendfile)
+                CHECK_CXX_SOURCE_COMPILES("${CHUCHO_LINK_ACTIVEMQ_SOURCE}" CHUCHO_LINK_ACTIVEMQ_WITH_SENDFILE)
+                IF(CHUCHO_LINK_ACTIVEMQ_WITH_SENDFILE)
+                    SET(CHUCHO_NEEDS_SENDFILE TRUE)
+                ELSE()
+                    MESSAGE(WARNING "There was a failure linking to the ActiveMQ library. The unit tests cannot be built.")
+                ENDIF()
+            ENDIF()
+        ENDIF()
+    ELSE()
+        MESSAGE(STATUS "Without the APR_LIB variable being set along with the ActiveMQ variables, the unit tests cannot be built.")
+    ENDIF()
+    UNSET(CMAKE_REQUIRED_INCLUDES)
+    UNSET(CMAKE_REQUIRED_LIBRARIES)
+    SET(CHUCHO_HAVE_ACTIVEMQ TRUE CACHE INTERNAL "Whether we have ActiveMQ")
+ELSEIF(ACTIVEMQ_INCLUDE_DIR OR ACTIVEMQ_LIB OR APR_LIB)
+    MESSAGE(WARNING "If any of the variables ACTIVEMQ_INCLUDE_DIR, ACTIVEMQ_LIB or APR_LIB has been set, then they must all be set for ActiveMQ support to be included")
 ENDIF()
 
 # doxygen

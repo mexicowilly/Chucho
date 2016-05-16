@@ -58,6 +58,51 @@ yaml_configurator::yaml_configurator()
 
 }
 
+#if defined(CHUCHO_HAVE_ACTIVEMQ)
+
+TEST_F(yaml_configurator, activemq_writer_bad)
+{
+    configure_with_error("- chucho::logger:\n"
+                         "    - name: will\n"
+                         "    - chucho::activemq_writer:\n"
+                         "        - chucho::pattern_formatter:\n"
+                         "            - pattern: '%m'\n"
+                         "        - chucho::formatted_message_serializer\n"
+                         "        - broker: 'tcp://127.0.0.1:61616'\n"
+                         "        - consumer_type: junk\n"
+                         "        - topic_or_queue: MonkeyBalls");
+}
+
+TEST_F(yaml_configurator, activemq_writer_queue)
+{
+    configure("- chucho::logger:\n"
+              "    - name: will\n"
+              "    - chucho::activemq_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            - pattern: '%m'\n"
+              "        - chucho::formatted_message_serializer\n"
+              "        - broker: 'tcp://127.0.0.1:61616'\n"
+              "        - consumer_type: queue\n"
+              "        - topic_or_queue: MonkeyBalls");
+    activemq_writer_queue_body();
+}
+
+TEST_F(yaml_configurator, activemq_writer_topic)
+{
+    configure("- chucho::logger:\n"
+              "    - name: will\n"
+              "    - chucho::activemq_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            - pattern: '%m'\n"
+              "        - chucho::formatted_message_serializer\n"
+              "        - broker: 'tcp://127.0.0.1:61616'\n"
+              "        - consumer_type: topic\n"
+              "        - topic_or_queue: MonkeyBalls");
+    activemq_writer_topic_body();
+}
+
+#endif
+
 TEST_F(yaml_configurator, async_writer)
 {
     configure("chucho::logger:\n"
@@ -164,6 +209,23 @@ TEST_F(yaml_configurator, cout_writer_invalid_2)
                          "    - name: will\n"
                          "    - chucho::cout_writer");
 }
+
+#if defined(CHUCHO_HAVE_DB2)
+
+TEST_F(yaml_configurator, db2_writer)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::db2_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m'\n"
+              "        user: db2inst1\n"
+              "        password: db2inst1\n"
+              "        database: chucho");
+    db2_writer_body();
+}
+
+#endif
 
 TEST_F(yaml_configurator, duplicate_message_filter)
 {
@@ -671,6 +733,20 @@ TEST_F(yaml_configurator, zeromq_writer_no_prefix)
               "        - chucho::formatted_message_serializer\n"
               "        - endpoint: 'tcp://127.0.0.1:7778'\n");
     zeromq_writer_no_prefix_body();
+}
+
+TEST_F(yaml_configurator, zeromq_writer_with_compressor)
+{
+    configure("- chucho::logger:\n"
+              "    - name: will\n"
+              "    - chucho::zeromq_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            - pattern: '%m'\n"
+              "        - chucho::formatted_message_serializer\n"
+              "        - endpoint: 'tcp://127.0.0.1:7776'\n"
+              "        - chucho::noop_compressor\n"
+              "        - prefix: Hi\n");
+    zeromq_writer_with_compressor_body();
 }
 
 #if defined(CHUCHO_HAVE_PROTOBUF)

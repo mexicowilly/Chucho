@@ -169,7 +169,13 @@ iterator& iterator::operator++ ()
     {
         regex_t& re(pimpl_->re_->pimpl_->re_);
         auto sub_count = re.re_nsub + 1;
-        regmatch_t pmatch[sub_count];
+        regmatch_t* pmatch = new regmatch_t[sub_count];
+        struct sentry
+        {
+            sentry(regmatch_t* p) : p_(p) { }
+            ~sentry() { delete [] p_; }
+            regmatch_t* p_;
+        } sent(pmatch);
         const char* cur = text_.c_str() + pimpl_->offset_;
         int rc = regexec(&re, cur, sub_count, pmatch, 0);
         if (rc == 0)
@@ -243,7 +249,13 @@ bool search(const std::string& text, expression& re, match& mch)
     }
 #elif defined(CHUCHO_HAVE_POSIX_REGEX)
     auto sub_count = re.pimpl_->re_.re_nsub + 1;
-    regmatch_t pmatch[sub_count];
+    regmatch_t* pmatch = new regmatch_t[sub_count];
+    struct sentry
+    {
+        sentry(regmatch_t* p) : p_(p) { }
+        ~sentry() { delete [] p_; }
+        regmatch_t* p_;
+    } sent(pmatch);
     if (regexec(&re.pimpl_->re_, text.c_str(), sub_count, pmatch, 0) == 0)
     {
         for (int i = 0; i < sub_count; i++)

@@ -73,7 +73,7 @@ std::string security_policy::validate(const std::string& key, const std::string&
             ", allowed by the security policy";
         throw exception(stream.str());
     }
-    return val;
+    return std::string(val);
 }
 
 }

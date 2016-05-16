@@ -22,7 +22,7 @@
  * Functions common to all file compressors. 
  * @copydoc chucho::file_compressor
  *  
- * @ingroup c_compressors 
+ * @ingroup c_fcompressors 
  */
 
 #include <chucho/return_code.h>

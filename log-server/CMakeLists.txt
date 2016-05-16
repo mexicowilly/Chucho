@@ -110,6 +110,10 @@ IF(CHUCHO_POSIX)
         platform/posix/socket_reader_posix.cpp
         ${CHUCHOD_POSIX_DAEMON}
         ${CHUCHOD_POSIX_LISTENER})
+    IF(CHUCHO_SOLARIS AND CMAKE_CXX_COMPILER_ID STREQUAL SunPro)
+        SET_SOURCE_FILES_PROPERTIES(platform/posix/signal_handler_posix.cpp PROPERTIES
+                                    COMPILE_DEFINITIONS _POSIX_PTHREAD_SEMANTICS)
+    ENDIF()
 ELSEIF(CHUCHO_WINDOWS)
     SET(CHUCHOD_PLATFORM_SOURCES
         platform/windows/daemon_windows.cpp

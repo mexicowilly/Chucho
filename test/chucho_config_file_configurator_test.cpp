@@ -46,6 +46,57 @@ chucho::configurator& chucho_config_file_configurator::get_configurator()
 
 }
 
+#if defined(CHUCHO_HAVE_ACTIVEMQ)
+
+TEST_F(chucho_config_file_configurator, activemq_writer_bad)
+{
+    configure_with_error("chucho.logger = will\n"
+                         "chucho.logger.will.writer = aw\n"
+                         "chucho.writer.aw = chucho::activemq_writer\n"
+                         "chucho.writer.aw.formatter = pf\n"
+                         "chucho.formatter.pf = chucho::pattern_formatter\n"
+                         "chucho.formatter.pf.pattern = %m\n"
+                         "chucho.writer.aw.serializer = fms\n"
+                         "chucho.serializer.fms = chucho::formatted_message_serializer\n"
+                         "chucho.writer.aw.broker = tcp://127.0.0.1:61616\n"
+                         "chucho.writer.aw.consumer_type = junk\n"
+                         "chucho.writer.aw.topic_or_queue = MonkeyBalls");
+}
+
+TEST_F(chucho_config_file_configurator, activemq_writer_queue)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = aw\n"
+              "chucho.writer.aw = chucho::activemq_writer\n"
+              "chucho.writer.aw.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.aw.serializer = fms\n"
+              "chucho.serializer.fms = chucho::formatted_message_serializer\n"
+              "chucho.writer.aw.broker = tcp://127.0.0.1:61616\n"
+              "chucho.writer.aw.consumer_type = QUEUE\n"
+              "chucho.writer.aw.topic_or_queue = MonkeyBalls");
+    activemq_writer_queue_body();
+}
+
+TEST_F(chucho_config_file_configurator, activemq_writer_topic)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = aw\n"
+              "chucho.writer.aw = chucho::activemq_writer\n"
+              "chucho.writer.aw.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.aw.serializer = fms\n"
+              "chucho.serializer.fms = chucho::formatted_message_serializer\n"
+              "chucho.writer.aw.broker = tcp://127.0.0.1:61616\n"
+              "chucho.writer.aw.consumer_type = ToPiC\n"
+              "chucho.writer.aw.topic_or_queue = MonkeyBalls");
+    activemq_writer_topic_body();
+}
+
+#endif
+
 TEST_F(chucho_config_file_configurator, async_writer)
 {
     configure("chucho.logger = will\n"
@@ -120,6 +171,24 @@ TEST_F(chucho_config_file_configurator, cout_writer)
               "chucho.formatter.pf.pattern = %m%n");
     cout_writer_body();
 }
+
+#if defined(CHUCHO_HAVE_DB2)
+
+TEST_F(chucho_config_file_configurator, db2_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = or\n"
+              "chucho.writer.or = chucho::db2_writer\n"
+              "chucho.writer.or.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.or.user = db2inst1\n"
+              "chucho.writer.or.password = db2inst1\n"
+              "chucho.writer.or.database = chucho");
+    db2_writer_body();
+}
+
+#endif
 
 TEST_F(chucho_config_file_configurator, duplicate_message_filter)
 {
@@ -703,6 +772,23 @@ TEST_F(chucho_config_file_configurator, zeromq_writer_no_prefix)
               "chucho.serializer.fms = chucho::formatted_message_serializer\n"
               "chucho.writer.zw.endpoint = tcp://127.0.0.1:7778\n");
     zeromq_writer_no_prefix_body();
+}
+
+TEST_F(chucho_config_file_configurator, zeromq_writer_with_compressor)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = zw\n"
+              "chucho.writer.zw = chucho::zeromq_writer\n"
+              "chucho.writer.zw.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.zw.serializer = fms\n"
+              "chucho.serializer.fms = chucho::formatted_message_serializer\n"
+              "chucho.writer.zw.endpoint = tcp://127.0.0.1:7776\n"
+              "chucho.writer.zw.prefix = Hi\n"
+              "chucho.writer.zw.compressor = cmp\n"
+              "chucho.compressor.cmp = chucho::noop_compressor");
+    zeromq_writer_with_compressor_body();
 }
 
 #if defined(CHUCHO_HAVE_PROTOBUF)

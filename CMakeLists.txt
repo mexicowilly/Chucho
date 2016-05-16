@@ -21,7 +21,7 @@ ENDIF()
 
 PROJECT(chucho CXX C)
 
-SET(CHUCHO_VERSION 1.8)
+SET(CHUCHO_VERSION 1.9)
 SET(CHUCHO_SO_VERSION 1)
 # This is used for release candidate distros
 #SET(CHUCHO_DIST_VERSION try-1)
@@ -57,6 +57,12 @@ IF(CHUCHO_HAVE_PROTOBUF)
 ENDIF()
 IF(CHUCHO_HAVE_ZEROMQ)
     INCLUDE_DIRECTORIES("${ZEROMQ_INCLUDE_DIR}")
+ENDIF()
+IF(CHUCHO_HAVE_ACTIVEMQ)
+    INCLUDE_DIRECTORIES("${ACTIVEMQ_INCLUDE_DIR}")
+ENDIF()
+IF(CHUCHO_HAVE_DB2)
+    INCLUDE_DIRECTORIES("${DB2_INCLUDE_DIR}")
 ENDIF()
 
 IF(CHUCHO_POSIX)
@@ -118,6 +124,10 @@ IF(CHUCHO_POSIX)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/file_writer_posix.cpp PROPERTIES
                                     COMPILE_DEFINITIONS CHUCHO_HAVE_O_LARGEFILE)
     ENDIF()
+    IF(CHUCHO_SOLARIS AND CMAKE_CXX_COMPILER_ID STREQUAL SunPro)
+        SET_SOURCE_FILES_PROPERTIES(platform/posix/socket_connector_posix.cpp PROPERTIES
+                                    COMPILE_DEFINITIONS _POSIX_PTHREAD_SEMANTICS)
+    ENDIF()
 ELSEIF(CHUCHO_WINDOWS)
     SET(CHUCHO_PLATFORM_SOURCES
         platform/windows/calendar_windows.cpp
@@ -153,6 +163,7 @@ ENDIF()
 SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/async_writer.hpp
     include/chucho/cerr_writer.hpp
+    include/chucho/compressor.hpp
     include/chucho/configurable.hpp
     include/chucho/configurable_factory.hpp
     include/chucho/configuration.hpp
@@ -192,6 +203,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/message_queue_writer.hpp
     include/chucho/named_pipe_writer.hpp
     include/chucho/non_copyable.hpp
+    include/chucho/noop_compressor.hpp
     include/chucho/noop_file_compressor.hpp
     include/chucho/numbered_file_roller.hpp
     include/chucho/optional.hpp
@@ -223,6 +235,7 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS ${CHUCHO_PUBLIC_HEADERS})
 SET(CHUCHO_C_HEADERS
     include/chucho/async_writer.h
     include/chucho/cerr_writer.h
+    include/chucho/compressor.h
     include/chucho/cout_writer.h
     include/chucho/configuration.h
     include/chucho/diagnostic_context.h
@@ -244,6 +257,7 @@ SET(CHUCHO_C_HEADERS
     include/chucho/log.h
     include/chucho/logger.h
     include/chucho/named_pipe_writer.h
+    include/chucho/noop_compressor.h
     include/chucho/numbered_file_roller.h
     include/chucho/pattern_formatter.h
     include/chucho/pipe_writer.h
@@ -282,15 +296,21 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/windows_event_log_writer.hpp)
 
 IF(CHUCHO_HAVE_ZLIB)
-    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.hpp)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/gzip_file_compressor.hpp
+         include/chucho/zlib_compressor.hpp)
     IF(C_API)
-        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/gzip_file_compressor.h)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS
+             include/chucho/gzip_file_compressor.h
+             include/chucho/zlib_compressor.h)
     ENDIF()
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/gzip_file_compressor.hpp
-     include/chucho/gzip_file_compressor.h)
+     include/chucho/gzip_file_compressor.h
+     include/chucho/zlib_compressor.hpp
+     include/chucho/zlib_compressor.h)
 
 IF(CHUCHO_HAVE_BZIP2)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/bzip2_file_compressor.hpp)
@@ -385,6 +405,24 @@ ENDIF()
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/postgres_writer.hpp
      include/chucho/postgres_writer.h)
+
+IF(CHUCHO_HAVE_DB2)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/db2_writer.hpp)
+    LIST(APPEND CHUCHO_DATABASE_SOURCES
+         db2_writer.cpp
+         db2_writer_factory.cpp
+         db2_writer_memento.cpp
+         include/chucho/db2_writer_factory.hpp
+         include/chucho/db2_writer_memento.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/db2_writer.h)
+        LIST(APPEND CHUCHO_DATABASE_SOURCES c_db2_writer.cpp)
+    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/db2_writer.hpp
+     include/chucho/db2_writer.h)
 
 IF(CHUCHO_HAVE_RUBY)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/ruby_evaluator_filter.hpp)
@@ -490,6 +528,26 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/zeromq_writer.hpp
      include/chucho/zeromq_writer.h)
 
+IF(CHUCHO_HAVE_ACTIVEMQ)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/activemq_writer.hpp
+         include/chucho/activemq_writer_factory.hpp
+         include/chucho/activemq_writer_memento.hpp)
+    LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
+         activemq_writer.cpp
+         activemq_writer_factory.cpp
+         activemq_writer_memento.cpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS
+             include/chucho/activemq_writer.h)
+        LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
+             c_activemq_writer.cpp)
+    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/activemq_writer.hpp)
+
 # The libyaml sources are required by chuchod
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
     # Update this when you rev libyaml
@@ -568,6 +626,7 @@ IF(C_API)
     SET(CHUCHO_C_SOURCES
         c_async_writer.cpp
         c_cerr_writer.cpp
+        c_compressor.cpp
         c_cout_writer.cpp
         c_configuration.cpp
         c_diagnostic_context.cpp
@@ -588,6 +647,7 @@ IF(C_API)
         c_log.cpp
         c_logger.cpp
         c_named_pipe_writer.cpp
+        c_noop_compressor.cpp
         c_numbered_file_roller.cpp
         c_pattern_formatter.cpp
         c_pipe_writer.cpp
@@ -604,6 +664,7 @@ IF(C_API)
         c_time_file_roller.cpp
         c_util.cpp
         c_writer.cpp
+        include/chucho/c_compressor.hpp
         include/chucho/c_file_compressor.hpp
         include/chucho/c_file_roll_trigger.hpp
         include/chucho/c_file_roller.hpp
@@ -690,6 +751,9 @@ SET(CHUCHO_SOURCES
     named_pipe_writer.cpp
     named_pipe_writer_factory.cpp
     named_pipe_writer_memento.cpp
+    noop_compressor.cpp
+    noop_compressor_factory.cpp
+    noop_compressor_memento.cpp
     noop_file_compressor.cpp
     numbered_file_roller.cpp
     numbered_file_roller_factory.cpp
@@ -770,6 +834,8 @@ SET(CHUCHO_SOURCES
     include/chucho/message_queue_writer_memento.hpp
     include/chucho/named_pipe_writer_factory.hpp
     include/chucho/named_pipe_writer_memento.hpp
+    include/chucho/noop_compressor_factory.hpp
+    include/chucho/noop_compressor_memento.hpp
     include/chucho/numbered_file_roller_factory.hpp
     include/chucho/numbered_file_roller_memento.hpp
     include/chucho/pattern_formatter_factory.hpp
@@ -844,6 +910,10 @@ IF(CHUCHO_HAVE_POSTGRES)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_POSTGRES)
 ENDIF()
 
+IF(CHUCHO_HAVE_DB2)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_DB2)
+ENDIF()
+
 IF(CHUCHO_HAVE_RUBY)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RUBY)
 ENDIF()
@@ -861,6 +931,14 @@ ENDIF()
 
 IF(CHUCHO_HAVE_ZEROMQ)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ZEROMQ)
+ENDIF()
+
+IF(CHUCHO_HAVE_ACTIVEMQ)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ACTIVEMQ)
+ENDIF()
+
+IF(CHUCHO_HAVE_ZLIB)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ZLIB)
 ENDIF()
 
 IF(DEFINED CHUCHO_CONFIGURATOR_DEFS)
@@ -895,9 +973,16 @@ ENDIF()
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_SOURCES
          gzip_file_compressor.cpp
+         zlib_compressor.cpp
+         zlib_compressor_factory.cpp
+         zlib_compressor_memento.cpp
+         include/chucho/zlib_compressor_factory.hpp
+         include/chucho/zlib_compressor_memento.hpp
          ${CHUCHO_ZLIB_SOURCES})
     IF(C_API)
-        LIST(APPEND CHUCHO_SOURCES c_gzip_file_compressor.cpp)
+        LIST(APPEND CHUCHO_SOURCES
+             c_gzip_file_compressor.cpp
+             c_zlib_compressor.cpp)
     ENDIF()
     IF(MSVC)
         SET_SOURCE_FILES_PROPERTIES(gzip_file_compressor.cpp PROPERTIES
@@ -912,11 +997,17 @@ IF(CHUCHO_HAVE_ZLIB)
     ENDIF()
     IF(CHUCHO_ZLIB_SOURCES)
         IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_COMPILER_IS_GNUCXX)
+            IF(CHUCHO_PRIV_EXPORT)
+                SET(CHUCHO_ZLIB_FLAGS -fvisibility=default)
+                SET_SOURCE_FILES_PROPERTIES(${CHUCHO_ZLIB_SOURCES}
+                                            PROPERTIES
+                                            COMPILE_FLAGS ${CHUCHO_ZLIB_FLAGS})
+            ENDIF()
             SET_SOURCE_FILES_PROPERTIES("${ZLIB_SOURCE}/gzlib.c"
                                         "${ZLIB_SOURCE}/gzread.c"
                                         "${ZLIB_SOURCE}/gzwrite.c"
                                         PROPERTIES
-                                        COMPILE_FLAGS -Wno-implicit-function-declaration)
+                                        COMPILE_FLAGS "${CHUCHO_ZLIB_FLAGS} -Wno-implicit-function-declaration")
         ELSEIF(MSVC)
             SET_SOURCE_FILES_PROPERTIES("${ZLIB_SOURCE}/gzlib.c"
                                         "${ZLIB_SOURCE}/gzread.c"
@@ -997,6 +1088,9 @@ IF(ENABLE_SHARED)
     IF(CHUCHO_HAVE_POSTGRES)
         TARGET_LINK_LIBRARIES(chucho "${POSTGRES_CLIENT_LIB}")
     ENDIF()
+    IF(CHUCHO_HAVE_DB2)
+        TARGET_LINK_LIBRARIES(chucho "${DB2_CLIENT_LIB}")
+    ENDIF()
     IF(CHUCHO_HAVE_RUBY)
         TARGET_LINK_LIBRARIES(chucho "${RUBY_LIB}")
     ENDIF()
@@ -1044,6 +1138,10 @@ IF(CHUCHO_HAVE_POSTGRES)
     TARGET_LINK_LIBRARIES(chucho "${POSTGRES_CLIENT_LIB}")
 ENDIF()
 
+IF(CHUCHO_HAVE_DB2)
+    TARGET_LINK_LIBRARIES(chucho "${DB2_CLIENT_LIB}")
+ENDIF()
+
 IF(CHUCHO_HAVE_RUBY AND NOT RUBY_FRAMEWORK)
     TARGET_LINK_LIBRARIES(chucho "${RUBY_LIB}")
 ENDIF()
@@ -1060,6 +1158,16 @@ IF(CHUCHO_HAVE_ZEROMQ)
     TARGET_LINK_LIBRARIES(chucho "${ZEROMQ_LIB}")
 ENDIF()
 
+IF(CHUCHO_HAVE_ACTIVEMQ)
+    TARGET_LINK_LIBRARIES(chucho "${ACTIVEMQ_LIB}")
+    IF(APR_LIB)
+        TARGET_LINK_LIBRARIES(chucho "${APR_LIB}")
+    ENDIF()
+    IF(CHUCHO_NEEDS_SENDFILE)
+        TARGET_LINK_LIBRARIES(chucho sendfile)
+    ENDIF()
+ENDIF()
+
 IF(ZLIB_LIB_DIR)
     LINK_DIRECTORIES("${ZLIB_LIB_DIR}")
     TARGET_LINK_LIBRARIES(chucho z)
@@ -1074,6 +1182,10 @@ TARGET_LINK_LIBRARIES(chucho ${CMAKE_THREAD_LIBS_INIT})
 
 IF(CHUCHO_SOLARIS)
     TARGET_LINK_LIBRARIES(chucho socket nsl)
+ENDIF()
+
+IF(CMAKE_CXX_COMPILER_ID STREQUAL SunPro)
+    TARGET_LINK_LIBRARIES(chucho demangle)
 ENDIF()
 
 IF(CHUCHO_WINDOWS)
@@ -1106,48 +1218,50 @@ ADD_SUBDIRECTORY(log-server)
 
 # Documentation
 IF(DOXYGEN_FOUND)
-    SET(CHUCHO_DOXYGEN_INPUT main_page.hpp)
-    IF(CHUCHO_DOCUMENT_ALL)
-        FILE(GLOB CHUCHO_ALL_HEADERS RELATIVE "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/include/chucho/*")
-        FOREACH(HEAD ${CHUCHO_ALL_HEADERS})
-            SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
-        ENDFOREACH()
-        FILE(GLOB CHUCHO_GENERATED_HEADERS RELATIVE "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/chucho/*.hpp")
-        FOREACH(HEAD ${CHUCHO_GENERATED_HEADERS})
-            SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
-        ENDFOREACH()
-        SET(CHUCHO_DOXYGEN_EXTRACT_ALL YES)
-    ELSE()
-        FOREACH(HEAD ${CHUCHO_DOCUMENTABLE_HEADERS})
-            SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
-        ENDFOREACH()
-        SET(CHUCHO_DOXYGEN_EXTRACT_ALL NO)
-    ENDIF()
-    CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/doxygen.conf.in" "${CMAKE_BINARY_DIR}/doxygen.conf")
-    MESSAGE(STATUS "Generating HTML header for API documentation")
-    EXECUTE_PROCESS(COMMAND "${DOXYGEN_EXECUTABLE}" -w html "${CMAKE_BINARY_DIR}/doc_header.html" "${CMAKE_BINARY_DIR}/doc_footer.html" "${CMAKE_BINARY_DIR}/doc_stylesheet.html" "${CMAKE_BINARY_DIR}/doxygen.conf"
-                    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-    FILE(STRINGS "${CMAKE_BINARY_DIR}/doc_header.html" CHUCHO_HTML_HEADER)
-    FILE(REMOVE "${CMAKE_BINARY_DIR}/doc_header.html" "${CMAKE_BINARY_DIR}/doc_footer.html" "${CMAKE_BINARY_DIR}/doc_stylesheet.html")
-    LIST(FIND CHUCHO_HTML_HEADER <head> CHUCHO_HEAD_INDEX)
-    IF(CHUCHO_HEAD_INDEX EQUAL -1)
-        MESSAGE(FATAL_ERROR "The <head> section of the HTML header could not be found")
-    ENDIF()
-    MATH(EXPR CHUCHO_FAVICON_INDEX "${CHUCHO_HEAD_INDEX} + 1")
-    LIST(INSERT CHUCHO_HTML_HEADER ${CHUCHO_FAVICON_INDEX} "<link rel=\"shortcut icon\" href=\"$relpath^itzcuintli.ico\" type=\"image/x-icon\"/>")
-    FOREACH(LINE ${CHUCHO_HTML_HEADER})
-        FILE(APPEND "${CMAKE_BINARY_DIR}/doc_header.html" ${LINE})
-        FILE(APPEND "${CMAKE_BINARY_DIR}/doc_header.html" "\n")
-    ENDFOREACH()
     IF(C_API)
+        SET(CHUCHO_DOXYGEN_INPUT main_page.hpp)
+        IF(CHUCHO_DOCUMENT_ALL)
+            FILE(GLOB CHUCHO_ALL_HEADERS RELATIVE "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/include/chucho/*")
+            FOREACH(HEAD ${CHUCHO_ALL_HEADERS})
+                SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
+            ENDFOREACH()
+            FILE(GLOB CHUCHO_GENERATED_HEADERS RELATIVE "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/chucho/*.hpp")
+            FOREACH(HEAD ${CHUCHO_GENERATED_HEADERS})
+                SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
+            ENDFOREACH()
+            SET(CHUCHO_DOXYGEN_EXTRACT_ALL YES)
+        ELSE()
+            FOREACH(HEAD ${CHUCHO_DOCUMENTABLE_HEADERS})
+                SET(CHUCHO_DOXYGEN_INPUT "${CHUCHO_DOXYGEN_INPUT} ${HEAD}")
+            ENDFOREACH()
+            SET(CHUCHO_DOXYGEN_EXTRACT_ALL NO)
+        ENDIF()
+        CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/doxygen.conf.in" "${CMAKE_BINARY_DIR}/doxygen.conf")
+        MESSAGE(STATUS "Generating HTML header for API documentation")
+        EXECUTE_PROCESS(COMMAND "${DOXYGEN_EXECUTABLE}" -w html "${CMAKE_BINARY_DIR}/doc_header.html" "${CMAKE_BINARY_DIR}/doc_footer.html" "${CMAKE_BINARY_DIR}/doc_stylesheet.html" "${CMAKE_BINARY_DIR}/doxygen.conf"
+                        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+        FILE(STRINGS "${CMAKE_BINARY_DIR}/doc_header.html" CHUCHO_HTML_HEADER)
+        FILE(REMOVE "${CMAKE_BINARY_DIR}/doc_header.html" "${CMAKE_BINARY_DIR}/doc_footer.html" "${CMAKE_BINARY_DIR}/doc_stylesheet.html")
+        LIST(FIND CHUCHO_HTML_HEADER <head> CHUCHO_HEAD_INDEX)
+        IF(CHUCHO_HEAD_INDEX EQUAL -1)
+            MESSAGE(FATAL_ERROR "The <head> section of the HTML header could not be found")
+        ENDIF()
+        MATH(EXPR CHUCHO_FAVICON_INDEX "${CHUCHO_HEAD_INDEX} + 1")
+        LIST(INSERT CHUCHO_HTML_HEADER ${CHUCHO_FAVICON_INDEX} "<link rel=\"shortcut icon\" href=\"$relpath^itzcuintli.ico\" type=\"image/x-icon\"/>")
+        FOREACH(LINE ${CHUCHO_HTML_HEADER})
+            FILE(APPEND "${CMAKE_BINARY_DIR}/doc_header.html" ${LINE})
+            FILE(APPEND "${CMAKE_BINARY_DIR}/doc_header.html" "\n")
+        ENDFOREACH()
         ADD_CUSTOM_TARGET(doc
                           COMMAND "${DOXYGEN_EXECUTABLE}" "${CMAKE_BINARY_DIR}/doxygen.conf"
                           WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
     ELSE()
+        MESSAGE(STATUS "The C API must be enabled in order to generate Doxygen documentation")
         ADD_CUSTOM_TARGET(doc
                           COMMAND "${CMAKE_COMMAND}" -E echo "C_API must be enabled in order to generate documentation")
     ENDIF()
 ELSE()
+    MESSAGE(STATUS "The C API must be enabled in order to generate Doxygen documentation")
     ADD_CUSTOM_TARGET(doc
                       COMMAND "${CMAKE_COMMAND}" -E echo "Doxygen was not found on this system, so the documentation cannot be generated")
 ENDIF()

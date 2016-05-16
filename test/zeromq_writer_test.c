@@ -34,7 +34,7 @@ static void zeromq_writer_test(void)
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
     rc = chucho_create_formatted_message_serializer(&ser);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create formatted message serializer");
-    rc = chucho_create_zeromq_writer(&wrt, fmt, ser, "tcp://127.0.0.1:7777", prefix, 6);
+    rc = chucho_create_zeromq_writer(&wrt, fmt, ser, NULL, "tcp://127.0.0.1:7777", prefix, 6);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create zeromq writer");
     if (rc != CHUCHO_NO_ERROR)
         return;

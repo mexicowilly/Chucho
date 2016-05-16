@@ -20,10 +20,18 @@ namespace chucho
 {
 
 message_queue_writer::message_queue_writer(std::shared_ptr<formatter> fmt,
-                                           std::shared_ptr<serializer> ser)
+                                           std::shared_ptr<serializer> ser,
+                                           std::shared_ptr<compressor> cmp)
     : writer(fmt),
-      serializer_(ser)
+      serializer_(ser),
+      compressor_(cmp)
 {
+}
+
+std::vector<std::uint8_t> message_queue_writer::serialize_and_compress(const event& evt)
+{
+    auto ser = serializer_->serialize(evt, formatter_);
+    return compressor_ ? compressor_->compress(ser) : ser;
 }
 
 }

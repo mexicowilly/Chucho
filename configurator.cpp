@@ -33,6 +33,7 @@
 #include <chucho/level_threshold_filter_factory.hpp>
 #include <chucho/logger_factory.hpp>
 #include <chucho/named_pipe_writer_factory.hpp>
+#include <chucho/noop_compressor_factory.hpp>
 #include <chucho/numbered_file_roller_factory.hpp>
 #include <chucho/pattern_formatter_factory.hpp>
 #include <chucho/pipe_writer_factory.hpp>
@@ -59,6 +60,9 @@
 #if defined(CHUCHO_HAVE_POSTGRES)
 #include <chucho/postgres_writer_factory.hpp>
 #endif
+#if defined(CHUCHO_HAVE_DB2)
+#include <chucho/db2_writer_factory.hpp>
+#endif
 #if defined(CHUCHO_HAVE_RUBY)
 #include <chucho/ruby_evaluator_filter_factory.hpp>
 #endif
@@ -71,6 +75,12 @@
 #endif
 #if defined(CHUCHO_HAVE_ZEROMQ)
 #include <chucho/zeromq_writer_factory.hpp>
+#endif
+#if defined(CHUCHO_HAVE_ZLIB)
+#include <chucho/zlib_compressor_factory.hpp>
+#endif
+#if defined(CHUCHO_HAVE_ACTIVEMQ)
+#include <chucho/activemq_writer_factory.hpp>
 #endif
 
 #include <cstring>
@@ -128,6 +138,8 @@ void configurator::initialize_impl()
     add_configurable_factory("chucho::logger", fact);
     fact.reset(new named_pipe_writer_factory());
     add_configurable_factory("chucho::named_pipe_writer", fact);
+    fact.reset(new noop_compressor_factory());
+    add_configurable_factory("chucho::noop_compressor", fact);
     fact.reset(new numbered_file_roller_factory());
     add_configurable_factory("chucho::numbered_file_roller", fact);
     fact.reset(new pattern_formatter_factory());
@@ -178,6 +190,10 @@ void configurator::initialize_impl()
     fact.reset(new postgres_writer_factory());
     add_configurable_factory("chucho::postgres_writer", fact);
 #endif
+#if defined(CHUCHO_HAVE_DB2)
+    fact.reset(new db2_writer_factory());
+    add_configurable_factory("chucho::db2_writer", fact);
+#endif
 #if defined(CHUCHO_HAVE_RUBY)
     fact.reset(new ruby_evaluator_filter_factory());
     add_configurable_factory("chucho::ruby_evaluator_filter", fact);
@@ -195,6 +211,14 @@ void configurator::initialize_impl()
 #if defined(CHUCHO_HAVE_ZEROMQ)
     fact.reset(new zeromq_writer_factory());
     add_configurable_factory("chucho::zeromq_writer", fact);
+#endif
+#if defined(CHUCHO_HAVE_ZLIB)
+    fact.reset(new zlib_compressor_factory());
+    add_configurable_factory("chucho::zlib_compressor", fact);
+#endif
+#if defined(CHUCHO_HAVE_ACTIVEMQ)
+    fact.reset(new activemq_writer_factory());
+    add_configurable_factory("chucho::activemq_writer", fact);
 #endif
 }
 

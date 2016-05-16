@@ -48,8 +48,14 @@ IF(CHUCHO_HAVE_ZEROMQ)
     LIST(APPEND CHUCHO_TEST_MQ_SOURCES zeromq_writer_test.cpp)
 ENDIF()
 
+IF(CHUCHO_HAVE_ACTIVEMQ)
+    LIST(APPEND CHUCHO_TEST_MQ_SOURCES activemq_writer_test.cpp)
+ENDIF()
+
 IF(CHUCHO_HAVE_ZLIB)
-    LIST(APPEND CHUCHO_TEST_COMPRESSION_SOURCES gzip_file_compressor_test.cpp)
+    LIST(APPEND CHUCHO_TEST_COMPRESSION_SOURCES
+         gzip_file_compressor_test.cpp
+         zlib_compressor_test.cpp)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_ZLIB)
 ENDIF()
 
@@ -101,6 +107,10 @@ IF(CHUCHO_HAVE_POSTGRES)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_POSTGRES)
 ENDIF()
 
+IF(CHUCHO_HAVE_DB2)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_DB2)
+ENDIF()
+
 IF(CHUCHO_HAVE_RUBY)
     LIST(APPEND CHUCHO_TEST_EVALUATOR_SOURCES ruby_evaluator_filter_test.cpp)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_RUBY)
@@ -116,6 +126,10 @@ ENDIF()
 
 IF(CHUCHO_HAVE_PROTOBUF)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_PROTOBUF)
+ENDIF()
+
+IF(CHUCHO_HAVE_ACTIVEMQ)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_ACTIVEMQ)
 ENDIF()
 
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
@@ -142,6 +156,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                marker_test.cpp
                multithread_test.cpp
                named_pipe_writer_test.cpp
+               noop_compressor_test.cpp
                optional_test.cpp
                pattern_formatter_test.cpp
                pipe_writer_test.cpp
@@ -175,6 +190,13 @@ IF(CHUCHO_HAVE_ZEROMQ)
                    zeromq_writer_test_helper.cpp)
     TARGET_LINK_LIBRARIES(zeromq-writer-test-helper chucho)
     ADD_DEPENDENCIES(unit-test zeromq-writer-test-helper)
+ENDIF()
+
+IF(CHUCHO_HAVE_ACTIVEMQ)
+    ADD_EXECUTABLE(activemq-writer-test-helper EXCLUDE_FROM_ALL
+                   activemq_writer_test_helper.cpp)
+    TARGET_LINK_LIBRARIES(activemq-writer-test-helper chucho)
+    ADD_DEPENDENCIES(unit-test activemq-writer-test-helper)
 ENDIF()
 
 ADD_CUSTOM_TARGET(check
@@ -218,6 +240,12 @@ IF(C_API)
              postgres_writer_test.h)
     ENDIF()
 
+    IF(CHUCHO_HAVE_DB2)
+        LIST(APPEND CHUCHO_DB_C_SOURCES
+             db2_writer_test.c
+             db2_writer_test.h)
+    ENDIF()
+
     IF(CHUCHO_HAVE_RUBY)
         LIST(APPEND CHUCHO_EVALUATOR_C_SOURCES
              ruby_evaluator_filter_test.c
@@ -234,6 +262,12 @@ IF(C_API)
         LIST(APPEND CHUCHO_MQ_C_SOURCES
              zeromq_writer_test.c
              zeromq_writer_test.h)
+    ENDIF()
+
+    IF(CHUCHO_HAVE_ACTIVEMQ)
+        LIST(APPEND CHUCHO_MQ_C_SOURCES
+             activemq_writer_test.c
+             activemq_writer_test.h)
     ENDIF()
 
     IF(CHUCHO_WINDOWS)
@@ -314,8 +348,8 @@ IF(C_API)
                    ${CHUCHO_MQ_C_SOURCES})
     TARGET_LINK_LIBRARIES(c-unit-test chucho)
 
-    IF(CHUCHO_SOLARIS)
-        TARGET_LINK_LIBRARIES(c-unit-test "${CHUCHO_LIBSTDCXX}")
+    IF(CHUCHO_SOLARIS AND ENABLE_SHARED AND CHUCHO_STD_CXX_LIBS)
+        TARGET_LINK_LIBRARIES(c-unit-test ${CHUCHO_STD_CXX_LIBS})
     ENDIF()
 
     ADD_CUSTOM_TARGET(c-check
@@ -372,6 +406,13 @@ IF(CHUCHO_HAVE_POSTGRES)
                    harness.cpp
                    postgres_writer_test.cpp)
     TARGET_LINK_LIBRARIES(postgres-writer-test chucho gtest)
+ENDIF()
+
+IF(CHUCHO_HAVE_DB2)
+    ADD_EXECUTABLE(db2-writer-test EXCLUDE_FROM_ALL
+                   harness.cpp
+                   db2_writer_test.cpp)
+    TARGET_LINK_LIBRARIES(db2-writer-test chucho gtest)
 ENDIF()
 
 IF(CURL_FOUND)

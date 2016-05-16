@@ -22,7 +22,7 @@
  * Creation of gzip file compressors. 
  * @copydoc chucho::gzip_file_compressor
  *  
- * @ingroup c_compressors 
+ * @ingroup c_fcompressors 
  */
 
 #include <chucho/file_compressor.h>

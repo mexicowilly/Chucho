@@ -113,9 +113,9 @@ private:
     {
         UNKNOWN,
         MINUTE = 60,
-        HOUR = MINUTE * 60,
-        DAY = HOUR * 24,
-        WEEK = DAY * 7,
+        HOUR = 60 * 60,             // Sun's compiler can't refer to MINUTE here
+        DAY = 60 * 60 * 24,         // Nor HOUR here
+        WEEK = 60 * 60 * 24 * 7,    // Nor DAY here
         MONTH,
         YEAR
     };
