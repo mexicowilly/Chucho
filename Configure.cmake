@@ -389,6 +389,20 @@ IF(ENABLE_CURL)
     ENDIF()
 ENDIF()
 
+# Doors
+IF(CHUCHO_SOLARIS)
+    CHECK_INCLUDE_FILE_CXX(door.h CHUCHO_HAVE_DOOR_H)
+    IF(CHUCHO_HAVE_DOOR_H)
+        CHECK_CXX_SYMBOL_EXISTS(door_call door.h CHUCHO_HAVE_DOOR_CALL)
+        CHECK_CXX_SYMBOL_EXISTS(door_getparam door.h CHUCHO_HAVE_DOOR_GETPARAM)
+        IF(CHUCHO_HAVE_DOOR_CALL AND CHUCHO_HAVE_DOOR_GETPARAM)
+            SET(CHUCHO_HAVE_DOORS TRUE CACHE INTERNAL "Whether we have doors")
+        ELSE()
+            MESSAGE(WARNING "The header door.h was found, but the required symbols door_call and door_getparam were not")
+        ENDIF()
+    ENDIF()
+ENDIF()
+
 # Nested exceptions
 CHECK_CXX_SOURCE_COMPILES("#include <exception>\nint main() { std::exception e; std::throw_with_nested(e); std::rethrow_if_nested(e); return 0; }"
                           CHUCHO_HAVE_NESTED_EXCEPTIONS)

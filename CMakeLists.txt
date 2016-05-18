@@ -548,6 +548,18 @@ ENDIF()
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/activemq_writer.hpp)
 
+IF(CHUCHO_HAVE_DOORS)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/door_event.h
+         include/chucho/door_writer.hpp)
+    LIST(APPEND CHUCHO_DOOR_SOURCES
+         platform/solaris/door_writer.cpp)
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/door_event.h
+     include/chucho/door_writer.hpp)
+
 # The libyaml sources are required by chuchod
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
     # Update this when you rev libyaml
@@ -875,7 +887,8 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_EVALUATOR_SOURCES}
     ${CHUCHO_EMAIL_SOURCES}
     ${CHUCHO_PROTOBUF_SOURCES}
-    ${CHUCHO_MESSAGE_QUEUE_SOURCES})
+    ${CHUCHO_MESSAGE_QUEUE_SOURCES}
+    ${CHUCHO_DOOR_SOURCES})
 
 IF(CHUCHO_HAVE_PUT_TIME)
     SET_SOURCE_FILES_PROPERTIES(calendar.cpp PROPERTIES

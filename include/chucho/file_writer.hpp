@@ -122,6 +122,8 @@ protected:
                 bool flsh);
     //@}
 
+    void ensure_access();
+    bool is_open() const;
     /**
      * Open a file of a new name.
      * 
@@ -139,7 +141,6 @@ protected:
     virtual void write_impl(const event& evt) override;
 
 private:
-    void ensure_access();
     void open_impl(const std::string& file_name);
 
     std::string initial_file_name_;
@@ -165,6 +166,11 @@ inline const std::string& file_writer::get_initial_file_name() const
 inline file_writer::on_start file_writer::get_on_start() const
 {
     return start_;
+}
+
+inline bool file_writer::is_open() const
+{
+    return is_open_;
 }
 
 inline void file_writer::set_allow_creation(bool allow)

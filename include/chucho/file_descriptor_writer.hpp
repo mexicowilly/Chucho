@@ -122,6 +122,8 @@ protected:
      * @}
      */
 
+    virtual void flush();
+    int get_file_descriptor() const;
     /**
      * Set whether the writer can allow the file descriptor to be
      * closed when the writer is destroyed.
@@ -157,8 +159,6 @@ protected:
     virtual void write_impl(const event& evt) override;
 
 private:
-    CHUCHO_NO_EXPORT void flush();
-
     std::array<char, 8 * 1024> buf_;
     std::size_t num_;
     #if defined(_WIN32)
@@ -168,6 +168,11 @@ private:
     bool flush_;
     bool allow_close_;
 };
+
+inline int file_descriptor_writer::get_file_descriptor() const
+{
+    return fd_;
+}
 
 inline bool file_descriptor_writer::get_flush() const
 {
