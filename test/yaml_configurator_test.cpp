@@ -227,6 +227,21 @@ TEST_F(yaml_configurator, db2_writer)
 
 #endif
 
+#if defined(CHUCHO_HAVE_DOORS)
+
+TEST_F(yaml_configurator, door_writer)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::door_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m'\n"
+              "        file_name: gargle");
+    door_writer_body();
+}
+
+#endif
+
 TEST_F(yaml_configurator, duplicate_message_filter)
 {
     configure("chucho::logger:\n"

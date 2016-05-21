@@ -45,6 +45,9 @@ protected:
 #if defined(CHUCHO_HAVE_DB2)
     void db2_writer_body();
 #endif
+#if defined(CHUCHO_HAVE_DOORS)
+    void door_writer_body();
+#endif
     void duplicate_message_filter_body();
 #if defined(CHUCHO_HAVE_EMAIL_WRITER)
     void email_writer_body();

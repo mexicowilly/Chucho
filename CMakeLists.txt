@@ -551,9 +551,13 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
 IF(CHUCHO_HAVE_DOORS)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
          include/chucho/door_event.h
-         include/chucho/door_writer.hpp)
+         include/chucho/door_writer.hpp
+         include/chucho/door_writer_factory.hpp
+         include/chucho/door_writer_memento.hpp)
     LIST(APPEND CHUCHO_DOOR_SOURCES
-         platform/solaris/door_writer.cpp)
+         platform/solaris/door_writer.cpp
+         platform/solaris/door_writer_factory.cpp
+         platform/solaris/door_writer_memento.cpp)
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
@@ -952,6 +956,10 @@ ENDIF()
 
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ZLIB)
+ENDIF()
+
+IF(CHUCHO_HAVE_DOORS)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_DOORS)
 ENDIF()
 
 IF(DEFINED CHUCHO_CONFIGURATOR_DEFS)

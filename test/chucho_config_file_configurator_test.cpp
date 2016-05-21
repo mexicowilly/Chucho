@@ -190,6 +190,22 @@ TEST_F(chucho_config_file_configurator, db2_writer)
 
 #endif
 
+#if defined(CHUCHO_HAVE_DOORS)
+
+TEST_F(chucho_config_file_configurator, door_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = dw\n"
+              "chucho.writer.dw = chucho::door_writer\n"
+              "chucho.writer.dw.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.dw.file_name = gargle\n");
+    door_writer_body();
+}
+
+#endif
+
 TEST_F(chucho_config_file_configurator, duplicate_message_filter)
 {
     configure("chucho.logger = will\n"
