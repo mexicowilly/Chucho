@@ -123,12 +123,12 @@ void door_writer::write_impl(const event& evt)
                 else if (err == ENOBUFS)
                 {
                     std::size_t data_max;
+                    std::ostringstream stream;
+                    stream << "The event size " << darg.data_size << " is greater than the maximum size ";
                     if (door_getparam(get_file_descriptor(), DOOR_PARAM_DATA_MAX, &data_max) == 0)
-                    {
-                        std::ostringstream stream;
-                        stream << "The event size " << darg.data_size << " is greater than the maximum size " << data_max << " allowed by the door attached to " << get_file_name();
-                        report_error(stream.str());
-                    }
+                        stream << data_max << ' ';
+                    stream << "allowed by the door attached to " << get_file_name();
+                    report_error(stream.str());
                 }
                 else
                 {
