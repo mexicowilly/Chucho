@@ -546,6 +546,7 @@ IF(CHUCHO_HAVE_ACTIVEMQ)
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/activemq_writer.h
      include/chucho/activemq_writer.hpp)
 
 IF(CHUCHO_HAVE_DOORS)
@@ -558,10 +559,17 @@ IF(CHUCHO_HAVE_DOORS)
          platform/solaris/door_writer.cpp
          platform/solaris/door_writer_factory.cpp
          platform/solaris/door_writer_memento.cpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS
+             include/chucho/door_writer.h)
+        LIST(APPEND CHUCHO_DOOR_SOURCES
+             c_door_writer.cpp)
+    ENDIF()
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/door_event.h
+     include/chucho/door_writer.h
      include/chucho/door_writer.hpp)
 
 # The libyaml sources are required by chuchod

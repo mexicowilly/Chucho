@@ -283,6 +283,12 @@ IF(C_API)
              activemq_writer_test.h)
     ENDIF()
 
+    IF(CHUCHO_HAVE_DOORS)
+        LIST(APPEND CHUCHO_DOOR_C_SOURCES
+             door_writer_test.c
+             door_writer_test.h)
+    ENDIF()
+
     IF(CHUCHO_WINDOWS)
         SET_SOURCE_FILES_PROPERTIES(windows_event_log_writer_test.c PROPERTIES
                                     COMPILE_DEFINITIONS CHUCHO_EVENT_LOG_DLL="${CHUCHO_EVENT_LOG_DLL}")
@@ -358,7 +364,8 @@ IF(C_API)
                    ${CHUCHO_EVALUATOR_C_SOURCES}
                    ${CHUCHO_PLATFORM_C_SOURCES}
                    ${CHUCHO_EMAIL_WRITER_C_SOURCES}
-                   ${CHUCHO_MQ_C_SOURCES})
+                   ${CHUCHO_MQ_C_SOURCES}
+                   ${CHUCHO_DOOR_C_SOURCES})
     TARGET_LINK_LIBRARIES(c-unit-test chucho)
 
     IF(CHUCHO_SOLARIS AND ENABLE_SHARED AND CHUCHO_STD_CXX_LIBS)

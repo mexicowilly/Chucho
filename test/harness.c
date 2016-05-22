@@ -76,6 +76,9 @@
 #if defined(CHUCHO_HAVE_ACTIVEMQ)
 #include "activemq_writer_test.h"
 #endif
+#if defined(CHUCHO_HAVE_DOORS)
+#include "door_writer_test.h"
+#endif
 
 sput_struct __sput;
 
@@ -142,6 +145,9 @@ int main()
     #endif
     #if defined(CHUCHO_HAVE_DB2)
     run_db2_writer_test();
+    #endif
+    #if defined(CHUCHO_HAVE_DOORS)
+    run_door_writer_test();
     #endif
 
     sput_finish_testing();
