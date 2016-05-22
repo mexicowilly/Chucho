@@ -389,6 +389,16 @@ IF(ENABLE_CURL)
     ENDIF()
 ENDIF()
 
+# Doors
+IF(CHUCHO_SOLARIS)
+    CHECK_INCLUDE_FILE_CXX(door.h CHUCHO_HAVE_DOOR_H)
+    IF(CHUCHO_HAVE_DOOR_H)
+        CHUCHO_REQUIRE_SYMBOLS(door.h door_call door_getparam door_create door_return)
+        CHUCHO_REQUIRE_SYMBOLS(stropts.h fattach)
+        SET(CHUCHO_HAVE_DOORS TRUE CACHE INTERNAL "Whether we have doors")
+    ENDIF()
+ENDIF()
+
 # Nested exceptions
 CHECK_CXX_SOURCE_COMPILES("#include <exception>\nint main() { std::exception e; std::throw_with_nested(e); std::rethrow_if_nested(e); return 0; }"
                           CHUCHO_HAVE_NESTED_EXCEPTIONS)

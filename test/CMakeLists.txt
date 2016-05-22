@@ -132,6 +132,11 @@ IF(CHUCHO_HAVE_ACTIVEMQ)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_ACTIVEMQ)
 ENDIF()
 
+IF(CHUCHO_HAVE_DOORS)
+    LIST(APPEND CHUCHO_TEST_DOOR_SOURCES door_writer_test.cpp)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_DOORS)
+ENDIF()
+
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
                calendar_test.cpp
@@ -170,7 +175,8 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                ${CHUCHO_CONFIGURATOR_TESTS}
                ${CHUCHO_TEST_EVALUATOR_SOURCES}
                ${CHUCHO_TEST_PROTOBUF_SOURCES}
-               ${CHUCHO_TEST_MQ_SOURCES})
+               ${CHUCHO_TEST_MQ_SOURCES}
+               ${CHUCHO_TEST_DOOR_SOURCES})
 TARGET_LINK_LIBRARIES(unit-test chucho gtest)
 
 IF(MSVC)
@@ -197,6 +203,13 @@ IF(CHUCHO_HAVE_ACTIVEMQ)
                    activemq_writer_test_helper.cpp)
     TARGET_LINK_LIBRARIES(activemq-writer-test-helper chucho)
     ADD_DEPENDENCIES(unit-test activemq-writer-test-helper)
+ENDIF()
+
+IF(CHUCHO_HAVE_DOORS)
+    ADD_EXECUTABLE(door-writer-test-helper EXCLUDE_FROM_ALL
+                   door_writer_test_helper.cpp)
+    TARGET_LINK_LIBRARIES(door-writer-test-helper chucho)
+    ADD_DEPENDENCIES(unit-test door-writer-test-helper)
 ENDIF()
 
 ADD_CUSTOM_TARGET(check
@@ -268,6 +281,12 @@ IF(C_API)
         LIST(APPEND CHUCHO_MQ_C_SOURCES
              activemq_writer_test.c
              activemq_writer_test.h)
+    ENDIF()
+
+    IF(CHUCHO_HAVE_DOORS)
+        LIST(APPEND CHUCHO_DOOR_C_SOURCES
+             door_writer_test.c
+             door_writer_test.h)
     ENDIF()
 
     IF(CHUCHO_WINDOWS)
@@ -345,7 +364,8 @@ IF(C_API)
                    ${CHUCHO_EVALUATOR_C_SOURCES}
                    ${CHUCHO_PLATFORM_C_SOURCES}
                    ${CHUCHO_EMAIL_WRITER_C_SOURCES}
-                   ${CHUCHO_MQ_C_SOURCES})
+                   ${CHUCHO_MQ_C_SOURCES}
+                   ${CHUCHO_DOOR_C_SOURCES})
     TARGET_LINK_LIBRARIES(c-unit-test chucho)
 
     IF(CHUCHO_SOLARIS AND ENABLE_SHARED AND CHUCHO_STD_CXX_LIBS)

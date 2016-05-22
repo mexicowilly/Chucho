@@ -86,6 +86,9 @@
 #if defined(CHUCHO_HAVE_ACTIVEMQ)
 #include <chucho/activemq_writer.hpp>
 #endif
+#if defined(CHUCHO_HAVE_DOORS)
+#include <chucho/door_writer.hpp>
+#endif
 
 namespace chucho
 {
@@ -226,6 +229,21 @@ void configurator::db2_writer_body()
     EXPECT_EQ(std::string("chucho"), owrt->get_database());
     EXPECT_EQ(std::string("db2inst1"), owrt->get_user());
     EXPECT_EQ(std::string("db2inst1"), owrt->get_password());
+}
+
+#endif
+
+#if defined(CHUCHO_HAVE_DOORS)
+
+void configurator::door_writer_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::door_writer), typeid(*wrts[0]));
+    auto dwrt = std::static_pointer_cast<chucho::door_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(dwrt));
+    EXPECT_STREQ("gargle", dwrt->get_file_name().c_str());
+    chucho::status_manager::get()->clear();
 }
 
 #endif

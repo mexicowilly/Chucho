@@ -123,6 +123,18 @@ protected:
     //@}
 
     /**
+     * Whether we have access to the file is checked every three seconds.
+     * If there is no current access to the file, an attempt is made to
+     * open it.
+     */
+    void ensure_access();
+    /**
+     * Return whether the file is open for business.
+     * 
+     * @return whether we have opened the file
+     */
+    bool is_open() const;
+    /**
      * Open a file of a new name.
      * 
      * @param file_name the name of the new file
@@ -139,7 +151,6 @@ protected:
     virtual void write_impl(const event& evt) override;
 
 private:
-    void ensure_access();
     void open_impl(const std::string& file_name);
 
     std::string initial_file_name_;
@@ -165,6 +176,11 @@ inline const std::string& file_writer::get_initial_file_name() const
 inline file_writer::on_start file_writer::get_on_start() const
 {
     return start_;
+}
+
+inline bool file_writer::is_open() const
+{
+    return is_open_;
 }
 
 inline void file_writer::set_allow_creation(bool allow)
