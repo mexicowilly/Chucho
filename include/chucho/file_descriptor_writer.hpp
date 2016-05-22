@@ -122,7 +122,14 @@ protected:
      * @}
      */
 
+    /**
+     * Flush the buffer.
+     */
     virtual void flush();
+    /**
+     * Return the file descriptor.
+     * @return the file descriptor
+     */
     int get_file_descriptor() const;
     /**
      * Set whether the writer can allow the file descriptor to be

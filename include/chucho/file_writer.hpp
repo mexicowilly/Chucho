@@ -122,7 +122,17 @@ protected:
                 bool flsh);
     //@}
 
+    /**
+     * Whether we have access to the file is checked every three seconds.
+     * If there is no current access to the file, an attempt is made to
+     * open it.
+     */
     void ensure_access();
+    /**
+     * Return whether the file is open for business.
+     * 
+     * @return whether we have opened the file
+     */
     bool is_open() const;
     /**
      * Open a file of a new name.

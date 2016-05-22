@@ -22,11 +22,36 @@
 namespace chucho
 {
 
+/**
+ * @class door_writer door_writer.hpp chucho/door_writer.hpp
+ * Write to Solaris doors. Doors are a lightweight form of IPC,
+ * kind of like RPC but good. The door to which Chucho writes
+ * must be attached to the file system, which is accomplished by
+ * calling @c fattach after creating the door.
+ * 
+ * The data sent is encapsulated in the @ref chucho_door_event
+ * structure from @ref door_event.h.
+ * 
+ * @ingroup writers
+ */
 class CHUCHO_EXPORT door_writer : public file_writer
 {
 public:
+    /**
+     * @name Constructor
+     * @{
+     */
+    /**
+     * Construct a door writer.
+     * 
+     * @param fmt the formatter
+     * @param name the file to which the door is attached
+     */
     door_writer(std::shared_ptr<formatter> fmt,
                 const std::string& name);
+    /**
+     * @}
+     */
 
 protected:
     virtual void flush() override;
