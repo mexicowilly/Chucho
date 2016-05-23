@@ -942,9 +942,10 @@ IF(CHUCHO_WINDOWS)
     SET(CHUCHO_GTEST_CMAKE_FLAGS -Dgtest_force_shared_crt:BOOL=ON)
 ENDIF()
 
+SET(GTEST_PACKAGE https://github.com/google/googletest/archive/release-1.7.0.zip CACHE STRING "Where to get gtest")
+
 ExternalProject_Add(gtest-external
-                    URL http://googletest.googlecode.com/files/gtest-1.7.0.zip
-                    URL_MD5 2d6ec8ccdf5c46b05ba54a9fd1d130d7
+                    URL "${GTEST_PACKAGE}"
                     CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} ${CHUCHO_ADDL_GTEST_CXX_FLAGS}" ${CHUCHO_GTEST_CMAKE_FLAGS}
                     CMAKE_GENERATOR "${CHUCHO_GTEST_GENERATOR}"
                     INSTALL_COMMAND "")
