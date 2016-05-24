@@ -844,6 +844,33 @@ ELSEIF(ACTIVEMQ_INCLUDE_DIR OR ACTIVEMQ_LIB OR APR_LIB)
     MESSAGE(WARNING "If any of the variables ACTIVEMQ_INCLUDE_DIR, ACTIVEMQ_LIB or APR_LIB has been set, then they must all be set for ActiveMQ support to be included")
 ENDIF()
 
+# RabbitMQ
+IF(RABBITMQ_INCLUDE_DIR AND RABBITMQ_LIB)
+    SET(CMAKE_REQUIRED_INCLUDES "${RABBITMQ_INCLUDE_DIR}")
+    FOREACH(HEAD amqp_tcp_socket amqp)
+        CHECK_INCLUDE_FILE_CXX(${HEAD}.h CHUCHO_HAVE_${HEAD})
+        IF(NOT CHUCHO_HAVE_${HEAD})
+            MESSAGE(FATAL_ERROR "The variable RABBITMQ_INCLUDE_DIR was provided as ${RABBITMQ_INCLUDE_DIR}, but it does not contain the RabbitMQ headers")
+        ENDIF()
+    ENDFOREACH()
+    IF(NOT EXISTS "${RABBITMQ_LIB}")
+        MESSAGE(FATAL_ERROR "The variable RABBITMQ_LIB was provided as ${RABBITMQ_LIB}, but it does not refer to an existing file")
+    ENDIF()
+    SET(CMAKE_REQUIRED_LIBRARIES "${RABBITMQ_LIB}" ${CMAKE_THREAD_LIBS_INIT})
+    IF(CHUCHO_SOLARIS)
+        SET(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES};socket;nsl")
+    ENDIF()
+    CHUCHO_REQUIRE_SYMBOLS(amqp.h amqp_new_connection amqp_socket_open amqp_login amqp_get_rpc_reply
+                           amqp_channel_close amqp_connection_close amqp_basic_publish amqp_channel_open
+                           amqp_destroy_connection amqp_error_string2 amqp_cstring_bytes)
+    CHUCHO_REQUIRE_SYMBOLS(amqp_tcp_socket.h amqp_tcp_socket_new)
+    UNSET(CMAKE_REQUIRED_INCLUDES)
+    UNSET(CMAKE_REQUIRED_LIBRARIES)
+    SET(CHUCHO_HAVE_RABBITMQ TRUE CACHE INTERNAL "Whether we have RabbitMQ")
+ELSEIF(ZEROMQ_INCLUDE_DIR OR ZEROMQ_LIB)
+    MESSAGE(WARNING "If either of the variables RABBITMQ_INCLUDE_DIR or RABBITMQ_LIB has been set, then they must both be set for RabbitMQ support to be included")
+ENDIF()
+
 # doxygen
 FIND_PACKAGE(Doxygen)
 

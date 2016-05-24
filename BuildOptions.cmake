@@ -226,6 +226,14 @@ OPTION(RUBY_FRAMEWORK "Whether Ruby should be included as a framework (Macintosh
 
 # SET(ZEROMQ_LIB "<My ZeroMQ Library>" CACHE STRING "ZeroMQ library")
 
+# The location of the RabbitMQ header files.
+
+# SET(RABBITMQ_INCLUDE_DIR "<My RabbitMQ Include Directory>" CACHE STRING "Include directory of the RabbitMQ library")
+
+# The name of the RabbitMQ library.
+
+# SET(RABBITMQ_LIB "<My RabbitMQ Library>" CACHE STRING "RabbitMQ library")
+
 # The location of the Protobuf header files.
 
 # SET(PROTOBUF_INCLUDE_DIR "<My Protobuf Include Directory>" CACHE STRING "Include directory of the Protobuf library")
