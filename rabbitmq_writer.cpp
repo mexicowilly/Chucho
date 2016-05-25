@@ -17,6 +17,7 @@
 #include <chucho/rabbitmq_writer.hpp>
 #include <chucho/exception.hpp>
 #include <amqp_tcp_socket.h>
+#include <amqp_ssl_socket.h>
 #include <sstream>
 
 namespace
@@ -32,44 +33,28 @@ namespace chucho
 rabbitmq_writer::rabbitmq_writer(std::shared_ptr<formatter> fmt,
                                  std::shared_ptr<serializer> ser,
                                  std::shared_ptr<compressor> cmp,
-                                 const std::string& host,
-                                 std::uint16_t port,
-                                 const std::string& user,
-                                 const std::string& password,
+                                 const std::string& url,
                                  const std::string& exchange,
-                                 const optional<std::string>& virtual_host,
                                  const optional<std::string>& routing_key)
     : message_queue_writer(fmt, ser, cmp),
-        host_(host),
-        port_(port),
-        user_(user),
-        password_(password),
-        exchange_(exchange),
-        vhost_(virtual_host ? *virtual_host : "/"),
-        routing_key_(routing_key ? *routing_key : ""),
-        cxn_(amqp_new_connection())
+      url_(url),
+      exchange_(exchange),
+      routing_key_(routing_key ? *routing_key : ""),
+      cxn_(amqp_new_connection())
 {
     init();
 }
 
 rabbitmq_writer::rabbitmq_writer(std::shared_ptr<formatter> fmt,
                                  std::shared_ptr<serializer> ser,
-                                 const std::string& host,
-                                 std::uint16_t port,
-                                 const std::string& user,
-                                 const std::string& password,
+                                 const std::string& url,
                                  const std::string& exchange,
-                                 const optional<std::string>& virtual_host,
                                  const optional<std::string>& routing_key)
     : message_queue_writer(fmt, ser),
-        host_(host),
-        port_(port),
-        user_(user),
-        password_(password),
-        exchange_(exchange),
-        vhost_(virtual_host ? *virtual_host : "/"),
-        routing_key_(routing_key ? *routing_key : ""),
-        cxn_(amqp_new_connection())
+      url_(url),
+      exchange_(exchange),
+      routing_key_(routing_key ? *routing_key : ""),
+      cxn_(amqp_new_connection())
 {
     init();
 }
@@ -87,24 +72,33 @@ void rabbitmq_writer::init()
         throw exception("Unable to create a RabbitMQ connection object");
     try
     {
+        std::vector<char> chars(url_.c_str(), url_.c_str() + url_.length() + 1);
+        amqp_connection_info info;
+        int rc = amqp_parse_url(&chars[0], &info);
+        if (rc != AMQP_STATUS_OK)
+            throw exception("Invalid RabbitMQ URL: " + url_);
+        if (info.ssl)
+            throw exception("Chucho does not support RabbitMQ connections using SSL");
         amqp_socket_t* sock = amqp_tcp_socket_new(cxn_);
         if (sock == nullptr)
             throw exception("Unable to create socket");
-        int rc = amqp_socket_open(sock, host_.c_str(), port_);
+        rc = amqp_socket_open(sock, info.host, info.port);
         if (rc != AMQP_STATUS_OK)
             throw exception(std::string("Error connecting to RabbitMQ host: ") + amqp_error_string2(rc));
         amqp_rpc_reply_t rep = amqp_login(cxn_,
-                                          vhost_.c_str(),
+                                          info.vhost,
                                           0,
                                           AMQP_DEFAULT_FRAME_SIZE,
                                           0,
                                           AMQP_SASL_METHOD_PLAIN,
-                                          user_.c_str(),
-                                          password_.c_str());
+                                          info.user,
+                                          info.password);
         respond(rep);
         amqp_channel_open(cxn_, CHUCHO_CHANNEL);
         rep = amqp_get_rpc_reply(cxn_);
         respond(rep);
+        exchange_bytes_ = amqp_cstring_bytes(exchange_.c_str());
+        routing_key_bytes_ = amqp_cstring_bytes(routing_key_.c_str());
     }
     catch (...)
     {
@@ -158,8 +152,8 @@ void rabbitmq_writer::write_impl(const event& evt)
     msg.len = bytes.size();
     int rc = amqp_basic_publish(cxn_,
                                 CHUCHO_CHANNEL,
-                                amqp_cstring_bytes(exchange_.c_str()),
-                                amqp_cstring_bytes(routing_key_.c_str()),
+                                exchange_bytes_,
+                                routing_key_bytes_,
                                 0,
                                 0,
                                 nullptr,

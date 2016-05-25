@@ -29,24 +29,20 @@ class CHUCHO_EXPORT rabbitmq_writer : public message_queue_writer
 public:
     rabbitmq_writer(std::shared_ptr<formatter> fmt,
                     std::shared_ptr<serializer> ser,
-                    const std::string& host,
-                    std::uint16_t port,
-                    const std::string& user,
-                    const std::string& password,
+                    const std::string& url,
                     const std::string& exchange,
-                    const optional<std::string>& virtual_host = optional<std::string>(),
                     const optional<std::string>& routing_key = optional<std::string>());
     rabbitmq_writer(std::shared_ptr<formatter> fmt,
                     std::shared_ptr<serializer> ser,
                     std::shared_ptr<compressor> cmp,
-                    const std::string& host,
-                    std::uint16_t port,
-                    const std::string& user,
-                    const std::string& password,
+                    const std::string& url,
                     const std::string& exchange,
-                    const optional<std::string>& virtual_host = optional<std::string>(),
                     const optional<std::string>& routing_key = optional<std::string>());
     ~rabbitmq_writer();
+
+    const std::string& get_exchange() const;
+    const std::string& get_routing_key() const;
+    const std::string& get_url() const;
 
 protected:
     virtual void write_impl(const event& evt) override;
@@ -55,16 +51,28 @@ private:
     CHUCHO_NO_EXPORT void init();
     CHUCHO_NO_EXPORT void respond(const amqp_rpc_reply_t& rep);
 
-    std::string host_;
-    std::uint16_t port_;
-    std::string user_;
-    std::string password_;
+    std::string url_;
     std::string exchange_;
-    std::string vhost_;
     std::string routing_key_;
     amqp_connection_state_t cxn_;
-    amqp_channel_t channel_;
+    amqp_bytes_t exchange_bytes_;
+    amqp_bytes_t routing_key_bytes_;
 };
+
+inline const std::string& rabbitmq_writer::get_exchange() const
+{
+    return exchange_;
+}
+
+inline const std::string& rabbitmq_writer::get_routing_key() const
+{
+    return routing_key_;
+}
+
+inline const std::string& rabbitmq_writer::get_url() const
+{
+    return url_;
+}
 
 }
 
