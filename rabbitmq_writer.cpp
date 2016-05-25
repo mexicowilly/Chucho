@@ -155,7 +155,7 @@ void rabbitmq_writer::write_impl(const event& evt)
                                 CHUCHO_CHANNEL,
                                 exchange_bytes_,
                                 routing_key_bytes_,
-                                1,
+                                0,
                                 0,
                                 nullptr,
                                 msg);
