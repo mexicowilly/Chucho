@@ -52,6 +52,10 @@ IF(CHUCHO_HAVE_ACTIVEMQ)
     LIST(APPEND CHUCHO_TEST_MQ_SOURCES activemq_writer_test.cpp)
 ENDIF()
 
+IF(CHUCHO_HAVE_RABBITMQ)
+    LIST(APPEND CHUCHO_TEST_MQ_SOURCES rabbitmq_writer_test.cpp)
+ENDIF()
+
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_TEST_COMPRESSION_SOURCES
          gzip_file_compressor_test.cpp
@@ -132,6 +136,10 @@ IF(CHUCHO_HAVE_ACTIVEMQ)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_ACTIVEMQ)
 ENDIF()
 
+IF(CHUCHO_HAVE_RABBITMQ)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_RABBITMQ)
+ENDIF()
+
 IF(CHUCHO_HAVE_DOORS)
     LIST(APPEND CHUCHO_TEST_DOOR_SOURCES door_writer_test.cpp)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_DOORS)
@@ -203,6 +211,13 @@ IF(CHUCHO_HAVE_ACTIVEMQ)
                    activemq_writer_test_helper.cpp)
     TARGET_LINK_LIBRARIES(activemq-writer-test-helper chucho)
     ADD_DEPENDENCIES(unit-test activemq-writer-test-helper)
+ENDIF()
+
+IF(CHUCHO_HAVE_RABBITMQ)
+    ADD_EXECUTABLE(rabbitmq-writer-test-helper EXCLUDE_FROM_ALL
+                   rabbitmq_writer_test_helper.cpp)
+    TARGET_LINK_LIBRARIES(rabbitmq-writer-test-helper chucho)
+    ADD_DEPENDENCIES(unit-test rabbitmq-writer-test-helper)
 ENDIF()
 
 IF(CHUCHO_HAVE_DOORS)

@@ -862,7 +862,9 @@ IF(RABBITMQ_INCLUDE_DIR AND RABBITMQ_LIB)
     ENDIF()
     CHUCHO_REQUIRE_SYMBOLS(amqp.h amqp_new_connection amqp_socket_open amqp_login amqp_get_rpc_reply
                            amqp_channel_close amqp_connection_close amqp_basic_publish amqp_channel_open
-                           amqp_destroy_connection amqp_error_string2 amqp_cstring_bytes)
+                           amqp_destroy_connection amqp_error_string2 amqp_cstring_bytes amqp_queue_declare
+                           amqp_basic_consume amqp_consume_message amqp_empty_bytes amqp_empty_table
+                           amqp_destroy_envelope)
     CHUCHO_REQUIRE_SYMBOLS(amqp_tcp_socket.h amqp_tcp_socket_new amqp_parse_url)
     UNSET(CMAKE_REQUIRED_INCLUDES)
     UNSET(CMAKE_REQUIRED_LIBRARIES)
