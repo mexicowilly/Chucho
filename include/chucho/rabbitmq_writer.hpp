@@ -24,24 +24,74 @@
 namespace chucho
 {
 
+/**
+ * @class rabbitmq_writer rabbitmq_writer.hpp chucho/rabbitmq_writer.hpp
+ * A writer that publishes <a href="http://http://www.rabbitmq.com/">RabbitMQ</a> messages.
+ * 
+ * @ingroup mq writers
+ */
 class CHUCHO_EXPORT rabbitmq_writer : public message_queue_writer
 {
 public:
+    /**
+     * @name Constructors and Destructor
+     * @{
+    */
+    /**
+     * Construct a RabbitMQ writer.
+     * 
+     * @param fmt the formatter
+     * @param ser the serializer
+     * @param url the URL to the RabbitMQ instance
+     * @param exchange the exchange to which to publish
+     * @param routing_key the routing key
+     */
     rabbitmq_writer(std::shared_ptr<formatter> fmt,
                     std::shared_ptr<serializer> ser,
                     const std::string& url,
                     const std::string& exchange,
                     const optional<std::string>& routing_key = optional<std::string>());
+    /**
+     * Construct a RabbitMQ writer.
+     * 
+     * @param fmt the formatter
+     * @param ser the serializer
+     * @param cmp the compressor
+     * @param url the URL to the RabbitMQ instance
+     * @param exchange the exchange to which to publish
+     * @param routing_key the routing key
+     */
     rabbitmq_writer(std::shared_ptr<formatter> fmt,
                     std::shared_ptr<serializer> ser,
                     std::shared_ptr<compressor> cmp,
                     const std::string& url,
                     const std::string& exchange,
                     const optional<std::string>& routing_key = optional<std::string>());
+    /**
+     * Destroy a RabbitMQ writer.
+     */
     ~rabbitmq_writer();
+    /**
+     * @}
+     */
 
+    /**
+     * Return the exchange to which message are published.
+     * 
+     * @return the exchange
+     */
     const std::string& get_exchange() const;
+    /**
+     * Return the routing key.
+     * 
+     * @return the the routing key
+     */
     const std::string& get_routing_key() const;
+    /**
+     * Return the routing URL.
+     * 
+     * @return the the URL
+     */
     const std::string& get_url() const;
 
 protected:

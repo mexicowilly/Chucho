@@ -570,7 +570,7 @@ IF(CHUCHO_HAVE_RABBITMQ)
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
-#     include/chucho/activemq_writer.h
+     include/chucho/rabbitmq_writer.h
      include/chucho/rabbitmq_writer.hpp)
 
 IF(CHUCHO_HAVE_DOORS)
