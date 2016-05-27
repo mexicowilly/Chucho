@@ -82,6 +82,9 @@
 #if defined(CHUCHO_HAVE_ACTIVEMQ)
 #include <chucho/activemq_writer_factory.hpp>
 #endif
+#if defined(CHUCHO_HAVE_RABBITMQ)
+#include <chucho/rabbitmq_writer_factory.hpp>
+#endif
 #if defined(CHUCHO_HAVE_DOORS)
 #include <chucho/door_writer_factory.hpp>
 #endif
@@ -226,6 +229,10 @@ void configurator::initialize_impl()
 #if defined(CHUCHO_HAVE_DOORS)
     fact.reset(new door_writer_factory());
     add_configurable_factory("chucho::door_writer", fact);
+#endif
+#if defined(CHUCHO_HAVE_RABBITMQ)
+    fact.reset(new rabbitmq_writer_factory());
+    add_configurable_factory("chucho::rabbitmq_writer", fact);
 #endif
 }
 

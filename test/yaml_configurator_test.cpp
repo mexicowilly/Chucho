@@ -508,6 +508,23 @@ TEST_F(yaml_configurator, postgres_writer)
 
 #endif
 
+#if defined(CHUCHO_HAVE_RABBITMQ)
+
+TEST_F(yaml_configurator, rabbitmq_writer)
+{
+    configure("chucho::logger:\n"
+              "    - name: will\n"
+              "    - chucho::rabbitmq_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            - pattern: '%m'\n"
+              "        - chucho::formatted_message_serializer\n"
+              "        - url: 'amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc'\n"
+              "        - exchange: logs");
+    rabbitmq_writer_body();
+}
+
+#endif
+
 TEST_F(yaml_configurator, remote_writer)
 {
     configure("- chucho::logger:\n"

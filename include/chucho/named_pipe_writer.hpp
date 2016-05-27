@@ -35,7 +35,7 @@ namespace chucho
  * On Windows, you may pass an unadorned name as the name of the pipe.
  * For example, if the name passed in the constructor here is
  * my_dog_has_fleas, then the name will be fleshed out completely as
- * @c \\\\.\\pipe\\my_dog_has_fleas. On POSIX systems, you must pass the
+ * @c \\\\\.\\pipe\\my_dog_has_fleas. On POSIX systems, you must pass the
  * file system name associated with the pipe, which may be a relative
  * path if you know your current working directory.
  * 

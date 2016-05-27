@@ -64,6 +64,9 @@ ENDIF()
 IF(CHUCHO_HAVE_DB2)
     INCLUDE_DIRECTORIES("${DB2_INCLUDE_DIR}")
 ENDIF()
+IF(CHUCHO_HAVE_RABBITMQ)
+    INCLUDE_DIRECTORIES("${RABBITMQ_INCLUDE_DIR}")
+ENDIF()
 
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
@@ -549,6 +552,27 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/activemq_writer.h
      include/chucho/activemq_writer.hpp)
 
+IF(CHUCHO_HAVE_RABBITMQ)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/rabbitmq_writer.hpp
+         include/chucho/rabbitmq_writer_factory.hpp
+         include/chucho/rabbitmq_writer_memento.hpp)
+    LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
+         rabbitmq_writer.cpp
+         rabbitmq_writer_factory.cpp
+         rabbitmq_writer_memento.cpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS
+             include/chucho/rabbitmq_writer.h)
+        LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
+             c_rabbitmq_writer.cpp)
+    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/rabbitmq_writer.h
+     include/chucho/rabbitmq_writer.hpp)
+
 IF(CHUCHO_HAVE_DOORS)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
          include/chucho/door_event.h
@@ -563,7 +587,7 @@ IF(CHUCHO_HAVE_DOORS)
         LIST(APPEND CHUCHO_PUBLIC_HEADERS
              include/chucho/door_writer.h)
         LIST(APPEND CHUCHO_DOOR_SOURCES
-             c_door_writer.cpp)
+             platform/solaris/c_door_writer.cpp)
     ENDIF()
 ENDIF()
 
@@ -962,6 +986,10 @@ IF(CHUCHO_HAVE_ACTIVEMQ)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ACTIVEMQ)
 ENDIF()
 
+IF(CHUCHO_HAVE_RABBITMQ)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RABBITMQ)
+ENDIF()
+
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ZLIB)
 ENDIF()
@@ -1195,6 +1223,10 @@ IF(CHUCHO_HAVE_ACTIVEMQ)
     IF(CHUCHO_NEEDS_SENDFILE)
         TARGET_LINK_LIBRARIES(chucho sendfile)
     ENDIF()
+ENDIF()
+
+IF(CHUCHO_HAVE_RABBITMQ)
+    TARGET_LINK_LIBRARIES(chucho "${RABBITMQ_LIB}")
 ENDIF()
 
 IF(ZLIB_LIB_DIR)
