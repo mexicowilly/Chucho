@@ -565,6 +565,25 @@ TEST_F(chucho_config_file_configurator, postgres_writer)
 
 #endif
 
+#if defined(CHUCHO_HAVE_RABBITMQ)
+
+TEST_F(chucho_config_file_configurator, rabbitmq_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = pg\n"
+              "chucho.writer.pg = chucho::rabbitmq_writer\n"
+              "chucho.writer.pg.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.pg.serializer = fms\n"
+              "chucho.serializer.fms = chucho::formatted_message_serializer\n"
+              "chucho.writer.pg.url = amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc\n"
+              "chucho.writer.pg.exchange = logs");
+    rabbitmq_writer_body();
+}
+
+#endif
+
 TEST_F(chucho_config_file_configurator, remote_writer)
 {
     configure("chucho.logger = will\n"

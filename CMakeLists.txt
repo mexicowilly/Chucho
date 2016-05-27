@@ -554,9 +554,13 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
 
 IF(CHUCHO_HAVE_RABBITMQ)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
-         include/chucho/rabbitmq_writer.hpp)
+         include/chucho/rabbitmq_writer.hpp
+         include/chucho/rabbitmq_writer_factory.hpp
+         include/chucho/rabbitmq_writer_memento.hpp)
     LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
-         rabbitmq_writer.cpp)
+         rabbitmq_writer.cpp
+         rabbitmq_writer_factory.cpp
+         rabbitmq_writer_memento.cpp)
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
@@ -974,6 +978,10 @@ ENDIF()
 
 IF(CHUCHO_HAVE_ACTIVEMQ)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ACTIVEMQ)
+ENDIF()
+
+IF(CHUCHO_HAVE_RABBITMQ)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RABBITMQ)
 ENDIF()
 
 IF(CHUCHO_HAVE_ZLIB)

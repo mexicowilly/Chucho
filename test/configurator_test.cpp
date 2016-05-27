@@ -89,6 +89,9 @@
 #if defined(CHUCHO_HAVE_DOORS)
 #include <chucho/door_writer.hpp>
 #endif
+#if defined(CHUCHO_HAVE_RABBITMQ)
+#include <chucho/rabbitmq_writer.hpp>
+#endif
 
 namespace chucho
 {
@@ -553,6 +556,22 @@ void configurator::postgres_writer_body()
     auto pwrt = std::static_pointer_cast<chucho::postgres_writer>(wrts[0]);
     ASSERT_TRUE(static_cast<bool>(pwrt));
     EXPECT_EQ(std::string("postgres://test_user:password@192.168.56.101/postgres"), pwrt->get_uri());
+}
+
+#endif
+
+#if defined(CHUCHO_HAVE_RABBITMQ)
+
+void configurator::rabbitmq_writer_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::rabbitmq_writer), typeid(*wrts[0]));
+    auto pwrt = std::static_pointer_cast<chucho::rabbitmq_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(pwrt));
+    EXPECT_EQ(std::string("amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc"), pwrt->get_url());
+    EXPECT_EQ(std::string("logs"), pwrt->get_exchange());
+    EXPECT_TRUE(pwrt->get_routing_key().empty());
 }
 
 #endif
