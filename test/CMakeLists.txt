@@ -298,6 +298,12 @@ IF(C_API)
              activemq_writer_test.h)
     ENDIF()
 
+    IF(CHUCHO_HAVE_RABBITMQ)
+        LIST(APPEND CHUCHO_MQ_C_SOURCES
+             rabbitmq_writer_test.c
+             rabbitmq_writer_test.h)
+    ENDIF()
+
     IF(CHUCHO_HAVE_DOORS)
         LIST(APPEND CHUCHO_DOOR_C_SOURCES
              door_writer_test.c

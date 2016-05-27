@@ -561,6 +561,12 @@ IF(CHUCHO_HAVE_RABBITMQ)
          rabbitmq_writer.cpp
          rabbitmq_writer_factory.cpp
          rabbitmq_writer_memento.cpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS
+             include/chucho/rabbitmq_writer.h)
+        LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
+             c_rabbitmq_writer.cpp)
+    ENDIF()
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
@@ -581,7 +587,7 @@ IF(CHUCHO_HAVE_DOORS)
         LIST(APPEND CHUCHO_PUBLIC_HEADERS
              include/chucho/door_writer.h)
         LIST(APPEND CHUCHO_DOOR_SOURCES
-             c_door_writer.cpp)
+             platform/solaris/c_door_writer.cpp)
     ENDIF()
 ENDIF()
 

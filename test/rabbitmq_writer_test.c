@@ -15,43 +15,42 @@
  */
 
 #include "sput.h"
-#include <chucho/activemq_writer.h>
+#include <chucho/rabbitmq_writer.h>
 #include <chucho/pattern_formatter.h>
 #include <chucho/formatted_message_serializer.h>
 
-static void activemq_writer_test(void)
+static void rabbitmq_writer_test(void)
 {
     chucho_formatter* fmt;
     chucho_serializer* ser;
     chucho_rc rc;
     chucho_writer* wrt;
     const char* text;
-    chucho_activemq_consumer_type tp;
 
     rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
     rc = chucho_create_formatted_message_serializer(&ser);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create formatted message serializer");
-    rc = chucho_create_activemq_writer(&wrt, fmt, ser, NULL, "tcp://127.0.0.1:61616", CHUCHO_ACTIVEMQ_QUEUE, "chunky_monkey");
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create activemq writer");
+    rc = chucho_create_rabbitmq_writer(&wrt, fmt, ser, NULL, "amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc", "logs", NULL);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "create rabbitmq writer");
     if (rc != CHUCHO_NO_ERROR)
         return;
-    rc = chucho_amqwrt_get_broker(wrt, &text);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_amqwrt_get_broker");
-    sput_fail_unless(strcmp(text, "tcp://127.0.0.1:61616") == 0, text);
-    rc = chucho_amqwrt_get_consumer_type(wrt, &tp);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_amqwrt_get_consumer_type");
-    sput_fail_unless(tp == CHUCHO_ACTIVEMQ_QUEUE, "Found queue");
-    rc = chucho_amqwrt_get_topic_or_queue(wrt, &text);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_amqwrt_get_topic_or_queue");
-    sput_fail_unless(strcmp(text, "chunky_monkey") == 0, text);
-    rc = chucho_release_writer(wrt);
-    sput_fail_unless(rc == CHUCHO_NO_ERROR, "release amqwrt writer");
+    rc = chucho_rmqwrt_get_url(wrt, &text);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_rmqwrt_get_url");
+    sput_fail_unless(strcmp(text, "amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc") == 0, text);
+    rc = chucho_rmqwrt_get_exchange(wrt, &text);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_rmqwrt_get_exchange");
+    sput_fail_unless(strcmp(text, "logs") == 0, text);
+    rc = chucho_rmqwrt_get_routing_key(wrt, &text);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_rmqwrt_get_routing_key");
+    sput_fail_unless(strlen(text) == 0, text);
+     rc = chucho_release_writer(wrt);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "release rmqwrt writer");
 }
 
-void run_activemq_writer_test(void)
+void run_rabbitmq_writer_test(void)
 {
-    sput_enter_suite("activemq_writer");
-    sput_run_test(activemq_writer_test);
+    sput_enter_suite("rabbitmq_writer");
+    sput_run_test(rabbitmq_writer_test);
     sput_leave_suite();
 }
