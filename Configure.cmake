@@ -880,6 +880,9 @@ ELSEIF(ZEROMQ_INCLUDE_DIR OR ZEROMQ_LIB)
     MESSAGE(WARNING "If either of the variables RABBITMQ_INCLUDE_DIR or RABBITMQ_LIB has been set, then they must both be set for RabbitMQ support to be included")
 ENDIF()
 
+# Qt
+FIND_PACKAGE(Qt4)
+
 # doxygen
 FIND_PACKAGE(Doxygen)
 

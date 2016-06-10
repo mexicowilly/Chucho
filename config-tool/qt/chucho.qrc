@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="chucho">
+    <file alias="itzcuintli.ico">../../images/itzcuintli.ico</file>
+  </qresource>
+</RCC>
