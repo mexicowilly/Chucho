@@ -14,14 +14,7 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CONFIG_BRAIN_HPP__)
-#define CHUCHO_CONFIG_BRAIN_HPP__
-
-#include "ui_chucho.h"
-#include "logger_win_controller.hpp"
-#include <QMainWindow>
-#include <QApplication>
-#include <memory>
+#include "logger_emittable.hpp"
 
 namespace chucho
 {
@@ -29,23 +22,16 @@ namespace chucho
 namespace config
 {
 
-class brain : public QObject
+logger_emittable::logger_emittable(const std::string& name)
+    : QTreeWidgetItem(QStringList() << QString::fromStdString(name) << "")
 {
-    Q_OBJECT
+    rename_logger(typeid(*this));
+}
 
-public:
-    brain(int argc, char* argv[]);
-    int think();
-
-private:
-    QApplication app_;
-    QMainWindow main_win_;
-    Ui::main_ui ui_;
-    std::unique_ptr<logger_win_controller> lgr_ctrl_;
-};
-
-} 
+void logger_emittable::emit_config(std::ostream& stream)
+{
+}
 
 }
 
-#endif
+}

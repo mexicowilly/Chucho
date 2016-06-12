@@ -14,14 +14,13 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CONFIG_BRAIN_HPP__)
-#define CHUCHO_CONFIG_BRAIN_HPP__
+#if !defined(CHUCHO_CONFIG_LOGGER_WIN_CONTROLLER_HPP__)
+#define CHUCHO_CONFIG_LOGGER_WIN_CONTROLLER_HPP__
 
+#include <chucho/loggable.hpp>
+#include <QObject>
+#include <QTreeWidget>
 #include "ui_chucho.h"
-#include "logger_win_controller.hpp"
-#include <QMainWindow>
-#include <QApplication>
-#include <memory>
 
 namespace chucho
 {
@@ -29,22 +28,22 @@ namespace chucho
 namespace config
 {
 
-class brain : public QObject
+class logger_win_controller : public QObject, public chucho::loggable<logger_win_controller>
 {
     Q_OBJECT
 
 public:
-    brain(int argc, char* argv[]);
-    int think();
+    logger_win_controller(Ui::main_ui& ui);
+
+public slots:
+    void item_double_clicked(QTreeWidgetItem* it, int col);
+    void new_logger();
 
 private:
-    QApplication app_;
-    QMainWindow main_win_;
-    Ui::main_ui ui_;
-    std::unique_ptr<logger_win_controller> lgr_ctrl_;
+    QTreeWidget& logger_win_;
 };
 
-} 
+}
 
 }
 

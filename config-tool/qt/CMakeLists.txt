@@ -21,6 +21,10 @@ INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}")
 ADD_EXECUTABLE(config-chucho
                brain.cpp
                brain.hpp
+               logger_emittable.cpp
+               logger_emittable.hpp
+               logger_win_controller.cpp
+               logger_win_controller.hpp
                main.cpp
                ${CHUCHO_UI_GEN}
                ${CHUCHO_RES_GEN})

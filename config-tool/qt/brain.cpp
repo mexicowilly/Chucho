@@ -27,6 +27,7 @@ brain::brain(int argc, char* argv[])
     : app_(argc, argv)
 {
     ui_.setupUi(&main_win_);
+    lgr_ctrl_.reset(new logger_win_controller(ui_));
     main_win_.show();
 }
 

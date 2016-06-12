@@ -21,20 +21,25 @@
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
      <widget class="QTreeWidget" name="logger_win">
-      <property name="editTriggers">
-       <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
-      </property>
       <property name="animated">
        <bool>true</bool>
+      </property>
+      <property name="columnCount">
+       <number>2</number>
       </property>
       <column>
        <property name="text">
         <string>Loggers</string>
        </property>
       </column>
+      <column>
+       <property name="text">
+        <string/>
+       </property>
+      </column>
       <item>
        <property name="text">
-        <string>&lt;New Logger&gt;</string>
+        <string>&lt;Add Logger&gt;</string>
        </property>
       </item>
      </widget>
@@ -63,9 +68,8 @@
     <property name="title">
      <string>Logger</string>
     </property>
-    <addaction name="add_action"/>
-    <addaction name="remove_action"/>
-    <addaction name="edit_action"/>
+    <addaction name="add_logger_action"/>
+    <addaction name="remove_logger_action"/>
    </widget>
    <addaction name="file_menu"/>
    <addaction name="logger_menu"/>
@@ -76,12 +80,12 @@
     <string>Exit</string>
    </property>
   </action>
-  <action name="add_action">
+  <action name="add_logger_action">
    <property name="text">
     <string>Add...</string>
    </property>
   </action>
-  <action name="remove_action">
+  <action name="remove_logger_action">
    <property name="enabled">
     <bool>false</bool>
    </property>
