@@ -14,8 +14,6 @@
 #    limitations under the License.
 #
 
-INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}")
-
 IF(Qt4_FOUND)
 ADD_SUBDIRECTORY(qt)
 ENDIF()

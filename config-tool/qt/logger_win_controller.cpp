@@ -16,8 +16,8 @@
 
 #include "logger_win_controller.hpp"
 #include "logger_emittable.hpp"
+#include "editable_item.hpp"
 #include <chucho/log.hpp>
-#include <assert.h>
 #include <vector>
 #include <QStyledItemDelegate>
 #include <QLineEdit>
@@ -44,7 +44,7 @@ private:
     std::vector<QString> existing_;
 };
 
-class logger_delegate : public QStyledItemDelegate
+class logger_delegate : public QStyledItemDelegate, public chucho::loggable<logger_delegate>
 {
 public:
     logger_delegate(QTreeWidget& logger_win)
@@ -56,16 +56,43 @@ public:
                                   const QStyleOptionViewItem& option,
                                   const QModelIndex& index) const override
     {
-        QLineEdit* le = reinterpret_cast<QLineEdit*>(QStyledItemDelegate::createEditor(parent, option, index));
-        std::vector<QString> existing;
-        for (int i = 0; i < logger_win_.topLevelItemCount() - 1; i++)
-            existing.push_back(logger_win_.topLevelItem(i)->text(0));
-        le->setValidator(new logger_validator(existing));
-        return le;
+        auto widg = QStyledItemDelegate::createEditor(parent, option, index);
+        QLineEdit* le = dynamic_cast<QLineEdit*>(widg);
+        if (le == nullptr)
+        {
+            return widg;
+        }
+        else
+        {
+            std::vector<QString> existing;
+            for (int i = 0; i < logger_win_.topLevelItemCount() - 1; i++)
+                existing.push_back(logger_win_.topLevelItem(i)->text(0));
+            le->setValidator(new logger_validator(existing));
+            return le;
+        }
     }
 
 private:
     QTreeWidget& logger_win_;
+};
+
+class editable_delegate : public QStyledItemDelegate
+{
+public:
+    virtual QWidget* createEditor(QWidget* parent,
+                                  const QStyleOptionViewItem& option,
+                                  const QModelIndex& index) const override
+    {
+        return create_editor_function_ ?  create_editor_function_(parent) : nullptr;
+    }
+
+    void set_create_editor_function(std::function<QWidget*(QWidget*)> func)
+    {
+        create_editor_function_ = func;
+    }
+
+private:
+    std::function<QWidget*(QWidget*)> create_editor_function_;
 };
 
 }
@@ -84,12 +111,21 @@ logger_win_controller::logger_win_controller(Ui::main_ui& ui)
     logger_win_.headerItem()->setText(1, "");
     logger_win_.setColumnWidth(0, 200);
     logger_win_.setItemDelegateForColumn(0, new logger_delegate(logger_win_));
+    logger_win_.setItemDelegateForColumn(1, new editable_delegate());
 }
 
 void logger_win_controller::item_double_clicked(QTreeWidgetItem* it, int col)
 {
-    if (logger_win_.indexOfTopLevelItem(it) == logger_win_.topLevelItemCount() - 1)
+    auto del = reinterpret_cast<editable_delegate*>(logger_win_.itemDelegateForColumn(1));
+    del->set_create_editor_function(std::function<QWidget*(QWidget*)>());
+    if (col == 0 && logger_win_.indexOfTopLevelItem(it) == logger_win_.topLevelItemCount() - 1)
+    {
         new_logger();
+    }
+    else if (col == 1 && dynamic_cast<editable_item*>(it))
+    {
+        del->set_create_editor_function(std::bind(&editable_item::create_editor, reinterpret_cast<editable_item*>(it), std::placeholders::_1));
+    }
 }
 
 void logger_win_controller::new_logger()
@@ -99,6 +135,7 @@ void logger_win_controller::new_logger()
     logger_win_.insertTopLevelItem(logger_win_.topLevelItemCount() - 1, item);
     logger_win_.editItem(item);
     logger_win_.setCurrentItem(item);
+    item->setExpanded(true);
 }
 
 }

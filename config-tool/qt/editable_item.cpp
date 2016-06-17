@@ -14,9 +14,7 @@
  *    limitations under the License.
  */
 
-#include "logger_emittable.hpp"
-#include "boolean_editable_item.hpp"
-#include "level_editable_item.hpp"
+#include "editable_item.hpp"
 
 namespace chucho
 {
@@ -24,20 +22,10 @@ namespace chucho
 namespace config
 {
 
-logger_emittable::logger_emittable(const std::string& name)
-    : QTreeWidgetItem(QStringList() << QString::fromStdString(name) << "")
+editable_item::editable_item(const std::string& key, const std::string& value)
+    : QTreeWidgetItem(QStringList() << QString::fromStdString(key) << QString::fromStdString(value))
 {
-    rename_logger(typeid(*this));
-    QTreeWidgetItem* child = new level_editable_item("Level", std::shared_ptr<chucho::level>());
-    addChild(child);
-    child = new boolean_editable_item("Writes to Ancestors", true);
-    addChild(child);
-    child = new QTreeWidgetItem(QStringList() << "<Add Writer>" << "");
-    addChild(child);
-}
-
-void logger_emittable::emit_config(std::ostream& stream)
-{
+    setFlags(flags() | Qt::ItemIsEditable);
 }
 
 }
