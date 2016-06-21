@@ -18,21 +18,27 @@ SET(CMAKE_AUTOMOC TRUE)
 QT4_WRAP_UI(CHUCHO_UI_GEN chucho.ui)
 QT4_ADD_RESOURCES(CHUCHO_RES_GEN chucho.qrc)
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}")
-ADD_EXECUTABLE(config-chucho
+ADD_EXECUTABLE(configure-chucho
                boolean_editable_item.cpp
                boolean_editable_item.hpp
                brain.cpp
                brain.hpp
+               creator_item.cpp
+               creator_item.hpp
                editable_item.cpp
                editable_item.hpp
                emittable.hpp
                level_editable_item.cpp
                level_editable_item.hpp
-               logger_emittable.cpp
-               logger_emittable.hpp
+               logger_creator_item.cpp
+               logger_creator_item.hpp
+               logger_editor.cpp
+               logger_editor.hpp
+               logger_editable_item.cpp
+               logger_editable_item.hpp
                logger_win_controller.cpp
                logger_win_controller.hpp
                main.cpp
                ${CHUCHO_UI_GEN}
                ${CHUCHO_RES_GEN})
-TARGET_LINK_LIBRARIES(config-chucho chucho Qt4::QtGui)
+TARGET_LINK_LIBRARIES(configure-chucho chucho Qt4::QtGui)

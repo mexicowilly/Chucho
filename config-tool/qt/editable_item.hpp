@@ -18,6 +18,7 @@
 #define CHUCHO_CONFIG_EDITABLE_ITEM_HPP__
 
 #include <QTreeWidgetItem>
+#include <chucho/loggable.hpp>
 
 namespace chucho
 {
@@ -25,9 +26,10 @@ namespace chucho
 namespace config
 {
 
-class editable_item : public QTreeWidgetItem
+class editable_item : public QTreeWidgetItem, public chucho::loggable<editable_item>
 {
 public:
+    virtual int column() const;
     virtual QWidget* create_editor(QWidget* parent) = 0;
 
 protected:

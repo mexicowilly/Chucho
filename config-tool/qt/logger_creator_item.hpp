@@ -14,7 +14,10 @@
  *    limitations under the License.
  */
 
-#include "editable_item.hpp"
+#if !defined(CHUCHO_CONFIG_LOGGER_CREATOR_ITEM_HPP__)
+#define CHUCHO_CONFIG_LOGGER_CREATOR_ITEM_HPP__
+
+#include "creator_item.hpp"
 
 namespace chucho
 {
@@ -22,17 +25,17 @@ namespace chucho
 namespace config
 {
 
-editable_item::editable_item(const std::string& key, const std::string& value)
-    : QTreeWidgetItem(QStringList() << QString::fromStdString(key) << QString::fromStdString(value))
+class logger_creator_item : public creator_item
 {
-    setFlags(flags() | Qt::ItemIsEditable);
-}
+public:
+    logger_creator_item(QTreeWidget& tree);
 
-int editable_item::column() const
-{
-    return 1;
-}
-
-}
+    virtual QWidget* create_editor(QWidget* parent) override;
+    virtual void create_item(QTreeWidgetItem* parent) override;
+};
 
 }
+
+}
+
+#endif

@@ -14,11 +14,12 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CONFIG_LOGGER_EMITTABLE_HPP__)
-#define CHUCHO_CONFIG_LOGGER_EMITTABLE_HPP__
+#if !defined(CHUCHO_CONFIG_LOGGER_EDITABLE_ITEM_HPP__)
+#define CHUCHO_CONFIG_LOGGER_EDITABLE_ITEM_HPP__
 
+#include "editable_item.hpp"
 #include "emittable.hpp"
-#include <QTreeWidgetItem>
+#include <QTreeWidget>
 
 namespace chucho
 {
@@ -26,16 +27,22 @@ namespace chucho
 namespace config
 {
 
-class logger_emittable : public emittable, public QTreeWidgetItem
+class logger_editable_item : public editable_item, public emittable
 {
 public:
-    logger_emittable(const std::string& name);
+    logger_editable_item(QTreeWidget& tree, const std::string& name);
 
+    virtual int column() const override;
+    virtual QWidget* create_editor(QWidget* parent) override;
     virtual void emit_config(std::ostream& stream) override;
+
+private:
+    QTreeWidget& tree_;
 };
 
 }
 
 }
+
 
 #endif

@@ -14,9 +14,10 @@
  *    limitations under the License.
  */
 
-#include "logger_emittable.hpp"
-#include "boolean_editable_item.hpp"
-#include "level_editable_item.hpp"
+#if !defined(CHUCHO_CONFIG_CREATOR_ITEM_HPP__)
+#define CHUCHO_CONFIG_CREATOR_ITEM_HPP__
+
+#include "editable_item.hpp"
 
 namespace chucho
 {
@@ -24,22 +25,22 @@ namespace chucho
 namespace config
 {
 
-logger_emittable::logger_emittable(const std::string& name)
-    : QTreeWidgetItem(QStringList() << QString::fromStdString(name) << "")
+class creator_item : public editable_item
 {
-    rename_logger(typeid(*this));
-    QTreeWidgetItem* child = new level_editable_item("Level", std::shared_ptr<chucho::level>());
-    addChild(child);
-    child = new boolean_editable_item("Writes to Ancestors", true);
-    addChild(child);
-    child = new QTreeWidgetItem(QStringList() << "<Add Writer>" << "");
-    addChild(child);
-}
+public:
+    virtual int column() const override;
+    virtual void create_item(QTreeWidgetItem* parent) = 0;
 
-void logger_emittable::emit_config(std::ostream& stream)
-{
-}
+protected:
+    creator_item(QTreeWidget& tree, const std::string& text);
 
-}
+    void create_item_impl(QTreeWidgetItem* parent, QTreeWidgetItem* item);
+
+    QTreeWidget& tree_;
+};
 
 }
+
+}
+
+#endif

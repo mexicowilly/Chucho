@@ -14,7 +14,8 @@
  *    limitations under the License.
  */
 
-#include "editable_item.hpp"
+#include "creator_item.hpp"
+#include <chucho/log.hpp>
 
 namespace chucho
 {
@@ -22,15 +23,27 @@ namespace chucho
 namespace config
 {
 
-editable_item::editable_item(const std::string& key, const std::string& value)
-    : QTreeWidgetItem(QStringList() << QString::fromStdString(key) << QString::fromStdString(value))
+creator_item::creator_item(QTreeWidget& tree, const std::string& text)
+    : editable_item(text, ""),
+      tree_(tree)
 {
-    setFlags(flags() | Qt::ItemIsEditable);
+    setFlags(flags() & ~Qt::ItemIsEditable);
 }
 
-int editable_item::column() const
+int creator_item::column() const
 {
-    return 1;
+    return 0;
+}
+
+void creator_item::create_item_impl(QTreeWidgetItem* parent, QTreeWidgetItem* item)
+{
+    if (parent == nullptr)
+        tree_.insertTopLevelItem(tree_.topLevelItemCount() - 1, item);
+    else
+        parent->insertChild(parent->childCount() - 1, item);
+    item->setExpanded(true);
+    tree_.editItem(item);
+    tree_.setCurrentItem(item);
 }
 
 }

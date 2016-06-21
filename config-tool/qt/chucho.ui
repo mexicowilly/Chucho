@@ -37,11 +37,6 @@
         <string/>
        </property>
       </column>
-      <item>
-       <property name="text">
-        <string>&lt;Add Logger&gt;</string>
-       </property>
-      </item>
      </widget>
     </item>
    </layout>

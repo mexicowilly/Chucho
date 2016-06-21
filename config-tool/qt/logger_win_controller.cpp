@@ -15,68 +15,14 @@
  */
 
 #include "logger_win_controller.hpp"
-#include "logger_emittable.hpp"
-#include "editable_item.hpp"
+#include "logger_creator_item.hpp"
 #include <chucho/log.hpp>
-#include <vector>
 #include <QStyledItemDelegate>
-#include <QLineEdit>
 
 namespace
 {
 
-class logger_validator : public QValidator
-{
-public:
-    logger_validator(const std::vector<QString>& existing)
-        : existing_(existing)
-    {
-    }
-
-    virtual State validate(QString& input, int& pos) const override
-    {
-        State st = std::find(existing_.begin(), existing_.end(), input) == existing_.end() ?
-            Acceptable : Intermediate;
-        return st;
-    }
-
-private:
-    std::vector<QString> existing_;
-};
-
-class logger_delegate : public QStyledItemDelegate, public chucho::loggable<logger_delegate>
-{
-public:
-    logger_delegate(QTreeWidget& logger_win)
-        : logger_win_(logger_win)
-    {
-    }
-
-    virtual QWidget* createEditor(QWidget* parent,
-                                  const QStyleOptionViewItem& option,
-                                  const QModelIndex& index) const override
-    {
-        auto widg = QStyledItemDelegate::createEditor(parent, option, index);
-        QLineEdit* le = dynamic_cast<QLineEdit*>(widg);
-        if (le == nullptr)
-        {
-            return widg;
-        }
-        else
-        {
-            std::vector<QString> existing;
-            for (int i = 0; i < logger_win_.topLevelItemCount() - 1; i++)
-                existing.push_back(logger_win_.topLevelItem(i)->text(0));
-            le->setValidator(new logger_validator(existing));
-            return le;
-        }
-    }
-
-private:
-    QTreeWidget& logger_win_;
-};
-
-class editable_delegate : public QStyledItemDelegate
+class editable_delegate : public QStyledItemDelegate, chucho::loggable<editable_delegate>
 {
 public:
     virtual QWidget* createEditor(QWidget* parent,
@@ -110,32 +56,35 @@ logger_win_controller::logger_win_controller(Ui::main_ui& ui)
     connect(&logger_win_, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), SLOT(item_double_clicked(QTreeWidgetItem*, int)));
     logger_win_.headerItem()->setText(1, "");
     logger_win_.setColumnWidth(0, 200);
-    logger_win_.setItemDelegateForColumn(0, new logger_delegate(logger_win_));
-    logger_win_.setItemDelegateForColumn(1, new editable_delegate());
+    logger_win_.setItemDelegate(new editable_delegate());
+    logger_win_.addTopLevelItem(new logger_creator_item(logger_win_));
 }
 
 void logger_win_controller::item_double_clicked(QTreeWidgetItem* it, int col)
 {
-    auto del = reinterpret_cast<editable_delegate*>(logger_win_.itemDelegateForColumn(1));
+    auto del = reinterpret_cast<editable_delegate*>(logger_win_.itemDelegate());
     del->set_create_editor_function(std::function<QWidget*(QWidget*)>());
-    if (col == 0 && logger_win_.indexOfTopLevelItem(it) == logger_win_.topLevelItemCount() - 1)
-    {
-        new_logger();
-    }
-    else if (col == 1 && dynamic_cast<editable_item*>(it))
+    auto ei = dynamic_cast<editable_item*>(it);
+    if (ei && col == ei->column())
     {
         del->set_create_editor_function(std::bind(&editable_item::create_editor, reinterpret_cast<editable_item*>(it), std::placeholders::_1));
+        auto ci = dynamic_cast<creator_item*>(it);
+        if (ci)
+            ci->create_item(ci->parent());
     }
 }
 
 void logger_win_controller::new_logger()
 {
-    logger_emittable* item = new logger_emittable("<Type logger name>");
-    item->setFlags(item->flags() | Qt::ItemIsEditable);
-    logger_win_.insertTopLevelItem(logger_win_.topLevelItemCount() - 1, item);
-    logger_win_.editItem(item);
-    logger_win_.setCurrentItem(item);
-    item->setExpanded(true);
+    for (int i = 0; i < logger_win_.topLevelItemCount(); i++)
+    {
+        auto lci = dynamic_cast<logger_creator_item*>(logger_win_.topLevelItem(i));
+        if (lci)
+        {
+            lci->create_item(nullptr);
+            break;
+        }
+    }
 }
 
 }

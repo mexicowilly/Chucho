@@ -17,7 +17,6 @@
 #if !defined(CHUCHO_CONFIG_EMITTABLE_HPP__)
 #define CHUCHO_CONFIG_EMITTABLE_HPP__
 
-#include <chucho/loggable.hpp>
 #include <ostream>
 
 namespace chucho
@@ -26,7 +25,7 @@ namespace chucho
 namespace config
 {
 
-class emittable : public chucho::loggable<emittable>
+class emittable
 {
 public:
     virtual ~emittable() { }
