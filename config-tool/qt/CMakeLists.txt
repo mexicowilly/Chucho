@@ -23,6 +23,8 @@ ADD_EXECUTABLE(configure-chucho
                boolean_editable_item.hpp
                brain.cpp
                brain.hpp
+               cout_writer_item.cpp
+               cout_writer_item.hpp
                creator_item.cpp
                creator_item.hpp
                editable_item.cpp
@@ -39,6 +41,13 @@ ADD_EXECUTABLE(configure-chucho
                logger_win_controller.cpp
                logger_win_controller.hpp
                main.cpp
+               pattern_formatter_writer_item.cpp
+               pattern_formatter_writer_item.hpp
+               text_editable_item.cpp
+               text_editable_item.hpp
+               writer_item.hpp
+               writer_creator_item.cpp
+               writer_creator_item.hpp
                ${CHUCHO_UI_GEN}
                ${CHUCHO_RES_GEN})
 TARGET_LINK_LIBRARIES(configure-chucho chucho Qt4::QtGui)

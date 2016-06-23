@@ -18,6 +18,7 @@
 #include "boolean_editable_item.hpp"
 #include "level_editable_item.hpp"
 #include "logger_editor.hpp"
+#include "writer_creator_item.hpp"
 
 namespace chucho
 {
@@ -34,7 +35,7 @@ logger_editable_item::logger_editable_item(QTreeWidget& tree, const std::string&
     addChild(child);
     child = new boolean_editable_item("Writes to Ancestors", true);
     addChild(child);
-    child = new QTreeWidgetItem(QStringList() << "<Add Writer>" << "");
+    child = new writer_creator_item(tree);
     addChild(child);
 }
 
