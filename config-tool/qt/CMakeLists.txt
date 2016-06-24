@@ -27,11 +27,17 @@ ADD_EXECUTABLE(configure-chucho
                cout_writer_item.hpp
                creator_item.cpp
                creator_item.hpp
+               creator_from_list_item.cpp
+               creator_from_list_item.hpp
                editable_item.cpp
                editable_item.hpp
                emittable.hpp
+               filter_creator_item.cpp
+               filter_creator_item.hpp
                level_editable_item.cpp
                level_editable_item.hpp
+               level_threshold_filter_item.cpp
+               level_threshold_filter_item.hpp
                logger_creator_item.cpp
                logger_creator_item.hpp
                logger_editor.cpp
@@ -45,6 +51,7 @@ ADD_EXECUTABLE(configure-chucho
                pattern_formatter_writer_item.hpp
                text_editable_item.cpp
                text_editable_item.hpp
+               writer_item.cpp
                writer_item.hpp
                writer_creator_item.cpp
                writer_creator_item.hpp

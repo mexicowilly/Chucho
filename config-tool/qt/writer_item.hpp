@@ -28,6 +28,10 @@ namespace config
 
 class writer_item : public QTreeWidgetItem, public emittable
 {
+public:
+    writer_item(QTreeWidget& tree);
+
+    virtual void emit_config(std::ostream& stream);
 };
 
 }

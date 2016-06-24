@@ -22,6 +22,11 @@ namespace chucho
 namespace config
 {
 
+cout_writer_item::cout_writer_item(QTreeWidget& tree)
+    : pattern_formatter_writer_item(tree)
+{
+}
+
 void cout_writer_item::emit_config(std::ostream& stream)
 {
 }

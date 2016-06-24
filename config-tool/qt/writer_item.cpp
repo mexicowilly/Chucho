@@ -14,10 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CONFIG_WRITER_CREATOR_ITEM_HPP__)
-#define CHUCHO_CONFIG_WRITER_CREATOR_ITEM_HPP__
-
-#include "creator_from_list_item.hpp"
+#include "writer_item.hpp"
+#include "filter_creator_item.hpp"
 
 namespace chucho
 {
@@ -25,14 +23,16 @@ namespace chucho
 namespace config
 {
 
-class writer_creator_item : public creator_from_list_item
+writer_item::writer_item(QTreeWidget& tree)
 {
-public:
-    writer_creator_item(QTreeWidget& tree);
-};
+    auto fc = new filter_creator_item(tree);
+    addChild(fc);
+}
 
+void writer_item::emit_config(std::ostream& stream)
+{
 }
 
 }
 
-#endif
+}

@@ -14,10 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CONFIG_WRITER_CREATOR_ITEM_HPP__)
-#define CHUCHO_CONFIG_WRITER_CREATOR_ITEM_HPP__
-
-#include "creator_from_list_item.hpp"
+#include "filter_creator_item.hpp"
+#include "level_threshold_filter_item.hpp"
 
 namespace chucho
 {
@@ -25,14 +23,15 @@ namespace chucho
 namespace config
 {
 
-class writer_creator_item : public creator_from_list_item
+filter_creator_item::filter_creator_item(QTreeWidget& tree)
+    : creator_from_list_item(tree, "<Add Filter>")
 {
-public:
-    writer_creator_item(QTreeWidget& tree);
-};
-
+    creators_["Duplicate Message Filter"] = nullptr;
+    creators_["Level Filter"] = nullptr;
+    creators_["Level Threshold Filter"] = get_func<level_threshold_filter_item>();
+    creators_["Ruby Evaluator Filter"] = nullptr;
 }
 
 }
 
-#endif
+}

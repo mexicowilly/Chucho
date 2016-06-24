@@ -23,10 +23,11 @@ namespace chucho
 namespace config
 {
 
-pattern_formatter_writer_item::pattern_formatter_writer_item()
+pattern_formatter_writer_item::pattern_formatter_writer_item(QTreeWidget& tree)
+    : writer_item(tree)
 {
     auto ted = new text_editable_item("Pattern Formatter", "%d{%H:%M:%S.%q} %-5p %.36c - %m%n");
-    addChild(ted);
+    insertChild(0, ted);
 }
 
 }

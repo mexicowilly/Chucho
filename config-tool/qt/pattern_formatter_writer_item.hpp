@@ -28,7 +28,7 @@ namespace config
 class pattern_formatter_writer_item : public writer_item
 {
 public:
-    pattern_formatter_writer_item();
+    pattern_formatter_writer_item(QTreeWidget& tree);
 };
 
 }

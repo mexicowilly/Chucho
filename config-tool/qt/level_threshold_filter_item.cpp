@@ -14,10 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CONFIG_WRITER_CREATOR_ITEM_HPP__)
-#define CHUCHO_CONFIG_WRITER_CREATOR_ITEM_HPP__
-
-#include "creator_from_list_item.hpp"
+#include "level_threshold_filter_item.hpp"
+#include "level_editable_item.hpp"
 
 namespace chucho
 {
@@ -25,14 +23,16 @@ namespace chucho
 namespace config
 {
 
-class writer_creator_item : public creator_from_list_item
+level_threshold_filter_item::level_threshold_filter_item(QTreeWidget&)
 {
-public:
-    writer_creator_item(QTreeWidget& tree);
-};
+    auto child = new level_editable_item("Level", chucho::level::INFO_());
+    addChild(child);
+}
 
+void level_threshold_filter_item::emit_config(std::ostream& stream)
+{
 }
 
 }
 
-#endif
+}
