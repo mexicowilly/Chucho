@@ -35,12 +35,14 @@ class logger_win_controller : public QObject, public chucho::loggable<logger_win
 public:
     logger_win_controller(Ui::main_ui& ui);
 
-public slots:
+private slots:
     void item_double_clicked(QTreeWidgetItem* it, int col);
     void new_logger();
+    void save();
 
 private:
     QTreeWidget& logger_win_;
+    QString save_file_name_;
 };
 
 }

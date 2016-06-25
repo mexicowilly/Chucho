@@ -15,7 +15,6 @@
  */
 
 #include "level_editable_item.hpp"
-#include <QComboBox>
 
 namespace chucho
 {
@@ -24,16 +23,19 @@ namespace config
 {
 
 level_editable_item::level_editable_item(const std::string& key, std::shared_ptr<chucho::level> lvl)
-    : editable_item(key, lvl ? lvl->get_name() : "")
+    : from_list_editable_item(key,
+                              lvl ? lvl->get_name() : "",
+                              8,
+                              "",
+                              "TRACE",
+                              "DEBUG",
+                              "INFO",
+                              "WARN",
+                              "ERROR",
+                              "FATAL",
+                              "OFF")
 {
-}
-
-QWidget* level_editable_item::create_editor(QWidget* parent)
-{
-    QComboBox* result = new QComboBox(parent);
-    result->addItems(QStringList() << "" << "TRACE" << "DEBUG" << "INFO" << "WARN" << "ERROR" << "FATAL" << "OFF");
-    result->setEditable(true);
-    return result;
+    set_manually_editable(true);
 }
 
 }

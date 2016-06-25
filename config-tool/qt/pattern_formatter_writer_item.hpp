@@ -28,7 +28,13 @@ namespace config
 class pattern_formatter_writer_item : public writer_item
 {
 public:
-    pattern_formatter_writer_item(QTreeWidget& tree);
+    pattern_formatter_writer_item(QTreeWidget& tree, const std::string& emit_name);
+
+    virtual void emit_config(std::ostream& stream, std::size_t tabstop) override;
+
+private:
+    QTreeWidgetItem* pattern_formatter_;
+    std::string emit_name_;
 };
 
 }

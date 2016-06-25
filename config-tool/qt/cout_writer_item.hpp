@@ -29,9 +29,12 @@ class cout_writer_item : public pattern_formatter_writer_item
 {
 public:
     cout_writer_item(QTreeWidget& tree);
-
-    virtual void emit_config(std::ostream& stream) override;
 };
+
+inline cout_writer_item::cout_writer_item(QTreeWidget& tree)
+    : pattern_formatter_writer_item(tree, "cout")
+{
+}
 
 }
 

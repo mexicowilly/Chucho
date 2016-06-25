@@ -16,6 +16,8 @@
 
 #include "writer_creator_item.hpp"
 #include "cout_writer_item.hpp"
+#include "cerr_writer_item.hpp"
+#include "file_writer_item.hpp"
 
 namespace chucho
 {
@@ -31,7 +33,7 @@ writer_creator_item::writer_creator_item(QTreeWidget& tree)
     creators_["DB2 Writer"] = nullptr;
     creators_["Door Writer"] = nullptr;
     creators_["Email Writer"] = nullptr;
-    creators_["File Writer"] = nullptr;
+    creators_["File Writer"] = get_func<file_writer_item>();
     creators_["MySQL Writer"] = nullptr;
     creators_["Named Pipe Writer"] = nullptr;
     creators_["Oracle Writer"] = nullptr;
@@ -41,7 +43,7 @@ writer_creator_item::writer_creator_item(QTreeWidget& tree)
     creators_["Remote Chucho Writer"] = nullptr;
     creators_["Rolling File Writer"] = nullptr;
     creators_["SQLite Writer"] = nullptr;
-    creators_["Standard Error Writer"] = nullptr;
+    creators_["Standard Error Writer"] = get_func<cerr_writer_item>();
     creators_["Standard Output Writer"] = get_func<cout_writer_item>();
     creators_["Syslog Writer"] = nullptr;
     creators_["Windows Event Log Writer"] = nullptr;

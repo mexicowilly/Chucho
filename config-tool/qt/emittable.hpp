@@ -18,6 +18,7 @@
 #define CHUCHO_CONFIG_EMITTABLE_HPP__
 
 #include <ostream>
+#include <QString>
 
 namespace chucho
 {
@@ -25,11 +26,18 @@ namespace chucho
 namespace config
 {
 
+extern std::size_t tab_width;
+
+std::ostream& operator<< (std::ostream& stream, const QString& str);
+
 class emittable
 {
 public:
-    virtual ~emittable() { }
-    virtual void emit_config(std::ostream& stream) = 0;
+    virtual ~emittable();
+    virtual void emit_config(std::ostream& stream, std::size_t tabstop) = 0;
+
+protected:
+    std::ostream& indent(std::ostream& stream, std::size_t tabstop);
 };
 
 }

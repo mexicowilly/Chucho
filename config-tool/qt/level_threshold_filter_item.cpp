@@ -25,12 +25,14 @@ namespace config
 
 level_threshold_filter_item::level_threshold_filter_item(QTreeWidget&)
 {
-    auto child = new level_editable_item("Level", chucho::level::INFO_());
-    addChild(child);
+    level_ = new level_editable_item("Level", chucho::level::INFO_());
+    addChild(level_);
 }
 
-void level_threshold_filter_item::emit_config(std::ostream& stream)
+void level_threshold_filter_item::emit_config(std::ostream& stream, std::size_t tabstop)
 {
+    indent(stream, tabstop) << "- chucho::level_threshold_filter:" << std::endl;
+    indent(stream, tabstop + 1) << " - level: " << level_->text(1) << std::endl;
 }
 
 }

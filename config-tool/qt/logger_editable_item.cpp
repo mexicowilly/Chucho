@@ -19,6 +19,7 @@
 #include "level_editable_item.hpp"
 #include "logger_editor.hpp"
 #include "writer_creator_item.hpp"
+#include "writer_item.hpp"
 
 namespace chucho
 {
@@ -31,11 +32,11 @@ logger_editable_item::logger_editable_item(QTreeWidget& tree, const std::string&
       tree_(tree)
 {
     rename_logger(typeid(*this));
-    QTreeWidgetItem* child = new level_editable_item("Level", std::shared_ptr<chucho::level>());
-    addChild(child);
-    child = new boolean_editable_item("Writes to Ancestors", true);
-    addChild(child);
-    child = new writer_creator_item(tree);
+    level_ = new level_editable_item("Level", std::shared_ptr<chucho::level>());
+    addChild(level_);
+    writes_to_ancestors_ = new boolean_editable_item("Writes to Ancestors", true);
+    addChild(writes_to_ancestors_);
+    auto child = new writer_creator_item(tree);
     addChild(child);
 }
 
@@ -49,8 +50,18 @@ QWidget* logger_editable_item::create_editor(QWidget* parent)
     return new logger_editor(parent, tree_);
 }
 
-void logger_editable_item::emit_config(std::ostream& stream)
+void logger_editable_item::emit_config(std::ostream& stream, std::size_t tabstop)
 {
+    indent(stream, tabstop++) << "- chucho::logger:" << std::endl;
+    indent(stream, tabstop) << "- name: " << text(0) << std::endl;
+    indent(stream, tabstop) << "- level: " << level_->text(1) << std::endl;
+    indent(stream, tabstop) << "- writes_to_ancestors: " << writes_to_ancestors_->text(1) << std::endl;
+    for (int i = 0; i < childCount(); i++)
+    {
+        auto wi = dynamic_cast<writer_item*>(child(i));
+        if (wi)
+            wi->emit_config(stream, tabstop);
+    }
 }
 
 }

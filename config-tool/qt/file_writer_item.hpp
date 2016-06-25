@@ -14,10 +14,10 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CONFIG_LEVEL_THRESHOLD_FILTER_ITEM_HPP__)
-#define CHUCHO_CONFIG_LEVEL_THRESHOLD_FILTER_ITEM_HPP__
+#if !defined(CHUCHO_CONFIG_FILE_WRITER_ITEM_HPP__)
+#define CHUCHO_CONFIG_FILE_WRITER_ITEM_HPP__
 
-#include "filter_item.hpp"
+#include "pattern_formatter_writer_item.hpp"
 
 namespace chucho
 {
@@ -25,15 +25,17 @@ namespace chucho
 namespace config
 {
 
-class level_threshold_filter_item : public filter_item
+class file_writer_item : public pattern_formatter_writer_item
 {
 public:
-    level_threshold_filter_item(QTreeWidget& tree);
+    file_writer_item(QTreeWidget& tree);
 
     virtual void emit_config(std::ostream& stream, std::size_t tabstop) override;
 
 private:
-    QTreeWidgetItem* level_;
+    QTreeWidgetItem* flush_;
+    QTreeWidgetItem* on_start_;
+    QTreeWidgetItem* file_name_;
 };
 
 }

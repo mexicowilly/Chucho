@@ -14,10 +14,7 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CONFIG_LEVEL_THRESHOLD_FILTER_ITEM_HPP__)
-#define CHUCHO_CONFIG_LEVEL_THRESHOLD_FILTER_ITEM_HPP__
-
-#include "filter_item.hpp"
+#include "emittable.hpp"
 
 namespace chucho
 {
@@ -25,19 +22,28 @@ namespace chucho
 namespace config
 {
 
-class level_threshold_filter_item : public filter_item
+std::size_t tab_width = 4;
+
+std::ostream& operator<< (std::ostream& stream, const QString& str)
 {
-public:
-    level_threshold_filter_item(QTreeWidget& tree);
+    auto ba = str.toUtf8();
+    for (auto b : ba)
+        stream.put(b);
+    return stream;
+}
 
-    virtual void emit_config(std::ostream& stream, std::size_t tabstop) override;
+emittable::~emittable()
+{
+}
 
-private:
-    QTreeWidgetItem* level_;
-};
-
+std::ostream& emittable::indent(std::ostream& stream, std::size_t tabstop)
+{
+    std::size_t spaces = tabstop * tab_width;
+    for (std::size_t i = 0; i < spaces; i++)
+        stream.put(' ');
+    return stream;
 }
 
 }
 
-#endif
+}

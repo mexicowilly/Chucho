@@ -14,12 +14,10 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CONFIG_LOGGER_EDITABLE_ITEM_HPP__)
-#define CHUCHO_CONFIG_LOGGER_EDITABLE_ITEM_HPP__
+#if !defined(CHUCHO_CONFIG_FROM_LIST_EDITABLE_ITEM_HPP__)
+#define CHUCHO_CONFIG_FROM_LIST_EDITABLE_ITEM_HPP__
 
 #include "editable_item.hpp"
-#include "emittable.hpp"
-#include <QTreeWidget>
 
 namespace chucho
 {
@@ -27,24 +25,37 @@ namespace chucho
 namespace config
 {
 
-class logger_editable_item : public editable_item, public emittable
+class from_list_editable_item : public editable_item
 {
 public:
-    logger_editable_item(QTreeWidget& tree, const std::string& name);
+    from_list_editable_item(const std::string& key,
+                            const std::string& value,
+                            std::size_t count,
+                            ...);
 
-    virtual int column() const override;
     virtual QWidget* create_editor(QWidget* parent) override;
-    virtual void emit_config(std::ostream& stream, std::size_t tabstop) override;
+
+protected:
+    void set_manually_editable(bool val);
+    void set_list(const std::vector<std::string>& lst);
 
 private:
-    QTreeWidget& tree_;
-    QTreeWidgetItem* level_;
-    QTreeWidgetItem* writes_to_ancestors_;
+    std::vector<std::string> lst_;
+    bool manually_editable_;
 };
 
+inline void from_list_editable_item::set_manually_editable(bool val)
+{
+    manually_editable_ = val;
+}
+
+inline void from_list_editable_item::set_list(const std::vector<std::string>& lst)
+{
+    lst_ = lst;
 }
 
 }
 
+}
 
 #endif

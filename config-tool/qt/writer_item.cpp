@@ -16,6 +16,7 @@
 
 #include "writer_item.hpp"
 #include "filter_creator_item.hpp"
+#include "filter_item.hpp"
 
 namespace chucho
 {
@@ -29,8 +30,14 @@ writer_item::writer_item(QTreeWidget& tree)
     addChild(fc);
 }
 
-void writer_item::emit_config(std::ostream& stream)
+void writer_item::emit_config(std::ostream& stream, std::size_t tabstop)
 {
+    for (int i = 0; i < childCount(); i++)
+    {
+        auto fi = dynamic_cast<filter_item*>(child(i));
+        if (fi)
+            fi->emit_config(stream, tabstop);
+    }
 }
 
 }

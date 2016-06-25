@@ -23,7 +23,7 @@ ADD_EXECUTABLE(configure-chucho
                boolean_editable_item.hpp
                brain.cpp
                brain.hpp
-               cout_writer_item.cpp
+               cerr_writer_item.hpp
                cout_writer_item.hpp
                creator_item.cpp
                creator_item.hpp
@@ -31,9 +31,15 @@ ADD_EXECUTABLE(configure-chucho
                creator_from_list_item.hpp
                editable_item.cpp
                editable_item.hpp
+               emittable.cpp
                emittable.hpp
+               file_writer_item.cpp
+               file_writer_item.hpp
                filter_creator_item.cpp
                filter_creator_item.hpp
+               filter_item.hpp
+               from_list_editable_item.cpp
+               from_list_editable_item.hpp
                level_editable_item.cpp
                level_editable_item.hpp
                level_threshold_filter_item.cpp

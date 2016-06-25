@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_CONFIG_LEVEL_EDITABLE_ITEM_HPP__)
 #define CHUCHO_CONFIG_LEVEL_EDITABLE_ITEM_HPP__
 
-#include "editable_item.hpp"
+#include "from_list_editable_item.hpp"
 #include <chucho/level.hpp>
 
 namespace chucho
@@ -26,12 +26,10 @@ namespace chucho
 namespace config
 {
 
-class level_editable_item : public editable_item
+class level_editable_item : public from_list_editable_item
 {
 public:
     level_editable_item(const std::string& key, std::shared_ptr<chucho::level> lvl);
-
-    virtual QWidget* create_editor(QWidget* parent) override;
 };
 
 }

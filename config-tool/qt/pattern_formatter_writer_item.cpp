@@ -23,11 +23,20 @@ namespace chucho
 namespace config
 {
 
-pattern_formatter_writer_item::pattern_formatter_writer_item(QTreeWidget& tree)
-    : writer_item(tree)
+pattern_formatter_writer_item::pattern_formatter_writer_item(QTreeWidget& tree, const std::string& emit_name)
+    : writer_item(tree),
+      emit_name_(emit_name)
 {
-    auto ted = new text_editable_item("Pattern Formatter", "%d{%H:%M:%S.%q} %-5p %.36c - %m%n");
-    insertChild(0, ted);
+    pattern_formatter_ = new text_editable_item("Pattern Formatter", "%d{%H:%M:%S.%q} %-5p %.36c - %m%n");
+    insertChild(0, pattern_formatter_);
+}
+
+void pattern_formatter_writer_item::emit_config(std::ostream& stream, std::size_t tabstop)
+{
+    indent(stream, tabstop++) << "- chucho::" << emit_name_ << "_writer:" << std::endl;
+    indent(stream, tabstop++) << "- chucho::pattern_formatter:" << std::endl;
+    indent(stream, tabstop) << "- pattern: " << pattern_formatter_->text(1) << std::endl;
+    writer_item::emit_config(stream, tabstop);
 }
 
 }

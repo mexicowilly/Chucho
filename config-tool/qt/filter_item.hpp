@@ -14,7 +14,11 @@
  *    limitations under the License.
  */
 
-#include "cout_writer_item.hpp"
+#if !defined(CHUCHO_CONFIG_FILTER_ITEM_HPP__)
+#define CHUCHO_CONFIG_FILTER_ITEM_HPP__
+
+#include "emittable.hpp"
+#include <QTreeWidgetItem>
 
 namespace chucho
 {
@@ -22,15 +26,12 @@ namespace chucho
 namespace config
 {
 
-cout_writer_item::cout_writer_item(QTreeWidget& tree)
-    : pattern_formatter_writer_item(tree)
+class filter_item : public QTreeWidgetItem, public emittable
 {
-}
-
-void cout_writer_item::emit_config(std::ostream& stream)
-{
-}
+};
 
 }
 
 }
+
+#endif

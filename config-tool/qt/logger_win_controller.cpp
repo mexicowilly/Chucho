@@ -16,8 +16,11 @@
 
 #include "logger_win_controller.hpp"
 #include "logger_creator_item.hpp"
+#include "emittable.hpp"
 #include <chucho/log.hpp>
 #include <QStyledItemDelegate>
+#include <QFileDialog>
+#include <fstream>
 
 namespace
 {
@@ -54,6 +57,7 @@ logger_win_controller::logger_win_controller(Ui::main_ui& ui)
 {
     connect(ui.add_logger_action, SIGNAL(triggered()), SLOT(new_logger()));
     connect(&logger_win_, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), SLOT(item_double_clicked(QTreeWidgetItem*, int)));
+    connect(ui.save_action, SIGNAL(triggered()), SLOT(save()));
     logger_win_.headerItem()->setText(1, "");
     logger_win_.setColumnWidth(0, 200);
     logger_win_.setItemDelegate(new editable_delegate());
@@ -83,6 +87,24 @@ void logger_win_controller::new_logger()
         {
             lci->create_item(nullptr);
             break;
+        }
+    }
+}
+
+void logger_win_controller::save()
+{
+    if (save_file_name_.isEmpty())
+        save_file_name_ = QFileDialog::getSaveFileName(&logger_win_);
+    if (!save_file_name_.isEmpty())
+    {
+        auto bytes = save_file_name_.toUtf8();
+        std::string str(bytes.begin(), bytes.end());
+        std::ofstream stream(str.c_str());
+        for (int i = 0; i < logger_win_.topLevelItemCount(); i++)
+        {
+            auto em = dynamic_cast<emittable*>(logger_win_.topLevelItem(i));
+            if (em)
+                em->emit_config(stream, 0);
         }
     }
 }
