@@ -39,8 +39,8 @@ namespace chucho
 namespace config
 {
 
-file_writer_item::file_writer_item(QTreeWidget& tree)
-    : pattern_formatter_writer_item(tree, "file")
+file_writer_item::file_writer_item(QTreeWidget& tree, const std::string& emit_name)
+    : pattern_formatter_writer_item(tree, emit_name)
 {
     flush_ = new boolean_editable_item("Flush on Append", true);
     insertChild(0, flush_);
@@ -53,9 +53,9 @@ file_writer_item::file_writer_item(QTreeWidget& tree)
 void file_writer_item::emit_config(std::ostream& stream, std::size_t tabstop)
 {
     pattern_formatter_writer_item::emit_config(stream, tabstop++);
-    indent(stream, tabstop) << "- file_name: " << file_name_->text(1) << std::endl;
+    indent(stream, tabstop) << "- file_name: '" << file_name_->text(1) << '\'' << std::endl;
     indent(stream, tabstop) << "- on_start: " << on_start_->text(1) << std::endl;
-    indent(stream, tabstop) << "- flush: " << on_start_->text(1) << std::endl;
+    indent(stream, tabstop) << "- flush: " << flush_->text(1) << std::endl;
 }
 
 }

@@ -14,10 +14,10 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CONFIG_FILE_WRITER_ITEM_HPP__)
-#define CHUCHO_CONFIG_FILE_WRITER_ITEM_HPP__
+#if !defined(CHUCHO_CONFIG_NUMBER_EDITABLE_ITEM_HPP__)
+#define CHUCHO_CONFIG_NUMBER_EDITABLE_ITEM_HPP__
 
-#include "pattern_formatter_writer_item.hpp"
+#include "editable_item.hpp"
 
 namespace chucho
 {
@@ -25,21 +25,21 @@ namespace chucho
 namespace config
 {
 
-class file_writer_item : public pattern_formatter_writer_item
+class number_editable_item : public editable_item
 {
 public:
-    file_writer_item(QTreeWidget& tree, const std::string& emit_name = std::string("file"));
+    number_editable_item(const std::string& key, int value, int minimum, int maximum);
 
-    virtual void emit_config(std::ostream& stream, std::size_t tabstop) override;
+    virtual QWidget* create_editor(QWidget* parent) override;
 
 private:
-    QTreeWidgetItem* flush_;
-    QTreeWidgetItem* on_start_;
-    QTreeWidgetItem* file_name_;
+    int minimum_;
+    int maximum_;
 };
 
 }
 
 }
+
 
 #endif

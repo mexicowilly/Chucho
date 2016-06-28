@@ -23,8 +23,8 @@ namespace chucho
 namespace config
 {
 
-creator_from_list_item::creator_from_list_item(QTreeWidget& tree, const std::string& text)
-    : creator_item(tree, text),
+creator_from_list_item::creator_from_list_item(QTreeWidget& tree, const std::string& text, bool disable_on_create)
+    : creator_item(tree, text, disable_on_create),
       created_(nullptr)
 {
 }

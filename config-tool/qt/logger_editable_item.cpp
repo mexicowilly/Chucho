@@ -53,8 +53,9 @@ QWidget* logger_editable_item::create_editor(QWidget* parent)
 void logger_editable_item::emit_config(std::ostream& stream, std::size_t tabstop)
 {
     indent(stream, tabstop++) << "- chucho::logger:" << std::endl;
-    indent(stream, tabstop) << "- name: " << text(0) << std::endl;
-    indent(stream, tabstop) << "- level: " << level_->text(1) << std::endl;
+    indent(stream, tabstop) << "- name: '" << text(0) << '\'' << std::endl;
+    if (!level_->text(1).isEmpty())
+        indent(stream, tabstop) << "- level: '" << level_->text(1) << '\'' << std::endl;
     indent(stream, tabstop) << "- writes_to_ancestors: " << writes_to_ancestors_->text(1) << std::endl;
     for (int i = 0; i < childCount(); i++)
     {

@@ -69,7 +69,7 @@ void logger_win_controller::item_double_clicked(QTreeWidgetItem* it, int col)
     auto del = reinterpret_cast<editable_delegate*>(logger_win_.itemDelegate());
     del->set_create_editor_function(std::function<QWidget*(QWidget*)>());
     auto ei = dynamic_cast<editable_item*>(it);
-    if (ei && col == ei->column())
+    if (ei && col == ei->column() && !ei->isDisabled())
     {
         del->set_create_editor_function(std::bind(&editable_item::create_editor, reinterpret_cast<editable_item*>(it), std::placeholders::_1));
         auto ci = dynamic_cast<creator_item*>(it);

@@ -14,10 +14,10 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CONFIG_FILE_WRITER_ITEM_HPP__)
-#define CHUCHO_CONFIG_FILE_WRITER_ITEM_HPP__
+#if !defined(CHUCHO_CONFIG_ROLLING_FILE_WRITER_ITEM_HPP__)
+#define CHUCHO_CONFIG_ROLLING_FILE_WRITER_ITEM_HPP__
 
-#include "pattern_formatter_writer_item.hpp"
+#include "file_writer_item.hpp"
 
 namespace chucho
 {
@@ -25,17 +25,12 @@ namespace chucho
 namespace config
 {
 
-class file_writer_item : public pattern_formatter_writer_item
+class rolling_file_writer_item : public file_writer_item
 {
 public:
-    file_writer_item(QTreeWidget& tree, const std::string& emit_name = std::string("file"));
+    rolling_file_writer_item(QTreeWidget& tree);
 
     virtual void emit_config(std::ostream& stream, std::size_t tabstop) override;
-
-private:
-    QTreeWidgetItem* flush_;
-    QTreeWidgetItem* on_start_;
-    QTreeWidgetItem* file_name_;
 };
 
 }

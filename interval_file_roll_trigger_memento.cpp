@@ -38,12 +38,13 @@ void interval_file_roll_trigger_memento::parse_period(const std::string& spec)
     if (spec.empty() || !std::isdigit(spec[0]))
         throw exception(get_status_origin() + ": The period specification must start with a digit");
     std::istringstream in(spec);
-    std::size_t count;
+    std::size_t count = 0;
     in >> count;
     validate("interval_file_roll_trigger::count", count);
     std::string raw;
     in >> raw;
     std::string period = text_util::to_lower(raw);
+    validate("interval_file_roll_trigger::period(text)", period);
     if (period.length() < 3)
         throw exception(get_status_origin() + ": The period must be minutes, hours, days, weeks or months. This one is \"" + raw + "\"");
     if (period.back() == 's')

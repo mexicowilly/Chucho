@@ -14,10 +14,9 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CONFIG_FILE_WRITER_ITEM_HPP__)
-#define CHUCHO_CONFIG_FILE_WRITER_ITEM_HPP__
-
-#include "pattern_formatter_writer_item.hpp"
+#include "number_editable_item.hpp"
+#include <QLineEdit>
+#include <QIntValidator>
 
 namespace chucho
 {
@@ -25,21 +24,20 @@ namespace chucho
 namespace config
 {
 
-class file_writer_item : public pattern_formatter_writer_item
+number_editable_item::number_editable_item(const std::string& key, int value, int minimum, int maximum)
+    : editable_item(key, std::to_string(value)),
+      minimum_(minimum),
+      maximum_(maximum)
 {
-public:
-    file_writer_item(QTreeWidget& tree, const std::string& emit_name = std::string("file"));
+}
 
-    virtual void emit_config(std::ostream& stream, std::size_t tabstop) override;
-
-private:
-    QTreeWidgetItem* flush_;
-    QTreeWidgetItem* on_start_;
-    QTreeWidgetItem* file_name_;
-};
-
+QWidget* number_editable_item::create_editor(QWidget* parent)
+{
+    auto le = new QLineEdit(parent);
+    le->setValidator(new QIntValidator(minimum_, maximum_));
+    return le;
 }
 
 }
 
-#endif
+}

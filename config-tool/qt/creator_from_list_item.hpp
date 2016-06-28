@@ -31,7 +31,7 @@ class creator_from_list_item : public QObject, public creator_item
     Q_OBJECT
 
 public:
-    creator_from_list_item(QTreeWidget& tree, const std::string& text);
+    creator_from_list_item(QTreeWidget& tree, const std::string& text, bool disable_on_create = false);
 
     virtual QWidget* create_editor(QWidget* parent) override;
     virtual void create_item(QTreeWidgetItem* parent) override;

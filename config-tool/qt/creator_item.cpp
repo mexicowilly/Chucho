@@ -23,9 +23,10 @@ namespace chucho
 namespace config
 {
 
-creator_item::creator_item(QTreeWidget& tree, const std::string& text)
+creator_item::creator_item(QTreeWidget& tree, const std::string& text, bool disable_on_create)
     : editable_item(text, ""),
-      tree_(tree)
+      tree_(tree),
+      disable_on_create_(disable_on_create)
 {
     setFlags(flags() & ~Qt::ItemIsEditable);
 }
@@ -38,12 +39,30 @@ int creator_item::column() const
 void creator_item::create_item_impl(QTreeWidgetItem* parent, QTreeWidgetItem* item)
 {
     if (parent == nullptr)
-        tree_.insertTopLevelItem(tree_.topLevelItemCount() - 1, item);
+    {
+        int idx = 0;
+        for ( ; idx < tree_.topLevelItemCount(); idx++)
+        {
+            if (dynamic_cast<creator_item*>(tree_.topLevelItem(idx)))
+                break;
+        }
+        tree_.insertTopLevelItem(idx, item);
+    }
     else
-        parent->insertChild(parent->childCount() - 1, item);
+    {
+        int idx = 0;
+        for ( ; idx < parent->childCount(); idx++)
+        {
+            if (dynamic_cast<creator_item*>(parent->child(idx)))
+                break;
+        }
+        parent->insertChild(idx, item);
+    }
     item->setExpanded(true);
     tree_.editItem(item);
     tree_.setCurrentItem(item);
+    if (disable_on_create_)
+        setDisabled(true);
 }
 
 }

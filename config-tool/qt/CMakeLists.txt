@@ -53,8 +53,12 @@ ADD_EXECUTABLE(configure-chucho
                logger_win_controller.cpp
                logger_win_controller.hpp
                main.cpp
+               number_editable_item.cpp
+               number_editable_item.hpp
                pattern_formatter_writer_item.cpp
                pattern_formatter_writer_item.hpp
+               rolling_file_writer_item.cpp
+               rolling_file_writer_item.hpp
                text_editable_item.cpp
                text_editable_item.hpp
                writer_item.cpp

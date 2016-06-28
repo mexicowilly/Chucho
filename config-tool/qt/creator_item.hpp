@@ -32,11 +32,12 @@ public:
     virtual void create_item(QTreeWidgetItem* parent) = 0;
 
 protected:
-    creator_item(QTreeWidget& tree, const std::string& text);
+    creator_item(QTreeWidget& tree, const std::string& text, bool disable_on_create = false);
 
     void create_item_impl(QTreeWidgetItem* parent, QTreeWidgetItem* item);
 
     QTreeWidget& tree_;
+    bool disable_on_create_;
 };
 
 }

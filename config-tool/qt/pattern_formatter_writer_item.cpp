@@ -35,7 +35,7 @@ void pattern_formatter_writer_item::emit_config(std::ostream& stream, std::size_
 {
     indent(stream, tabstop++) << "- chucho::" << emit_name_ << "_writer:" << std::endl;
     indent(stream, tabstop++) << "- chucho::pattern_formatter:" << std::endl;
-    indent(stream, tabstop) << "- pattern: " << pattern_formatter_->text(1) << std::endl;
+    indent(stream, tabstop) << "- pattern: '" << pattern_formatter_->text(1) << '\'' << std::endl;
     writer_item::emit_config(stream, tabstop);
 }
 

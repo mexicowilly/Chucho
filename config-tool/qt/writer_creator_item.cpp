@@ -18,6 +18,7 @@
 #include "cout_writer_item.hpp"
 #include "cerr_writer_item.hpp"
 #include "file_writer_item.hpp"
+#include "rolling_file_writer_item.hpp"
 
 namespace chucho
 {
@@ -41,7 +42,7 @@ writer_creator_item::writer_creator_item(QTreeWidget& tree)
     creators_["PostgresSQL Writer"] = nullptr;
     creators_["RabbitMQ Writer"] = nullptr;
     creators_["Remote Chucho Writer"] = nullptr;
-    creators_["Rolling File Writer"] = nullptr;
+    creators_["Rolling File Writer"] = get_func<rolling_file_writer_item>();
     creators_["SQLite Writer"] = nullptr;
     creators_["Standard Error Writer"] = get_func<cerr_writer_item>();
     creators_["Standard Output Writer"] = get_func<cout_writer_item>();
