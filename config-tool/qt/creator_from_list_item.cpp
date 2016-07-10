@@ -15,7 +15,13 @@
  */
 
 #include "creator_from_list_item.hpp"
+#include "emittable.hpp"
+#include <chucho/loggable.hpp>
+#include <chucho/log.hpp>
 #include <QComboBox>
+#include <QKeyEvent>
+#include <QKeySequence>
+#include <iomanip>
 
 namespace chucho
 {
@@ -27,31 +33,14 @@ creator_from_list_item::creator_from_list_item(QTreeWidget& tree, const std::str
     : creator_item(tree, text, disable_on_create),
       created_(nullptr)
 {
+    rename_logger(typeid(*this));
 }
 
-QWidget* creator_from_list_item::create_editor(QWidget* parent)
-{
-    QComboBox* box = new QComboBox(parent);
-    QStringList keys;
-    for (const auto& p : creators_)
-        keys << p.first;
-    box->addItems(keys);
-    connect(box, SIGNAL(activated(const QString&)), SLOT(item_activated(const QString&)));
-    return box;
-}
-
-void creator_from_list_item::create_item(QTreeWidgetItem* parent)
-{
-    created_ = new QTreeWidgetItem();
-    created_->setFlags(created_->flags() | Qt::ItemIsEditable);
-    create_item_impl(parent, created_);
-}
-
-void creator_from_list_item::item_activated(const QString& text)
+void creator_from_list_item::commit_data(QWidget* ed)
 {
     if (created_ != nullptr)
     {
-        auto it = creators_.find(text);
+        auto it = creators_.find(created_->text(0));
         if (it != creators_.end() && it->second != nullptr)
         {
             auto p = created_->parent();
@@ -63,7 +52,27 @@ void creator_from_list_item::item_activated(const QString& text)
             child->setExpanded(true);
             tree_.setCurrentItem(child);
         }
+        created_ = nullptr;
     }
+    disconnect(tree_.itemDelegate(), SIGNAL(commitData(QWidget*)), this, SLOT(commit_data(QWidget*)));
+}
+
+QWidget* creator_from_list_item::create_editor(QWidget* parent)
+{
+    QComboBox* box = new QComboBox(parent);
+    QStringList keys;
+    for (const auto& p : creators_)
+        keys << p.first;
+    box->addItems(keys);
+    connect(tree_.itemDelegate(), SIGNAL(commitData(QWidget*)), SLOT(commit_data(QWidget*)));
+    return box;
+}
+
+void creator_from_list_item::create_item(QTreeWidgetItem* parent)
+{
+    created_ = new QTreeWidgetItem();
+    created_->setFlags(created_->flags() | Qt::ItemIsEditable);
+    create_item_impl(parent, created_);
 }
 
 }

@@ -47,7 +47,7 @@ protected:
     std::map<QString, creator_func> creators_;
 
 private slots:
-    void item_activated(const QString& text);
+    void commit_data(QWidget* ed);
 
 private:
     QTreeWidgetItem* created_;

@@ -14,7 +14,6 @@
 #    limitations under the License.
 #
 
-SET(CMAKE_AUTOMOC TRUE)
 QT4_WRAP_UI(CHUCHO_UI_GEN chucho.ui)
 QT4_ADD_RESOURCES(CHUCHO_RES_GEN chucho.qrc)
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}")
@@ -68,3 +67,5 @@ ADD_EXECUTABLE(configure-chucho
                ${CHUCHO_UI_GEN}
                ${CHUCHO_RES_GEN})
 TARGET_LINK_LIBRARIES(configure-chucho chucho Qt4::QtGui)
+
+SET_TARGET_PROPERTIES(configure-chucho PROPERTIES AUTOMOC TRUE)
