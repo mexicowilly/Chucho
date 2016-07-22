@@ -36,6 +36,7 @@ public:
     logger_win_controller(Ui::main_ui& ui);
 
 private slots:
+    void item_changed(QTreeWidgetItem* it, int col);
     void item_double_clicked(QTreeWidgetItem* it, int col);
     void new_logger();
     void save();

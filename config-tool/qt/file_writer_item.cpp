@@ -47,6 +47,7 @@ file_writer_item::file_writer_item(QTreeWidget& tree, const std::string& emit_na
     on_start_ = new on_start_editable_item();
     insertChild(0, on_start_);
     file_name_ = new text_editable_item("File Name", "");
+    reinterpret_cast<text_editable_item*>(file_name_)->set_required(true);
     insertChild(0, file_name_);
 }
 

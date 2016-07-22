@@ -23,7 +23,8 @@ namespace config
 {
 
 editable_item::editable_item(const std::string& key, const std::string& value)
-    : QTreeWidgetItem(QStringList() << QString::fromStdString(key) << QString::fromStdString(value))
+    : QTreeWidgetItem(QStringList() << QString::fromStdString(key) << QString::fromStdString(value)),
+      required_(false)
 {
     setFlags(flags() | Qt::ItemIsEditable);
 }
@@ -31,6 +32,13 @@ editable_item::editable_item(const std::string& key, const std::string& value)
 int editable_item::column() const
 {
     return 1;
+}
+
+void editable_item::set_required(bool state)
+{
+    required_ = state;
+    QColor c = (required_ && text(1).isEmpty()) ? "red" : "black";
+    setForeground(0, c);
 }
 
 }

@@ -56,12 +56,25 @@ logger_win_controller::logger_win_controller(Ui::main_ui& ui)
     : logger_win_(*ui.logger_win)
 {
     connect(ui.add_logger_action, SIGNAL(triggered()), SLOT(new_logger()));
+    connect(&logger_win_, SIGNAL(itemChanged(QTreeWidgetItem*, int)), SLOT(item_changed(QTreeWidgetItem*, int)));
     connect(&logger_win_, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), SLOT(item_double_clicked(QTreeWidgetItem*, int)));
     connect(ui.save_action, SIGNAL(triggered()), SLOT(save()));
     logger_win_.headerItem()->setText(1, "");
     logger_win_.setColumnWidth(0, 200);
     logger_win_.setItemDelegate(new editable_delegate());
     logger_win_.addTopLevelItem(new logger_creator_item(logger_win_));
+}
+
+void logger_win_controller::item_changed(QTreeWidgetItem* it, int col)
+{
+    auto ed = dynamic_cast<editable_item*>(it);
+    if (ed != nullptr)
+    {
+        if (ed->required() && ed->text(1).isEmpty())
+            ed->setForeground(0, QColor("red"));
+        else
+            ed->setForeground(0, QColor("black"));
+    }
 }
 
 void logger_win_controller::item_double_clicked(QTreeWidgetItem* it, int col)

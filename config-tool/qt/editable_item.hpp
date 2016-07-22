@@ -31,10 +31,20 @@ class editable_item : public QTreeWidgetItem, public chucho::loggable<editable_i
 public:
     virtual int column() const;
     virtual QWidget* create_editor(QWidget* parent) = 0;
+    bool required() const;
+    void set_required(bool state);
 
 protected:
     editable_item(const std::string& key, const std::string& value);
+
+private:
+    bool required_;
 };
+
+inline bool editable_item::required() const
+{
+    return required_;
+}
 
 }
 

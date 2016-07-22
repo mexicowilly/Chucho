@@ -39,12 +39,13 @@ protected:
         : name_prefix_(name_prefix)
     {
         min_idx_ = new chucho::config::number_editable_item("Minimum Index", 1, 1, 1000);
+        min_idx_->set_required(true);
         addChild(min_idx_);
     }
 
 private:
     std::string name_prefix_;
-    QTreeWidgetItem* min_idx_;
+    chucho::config::number_editable_item* min_idx_;
 };
 
 class bzip2_file_compressor_item : public file_compressor_item
