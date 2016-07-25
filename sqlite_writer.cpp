@@ -19,6 +19,7 @@
 #include <chucho/exception.hpp>
 #include <sstream>
 #include <thread>
+#include <cstring>
 
 namespace chucho
 {

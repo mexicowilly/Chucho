@@ -152,16 +152,16 @@ OPTION(ENABLE_CURL "Whether libcurl should be checked so that email_writer will 
 
 # SET(SQLITE_CLIENT_LIB "<My SQLite Library>" CACHE STRING "SQLite client library")
 
-# The location of the PostgresSQL header files.
+# The location of the PostgreSQL header files.
 
-# SET(POSTGRES_INCLUDE_DIR "<My PostgresSQL Include Directory>" CACHE STRING "Include directory of the PostgresSQL client")
+# SET(POSTGRES_INCLUDE_DIR "<My PostgreSQL Include Directory>" CACHE STRING "Include directory of the PostgreSQL client")
 
-# The name of the PostgresSQL library. This variable need not be set for the Chucho
-# library to build successfully with PostgresSQL support. In the context of the
+# The name of the PostgreSQL library. This variable need not be set for the Chucho
+# library to build successfully with PostgreSQL support. In the context of the
 # Chucho build, this variable is only used for unit test linkage. However, you must
 # link your own application to the PostgresSQL library when linking to Chucho.
 
-# SET(POSTGRES_CLIENT_LIB "<My PostgresSQL Library>" CACHE STRING "PostgresSQL client library")
+# SET(POSTGRES_CLIENT_LIB "<My PostgreSQL Library>" CACHE STRING "PostgreSQL client library")
 
 # The location of the DB2 header files.
 
