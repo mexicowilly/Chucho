@@ -25,6 +25,7 @@
  * @ingroup miscellaneous
  */
 
+#include <chucho/export.hpp>
 #include <bitset>
 
 namespace chucho
@@ -75,14 +76,12 @@ typedef std::bitset<FEATURE_COUNT> feature_set;
  * 
  * @return the current set of features
  */
-const feature_set& get();
+CHUCHO_EXPORT const feature_set& get();
 /**
  * Test whether a single feature is present.
  * @param feat the feature to test
  * @return true if that feature is present, false otherwise
  */
-bool have(feature feat);
-
 inline bool have(feature feat)
 {
     return get().test(feat);

@@ -64,7 +64,9 @@ IF(CHUCHO_HAVE_ZLIB)
 ENDIF()
 
 IF(CHUCHO_HAVE_BZIP2)
-    LIST(APPEND CHUCHO_TEST_COMPRESSION_SOURCES bzip2_file_compressor_test.cpp)
+    LIST(APPEND CHUCHO_TEST_COMPRESSION_SOURCES
+         bzip2_compressor_test.cpp
+         bzip2_file_compressor_test.cpp)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_BZIP2)
 ENDIF()
 
