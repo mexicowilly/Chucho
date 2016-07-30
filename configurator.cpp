@@ -88,6 +88,9 @@
 #if defined(CHUCHO_HAVE_DOORS)
 #include <chucho/door_writer_factory.hpp>
 #endif
+#if defined(CHUCHO_HAVE_BZIP2)
+#include <chucho/bzip2_compressor_factory.hpp>
+#endif
 
 #include <cstring>
 #include <mutex>
@@ -233,6 +236,10 @@ void configurator::initialize_impl()
 #if defined(CHUCHO_HAVE_RABBITMQ)
     fact.reset(new rabbitmq_writer_factory());
     add_configurable_factory("chucho::rabbitmq_writer", fact);
+#endif
+#if defined(CHUCHO_HAVE_BZIP2)
+    fact.reset(new bzip2_compressor_factory());
+    add_configurable_factory("chucho::bzip2_compressor", fact);
 #endif
 }
 

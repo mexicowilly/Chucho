@@ -317,13 +317,16 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/zlib_compressor.h)
 
 IF(CHUCHO_HAVE_BZIP2)
-    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/bzip2_file_compressor.hpp)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/bzip2_compressor.hpp
+         include/chucho/bzip2_file_compressor.hpp)
     IF(C_API)
         LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/bzip2_file_compressor.h)
     ENDIF()
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/bzip2_compressor.hpp
      include/chucho/bzip2_file_compressor.hpp
      include/chucho/bzip2_file_compressor.h)
 
@@ -996,6 +999,10 @@ IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ZLIB)
 ENDIF()
 
+IF(CHUCHO_HAVE_BZIP2)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_BZIP2)
+ENDIF()
+
 IF(CHUCHO_HAVE_DOORS)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_DOORS)
 ENDIF()
@@ -1139,7 +1146,12 @@ ENDIF()
 
 IF(CHUCHO_HAVE_BZIP2)
     LIST(APPEND CHUCHO_SOURCES
+         bzip2_compressor.cpp
+         bzip2_compressor_factory.cpp
+         bzip2_compressor_memento.cpp
          bzip2_file_compressor.cpp
+         include/chucho/bzip2_compressor_factory.hpp
+         include/chucho/bzip2_compressor_memento.hpp
          ${CHUCHO_BZIP2_SOURCES})
     IF(C_API)
         LIST(APPEND CHUCHO_SOURCES c_bzip2_file_compressor.cpp)
