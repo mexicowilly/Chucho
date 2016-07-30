@@ -22,6 +22,11 @@
 namespace chucho
 {
 
+bzip2_compressor::bzip2_compressor()
+{
+    set_status_origin("bzip2_compressor");
+}
+
 std::vector<std::uint8_t> bzip2_compressor::compress(const std::vector<std::uint8_t>& in)
 {
     unsigned count = ceil(static_cast<double>(in.size()) * 1.05) + 600.0;
@@ -35,7 +40,9 @@ std::vector<std::uint8_t> bzip2_compressor::compress(const std::vector<std::uint
                                       0);
     while (rc == BZ_OUTBUFF_FULL)
     {
+        report_info("Resizing the output buffer from " + std::to_string(count) + " to " + std::to_string(count + in.size()));
         count = count + in.size();
+        result.resize(count);
         rc = BZ2_bzBuffToBuffCompress(reinterpret_cast<char*>(&result[0]),
                                       &count,
                                       const_cast<char*>(reinterpret_cast<const char*>(&in[0])),

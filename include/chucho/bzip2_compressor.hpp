@@ -31,6 +31,16 @@ namespace chucho
 class CHUCHO_EXPORT bzip2_compressor : public compressor
 {
 public:
+    /**
+     * @name Constructor
+     * @{
+     */
+    /**
+     * Construct a bzip2 compressor.
+     */
+    bzip2_compressor();
+    /** @} */
+
     virtual std::vector<std::uint8_t> compress(const std::vector<std::uint8_t>& in) override;
 };
 
