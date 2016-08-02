@@ -47,6 +47,7 @@ enum feature
     ACTIVEMQ_WRITER,            /**< ActiveMQ */
     BZIP2_COMPRESSION,          /**< Bzip2 */
     C_API,                      /**< C API */
+    CAPN_PROTO_SERIALIZER,      /**< Cap'n Proto serialization */
     DB2_WRITER,                 /**< DB2 */
     CONFIG_FILE_CONFIGURATION,  /**< Config file format configuration */
     EMAIL_WRITER,               /**< Whether CURL is present */

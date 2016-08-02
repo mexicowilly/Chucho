@@ -55,6 +55,9 @@ ENDIF()
 IF(CHUCHO_HAVE_PROTOBUF)
     INCLUDE_DIRECTORIES("${PROTOBUF_INCLUDE_DIR}")
 ENDIF()
+IF(CHUCHO_HAVE_CAPN_PROTO)
+    INCLUDE_DIRECTORIES("${CAPN_PROTO_INCLUDE_DIR}")
+ENDIF()
 IF(CHUCHO_HAVE_ZEROMQ)
     INCLUDE_DIRECTORIES("${ZEROMQ_INCLUDE_DIR}")
 ENDIF()
@@ -498,7 +501,7 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
 IF(CHUCHO_HAVE_PROTOBUF)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
          include/chucho/protobuf_serializer.hpp)
-    LIST(APPEND CHUCHO_PROTOBUF_SOURCES
+    LIST(APPEND CHUCHO_SERIALIZER_SOURCES
          protobuf_serializer.cpp
          protobuf_serializer_factory.cpp
          include/chucho/protobuf_serializer_factory.hpp
@@ -513,6 +516,25 @@ ENDIF()
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/protobuf_serializer.h
      include/chucho/protobuf_serializer.hpp)
+
+IF(CHUCHO_HAVE_CAPN_PROTO)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/capn_proto_serializer.hpp)
+    LIST(APPEND CHUCHO_SERIALIZER_SOURCES
+         capn_proto_serializer.cpp)
+#         protobuf_serializer_factory.cpp
+#         include/chucho/protobuf_serializer_factory.hpp
+#         protobuf_serializer_memento.cpp
+#         include/chucho/protobuf_serializer_memento.hpp)
+#    IF(C_API)
+#        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/protobuf_serializer.h)
+#        LIST(APPEND CHUCHO_PROTOBUF_SOURCES c_protobuf_serializer.cpp)
+#    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+#     include/chucho/protobuf_serializer.h
+     include/chucho/capn_proto_serializer.hpp)
 
 IF(CHUCHO_HAVE_ZEROMQ)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
@@ -927,7 +949,7 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_DATABASE_SOURCES}
     ${CHUCHO_EVALUATOR_SOURCES}
     ${CHUCHO_EMAIL_SOURCES}
-    ${CHUCHO_PROTOBUF_SOURCES}
+    ${CHUCHO_SERIALIZER_SOURCES}
     ${CHUCHO_MESSAGE_QUEUE_SOURCES}
     ${CHUCHO_DOOR_SOURCES})
 
@@ -981,6 +1003,10 @@ ENDIF()
 
 IF(CHUCHO_HAVE_PROTOBUF)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_PROTOBUF)
+ENDIF()
+
+IF(CHUCHO_HAVE_CAPN_PROTO)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_CAPN_PROTO)
 ENDIF()
 
 IF(CHUCHO_HAVE_ZEROMQ)
@@ -1057,6 +1083,9 @@ IF(CHUCHO_HAVE_RABBITMQ)
 ENDIF()
 IF(CHUCHO_HAVE_PROTOBUF)
     LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_PROTOBUF_SERIALIZER)
+ENDIF()
+IF(CHUCHO_HAVE_CAPN_PROTO)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_CAPN_PROTO_SERIALIZER)
 ENDIF()
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_ZLIB_COMPRESSION)
@@ -1285,6 +1314,10 @@ IF(CHUCHO_HAVE_PROTOBUF)
     TARGET_LINK_LIBRARIES(chucho "${PROTOBUF_LIB}")
 ENDIF()
 
+IF(CHUCHO_HAVE_CAPN_PROTO)
+    TARGET_LINK_LIBRARIES(chucho "${CAPN_PROTO_LIB}" "${CAPN_PROTO_KJ_LIB}")
+ENDIF()
+
 IF(CHUCHO_HAVE_ZEROMQ)
     TARGET_LINK_LIBRARIES(chucho "${ZEROMQ_LIB}")
 ENDIF()
@@ -1344,8 +1377,15 @@ ENDIF()
 IF(CHUCHO_HAVE_PROTOBUF)
     ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/chucho.pb.cc" "${CMAKE_BINARY_DIR}/chucho.pb.h"
                        COMMAND "${CHUCHO_PROTOC}" "--cpp_out=${CMAKE_BINARY_DIR}" chucho.proto
-                       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/protobuf"
-                       DEPENDS "${CMAKE_SOURCE_DIR}/protobuf/chucho.proto")
+                       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/serialization"
+                       DEPENDS "${CMAKE_SOURCE_DIR}/serialization/chucho.proto")
+ENDIF()
+
+IF(CHUCHO_HAVE_CAPN_PROTO)
+    ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/chucho.capnp.c++" "${CMAKE_BINARY_DIR}/chucho.capnp.h"
+                       COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_SOURCE_DIR}/serialization/chucho.capnp" "${CMAKE_BINARY_DIR}"
+                       COMMAND "${CHUCHO_CAPNP}" compile "--output=${CHUCHO_CAPNPC_CXX}" "${CMAKE_BINARY_DIR}/chucho.capnp"
+                       DEPENDS "${CMAKE_SOURCE_DIR}/serialization/chucho.capnp")
 ENDIF()
 
 ADD_SUBDIRECTORY(test)

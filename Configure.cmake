@@ -768,12 +768,50 @@ IF(PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIB AND PROTOC_DIR)
     IF(NOT EXISTS "${PROTOBUF_LIB}")
         MESSAGE(FATAL_ERROR "The variable PROTOBUF_LIB was provided as ${PROTOBUF_LIB}, but it does not refer to an existing file")
     ENDIF()
-    SET(CHUCHO_PROTOBUF_SOURCES
+    LIST(APPEND CHUCHO_SERIALIZER_SOURCES
         "${CMAKE_BINARY_DIR}/chucho.pb.cc"
         "${CMAKE_BINARY_DIR}/chucho.pb.h")
     SET(CHUCHO_HAVE_PROTOBUF TRUE CACHE INTERNAL "Whether we have protobuf")
 ELSEIF(PROTOBUF_INCLUDE_DIR OR PROTOBUF_LIB OR PROTOC_DIR)
     MESSAGE(WARNING "If any of the variables PROTOBUF_INCLUDE_DIR, PROTOBUF_LIB or PROTOC_DIR have been set, then they must all be set for protobuf support to be included")
+ENDIF()
+
+# Cap'n Proto
+IF(CAPN_PROTO_INCLUDE_DIR AND CAPN_PROTO_LIB AND CAPN_PROTO_KJ_LIB AND CAPNP_DIR)
+    FIND_PROGRAM(CHUCHO_CAPNP
+                 capnp
+                 PATHS "${CAPNP_DIR}"
+                 NO_DEFAULT_PATH)
+    IF(NOT CHUCHO_CAPNP)
+        MESSAGE(FATAL_ERROR "The variable CAPNP_DIR was provided as ${CAPNP_DIR}, but it does not contain the capnp program")
+    ENDIF()
+    FIND_PROGRAM(CHUCHO_CAPNPC_CXX
+                 capnpc-c++
+                 PATHS "${CAPNP_DIR}"
+                 NO_DEFAULT_PATH)
+    IF(NOT CHUCHO_CAPNPC_CXX)
+        MESSAGE(FATAL_ERROR "The variable CAPNP_DIR was provided as ${CAPNP_DIR}, but it does not contain the capnpc-c++ program")
+    ENDIF()
+    SET(CMAKE_REQUIRED_INCLUDES "${CAPN_PROTO_INCLUDE_DIR}")
+    CHECK_INCLUDE_FILE_CXX(capnp/message.h CHUCHO_CAPN_PROTO_MESSAGE_H)
+    CHECK_INCLUDE_FILE_CXX(capnp/serialize-packed.h CHUCHO_CAPN_PROTO_SERIALIZE_PACKED_H)
+    CHECK_INCLUDE_FILE_CXX(kj/vector.h CHUCHO_CAPN_PROTO_VECTOR_H)
+    IF(NOT CHUCHO_CAPN_PROTO_MESSAGE_H OR NOT CHUCHO_CAPN_PROTO_SERIALIZE_PACKED_H OR NOT CHUCHO_CAPN_PROTO_VECTOR_H)
+        MESSAGE(FATAL_ERROR "The variable CAPN_PROTO_INCLUDE_DIR was provided as ${CAPN_PROTO_INCLUDE_DIR}, but it does not contain the Cap'n Proto headers")
+    ENDIF()
+    UNSET(CMAKE_REQUIRED_INCLUDES)
+    IF(NOT EXISTS "${CAPN_PROTO_LIB}")
+        MESSAGE(FATAL_ERROR "The variable CAPN_PROTO_LIB was provided as ${CAPN_PROTO_LIB}, but it does not refer to an existing file")
+    ENDIF()
+    IF(NOT EXISTS "${CAPN_PROTO_KJ_LIB}")
+        MESSAGE(FATAL_ERROR "The variable CAPN_PROTO_KJ_LIB was provided as ${CAPN_PROTO_KJ_LIB}, but it does not refer to an existing file")
+    ENDIF()
+    LIST(APPEND CHUCHO_SERIALIZER_SOURCES
+        "${CMAKE_BINARY_DIR}/chucho.capnp.c++"
+        "${CMAKE_BINARY_DIR}/chucho.capnp.h")
+    SET(CHUCHO_HAVE_CAPN_PROTO TRUE CACHE INTERNAL "Whether we have Cap'n Proto")
+ELSEIF(CAPN_PROTO_INCLUDE_DIR OR CAPN_PROTO_LIB OR CAPN_PROTO_KJ_LIB OR CAPNP_DIR)
+    MESSAGE(WARNING "If any of the variables CAPN_PROTO_INCLUDE_DIR, CAPN_PROTO_LIB, CAPN_PROTO_KJ_LIB or CAPNP_DIR have been set, then they must all be set for Cap'n Proto support to be included")
 ENDIF()
 
 # zeromq

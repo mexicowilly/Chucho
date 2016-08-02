@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_PROTOBUF_SERIALIZER_HPP__)
-#define CHUCHO_PROTOBUF_SERIALIZER_HPP__
+#if !defined(CHUCHO_CAPN_PROTO_SERIALIZER_HPP__)
+#define CHUCHO_CAPN_PROTO_SERIALIZER_HPP__
 
 #include <chucho/serializer.hpp>
 
@@ -32,7 +32,7 @@ namespace chucho
  * 
  * @ingroup mq
  */
-class CHUCHO_EXPORT protobuf_serializer : public serializer
+class CHUCHO_EXPORT capn_proto_serializer : public serializer
 {
 public:
     /**

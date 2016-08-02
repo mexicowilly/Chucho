@@ -17,6 +17,7 @@
 #include <gtest/gtest.h>
 #include <chucho/file.hpp>
 #include <chucho/door_event.h>
+#include <chucho/exception.hpp>
 #include <door.h>
 #include <fcntl.h>
 #include <stropts.h>
@@ -64,14 +65,14 @@ public:
         {
             int tmp = open(door_name_.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0644);
             if (tmp == -1)
-                FAIL() << "Could not create the door file: " << std::strerror(errno);
+                throw chucho::exception(std::string("Could not create the door file: ") + std::strerror(errno));
             close(tmp);
         }
         door_ = door_create(door_proc, nullptr, 0);
         if (door_ == -1)
-            FAIL() << "Unable to create the door";
+            throw chucho::exception("Unable to create the door");
         if (fattach(door_, door_name_.c_str()) != 0)
-            FAIL() << "Unable to attach door to file system: " << std::strerror(errno);
+            throw chucho::exception(std::string("Unable to attach door to file system: ") + std::strerror(errno));
     }
 
     ~door_writer_test()
