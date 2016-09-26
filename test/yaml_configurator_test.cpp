@@ -523,6 +523,23 @@ TEST_F(yaml_configurator, rabbitmq_writer)
     rabbitmq_writer_body();
 }
 
+#if defined(CHUCHO_HAVE_CAPN_PROTO)
+
+TEST_F(yaml_configurator, rabbitmq_writer_capn_proto)
+{
+    configure("chucho::logger:\n"
+              "    - name: will\n"
+              "    - chucho::rabbitmq_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            - pattern: '%m'\n"
+              "        - chucho::capn_proto_serializer\n"
+              "        - url: 'amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc'\n"
+              "        - exchange: logs");
+    rabbitmq_writer_capn_proto_body();
+}
+
+#endif
+
 #endif
 
 TEST_F(yaml_configurator, remote_writer)

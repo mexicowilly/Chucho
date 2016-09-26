@@ -92,6 +92,9 @@
 #if defined(CHUCHO_HAVE_RABBITMQ)
 #include <chucho/rabbitmq_writer.hpp>
 #endif
+#if defined(CHUCHO_HAVE_CAPN_PROTO)
+#include <chucho/capn_proto_serializer.hpp>
+#endif
 
 namespace chucho
 {
@@ -573,6 +576,25 @@ void configurator::rabbitmq_writer_body()
     EXPECT_EQ(std::string("logs"), pwrt->get_exchange());
     EXPECT_TRUE(pwrt->get_routing_key().empty());
 }
+
+#if defined(CHUCHO_HAVE_CAPN_PROTO)
+
+void configurator::rabbitmq_writer_capn_proto_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::rabbitmq_writer), typeid(*wrts[0]));
+    auto pwrt = std::static_pointer_cast<chucho::rabbitmq_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(pwrt));
+    auto ser = pwrt->get_serializer();
+    ASSERT_TRUE(static_cast<bool>(ser));
+    EXPECT_EQ(typeid(chucho::capn_proto_serializer), typeid(*ser));
+    EXPECT_EQ(std::string("amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc"), pwrt->get_url());
+    EXPECT_EQ(std::string("logs"), pwrt->get_exchange());
+    EXPECT_TRUE(pwrt->get_routing_key().empty());
+}
+
+#endif
 
 #endif
 

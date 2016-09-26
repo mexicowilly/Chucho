@@ -526,14 +526,14 @@ IF(CHUCHO_HAVE_CAPN_PROTO)
          include/chucho/capn_proto_serializer_factory.hpp
          capn_proto_serializer_memento.cpp
          include/chucho/capn_proto_serializer_memento.hpp)
-#    IF(C_API)
-#        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/protobuf_serializer.h)
-#        LIST(APPEND CHUCHO_PROTOBUF_SOURCES c_protobuf_serializer.cpp)
-#    ENDIF()
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/capn_proto_serializer.h)
+        LIST(APPEND CHUCHO_SERIALIZER_SOURCES c_capn_proto_serializer.cpp)
+    ENDIF()
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
-#     include/chucho/protobuf_serializer.h
+     include/chucho/capn_proto_serializer.h
      include/chucho/capn_proto_serializer.hpp)
 
 IF(CHUCHO_HAVE_ZEROMQ)
