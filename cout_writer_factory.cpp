@@ -15,7 +15,6 @@
  */
 
 #include <chucho/cout_writer_factory.hpp>
-#include <chucho/cout_writer_memento.hpp>
 #include <chucho/cout_writer.hpp>
 #include <chucho/demangle.hpp>
 #include <chucho/exception.hpp>
@@ -31,7 +30,7 @@ cout_writer_factory::cout_writer_factory()
 
 std::shared_ptr<configurable> cout_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
 {
-    auto cwm = std::dynamic_pointer_cast<cout_writer_memento>(mnto);
+    auto cwm = std::dynamic_pointer_cast<writer_memento>(mnto);
     assert(cwm);
     if (!cwm->get_formatter())
         throw exception("cout_writer_factory: The writer's formatter is not set");
@@ -43,7 +42,7 @@ std::shared_ptr<configurable> cout_writer_factory::create_configurable(std::shar
 
 std::shared_ptr<memento> cout_writer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto(new cout_writer_memento(cfg));
+    std::shared_ptr<memento> mnto(new writer_memento(cfg));
     return mnto;
 }
 

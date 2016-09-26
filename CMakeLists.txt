@@ -504,9 +504,7 @@ IF(CHUCHO_HAVE_PROTOBUF)
     LIST(APPEND CHUCHO_SERIALIZER_SOURCES
          protobuf_serializer.cpp
          protobuf_serializer_factory.cpp
-         include/chucho/protobuf_serializer_factory.hpp
-         protobuf_serializer_memento.cpp
-         include/chucho/protobuf_serializer_memento.hpp)
+         include/chucho/protobuf_serializer_factory.hpp)
     IF(C_API)
         LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/protobuf_serializer.h)
         LIST(APPEND CHUCHO_PROTOBUF_SOURCES c_protobuf_serializer.cpp)
@@ -523,9 +521,7 @@ IF(CHUCHO_HAVE_CAPN_PROTO)
     LIST(APPEND CHUCHO_SERIALIZER_SOURCES
          capn_proto_serializer.cpp
          capn_proto_serializer_factory.cpp
-         include/chucho/capn_proto_serializer_factory.hpp
-         capn_proto_serializer_memento.cpp
-         include/chucho/capn_proto_serializer_memento.hpp)
+         include/chucho/capn_proto_serializer_factory.hpp)
     IF(C_API)
         LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/capn_proto_serializer.h)
         LIST(APPEND CHUCHO_SERIALIZER_SOURCES c_capn_proto_serializer.cpp)
@@ -770,20 +766,17 @@ SET(CHUCHO_SOURCES
     bzip2_file_compressor_factory.cpp
     calendar.cpp
     cerr_writer_factory.cpp
-    cerr_writer_memento.cpp
     clock_util.cpp
     configurable.cpp
     configurable_factory.cpp
     configuration.cpp
     configurator.cpp
     cout_writer_factory.cpp
-    cout_writer_memento.cpp
     demangle.cpp
     database_writer.cpp
     diagnostic_context.cpp
     duplicate_message_filter.cpp
     duplicate_message_filter_factory.cpp
-    duplicate_message_filter_memento.cpp
     event.cpp
     exception.cpp
     file_compressor_factory.cpp
@@ -798,7 +791,6 @@ SET(CHUCHO_SOURCES
     finalize.cpp
     formatted_message_serializer.cpp
     formatted_message_serializer_factory.cpp
-    formatted_message_serializer_memento.cpp
     garbage_cleaner.cpp
     gzip_file_compressor_factory.cpp
     host.cpp
@@ -827,7 +819,6 @@ SET(CHUCHO_SOURCES
     named_pipe_writer_memento.cpp
     noop_compressor.cpp
     noop_compressor_factory.cpp
-    noop_compressor_memento.cpp
     noop_file_compressor.cpp
     numbered_file_roller.cpp
     numbered_file_roller_factory.cpp
@@ -877,14 +868,11 @@ SET(CHUCHO_SOURCES
     include/chucho/bzip2_file_compressor_factory.hpp
     include/chucho/calendar.hpp
     include/chucho/cerr_writer_factory.hpp
-    include/chucho/cerr_writer_memento.hpp
     include/chucho/clock_util.hpp
     include/chucho/configurator.hpp
     include/chucho/cout_writer_factory.hpp
-    include/chucho/cout_writer_memento.hpp
     include/chucho/demangle.hpp
     include/chucho/duplicate_message_filter_factory.hpp
-    include/chucho/duplicate_message_filter_memento.hpp
     include/chucho/environment.hpp
     include/chucho/exception.hpp
     include/chucho/file.hpp
@@ -892,7 +880,6 @@ SET(CHUCHO_SOURCES
     include/chucho/file_writer_factory.hpp
     include/chucho/file_writer_memento.hpp
     include/chucho/formatted_message_serializer_factory.hpp
-    include/chucho/formatted_message_serializer_memento.hpp
     include/chucho/garbage_cleaner.hpp
     include/chucho/gzip_file_compressor_factory.hpp
     include/chucho/host.hpp
@@ -910,7 +897,6 @@ SET(CHUCHO_SOURCES
     include/chucho/named_pipe_writer_factory.hpp
     include/chucho/named_pipe_writer_memento.hpp
     include/chucho/noop_compressor_factory.hpp
-    include/chucho/noop_compressor_memento.hpp
     include/chucho/numbered_file_roller_factory.hpp
     include/chucho/numbered_file_roller_memento.hpp
     include/chucho/pattern_formatter_factory.hpp
@@ -1177,10 +1163,8 @@ IF(CHUCHO_HAVE_BZIP2)
     LIST(APPEND CHUCHO_SOURCES
          bzip2_compressor.cpp
          bzip2_compressor_factory.cpp
-         bzip2_compressor_memento.cpp
          bzip2_file_compressor.cpp
          include/chucho/bzip2_compressor_factory.hpp
-         include/chucho/bzip2_compressor_memento.hpp
          ${CHUCHO_BZIP2_SOURCES})
     IF(C_API)
         LIST(APPEND CHUCHO_SOURCES c_bzip2_file_compressor.cpp)

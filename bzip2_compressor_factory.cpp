@@ -16,7 +16,6 @@
 
 #include <chucho/bzip2_compressor_factory.hpp>
 #include <chucho/bzip2_compressor.hpp>
-#include <chucho/bzip2_compressor_memento.hpp>
 #include <chucho/demangle.hpp>
 
 namespace chucho
@@ -36,7 +35,7 @@ std::shared_ptr<configurable> bzip2_compressor_factory::create_configurable(std:
 
 std::shared_ptr<memento> bzip2_compressor_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto(new bzip2_compressor_memento(cfg));
+    std::shared_ptr<memento> mnto(new memento(cfg));
     return mnto;
 }
 

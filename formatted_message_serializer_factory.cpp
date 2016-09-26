@@ -15,7 +15,6 @@
  */
 
 #include <chucho/formatted_message_serializer_factory.hpp>
-#include <chucho/formatted_message_serializer_memento.hpp>
 #include <chucho/formatted_message_serializer.hpp>
 #include <chucho/demangle.hpp>
 
@@ -36,7 +35,7 @@ std::shared_ptr<configurable> formatted_message_serializer_factory::create_confi
 
 std::shared_ptr<memento> formatted_message_serializer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto(new formatted_message_serializer_memento(cfg));
+    std::shared_ptr<memento> mnto(new memento(cfg));
     return mnto;
 }
 

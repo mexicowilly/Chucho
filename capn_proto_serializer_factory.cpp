@@ -15,7 +15,6 @@
  */
 
 #include <chucho/capn_proto_serializer_factory.hpp>
-#include <chucho/capn_proto_serializer_memento.hpp>
 #include <chucho/capn_proto_serializer.hpp>
 #include <chucho/demangle.hpp>
 
@@ -36,7 +35,7 @@ std::shared_ptr<configurable> capn_proto_serializer_factory::create_configurable
 
 std::shared_ptr<memento> capn_proto_serializer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto(new capn_proto_serializer_memento(cfg));
+    std::shared_ptr<memento> mnto(new memento(cfg));
     return mnto;
 }
 
