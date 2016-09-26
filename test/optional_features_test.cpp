@@ -36,6 +36,9 @@ TEST(optional_features, simple)
 #if defined(CHUCHO_HAVE_C_API)
     EXPECT_FEATURE(chucho::optional_features::C_API);
 #endif
+#if defined(CHUCHO_HAVE_CAPN_PROTO)
+    EXPECT_FEATURE(chucho::optional_features::CAPN_PROTO_SERIALIZER);
+#endif
 #if defined(CHUCHO_HAVE_DB2)
     EXPECT_FEATURE(chucho::optional_features::DB2_WRITER);
 #endif

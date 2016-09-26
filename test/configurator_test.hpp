@@ -74,6 +74,9 @@ protected:
 #endif
 #if defined(CHUCHO_HAVE_RABBITMQ)
     void rabbitmq_writer_body();
+#if defined(CHUCHO_HAVE_CAPN_PROTO)
+    void rabbitmq_writer_capn_proto_body();
+#endif
 #endif
     void remote_writer_body();
 #if defined(CHUCHO_HAVE_RUBY)
@@ -97,7 +100,7 @@ protected:
     void zeromq_writer_body();
     void zeromq_writer_with_compressor_body();
     void zeromq_writer_no_prefix_body();
-#if defined(CHUCHO_HAVE_PROTOBUF) && defined(CHUCHO_HAVE_ZEROMQ)
+#if defined(CHUCHO_HAVE_PROTOBUF)
     void zeromq_writer_protobuf_body();
 #endif
 #endif

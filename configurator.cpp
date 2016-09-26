@@ -91,6 +91,9 @@
 #if defined(CHUCHO_HAVE_BZIP2)
 #include <chucho/bzip2_compressor_factory.hpp>
 #endif
+#if defined(CHUCHO_HAVE_CAPN_PROTO)
+#include <chucho/capn_proto_serializer_factory.hpp>
+#endif
 
 #include <cstring>
 #include <mutex>
@@ -240,6 +243,10 @@ void configurator::initialize_impl()
 #if defined(CHUCHO_HAVE_BZIP2)
     fact.reset(new bzip2_compressor_factory());
     add_configurable_factory("chucho::bzip2_compressor", fact);
+#endif
+#if defined(CHUCHO_HAVE_CAPN_PROTO)
+    fact.reset(new capn_proto_serializer_factory());
+    add_configurable_factory("chucho::capn_proto_serializer", fact);
 #endif
 }
 

@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_PROTOBUF_SERIALIZER_HPP__)
-#define CHUCHO_PROTOBUF_SERIALIZER_HPP__
+#if !defined(CHUCHO_CAPN_PROTO_SERIALIZER_HPP__)
+#define CHUCHO_CAPN_PROTO_SERIALIZER_HPP__
 
 #include <chucho/serializer.hpp>
 
@@ -23,16 +23,16 @@ namespace chucho
 {
 
 /**
- * @class protobuf_serializer protobuf_serializer.hpp chucho/protobuf_serializer.hpp
- * A @ref serializer that creates a <a href="https://developers.google.com/protocol-buffers/?hl=en">protobuf</a>
- * message. The definintion of the message is in the file @c serialization/chucho.proto.
+ * @class capn_proto_serializer capn_proto_serializer.hpp chucho/capn_proto_serializer.hpp
+ * A @ref serializer that creates a <a href="https://capnproto.org/">Cap'n Proto</a>
+ * message. The definintion of the message is in the file @c serialization/chucho.capnp.
  * All of the event data, including the formatted message, will appear in the
  * resulting message. If you only need the formatted message, then please consider
  * using the @ref formatted_message_serializer instead.
  * 
  * @ingroup mq
  */
-class CHUCHO_EXPORT protobuf_serializer : public serializer
+class CHUCHO_EXPORT capn_proto_serializer : public serializer
 {
 public:
     /**

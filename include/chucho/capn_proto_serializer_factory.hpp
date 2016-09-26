@@ -14,27 +14,27 @@
  *    limitations under the License.
  */
 
-#include <chucho/protobuf_serializer.hpp>
-#include <chucho/protobuf_serializer.h>
-#include <chucho/c_serializer.hpp>
+#if !defined(CHUCHO_CAPN_PROTO_SERIALIZER_FACTORY_HPP__)
+#define CHUCHO_CAPN_PROTO_SERIALIZER_FACTORY_HPP__
 
-extern "C"
+#if !defined(CHUCHO_BUILD)
+#error "This header is private"
+#endif
+
+#include <chucho/configurable_factory.hpp>
+
+namespace chucho
 {
 
-chucho_rc chucho_create_protobuf_serializer(chucho_serializer** ser)
+class capn_proto_serializer_factory : public configurable_factory
 {
-    if (ser == nullptr)
-        return CHUCHO_NULL_POINTER;
-    try
-    {
-        *ser = new chucho_serializer();
-        (*ser)->ser_ = std::make_shared<chucho::protobuf_serializer>();
-    }
-    catch (...)
-    {
-        return CHUCHO_OUT_OF_MEMORY;
-    }
-    return CHUCHO_NO_ERROR;
-}
+public:
+    capn_proto_serializer_factory();
+
+    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
+    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
+};
 
 }
+
+#endif

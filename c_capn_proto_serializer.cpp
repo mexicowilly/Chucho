@@ -14,21 +14,21 @@
  *    limitations under the License.
  */
 
-#include <chucho/protobuf_serializer.hpp>
-#include <chucho/protobuf_serializer.h>
+#include <chucho/capn_proto_serializer.hpp>
+#include <chucho/capn_proto_serializer.h>
 #include <chucho/c_serializer.hpp>
 
 extern "C"
 {
 
-chucho_rc chucho_create_protobuf_serializer(chucho_serializer** ser)
+chucho_rc chucho_create_capn_proto_serializer(chucho_serializer** ser)
 {
     if (ser == nullptr)
         return CHUCHO_NULL_POINTER;
     try
     {
         *ser = new chucho_serializer();
-        (*ser)->ser_ = std::make_shared<chucho::protobuf_serializer>();
+        (*ser)->ser_ = std::make_shared<chucho::capn_proto_serializer>();
     }
     catch (...)
     {

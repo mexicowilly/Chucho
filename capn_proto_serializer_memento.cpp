@@ -14,27 +14,14 @@
  *    limitations under the License.
  */
 
-#include <chucho/protobuf_serializer.hpp>
-#include <chucho/protobuf_serializer.h>
-#include <chucho/c_serializer.hpp>
+#include <chucho/capn_proto_serializer_memento.hpp>
 
-extern "C"
+namespace chucho
 {
 
-chucho_rc chucho_create_protobuf_serializer(chucho_serializer** ser)
+capn_proto_serializer_memento::capn_proto_serializer_memento(configurator& cfg)
+    : memento(cfg)
 {
-    if (ser == nullptr)
-        return CHUCHO_NULL_POINTER;
-    try
-    {
-        *ser = new chucho_serializer();
-        (*ser)->ser_ = std::make_shared<chucho::protobuf_serializer>();
-    }
-    catch (...)
-    {
-        return CHUCHO_OUT_OF_MEMORY;
-    }
-    return CHUCHO_NO_ERROR;
 }
 
 }

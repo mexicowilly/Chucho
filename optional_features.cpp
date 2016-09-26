@@ -31,6 +31,9 @@ void init_feature_set(chucho::optional_features::feature_set& fs)
 #if defined(CHUCHO_HAVE_C_API)
     fs.set(chucho::optional_features::C_API);
 #endif
+#if defined(CHUCHO_HAVE_CAPN_PROTO_SERIALIZER)
+    fs.set(chucho::optional_features::CAPN_PROTO_SERIALIZER);
+#endif
 #if defined(CHUCHO_HAVE_CONFIG_FILE_CONFIG)
     fs.set(chucho::optional_features::CONFIG_FILE_CONFIGURATION);
 #endif
