@@ -30,5 +30,5 @@ CREATE TABLE chucho_event
     logger TEXT NOT NULL,
     level_name TEXT NOT NULL,
     marker TEXT,
-    thread TEXT
+    thread TEXT NOT NULL
 );

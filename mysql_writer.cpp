@@ -20,6 +20,7 @@
 #include <chucho/logger.hpp>
 #include <mysql.h>
 #include <sstream>
+#include <cstring>
 
 namespace
 {
