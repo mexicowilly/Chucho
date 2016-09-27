@@ -246,6 +246,23 @@ OPTION(RUBY_FRAMEWORK "Whether Ruby should be included as a framework (Macintosh
 
 # SET(PROTOC_DIR "<Location of Protoc>" CACHE STRING "Protoc location")
 
+# The location of the Cap'n Proto header files.
+
+# SET(CAPNP_INCLUDE_DIR "<My Cap'n Proto Include Directory>" CACHE STRING "Include directory of the Cap'n Proto library")
+
+# The name of the Cap'n Proto library.
+
+# SET(CAPN_PROTO_LIB "<My Cap'n Proto Library>" CACHE STRING "Cap'n Proto library")
+
+# The name of the Cap'n Proto KJ library.
+
+# SET(CAPN_PROTO_KJ_LIB "<My Cap'n Proto KJ Library>" CACHE STRING "Cap'n Proto KJ library")
+
+# The location of the Cap'n Proto compiler.
+
+# SET(CAPNP_DIR "<Location of Capnp>" CACHE STRING "Capnp location")
+
+
 # COMPRESSION
 # ================================================================================
 #     When rolling files, Chucho may compress them to gzip, bzip2 or zip file
