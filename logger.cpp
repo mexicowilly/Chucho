@@ -21,6 +21,7 @@
 #include <chucho/garbage_cleaner.hpp>
 #include <chucho/time_util.hpp>
 #include <chucho/demangle.hpp>
+#include <chucho/regex.hpp>
 #include <map>
 #include <stdexcept>
 #include <atomic>
@@ -259,10 +260,8 @@ void logger::set_writes_to_ancestors(bool val)
 
 std::string logger::type_to_logger_name(const std::type_info& info)
 {
-    std::string name = demangle::get_demangled_name(info);
-    auto spc = name.find(' ');
-    if (spc != std::string::npos) 
-        name.erase(0, spc + 1);
+    regex::expression re("(class |struct )?.anonymous namespace.");
+    std::string name = regex::replace(demangle::get_demangled_name(info), re, "~");
     auto found = name.find("::");
     while (found != std::string::npos)
     {
