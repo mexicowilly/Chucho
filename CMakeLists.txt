@@ -1373,7 +1373,9 @@ IF(CHUCHO_HAVE_CAPN_PROTO)
 ENDIF()
 
 ADD_SUBDIRECTORY(test)
-ADD_SUBDIRECTORY(log-server)
+IF(CHUCHOD)
+    ADD_SUBDIRECTORY(log-server)
+ENDIF()
 
 # Documentation
 IF(DOXYGEN_FOUND)
@@ -1420,7 +1422,7 @@ IF(DOXYGEN_FOUND)
                           COMMAND "${CMAKE_COMMAND}" -E echo "C_API must be enabled in order to generate documentation")
     ENDIF()
 ELSE()
-    MESSAGE(STATUS "The C API must be enabled in order to generate Doxygen documentation")
+    MESSAGE(STATUS "Doxygen must be present in order to generate Doxygen documentation")
     ADD_CUSTOM_TARGET(doc
                       COMMAND "${CMAKE_COMMAND}" -E echo "Doxygen was not found on this system, so the documentation cannot be generated")
 ENDIF()

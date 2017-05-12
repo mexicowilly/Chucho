@@ -82,6 +82,12 @@ OPTION(INSTALL_SERVICE "Whether to install chuchod as a system service" OFF)
 
 OPTION(C_API "Whether the C API should be built into this Chucho" OFF)
 
+# Whether to build the log server, chuchod. This is only necessary if you are planning
+# on installing the server to this host. If you only need to use remote_writer to
+# forward event to another host, then there is no need to build chuchod.
+
+OPTION(CHUCHOD "Whether the log server, chuchod, should be built into this Chucho" OFF)
+
 # CONFIGURATION FORMATS
 # ================================================================================
 #     Chucho is able to parse configuration files using three different formats,

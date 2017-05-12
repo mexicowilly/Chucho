@@ -233,7 +233,7 @@ FIND_PACKAGE(Threads REQUIRED)
 
 IF(CHUCHO_POSIX)
     # headers
-    FOREACH(HEAD arpa/inet.h assert.h fcntl.h limits.h netdb.h poll.h pthread.h pwd.h signal.h
+    FOREACH(HEAD arpa/inet.h assert.h fcntl.h limits.h netdb.h poll.h pthread.h signal.h
                  sys/socket.h sys/stat.h sys/utsname.h syslog.h time.h unistd.h)
         STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
         STRING(REPLACE / _ CHUCHO_HEAD_VAR_NAME ${CHUCHO_HEAD_VAR_NAME})
@@ -247,8 +247,8 @@ IF(CHUCHO_POSIX)
     # host name functions
     CHUCHO_REQUIRE_SYMBOLS(sys/utsname.h uname)
 
-    # getpid/access/getuid/fork/close/setsid/dup2/chdir/_exit/write/pipe/read
-    CHUCHO_REQUIRE_SYMBOLS(unistd.h getpid access getuid fork close setsid dup2 chdir _exit write pipe read)
+    # getpid/access/close/write/pipe/read
+    CHUCHO_REQUIRE_SYMBOLS(unistd.h getpid access close write pipe read)
 
     # stat/mkdir
     CHUCHO_REQUIRE_SYMBOLS(sys/stat.h stat mkdir mkfifo)
@@ -302,11 +302,11 @@ IF(CHUCHO_POSIX)
     # syslog
     CHUCHO_REQUIRE_SYMBOLS(syslog.h syslog)
 
-    # socket/sendto/connect/shutdown/send/recv/bind/listen
+    # socket/sendto/connect/shutdown/send
     IF(CHUCHO_SOLARIS)
         SET(CMAKE_REQUIRED_LIBRARIES socket)
     ENDIF()
-    CHUCHO_REQUIRE_SYMBOLS(sys/socket.h socket sendto connect shutdown send recv bind listen accept)
+    CHUCHO_REQUIRE_SYMBOLS(sys/socket.h socket sendto connect shutdown send)
     IF(CHUCHO_SOLARIS)
         UNSET(CMAKE_REQUIRED_LIBRARIES)
     ENDIF()
@@ -314,12 +314,9 @@ IF(CHUCHO_POSIX)
     # poll
     CHUCHO_REQUIRE_SYMBOLS(poll.h poll)
 
-    # getpwuid
-    CHUCHO_REQUIRE_SYMBOLS(pwd.h getpwuid)
-
     # signal stuff
     SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
-    CHUCHO_REQUIRE_SYMBOLS(signal.h raise sigemptyset sigaddset sigwait sigaction kill sigpending sigismember pthread_sigmask)
+    CHUCHO_REQUIRE_SYMBOLS(signal.h sigemptyset sigwait sigpending sigismember pthread_sigmask)
     UNSET(CMAKE_REQUIRED_LIBRARIES)
 
     # open/fcntl
@@ -363,6 +360,19 @@ IF(CHUCHO_POSIX)
         ENDIF()
     ENDIF()
     CHECK_CXX_SYMBOL_EXISTS(O_LARGEFILE fcntl.h CHUCHO_HAVE_O_LARGEFILE)
+
+    IF(CHUCHOD)
+        CHECK_INCLUDE_FILE_CXX(pwd.h CHUCHO_HAVE_PWD_H)
+        IF(NOT ${CHUCHO_HAVE_PWD_H})
+            MESSAGE(FATAL_ERROR "The header pwd.h is required")
+        ENDIF()
+        CHUCHO_REQUIRE_SYMBOLS(unistd.h getuid fork setsid dup2 chdir _exit)
+        CHUCHO_REQUIRE_SYMBOLS(sys/socket.h recv bind listen accept)
+        CHUCHO_REQUIRE_SYMBOLS(pwd.h getpwuid)
+        SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
+        CHUCHO_REQUIRE_SYMBOLS(signal.h raise sigaddset sigaction kill)
+        UNSET(CMAKE_REQUIRED_LIBRARIES)
+    ENDIF()
 
 ELSEIF(CHUCHO_WINDOWS)
     FOREACH(HEAD windows.h winsock2.h io.h process.h ws2tcpip.h time.h assert.h)
