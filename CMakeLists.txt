@@ -324,14 +324,17 @@ IF(CHUCHO_HAVE_BZIP2)
          include/chucho/bzip2_compressor.hpp
          include/chucho/bzip2_file_compressor.hpp)
     IF(C_API)
-        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/bzip2_file_compressor.h)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS
+             include/chucho/bzip2_file_compressor.h
+             include/chucho/bzip2_compressor.h)
     ENDIF()
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/bzip2_compressor.hpp
      include/chucho/bzip2_file_compressor.hpp
-     include/chucho/bzip2_file_compressor.h)
+     include/chucho/bzip2_file_compressor.h
+     include/chucho/bzip2_compressor.h)
 
 IF(CHUCHO_HAVE_MINIZIP)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/zip_file_compressor.hpp)
@@ -1167,7 +1170,9 @@ IF(CHUCHO_HAVE_BZIP2)
          include/chucho/bzip2_compressor_factory.hpp
          ${CHUCHO_BZIP2_SOURCES})
     IF(C_API)
-        LIST(APPEND CHUCHO_SOURCES c_bzip2_file_compressor.cpp)
+        LIST(APPEND CHUCHO_SOURCES
+             c_bzip2_file_compressor.cpp
+             c_bzip2_compressor.cpp)
     ENDIF()
     SET_SOURCE_FILES_PROPERTIES(bzip2_file_compressor_factory.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_HAVE_BZIP2)
