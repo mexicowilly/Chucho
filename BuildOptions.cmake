@@ -88,6 +88,9 @@ OPTION(C_API "Whether the C API should be built into this Chucho" OFF)
 
 OPTION(CHUCHOD "Whether the log server, chuchod, should be built into this Chucho" OFF)
 
+# Whether to use libstdc++ when compiling with Clang.
+OPTION(CLANG_LIBSTDCXX "Whether to use libstdc++ with the Clang compiler" OFF)
+
 # CONFIGURATION FORMATS
 # ================================================================================
 #     Chucho is able to parse configuration files using three different formats,
