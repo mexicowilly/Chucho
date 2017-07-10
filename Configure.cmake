@@ -1046,37 +1046,17 @@ IF(CHUCHO_WINDOWS)
     SET(CHUCHO_GTEST_CMAKE_FLAGS -Dgtest_force_shared_crt:BOOL=ON)
 ENDIF()
 
-SET(GTEST_PACKAGE https://github.com/google/googletest/archive/release-1.7.0.zip CACHE STRING "Where to get gtest")
+SET(GTEST_PACKAGE https://github.com/google/googletest/archive/release-1.8.0.tar.gz CACHE STRING "Where to get gtest")
 
 ExternalProject_Add(gtest-external
                     URL "${GTEST_PACKAGE}"
-                    CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} ${CHUCHO_ADDL_GTEST_CXX_FLAGS}" ${CHUCHO_GTEST_CMAKE_FLAGS}
-                    CMAKE_GENERATOR "${CHUCHO_GTEST_GENERATOR}"
-                    INSTALL_COMMAND "")
-ExternalProject_Add_Step(gtest-external
-                         install-headers
-                         COMMAND "${CMAKE_COMMAND}" -E make_directory <INSTALL_DIR>/include
-                         COMMAND "${CMAKE_COMMAND}" -E copy_directory <SOURCE_DIR>/include <INSTALL_DIR>/include
-                         DEPENDEES build)
+                    CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} ${CHUCHO_ADDL_GTEST_CXX_FLAGS}" -DBUILD_GTEST=ON -DBUILD_GMOCK=OFF "-DCMAKE_INSTALL_PREFIX=${CHUCHO_EXTERNAL_PREFIX}" ${CHUCHO_GTEST_CMAKE_FLAGS}
+                    CMAKE_GENERATOR "${CHUCHO_GTEST_GENERATOR}")
 ADD_LIBRARY(gtest STATIC IMPORTED)
 IF(CHUCHO_WINDOWS)
-    ExternalProject_Add_Step(gtest-external
-                             install-libs
-                             COMMAND "${CMAKE_COMMAND}" -E make_directory <INSTALL_DIR>/lib
-                             COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/gtest.lib <INSTALL_DIR>/lib
-                             COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/gtest.pdb <INSTALL_DIR>/lib
-                             COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/gtest_main.lib <INSTALL_DIR>/lib
-                             COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/gtest_main.pdb <INSTALL_DIR>/lib
-                             DEPENDEES install-headers)
     SET_TARGET_PROPERTIES(gtest PROPERTIES
                           IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/gtest.lib")
 ELSE()
-    ExternalProject_Add_Step(gtest-external
-                             install-libs
-                             COMMAND "${CMAKE_COMMAND}" -E make_directory <INSTALL_DIR>/lib
-                             COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/libgtest.a <INSTALL_DIR>/lib
-                             COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/libgtest_main.a <INSTALL_DIR>/lib
-                             DEPENDEES install-headers)
     SET_TARGET_PROPERTIES(gtest PROPERTIES
                           IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/libgtest.a")
 ENDIF()
