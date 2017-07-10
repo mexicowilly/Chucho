@@ -626,7 +626,7 @@ MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
     # Update this when you rev libyaml
     SET(CHUCHO_LIBYAML_VERSION_MAJOR 0)
     SET(CHUCHO_LIBYAML_VERSION_MINOR 1)
-    SET(CHUCHO_LIBYAML_VERSION_PATCH 5)
+    SET(CHUCHO_LIBYAML_VERSION_PATCH 7)
 
     LIST(APPEND ${CHUCHO_YAML_SOURCE_VAR}
         "${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c"
@@ -647,7 +647,7 @@ MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
         # Microsoft doesn't want libyaml to use strdup
         SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
                                     COMPILE_FLAGS /wd4996)
-    ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
+    ELSEIF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER_ID STREQUAL Clang)
         SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
                                     COMPILE_FLAGS "-Wno-implicit-function-declaration -Wno-int-to-pointer-cast")
     ENDIF()
