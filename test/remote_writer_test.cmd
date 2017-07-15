@@ -1,7 +1,7 @@
 @echo off
 
 rem
-rem Copyright 2013-2016 Will Mason
+rem Copyright 2013-2017 Will Mason
 rem 
 rem    Licensed under the Apache License, Version 2.0 (the "License");
 rem    you may not use this file except in compliance with the License.
