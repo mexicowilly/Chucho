@@ -1016,12 +1016,6 @@ IF(CHUCHO_BSD AND EXISTS /etc/rc AND EXISTS /etc/rc.conf AND EXISTS /etc/rc.subr
     SET(CHUCHO_RC_INIT TRUE)
 ENDIF()
 
-# zip
-CHUCHO_FIND_PROGRAM(CHUCHO_ZIP zip)
-IF(NOT CHUCHO_ZIP)
-    MESSAGE(STATUS "No zdist target will be available, since you don't have zip")
-ENDIF()
-
 #
 # External projects
 #
