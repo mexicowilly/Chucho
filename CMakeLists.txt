@@ -1409,7 +1409,7 @@ IF(DOXYGEN_FOUND)
             SET(CHUCHO_DOXYGEN_EXTRACT_ALL NO)
         ENDIF()
         CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/doxygen.conf.in" "${CMAKE_BINARY_DIR}/doxygen.conf")
-        MESSAGE(STATUS "Generating HTML header for API documentation")
+        MESSAGE(STATUS "Generating HTML header and footer for API documentation")
         EXECUTE_PROCESS(COMMAND "${DOXYGEN_EXECUTABLE}" -w html "${CMAKE_BINARY_DIR}/doc_header.html" "${CMAKE_BINARY_DIR}/doc_footer.html" "${CMAKE_BINARY_DIR}/doc_stylesheet.html" "${CMAKE_BINARY_DIR}/doxygen.conf"
                         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
         FILE(STRINGS "${CMAKE_BINARY_DIR}/doc_header.html" CHUCHO_HTML_HEADER)
