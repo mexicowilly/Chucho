@@ -84,7 +84,7 @@ protected:
      * 
      * @param new_type the type on which to base the new name
      */
-    void rename_logger(const std::type_info& new_type);
+    virtual void rename_logger(const std::type_info& new_type);
     /**
      * Rename the logger. This method is meant to be used in cases 
      * where a subclass of a subclass of loggable needs a different 
@@ -96,7 +96,7 @@ protected:
      * 
      * @param name the new logger name
      */
-    void rename_logger(const std::string& name);
+    virtual void rename_logger(const std::string& name);
 
 private:
     std::shared_ptr<logger> logger_;

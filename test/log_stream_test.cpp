@@ -40,7 +40,7 @@ public:
     }
     
 protected:
-    void write_impl(const chucho::event& evt)
+    virtual void write_impl(const chucho::event& evt) override
     {
         stream_ << formatter_->format(evt);
     }
