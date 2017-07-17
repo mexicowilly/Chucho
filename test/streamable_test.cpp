@@ -47,6 +47,31 @@ private:
     std::stringstream stream_;
 };
 
+class my_streamable : public chucho::streamable<my_streamable>
+{
+public:
+    my_streamable(const std::string& logger_name = std::string())
+    {
+        if (!logger_name.empty())
+            rename_logger(logger_name);
+    }
+
+    std::shared_ptr<chucho::level> get_level() const
+    {
+        return get_log_stream().get_level();
+    }
+
+    void set_level(std::shared_ptr<chucho::level> lvl)
+    {
+        get_log_stream().set_level(lvl);
+    }
+
+    const std::string& get_logger_name() const
+    {
+        return get_logger()->get_name();
+    }
+};
+
 }
 
 class streamable_test : public ::testing::Test, public chucho::streamable<streamable_test>
@@ -66,12 +91,45 @@ protected:
     std::shared_ptr<string_writer> wrt_;
 };
 
+TEST_F(streamable_test, copy)
+{
+    my_streamable s1("s1");
+    EXPECT_EQ(std::string("s1"), s1.get_logger_name());
+    EXPECT_FALSE(s1.get_level());
+    my_streamable s2("s2");
+    s2.set_level(chucho::level::INFO_());
+    EXPECT_EQ(std::string("s2"), s2.get_logger_name());
+    EXPECT_EQ(chucho::level::INFO_(), s2.get_level());
+    my_streamable s3(s2);
+    EXPECT_EQ(std::string("s2"), s3.get_logger_name());
+    EXPECT_EQ(chucho::level::INFO_(), s3.get_level());
+    s2 = s1;
+    EXPECT_EQ(std::string("s1"), s2.get_logger_name());
+    EXPECT_FALSE(s2.get_level());
+}
+
 TEST_F(streamable_test, info)
 {
     get_logger()->set_level(chucho::level::INFO_());
     CHUCHO_MS << chucho::info << "hello" << chucho::endm;
     CHUCHO_MS << chucho::debug << "goodbye" << chucho::endm;
     EXPECT_EQ(std::string("hello"), wrt_->get_text());
+}
+
+TEST_F(streamable_test, level)
+{
+    my_streamable ms;
+    ms.set_level(chucho::level::FATAL_());
+    EXPECT_EQ(chucho::level::FATAL_(), ms.get_level());
+}
+
+TEST_F(streamable_test, move)
+{
+    my_streamable s1("s1");
+    s1.set_level(chucho::level::INFO_());
+    my_streamable s2(std::move(s1));
+    EXPECT_EQ(std::string("s1"), s2.get_logger_name());
+    EXPECT_EQ(chucho::level::INFO_(), s2.get_level());
 }
 
 TEST_F(streamable_test, logger_name)

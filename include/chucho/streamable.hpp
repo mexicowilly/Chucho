@@ -61,13 +61,15 @@ streamable<type>::streamable(const std::string& name,
 
 template <typename type>
 streamable<type>::streamable(const streamable& other)
-    : log_stream_(new log_stream(loggable<type>::get_logger(), other.get_level()))
+    : log_stream_(new log_stream(loggable<type>::get_logger(), other.log_stream_->get_level()))
 {
+    loggable<type>::rename_logger(other.get_logger()->get_name());
 }
 
 template <typename type>
 streamable<type>::streamable(streamable&& other)
-    : log_stream_(std::move(other.log_stream_))
+    : loggable<type>(other.get_logger()->get_name()),
+      log_stream_(std::move(other.log_stream_))
 {
 }
 
@@ -75,7 +77,11 @@ template <typename type>
 streamable<type>& streamable<type>::operator= (const streamable& other)
 {
     if (&other != this)
+    {
+        loggable<type>::rename_logger(other.get_logger()->get_name());
         log_stream_.reset(new log_stream(other.get_logger(), other.log_stream_->get_level()));
+    }
+    return *this;
 }
 
 template <typename type>
