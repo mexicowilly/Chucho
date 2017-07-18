@@ -20,21 +20,94 @@
 #include <chucho/loggable.hpp>
 #include <chucho/log_stream.hpp>
 
+/**
+ * @file
+ * Classes and macros for writing log events to
+ * Chucho-supplied log streams and loggers.
+ *
+ * @ingroup streams
+ */
+
 namespace chucho
 {
 
+/**
+ * @class streamable streamable.hpp chucho/streamable.hpp
+ * A class that inherits from @ref streamable gets a @ref logger
+ * and a @ref log_stream for free. In addition to being able to
+ * write log events with the LGBL-tagged macros that are available
+ * to descendants of @ref loggable, @ref CHUCHO_MS can be used to
+ * write to the @ref log_stream that is provided. So, in non-static
+ * methods of classes that inherit from @ref streamable, the
+ * following may be used:
+ * @code
+ * CHUCHO_INFO_LGBL("All the " << animals << " like me");
+ * @endcode
+ * And:
+ * @code
+ * CHUCHO_MS << chucho::info << "All the " << animals << " like me" << chucho::endm;
+ * @endcode
+ * Both will have identical results.
+ *
+ * @ingroup streams
+ */
 template <typename type>
 class streamable : public loggable<type>
 {
 protected:
+    /**
+     * @name Constructors
+     */
+    //@{
+    /**
+     * Construct a streamable whose logger's name will be
+     * derived from the type. For example, if the type of
+     * this class is three::doggies, then the logger will be
+     * named three.doggies.
+     *
+     * @param lvl the initial level of the stream
+     */
     streamable(std::shared_ptr<level> lvl = std::shared_ptr<level>());
+    /**
+     * Construct a streamable whose logger has the given name.
+     *
+     * @param name the name of the logger
+     * @param lvl the initial level of the stream
+     */
     streamable(const std::string& name,
                std::shared_ptr<level> lvl = std::shared_ptr<level>());
+    /**
+     * Copy a stream.
+     *
+     * @param other the stream to copy
+     */
     streamable(const streamable& other);
+    /**
+     * Move a stream.
+     *
+     * @param other the stream to move
+     */
     streamable(streamable&& other);
+    //@}
 
+    /**
+     * @name Operators
+     */
+    //@{
+    /**
+     * Assign from another stream.
+     *
+     * @param other the stream to copy
+     * @return this stream
+     */
     streamable& operator= (const streamable& other);
+    //@}
 
+    /**
+     * Return the log stream.
+     *
+     * @return the stream
+     */
     log_stream& get_log_stream() const;
     virtual void rename_logger(const std::type_info& new_type) override;
     virtual void rename_logger(const std::string& name) override;
@@ -43,6 +116,19 @@ private:
     std::unique_ptr<log_stream> log_stream_;
 };
 
+/**
+ * @def CHUCHO_MS
+ * Prepare the internal stream to write a message. This macro puts the
+ * location information of the message, file, line number and
+ * function name, into the stream. If this information is not
+ * required, then the macro is not necessary. Typical usage is:
+ * @code
+ * CHUCHO_MS << chucho::info << "My dog has fleas." << chucho::endm;
+ * @endcode
+ *
+ * @note This macro may only be used in non-static methods of a class
+ * that inherits from @ref streamable.
+ */
 #define CHUCHO_MS CHUCHO_M(get_log_stream())
 
 template <typename type>

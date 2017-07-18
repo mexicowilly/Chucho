@@ -17,6 +17,7 @@
 #include <gtest/gtest.h>
 #include <chucho/streamable.hpp>
 #include <chucho/pattern_formatter.hpp>
+#include <chucho/log.hpp>
 
 namespace
 {
@@ -113,6 +114,14 @@ TEST_F(streamable_test, info)
     get_logger()->set_level(chucho::level::INFO_());
     CHUCHO_MS << chucho::info << "hello" << chucho::endm;
     CHUCHO_MS << chucho::debug << "goodbye" << chucho::endm;
+    EXPECT_EQ(std::string("hello"), wrt_->get_text());
+}
+
+TEST_F(streamable_test, info_lgbl)
+{
+    get_logger()->set_level(chucho::level::INFO_());
+    CHUCHO_INFO_LGBL("hello");
+    CHUCHO_DEBUG_LGBL("goodbye");
     EXPECT_EQ(std::string("hello"), wrt_->get_text());
 }
 
