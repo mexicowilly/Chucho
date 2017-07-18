@@ -183,6 +183,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                rolling_file_writer_test.cpp
                security_policy_test.cpp
                size_file_roll_trigger_test.cpp
+               streamable_test.cpp
                text_util_test.cpp
                utf8_test.cpp
                ${CHUCHO_TEST_COMPRESSION_SOURCES}

@@ -233,6 +233,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/status_manager.hpp
     include/chucho/status_observer.hpp
     include/chucho/status_reporter.hpp
+    include/chucho/streamable.hpp
     include/chucho/syslog_constants.h
     include/chucho/syslog_constants.hpp
     include/chucho/syslog_writer.hpp
