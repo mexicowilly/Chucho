@@ -477,7 +477,7 @@ ADD_EXECUTABLE(configuration-off EXCLUDE_FROM_ALL
 TARGET_LINK_LIBRARIES(configuration-off chucho)
 
 ADD_CUSTOM_TARGET(check-config
-                  COMMAND "${CMAKE_COMMAND}" "-DCHUCHO_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P "${CMAKE_CURRENT_SOURCE_DIR}/CheckAllConfigs.cmake")
+                  COMMAND "${CMAKE_COMMAND}" "-DCHUCHO_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -DCLANG_LIBSTDCXX=${CLANG_LIBSTDCXX} -P "${CMAKE_CURRENT_SOURCE_DIR}/CheckAllConfigs.cmake")
 
 ADD_CUSTOM_TARGET(all-test
                   DEPENDS unit-test rolling-file-test syslog-writer-test remote-writer-test windows-event-log-writer-test)
