@@ -260,8 +260,20 @@ void logger::set_writes_to_ancestors(bool val)
 
 std::string logger::type_to_logger_name(const std::type_info& info)
 {
-    regex::expression re("(class |struct )?.anonymous namespace.");
-    std::string name = regex::replace(demangle::get_demangled_name(info), re, "~");
+    static std::string starts[] = { "class ", "struct " };
+    static regex::expression re(".anonymous namespace.");
+
+    auto name = demangle::get_demangled_name(info);
+    for (const auto& start : starts)
+    {
+        auto found = name.find(start);
+        if (found != std::string::npos)
+        {
+            name.erase(name.begin(), name.begin() + start.length());
+            break;
+        }
+    }
+    name = regex::replace(name, re, "~");
     auto found = name.find("::");
     while (found != std::string::npos)
     {

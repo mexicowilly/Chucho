@@ -961,29 +961,34 @@ ENDIF()
 
 # Linux service stuff
 IF(CHUCHO_LINUX)
-    FILE(READ /proc/1/cmdline CHUCHO_PROC1_CMDLINE)
-    STRING(REGEX MATCH systemd CHUCHO_SYSTEMD_MATCH "${CHUCHO_PROC1_CMDLINE}")
-    IF(CHUCHO_SYSTEMD_MATCH)
-        CHUCHO_FIND_PROGRAM(CHUCHO_SYSTEMCTL systemctl)
-        IF(NOT CHUCHO_SYSTEMCTL)
-            MESSAGE(FATAL_ERROR "systemctl is required when using the systemd init system")
+    CHUCHO_FIND_PROGRAM(CHUCHO_INIT init)
+    IF(CHUCHO_INIT)
+        EXECUTE_PROCESS(COMMAND "${CHUCHO_INIT}" --version
+                        OUTPUT_VARIABLE CHUCHO_INIT_OUT
+                        ERROR_QUIET)
+    ENDIF()
+    IF(CHUCHO_INIT_OUT AND CHUCHO_INIT_OUT MATCHES upstart)
+        CHUCHO_FIND_PROGRAM(CHUCHO_INITCTL initctl)
+        IF(CHUCHO_INITCTL)
+            MESSAGE(STATUS "This Linux is using the Upstart init system")
+            SET(CHUCHO_UPSTART_INIT TRUE)
+        ELSE()
+            MESSAGE(WARNING "initctl is required when using the Upstart init system. The chuchod service will not be installed.")
         ENDIF()
-        MESSAGE(STATUS "This Linux is using the systemd init system")
-        SET(CHUCHO_SYSTEMD_INIT TRUE)
     ELSE()
-        STRING(REGEX MATCH "^.+/init$" CHUCHO_INIT_MATCH "${CHUCHO_PROC1_CMDLINE}")
-        IF(CHUCHO_INIT_MATCH)
-            EXECUTE_PROCESS(COMMAND "${CHUCHO_PROC1_CMDLINE}" --version
-                            OUTPUT_VARIABLE CHUCHO_INIT_OUT)
-            STRING(REGEX MATCH upstart CHUCHO_UPSTART_MATCH "${CHUCHO_INIT_OUT}")
-            IF(CHUCHO_UPSTART_MATCH)
-                CHUCHO_FIND_PROGRAM(CHUCHO_INITCTL initctl)
-                IF(NOT CHUCHO_INITCTL)
-                    MESSAGE(FATAL_ERROR "initctl is required when using the Upstart init system")
-                ENDIF()
-                MESSAGE(STATUS "This Linux is using the Upstart init system")
-                SET(CHUCHO_UPSTART_INIT TRUE)
+        CHUCHO_FIND_PROGRAM(CHUCHO_SYSTEMCTL systemctl)
+        IF(CHUCHO_SYSTEMCTL)
+            EXECUTE_PROCESS(COMMAND "${CHUCHO_SYSTEMCTL}"
+                            OUTPUT_VARIABLE CHUCHO_SYSTEMCTL_OUT
+                            ERROR_QUIET)
+            IF(CHUCHO_SYSTEMCTL_OUT AND CHUCHO_SYSTEMCTL_OUT MATCHES "-\\.mount")
+                MESSAGE(STATUS "This Linux is using the systemd init system")
+                SET(CHUCHO_SYSTEMD_INIT TRUE)
+            ELSE()
+                MESSAGE(WARNING "systemctl is required when using the systemd init system. The chuchod service will not be installed.")
             ENDIF()
+        ELSE()
+            MESSAGE(STATUS "Chucho only supports the Upstart and systemd init systems on Linux.")
         ENDIF()
     ENDIF()
 ENDIF()
@@ -1022,11 +1027,21 @@ IF(CHUCHO_WINDOWS)
     SET(CHUCHO_GTEST_CMAKE_FLAGS -Dgtest_force_shared_crt:BOOL=ON)
 ENDIF()
 
-SET(GTEST_PACKAGE https://github.com/google/googletest/archive/release-1.8.0.tar.gz CACHE STRING "Where to get gtest")
-
+# Not all cmakes can download URLs of the https variety. Therefore, if
+# there is no specific package, we just clone the repository.
+IF(GTEST_PACKAGE AND EXISTS "${GTEST_PACKAGE}")
+    FILE(SHA1 "${GTEST_PACKAGE}" CHUCHO_GTEST_SHA1)
+    FILE(TO_CMAKE_PATH "${GTEST_PACKAGE}" GTEST_PACKAGE_CMAKE_PATH)
+    SET(CHUCHO_GTEST_PACKAGE_ARGS
+        URL "${GTEST_PACKAGE_CMAKE_PATH}"
+        URL_HASH SHA1=${CHUCHO_GTEST_SHA1})
+ELSE()
+    SET(CHUCHO_GTEST_PACKAGE_ARGS
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG release-1.8.0)
+ENDIF()
 ExternalProject_Add(gtest-external
-                    URL "${GTEST_PACKAGE}"
-                    URL_HASH SHA1=e7e646a6204638fe8e87e165292b8dd9cd4c36ed
+                    ${CHUCHO_GTEST_PACKAGE_ARGS}
                     CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} ${CHUCHO_ADDL_GTEST_CXX_FLAGS}" -DBUILD_GTEST=ON -DBUILD_GMOCK=OFF "-DCMAKE_INSTALL_PREFIX=${CHUCHO_EXTERNAL_PREFIX}" ${CHUCHO_GTEST_CMAKE_FLAGS}
                     CMAKE_GENERATOR "${CHUCHO_GTEST_GENERATOR}")
 ADD_LIBRARY(gtest STATIC IMPORTED)

@@ -37,7 +37,9 @@ static void file_descriptor_writer_test(void)
 
 void run_file_descriptor_writer_test(void)
 {
+#if !defined(CHUCHO_WINDOWS)
     sput_enter_suite("file_descriptor_writer");
     sput_run_test(file_descriptor_writer_test);
     sput_leave_suite();
+#endif
 }
