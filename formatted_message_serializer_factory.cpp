@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 
 #include <chucho/formatted_message_serializer_factory.hpp>
-#include <chucho/formatted_message_serializer_memento.hpp>
 #include <chucho/formatted_message_serializer.hpp>
 #include <chucho/demangle.hpp>
 
@@ -36,7 +35,7 @@ std::shared_ptr<configurable> formatted_message_serializer_factory::create_confi
 
 std::shared_ptr<memento> formatted_message_serializer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto(new formatted_message_serializer_memento(cfg));
+    std::shared_ptr<memento> mnto(new memento(cfg));
     return mnto;
 }
 

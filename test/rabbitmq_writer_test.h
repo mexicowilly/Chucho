@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,24 +14,9 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CERR_WRITER_MEMENTO_HPP__)
-#define CHUCHO_CERR_WRITER_MEMENTO_HPP__
+#if !defined(CHUCHO_RABBITMQ_WRITER_TEST_H__)
+#define CHUCHO_RABBITMQ_WRITER_TEST_H__
 
-#if !defined(CHUCHO_BUILD)
-#error "This header is private"
-#endif
-
-#include <chucho/writer_memento.hpp>
-
-namespace chucho
-{
-
-class cerr_writer_memento : public writer_memento
-{
-public:
-    cerr_writer_memento(configurator& cfg);
-};
-
-}
+void run_rabbitmq_writer_test(void);
 
 #endif

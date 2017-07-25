@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2016 Will Mason
+# Copyright 2013-2017 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -30,5 +30,5 @@ CREATE TABLE chucho_event
     logger TEXT NOT NULL,
     level_name TEXT NOT NULL,
     marker TEXT,
-    thread TEXT
+    thread TEXT NOT NULL
 );

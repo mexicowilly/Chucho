@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,14 +14,27 @@
  *    limitations under the License.
  */
 
-#include <chucho/cerr_writer_memento.hpp>
+#if !defined(CHUCHO_RABBITMQ_WRITER_FACTORY_HPP__)
+#define CHUCHO_RABBITMQ_WRITER_FACTORY_HPP__
+
+#if !defined(CHUCHO_BUILD)
+#error "This header is private"
+#endif
+
+#include <chucho/writer_factory.hpp>
 
 namespace chucho
 {
 
-cerr_writer_memento::cerr_writer_memento(configurator& cfg)
-    : writer_memento(cfg)
+class rabbitmq_writer_factory : public writer_factory
 {
-}
+public:
+    rabbitmq_writer_factory();
+
+    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
+    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
+};
 
 }
+
+#endif

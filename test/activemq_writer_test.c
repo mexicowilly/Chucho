@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@
 #include <chucho/pattern_formatter.h>
 #include <chucho/formatted_message_serializer.h>
 
-#include <stdio.h>
-
 static void activemq_writer_test(void)
 {
     chucho_formatter* fmt;
@@ -36,7 +34,6 @@ static void activemq_writer_test(void)
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create formatted message serializer");
     rc = chucho_create_activemq_writer(&wrt, fmt, ser, NULL, "tcp://127.0.0.1:61616", CHUCHO_ACTIVEMQ_QUEUE, "chunky_monkey");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create activemq writer");
-    printf("rc %i\n", rc);
     if (rc != CHUCHO_NO_ERROR)
         return;
     rc = chucho_amqwrt_get_broker(wrt, &text);

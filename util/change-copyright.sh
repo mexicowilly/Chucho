@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2016 Will Mason
+# Copyright 2013-2017 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -13,6 +13,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+
+if [ "`uname`" != "SunOS" ] ; then
+    echo "This is only know to work on Solaris. I tried it once on Linux and it got freaky and spun forever."
+    exit
+fi
 
 if [ "$#" -ne 2 ] ; then
     echo "You must provide the old year as arg 1 and the new year as arg 2"

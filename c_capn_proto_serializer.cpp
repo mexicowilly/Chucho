@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,25 +14,27 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_COUT_WRITER_MEMENTO_HPP__)
-#define CHUCHO_COUT_WRITER_MEMENTO_HPP__
+#include <chucho/capn_proto_serializer.hpp>
+#include <chucho/capn_proto_serializer.h>
+#include <chucho/c_serializer.hpp>
 
-#if !defined(CHUCHO_BUILD)
-#error "This header is private"
-#endif
-
-#include <chucho/writer_memento.hpp>
-
-namespace chucho
+extern "C"
 {
 
-class cout_writer_memento : public writer_memento
+chucho_rc chucho_create_capn_proto_serializer(chucho_serializer** ser)
 {
-public:
-    cout_writer_memento(configurator& cfg);
-};
-
+    if (ser == nullptr)
+        return CHUCHO_NULL_POINTER;
+    try
+    {
+        *ser = new chucho_serializer();
+        (*ser)->ser_ = std::make_shared<chucho::capn_proto_serializer>();
+    }
+    catch (...)
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
+    return CHUCHO_NO_ERROR;
 }
 
-#endif
-
+}

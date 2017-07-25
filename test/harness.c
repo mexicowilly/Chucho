@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -76,6 +76,9 @@
 #if defined(CHUCHO_HAVE_ACTIVEMQ)
 #include "activemq_writer_test.h"
 #endif
+#if defined(CHUCHO_HAVE_DOORS)
+#include "door_writer_test.h"
+#endif
 
 sput_struct __sput;
 
@@ -142,6 +145,9 @@ int main()
     #endif
     #if defined(CHUCHO_HAVE_DB2)
     run_db2_writer_test();
+    #endif
+    #if defined(CHUCHO_HAVE_DOORS)
+    run_door_writer_test();
     #endif
 
     sput_finish_testing();

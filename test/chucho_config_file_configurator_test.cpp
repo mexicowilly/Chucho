@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -186,6 +186,22 @@ TEST_F(chucho_config_file_configurator, db2_writer)
               "chucho.writer.or.password = db2inst1\n"
               "chucho.writer.or.database = chucho");
     db2_writer_body();
+}
+
+#endif
+
+#if defined(CHUCHO_HAVE_DOORS)
+
+TEST_F(chucho_config_file_configurator, door_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = dw\n"
+              "chucho.writer.dw = chucho::door_writer\n"
+              "chucho.writer.dw.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.dw.file_name = gargle\n");
+    door_writer_body();
 }
 
 #endif
@@ -546,6 +562,44 @@ TEST_F(chucho_config_file_configurator, postgres_writer)
               "chucho.writer.pg.uri = postgres://test_user:password@192.168.56.101/postgres");
     postgres_writer_body();
 }
+
+#endif
+
+#if defined(CHUCHO_HAVE_RABBITMQ)
+
+TEST_F(chucho_config_file_configurator, rabbitmq_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = pg\n"
+              "chucho.writer.pg = chucho::rabbitmq_writer\n"
+              "chucho.writer.pg.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.pg.serializer = fms\n"
+              "chucho.serializer.fms = chucho::formatted_message_serializer\n"
+              "chucho.writer.pg.url = amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc\n"
+              "chucho.writer.pg.exchange = logs");
+    rabbitmq_writer_body();
+}
+
+#if defined(CHUCHO_HAVE_RABBITMQ)
+
+TEST_F(chucho_config_file_configurator, rabbitmq_writer_capn_proto)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = pg\n"
+              "chucho.writer.pg = chucho::rabbitmq_writer\n"
+              "chucho.writer.pg.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.pg.serializer = fms\n"
+              "chucho.serializer.fms = chucho::capn_proto_serializer\n"
+              "chucho.writer.pg.url = amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc\n"
+              "chucho.writer.pg.exchange = logs");
+    rabbitmq_writer_body();
+}
+
+#endif
 
 #endif
 

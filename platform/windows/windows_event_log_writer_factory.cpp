@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@ std::shared_ptr<configurable> windows_event_log_writer_factory::create_configura
     std::shared_ptr<configurable> cnf;
     auto welwm = std::dynamic_pointer_cast<windows_event_log_writer_memento>(mnto);
     assert(welwm);
+    if (!welwm->get_formatter())
+        throw exception("windows_event_log_writer_factory: The writer's formatter is not set");
     if (welwm->get_log().empty() && welwm->get_host().empty())
     {
         cnf.reset(new windows_event_log_writer(welwm->get_formatter(),

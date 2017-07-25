@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,15 +14,34 @@
  *    limitations under the License.
  */
 
-#include <chucho/cout_writer_memento.hpp>
+#if !defined(CHUCHO_PIPE_WRITER_MEMENTO_HPP__)
+#define CHUCHO_PIPE_WRITER_MEMENTO_HPP__
+
+#if !defined(CHUCHO_BUILD)
+#error "This header is private"
+#endif
+
+#include <chucho/writer_memento.hpp>
 
 namespace chucho
 {
 
-cout_writer_memento::cout_writer_memento(configurator& cfg)
-    : writer_memento(cfg)
+class door_writer_memento : public writer_memento
 {
+public:
+    door_writer_memento(configurator& cfg);
+
+    const std::string& get_file_name() const;
+
+private:
+    std::string file_name_;
+};
+
+inline const std::string& door_writer_memento::get_file_name() const
+{
+    return file_name_;
 }
 
 }
 
+#endif

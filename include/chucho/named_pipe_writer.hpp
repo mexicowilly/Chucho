@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ namespace chucho
  * On Windows, you may pass an unadorned name as the name of the pipe.
  * For example, if the name passed in the constructor here is
  * my_dog_has_fleas, then the name will be fleshed out completely as
- * \\.\pipe\my_dog_has_fleas. On POSIX systems, you must pass the
+ * @c \\\\\.\\pipe\\my_dog_has_fleas. On POSIX systems, you must pass the
  * file system name associated with the pipe, which may be a relative
  * path if you know your current working directory.
  * 

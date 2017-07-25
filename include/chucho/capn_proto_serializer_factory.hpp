@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,22 +14,25 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_DUPLICATE_MESSAGE_FILTER_MEMENTO_HPP__)
-#define CHUCHO_DUPLICATE_MESSAGE_FILTER_MEMENTO_HPP__
+#if !defined(CHUCHO_CAPN_PROTO_SERIALIZER_FACTORY_HPP__)
+#define CHUCHO_CAPN_PROTO_SERIALIZER_FACTORY_HPP__
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"
 #endif
 
-#include <chucho/memento.hpp>
+#include <chucho/configurable_factory.hpp>
 
 namespace chucho
 {
 
-class duplicate_message_filter_memento : public memento
+class capn_proto_serializer_factory : public configurable_factory
 {
 public:
-    duplicate_message_filter_memento(configurator& cfg);
+    capn_proto_serializer_factory();
+
+    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
+    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
 };
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,25 +14,16 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_NOOP_COMPRESSOR_MEMENTO_HPP__)
-#define CHUCHO_NOOP_COMPRESSOR_MEMENTO_HPP__
-
-#if !defined(CHUCHO_BUILD)
-#error "This header is private"
-#endif
-
-#include <chucho/memento.hpp>
+#include <chucho/door_writer_memento.hpp>
 
 namespace chucho
 {
 
-class noop_compressor_memento : public memento
+door_writer_memento::door_writer_memento(configurator& cfg)
+    : writer_memento(cfg)
 {
-public:
-    noop_compressor_memento(configurator& cfg);
-};
-
+    set_status_origin("door_writer_memento");
+    set_handler("file_name", [this] (const std::string& val) { file_name_ = validate("door_writer::file_name", val); });
 }
 
-#endif
-
+}

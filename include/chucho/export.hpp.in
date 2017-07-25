@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -56,10 +56,8 @@
 #define CHUCHO_PRIV_EXPORT
 #endif
 
-#if defined(__clang__) || (defined(__GNUC__) && __GNUC__ >= 4)
+#if !defined(__CYGWIN__) && (defined(__clang__) || (defined(__GNUC__) && __GNUC__ >= 4))
 #define CHUCHO_NO_EXPORT __attribute__ ((visibility ("hidden")))
-#elif defined(__SUNPRO_CC)
-#define CHUCHO_NO_EXPORT __hidden
 #else
 #define CHUCHO_NO_EXPORT
 #endif

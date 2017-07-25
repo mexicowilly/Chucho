@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2016 Will Mason
+# Copyright 2013-2017 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -74,6 +74,8 @@ ELSEIF(CMAKE_SYSTEM_NAME STREQUAL Darwin)
     SET(CHUCHO_MACINTOSH TRUE)
 ELSEIF(CMAKE_SYSTEM_NAME STREQUAL AIX)
     SET(CHUCHO_AIX TRUE)
+ELSEIF(CYGWIN)
+    SET(CHUCHO_CYGWIN TRUE)
 ENDIF()
 IF(CMAKE_SYSTEM_NAME MATCHES "^.+BSD$")
     SET(CHUCHO_BSD TRUE)
@@ -88,18 +90,24 @@ IF(NOT CMAKE_BUILD_TYPE)
 ENDIF()
 MESSAGE(STATUS "Build type -- ${CMAKE_BUILD_TYPE}")
 
+# Standards
+SET(CMAKE_CXX_STANDARD 11)
+SET(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+SET(CMAKE_C_STANDARD 99)
+SET(CMAKE_C_STANDARD_REQUIRED TRUE)
+
 # Compiler flags
-IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-    CHECK_CXX_COMPILER_FLAG(-stdlib=libc++ CHUCHO_LIBCXX_FLAG)
-    IF(NOT CHUCHO_LIBCXX_FLAG)
-        MESSAGE(FATAL_ERROR "libc++ is required")
+IF(CMAKE_CXX_COMPILER_ID MATCHES Clang)
+    IF(CLANG_LIBSTDCXX)
+        SET(CHUCHO_LIBCXX_FLAG -stdlib=libstdc++)
+    ELSE()
+        SET(CHUCHO_LIBCXX_FLAG -stdlib=libc++)
     ENDIF()
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-    CHECK_CXX_COMPILER_FLAG(-std=c++11 CHUCHO_CXX11_FLAG)
-    IF(CHUCHO_CXX11_FLAG)
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-    ELSEIF(CHUCHO_MACINTOSH)
-        MESSAGE(FATAL_ERROR "C++11 compatibility is required")
+    CHECK_CXX_COMPILER_FLAG(${CHUCHO_LIBCXX_FLAG} CHUCHO_HAS_LIBCXX_FLAG)
+    IF(CHUCHO_HAS_LIBCXX_FLAG)
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CHUCHO_LIBCXX_FLAG}")
+    ELSE()
+        MESSAGE(FATAL_ERROR "${CHUCHO_LIBCXX_FLAG} is required")
     ENDIF()
     IF(ENABLE_SHARED)
         CHECK_CXX_COMPILER_FLAG(-fvisibility=hidden CHUCHO_VIS_FLAG)
@@ -109,28 +117,15 @@ IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         ENDIF()
     ENDIF()
     IF(CMAKE_GENERATOR STREQUAL Xcode)
-        SET(CMAKE_EXE_LINKER_FLAGS "-std=c++11 -stdlib=libc++")
+        SET(CMAKE_EXE_LINKER_FLAGS "-std=c++11 ${CHUCHO_LIBCXX_FLAG}")
     ENDIF()
-    CHECK_C_COMPILER_FLAG(-std=c99 CHUCHO_HAVE_STDC99)
-    IF(NOT CHUCHO_HAVE_STDC99)
-        MESSAGE(FATAL_ERROR "-std=c99 is required")
-    ENDIF()
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
-    IF(CHUCHO_MACINTOSH)
-        CHECK_CXX_COMPILER_FLAG(-Wno-potentially-evaluated-expression CHUCHO_HAVE_NO_POT_EVAL_EXP)
-        IF(CHUCHO_HAVE_NO_POT_EVAL_EXP)
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-potentially-evaluated-expression")
-        ENDIF()
+    CHECK_CXX_COMPILER_FLAG(-Wno-potentially-evaluated-expression CHUCHO_HAVE_NO_POT_EVAL_EXP)
+    IF(CHUCHO_HAVE_NO_POT_EVAL_EXP)
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-potentially-evaluated-expression")
     ENDIF()
 ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
     IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.7)
         MESSAGE(FATAL_ERROR "g++ version 4.7 or later is required")
-    ENDIF()
-    CHECK_CXX_COMPILER_FLAG(-std=c++11 CHUCHO_HAVE_STD)
-    IF(CHUCHO_HAVE_STD)
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-    ELSE()
-        MESSAGE(FATAL_ERROR "-std=c++11 is required")
     ENDIF()
     IF(ENABLE_SHARED)
         CHECK_CXX_COMPILER_FLAG(-fvisibility=hidden CHUCHO_VIS_FLAG)
@@ -139,11 +134,6 @@ ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
             SET(CHUCHO_SO_FLAGS "-fvisibility=hidden")
         ENDIF()
     ENDIF()
-    CHECK_C_COMPILER_FLAG(-std=c99 CHUCHO_HAVE_STDC99)
-    IF(NOT CHUCHO_HAVE_STDC99)
-        MESSAGE(FATAL_ERROR "-std=c99 is required")
-    ENDIF()
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 ELSEIF(MSVC)
     IF(MSVC_VERSION LESS 1700)
         MESSAGE(FATAL_ERROR "Microsoft compiler version 17 or later is required (the compiler that ships with Visual Studio 2012)")
@@ -155,8 +145,9 @@ ELSEIF(CMAKE_CXX_COMPILER_ID STREQUAL SunPro)
     IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.14.0)
         MESSAGE(FATAL_ERROR "CC version 5.14.0 or later is required (the compiler that ships with Solaris Studio 12.5)")
     ENDIF()
-    CHECK_CXX_COMPILER_FLAG(-std=c++11 CHUCHO_HAVE_STD)
-    IF(CHUCHO_HAVE_STD)
+    # CMake is supposed to do this with the standards flags. Jul 15 2017
+    CHECK_CXX_COMPILER_FLAG(-std=c++11 CHUCHO_HAVE_CXX11)
+    IF(CHUCHO_HAVE_CXX11)
         SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
     ELSE()
         MESSAGE(FATAL_ERROR "-std=c++11 is required")
@@ -171,8 +162,15 @@ ELSEIF(CMAKE_CXX_COMPILER_ID STREQUAL SunPro)
     ENDIF()
     SET(CHUCHO_SUNPRO_DISABLED_WARNINGS nonewline,wbadlkginit)
     CHECK_CXX_COMPILER_FLAG(-erroff=${CHUCHO_SUNPRO_DISABLED_WARNINGS} CHUCHO_HAVE_ERROFF)
-    IF(CHUCHO_HAVE_ERRTAGS)
+    IF(CHUCHO_HAVE_ERROFF)
         SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -erroff=${CHUCHO_SUNPRO_DISABLED_WARNINGS}")
+    ELSE()
+        MESSAGE(FATAL_ERROR "-erroff=${CHUCHO_SUNPRO_DISABLED_WARNINGS} is required")
+    ENDIF()
+    SET(CHUCHO_SUNPRO_C_DISABLED_WARNINGS E_NEWLINE_NOT_LAST)
+    CHECK_C_COMPILER_FLAG(-erroff=${CHUCHO_SUNPRO_C_DISABLED_WARNINGS} CHUCHO_HAVE_C_ERROFF)
+    IF(CHUCHO_HAVE_C_ERROFF)
+        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -erroff=${CHUCHO_SUNPRO_C_DISABLED_WARNINGS}")
     ELSE()
         MESSAGE(FATAL_ERROR "-erroff=${CHUCHO_SUNPRO_DISABLED_WARNINGS} is required")
     ENDIF()
@@ -180,6 +178,11 @@ ENDIF()
 
 # We are building Chucho
 ADD_DEFINITIONS(-DCHUCHO_BUILD)
+
+IF(CHUCHO_CYGWIN)
+    ADD_DEFINITIONS(-D_BSD_SOURCE)
+    SET(CMAKE_REQUIRED_DEFINITIONS -D_BSD_SOURCE)
+ENDIF()
 
 # Configure our export definitions
 IF(ENABLE_SHARED)
@@ -218,7 +221,7 @@ FIND_PACKAGE(Threads REQUIRED)
 
 IF(CHUCHO_POSIX)
     # headers
-    FOREACH(HEAD arpa/inet.h assert.h fcntl.h limits.h netdb.h poll.h pthread.h pwd.h signal.h
+    FOREACH(HEAD arpa/inet.h assert.h fcntl.h limits.h netdb.h poll.h pthread.h signal.h
                  sys/socket.h sys/stat.h sys/utsname.h syslog.h time.h unistd.h)
         STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
         STRING(REPLACE / _ CHUCHO_HEAD_VAR_NAME ${CHUCHO_HEAD_VAR_NAME})
@@ -232,8 +235,8 @@ IF(CHUCHO_POSIX)
     # host name functions
     CHUCHO_REQUIRE_SYMBOLS(sys/utsname.h uname)
 
-    # getpid/access/getuid/fork/close/setsid/dup2/chdir/_exit/write/pipe/read
-    CHUCHO_REQUIRE_SYMBOLS(unistd.h getpid access getuid fork close setsid dup2 chdir _exit write pipe read)
+    # getpid/access/close/write/pipe/read
+    CHUCHO_REQUIRE_SYMBOLS(unistd.h getpid access close write pipe read)
 
     # stat/mkdir
     CHUCHO_REQUIRE_SYMBOLS(sys/stat.h stat mkdir mkfifo)
@@ -287,11 +290,11 @@ IF(CHUCHO_POSIX)
     # syslog
     CHUCHO_REQUIRE_SYMBOLS(syslog.h syslog)
 
-    # socket/sendto/connect/shutdown/send/recv/bind/listen
+    # socket/sendto/connect/shutdown/send
     IF(CHUCHO_SOLARIS)
         SET(CMAKE_REQUIRED_LIBRARIES socket)
     ENDIF()
-    CHUCHO_REQUIRE_SYMBOLS(sys/socket.h socket sendto connect shutdown send recv bind listen accept)
+    CHUCHO_REQUIRE_SYMBOLS(sys/socket.h socket sendto connect shutdown send)
     IF(CHUCHO_SOLARIS)
         UNSET(CMAKE_REQUIRED_LIBRARIES)
     ENDIF()
@@ -299,12 +302,9 @@ IF(CHUCHO_POSIX)
     # poll
     CHUCHO_REQUIRE_SYMBOLS(poll.h poll)
 
-    # getpwuid
-    CHUCHO_REQUIRE_SYMBOLS(pwd.h getpwuid)
-
     # signal stuff
     SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
-    CHUCHO_REQUIRE_SYMBOLS(signal.h raise sigemptyset sigaddset sigwait sigaction kill sigpending sigismember pthread_sigmask)
+    CHUCHO_REQUIRE_SYMBOLS(signal.h sigemptyset sigwait sigpending sigismember pthread_sigmask)
     UNSET(CMAKE_REQUIRED_LIBRARIES)
 
     # open/fcntl
@@ -349,6 +349,25 @@ IF(CHUCHO_POSIX)
     ENDIF()
     CHECK_CXX_SYMBOL_EXISTS(O_LARGEFILE fcntl.h CHUCHO_HAVE_O_LARGEFILE)
 
+    IF(CHUCHOD)
+        CHECK_INCLUDE_FILE_CXX(pwd.h CHUCHO_HAVE_PWD_H)
+        IF(NOT ${CHUCHO_HAVE_PWD_H})
+            MESSAGE(FATAL_ERROR "The header pwd.h is required")
+        ENDIF()
+        CHUCHO_REQUIRE_SYMBOLS(unistd.h getuid fork setsid dup2 chdir _exit)
+        IF(CHUCHO_SOLARIS)
+            SET(CMAKE_REQUIRED_LIBRARIES socket)
+        ENDIF()
+        CHUCHO_REQUIRE_SYMBOLS(sys/socket.h recv bind listen accept)
+        IF(CHUCHO_SOLARIS)
+            UNSET(CMAKE_REQUIRED_LIBRARIES)
+        ENDIF()
+        CHUCHO_REQUIRE_SYMBOLS(pwd.h getpwuid)
+        SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
+        CHUCHO_REQUIRE_SYMBOLS(signal.h raise sigaddset sigaction kill)
+        UNSET(CMAKE_REQUIRED_LIBRARIES)
+    ENDIF()
+
 ELSEIF(CHUCHO_WINDOWS)
     FOREACH(HEAD windows.h winsock2.h io.h process.h ws2tcpip.h time.h assert.h)
         STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
@@ -386,6 +405,16 @@ IF(ENABLE_CURL)
                                curl_slist_free_all)
         UNSET(CMAKE_REQUIRED_INCLUDES)
         UNSET(CMAKE_REQUIRED_LIBRARIES)
+    ENDIF()
+ENDIF()
+
+# Doors
+IF(CHUCHO_SOLARIS)
+    CHECK_INCLUDE_FILE_CXX(door.h CHUCHO_HAVE_DOOR_H)
+    IF(CHUCHO_HAVE_DOOR_H)
+        CHUCHO_REQUIRE_SYMBOLS(door.h door_call door_getparam door_create door_return)
+        CHUCHO_REQUIRE_SYMBOLS(stropts.h fattach)
+        SET(CHUCHO_HAVE_DOORS TRUE CACHE INTERNAL "Whether we have doors")
     ENDIF()
 ENDIF()
 
@@ -743,12 +772,48 @@ IF(PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIB AND PROTOC_DIR)
     IF(NOT EXISTS "${PROTOBUF_LIB}")
         MESSAGE(FATAL_ERROR "The variable PROTOBUF_LIB was provided as ${PROTOBUF_LIB}, but it does not refer to an existing file")
     ENDIF()
-    SET(CHUCHO_PROTOBUF_SOURCES
+    LIST(APPEND CHUCHO_SERIALIZER_SOURCES
         "${CMAKE_BINARY_DIR}/chucho.pb.cc"
         "${CMAKE_BINARY_DIR}/chucho.pb.h")
     SET(CHUCHO_HAVE_PROTOBUF TRUE CACHE INTERNAL "Whether we have protobuf")
 ELSEIF(PROTOBUF_INCLUDE_DIR OR PROTOBUF_LIB OR PROTOC_DIR)
     MESSAGE(WARNING "If any of the variables PROTOBUF_INCLUDE_DIR, PROTOBUF_LIB or PROTOC_DIR have been set, then they must all be set for protobuf support to be included")
+ENDIF()
+
+# Cap'n Proto
+IF(CAPN_PROTO_INCLUDE_DIR AND CAPN_PROTO_LIB AND CAPN_PROTO_KJ_LIB AND CAPNP_DIR)
+    FIND_PROGRAM(CHUCHO_CAPNP
+                 capnp
+                 PATHS "${CAPNP_DIR}"
+                 NO_DEFAULT_PATH)
+    IF(NOT CHUCHO_CAPNP)
+        MESSAGE(FATAL_ERROR "The variable CAPNP_DIR was provided as ${CAPNP_DIR}, but it does not contain the capnp program")
+    ENDIF()
+    FIND_PROGRAM(CHUCHO_CAPNPC_CXX
+                 capnpc-c++
+                 PATHS "${CAPNP_DIR}"
+                 NO_DEFAULT_PATH)
+    IF(NOT CHUCHO_CAPNPC_CXX)
+        MESSAGE(FATAL_ERROR "The variable CAPNP_DIR was provided as ${CAPNP_DIR}, but it does not contain the capnpc-c++ program")
+    ENDIF()
+    SET(CMAKE_REQUIRED_INCLUDES "${CAPN_PROTO_INCLUDE_DIR}")
+    CHECK_INCLUDE_FILE_CXX(capnp/serialize.h CHUCHO_CAPN_PROTO_SERIALIZE_PACKED_H)
+    IF(NOT CHUCHO_CAPN_PROTO_MESSAGE_H OR NOT CHUCHO_CAPN_PROTO_SERIALIZE_PACKED_H OR NOT CHUCHO_CAPN_PROTO_VECTOR_H)
+        MESSAGE(FATAL_ERROR "The variable CAPN_PROTO_INCLUDE_DIR was provided as ${CAPN_PROTO_INCLUDE_DIR}, but it does not contain the Cap'n Proto headers")
+    ENDIF()
+    UNSET(CMAKE_REQUIRED_INCLUDES)
+    IF(NOT EXISTS "${CAPN_PROTO_LIB}")
+        MESSAGE(FATAL_ERROR "The variable CAPN_PROTO_LIB was provided as ${CAPN_PROTO_LIB}, but it does not refer to an existing file")
+    ENDIF()
+    IF(NOT EXISTS "${CAPN_PROTO_KJ_LIB}")
+        MESSAGE(FATAL_ERROR "The variable CAPN_PROTO_KJ_LIB was provided as ${CAPN_PROTO_KJ_LIB}, but it does not refer to an existing file")
+    ENDIF()
+    LIST(APPEND CHUCHO_SERIALIZER_SOURCES
+        "${CMAKE_BINARY_DIR}/chucho.capnp.c++"
+        "${CMAKE_BINARY_DIR}/chucho.capnp.h")
+    SET(CHUCHO_HAVE_CAPN_PROTO TRUE CACHE INTERNAL "Whether we have Cap'n Proto")
+ELSEIF(CAPN_PROTO_INCLUDE_DIR OR CAPN_PROTO_LIB OR CAPN_PROTO_KJ_LIB OR CAPNP_DIR)
+    MESSAGE(WARNING "If any of the variables CAPN_PROTO_INCLUDE_DIR, CAPN_PROTO_LIB, CAPN_PROTO_KJ_LIB or CAPNP_DIR have been set, then they must all be set for Cap'n Proto support to be included")
 ENDIF()
 
 # zeromq
@@ -826,6 +891,35 @@ ELSEIF(ACTIVEMQ_INCLUDE_DIR OR ACTIVEMQ_LIB OR APR_LIB)
     MESSAGE(WARNING "If any of the variables ACTIVEMQ_INCLUDE_DIR, ACTIVEMQ_LIB or APR_LIB has been set, then they must all be set for ActiveMQ support to be included")
 ENDIF()
 
+# RabbitMQ
+IF(RABBITMQ_INCLUDE_DIR AND RABBITMQ_LIB)
+    SET(CMAKE_REQUIRED_INCLUDES "${RABBITMQ_INCLUDE_DIR}")
+    FOREACH(HEAD amqp_tcp_socket amqp)
+        CHECK_INCLUDE_FILE_CXX(${HEAD}.h CHUCHO_HAVE_${HEAD})
+        IF(NOT CHUCHO_HAVE_${HEAD})
+            MESSAGE(FATAL_ERROR "The variable RABBITMQ_INCLUDE_DIR was provided as ${RABBITMQ_INCLUDE_DIR}, but it does not contain the RabbitMQ headers")
+        ENDIF()
+    ENDFOREACH()
+    IF(NOT EXISTS "${RABBITMQ_LIB}")
+        MESSAGE(FATAL_ERROR "The variable RABBITMQ_LIB was provided as ${RABBITMQ_LIB}, but it does not refer to an existing file")
+    ENDIF()
+    SET(CMAKE_REQUIRED_LIBRARIES "${RABBITMQ_LIB}" ${CMAKE_THREAD_LIBS_INIT})
+    IF(CHUCHO_SOLARIS)
+        SET(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES};socket;nsl")
+    ENDIF()
+    CHUCHO_REQUIRE_SYMBOLS(amqp.h amqp_new_connection amqp_socket_open amqp_login amqp_get_rpc_reply
+                           amqp_channel_close amqp_connection_close amqp_basic_publish amqp_channel_open
+                           amqp_destroy_connection amqp_error_string2 amqp_cstring_bytes amqp_queue_declare
+                           amqp_basic_consume amqp_consume_message amqp_empty_bytes amqp_empty_table
+                           amqp_destroy_envelope)
+    CHUCHO_REQUIRE_SYMBOLS(amqp_tcp_socket.h amqp_tcp_socket_new amqp_parse_url)
+    UNSET(CMAKE_REQUIRED_INCLUDES)
+    UNSET(CMAKE_REQUIRED_LIBRARIES)
+    SET(CHUCHO_HAVE_RABBITMQ TRUE CACHE INTERNAL "Whether we have RabbitMQ")
+ELSEIF(RABBITMQ_INCLUDE_DIR OR RABBITMQ_LIB)
+    MESSAGE(WARNING "If either of the variables RABBITMQ_INCLUDE_DIR or RABBITMQ_LIB has been set, then they must both be set for RabbitMQ support to be included")
+ENDIF()
+
 # doxygen
 FIND_PACKAGE(Doxygen)
 
@@ -867,29 +961,34 @@ ENDIF()
 
 # Linux service stuff
 IF(CHUCHO_LINUX)
-    FILE(READ /proc/1/cmdline CHUCHO_PROC1_CMDLINE)
-    STRING(REGEX MATCH systemd CHUCHO_SYSTEMD_MATCH "${CHUCHO_PROC1_CMDLINE}")
-    IF(CHUCHO_SYSTEMD_MATCH)
-        CHUCHO_FIND_PROGRAM(CHUCHO_SYSTEMCTL systemctl)
-        IF(NOT CHUCHO_SYSTEMCTL)
-            MESSAGE(FATAL_ERROR "systemctl is required when using the systemd init system")
+    CHUCHO_FIND_PROGRAM(CHUCHO_INIT init)
+    IF(CHUCHO_INIT)
+        EXECUTE_PROCESS(COMMAND "${CHUCHO_INIT}" --version
+                        OUTPUT_VARIABLE CHUCHO_INIT_OUT
+                        ERROR_QUIET)
+    ENDIF()
+    IF(CHUCHO_INIT_OUT AND CHUCHO_INIT_OUT MATCHES upstart)
+        CHUCHO_FIND_PROGRAM(CHUCHO_INITCTL initctl)
+        IF(CHUCHO_INITCTL)
+            MESSAGE(STATUS "This Linux is using the Upstart init system")
+            SET(CHUCHO_UPSTART_INIT TRUE)
+        ELSE()
+            MESSAGE(WARNING "initctl is required when using the Upstart init system. The chuchod service will not be installed.")
         ENDIF()
-        MESSAGE(STATUS "This Linux is using the systemd init system")
-        SET(CHUCHO_SYSTEMD_INIT TRUE)
     ELSE()
-        STRING(REGEX MATCH "^.+/init$" CHUCHO_INIT_MATCH "${CHUCHO_PROC1_CMDLINE}")
-        IF(CHUCHO_INIT_MATCH)
-            EXECUTE_PROCESS(COMMAND "${CHUCHO_PROC1_CMDLINE}" --version
-                            OUTPUT_VARIABLE CHUCHO_INIT_OUT)
-            STRING(REGEX MATCH upstart CHUCHO_UPSTART_MATCH "${CHUCHO_INIT_OUT}")
-            IF(CHUCHO_UPSTART_MATCH)
-                CHUCHO_FIND_PROGRAM(CHUCHO_INITCTL initctl)
-                IF(NOT CHUCHO_INITCTL)
-                    MESSAGE(FATAL_ERROR "initctl is required when using the Upstart init system")
-                ENDIF()
-                MESSAGE(STATUS "This Linux is using the Upstart init system")
-                SET(CHUCHO_UPSTART_INIT TRUE)
+        CHUCHO_FIND_PROGRAM(CHUCHO_SYSTEMCTL systemctl)
+        IF(CHUCHO_SYSTEMCTL)
+            EXECUTE_PROCESS(COMMAND "${CHUCHO_SYSTEMCTL}"
+                            OUTPUT_VARIABLE CHUCHO_SYSTEMCTL_OUT
+                            ERROR_QUIET)
+            IF(CHUCHO_SYSTEMCTL_OUT AND CHUCHO_SYSTEMCTL_OUT MATCHES "-\\.mount")
+                MESSAGE(STATUS "This Linux is using the systemd init system")
+                SET(CHUCHO_SYSTEMD_INIT TRUE)
+            ELSE()
+                MESSAGE(WARNING "systemctl is required when using the systemd init system. The chuchod service will not be installed.")
             ENDIF()
+        ELSE()
+            MESSAGE(STATUS "Chucho only supports the Upstart and systemd init systems on Linux.")
         ENDIF()
     ENDIF()
 ENDIF()
@@ -902,12 +1001,6 @@ IF(CHUCHO_BSD AND EXISTS /etc/rc AND EXISTS /etc/rc.conf AND EXISTS /etc/rc.subr
     ENDIF()
     MESSAGE(STATUS "This ${CMAKE_SYSTEM_NAME} is using the rc.d init system")
     SET(CHUCHO_RC_INIT TRUE)
-ENDIF()
-
-# zip
-CHUCHO_FIND_PROGRAM(CHUCHO_ZIP zip)
-IF(NOT CHUCHO_ZIP)
-    MESSAGE(STATUS "No zdist target will be available, since you don't have zip")
 ENDIF()
 
 #
@@ -926,42 +1019,36 @@ ENDIF()
 
 IF(MSVC)
     SET(CHUCHO_ADDL_GTEST_CXX_FLAGS "-D_VARIADIC_MAX=10")
+ELSEIF(CHUCHO_CYGWIN)
+    SET(CHUCHO_ADDL_GTEST_CXX_FLAGS "-D_BSD_SOURCE")
 ENDIF()
 
 IF(CHUCHO_WINDOWS)
     SET(CHUCHO_GTEST_CMAKE_FLAGS -Dgtest_force_shared_crt:BOOL=ON)
 ENDIF()
 
+# Not all cmakes can download URLs of the https variety. Therefore, if
+# there is no specific package, we just clone the repository.
+IF(GTEST_PACKAGE AND EXISTS "${GTEST_PACKAGE}")
+    FILE(SHA1 "${GTEST_PACKAGE}" CHUCHO_GTEST_SHA1)
+    FILE(TO_CMAKE_PATH "${GTEST_PACKAGE}" GTEST_PACKAGE_CMAKE_PATH)
+    SET(CHUCHO_GTEST_PACKAGE_ARGS
+        URL "${GTEST_PACKAGE_CMAKE_PATH}"
+        URL_HASH SHA1=${CHUCHO_GTEST_SHA1})
+ELSE()
+    SET(CHUCHO_GTEST_PACKAGE_ARGS
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG release-1.8.0)
+ENDIF()
 ExternalProject_Add(gtest-external
-                    URL http://googletest.googlecode.com/files/gtest-1.7.0.zip
-                    URL_MD5 2d6ec8ccdf5c46b05ba54a9fd1d130d7
-                    CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} ${CHUCHO_ADDL_GTEST_CXX_FLAGS}" ${CHUCHO_GTEST_CMAKE_FLAGS}
-                    CMAKE_GENERATOR "${CHUCHO_GTEST_GENERATOR}"
-                    INSTALL_COMMAND "")
-ExternalProject_Add_Step(gtest-external
-                         install-headers
-                         COMMAND "${CMAKE_COMMAND}" -E make_directory <INSTALL_DIR>/include
-                         COMMAND "${CMAKE_COMMAND}" -E copy_directory <SOURCE_DIR>/include <INSTALL_DIR>/include
-                         DEPENDEES build)
+                    ${CHUCHO_GTEST_PACKAGE_ARGS}
+                    CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} ${CHUCHO_ADDL_GTEST_CXX_FLAGS}" -DBUILD_GTEST=ON -DBUILD_GMOCK=OFF "-DCMAKE_INSTALL_PREFIX=${CHUCHO_EXTERNAL_PREFIX}" ${CHUCHO_GTEST_CMAKE_FLAGS}
+                    CMAKE_GENERATOR "${CHUCHO_GTEST_GENERATOR}")
 ADD_LIBRARY(gtest STATIC IMPORTED)
 IF(CHUCHO_WINDOWS)
-    ExternalProject_Add_Step(gtest-external
-                             install-libs
-                             COMMAND "${CMAKE_COMMAND}" -E make_directory <INSTALL_DIR>/lib
-                             COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/gtest.lib <INSTALL_DIR>/lib
-                             COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/gtest.pdb <INSTALL_DIR>/lib
-                             COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/gtest_main.lib <INSTALL_DIR>/lib
-                             COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/gtest_main.pdb <INSTALL_DIR>/lib
-                             DEPENDEES install-headers)
     SET_TARGET_PROPERTIES(gtest PROPERTIES
                           IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/gtest.lib")
 ELSE()
-    ExternalProject_Add_Step(gtest-external
-                             install-libs
-                             COMMAND "${CMAKE_COMMAND}" -E make_directory <INSTALL_DIR>/lib
-                             COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/libgtest.a <INSTALL_DIR>/lib
-                             COMMAND "${CMAKE_COMMAND}" -E copy <BINARY_DIR>/libgtest_main.a <INSTALL_DIR>/lib
-                             DEPENDEES install-headers)
     SET_TARGET_PROPERTIES(gtest PROPERTIES
                           IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/libgtest.a")
 ENDIF()

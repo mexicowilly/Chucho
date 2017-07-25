@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,14 +14,29 @@
  *    limitations under the License.
  */
 
-#include <chucho/noop_compressor_memento.hpp>
+#include <chucho/bzip2_compressor.hpp>
+#include <chucho/bzip2_compressor.h>
+#include <chucho/c_compressor.hpp>
 
-namespace chucho
+extern "C"
 {
 
-noop_compressor_memento::noop_compressor_memento(configurator& cfg)
-    : memento(cfg)
+chucho_rc chucho_create_bzip2_compressor(chucho_compressor** cmp)
 {
+    if (cmp == nullptr)
+        return CHUCHO_NULL_POINTER;
+    try
+    {
+        chucho_compressor* loc = new chucho_compressor();
+        loc->cmp_ = std::make_shared<chucho::bzip2_compressor>();
+        *cmp = loc;
+    }
+    catch (...)
+    {
+        return CHUCHO_OUT_OF_MEMORY;
+    }
+    return CHUCHO_NO_ERROR;
 }
 
 }
+

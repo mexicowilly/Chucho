@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ namespace chucho
 /**
  * @class protobuf_serializer protobuf_serializer.hpp chucho/protobuf_serializer.hpp
  * A @ref serializer that creates a <a href="https://developers.google.com/protocol-buffers/?hl=en">protobuf</a>
- * message. The definintion of the message is in the file @c protobuf/chucho.proto.
+ * message. The definintion of the message is in the file @c serialization/chucho.proto.
  * All of the event data, including the formatted message, will appear in the
  * resulting message. If you only need the formatted message, then please consider
  * using the @ref formatted_message_serializer instead.

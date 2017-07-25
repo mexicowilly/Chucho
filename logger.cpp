@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <chucho/garbage_cleaner.hpp>
 #include <chucho/time_util.hpp>
 #include <chucho/demangle.hpp>
+#include <chucho/regex.hpp>
 #include <map>
 #include <stdexcept>
 #include <atomic>
@@ -259,10 +260,20 @@ void logger::set_writes_to_ancestors(bool val)
 
 std::string logger::type_to_logger_name(const std::type_info& info)
 {
-    std::string name = demangle::get_demangled_name(info);
-    auto spc = name.find(' ');
-    if (spc != std::string::npos) 
-        name.erase(0, spc + 1);
+    static std::string starts[] = { "class ", "struct " };
+    static regex::expression re(".anonymous namespace.");
+
+    auto name = demangle::get_demangled_name(info);
+    for (const auto& start : starts)
+    {
+        auto found = name.find(start);
+        if (found != std::string::npos)
+        {
+            name.erase(name.begin(), name.begin() + start.length());
+            break;
+        }
+    }
+    name = regex::replace(name, re, "~");
     auto found = name.find("::");
     while (found != std::string::npos)
     {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,14 +14,27 @@
  *    limitations under the License.
  */
 
-#include <chucho/formatted_message_serializer_memento.hpp>
+#if !defined(CHUCHO_DOOR_WRITER_FACTORY_HPP__)
+#define CHUCHO_DOOR_WRITER_FACTORY_HPP__
+
+#if !defined(CHUCHO_BUILD)
+#error "This header is private"
+#endif
+
+#include <chucho/writer_factory.hpp>
 
 namespace chucho
 {
 
-formatted_message_serializer_memento::formatted_message_serializer_memento(configurator& cfg)
-    : memento(cfg)
+class door_writer_factory : public writer_factory
 {
-}
+public:
+    door_writer_factory();
+
+    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
+    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
+};
 
 }
+
+#endif

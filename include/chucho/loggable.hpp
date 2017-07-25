@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ protected:
      * 
      * @param new_type the type on which to base the new name
      */
-    void rename_logger(const std::type_info& new_type);
+    virtual void rename_logger(const std::type_info& new_type);
     /**
      * Rename the logger. This method is meant to be used in cases 
      * where a subclass of a subclass of loggable needs a different 
@@ -96,7 +96,7 @@ protected:
      * 
      * @param name the new logger name
      */
-    void rename_logger(const std::string& name);
+    virtual void rename_logger(const std::string& name);
 
 private:
     std::shared_ptr<logger> logger_;

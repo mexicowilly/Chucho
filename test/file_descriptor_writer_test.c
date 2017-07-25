@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -37,7 +37,9 @@ static void file_descriptor_writer_test(void)
 
 void run_file_descriptor_writer_test(void)
 {
+#if !defined(CHUCHO_WINDOWS)
     sput_enter_suite("file_descriptor_writer");
     sput_run_test(file_descriptor_writer_test);
     sput_leave_suite();
+#endif
 }

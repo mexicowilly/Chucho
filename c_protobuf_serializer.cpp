@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ chucho_rc chucho_create_protobuf_serializer(chucho_serializer** ser)
     try
     {
         *ser = new chucho_serializer();
-        *ser->ser_ = std::make_shared<chucho::protobuf_serializer>();
+        (*ser)->ser_ = std::make_shared<chucho::protobuf_serializer>();
     }
     catch (...)
     {

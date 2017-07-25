@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2016 Will Mason
+# Copyright 2013-2017 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -41,7 +41,11 @@ IF(CHUCHO_SOLARIS)
 ENDIF()
 
 IF(CHUCHO_HAVE_PROTOBUF)
-    LIST(APPEND CHUCHO_TEST_PROTOBUF_SOURCES protobuf_serializer_test.cpp)
+    LIST(APPEND CHUCHO_TEST_SERIALIZER_SOURCES protobuf_serializer_test.cpp)
+ENDIF()
+
+IF(CHUCHO_HAVE_CAPN_PROTO)
+    LIST(APPEND CHUCHO_TEST_SERIALIZER_SOURCES capn_proto_serializer_test.cpp)
 ENDIF()
 
 IF(CHUCHO_HAVE_ZEROMQ)
@@ -52,6 +56,10 @@ IF(CHUCHO_HAVE_ACTIVEMQ)
     LIST(APPEND CHUCHO_TEST_MQ_SOURCES activemq_writer_test.cpp)
 ENDIF()
 
+IF(CHUCHO_HAVE_RABBITMQ)
+    LIST(APPEND CHUCHO_TEST_MQ_SOURCES rabbitmq_writer_test.cpp)
+ENDIF()
+
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_TEST_COMPRESSION_SOURCES
          gzip_file_compressor_test.cpp
@@ -60,7 +68,9 @@ IF(CHUCHO_HAVE_ZLIB)
 ENDIF()
 
 IF(CHUCHO_HAVE_BZIP2)
-    LIST(APPEND CHUCHO_TEST_COMPRESSION_SOURCES bzip2_file_compressor_test.cpp)
+    LIST(APPEND CHUCHO_TEST_COMPRESSION_SOURCES
+         bzip2_compressor_test.cpp
+         bzip2_file_compressor_test.cpp)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_BZIP2)
 ENDIF()
 
@@ -71,24 +81,19 @@ ENDIF()
 
 IF(YAML_CONFIG)
     SET(CHUCHO_CONFIGURATOR_TESTS yaml_configurator_test.cpp utf8_test.cpp)
-    SET(CHUCHO_CONFIGURATION_TEST_DEFS CHUCHO_YAML_CONFIG)
+    ADD_DEFINITIONS(-DCHUCHO_YAML_CONFIG)
 ENDIF()
 
 IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
     LIST(APPEND CHUCHO_CONFIGURATOR_TESTS properties_test.cpp)
     IF(CONFIG_FILE_CONFIG)
         LIST(APPEND CHUCHO_CONFIGURATOR_TESTS chucho_config_file_configurator_test.cpp)
-        LIST(APPEND CHUCHO_CONFIGURATION_TEST_DEFS CHUCHO_CONFIG_FILE_CONFIG)
+        ADD_DEFINITIONS(-DCHUCHO_CONFIG_FILE_CONFIG)
     ENDIF()
     IF(LOG4CPLUS_CONFIG)
         LIST(APPEND CHUCHO_CONFIGURATOR_TESTS log4cplus_config_file_configurator_test.cpp)
-        LIST(APPEND CHUCHO_CONFIGURATION_TEST_DEFS CHUCHO_LOG4CPLUS_CONFIG)
+        ADD_DEFINITIONS(-DCHUCHO_LOG4CPLUS_CONFIG)
     ENDIF()
-ENDIF()
-
-IF(DEFINED CHUCHO_CONFIGURATION_TEST_DEFS)
-    SET_SOURCE_FILES_PROPERTIES(configuration_test.cpp PROPERTIES
-                                COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATION_TEST_DEFS}")
 ENDIF()
 
 IF(CHUCHO_HAVE_MYSQL)
@@ -128,8 +133,21 @@ IF(CHUCHO_HAVE_PROTOBUF)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_PROTOBUF)
 ENDIF()
 
+IF(CHUCHO_HAVE_CAPN_PROTO)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_CAPN_PROTO)
+ENDIF()
+
 IF(CHUCHO_HAVE_ACTIVEMQ)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_ACTIVEMQ)
+ENDIF()
+
+IF(CHUCHO_HAVE_RABBITMQ)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_RABBITMQ)
+ENDIF()
+
+IF(CHUCHO_HAVE_DOORS)
+    LIST(APPEND CHUCHO_TEST_DOOR_SOURCES door_writer_test.cpp)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_DOORS)
 ENDIF()
 
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
@@ -158,19 +176,22 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                named_pipe_writer_test.cpp
                noop_compressor_test.cpp
                optional_test.cpp
+               optional_features_test.cpp
                pattern_formatter_test.cpp
                pipe_writer_test.cpp
                regex_test.cpp
                rolling_file_writer_test.cpp
                security_policy_test.cpp
                size_file_roll_trigger_test.cpp
+               streamable_test.cpp
                text_util_test.cpp
                utf8_test.cpp
                ${CHUCHO_TEST_COMPRESSION_SOURCES}
                ${CHUCHO_CONFIGURATOR_TESTS}
                ${CHUCHO_TEST_EVALUATOR_SOURCES}
-               ${CHUCHO_TEST_PROTOBUF_SOURCES}
-               ${CHUCHO_TEST_MQ_SOURCES})
+               ${CHUCHO_TEST_SERIALIZER_SOURCES}
+               ${CHUCHO_TEST_MQ_SOURCES}
+               ${CHUCHO_TEST_DOOR_SOURCES})
 TARGET_LINK_LIBRARIES(unit-test chucho gtest)
 
 IF(MSVC)
@@ -199,6 +220,20 @@ IF(CHUCHO_HAVE_ACTIVEMQ)
     ADD_DEPENDENCIES(unit-test activemq-writer-test-helper)
 ENDIF()
 
+IF(CHUCHO_HAVE_RABBITMQ)
+    ADD_EXECUTABLE(rabbitmq-writer-test-helper EXCLUDE_FROM_ALL
+                   rabbitmq_writer_test_helper.cpp)
+    TARGET_LINK_LIBRARIES(rabbitmq-writer-test-helper chucho)
+    ADD_DEPENDENCIES(unit-test rabbitmq-writer-test-helper)
+ENDIF()
+
+IF(CHUCHO_HAVE_DOORS)
+    ADD_EXECUTABLE(door-writer-test-helper EXCLUDE_FROM_ALL
+                   door_writer_test_helper.cpp)
+    TARGET_LINK_LIBRARIES(door-writer-test-helper chucho)
+    ADD_DEPENDENCIES(unit-test door-writer-test-helper)
+ENDIF()
+
 ADD_CUSTOM_TARGET(check
                   COMMAND unit-test
                   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
@@ -210,6 +245,8 @@ IF(CHUCHO_WINDOWS)
 ENDIF()
 
 IF(C_API)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_C_API)
+
     IF(CHUCHO_HAVE_ZLIB OR CHUCHO_HAVE_BZIP2 OR CHUCHO_HAVE_MINIZIP)
         SET(CHUCHO_TEST_COMPRESSION_C_SOURCES
             file_compressor_test.c
@@ -268,6 +305,18 @@ IF(C_API)
         LIST(APPEND CHUCHO_MQ_C_SOURCES
              activemq_writer_test.c
              activemq_writer_test.h)
+    ENDIF()
+
+    IF(CHUCHO_HAVE_RABBITMQ)
+        LIST(APPEND CHUCHO_MQ_C_SOURCES
+             rabbitmq_writer_test.c
+             rabbitmq_writer_test.h)
+    ENDIF()
+
+    IF(CHUCHO_HAVE_DOORS)
+        LIST(APPEND CHUCHO_DOOR_C_SOURCES
+             door_writer_test.c
+             door_writer_test.h)
     ENDIF()
 
     IF(CHUCHO_WINDOWS)
@@ -345,7 +394,8 @@ IF(C_API)
                    ${CHUCHO_EVALUATOR_C_SOURCES}
                    ${CHUCHO_PLATFORM_C_SOURCES}
                    ${CHUCHO_EMAIL_WRITER_C_SOURCES}
-                   ${CHUCHO_MQ_C_SOURCES})
+                   ${CHUCHO_MQ_C_SOURCES}
+                   ${CHUCHO_DOOR_C_SOURCES})
     TARGET_LINK_LIBRARIES(c-unit-test chucho)
 
     IF(CHUCHO_SOLARIS AND ENABLE_SHARED AND CHUCHO_STD_CXX_LIBS)
@@ -427,7 +477,7 @@ ADD_EXECUTABLE(configuration-off EXCLUDE_FROM_ALL
 TARGET_LINK_LIBRARIES(configuration-off chucho)
 
 ADD_CUSTOM_TARGET(check-config
-                  COMMAND "${CMAKE_COMMAND}" "-DCHUCHO_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P "${CMAKE_CURRENT_SOURCE_DIR}/CheckAllConfigs.cmake")
+                  COMMAND "${CMAKE_COMMAND}" "-DCHUCHO_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -DCLANG_LIBSTDCXX=${CLANG_LIBSTDCXX} -P "${CMAKE_CURRENT_SOURCE_DIR}/CheckAllConfigs.cmake")
 
 ADD_CUSTOM_TARGET(all-test
                   DEPENDS unit-test rolling-file-test syslog-writer-test remote-writer-test windows-event-log-writer-test)

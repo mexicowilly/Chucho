@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -85,6 +85,15 @@
 #endif
 #if defined(CHUCHO_HAVE_ACTIVEMQ)
 #include <chucho/activemq_writer.hpp>
+#endif
+#if defined(CHUCHO_HAVE_DOORS)
+#include <chucho/door_writer.hpp>
+#endif
+#if defined(CHUCHO_HAVE_RABBITMQ)
+#include <chucho/rabbitmq_writer.hpp>
+#endif
+#if defined(CHUCHO_HAVE_CAPN_PROTO)
+#include <chucho/capn_proto_serializer.hpp>
 #endif
 
 namespace chucho
@@ -226,6 +235,21 @@ void configurator::db2_writer_body()
     EXPECT_EQ(std::string("chucho"), owrt->get_database());
     EXPECT_EQ(std::string("db2inst1"), owrt->get_user());
     EXPECT_EQ(std::string("db2inst1"), owrt->get_password());
+}
+
+#endif
+
+#if defined(CHUCHO_HAVE_DOORS)
+
+void configurator::door_writer_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::door_writer), typeid(*wrts[0]));
+    auto dwrt = std::static_pointer_cast<chucho::door_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(dwrt));
+    EXPECT_STREQ("gargle", dwrt->get_file_name().c_str());
+    chucho::status_manager::get()->clear();
 }
 
 #endif
@@ -536,6 +560,41 @@ void configurator::postgres_writer_body()
     ASSERT_TRUE(static_cast<bool>(pwrt));
     EXPECT_EQ(std::string("postgres://test_user:password@192.168.56.101/postgres"), pwrt->get_uri());
 }
+
+#endif
+
+#if defined(CHUCHO_HAVE_RABBITMQ)
+
+void configurator::rabbitmq_writer_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::rabbitmq_writer), typeid(*wrts[0]));
+    auto pwrt = std::static_pointer_cast<chucho::rabbitmq_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(pwrt));
+    EXPECT_EQ(std::string("amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc"), pwrt->get_url());
+    EXPECT_EQ(std::string("logs"), pwrt->get_exchange());
+    EXPECT_TRUE(pwrt->get_routing_key().empty());
+}
+
+#if defined(CHUCHO_HAVE_CAPN_PROTO)
+
+void configurator::rabbitmq_writer_capn_proto_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::rabbitmq_writer), typeid(*wrts[0]));
+    auto pwrt = std::static_pointer_cast<chucho::rabbitmq_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(pwrt));
+    auto ser = pwrt->get_serializer();
+    ASSERT_TRUE(static_cast<bool>(ser));
+    EXPECT_EQ(typeid(chucho::capn_proto_serializer), typeid(*ser));
+    EXPECT_EQ(std::string("amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc"), pwrt->get_url());
+    EXPECT_EQ(std::string("logs"), pwrt->get_exchange());
+    EXPECT_TRUE(pwrt->get_routing_key().empty());
+}
+
+#endif
 
 #endif
 

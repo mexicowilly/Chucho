@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 
 #include <chucho/cerr_writer_factory.hpp>
-#include <chucho/cerr_writer_memento.hpp>
 #include <chucho/cerr_writer.hpp>
 #include <chucho/demangle.hpp>
 #include <chucho/exception.hpp>
@@ -31,7 +30,7 @@ cerr_writer_factory::cerr_writer_factory()
 
 std::shared_ptr<configurable> cerr_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
 {
-    auto cwm = std::dynamic_pointer_cast<cerr_writer_memento>(mnto);
+    auto cwm = std::dynamic_pointer_cast<writer_memento>(mnto);
     assert(cwm);
     if (!cwm->get_formatter())
         throw exception("cerr_writer_factory: The writer's formatter is not set");
@@ -43,7 +42,7 @@ std::shared_ptr<configurable> cerr_writer_factory::create_configurable(std::shar
 
 std::shared_ptr<memento> cerr_writer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto(new cerr_writer_memento(cfg));
+    std::shared_ptr<memento> mnto(new writer_memento(cfg));
     return mnto;
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -223,6 +223,21 @@ TEST_F(yaml_configurator, db2_writer)
               "        password: db2inst1\n"
               "        database: chucho");
     db2_writer_body();
+}
+
+#endif
+
+#if defined(CHUCHO_HAVE_DOORS)
+
+TEST_F(yaml_configurator, door_writer)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::door_writer:\n"
+              "        chucho::pattern_formatter:\n"
+              "            pattern: '%m'\n"
+              "        file_name: gargle");
+    door_writer_body();
 }
 
 #endif
@@ -490,6 +505,40 @@ TEST_F(yaml_configurator, postgres_writer)
               "        uri: 'postgres://test_user:password@192.168.56.101/postgres'");
     postgres_writer_body();
 }
+
+#endif
+
+#if defined(CHUCHO_HAVE_RABBITMQ)
+
+TEST_F(yaml_configurator, rabbitmq_writer)
+{
+    configure("chucho::logger:\n"
+              "    - name: will\n"
+              "    - chucho::rabbitmq_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            - pattern: '%m'\n"
+              "        - chucho::formatted_message_serializer\n"
+              "        - url: 'amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc'\n"
+              "        - exchange: logs");
+    rabbitmq_writer_body();
+}
+
+#if defined(CHUCHO_HAVE_CAPN_PROTO)
+
+TEST_F(yaml_configurator, rabbitmq_writer_capn_proto)
+{
+    configure("chucho::logger:\n"
+              "    - name: will\n"
+              "    - chucho::rabbitmq_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            - pattern: '%m'\n"
+              "        - chucho::capn_proto_serializer\n"
+              "        - url: 'amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc'\n"
+              "        - exchange: logs");
+    rabbitmq_writer_capn_proto_body();
+}
+
+#endif
 
 #endif
 

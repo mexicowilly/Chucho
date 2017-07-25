@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -81,6 +81,18 @@
 #endif
 #if defined(CHUCHO_HAVE_ACTIVEMQ)
 #include <chucho/activemq_writer_factory.hpp>
+#endif
+#if defined(CHUCHO_HAVE_RABBITMQ)
+#include <chucho/rabbitmq_writer_factory.hpp>
+#endif
+#if defined(CHUCHO_HAVE_DOORS)
+#include <chucho/door_writer_factory.hpp>
+#endif
+#if defined(CHUCHO_HAVE_BZIP2)
+#include <chucho/bzip2_compressor_factory.hpp>
+#endif
+#if defined(CHUCHO_HAVE_CAPN_PROTO)
+#include <chucho/capn_proto_serializer_factory.hpp>
 #endif
 
 #include <cstring>
@@ -219,6 +231,22 @@ void configurator::initialize_impl()
 #if defined(CHUCHO_HAVE_ACTIVEMQ)
     fact.reset(new activemq_writer_factory());
     add_configurable_factory("chucho::activemq_writer", fact);
+#endif
+#if defined(CHUCHO_HAVE_DOORS)
+    fact.reset(new door_writer_factory());
+    add_configurable_factory("chucho::door_writer", fact);
+#endif
+#if defined(CHUCHO_HAVE_RABBITMQ)
+    fact.reset(new rabbitmq_writer_factory());
+    add_configurable_factory("chucho::rabbitmq_writer", fact);
+#endif
+#if defined(CHUCHO_HAVE_BZIP2)
+    fact.reset(new bzip2_compressor_factory());
+    add_configurable_factory("chucho::bzip2_compressor", fact);
+#endif
+#if defined(CHUCHO_HAVE_CAPN_PROTO)
+    fact.reset(new capn_proto_serializer_factory());
+    add_configurable_factory("chucho::capn_proto_serializer", fact);
 #endif
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -45,6 +45,9 @@ protected:
 #if defined(CHUCHO_HAVE_DB2)
     void db2_writer_body();
 #endif
+#if defined(CHUCHO_HAVE_DOORS)
+    void door_writer_body();
+#endif
     void duplicate_message_filter_body();
 #if defined(CHUCHO_HAVE_EMAIL_WRITER)
     void email_writer_body();
@@ -69,6 +72,12 @@ protected:
 #if defined(CHUCHO_HAVE_POSTGRES)
     void postgres_writer_body();
 #endif
+#if defined(CHUCHO_HAVE_RABBITMQ)
+    void rabbitmq_writer_body();
+#if defined(CHUCHO_HAVE_CAPN_PROTO)
+    void rabbitmq_writer_capn_proto_body();
+#endif
+#endif
     void remote_writer_body();
 #if defined(CHUCHO_HAVE_RUBY)
     void ruby_evaluator_filter_body();
@@ -91,7 +100,7 @@ protected:
     void zeromq_writer_body();
     void zeromq_writer_with_compressor_body();
     void zeromq_writer_no_prefix_body();
-#if defined(CHUCHO_HAVE_PROTOBUF) && defined(CHUCHO_HAVE_ZEROMQ)
+#if defined(CHUCHO_HAVE_PROTOBUF)
     void zeromq_writer_protobuf_body();
 #endif
 #endif

@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2016 Will Mason
+# Copyright 2013-2017 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -82,6 +82,15 @@ OPTION(INSTALL_SERVICE "Whether to install chuchod as a system service" OFF)
 
 OPTION(C_API "Whether the C API should be built into this Chucho" OFF)
 
+# Whether to build the log server, chuchod. This is only necessary if you are planning
+# on installing the server to this host. If you only need to use remote_writer to
+# forward event to another host, then there is no need to build chuchod.
+
+OPTION(CHUCHOD "Whether the log server, chuchod, should be built into this Chucho" OFF)
+
+# Whether to use libstdc++ when compiling with Clang.
+OPTION(CLANG_LIBSTDCXX "Whether to use libstdc++ with the Clang compiler" OFF)
+
 # CONFIGURATION FORMATS
 # ================================================================================
 #     Chucho is able to parse configuration files using three different formats,
@@ -152,16 +161,16 @@ OPTION(ENABLE_CURL "Whether libcurl should be checked so that email_writer will 
 
 # SET(SQLITE_CLIENT_LIB "<My SQLite Library>" CACHE STRING "SQLite client library")
 
-# The location of the PostgresSQL header files.
+# The location of the PostgreSQL header files.
 
-# SET(POSTGRES_INCLUDE_DIR "<My PostgresSQL Include Directory>" CACHE STRING "Include directory of the PostgresSQL client")
+# SET(POSTGRES_INCLUDE_DIR "<My PostgreSQL Include Directory>" CACHE STRING "Include directory of the PostgreSQL client")
 
-# The name of the PostgresSQL library. This variable need not be set for the Chucho
-# library to build successfully with PostgresSQL support. In the context of the
+# The name of the PostgreSQL library. This variable need not be set for the Chucho
+# library to build successfully with PostgreSQL support. In the context of the
 # Chucho build, this variable is only used for unit test linkage. However, you must
 # link your own application to the PostgresSQL library when linking to Chucho.
 
-# SET(POSTGRES_CLIENT_LIB "<My PostgresSQL Library>" CACHE STRING "PostgresSQL client library")
+# SET(POSTGRES_CLIENT_LIB "<My PostgreSQL Library>" CACHE STRING "PostgreSQL client library")
 
 # The location of the DB2 header files.
 
@@ -226,6 +235,14 @@ OPTION(RUBY_FRAMEWORK "Whether Ruby should be included as a framework (Macintosh
 
 # SET(ZEROMQ_LIB "<My ZeroMQ Library>" CACHE STRING "ZeroMQ library")
 
+# The location of the RabbitMQ header files.
+
+# SET(RABBITMQ_INCLUDE_DIR "<My RabbitMQ Include Directory>" CACHE STRING "Include directory of the RabbitMQ library")
+
+# The name of the RabbitMQ library.
+
+# SET(RABBITMQ_LIB "<My RabbitMQ Library>" CACHE STRING "RabbitMQ library")
+
 # The location of the Protobuf header files.
 
 # SET(PROTOBUF_INCLUDE_DIR "<My Protobuf Include Directory>" CACHE STRING "Include directory of the Protobuf library")
@@ -237,6 +254,23 @@ OPTION(RUBY_FRAMEWORK "Whether Ruby should be included as a framework (Macintosh
 # The location of the Protobuf compiler.
 
 # SET(PROTOC_DIR "<Location of Protoc>" CACHE STRING "Protoc location")
+
+# The location of the Cap'n Proto header files.
+
+# SET(CAPNP_INCLUDE_DIR "<My Cap'n Proto Include Directory>" CACHE STRING "Include directory of the Cap'n Proto library")
+
+# The name of the Cap'n Proto library.
+
+# SET(CAPN_PROTO_LIB "<My Cap'n Proto Library>" CACHE STRING "Cap'n Proto library")
+
+# The name of the Cap'n Proto KJ library.
+
+# SET(CAPN_PROTO_KJ_LIB "<My Cap'n Proto KJ Library>" CACHE STRING "Cap'n Proto KJ library")
+
+# The location of the Cap'n Proto compiler.
+
+# SET(CAPNP_DIR "<Location of Capnp>" CACHE STRING "Capnp location")
+
 
 # COMPRESSION
 # ================================================================================

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,22 +14,34 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_FORMATTED_MESSAGE_SERIALIZER_MEMENTO_HPP__)
-#define CHUCHO_FORMATTED_MESSAGE_SERIALIZER_MEMENTO_HPP__
+#if !defined(CHUCHO_BZIP2_COMPRESSOR_HPP__)
+#define CHUCHO_BZIP2_COMPRESSOR_HPP__
 
-#if !defined(CHUCHO_BUILD)
-#error "This header is private"
-#endif
-
-#include <chucho/memento.hpp>
+#include <chucho/compressor.hpp>
 
 namespace chucho
 {
 
-class formatted_message_serializer_memento : public memento
+/**
+ * @class bzip2_compressor bzip2_compressor.hpp chucho/bzip2_compressor.hpp
+ * A compressor that uses bzip2.
+ * 
+ * @ingroup compressors
+ */
+class CHUCHO_EXPORT bzip2_compressor : public compressor
 {
 public:
-    formatted_message_serializer_memento(configurator& cfg);
+    /**
+     * @name Constructor
+     * @{
+     */
+    /**
+     * Construct a bzip2 compressor.
+     */
+    bzip2_compressor();
+    /** @} */
+
+    virtual std::vector<std::uint8_t> compress(const std::vector<std::uint8_t>& in) override;
 };
 
 }

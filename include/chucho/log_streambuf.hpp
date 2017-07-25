@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -71,6 +71,12 @@ public:
      */
     std::shared_ptr<level> get_level() const;
     /**
+     * Return the logger of this streambuf.
+     *
+     * @return the logger
+     */
+    std::shared_ptr<logger> get_logger() const;
+    /**
      * Used internally by the stream to add characters to a message. 
      * You don't use this method. Don't even look at it.
      * 
@@ -119,6 +125,11 @@ private:
 inline std::shared_ptr<level> log_streambuf::get_level() const
 {
     return level_;
+}
+
+inline std::shared_ptr<logger> log_streambuf::get_logger() const
+{
+    return logger_;
 }
 
 inline void log_streambuf::set_level(std::shared_ptr<level> lvl)

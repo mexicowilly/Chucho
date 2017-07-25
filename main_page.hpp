@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Will Mason
+ * Copyright 2013-2017 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@
  * href="https://groups.google.com/forum/?fromgroups#!forum/chucho-logging" 
  * target="_blank">Google group</a>. 
  *  
- * @copyright &copy; 2013-2016 Will Mason 
+ * @copyright &copy; 2013-2017 Will Mason
  */
 
 /**

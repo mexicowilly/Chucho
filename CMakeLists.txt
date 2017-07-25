@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2016 Will Mason
+# Copyright 2013-2017 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,20 +14,27 @@
 #    limitations under the License.
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.10)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1.3)
 IF(POLICY CMP0042)
     CMAKE_POLICY(SET CMP0042 OLD)
 ENDIF()
 
 PROJECT(chucho CXX C)
 
-SET(CHUCHO_VERSION 1.9)
-SET(CHUCHO_SO_VERSION 1)
-# This is used for release candidate distros
-#SET(CHUCHO_DIST_VERSION try-1)
+SET(CHUCHO_MAJOR_VERSION 1)
+SET(CHUCHO_MINOR_VERSION 10)
+SET(CHUCHO_VERSION ${CHUCHO_MAJOR_VERSION}.${CHUCHO_MINOR_VERSION})
 
 INCLUDE(BuildOptions.cmake)
 INCLUDE(Configure.cmake)
+
+# We can release stuff
+SET(CPACK_PACKAGE_VERSION_MAJOR ${CHUCHO_MAJOR_VERSION})
+SET(CPACK_PACKAGE_VERSION_MINOR ${CHUCHO_MINOR_VERSION})
+SET(CPACK_SOURCE_PACKAGE_FILE_NAME ${CMAKE_PROJECT_NAME}-${CHUCHO_VERSION})
+SET(CPACK_SOURCE_IGNORE_FILES "build;\.git;\.idea;^.*\.swp$;${CPACK_SOURCE_IGNORE_FILES}")
+SET(CPACK_SOURCE_GENERATOR TGZ ZIP)
+INCLUDE(CPack)
 
 # Include CMAKE_BINARY_DIR because that's where the generated file
 # export.hpp lives.
@@ -55,6 +62,9 @@ ENDIF()
 IF(CHUCHO_HAVE_PROTOBUF)
     INCLUDE_DIRECTORIES("${PROTOBUF_INCLUDE_DIR}")
 ENDIF()
+IF(CHUCHO_HAVE_CAPN_PROTO)
+    INCLUDE_DIRECTORIES("${CAPN_PROTO_INCLUDE_DIR}")
+ENDIF()
 IF(CHUCHO_HAVE_ZEROMQ)
     INCLUDE_DIRECTORIES("${ZEROMQ_INCLUDE_DIR}")
 ENDIF()
@@ -63,6 +73,9 @@ IF(CHUCHO_HAVE_ACTIVEMQ)
 ENDIF()
 IF(CHUCHO_HAVE_DB2)
     INCLUDE_DIRECTORIES("${DB2_INCLUDE_DIR}")
+ENDIF()
+IF(CHUCHO_HAVE_RABBITMQ)
+    INCLUDE_DIRECTORIES("${RABBITMQ_INCLUDE_DIR}")
 ENDIF()
 
 IF(CHUCHO_POSIX)
@@ -207,6 +220,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/noop_file_compressor.hpp
     include/chucho/numbered_file_roller.hpp
     include/chucho/optional.hpp
+    include/chucho/optional_features.hpp
     include/chucho/pattern_formatter.hpp
     include/chucho/pipe_writer.hpp
     include/chucho/remote_writer.hpp
@@ -220,6 +234,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/status_manager.hpp
     include/chucho/status_observer.hpp
     include/chucho/status_reporter.hpp
+    include/chucho/streamable.hpp
     include/chucho/syslog_constants.h
     include/chucho/syslog_constants.hpp
     include/chucho/syslog_writer.hpp
@@ -313,15 +328,21 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/zlib_compressor.h)
 
 IF(CHUCHO_HAVE_BZIP2)
-    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/bzip2_file_compressor.hpp)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/bzip2_compressor.hpp
+         include/chucho/bzip2_file_compressor.hpp)
     IF(C_API)
-        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/bzip2_file_compressor.h)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS
+             include/chucho/bzip2_file_compressor.h
+             include/chucho/bzip2_compressor.h)
     ENDIF()
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/bzip2_compressor.hpp
      include/chucho/bzip2_file_compressor.hpp
-     include/chucho/bzip2_file_compressor.h)
+     include/chucho/bzip2_file_compressor.h
+     include/chucho/bzip2_compressor.h)
 
 IF(CHUCHO_HAVE_MINIZIP)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/zip_file_compressor.hpp)
@@ -491,12 +512,10 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
 IF(CHUCHO_HAVE_PROTOBUF)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
          include/chucho/protobuf_serializer.hpp)
-    LIST(APPEND CHUCHO_PROTOBUF_SOURCES
+    LIST(APPEND CHUCHO_SERIALIZER_SOURCES
          protobuf_serializer.cpp
          protobuf_serializer_factory.cpp
-         include/chucho/protobuf_serializer_factory.hpp
-         protobuf_serializer_memento.cpp
-         include/chucho/protobuf_serializer_memento.hpp)
+         include/chucho/protobuf_serializer_factory.hpp)
     IF(C_API)
         LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/protobuf_serializer.h)
         LIST(APPEND CHUCHO_PROTOBUF_SOURCES c_protobuf_serializer.cpp)
@@ -506,6 +525,23 @@ ENDIF()
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/protobuf_serializer.h
      include/chucho/protobuf_serializer.hpp)
+
+IF(CHUCHO_HAVE_CAPN_PROTO)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/capn_proto_serializer.hpp)
+    LIST(APPEND CHUCHO_SERIALIZER_SOURCES
+         capn_proto_serializer.cpp
+         capn_proto_serializer_factory.cpp
+         include/chucho/capn_proto_serializer_factory.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/capn_proto_serializer.h)
+        LIST(APPEND CHUCHO_SERIALIZER_SOURCES c_capn_proto_serializer.cpp)
+    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/capn_proto_serializer.h
+     include/chucho/capn_proto_serializer.hpp)
 
 IF(CHUCHO_HAVE_ZEROMQ)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
@@ -546,14 +582,59 @@ IF(CHUCHO_HAVE_ACTIVEMQ)
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/activemq_writer.h
      include/chucho/activemq_writer.hpp)
+
+IF(CHUCHO_HAVE_RABBITMQ)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/rabbitmq_writer.hpp
+         include/chucho/rabbitmq_writer_factory.hpp
+         include/chucho/rabbitmq_writer_memento.hpp)
+    LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
+         rabbitmq_writer.cpp
+         rabbitmq_writer_factory.cpp
+         rabbitmq_writer_memento.cpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS
+             include/chucho/rabbitmq_writer.h)
+        LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
+             c_rabbitmq_writer.cpp)
+    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/rabbitmq_writer.h
+     include/chucho/rabbitmq_writer.hpp)
+
+IF(CHUCHO_HAVE_DOORS)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/door_event.h
+         include/chucho/door_writer.hpp
+         include/chucho/door_writer_factory.hpp
+         include/chucho/door_writer_memento.hpp)
+    LIST(APPEND CHUCHO_DOOR_SOURCES
+         platform/solaris/door_writer.cpp
+         platform/solaris/door_writer_factory.cpp
+         platform/solaris/door_writer_memento.cpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS
+             include/chucho/door_writer.h)
+        LIST(APPEND CHUCHO_DOOR_SOURCES
+             platform/solaris/c_door_writer.cpp)
+    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/door_event.h
+     include/chucho/door_writer.h
+     include/chucho/door_writer.hpp)
 
 # The libyaml sources are required by chuchod
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
     # Update this when you rev libyaml
     SET(CHUCHO_LIBYAML_VERSION_MAJOR 0)
     SET(CHUCHO_LIBYAML_VERSION_MINOR 1)
-    SET(CHUCHO_LIBYAML_VERSION_PATCH 5)
+    SET(CHUCHO_LIBYAML_VERSION_PATCH 7)
 
     LIST(APPEND ${CHUCHO_YAML_SOURCE_VAR}
         "${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c"
@@ -574,7 +655,7 @@ MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
         # Microsoft doesn't want libyaml to use strdup
         SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
                                     COMPILE_FLAGS /wd4996)
-    ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
+    ELSEIF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER_ID STREQUAL Clang)
         SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
                                     COMPILE_FLAGS "-Wno-implicit-function-declaration -Wno-int-to-pointer-cast")
     ENDIF()
@@ -696,20 +777,17 @@ SET(CHUCHO_SOURCES
     bzip2_file_compressor_factory.cpp
     calendar.cpp
     cerr_writer_factory.cpp
-    cerr_writer_memento.cpp
     clock_util.cpp
     configurable.cpp
     configurable_factory.cpp
     configuration.cpp
     configurator.cpp
     cout_writer_factory.cpp
-    cout_writer_memento.cpp
     demangle.cpp
     database_writer.cpp
     diagnostic_context.cpp
     duplicate_message_filter.cpp
     duplicate_message_filter_factory.cpp
-    duplicate_message_filter_memento.cpp
     event.cpp
     exception.cpp
     file_compressor_factory.cpp
@@ -724,7 +802,6 @@ SET(CHUCHO_SOURCES
     finalize.cpp
     formatted_message_serializer.cpp
     formatted_message_serializer_factory.cpp
-    formatted_message_serializer_memento.cpp
     garbage_cleaner.cpp
     gzip_file_compressor_factory.cpp
     host.cpp
@@ -753,11 +830,11 @@ SET(CHUCHO_SOURCES
     named_pipe_writer_memento.cpp
     noop_compressor.cpp
     noop_compressor_factory.cpp
-    noop_compressor_memento.cpp
     noop_file_compressor.cpp
     numbered_file_roller.cpp
     numbered_file_roller_factory.cpp
     numbered_file_roller_memento.cpp
+    optional_features.cpp
     pattern_formatter.cpp
     pattern_formatter_factory.cpp
     pattern_formatter_memento.cpp
@@ -802,14 +879,11 @@ SET(CHUCHO_SOURCES
     include/chucho/bzip2_file_compressor_factory.hpp
     include/chucho/calendar.hpp
     include/chucho/cerr_writer_factory.hpp
-    include/chucho/cerr_writer_memento.hpp
     include/chucho/clock_util.hpp
     include/chucho/configurator.hpp
     include/chucho/cout_writer_factory.hpp
-    include/chucho/cout_writer_memento.hpp
     include/chucho/demangle.hpp
     include/chucho/duplicate_message_filter_factory.hpp
-    include/chucho/duplicate_message_filter_memento.hpp
     include/chucho/environment.hpp
     include/chucho/exception.hpp
     include/chucho/file.hpp
@@ -817,7 +891,6 @@ SET(CHUCHO_SOURCES
     include/chucho/file_writer_factory.hpp
     include/chucho/file_writer_memento.hpp
     include/chucho/formatted_message_serializer_factory.hpp
-    include/chucho/formatted_message_serializer_memento.hpp
     include/chucho/garbage_cleaner.hpp
     include/chucho/gzip_file_compressor_factory.hpp
     include/chucho/host.hpp
@@ -835,7 +908,6 @@ SET(CHUCHO_SOURCES
     include/chucho/named_pipe_writer_factory.hpp
     include/chucho/named_pipe_writer_memento.hpp
     include/chucho/noop_compressor_factory.hpp
-    include/chucho/noop_compressor_memento.hpp
     include/chucho/numbered_file_roller_factory.hpp
     include/chucho/numbered_file_roller_memento.hpp
     include/chucho/pattern_formatter_factory.hpp
@@ -874,8 +946,9 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_DATABASE_SOURCES}
     ${CHUCHO_EVALUATOR_SOURCES}
     ${CHUCHO_EMAIL_SOURCES}
-    ${CHUCHO_PROTOBUF_SOURCES}
-    ${CHUCHO_MESSAGE_QUEUE_SOURCES})
+    ${CHUCHO_SERIALIZER_SOURCES}
+    ${CHUCHO_MESSAGE_QUEUE_SOURCES}
+    ${CHUCHO_DOOR_SOURCES})
 
 IF(CHUCHO_HAVE_PUT_TIME)
     SET_SOURCE_FILES_PROPERTIES(calendar.cpp PROPERTIES
@@ -929,6 +1002,10 @@ IF(CHUCHO_HAVE_PROTOBUF)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_PROTOBUF)
 ENDIF()
 
+IF(CHUCHO_HAVE_CAPN_PROTO)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_CAPN_PROTO)
+ENDIF()
+
 IF(CHUCHO_HAVE_ZEROMQ)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ZEROMQ)
 ENDIF()
@@ -937,13 +1014,88 @@ IF(CHUCHO_HAVE_ACTIVEMQ)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ACTIVEMQ)
 ENDIF()
 
+IF(CHUCHO_HAVE_RABBITMQ)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RABBITMQ)
+ENDIF()
+
 IF(CHUCHO_HAVE_ZLIB)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ZLIB)
+ENDIF()
+
+IF(CHUCHO_HAVE_BZIP2)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_BZIP2)
+ENDIF()
+
+IF(CHUCHO_HAVE_DOORS)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_DOORS)
 ENDIF()
 
 IF(DEFINED CHUCHO_CONFIGURATOR_DEFS)
     SET_SOURCE_FILES_PROPERTIES(configurator.cpp PROPERTIES
                                 COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATOR_DEFS}")
+ENDIF()
+
+# Feature definitions
+IF(C_API)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_C_API)
+ENDIF()
+IF(YAML_CONFIG)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_YAML_CONFIG)
+ENDIF()
+IF(CONFIG_FILE_CONFIG)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_CONFIG_FILE_CONFIG)
+ENDIF()
+IF(LOG4CPLUS_CONFIG)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_LOG4CPLUS_CONFIG)
+ENDIF()
+IF(CURL_FOUND)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_EMAIL_WRITER)
+ENDIF()
+IF(CHUCHO_HAVE_DB2)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_DB2_WRITER)
+ENDIF()
+IF(CHUCHO_HAVE_MYSQL)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_MYSQL_WRITER)
+ENDIF()
+IF(CHUCHO_HAVE_ORACLE)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_ORACLE_WRITER)
+ENDIF()
+IF(CHUCHO_HAVE_POSTGRES)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_POSTGRESQL_WRITER)
+ENDIF()
+IF(CHUCHO_HAVE_SQLITE)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_SQLITE_WRITER)
+ENDIF()
+IF(CHUCHO_HAVE_RUBY)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_RUBY_EVALUATOR_FILTER)
+ENDIF()
+IF(CHUCHO_HAVE_ACTIVEMQ)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_ACTIVEMQ_WRITER)
+ENDIF()
+IF(CHUCHO_HAVE_ZEROMQ)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_ZEROMQ_WRITER)
+ENDIF()
+IF(CHUCHO_HAVE_RABBITMQ)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_RABBITMQ_WRITER)
+ENDIF()
+IF(CHUCHO_HAVE_PROTOBUF)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_PROTOBUF_SERIALIZER)
+ENDIF()
+IF(CHUCHO_HAVE_CAPN_PROTO)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_CAPN_PROTO_SERIALIZER)
+ENDIF()
+IF(CHUCHO_HAVE_ZLIB)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_ZLIB_COMPRESSION)
+ENDIF()
+IF(CHUCHO_HAVE_BZIP2)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_BZIP2_COMPRESSION)
+ENDIF()
+IF(CHUCHO_HAVE_MINIZIP)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_MINIZIP_COMPRESSION)
+ENDIF()
+IF(DEFINED CHUCHO_FEATURE_DEFS)
+    SET_SOURCE_FILES_PROPERTIES(optional_features.cpp PROPERTIES
+                                COMPILE_DEFINITIONS "${CHUCHO_FEATURE_DEFS}")
 ENDIF()
 
 SET_SOURCE_FILES_PROPERTIES(yaml_configurator.cpp PROPERTIES
@@ -1020,10 +1172,15 @@ ENDIF()
 
 IF(CHUCHO_HAVE_BZIP2)
     LIST(APPEND CHUCHO_SOURCES
+         bzip2_compressor.cpp
+         bzip2_compressor_factory.cpp
          bzip2_file_compressor.cpp
+         include/chucho/bzip2_compressor_factory.hpp
          ${CHUCHO_BZIP2_SOURCES})
     IF(C_API)
-        LIST(APPEND CHUCHO_SOURCES c_bzip2_file_compressor.cpp)
+        LIST(APPEND CHUCHO_SOURCES
+             c_bzip2_file_compressor.cpp
+             c_bzip2_compressor.cpp)
     ENDIF()
     SET_SOURCE_FILES_PROPERTIES(bzip2_file_compressor_factory.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_HAVE_BZIP2)
@@ -1075,7 +1232,7 @@ IF(ENABLE_SHARED)
     ADD_LIBRARY(chucho SHARED ${CHUCHO_SOURCES})
     SET_TARGET_PROPERTIES(chucho PROPERTIES
                           VERSION ${CHUCHO_VERSION}
-                          SOVERSION ${CHUCHO_SO_VERSION}
+                          SOVERSION ${CHUCHO_MAJOR_VERSION}
                           PUBLIC_HEADER "${CHUCHO_PUBLIC_HEADERS}"
                           FRAMEWORK ${ENABLE_FRAMEWORK})
     IF(DEFINED CHUCHO_SO_FLAGS)
@@ -1154,6 +1311,10 @@ IF(CHUCHO_HAVE_PROTOBUF)
     TARGET_LINK_LIBRARIES(chucho "${PROTOBUF_LIB}")
 ENDIF()
 
+IF(CHUCHO_HAVE_CAPN_PROTO)
+    TARGET_LINK_LIBRARIES(chucho "${CAPN_PROTO_LIB}" "${CAPN_PROTO_KJ_LIB}")
+ENDIF()
+
 IF(CHUCHO_HAVE_ZEROMQ)
     TARGET_LINK_LIBRARIES(chucho "${ZEROMQ_LIB}")
 ENDIF()
@@ -1166,6 +1327,10 @@ IF(CHUCHO_HAVE_ACTIVEMQ)
     IF(CHUCHO_NEEDS_SENDFILE)
         TARGET_LINK_LIBRARIES(chucho sendfile)
     ENDIF()
+ENDIF()
+
+IF(CHUCHO_HAVE_RABBITMQ)
+    TARGET_LINK_LIBRARIES(chucho "${RABBITMQ_LIB}")
 ENDIF()
 
 IF(ZLIB_LIB_DIR)
@@ -1209,12 +1374,21 @@ ENDIF()
 IF(CHUCHO_HAVE_PROTOBUF)
     ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/chucho.pb.cc" "${CMAKE_BINARY_DIR}/chucho.pb.h"
                        COMMAND "${CHUCHO_PROTOC}" "--cpp_out=${CMAKE_BINARY_DIR}" chucho.proto
-                       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/protobuf"
-                       DEPENDS "${CMAKE_SOURCE_DIR}/protobuf/chucho.proto")
+                       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/serialization"
+                       DEPENDS "${CMAKE_SOURCE_DIR}/serialization/chucho.proto")
+ENDIF()
+
+IF(CHUCHO_HAVE_CAPN_PROTO)
+    ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/chucho.capnp.c++" "${CMAKE_BINARY_DIR}/chucho.capnp.h"
+                       COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_SOURCE_DIR}/serialization/chucho.capnp" "${CMAKE_BINARY_DIR}"
+                       COMMAND "${CHUCHO_CAPNP}" compile "--output=${CHUCHO_CAPNPC_CXX}" "${CMAKE_BINARY_DIR}/chucho.capnp"
+                       DEPENDS "${CMAKE_SOURCE_DIR}/serialization/chucho.capnp")
 ENDIF()
 
 ADD_SUBDIRECTORY(test)
-ADD_SUBDIRECTORY(log-server)
+IF(CHUCHOD)
+    ADD_SUBDIRECTORY(log-server)
+ENDIF()
 
 # Documentation
 IF(DOXYGEN_FOUND)
@@ -1237,10 +1411,11 @@ IF(DOXYGEN_FOUND)
             SET(CHUCHO_DOXYGEN_EXTRACT_ALL NO)
         ENDIF()
         CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/doxygen.conf.in" "${CMAKE_BINARY_DIR}/doxygen.conf")
-        MESSAGE(STATUS "Generating HTML header for API documentation")
+        MESSAGE(STATUS "Generating HTML header and footer for API documentation")
         EXECUTE_PROCESS(COMMAND "${DOXYGEN_EXECUTABLE}" -w html "${CMAKE_BINARY_DIR}/doc_header.html" "${CMAKE_BINARY_DIR}/doc_footer.html" "${CMAKE_BINARY_DIR}/doc_stylesheet.html" "${CMAKE_BINARY_DIR}/doxygen.conf"
                         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
         FILE(STRINGS "${CMAKE_BINARY_DIR}/doc_header.html" CHUCHO_HTML_HEADER)
+        FILE(STRINGS "${CMAKE_BINARY_DIR}/doc_footer.html" CHUCHO_HTML_FOOTER)
         FILE(REMOVE "${CMAKE_BINARY_DIR}/doc_header.html" "${CMAKE_BINARY_DIR}/doc_footer.html" "${CMAKE_BINARY_DIR}/doc_stylesheet.html")
         LIST(FIND CHUCHO_HTML_HEADER <head> CHUCHO_HEAD_INDEX)
         IF(CHUCHO_HEAD_INDEX EQUAL -1)
@@ -1252,6 +1427,15 @@ IF(DOXYGEN_FOUND)
             FILE(APPEND "${CMAKE_BINARY_DIR}/doc_header.html" ${LINE})
             FILE(APPEND "${CMAKE_BINARY_DIR}/doc_header.html" "\n")
         ENDFOREACH()
+        LIST(FIND CHUCHO_HTML_FOOTER </body> CHUCHO_BODY_INDEX)
+        IF(CHUCHO_BODY_INDEX EQUAL -1)
+            MESSAGE(FATAL_ERROR "The </body> section of the HTML footer could not be found")
+        ENDIF()
+        LIST(INSERT CHUCHO_HTML_FOOTER ${CHUCHO_BODY_INDEX} "<script async src=\"//radar.cedexis.com/1/23762/radar.js\"></script>")
+        FOREACH(LINE ${CHUCHO_HTML_FOOTER})
+            FILE(APPEND "${CMAKE_BINARY_DIR}/doc_footer.html" ${LINE})
+            FILE(APPEND "${CMAKE_BINARY_DIR}/doc_footer.html" "\n")
+        ENDFOREACH()
         ADD_CUSTOM_TARGET(doc
                           COMMAND "${DOXYGEN_EXECUTABLE}" "${CMAKE_BINARY_DIR}/doxygen.conf"
                           WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
@@ -1261,7 +1445,7 @@ IF(DOXYGEN_FOUND)
                           COMMAND "${CMAKE_COMMAND}" -E echo "C_API must be enabled in order to generate documentation")
     ENDIF()
 ELSE()
-    MESSAGE(STATUS "The C API must be enabled in order to generate Doxygen documentation")
+    MESSAGE(STATUS "Doxygen must be present in order to generate Doxygen documentation")
     ADD_CUSTOM_TARGET(doc
                       COMMAND "${CMAKE_COMMAND}" -E echo "Doxygen was not found on this system, so the documentation cannot be generated")
 ENDIF()
@@ -1280,40 +1464,4 @@ IF(CHUCHO_CPPCHECK)
     ADD_CUSTOM_TARGET(cppcheck
                       COMMAND "${CHUCHO_CPPCHECK}" --enable=all -I include -I embedded/include -U_MSC_VER -U__clang__ -U__GNUC__ -U__SUNPRO_CC ${CHUCHO_CPPCHECK_SOURCES}
                       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-ENDIF()
-
-# Distro
-FILE(GLOB_RECURSE CHUCHO_ALL_FILES RELATIVE "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/*")
-FILE(RELATIVE_PATH CHUCHO_REL_BINARY_DIR "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
-UNSET(CHUCHO_TO_REMOVE)
-FOREACH(SRC ${CHUCHO_ALL_FILES})
-    IF(SRC MATCHES "^${CHUCHO_REL_BINARY_DIR}/" OR SRC MATCHES "\\.git" OR SRC MATCHES ".DS_Store$")
-        LIST(APPEND CHUCHO_TO_REMOVE "${SRC}")
-    ENDIF()
-ENDFOREACH()
-LIST(LENGTH CHUCHO_TO_REMOVE CHUCHO_TO_REMOVE_LENGTH)
-IF(CHUCHO_TO_REMOVE_LENGTH GREATER 0)
-    LIST(REMOVE_ITEM CHUCHO_ALL_FILES ${CHUCHO_TO_REMOVE})
-ENDIF()
-STRING(TOLOWER ${CMAKE_PROJECT_NAME} CHUCHO_LOWER_PROJECT_NAME)
-SET(CHUCHO_DIST_NAME_BASE "${CMAKE_BINARY_DIR}/${CHUCHO_LOWER_PROJECT_NAME}-${CHUCHO_VERSION}")
-IF(DEFINED CHUCHO_DIST_VERSION)
-    SET(CHUCHO_DIST_NAME_BASE "${CHUCHO_DIST_NAME_BASE}-${CHUCHO_DIST_VERSION}")
-ENDIF()
-FOREACH(SRC ${CHUCHO_ALL_FILES})
-    SET(CHUCHO_SRC_OUT "${CHUCHO_DIST_NAME_BASE}/${SRC}")
-    LIST(APPEND CHUCHO_DIST_OUTPUT "${CHUCHO_SRC_OUT}")
-    ADD_CUSTOM_COMMAND(OUTPUT "${CHUCHO_SRC_OUT}"
-                       COMMAND "${CMAKE_COMMAND}" -E copy "${SRC}" "${CHUCHO_SRC_OUT}"
-                       DEPENDS "${SRC}"
-                       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-ENDFOREACH()
-ADD_CUSTOM_TARGET(dist
-                  COMMAND "${CMAKE_COMMAND}" -E tar czvf ${CHUCHO_DIST_NAME_BASE}.tar.gz ${CHUCHO_DIST_NAME_BASE}
-                  DEPENDS ${CHUCHO_DIST_OUTPUT})
-IF(CHUCHO_ZIP)
-    FILE(RELATIVE_PATH CHUCHO_ZDIST_NAME_BASE "${CMAKE_BINARY_DIR}" "${CHUCHO_DIST_NAME_BASE}")
-    ADD_CUSTOM_TARGET(zdist
-                      COMMAND "${CHUCHO_ZIP}" --recurse-paths --to-crlf ${CHUCHO_DIST_NAME_BASE}.zip ${CHUCHO_ZDIST_NAME_BASE}
-                      DEPENDS ${CHUCHO_DIST_OUTPUT})
 ENDIF()
