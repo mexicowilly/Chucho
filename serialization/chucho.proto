@@ -16,7 +16,11 @@
 
 package chucho.proto;
 
-message event {
+message log_events {
+    repeated log_event events = 1;
+}
+
+message log_event {
     optional string formatted_message = 1;
     optional uint64 seconds_since_epoch = 2;
     optional string file_name = 3;

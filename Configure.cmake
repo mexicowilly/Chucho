@@ -755,30 +755,7 @@ ELSEIF(RUBY_FRAMEWORK)
 ENDIF()
 
 # protobuf
-IF(PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIB AND PROTOC_DIR)
-    FIND_PROGRAM(CHUCHO_PROTOC
-                 protoc
-                 PATHS "${PROTOC_DIR}"
-                 NO_DEFAULT_PATH)
-    IF(NOT CHUCHO_PROTOC)
-        MESSAGE(FATAL_ERROR "The variable PROTOC_DIR was provided as ${PROTOC_DIR}, but it does not contain the protoc program")
-    ENDIF()
-    SET(CMAKE_REQUIRED_INCLUDES "${PROTOBUF_INCLUDE_DIR}")
-    CHECK_INCLUDE_FILE_CXX(google/protobuf/message.h CHUCHO_GOOGLE_PROTOBUF_MESSAGE_H)
-    IF(NOT CHUCHO_GOOGLE_PROTOBUF_MESSAGE_H)
-        MESSAGE(FATAL_ERROR "The variable PROTOBUF_INCLUDE_DIR was provided as ${PROTOBUF_INCLUDE_DIR}, but it does not contain the protobuf headers")
-    ENDIF()
-    UNSET(CMAKE_REQUIRED_INCLUDES)
-    IF(NOT EXISTS "${PROTOBUF_LIB}")
-        MESSAGE(FATAL_ERROR "The variable PROTOBUF_LIB was provided as ${PROTOBUF_LIB}, but it does not refer to an existing file")
-    ENDIF()
-    LIST(APPEND CHUCHO_SERIALIZER_SOURCES
-        "${CMAKE_BINARY_DIR}/chucho.pb.cc"
-        "${CMAKE_BINARY_DIR}/chucho.pb.h")
-    SET(CHUCHO_HAVE_PROTOBUF TRUE CACHE INTERNAL "Whether we have protobuf")
-ELSEIF(PROTOBUF_INCLUDE_DIR OR PROTOBUF_LIB OR PROTOC_DIR)
-    MESSAGE(WARNING "If any of the variables PROTOBUF_INCLUDE_DIR, PROTOBUF_LIB or PROTOC_DIR have been set, then they must all be set for protobuf support to be included")
-ENDIF()
+FIND_PACKAGE(Protobuf)
 
 # Cap'n Proto
 IF(CAPN_PROTO_INCLUDE_DIR AND CAPN_PROTO_LIB AND CAPN_PROTO_KJ_LIB AND CAPNP_DIR)
@@ -797,11 +774,15 @@ IF(CAPN_PROTO_INCLUDE_DIR AND CAPN_PROTO_LIB AND CAPN_PROTO_KJ_LIB AND CAPNP_DIR
         MESSAGE(FATAL_ERROR "The variable CAPNP_DIR was provided as ${CAPNP_DIR}, but it does not contain the capnpc-c++ program")
     ENDIF()
     SET(CMAKE_REQUIRED_INCLUDES "${CAPN_PROTO_INCLUDE_DIR}")
+    IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang)
+        SET(CMAKE_REQUIRED_FLAGS -std=c++11)
+    ENDIF()
     CHECK_INCLUDE_FILE_CXX(capnp/serialize.h CHUCHO_CAPN_PROTO_SERIALIZE_PACKED_H)
-    IF(NOT CHUCHO_CAPN_PROTO_MESSAGE_H OR NOT CHUCHO_CAPN_PROTO_SERIALIZE_PACKED_H OR NOT CHUCHO_CAPN_PROTO_VECTOR_H)
+    IF(NOT CHUCHO_CAPN_PROTO_SERIALIZE_PACKED_H)
         MESSAGE(FATAL_ERROR "The variable CAPN_PROTO_INCLUDE_DIR was provided as ${CAPN_PROTO_INCLUDE_DIR}, but it does not contain the Cap'n Proto headers")
     ENDIF()
     UNSET(CMAKE_REQUIRED_INCLUDES)
+    UNSET(CMAKE_REQUIRED_FLAGS)
     IF(NOT EXISTS "${CAPN_PROTO_LIB}")
         MESSAGE(FATAL_ERROR "The variable CAPN_PROTO_LIB was provided as ${CAPN_PROTO_LIB}, but it does not refer to an existing file")
     ENDIF()

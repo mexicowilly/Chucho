@@ -26,11 +26,39 @@
 namespace chucho
 {
 
-std::vector<std::uint8_t> capn_proto_serializer::serialize(const event& evt,
-                                                           std::shared_ptr<formatter> fmt)
+struct capn_proto_serializer::handle
+{
+    std::vector<::capnp::Orphan<capnp::Event>> events;
+};
+
+capn_proto_serializer::capn_proto_serializer()
+    : handle_(new handle)
+{
+}
+
+capn_proto_serializer::~capn_proto_serializer()
+{
+}
+
+std::vector<std::uint8_t> capn_proto_serializer::finish_blob()
 {
     ::capnp::MallocMessageBuilder message;
-    capnp::Event::Builder cevt = message.initRoot<capnp::Event>();
+    capnp::Events::Builder events = message.initRoot<capnp::Events>();
+    auto cevts = events.initEvents(handle_->events.size());
+    for (auto i = 0; i < handle_->events.size(); i++)
+        cevts.adoptWithCaveats(i, std::move(handle_->events[i]));
+    handle_->events.clear();
+    auto words = ::capnp::messageToFlatArray(message);
+    auto bytes = words.asBytes();
+    return std::vector<std::uint8_t>(bytes.begin(), bytes.end());
+}
+
+void capn_proto_serializer::serialize(const event& evt, std::shared_ptr<formatter> fmt)
+{
+    ::capnp::MallocMessageBuilder message;
+    auto orphanage = message.getOrphanage();
+    auto orphan = orphanage.newOrphan<capnp::Event>();
+    auto cevt = orphan.get();
     cevt.setFormattedMessage(utf8::escape_invalid(fmt->format(evt)));
     cevt.setSecondsSinceEpoch(event::clock_type::to_time_t(evt.get_time()));
     cevt.setFileName(utf8::escape_invalid(evt.get_file_name()));
@@ -47,9 +75,7 @@ std::vector<std::uint8_t> capn_proto_serializer::serialize(const event& evt,
     std::ostringstream tstream;
     tstream << std::this_thread::get_id();
     cevt.setThread(utf8::escape_invalid(tstream.str()));
-    auto words = ::capnp::messageToFlatArray(message);
-    auto bytes = words.asBytes();
-    return std::vector<std::uint8_t>(bytes.begin(), bytes.end());
+    handle_->events.push_back(std::move(orphan));
 }
 
 }

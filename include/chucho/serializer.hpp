@@ -21,6 +21,7 @@
 #include <chucho/status_reporter.hpp>
 #include <chucho/configurable.hpp>
 #include <chucho/formatter.hpp>
+#include <chucho/non_copyable.hpp>
 #include <vector>
 #include <cstdint>
 
@@ -36,7 +37,8 @@ namespace chucho
  * @ingroup mq
  */
 class CHUCHO_EXPORT serializer : public status_reporter,
-                                 public configurable
+                                 public configurable,
+                                 public non_copyable
 {
 public:
     /**
@@ -50,6 +52,7 @@ public:
     /**
      * @}
      */
+    virtual std::vector<std::uint8_t> finish_blob() = 0;
     /**
      * Turn an event into a blob.
      * 
@@ -57,8 +60,7 @@ public:
      * @param fmt the formatter used to create the formatted message
      * @return the blob
      */
-    virtual std::vector<std::uint8_t> serialize(const event& evt,
-                                                std::shared_ptr<formatter> fmt) = 0;
+    virtual void serialize(const event& evt, std::shared_ptr<formatter> fmt) = 0;
 };
 
 }

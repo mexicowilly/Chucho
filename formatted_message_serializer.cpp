@@ -15,15 +15,21 @@
  */
 
 #include <chucho/formatted_message_serializer.hpp>
+#include <chucho/line_ending.hpp>
 
 namespace chucho
 {
 
-std::vector<std::uint8_t> formatted_message_serializer::serialize(const event& evt,
-                                                                  std::shared_ptr<formatter> fmt)
+std::vector<std::uint8_t> formatted_message_serializer::finish_blob()
 {
-    std::string msg = fmt->format(evt);
-    return std::vector<std::uint8_t>(msg.begin(), msg.end());
+    auto result(std::vector<std::uint8_t>(events_.begin(), events_.end()));
+    events_.clear();
+    return result;
+}
+
+void formatted_message_serializer::serialize(const event& evt, std::shared_ptr<formatter> fmt)
+{
+    events_ += fmt->format(evt) + line_ending::EOL;
 }
 
 }

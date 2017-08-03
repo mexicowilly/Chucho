@@ -25,10 +25,31 @@
 namespace chucho
 {
 
-std::vector<std::uint8_t> protobuf_serializer::serialize(const event& evt,
-                                                         std::shared_ptr<formatter> fmt)
+struct protobuf_serializer::handle
 {
-    proto::event pevt;
+    proto::log_events events;
+};
+
+protobuf_serializer::protobuf_serializer()
+    : handle_(new handle)
+{
+}
+
+protobuf_serializer::~protobuf_serializer()
+{
+}
+
+std::vector<std::uint8_t> protobuf_serializer::finish_blob()
+{
+    std::vector<std::uint8_t> result;
+    std::string tmp = handle_->events.SerializeAsString();
+    handle_->events.clear_events();
+    return std::vector<std::uint8_t>(tmp.begin(), tmp.end());
+}
+
+void protobuf_serializer::serialize(const event& evt, std::shared_ptr<formatter> fmt)
+{
+    proto::log_event& pevt(*handle_->events.add_events());
     pevt.set_formatted_message(utf8::escape_invalid(fmt->format(evt)));
     pevt.set_seconds_since_epoch(event::clock_type::to_time_t(evt.get_time()));
     pevt.set_file_name(utf8::escape_invalid(evt.get_file_name()));
@@ -45,8 +66,6 @@ std::vector<std::uint8_t> protobuf_serializer::serialize(const event& evt,
     std::ostringstream tstream;
     tstream << std::this_thread::get_id();
     pevt.set_thread(utf8::escape_invalid(tstream.str()));
-    std::string tmp = pevt.SerializeAsString();
-    return std::vector<std::uint8_t>(tmp.begin(), tmp.end());
 }
 
 }

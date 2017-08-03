@@ -25,6 +25,7 @@
 #include <chucho/writer.hpp>
 #include <chucho/serializer.hpp>
 #include <chucho/compressor.hpp>
+#include <atomic>
 
 namespace chucho
 {
@@ -43,18 +44,24 @@ namespace chucho
 class CHUCHO_EXPORT message_queue_writer : public writer
 {
 public:
+    static const std::size_t DEFAULT_COALESCE_MAX;
+
+    void flush();
+    std::size_t get_coalesce_max() const;
     /**
      * Return the compressor.
      * 
      * @return the compressor
      */
     std::shared_ptr<compressor> get_compressor() const;
+    std::size_t get_number_coalesced() const;
     /**
      * Return the serializer.
      * 
      * @return the serializer
      */
     std::shared_ptr<serializer> get_serializer() const;
+    void set_coalesce_max(std::size_t num);
 
 protected:
     /**
@@ -71,17 +78,16 @@ protected:
     message_queue_writer(std::shared_ptr<formatter> fmt,
                          std::shared_ptr<serializer> ser,
                          std::shared_ptr<compressor> cmp = std::shared_ptr<compressor>());
+    message_queue_writer(std::shared_ptr<formatter> fmt,
+                         std::shared_ptr<serializer> ser,
+                         std::size_t coalesce_max,
+                         std::shared_ptr<compressor> cmp = std::shared_ptr<compressor>());
+    virtual ~message_queue_writer();
     /**
      * @}
      */
-    /**
-     * Convenience function to serialize and compress
-     * 
-     * @param evt the event to send
-     * @return a vector of serialized and compressed bytes
-     */
-    std::vector<std::uint8_t> serialize_and_compress(const event& evt);
-
+    virtual void flush_impl(const std::vector<std::uint8_t>& blob) = 0;
+    virtual void write_impl(const event& evt) override;
     /**
      * The serializer
      */
@@ -89,17 +95,34 @@ protected:
     /**
      * The compressor
      */
-     std::shared_ptr<compressor> compressor_;
+    std::shared_ptr<compressor> compressor_;
+    std::atomic<std::size_t> coalesce_max_;
+    std::atomic<std::size_t> number_coalesced_;
 };
+
+inline std::size_t message_queue_writer::get_coalesce_max() const
+{
+    return coalesce_max_;
+}
 
 inline std::shared_ptr<compressor> message_queue_writer::get_compressor() const
 {
     return compressor_;
 }
 
+inline std::size_t message_queue_writer::get_number_coalesced() const
+{
+    return number_coalesced_;
+}
+
 inline std::shared_ptr<serializer> message_queue_writer::get_serializer() const
 {
     return serializer_;
+}
+
+inline void message_queue_writer::set_coalesce_max(std::size_t num)
+{
+    coalesce_max_ = num;
 }
 
 }
