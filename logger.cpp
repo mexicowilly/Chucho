@@ -80,6 +80,7 @@ logger::logger(const std::string& name, std::shared_ptr<level> lvl)
       level_(lvl),
       writes_to_ancestors_(true)
 {
+    set_status_origin("logger");
     auto ancestors = split(name);
     ancestors.pop_back();
     std::vector<std::shared_ptr<logger>> resolved;
@@ -107,6 +108,21 @@ logger::logger(const std::string& name, std::shared_ptr<level> lvl)
                 resolved[i]->parent_ = resolved[i - 1];
         }
         parent_ = resolved.back();
+    }
+}
+
+logger::~logger()
+{
+    for (auto w : writers_)
+    {
+        try
+        {
+            w->flush();
+        }
+        catch (std::exception& e)
+        {
+            report_error(name_ + " error flushing " + demangle::get_demangled_name(typeid(*w)) + ": " + e.what());
+        }
     }
 }
 

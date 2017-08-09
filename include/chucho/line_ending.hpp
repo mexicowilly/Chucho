@@ -18,7 +18,7 @@
 #define CHUCHO_LINE_ENDING_HPP__
 
 #if !defined(CHUCHO_BUILD)
-#error "This header if private"
+#error "This header is private"
 #endif
 
 #include <chucho/export.hpp>

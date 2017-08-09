@@ -78,6 +78,7 @@ public:
      * Remove all filters.
      */
     void clear_filters();
+    virtual void flush();
     /**
      * Receive the collection of all filters.
      * @return the filters

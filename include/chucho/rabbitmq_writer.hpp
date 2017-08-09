@@ -53,6 +53,21 @@ public:
                     const optional<std::string>& routing_key = optional<std::string>());
     /**
      * Construct a RabbitMQ writer.
+     *
+     * @param fmt the formatter
+     * @param ser the serializer
+     * @param url the URL to the RabbitMQ instance
+     * @param exchange the exchange to which to publish
+     * @param routing_key the routing key
+     */
+    rabbitmq_writer(std::shared_ptr<formatter> fmt,
+                    std::shared_ptr<serializer> ser,
+                    std::size_t coalesce_max,
+                    const std::string& url,
+                    const std::string& exchange,
+                    const optional<std::string>& routing_key = optional<std::string>());
+    /**
+     * Construct a RabbitMQ writer.
      * 
      * @param fmt the formatter
      * @param ser the serializer
@@ -63,6 +78,23 @@ public:
      */
     rabbitmq_writer(std::shared_ptr<formatter> fmt,
                     std::shared_ptr<serializer> ser,
+                    std::shared_ptr<compressor> cmp,
+                    const std::string& url,
+                    const std::string& exchange,
+                    const optional<std::string>& routing_key = optional<std::string>());
+    /**
+     * Construct a RabbitMQ writer.
+     *
+     * @param fmt the formatter
+     * @param ser the serializer
+     * @param cmp the compressor
+     * @param url the URL to the RabbitMQ instance
+     * @param exchange the exchange to which to publish
+     * @param routing_key the routing key
+     */
+    rabbitmq_writer(std::shared_ptr<formatter> fmt,
+                    std::shared_ptr<serializer> ser,
+                    std::size_t coalesce_max,
                     std::shared_ptr<compressor> cmp,
                     const std::string& url,
                     const std::string& exchange,
@@ -95,7 +127,7 @@ public:
     const std::string& get_url() const;
 
 protected:
-    virtual void write_impl(const event& evt) override;
+    virtual void flush_impl(const std::vector<std::uint8_t>& bytes) override;
 
 private:
     CHUCHO_NO_EXPORT void init();

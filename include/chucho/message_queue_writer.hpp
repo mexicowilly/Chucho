@@ -46,7 +46,7 @@ class CHUCHO_EXPORT message_queue_writer : public writer
 public:
     static const std::size_t DEFAULT_COALESCE_MAX;
 
-    void flush();
+    virtual void flush() override;
     std::size_t get_coalesce_max() const;
     /**
      * Return the compressor.
