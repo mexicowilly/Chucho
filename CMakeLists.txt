@@ -271,6 +271,7 @@ SET(CHUCHO_C_HEADERS
     include/chucho/level_threshold_filter.h
     include/chucho/log.h
     include/chucho/logger.h
+    include/chucho/message_queue_writer.h
     include/chucho/named_pipe_writer.h
     include/chucho/noop_compressor.h
     include/chucho/numbered_file_roller.h
@@ -727,6 +728,7 @@ IF(C_API)
         c_level_threshold_filter.cpp
         c_log.cpp
         c_logger.cpp
+        c_message_queue_writer.cpp
         c_named_pipe_writer.cpp
         c_noop_compressor.cpp
         c_numbered_file_roller.cpp

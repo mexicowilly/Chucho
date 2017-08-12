@@ -69,6 +69,8 @@ typedef enum
  * @param[out] wrt the ActiveMQ writer to create
  * @param[in] fmt the formatter
  * @param[in] ser the serializer
+ * @param[in] coalesce_max The maximum number of log events to hold in
+ * cache before sending them. If -1, then the default of 25 will be used.
  * @param[in] cmp the compressor, which may be NULL
  * @param[in] broker the URI of the ActiveMQ broker
  * @param[in] tp the type of consumer, queue or topic
@@ -79,6 +81,7 @@ typedef enum
 CHUCHO_EXPORT chucho_rc chucho_create_activemq_writer(chucho_writer** wrt,
                                                       chucho_formatter* fmt,
                                                       chucho_serializer* ser,
+                                                      int coalesce_max,
                                                       chucho_compressor* cmp,
                                                       const char* const broker,
                                                       chucho_activemq_consumer_type tp,

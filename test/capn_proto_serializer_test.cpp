@@ -35,7 +35,7 @@ TEST(capn_proto_serializer, no_marker)
     chucho::capn_proto_serializer ser;
     ser.serialize(evt, fmt);
     auto res = ser.finish_blob();
-    kj::ArrayPtr<capnp::word> ptr(reinterpret_cast<capnp::word*>(&res[0]), res.size() / 8);
+    kj::ArrayPtr<capnp::word> ptr(reinterpret_cast<capnp::word*>(&res[0]), res.size() / sizeof(capnp::word));
     capnp::FlatArrayMessageReader reader(ptr);
     chucho::capnp::Events::Reader cevts = reader.getRoot<chucho::capnp::Events>();
     ASSERT_EQ(1, cevts.getEvents().size());

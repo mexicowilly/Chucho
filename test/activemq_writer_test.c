@@ -18,6 +18,7 @@
 #include <chucho/activemq_writer.h>
 #include <chucho/pattern_formatter.h>
 #include <chucho/formatted_message_serializer.h>
+#include <chucho/message_queue_writer.h>
 
 static void activemq_writer_test(void)
 {
@@ -27,12 +28,13 @@ static void activemq_writer_test(void)
     chucho_writer* wrt;
     const char* text;
     chucho_activemq_consumer_type tp;
+    size_t cmax;
 
     rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
     rc = chucho_create_formatted_message_serializer(&ser);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create formatted message serializer");
-    rc = chucho_create_activemq_writer(&wrt, fmt, ser, NULL, "tcp://127.0.0.1:61616", CHUCHO_ACTIVEMQ_QUEUE, "chunky_monkey");
+    rc = chucho_create_activemq_writer(&wrt, fmt, ser, -1, NULL, "tcp://127.0.0.1:61616", CHUCHO_ACTIVEMQ_QUEUE, "chunky_monkey");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create activemq writer");
     if (rc != CHUCHO_NO_ERROR)
         return;
@@ -45,6 +47,9 @@ static void activemq_writer_test(void)
     rc = chucho_amqwrt_get_topic_or_queue(wrt, &text);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_amqwrt_get_topic_or_queue");
     sput_fail_unless(strcmp(text, "chunky_monkey") == 0, text);
+    rc = chucho_mqwrt_get_coalesce_max(wrt, &cmax);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_zmqwrt_get_coalesce_max");
+    sput_fail_unless(cmax == 25, "Coalesce max");
     rc = chucho_release_writer(wrt);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "release amqwrt writer");
 }

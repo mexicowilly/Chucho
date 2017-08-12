@@ -95,6 +95,23 @@ TEST_F(chucho_config_file_configurator, activemq_writer_topic)
     activemq_writer_topic_body();
 }
 
+TEST_F(chucho_config_file_configurator, activemq_writer_topic_coalesce)
+{
+    configure("chucho.logger = will\n"
+                  "chucho.logger.will.writer = aw\n"
+                  "chucho.writer.aw = chucho::activemq_writer\n"
+                  "chucho.writer.aw.formatter = pf\n"
+                  "chucho.formatter.pf = chucho::pattern_formatter\n"
+                  "chucho.formatter.pf.pattern = %m\n"
+                  "chucho.writer.aw.serializer = fms\n"
+                  "chucho.serializer.fms = chucho::formatted_message_serializer\n"
+                  "chucho.writer.aw.broker = tcp://127.0.0.1:61616\n"
+                  "chucho.writer.aw.consumer_type = ToPiC\n"
+                  "chucho.writer.aw.coalesce_max = 301\n"
+                  "chucho.writer.aw.topic_or_queue = MonkeyBalls");
+    activemq_writer_topic_coalesce_body();
+}
+
 #endif
 
 TEST_F(chucho_config_file_configurator, async_writer)
@@ -582,6 +599,22 @@ TEST_F(chucho_config_file_configurator, rabbitmq_writer)
     rabbitmq_writer_body();
 }
 
+TEST_F(chucho_config_file_configurator, rabbitmq_writer_coalesce)
+{
+    configure("chucho.logger = will\n"
+                  "chucho.logger.will.writer = pg\n"
+                  "chucho.writer.pg = chucho::rabbitmq_writer\n"
+                  "chucho.writer.pg.coalesce_max = 302\n"
+                  "chucho.writer.pg.formatter = pf\n"
+                  "chucho.formatter.pf = chucho::pattern_formatter\n"
+                  "chucho.formatter.pf.pattern = %m\n"
+                  "chucho.writer.pg.serializer = fms\n"
+                  "chucho.serializer.fms = chucho::formatted_message_serializer\n"
+                  "chucho.writer.pg.url = amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc\n"
+                  "chucho.writer.pg.exchange = logs");
+    rabbitmq_writer_coalesce_body();
+}
+
 #if defined(CHUCHO_HAVE_RABBITMQ)
 
 TEST_F(chucho_config_file_configurator, rabbitmq_writer_capn_proto)
@@ -812,6 +845,22 @@ TEST_F(chucho_config_file_configurator, zeromq_writer)
               "chucho.writer.zw.endpoint = tcp://127.0.0.1:7777\n"
               "chucho.writer.zw.prefix = Hi");
     zeromq_writer_body();
+}
+
+TEST_F(chucho_config_file_configurator, zeromq_writer_coalesce)
+{
+    configure("chucho.logger = will\n"
+                  "chucho.logger.will.writer = zw\n"
+                  "chucho.writer.zw = chucho::zeromq_writer\n"
+                  "chucho.writer.zw.formatter = pf\n"
+                  "chucho.formatter.pf = chucho::pattern_formatter\n"
+                  "chucho.formatter.pf.pattern = %m\n"
+                  "chucho.writer.zw.serializer = fms\n"
+                  "chucho.writer.zw.coalesce_max = 300\n"
+                  "chucho.serializer.fms = chucho::formatted_message_serializer\n"
+                  "chucho.writer.zw.endpoint = tcp://127.0.0.1:7780\n"
+                  "chucho.writer.zw.prefix = Hi");
+    zeromq_writer_coalesce_body();
 }
 
 TEST_F(chucho_config_file_configurator, zeromq_writer_no_prefix)

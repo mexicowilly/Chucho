@@ -147,6 +147,22 @@ void configurator::activemq_writer_topic_body()
     EXPECT_EQ(std::string("MonkeyBalls"), aw->get_topic_or_queue());
 }
 
+void configurator::activemq_writer_topic_coalesce_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::activemq_writer), typeid(*wrts[0]));
+    auto aw = std::static_pointer_cast<chucho::activemq_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(aw));
+    auto ser = aw->get_serializer();
+    ASSERT_TRUE(static_cast<bool>(ser));
+    EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(*ser));
+    EXPECT_EQ(std::string("tcp://127.0.0.1:61616"), aw->get_broker());
+    EXPECT_EQ(activemq_writer::consumer_type::TOPIC, aw->get_consumer_type());
+    EXPECT_EQ(std::string("MonkeyBalls"), aw->get_topic_or_queue());
+    EXPECT_EQ(301, aw->get_coalesce_max());
+}
+
 #endif
 
 void configurator::async_writer_body()
@@ -577,6 +593,19 @@ void configurator::rabbitmq_writer_body()
     EXPECT_TRUE(pwrt->get_routing_key().empty());
 }
 
+void configurator::rabbitmq_writer_coalesce_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::rabbitmq_writer), typeid(*wrts[0]));
+    auto pwrt = std::static_pointer_cast<chucho::rabbitmq_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(pwrt));
+    EXPECT_EQ(std::string("amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc"), pwrt->get_url());
+    EXPECT_EQ(std::string("logs"), pwrt->get_exchange());
+    EXPECT_TRUE(pwrt->get_routing_key().empty());
+    EXPECT_EQ(302, pwrt->get_coalesce_max());
+}
+
 #if defined(CHUCHO_HAVE_CAPN_PROTO)
 
 void configurator::rabbitmq_writer_capn_proto_body()
@@ -913,6 +942,23 @@ void configurator::zeromq_writer_body()
     std::string pfx_str("Hi");
     std::vector<std::uint8_t> pfx(pfx_str.begin(), pfx_str.end());
     EXPECT_EQ(pfx, zw->get_prefix());
+}
+
+void configurator::zeromq_writer_coalesce_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::zeromq_writer), typeid(*wrts[0]));
+    auto zw = std::static_pointer_cast<chucho::zeromq_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(zw));
+    auto ser = zw->get_serializer();
+    ASSERT_TRUE(static_cast<bool>(ser));
+    EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(*ser));
+    EXPECT_EQ(std::string("tcp://127.0.0.1:7780"), zw->get_endpoint());
+    std::string pfx_str("Hi");
+    std::vector<std::uint8_t> pfx(pfx_str.begin(), pfx_str.end());
+    EXPECT_EQ(pfx, zw->get_prefix());
+    EXPECT_EQ(zw->get_coalesce_max(), 300);
 }
 
 void configurator::zeromq_writer_with_compressor_body()

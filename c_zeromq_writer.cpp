@@ -28,6 +28,7 @@ extern "C"
 chucho_rc chucho_create_zeromq_writer(chucho_writer** wrt,
                                       chucho_formatter* fmt,
                                       chucho_serializer* ser,
+                                      int coalesce_max,
                                       chucho_compressor* cmp,
                                       const char* const endpoint,
                                       const unsigned char* const prefix,
@@ -47,8 +48,10 @@ chucho_rc chucho_create_zeromq_writer(chucho_writer** wrt,
         std::shared_ptr<chucho::compressor> pcmp;
         if (cmp != nullptr)
             pcmp = cmp->cmp_;
+        std::size_t cmax = (coalesce_max == -1) ? chucho::message_queue_writer::DEFAULT_COALESCE_MAX : coalesce_max;
         (*wrt)->writer_ = std::make_shared<chucho::zeromq_writer>(fmt->fmt_,
                                                                   ser->ser_,
+                                                                  cmax,
                                                                   pcmp,
                                                                   endpoint,
                                                                   pfx);
