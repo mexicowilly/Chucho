@@ -40,11 +40,11 @@ public:
     virtual std::vector<std::uint8_t> finish_blob() override;
     /**
      * Format the message of the event using the given @ref formatter and
-     * put copy those bytes into the returned blob.
+     * put copy those bytes into the returned blob. Each message is
+     * separated by a platform-specific new line.
      * 
      * @param evt the event
      * @param fmt the formatter
-     * @return the blob containing only the formatted message
      */
     virtual void serialize(const event& evt, std::shared_ptr<formatter> fmt) override;
 

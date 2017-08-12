@@ -29,7 +29,7 @@ namespace chucho
 
 /**
  * @class cerr_writer cerr_writer.hpp chucho/cerr_writer.hpp 
- * A @ref chucho::console_writer that writes to std::cerr. 
+ * A @ref chucho::file_descriptor_writer that writes to std::cerr.
  * 
  * @ingroup writers
  */

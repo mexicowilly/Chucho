@@ -24,7 +24,7 @@ namespace chucho
 
 /**
  * @class cout_writer cout_writer.hpp chucho/cout_writer.hpp 
- * A @ref console_writer that writes to std::cout. 
+ * A @ref file_descriptor_writer that writes to std::cout.
  * 
  * @ingroup writers
  */

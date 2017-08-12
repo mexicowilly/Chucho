@@ -35,6 +35,7 @@ protobuf_serializer::protobuf_serializer()
 {
 }
 
+// Don't remove this. It has to be defined here.
 protobuf_serializer::~protobuf_serializer()
 {
 }

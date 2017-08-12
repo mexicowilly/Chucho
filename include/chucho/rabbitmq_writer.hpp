@@ -56,6 +56,7 @@ public:
      *
      * @param fmt the formatter
      * @param ser the serializer
+     * @param coalesce_max the maximum number of events to write in a single RabbitMQ message
      * @param url the URL to the RabbitMQ instance
      * @param exchange the exchange to which to publish
      * @param routing_key the routing key
@@ -87,6 +88,7 @@ public:
      *
      * @param fmt the formatter
      * @param ser the serializer
+     * @param coalesce_max the maximum number of events to write in a single RabbitMQ message
      * @param cmp the compressor
      * @param url the URL to the RabbitMQ instance
      * @param exchange the exchange to which to publish

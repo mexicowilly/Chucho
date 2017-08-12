@@ -67,6 +67,7 @@ public:
      *
      * @param fmt the formatter
      * @param ser the serializer
+     * @param coalesce_max the maximum number of events to write in a single ActiveMQ message
      * @param broker the URI of the ActiveMQ broker
      * @param tp whether to publish to a topic or queue
      * @param topic_or_queue the name of the topic or queue
@@ -98,6 +99,7 @@ public:
      *
      * @param fmt the formatter
      * @param ser the serializer
+     * @param coalesce_max the maximum number of events to write in a single ActiveMQ message
      * @param cmp the compressor
      * @param broker the URI of the ActiveMQ broker
      * @param tp whether to publish to a topic or queue

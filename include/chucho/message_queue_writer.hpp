@@ -44,9 +44,21 @@ namespace chucho
 class CHUCHO_EXPORT message_queue_writer : public writer
 {
 public:
+    /**
+     * The number of log events that will be coalsced into a
+     * single message if no other value is specified.
+     *
+     * The value is 25.
+     */
     static const std::size_t DEFAULT_COALESCE_MAX;
 
     virtual void flush() override;
+    /**
+     * Return the maximum number of events that can appear
+     * in a single message queue message.
+     *
+     * @return the maximum
+     */
     std::size_t get_coalesce_max() const;
     /**
      * Return the compressor.
@@ -54,6 +66,12 @@ public:
      * @return the compressor
      */
     std::shared_ptr<compressor> get_compressor() const;
+    /**
+     * Get the current number of events that have been added
+     * to the outgoing message but not yet sent.
+     *
+     * @return the current number
+     */
     std::size_t get_number_coalesced() const;
     /**
      * Return the serializer.
@@ -61,11 +79,18 @@ public:
      * @return the serializer
      */
     std::shared_ptr<serializer> get_serializer() const;
+    /**
+     * Set the maximum number of events that can be added to
+     * an outgoing message before it is flushed to the message
+     * queue.
+     *
+     * @param num the maximum
+     */
     void set_coalesce_max(std::size_t num);
 
 protected:
     /**
-     * @name Constructor
+     * @name Constructors and Destructor
      * @{
      */
     /**
@@ -78,13 +103,29 @@ protected:
     message_queue_writer(std::shared_ptr<formatter> fmt,
                          std::shared_ptr<serializer> ser,
                          std::shared_ptr<compressor> cmp = std::shared_ptr<compressor>());
+    /**
+     * Construct a message queue writer.
+     * 
+     * @param fmt the formatter
+     * @param ser the serializer
+     * @param coalesce_max the maximum number of events to collect before sending
+     * @param cmp the compressor
+     */
     message_queue_writer(std::shared_ptr<formatter> fmt,
                          std::shared_ptr<serializer> ser,
                          std::size_t coalesce_max,
                          std::shared_ptr<compressor> cmp = std::shared_ptr<compressor>());
+    /**
+     * Destroy the writer.
+     */
     virtual ~message_queue_writer();
     /**
      * @}
+     */
+    /**
+     * Write the blob to the message queue.
+     *
+     * @param blob the bytes to write
      */
     virtual void flush_impl(const std::vector<std::uint8_t>& blob) = 0;
     virtual void write_impl(const event& evt) override;
@@ -96,7 +137,13 @@ protected:
      * The compressor
      */
     std::shared_ptr<compressor> compressor_;
+    /**
+     * The maximum number of events to coalesce.
+     */
     std::atomic<std::size_t> coalesce_max_;
+    /**
+     * The current number of coalesced events.
+     */
     std::atomic<std::size_t> number_coalesced_;
 };
 

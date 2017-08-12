@@ -22,7 +22,7 @@
  * Functions that can be used with any of the message queue writers created by
  * one of the creation functions.
  *
- * @ingroup c_writers
+ * @ingroup c_mq
  */
 
 #include <chucho/writer.h>
@@ -32,6 +32,15 @@ extern "C"
 {
 #endif
 
+/**
+ * Return the maximum number of events that the writer will collect before
+ * sending them to the message queue.
+ *
+ * @param[in] wrt the message queue writer
+ * @param[out] cmax the maximum
+ * @return a value from @ref return_code.h indicating success or
+ *         failure
+ */
 CHUCHO_EXPORT chucho_rc chucho_mqwrt_get_coalesce_max(const chucho_writer* wrt, size_t* cmax);
 
 #if defined(__cplusplus)

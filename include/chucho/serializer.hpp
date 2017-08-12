@@ -42,23 +42,16 @@ class CHUCHO_EXPORT serializer : public status_reporter,
 {
 public:
     /**
-     * @name Destructor
-     * @{
-     */
-    /**
-     * Destroy a serializer
-     */
-    virtual ~serializer() { };
-    /**
-     * @}
+     * Finish the blob and return it.
+     *
+     * @return the blob
      */
     virtual std::vector<std::uint8_t> finish_blob() = 0;
     /**
-     * Turn an event into a blob.
+     * Turn an event into part of a blob.
      * 
      * @param evt the event to blobify
      * @param fmt the formatter used to create the formatted message
-     * @return the blob
      */
     virtual void serialize(const event& evt, std::shared_ptr<formatter> fmt) = 0;
 };
