@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
     if (argc == 6)
     {
         if (std::strcmp(argv[5], "noop") == 0)
-            cmp == std::make_shared<chucho::noop_compressor>();
+            cmp = std::make_shared<chucho::noop_compressor>();
     }
     std::unique_ptr<chucho::zeromq_writer> wrt;
     if (cmp)
@@ -60,6 +60,7 @@ int main(int argc, char* argv[])
     auto count = std::stoul(argv[3]);
     for (decltype(count) i = 0; i < count; i++)
         wrt->write(evt);
+    wrt->flush();
     // Wait for client to receive message
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     return EXIT_SUCCESS;
