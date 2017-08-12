@@ -28,7 +28,7 @@ namespace chucho
 
 struct capn_proto_serializer::handle
 {
-    std::vector<::capnp::Orphan<capnp::Event>> events;
+    std::vector<std::pair<event, std::string>> events;
 };
 
 capn_proto_serializer::capn_proto_serializer()
@@ -46,7 +46,27 @@ std::vector<std::uint8_t> capn_proto_serializer::finish_blob()
     capnp::Events::Builder events = message.initRoot<capnp::Events>();
     auto cevts = events.initEvents(handle_->events.size());
     for (auto i = 0; i < handle_->events.size(); i++)
-        cevts.adoptWithCaveats(i, std::move(handle_->events[i]));
+    {
+        capnp::Event::Builder evt = cevts[i];
+        const auto& chevt = handle_->events[i].first;
+        evt.setFormattedMessage(handle_->events[i].second);
+        evt.setSecondsSinceEpoch(event::clock_type::to_time_t(chevt.get_time()));
+        evt.setFileName(utf8::escape_invalid(chevt.get_file_name()));
+        evt.setLineNumber(chevt.get_line_number());
+        evt.setFunctionName(utf8::escape_invalid(chevt.get_function_name()));
+        evt.setLogger(utf8::escape_invalid(chevt.get_logger()->get_name()));
+        evt.setLevelName(utf8::escape_invalid(chevt.get_level()->get_name()));
+        if (chevt.get_marker())
+        {
+            std::ostringstream mstream;
+            mstream << *chevt.get_marker();
+            evt.setMarker(utf8::escape_invalid(mstream.str()));
+        }
+        std::ostringstream tstream;
+        tstream << std::this_thread::get_id();
+        evt.setThread(utf8::escape_invalid(tstream.str()));
+
+    }
     handle_->events.clear();
     auto words = ::capnp::messageToFlatArray(message);
     auto bytes = words.asBytes();
@@ -55,27 +75,7 @@ std::vector<std::uint8_t> capn_proto_serializer::finish_blob()
 
 void capn_proto_serializer::serialize(const event& evt, std::shared_ptr<formatter> fmt)
 {
-    ::capnp::MallocMessageBuilder message;
-    auto orphanage = message.getOrphanage();
-    auto orphan = orphanage.newOrphan<capnp::Event>();
-    auto cevt = orphan.get();
-    cevt.setFormattedMessage(utf8::escape_invalid(fmt->format(evt)));
-    cevt.setSecondsSinceEpoch(event::clock_type::to_time_t(evt.get_time()));
-    cevt.setFileName(utf8::escape_invalid(evt.get_file_name()));
-    cevt.setLineNumber(evt.get_line_number());
-    cevt.setFunctionName(utf8::escape_invalid(evt.get_function_name()));
-    cevt.setLogger(utf8::escape_invalid(evt.get_logger()->get_name()));
-    cevt.setLevelName(utf8::escape_invalid(evt.get_level()->get_name()));
-    if (evt.get_marker())
-    {
-        std::ostringstream mstream;
-        mstream << *evt.get_marker();
-        cevt.setMarker(utf8::escape_invalid(mstream.str()));
-    }
-    std::ostringstream tstream;
-    tstream << std::this_thread::get_id();
-    cevt.setThread(utf8::escape_invalid(tstream.str()));
-    handle_->events.push_back(std::move(orphan));
+    handle_->events.push_back(std::make_pair(evt, utf8::escape_invalid(fmt->format(evt))));
 }
 
 }

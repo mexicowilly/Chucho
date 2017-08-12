@@ -905,10 +905,10 @@ TEST_F(chucho_config_file_configurator, zeromq_writer_protobuf)
               "chucho.formatter.pf = chucho::pattern_formatter\n"
               "chucho.formatter.pf.pattern = %m\n"
               "chucho.writer.zw.serializer = ps\n"
-              "chucho.serializer.fms = chucho::protobuf_serializer\n"
-              "chucho.writer.zw.endpoint = tcp://127.0.0.1:7777\n"
+              "chucho.serializer.ps = chucho::protobuf_serializer\n"
+              "chucho.writer.zw.endpoint = tcp://127.0.0.1:7779\n"
               "chucho.writer.zw.prefix = Hi");
-    zeromq_writer_body();
+    zeromq_writer_protobuf_body();
 }
 
 #endif
