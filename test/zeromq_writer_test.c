@@ -18,6 +18,7 @@
 #include <chucho/zeromq_writer.h>
 #include <chucho/pattern_formatter.h>
 #include <chucho/formatted_message_serializer.h>
+#include <chucho/message_queue_writer.h>
 
 static void zeromq_writer_test(void)
 {
@@ -29,12 +30,13 @@ static void zeromq_writer_test(void)
     const char* text;
     const unsigned char* found_pfx;
     size_t found_len;
+    size_t cmax;
 
     rc = chucho_create_pattern_formatter(&fmt, "%p %m %k%n");
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create pattern formatter");
     rc = chucho_create_formatted_message_serializer(&ser);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create formatted message serializer");
-    rc = chucho_create_zeromq_writer(&wrt, fmt, ser, NULL, "tcp://127.0.0.1:7777", prefix, 6);
+    rc = chucho_create_zeromq_writer(&wrt, fmt, ser, -1, NULL, "tcp://127.0.0.1:7777", prefix, 6);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "create zeromq writer");
     if (rc != CHUCHO_NO_ERROR)
         return;
@@ -45,6 +47,9 @@ static void zeromq_writer_test(void)
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_zmqwrt_get_prefix");
     sput_fail_unless(found_len == 6, "Found prefix length");
     sput_fail_unless(memcmp(prefix, found_pfx, found_len) == 0, "Found prefix");
+    rc = chucho_mqwrt_get_coalesce_max(wrt, &cmax);
+    sput_fail_unless(rc == CHUCHO_NO_ERROR, "chucho_zmqwrt_get_coalesce_max");
+    sput_fail_unless(cmax == 25, "Coalesce max");
     rc = chucho_release_writer(wrt);
     sput_fail_unless(rc == CHUCHO_NO_ERROR, "release owrt writer");
 }

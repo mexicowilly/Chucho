@@ -27,6 +27,7 @@ extern "C"
 chucho_rc chucho_create_activemq_writer(chucho_writer** wrt,
                                         chucho_formatter* fmt,
                                         chucho_serializer* ser,
+                                        int coalesce_max,
                                         chucho_compressor* cmp,
                                         const char* const broker,
                                         chucho_activemq_consumer_type tp,
@@ -45,8 +46,10 @@ chucho_rc chucho_create_activemq_writer(chucho_writer** wrt,
         std::shared_ptr<chucho::compressor> pcmp;
         if (cmp != nullptr)
             pcmp = cmp->cmp_;
+        std::size_t cmax = (coalesce_max == -1) ? chucho::message_queue_writer::DEFAULT_COALESCE_MAX : coalesce_max;
         (*wrt)->writer_ = std::make_shared<chucho::activemq_writer>(fmt->fmt_,
                                                                     ser->ser_,
+                                                                    cmax,
                                                                     pcmp,
                                                                     broker,
                                                                     cxxtp,

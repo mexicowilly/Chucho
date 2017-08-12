@@ -19,19 +19,51 @@
 namespace chucho
 {
 
+const std::size_t message_queue_writer::DEFAULT_COALESCE_MAX = 25;
+
 message_queue_writer::message_queue_writer(std::shared_ptr<formatter> fmt,
                                            std::shared_ptr<serializer> ser,
                                            std::shared_ptr<compressor> cmp)
     : writer(fmt),
       serializer_(ser),
-      compressor_(cmp)
+      compressor_(cmp),
+      coalesce_max_(DEFAULT_COALESCE_MAX),
+      number_coalesced_(0)
 {
 }
 
-std::vector<std::uint8_t> message_queue_writer::serialize_and_compress(const event& evt)
+message_queue_writer::message_queue_writer(std::shared_ptr<formatter> fmt,
+                                           std::shared_ptr<serializer> ser,
+                                           std::size_t coalesce_max,
+                                           std::shared_ptr<compressor> cmp)
+    : writer(fmt),
+      serializer_(ser),
+      compressor_(cmp),
+      coalesce_max_(coalesce_max),
+      number_coalesced_(0)
 {
-    auto ser = serializer_->serialize(evt, formatter_);
-    return compressor_ ? compressor_->compress(ser) : ser;
+}
+
+message_queue_writer::~message_queue_writer()
+{
+    if (number_coalesced_ > 0)
+        report_warning("The message queue writer is closing with " + std::to_string(number_coalesced_) + " unflushed events");
+}
+
+void message_queue_writer::flush()
+{
+    auto bytes = serializer_->finish_blob();
+    if (compressor_)
+        bytes = compressor_->compress(bytes);
+    flush_impl(bytes);
+    number_coalesced_ = 0;
+}
+
+void message_queue_writer::write_impl(const event& evt)
+{
+    serializer_->serialize(evt, formatter_);
+    if (++number_coalesced_ == coalesce_max_)
+        flush();
 }
 
 }

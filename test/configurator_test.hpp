@@ -33,6 +33,7 @@ protected:
 #if defined(CHUCHO_HAVE_ACTIVEMQ)
     void activemq_writer_queue_body();
     void activemq_writer_topic_body();
+    void activemq_writer_topic_coalesce_body();
 #endif
     void async_writer_body();
     void async_writer_with_opts_body();
@@ -74,6 +75,7 @@ protected:
 #endif
 #if defined(CHUCHO_HAVE_RABBITMQ)
     void rabbitmq_writer_body();
+    void rabbitmq_writer_coalesce_body();
 #if defined(CHUCHO_HAVE_CAPN_PROTO)
     void rabbitmq_writer_capn_proto_body();
 #endif
@@ -98,6 +100,7 @@ protected:
 #endif
 #if defined(CHUCHO_HAVE_ZEROMQ)
     void zeromq_writer_body();
+    void zeromq_writer_coalesce_body();
     void zeromq_writer_with_compressor_body();
     void zeromq_writer_no_prefix_body();
 #if defined(CHUCHO_HAVE_PROTOBUF)

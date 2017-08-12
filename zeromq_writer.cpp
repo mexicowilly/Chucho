@@ -40,9 +40,9 @@ namespace chucho
 {
 
 zeromq_writer::zeromq_writer(std::shared_ptr<formatter> fmt,
-                                                         std::shared_ptr<serializer> ser,
-                                                         const std::string& endpoint,
-                                                         const std::vector<std::uint8_t>& prefix)
+                             std::shared_ptr<serializer> ser,
+                             const std::string& endpoint,
+                             const std::vector<std::uint8_t>& prefix)
     : message_queue_writer(fmt, ser),
       endpoint_(endpoint),
       prefix_(prefix)
@@ -51,11 +51,36 @@ zeromq_writer::zeromq_writer(std::shared_ptr<formatter> fmt,
 }
 
 zeromq_writer::zeromq_writer(std::shared_ptr<formatter> fmt,
-                                                         std::shared_ptr<serializer> ser,
-                                                         std::shared_ptr<compressor> cmp,
-                                                         const std::string& endpoint,
-                                                         const std::vector<std::uint8_t>& prefix)
+                             std::shared_ptr<serializer> ser,
+                             std::size_t coalesce_max,
+                             const std::string& endpoint,
+                             const std::vector<std::uint8_t>& prefix)
+    : message_queue_writer(fmt, ser, coalesce_max),
+      endpoint_(endpoint),
+      prefix_(prefix)
+{
+    init();
+}
+
+zeromq_writer::zeromq_writer(std::shared_ptr<formatter> fmt,
+                             std::shared_ptr<serializer> ser,
+                             std::shared_ptr<compressor> cmp,
+                             const std::string& endpoint,
+                             const std::vector<std::uint8_t>& prefix)
     : message_queue_writer(fmt, ser, cmp),
+      endpoint_(endpoint),
+      prefix_(prefix)
+{
+    init();
+}
+
+zeromq_writer::zeromq_writer(std::shared_ptr<formatter> fmt,
+                             std::shared_ptr<serializer> ser,
+                             std::size_t coalesce_max,
+                             std::shared_ptr<compressor> cmp,
+                             const std::string& endpoint,
+                             const std::vector<std::uint8_t>& prefix)
+    : message_queue_writer(fmt, ser, coalesce_max, cmp),
       endpoint_(endpoint),
       prefix_(prefix)
 {
@@ -67,22 +92,7 @@ zeromq_writer::~zeromq_writer()
     zmq_close(socket_);
 }
 
-void zeromq_writer::init()
-{
-    socket_ = zmq_socket(get_zmq_context(), ZMQ_PUB);
-    if (socket_ == nullptr)
-    {
-        throw exception("The zeromq socket could not be created because there are too many zeromq sockets open");
-    }
-    else
-    {
-        int rc = zmq_bind(socket_, endpoint_.c_str());
-        if (rc != 0)
-            throw exception("Could not bind to zeromq endpoint " + endpoint_ + ": " + zmq_strerror(rc));
-    }
-}
-
-void zeromq_writer::write_impl(const event& evt)
+void zeromq_writer::flush_impl(const std::vector<std::uint8_t>& bytes)
 {
     if (socket_ != nullptr)
     {
@@ -99,7 +109,6 @@ void zeromq_writer::write_impl(const event& evt)
                 throw exception(std::string("Error sending zeromq message prefix: ") + zmq_strerror(rc));
             }
         }
-        auto bytes = serialize_and_compress(evt);
         zmq_msg_t msg;
         zmq_msg_init_size(&msg, bytes.size());
         std::memcpy(zmq_msg_data(&msg), &bytes[0], bytes.size());
@@ -109,6 +118,21 @@ void zeromq_writer::write_impl(const event& evt)
             zmq_msg_close(&msg);
             throw exception(std::string("Error sending zeromq message: ") + zmq_strerror(rc));
         }
+    }
+}
+
+void zeromq_writer::init()
+{
+    socket_ = zmq_socket(get_zmq_context(), ZMQ_PUB);
+    if (socket_ == nullptr)
+    {
+        throw exception("The zeromq socket could not be created because there are too many zeromq sockets open");
+    }
+    else
+    {
+        int rc = zmq_bind(socket_, endpoint_.c_str());
+        if (rc != 0)
+            throw exception("Could not bind to zeromq endpoint " + endpoint_ + ": " + zmq_strerror(rc));
     }
 }
 

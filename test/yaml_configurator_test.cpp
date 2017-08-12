@@ -101,6 +101,21 @@ TEST_F(yaml_configurator, activemq_writer_topic)
     activemq_writer_topic_body();
 }
 
+TEST_F(yaml_configurator, activemq_writer_topic_coalesce)
+{
+    configure("- chucho::logger:\n"
+                  "    - name: will\n"
+                  "    - chucho::activemq_writer:\n"
+                  "        - chucho::pattern_formatter:\n"
+                  "            - pattern: '%m'\n"
+                  "        - chucho::formatted_message_serializer\n"
+                  "        - broker: 'tcp://127.0.0.1:61616'\n"
+                  "        - consumer_type: topic\n"
+                  "        - coalesce_max: 301\n"
+                  "        - topic_or_queue: MonkeyBalls");
+    activemq_writer_topic_coalesce_body();
+}
+
 #endif
 
 TEST_F(yaml_configurator, async_writer)
@@ -523,6 +538,20 @@ TEST_F(yaml_configurator, rabbitmq_writer)
     rabbitmq_writer_body();
 }
 
+TEST_F(yaml_configurator, rabbitmq_writer_coalesce)
+{
+    configure("chucho::logger:\n"
+                  "    - name: will\n"
+                  "    - chucho::rabbitmq_writer:\n"
+                  "        - coalesce_max: 302\n"
+                  "        - chucho::pattern_formatter:\n"
+                  "            - pattern: '%m'\n"
+                  "        - chucho::formatted_message_serializer\n"
+                  "        - url: 'amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc'\n"
+                  "        - exchange: logs");
+    rabbitmq_writer_coalesce_body();
+}
+
 #if defined(CHUCHO_HAVE_CAPN_PROTO)
 
 TEST_F(yaml_configurator, rabbitmq_writer_capn_proto)
@@ -770,6 +799,20 @@ TEST_F(yaml_configurator, zeromq_writer)
               "        - endpoint: 'tcp://127.0.0.1:7777'\n"
               "        - prefix: Hi");
     zeromq_writer_body();
+}
+
+TEST_F(yaml_configurator, zeromq_writer_coalesce)
+{
+    configure("- chucho::logger:\n"
+                  "    - name: will\n"
+                  "    - chucho::zeromq_writer:\n"
+                  "        - chucho::pattern_formatter:\n"
+                  "            - pattern: '%m'\n"
+                  "        - chucho::formatted_message_serializer\n"
+                  "        - endpoint: 'tcp://127.0.0.1:7780'\n"
+                  "        - coalesce_max: 300\n"
+                  "        - prefix: Hi");
+    zeromq_writer_coalesce_body();
 }
 
 TEST_F(yaml_configurator, zeromq_writer_no_prefix)

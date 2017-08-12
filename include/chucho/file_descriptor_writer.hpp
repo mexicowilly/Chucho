@@ -125,7 +125,7 @@ protected:
     /**
      * Flush the buffer.
      */
-    virtual void flush();
+    virtual void flush() override;
     /**
      * Return the file descriptor.
      * @return the file descriptor

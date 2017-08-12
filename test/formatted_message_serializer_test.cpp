@@ -29,8 +29,12 @@ TEST(formatted_message_serializer, simple)
                       __FUNCTION__);
     auto fmt = std::make_shared<chucho::pattern_formatter>("%m");
     chucho::formatted_message_serializer ser;
-    auto res = ser.serialize(evt, fmt);
+    ser.serialize(evt, fmt);
+    auto res = ser.finish_blob();
     std::string seried(res.begin(), res.end());
+    auto last = seried.find_last_not_of("\r\n") + 1;
+    ASSERT_LT(last, seried.length());
+    seried.erase(last);
     auto exp = fmt->format(evt);
     EXPECT_EQ(exp, seried);
 }

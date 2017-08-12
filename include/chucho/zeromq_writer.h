@@ -60,6 +60,8 @@ extern "C"
  * @param[out] wrt the ZeroMQ writer to create
  * @param[in] fmt the formatter
  * @param[in] ser the serializer
+ * @param[in] coalesce_max The maximum number of log events to hold in
+ * cache before sending them. If -1, then the default of 25 will be used.
  * @param[in] cmp the compressor, which may be NULL
  * @param[in] endpoint the ZeroMQ endpoint to which to publish messages
  * @param[in] prefix the message "topic", which, if provided, will cause
@@ -72,6 +74,7 @@ extern "C"
 CHUCHO_EXPORT chucho_rc chucho_create_zeromq_writer(chucho_writer** wrt,
                                                     chucho_formatter* fmt,
                                                     chucho_serializer* ser,
+                                                    int coalesce_max,
                                                     chucho_compressor* cmp,
                                                     const char* const endpoint,
                                                     const unsigned char* const prefix,

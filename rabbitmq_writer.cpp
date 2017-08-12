@@ -32,6 +32,35 @@ namespace chucho
 
 rabbitmq_writer::rabbitmq_writer(std::shared_ptr<formatter> fmt,
                                  std::shared_ptr<serializer> ser,
+                                 const std::string& url,
+                                 const std::string& exchange,
+                                 const optional<std::string>& routing_key)
+    : message_queue_writer(fmt, ser),
+      url_(url),
+      exchange_(exchange),
+      routing_key_(routing_key ? *routing_key : ""),
+      cxn_(amqp_new_connection())
+{
+    init();
+}
+
+rabbitmq_writer::rabbitmq_writer(std::shared_ptr<formatter> fmt,
+                                 std::shared_ptr<serializer> ser,
+                                 std::size_t coalesce_max,
+                                 const std::string& url,
+                                 const std::string& exchange,
+                                 const optional<std::string>& routing_key)
+    : message_queue_writer(fmt, ser, coalesce_max),
+      url_(url),
+      exchange_(exchange),
+      routing_key_(routing_key ? *routing_key : ""),
+      cxn_(amqp_new_connection())
+{
+    init();
+}
+
+rabbitmq_writer::rabbitmq_writer(std::shared_ptr<formatter> fmt,
+                                 std::shared_ptr<serializer> ser,
                                  std::shared_ptr<compressor> cmp,
                                  const std::string& url,
                                  const std::string& exchange,
@@ -47,10 +76,12 @@ rabbitmq_writer::rabbitmq_writer(std::shared_ptr<formatter> fmt,
 
 rabbitmq_writer::rabbitmq_writer(std::shared_ptr<formatter> fmt,
                                  std::shared_ptr<serializer> ser,
+                                 std::size_t coalesce_max,
+                                 std::shared_ptr<compressor> cmp,
                                  const std::string& url,
                                  const std::string& exchange,
                                  const optional<std::string>& routing_key)
-    : message_queue_writer(fmt, ser),
+    : message_queue_writer(fmt, ser, coalesce_max, cmp),
       url_(url),
       exchange_(exchange),
       routing_key_(routing_key ? *routing_key : ""),
@@ -58,12 +89,28 @@ rabbitmq_writer::rabbitmq_writer(std::shared_ptr<formatter> fmt,
 {
     init();
 }
-
 rabbitmq_writer::~rabbitmq_writer()
 {
     amqp_channel_close(cxn_, CHUCHO_CHANNEL, AMQP_REPLY_SUCCESS);
     amqp_connection_close(cxn_, AMQP_REPLY_SUCCESS);
     amqp_destroy_connection(cxn_);
+}
+
+void rabbitmq_writer::flush_impl(const std::vector<std::uint8_t>& bytes)
+{
+    amqp_bytes_t msg;
+    msg.bytes = const_cast<std::uint8_t*>(&bytes[0]);
+    msg.len = bytes.size();
+    int rc = amqp_basic_publish(cxn_,
+                                CHUCHO_CHANNEL,
+                                exchange_bytes_,
+                                routing_key_bytes_,
+                                0,
+                                0,
+                                nullptr,
+                                msg);
+    if (rc != AMQP_STATUS_OK)
+        throw exception(std::string("Unable to send RabbitMQ message: ") + amqp_error_string2(rc));
 }
 
 void rabbitmq_writer::init()
@@ -143,24 +190,6 @@ void rabbitmq_writer::respond(const amqp_rpc_reply_t& rep)
         }
     }
     throw exception(stream.str());
-}
-
-void rabbitmq_writer::write_impl(const event& evt)
-{
-    auto bytes = serialize_and_compress(evt);
-    amqp_bytes_t msg;
-    msg.bytes = &bytes[0];
-    msg.len = bytes.size();
-    int rc = amqp_basic_publish(cxn_,
-                                CHUCHO_CHANNEL,
-                                exchange_bytes_,
-                                routing_key_bytes_,
-                                0,
-                                0,
-                                nullptr,
-                                msg);
-    if (rc != AMQP_STATUS_OK)
-        throw exception(std::string("Unable to send RabbitMQ message: ") + amqp_error_string2(rc));
 }
 
 }

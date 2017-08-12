@@ -15,10 +15,12 @@
  */
 
 #include <gtest/gtest.h>
+#include <chucho/message_queue_writer.hpp>
 #include <chucho/file.hpp>
 #include <zmq.h>
 #include <thread>
 #include <cstring>
+#include <sstream>
 
 namespace
 {
@@ -29,18 +31,24 @@ const std::string TOPIC("Chucho");
 class zeromq_writer_test : public ::testing::Test
 {
 public:
-    void read(const std::string& exp)
+    void read(std::size_t count, const std::string& exp)
     {
         int rc = zmq_connect(socket_, ENDPOINT.c_str());
         ASSERT_EQ(0, rc);
-        rc = zmq_msg_recv(&msg_, socket_, 0);
-        ASSERT_EQ(TOPIC.length(), rc);
-        EXPECT_EQ(0, std::memcmp(zmq_msg_data(&msg_), TOPIC.data(), TOPIC.length()));
-        ASSERT_NE(0, zmq_msg_more(&msg_));
-        rc = zmq_msg_recv(&msg_, socket_, 0);
-        ASSERT_EQ(exp.length(), rc);
-        EXPECT_EQ(0, std::memcmp(zmq_msg_data(&msg_), exp.data(), exp.length()));
-        EXPECT_EQ(0, zmq_msg_more(&msg_));
+        int scount = count;
+        while (scount > 0)
+        {
+            rc = zmq_msg_recv(&msg_, socket_, 0);
+            ASSERT_EQ(TOPIC.length(), rc);
+            EXPECT_EQ(0, std::memcmp(zmq_msg_data(&msg_), TOPIC.data(), TOPIC.length()));
+            ASSERT_NE(0, zmq_msg_more(&msg_));
+            rc = zmq_msg_recv(&msg_, socket_, 0);
+            std::istringstream input(std::string(reinterpret_cast<const char*>(zmq_msg_data(&msg_)), zmq_msg_size(&msg_)));
+            for (std::string line; std::getline(input, line); )
+                EXPECT_EQ(exp, line);
+            EXPECT_EQ(0, zmq_msg_more(&msg_));
+            scount -= chucho::message_queue_writer::DEFAULT_COALESCE_MAX;
+        }
     }
 
     virtual void SetUp() override
@@ -74,9 +82,9 @@ public:
         }
     }
 
-    void write(const std::string& msg, const std::string& cmp = std::string())
+    void write(std::size_t count, const std::string& msg, const std::string& cmp = std::string())
     {
-        std::string cmd = helper_ + ' ' + ENDPOINT + ' ' + TOPIC + ' ' + msg;
+        std::string cmd = helper_ + ' ' + ENDPOINT + ' ' + TOPIC + ' ' + std::to_string(count) + ' ' + msg;
         if (!cmp.empty())
             cmd += ' ' + cmp;
         int rc = std::system(cmd.c_str());
@@ -103,8 +111,8 @@ TEST_F(zeromq_writer_test, compress)
     else
     {
         std::string msg("MonkeyBalls");
-        std::thread thr([&, this] () { read(msg); });
-        write(msg, "noop");
+        std::thread thr([&, this] () { read(1, msg); });
+        write(1, msg, "noop");
         thr.join();
     }
 }
@@ -118,8 +126,8 @@ TEST_F(zeromq_writer_test, simple)
     else
     {
         std::string msg("MonkeyBalls");
-        std::thread thr([&, this] () { read(msg); });
-        write(msg);
+        std::thread thr([&, this] () { read(50, msg); });
+        write(50, msg);
         thr.join();
     }
 }

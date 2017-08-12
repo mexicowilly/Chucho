@@ -22,7 +22,7 @@
 #include <cms/MessageListener.h>
 #include <cms/Connection.h>
 #include <cms/CMSException.h>
-#include <memory>
+#include <cstring>
 #include <thread>
 
 namespace

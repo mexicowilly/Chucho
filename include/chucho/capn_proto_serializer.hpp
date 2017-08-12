@@ -36,14 +36,28 @@ class CHUCHO_EXPORT capn_proto_serializer : public serializer
 {
 public:
     /**
-     * Serialize the event into a protobuf message.
-     * 
-     * @param evt the event
-     * @param fmt the formatter
-     * @return the blob containing only the formatted message
+     * @name Constructor and Destructor
+     * @{
      */
-    virtual std::vector<std::uint8_t> serialize(const event& evt,
-                                                std::shared_ptr<formatter> fmt) override;
+    /**
+     * Make a serializer.
+     */
+    capn_proto_serializer();
+    /**
+     * Destroy a serializer.
+     */
+    virtual ~capn_proto_serializer();
+    /**
+     * @}
+     */
+
+    virtual std::vector<std::uint8_t> finish_blob() override;
+    virtual void serialize(const event& evt, std::shared_ptr<formatter> fmt) override;
+
+private:
+    struct handle;
+
+    std::unique_ptr<handle> handle_;
 };
 
 }

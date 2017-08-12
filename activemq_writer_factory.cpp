@@ -44,6 +44,7 @@ std::shared_ptr<configurable> activemq_writer_factory::create_configurable(std::
         throw exception("activemq_writer_factory: The topic or queue name is not set");
     auto aw = std::make_shared<activemq_writer>(am->get_formatter(),
                                                 am->get_serializer(),
+                                                am->get_coalesce_max(),
                                                 am->get_compressor(),
                                                 am->get_broker(),
                                                 *am->get_consumer_type(),

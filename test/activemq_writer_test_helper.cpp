@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
     if (argc == 5)
     {
         if (std::strcmp(argv[4], "noop") == 0)
-            cmp == std::make_shared<chucho::noop_compressor>();
+            cmp = std::make_shared<chucho::noop_compressor>();
     }
     std::unique_ptr<chucho::activemq_writer> wrt;
     if (cmp)

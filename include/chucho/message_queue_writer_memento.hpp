@@ -33,6 +33,7 @@ class message_queue_writer_memento : public writer_memento
 public:
     message_queue_writer_memento(configurator& cfg);
 
+    std::size_t get_coalesce_max() const;
     std::shared_ptr<compressor> get_compressor() const;
     std::shared_ptr<serializer> get_serializer() const;
     virtual void handle(std::shared_ptr<configurable> cnf) override;
@@ -40,7 +41,13 @@ public:
 private:
     std::shared_ptr<serializer> serializer_;
     std::shared_ptr<compressor> compressor_;
+    std::size_t coalesce_max_;
 };
+
+inline std::size_t message_queue_writer_memento::get_coalesce_max() const
+{
+    return coalesce_max_;
+}
 
 inline std::shared_ptr<compressor> message_queue_writer_memento::get_compressor() const
 {

@@ -15,14 +15,25 @@
  */
 
 #include <chucho/message_queue_writer_memento.hpp>
+#include <chucho/message_queue_writer.hpp>
 
 namespace chucho
 {
 
 message_queue_writer_memento::message_queue_writer_memento(configurator& cfg)
-    : writer_memento(cfg)
+    : writer_memento(cfg),
+      coalesce_max_(message_queue_writer::DEFAULT_COALESCE_MAX)
 {
     set_status_origin("message_queue_writer_memento");
+    cfg.get_security_policy().set_integer("message_queue_writer::coalesce_max", 0, 10000);
+    cfg.get_security_policy().set_text("message_queue_writer::coalesce_max(text)", 5);
+    set_handler("coalesce_max",
+                [this] (const std::string& cm)
+                {
+                    coalesce_max_ = validate("message_queue_writer::coalesce_max",
+                                             std::stoul(validate("message_queue_writer::coalesce_max(text)",
+                                                                 cm)));
+                });
 }
 
 void message_queue_writer_memento::handle(std::shared_ptr<configurable> cnf)
