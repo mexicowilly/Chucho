@@ -25,8 +25,10 @@ SET(CHUCHO_MAJOR_VERSION 1)
 SET(CHUCHO_MINOR_VERSION 10)
 SET(CHUCHO_VERSION ${CHUCHO_MAJOR_VERSION}.${CHUCHO_MINOR_VERSION})
 
-INCLUDE(BuildOptions.cmake)
-INCLUDE(Configure.cmake)
+LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+
+INCLUDE(BuildOptions)
+INCLUDE(Configure)
 
 # We can release stuff
 SET(CPACK_PACKAGE_VERSION_MAJOR ${CHUCHO_MAJOR_VERSION})
@@ -1137,8 +1139,7 @@ IF(CHUCHO_HAVE_ZLIB)
          zlib_compressor_factory.cpp
          zlib_compressor_memento.cpp
          include/chucho/zlib_compressor_factory.hpp
-         include/chucho/zlib_compressor_memento.hpp
-         ${CHUCHO_ZLIB_SOURCES})
+         include/chucho/zlib_compressor_memento.hpp)
     IF(C_API)
         LIST(APPEND CHUCHO_SOURCES
              c_gzip_file_compressor.cpp
@@ -1150,32 +1151,6 @@ IF(CHUCHO_HAVE_ZLIB)
     ENDIF()
     SET_SOURCE_FILES_PROPERTIES(gzip_file_compressor_factory.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_HAVE_ZLIB)
-    IF(ZLIB_SOURCE)
-        INCLUDE_DIRECTORIES("${ZLIB_SOURCE}")
-    ELSEIF(ZLIB_INCLUDE_DIR)
-        INCLUDE_DIRECTORIES("${ZLIB_INCLUDE_DIR}")
-    ENDIF()
-    IF(CHUCHO_ZLIB_SOURCES)
-        IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_COMPILER_IS_GNUCXX)
-            IF(CHUCHO_PRIV_EXPORT)
-                SET(CHUCHO_ZLIB_FLAGS -fvisibility=default)
-                SET_SOURCE_FILES_PROPERTIES(${CHUCHO_ZLIB_SOURCES}
-                                            PROPERTIES
-                                            COMPILE_FLAGS ${CHUCHO_ZLIB_FLAGS})
-            ENDIF()
-            SET_SOURCE_FILES_PROPERTIES("${ZLIB_SOURCE}/gzlib.c"
-                                        "${ZLIB_SOURCE}/gzread.c"
-                                        "${ZLIB_SOURCE}/gzwrite.c"
-                                        PROPERTIES
-                                        COMPILE_FLAGS "${CHUCHO_ZLIB_FLAGS} -Wno-implicit-function-declaration")
-        ELSEIF(MSVC)
-            SET_SOURCE_FILES_PROPERTIES("${ZLIB_SOURCE}/gzlib.c"
-                                        "${ZLIB_SOURCE}/gzread.c"
-                                        "${ZLIB_SOURCE}/gzwrite.c"
-                                        PROPERTIES
-                                        COMPILE_FLAGS /wd4996)
-        ENDIF()
-    ENDIF()
 ENDIF()
 
 IF(CHUCHO_HAVE_BZIP2)
@@ -1183,8 +1158,7 @@ IF(CHUCHO_HAVE_BZIP2)
          bzip2_compressor.cpp
          bzip2_compressor_factory.cpp
          bzip2_file_compressor.cpp
-         include/chucho/bzip2_compressor_factory.hpp
-         ${CHUCHO_BZIP2_SOURCES})
+         include/chucho/bzip2_compressor_factory.hpp)
     IF(C_API)
         LIST(APPEND CHUCHO_SOURCES
              c_bzip2_file_compressor.cpp
@@ -1192,22 +1166,6 @@ IF(CHUCHO_HAVE_BZIP2)
     ENDIF()
     SET_SOURCE_FILES_PROPERTIES(bzip2_file_compressor_factory.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_HAVE_BZIP2)
-    IF(BZIP2_SOURCE)
-        INCLUDE_DIRECTORIES("${BZIP2_SOURCE}")
-    ELSEIF(BZIP2_INCLUDE_DIR)
-        INCLUDE_DIRECTORIES("${BZIP2_INCLUDE_DIR}")
-    ENDIF()
-    IF(MSVC)
-        SET_SOURCE_FILES_PROPERTIES(bzip2_file_compressor.cpp PROPERTIES
-                                    COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
-        IF(CHUCHO_BZIP2_SOURCES)
-            SET_SOURCE_FILES_PROPERTIES("${BZIP2_SOURCE}/bzlib.c" PROPERTIES
-                                        COMPILE_FLAGS /wd4996)
-        ENDIF()
-    ELSEIF(CMAKE_COMPILER_IS_GNUCXX AND CHUCHO_BZIP2_SOURCES)
-        SET_SOURCE_FILES_PROPERTIES("${BZIP2_SOURCE}/bzlib.c" PROPERTIES
-                                    COMPILE_FLAGS -Wno-implicit-function-declaration)
-    ENDIF()
 ENDIF()
 
 IF(CHUCHO_HAVE_MINIZIP)

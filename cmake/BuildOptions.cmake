@@ -113,13 +113,18 @@ OPTION(CONFIG_FILE_CONFIG "Whether to include the config file configuration pars
 
 OPTION(LOG4CPLUS_CONFIG "Whether to support reading log4cplus configuration files" OFF)
 
+# zlib, bzip2, minizip, curl, oracle, mysql, sqlite, postgres,
+# db2, ruby, activemq, zeromq, rabbitmq, protobuf, capnproto
+
+# SET(WITH_LIBS <Your libraries>)
+
 # EMAIL WRITER
 # ================================================================================
 
 # Whether to search for the curl library. Libcurl is used to support the Chucho
 # email_writer. You may explicitly disable this search if you wish.
 
-OPTION(ENABLE_CURL "Whether libcurl should be checked so that email_writer will be enabled" ON)
+#OPTION(ENABLE_CURL "Whether libcurl should be checked so that email_writer will be enabled" ON)
 
 # DATABASE
 # ================================================================================
@@ -200,7 +205,7 @@ OPTION(ENABLE_CURL "Whether libcurl should be checked so that email_writer will 
 # Whether to use the system's Ruby framework on Macintosh. If you set this option
 # to ON, then the RUBY_INCLUDE_DIR and RUBY_LIB variables are ignored.
 
-OPTION(RUBY_FRAMEWORK "Whether Ruby should be included as a framework (Macintosh only)" OFF)
+#OPTION(RUBY_FRAMEWORK "Whether Ruby should be included as a framework (Macintosh only)" OFF)
 
 # MESSAGE QUEUE
 # ================================================================================
@@ -301,7 +306,7 @@ OPTION(RUBY_FRAMEWORK "Whether Ruby should be included as a framework (Macintosh
 # variables are used, then the system will be searched for zlib, which, if it is
 # found, will result in zlib being enabled with external linkage.
 
-OPTION(DISABLE_ZLIB "Whether zlib compression should be disabled" ON)
+#OPTION(DISABLE_ZLIB "Whether zlib compression should be disabled" ON)
 
 # The URL from which to download zlib, resulting in it being embedded in the
 # Chucho library. If this is set, then no other zlib variables should also be set.
@@ -338,7 +343,7 @@ OPTION(DISABLE_ZLIB "Whether zlib compression should be disabled" ON)
 # variables are used, then the system will be searched for bzip2, which, if it is
 # found, will result in bzip2 being enabled with external linkage.
 
-OPTION(DISABLE_BZIP2 "Whether bzip2 compression should be disabled" ON)
+#OPTION(DISABLE_BZIP2 "Whether bzip2 compression should be disabled" ON)
 
 # The URL from which to download bzip2, resulting in it being embedded in the
 # Chucho library. If this is set, then no other bzip2 variables should also be set.
