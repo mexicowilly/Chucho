@@ -21,6 +21,7 @@
 #include <chucho/calendar.hpp>
 #include <sstream>
 #include <thread>
+#include <cstring>
 
 namespace chucho
 {

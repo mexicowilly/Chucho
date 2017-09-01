@@ -40,7 +40,7 @@ IF(CHUCHO_SOLARIS)
     ADD_DEFINITIONS(-DCHUCHO_SOLARIS)
 ENDIF()
 
-IF(Protobuf_FOUND)
+IF(PROTOBUF_FOUND)
     LIST(APPEND CHUCHO_TEST_SERIALIZER_SOURCES protobuf_serializer_test.cpp)
 ENDIF()
 
@@ -60,14 +60,14 @@ IF(CHUCHO_HAVE_RABBITMQ)
     LIST(APPEND CHUCHO_TEST_MQ_SOURCES rabbitmq_writer_test.cpp)
 ENDIF()
 
-IF(CHUCHO_HAVE_ZLIB)
+IF(ZLIB_FOUND)
     LIST(APPEND CHUCHO_TEST_COMPRESSION_SOURCES
          gzip_file_compressor_test.cpp
          zlib_compressor_test.cpp)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_ZLIB)
 ENDIF()
 
-IF(CHUCHO_HAVE_BZIP2)
+IF(BZIP2_FOUND)
     LIST(APPEND CHUCHO_TEST_COMPRESSION_SOURCES
          bzip2_compressor_test.cpp
          bzip2_file_compressor_test.cpp)
@@ -116,7 +116,7 @@ IF(CHUCHO_HAVE_DB2)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_DB2)
 ENDIF()
 
-IF(CHUCHO_HAVE_RUBY)
+IF(RUBY_FOUND)
     LIST(APPEND CHUCHO_TEST_EVALUATOR_SOURCES ruby_evaluator_filter_test.cpp)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_RUBY)
 ENDIF()
@@ -129,7 +129,7 @@ IF(CHUCHO_HAVE_ZEROMQ)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_ZEROMQ)
 ENDIF()
 
-IF(Protobuf_FOUND)
+IF(PROTOBUF_FOUND)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_PROTOBUF)
 ENDIF()
 
@@ -247,7 +247,7 @@ ENDIF()
 IF(C_API)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_C_API)
 
-    IF(CHUCHO_HAVE_ZLIB OR CHUCHO_HAVE_BZIP2 OR CHUCHO_HAVE_MINIZIP)
+    IF(ZLIB_FOUND OR BZIP2_FOUND OR CHUCHO_HAVE_MINIZIP)
         SET(CHUCHO_TEST_COMPRESSION_C_SOURCES
             file_compressor_test.c
             file_compressor_test.h)
@@ -283,7 +283,7 @@ IF(C_API)
              db2_writer_test.h)
     ENDIF()
 
-    IF(CHUCHO_HAVE_RUBY)
+    IF(RUBY_FOUND)
         LIST(APPEND CHUCHO_EVALUATOR_C_SOURCES
              ruby_evaluator_filter_test.c
              ruby_evaluator_filter_test.h)
