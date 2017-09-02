@@ -45,6 +45,7 @@ TEST(zip_file_compressor, compress)
     EXPECT_STREQ(".zip", z.get_extension());
     ASSERT_TRUE(chucho::file::exists(name));
     ASSERT_NO_THROW(z.compress(name));
+    z.compress(name);
     EXPECT_FALSE(chucho::file::exists(name));
     name += ".zip";
     EXPECT_TRUE(chucho::file::exists(name));

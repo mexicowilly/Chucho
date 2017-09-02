@@ -17,13 +17,10 @@
 #include <chucho/zip_file_compressor.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/file.hpp>
-#include <chucho/calendar.hpp>
-#include <chucho/version.hpp>
-#include <zip.h>
+#include <archive.h>
+#include <archive_entry.h>
 #include <fstream>
-#include <cstdio>
-#include <chrono>
-#include <cstring>
+#include <memory>
 
 namespace chucho
 {
@@ -35,65 +32,60 @@ zip_file_compressor::zip_file_compressor(unsigned min_idx)
 
 void zip_file_compressor::compress(const std::string& file_name)
 {
-    std::ifstream in(file_name.c_str(), std::ios::in | std::ios::binary);
-    if (!in.is_open())
-        throw exception("Could not open " + file_name + " for reading");
     std::string to_write = file_name + get_extension();
-    zipFile z = zipOpen(to_write.c_str(), APPEND_STATUS_CREATE);
-    if (z == nullptr)
-        throw exception("Could not create zip archive " + to_write);
-    struct std::tm now = calendar::get_utc(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
-    zip_fileinfo zipfi;
-    std::memset(&zipfi, 0, sizeof(zipfi));
-    zipfi.tmz_date.tm_sec = now.tm_sec;
-    zipfi.tmz_date.tm_min = now.tm_min;
-    zipfi.tmz_date.tm_hour = now.tm_hour;
-    zipfi.tmz_date.tm_mday = now.tm_mday;
-    zipfi.tmz_date.tm_mon = now.tm_mon;
-    zipfi.tmz_date.tm_year = now.tm_year;
-    std::string created_msg("Created by Chucho version ");
-    created_msg += version::text();
-    if (zipOpenNewFileInZip(z,
-                            file::base_name(file_name).c_str(),
-                            &zipfi,
-                            nullptr,
-                            0,
-                            nullptr,
-                            0,
-                            nullptr,
-                            Z_DEFLATED,
-                            Z_DEFAULT_COMPRESSION) != ZIP_OK)
+    try
     {
-        zipClose(z, created_msg.c_str());
+        std::ifstream in(file_name.c_str(), std::ios::in | std::ios::binary);
+        if (!in.is_open())
+            throw exception("Could not open " + file_name + " for reading");
+        std::unique_ptr<struct archive, std::function<void(struct archive*)>>
+            arch(archive_write_new(), [] (struct archive* a) { archive_write_free(a); });
+        if (!arch)
+            throw exception("Could not create a new archive object");
+        archive_write_set_format_zip(arch.get());
+        if (archive_write_open_filename(arch.get(), to_write.c_str()) != ARCHIVE_OK)
+        {
+            throw exception(std::string("Could not open ") + to_write+
+                            " for writing: " + archive_error_string(arch.get()));
+        }
+        std::unique_ptr<struct archive_entry, std::function<void(struct archive_entry*)>>
+            ent(archive_entry_new2(arch.get()), [] (struct archive_entry* e) { archive_entry_free(e); });
+        if (!ent)
+            throw exception("Could not create new archive entry object");
+        archive_entry_set_pathname(ent.get(), file::base_name(file_name).c_str());
+        archive_entry_set_size(ent.get(), file::size(file_name));
+        archive_entry_set_filetype(ent.get(), AE_IFREG);
+        archive_entry_set_perm(ent.get(), 0644);
+        archive_write_header(arch.get(), ent.get());
+        char buf[BUFSIZ];
+        while (in.good())
+        {
+            in.read(buf, BUFSIZ);
+            if (archive_write_data(arch.get(), buf, in.gcount()) != in.gcount())
+            {
+                throw exception("Could not write file " + file::base_name(file_name) +
+                                " in zip archive " + to_write + ": " + archive_error_string(arch.get()));
+            }
+        }
+        if (!in.eof())
+            throw exception("Did not read to end of input file " + file_name + " during zip compression");
+        in.close();
+        if (archive_write_close(arch.get()) != ARCHIVE_OK)
+            throw exception(std::string("Error closing archive: ") + archive_error_string(arch.get()));
+        file::remove(file_name);
+    }
+    catch (...)
+    {
         try
         {
             file::remove(to_write);
         }
         catch (...)
         {
-            // don't care
+            // Don't care
         }
-        throw exception("Unable to create file " + file::base_name(file_name) + " in zip archive " + to_write);
+        throw;
     }
-    struct sentry
-    {
-        sentry(zipFile z, const std::string& msg) : z_(z) { }
-        ~sentry() { zipCloseFileInZip(z_); zipClose(z_, msg_.c_str()); }
-        zipFile z_;
-        std::string msg_;
-    } s(z, created_msg);
-    char buf[BUFSIZ];
-    while (in.good())
-    {
-        in.read(buf, BUFSIZ);
-        if (zipWriteInFileInZip(z, buf, static_cast<unsigned>(in.gcount())) != ZIP_OK)
-            throw exception("Could not write file " + file::base_name(file_name) + " in zip archive " + to_write);
-
-    }
-    if (!in.eof())
-        throw exception("Did not read to end of input file " + file_name + " during zip compression");
-    in.close();
-    file::remove(file_name);
 }
 
 }

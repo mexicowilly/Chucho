@@ -571,6 +571,10 @@ CHUCHO_FIND_PACKAGE(Protobuf)
 FIND_PACKAGE(CapnProto)
 CHUCHO_FIND_PACKAGE(ZLIB)
 CHUCHO_FIND_PACKAGE(BZip2)
+CHUCHO_FIND_PACKAGE(LIBARCHIVE INCLUDE archive.h LIBS archive SYMBOLS
+    archive_write_new archive_write_set_format_zip archive_write_open_filename
+    archive_write_header archive_write_data archive_write_close archive_write_free
+    archive_error_string)
 CHUCHO_FIND_PACKAGE(SQLITE INCLUDE sqlite3.h LIBS sqlite3 PKG_CONFIG_NAME sqlite3 SYMBOLS
     sqlite3_threadsafe sqlite3_open sqlite3_prepare_v2 sqlite3_reset sqlite3_bind_text
     sqlite3_bind_int64 sqlite3_bind_int sqlite3_step sqlite3_finalize sqlite3_close

@@ -36,7 +36,7 @@
 #if defined(CHUCHO_HAVE_ZLIB)
 #include <chucho/gzip_file_compressor.hpp>
 #endif
-#if defined(CHUCHO_HAVE_MINIZIP)
+#if defined(CHUCHO_HAVE_LIBARCHIVE)
 #include <chucho/zip_file_compressor.hpp>
 #endif
 #include <chucho/async_writer.hpp>
@@ -1029,7 +1029,7 @@ void configurator::zip_file_compressor_body()
     ASSERT_TRUE(static_cast<bool>(trlr));
     auto cmp = trlr->get_file_compressor();
     ASSERT_TRUE(static_cast<bool>(cmp));
-#if defined(CHUCHO_HAVE_MINIZIP)
+#if defined(CHUCHO_HAVE_LIBARCHIVE)
     ASSERT_EQ(typeid(chucho::zip_file_compressor), typeid(*cmp));
     EXPECT_EQ(700, cmp->get_min_index());
 #else

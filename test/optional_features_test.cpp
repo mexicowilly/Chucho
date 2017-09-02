@@ -51,8 +51,8 @@ TEST(optional_features, simple)
 #if defined(CHUCHO_LOG4CPLUS_CONFIG)
     EXPECT_FEATURE(chucho::optional_features::LOG4CPLUS_CONFIGURATION);
 #endif
-#if defined(CHUCHO_HAVE_MINIZIP)
-    EXPECT_FEATURE(chucho::optional_features::MINIZIP_COMPRESSION);
+#if defined(CHUCHO_HAVE_LIBARCHIVE)
+    EXPECT_FEATURE(chucho::optional_features::LIBARCHIVE_COMPRESSION);
 #endif
 #if defined(CHUCHO_HAVE_MYSQL)
     EXPECT_FEATURE(chucho::optional_features::MYSQL_WRITER);
