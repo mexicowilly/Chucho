@@ -50,4 +50,3 @@ TEST(zip_file_compressor, compress)
     EXPECT_TRUE(chucho::file::exists(name));
     chucho::file::remove(name);
 }
-

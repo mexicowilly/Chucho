@@ -37,9 +37,8 @@
  *  
  * This is the documentation of the Chucho API. For access to 
  * releases, documentation, tickets and source code, please 
- * visit the <a href="https://www.assembla.com/spaces/chucho" 
- * target="_blank">project 
- * site</a>.
+ * visit the <a href="https://github.com/mexicowilly/Chucho"
+ * target="_blank">project * site</a>.
  *  
  * Chucho uses the same architecture as <a 
  * href="http://logback.qos.ch/" 

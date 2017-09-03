@@ -152,7 +152,7 @@ std::shared_ptr<chucho::file_compressor> create_compressor(int min_index)
         result = std::make_shared<chucho::gzip_file_compressor>(min_index);
 #elif defined(CHUCHO_HAVE_BZIP2)
         result = std::make_shared<chucho::bzip2_file_compressor>(min_index);
-#elif defined(CHUCHO_HAVE_MINIZIP)
+#elif defined(CHUCHO_HAVE_LIBARCHIVE)
         result = std::make_shared<chucho::zip_file_compressor>(min_index);
 #else
         result = std::make_shared<chucho::noop_file_compressor>();

@@ -16,7 +16,7 @@
 
 #include <chucho/zip_file_compressor_factory.hpp>
 #include <chucho/file_compressor_memento.hpp>
-#if defined(CHUCHO_HAVE_MINIZIP)
+#if defined(CHUCHO_HAVE_LIBARCHIVE)
 #include <chucho/zip_file_compressor.hpp>
 #endif
 #include <chucho/noop_file_compressor.hpp>
@@ -34,11 +34,11 @@ zip_file_compressor_factory::zip_file_compressor_factory()
 
 std::shared_ptr<configurable> zip_file_compressor_factory::create_configurable(std::shared_ptr<memento> mnto)
 {
-#if defined(CHUCHO_HAVE_MINIZIP)
+#if defined(CHUCHO_HAVE_LIBARCHIVE)
     auto fcm = std::dynamic_pointer_cast<file_compressor_memento>(mnto);
     assert(fcm);
     if (!fcm->get_min_index())
-        throw exception("gzip_file_compressor_factory: The min_index field must be set");
+        throw exception("zip_file_compressor_factory: The min_index field must be set");
     unsigned mi = *fcm->get_min_index();
     if (mi == 0)
     {

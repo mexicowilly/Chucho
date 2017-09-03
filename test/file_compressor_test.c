@@ -22,7 +22,7 @@
 #if defined(CHUCHO_HAVE_BZIP2)
 #include <chucho/bzip2_file_compressor.h>
 #endif
-#if defined(CHUCHO_HAVE_MINIZIP)
+#if defined(CHUCHO_HAVE_LIBARCHIVE)
 #include <chucho/zip_file_compressor.h>
 #endif
 
@@ -66,7 +66,7 @@ static void bzip2_compressor_test(void)
 }
 #endif
 
-#if defined(CHUCHO_HAVE_MINIZIP)
+#if defined(CHUCHO_HAVE_LIBARCHIVE)
 static void zip_compressor_test(void)
 {
     chucho_file_compressor* cmp;
@@ -95,7 +95,7 @@ void run_file_compressor_test(void)
     #if defined(CHUCHO_HAVE_BZIP2)
     sput_run_test(bzip2_compressor_test);
     #endif
-    #if defined(CHUCHO_HAVE_MINIZIP)
+    #if defined(CHUCHO_HAVE_LIBARCHIVE)
     sput_run_test(zip_compressor_test);
     #endif
     sput_leave_suite();
