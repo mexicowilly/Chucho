@@ -1,7 +1,7 @@
 Chucho Installation
 ===================
 
-Please refer to the file BuildOptions.cmake, where you will find all supported
+Please refer to the file cmake/BuildOptions.cmake, where you will find all supported
 build options and documentation.
 
 Then you may run the following commands:

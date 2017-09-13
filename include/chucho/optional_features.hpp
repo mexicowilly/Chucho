@@ -39,7 +39,7 @@ namespace optional_features
 
 /**
  * Features that may or may not be present. Please refer to the file
- * @c BuildOptions.cmake for information about how to enable or disable
+ * @c cmake/BuildOptions.cmake for information about how to enable or disable
  * optional features.
  */
 enum feature

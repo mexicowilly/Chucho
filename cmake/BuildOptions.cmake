@@ -39,12 +39,7 @@
 #     Sections include:
 #         * GENERAL
 #         * CONFIGURATION FORMATS
-#         * EMAIL WRITER
-#         * DATABASE
-#         * RUBY EVALUATOR FILTER
-#         * MESSAGE QUEUE
-#         * COMPRESSION
-
+#         * OPTIONAL FEATURES
 # GENERAL
 # ================================================================================
 
@@ -113,282 +108,30 @@ OPTION(CONFIG_FILE_CONFIG "Whether to include the config file configuration pars
 
 OPTION(LOG4CPLUS_CONFIG "Whether to support reading log4cplus configuration files" OFF)
 
-# zlib, bzip2, minizip, curl, oracle, mysql, sqlite, postgres,
-# db2, ruby, activemq, zeromq, rabbitmq, protobuf, capnproto
+# OPTIONAL FEATURES
+# ================================================================================
+#     Optional features can be enabled by linking to third-party libraries. If any
+# of these libraries is found, corresponding elements of Chucho will be built. In
+# order to help CMake find these features, you may need to set the variables
+# CMAKE_INCLUDE_PATH, CMAKE_LIBRARY_PATH and CMAKE_PROGRAM_PATH.
+#
+# The feature names and what they provide are:
+#
+# activemq: activemq_writer
+# bzip2: bzip2_compressor, bzip2_file_compressor
+# capnproto: capn_proto_serializer
+# curl: email_writer, email_trigger, level_threshold_email_trigger
+# db2: db2_writer
+# libarchive: zip_file_compressor
+# mysql: mysql_writer
+# oracle: oracle_writer
+# postgres: postgres_writer
+# protobuf: protobuf_serializer
+# rabbitmq: rabbitmq_writer
+# ruby: ruby_evaluator_filter
+# sqlite: sqlite_writer
+# zeromq: zeromq_writer
+# zlib: zlib_compressor, gzip_file_compressor
+#
 
 # SET(WITH_LIBS <Your libraries>)
-
-# EMAIL WRITER
-# ================================================================================
-
-# Whether to search for the curl library. Libcurl is used to support the Chucho
-# email_writer. You may explicitly disable this search if you wish.
-
-#OPTION(ENABLE_CURL "Whether libcurl should be checked so that email_writer will be enabled" ON)
-
-# DATABASE
-# ================================================================================
-#     Chucho supports sending log events to databases. You must have the database
-# client library available on your system at build time in order for database
-# support to be included. Please refer to the files in the sql directory for exact
-# descriptions of how the databases will be utilized.
-
-# The location of the Oracle OCI header files.
-
-# SET(ORACLE_INCLUDE_DIR "<My Oracle Include Directory>" CACHE STRING "Include directory of the Oracle client")
-
-# The name of the Oracle OCI library. This variable need not be set for the Chucho
-# library to build successfully with Oracle support. In the context of the Chucho
-# build, this variable is only used for unit test linkage. However, you must link
-# your own application to the OCI library when linking to Chucho.
-
-# SET(ORACLE_CLIENT_LIB "<My Oracle Library>" CACHE STRING "Oracle client library")
-
-# The location of the MySQL header files.
-
-# SET(MYSQL_INCLUDE_DIR "<My MySQL Include Directory>" CACHE STRING "Include directory of the MySQL client")
-
-# The name of the MySQL library. This variable need not be set for the Chucho
-# library to build successfully with MySQL support. In the context of the Chucho
-# build, this variable is only used for unit test linkage. However, you must link
-# your own application to the MySQL library when linking to Chucho.
-
-# SET(MYSQL_CLIENT_LIB "<My MySQL Library>" CACHE STRING "MySQL client library")
-
-# The location of the SQLite header files.
-
-# SET(SQLITE_INCLUDE_DIR "<My SQLite Include Directory>" CACHE STRING "Include directory of the SQLite client")
-
-# The name of the SQLite library. This variable need not be set for the Chucho
-# library to build successfully with SQLite support. In the context of the Chucho
-# build, this variable is only used for unit test linkage. However, you must link
-# your own application to the SQLite library when linking to Chucho.
-
-# SET(SQLITE_CLIENT_LIB "<My SQLite Library>" CACHE STRING "SQLite client library")
-
-# The location of the PostgreSQL header files.
-
-# SET(POSTGRES_INCLUDE_DIR "<My PostgreSQL Include Directory>" CACHE STRING "Include directory of the PostgreSQL client")
-
-# The name of the PostgreSQL library. This variable need not be set for the Chucho
-# library to build successfully with PostgreSQL support. In the context of the
-# Chucho build, this variable is only used for unit test linkage. However, you must
-# link your own application to the PostgresSQL library when linking to Chucho.
-
-# SET(POSTGRES_CLIENT_LIB "<My PostgreSQL Library>" CACHE STRING "PostgreSQL client library")
-
-# The location of the DB2 header files.
-
-# SET(DB2_INCLUDE_DIR "<My DB2 Include Directory>" CACHE STRING "Include directory of the DB2 client")
-
-# The name of the DB2 library. This variable need not be set for the Chucho
-# library to build successfully with DB2 support. In the context of the
-# Chucho build, this variable is only used for unit test linkage. However, you must
-# link your own application to the DB2 library when linking to Chucho.
-
-# SET(DB2_CLIENT_LIB "<My DB2 Library>" CACHE STRING "DB2 client library")
-
-# RUBY EVALUATOR FILTER
-# ================================================================================
-#     Chucho has a filter that can evaluate any Ruby expression to determine the
-# filtration disposition. Chucho must have access to the Ruby library when Chucho
-# is built for this filter to be available.
-
-# The location of the Ruby header files.
-
-# SET(RUBY_INCLUDE_DIR "<My Ruby Include Directory>" CACHE STRING "Include directory of the Ruby client")
-
-# The name of the Ruby library.
-
-# SET(RUBY_LIB "<My Ruby Library>" CACHE STRING "Ruby library")
-
-# Whether to use the system's Ruby framework on Macintosh. If you set this option
-# to ON, then the RUBY_INCLUDE_DIR and RUBY_LIB variables are ignored.
-
-#OPTION(RUBY_FRAMEWORK "Whether Ruby should be included as a framework (Macintosh only)" OFF)
-
-# MESSAGE QUEUE
-# ================================================================================
-#     Chucho can write log events to message queueus. The message queue client
-# library must be available to Chucho at build time. Additionally, message queues
-# tend to treat message as blobs. Chucho must therefore have a way to blobify a
-# log event using a serializer, which is an abstract class. There is currently a
-# simple formatted_message_serializer that just puts the event's formatted
-# message into a blob. The possibility of more advanced serialization exists with
-# the protobuf_serializer. In order to make use of this, please enable Protobuf
-# support using the settings below. Please refer to the file protobuf/chucho.proto
-# for precise information about how Protobuf serialization of Chucho events is
-# accomplished.
-
-# The location of the ActiveMQ header files.
-
-# SET(ACTIVEMQ_INCLUDE_DIR "<My ActiveMQ Include Directory>" CACHE STRING "Include directory of the ActiveMQ library")
-
-# The name of the ActiveMQ library.
-
-# SET(ACTIVEMQ_LIB "<My ActiveMQ Library>" CACHE STRING "ActiveMQ library")
-
-# The name of the Apache Portable Runtime library. This is required by the ActiveMQ-CPP library.
-
-# SET(APR_LIB "<My APR Library>" CACHE STRING "APR Library")
-
-# The location of the ZeroMQ header files.
-
-# SET(ZEROMQ_INCLUDE_DIR "<My ZeroMQ Include Directory>" CACHE STRING "Include directory of the ZeroMQ library")
-
-# The name of the ZeroMQ library.
-
-# SET(ZEROMQ_LIB "<My ZeroMQ Library>" CACHE STRING "ZeroMQ library")
-
-# The location of the RabbitMQ header files.
-
-# SET(RABBITMQ_INCLUDE_DIR "<My RabbitMQ Include Directory>" CACHE STRING "Include directory of the RabbitMQ library")
-
-# The name of the RabbitMQ library.
-
-# SET(RABBITMQ_LIB "<My RabbitMQ Library>" CACHE STRING "RabbitMQ library")
-
-# The location of the Protobuf header files.
-
-# SET(PROTOBUF_INCLUDE_DIR "<My Protobuf Include Directory>" CACHE STRING "Include directory of the Protobuf library")
-
-# The name of the Protobuf library.
-
-# SET(PROTOBUF_LIB "<My Protobuf Library>" CACHE STRING "Protobuf library")
-
-# The location of the Protobuf compiler.
-
-# SET(PROTOC_DIR "<Location of Protoc>" CACHE STRING "Protoc location")
-
-# The location of the Cap'n Proto header files.
-
-# SET(CAPNP_INCLUDE_DIR "<My Cap'n Proto Include Directory>" CACHE STRING "Include directory of the Cap'n Proto library")
-
-# The name of the Cap'n Proto library.
-
-# SET(CAPN_PROTO_LIB "<My Cap'n Proto Library>" CACHE STRING "Cap'n Proto library")
-
-# The name of the Cap'n Proto KJ library.
-
-# SET(CAPN_PROTO_KJ_LIB "<My Cap'n Proto KJ Library>" CACHE STRING "Cap'n Proto KJ library")
-
-# The location of the Cap'n Proto compiler.
-
-# SET(CAPNP_DIR "<Location of Capnp>" CACHE STRING "Capnp location")
-
-
-# COMPRESSION
-# ================================================================================
-#     When rolling files, Chucho may compress them to gzip, bzip2 or zip file
-# formats. With gzip and bzip2, the compression may be utilized by Chucho in one
-# of two ways: embedded in the Chucho library or linked to externally by your
-# application. With minizip, the library used for zip file format, the library may
-# not be linked externally, only embedded into the Chucho library itself.
-#
-#     There are three ways that zlib (for gzip format), bzip2 (for bzip2 format)
-# or minizip (for zip file format) can be embedded in the Chucho library:
-#
-#     * Specifying an URL from which to download the compression tarball
-#     * Specifying a location in the file system where the tarball resides
-#     * Specifying the location of an already unpacked tarball
-#
-#     There is one way that zlib or bzip2 can be linked to externally:
-#
-#     * Specifying the directory where the header files reside and the directory
-#       where the compression library resides
-#
-#     Note that minizip cannot be linked externally by your application because it
-# doesn't even have a build system, and thus no consistent way to deploy it on its
-# own. Also note that in order to use minizip for zip file format compression, you
-# must also include zlib support.
-
-# Whether to disable zlib. If this option is turned OFF and no other zlib
-# variables are used, then the system will be searched for zlib, which, if it is
-# found, will result in zlib being enabled with external linkage.
-
-#OPTION(DISABLE_ZLIB "Whether zlib compression should be disabled" ON)
-
-# The URL from which to download zlib, resulting in it being embedded in the
-# Chucho library. If this is set, then no other zlib variables should also be set.
-
-# SET(ZLIB_URL "<My Zlib URL>" CACHE STRING "URL for downloading zlib")
-
-# The location on the file system of the zlib tarball. This will cause zlib to be
-# embedded in the Chucho library. If this is set,then no other zlib variables
-# should also be set.
-
-# SET(ZLIB_PACKAGE "<My Zlib Package>" CACHE STRING "Zlib tarball")
-
-# The location on the file system of an unpacked zlib tarball. This will cause
-# zlib to be embedded in the Chucho library. If this is set, then no other zlib
-# variables should also be set.
-
-# SET(ZLIB_SOURCE "<My Zlib Source>" CACHE STRING "Zlib source")
-
-# The location of the directory that contains the zlib headers. This will cause
-# zlib to require external linkage to your application later. If this is set,
-# then ZLIB_LIB_DIR must also be set and no other zlib variables should also be
-# set.
-
-# SET(ZLIB_INCLUDE_DIR "<My Zlib Include Directory>" CACHE STRING "Include directory of the zlib library")
-
-# The directory containing the zlib library. This will cause zlib to require
-# external linkage to your application later. If this is set, then
-# ZLIB_INCLUDE_DIR must also be set and no other zlib variables should also be
-# set.
-
-# SET(ZLIB_LIB_DIR "<My Zlib Library Directory>" CACHE STRING "Zlib library directory")
-
-# Whether to disable bzip2. If this option is turned OFF and no other bzip2
-# variables are used, then the system will be searched for bzip2, which, if it is
-# found, will result in bzip2 being enabled with external linkage.
-
-#OPTION(DISABLE_BZIP2 "Whether bzip2 compression should be disabled" ON)
-
-# The URL from which to download bzip2, resulting in it being embedded in the
-# Chucho library. If this is set, then no other bzip2 variables should also be set.
-
-# SET(BZIP2_URL "<My Bzip2 URL>" CACHE STRING "URL for downloading bzip2")
-
-# The location on the file system of the bzip2 tarball. This will cause bzip2 to be
-# embedded in the Chucho library. If this is set,then no other bzip2 variables
-# should also be set.
-
-# SET(BZIP2_PACKAGE "<My Bzip2 Package>" CACHE STRING "bzip2 tarball")
-
-# The location on the file system of an unpacked bzip2 tarball. This will cause
-# bzip2 to be embedded in the Chucho library. If this is set, then no other bzip2
-# variables should also be set.
-
-# SET(BZIP2_SOURCE "<My Bzip2 Source>" CACHE STRING "Bzip2 source")
-
-# The location of the directory that contains the bzip2 headers. This will cause
-# bzip2 to require external linkage to your application later. If this is set,
-# then BZIP2_LIB_DIR must also be set and no other bzip2 variables should also be
-# set.
-
-# SET(BZIP2_INCLUDE_DIR "<My Bzip2 Include Directory>" CACHE STRING "Include directory of the bzip2 library")
-
-# The directory containing the bzip2 library. This will cause bzip2 to require
-# external linkage to your application later. If this is set, then
-# BZIP2_INCLUDE_DIR must also be set and no other bzip2 variables should also be
-# set.
-
-# SET(BZIP2_LIB_DIR "<My Bzip2 Library Directory>" CACHE STRING "bzip2 library directory")
-
-# The URL from which to download minizip, resulting in it being embedded in the
-# Chucho library. If this is set, then no other minizip variables should also be set.
-
-# SET(MINIZIP_URL "<My Minizip URL>" CACHE STRING "URL for downloading minizip")
-
-# The location on the file system of the minizip tarball. This will cause minizip to be
-# embedded in the Chucho library. If this is set,then no other minizip variables
-# should also be set.
-
-# SET(MINIZIP_PACKAGE "<My Minizip Package>" CACHE STRING "minizip tarball")
-
-# The location on the file system of an unpacked minizip tarball. This will cause
-# minizip to be embedded in the Chucho library. If this is set, then no other minizip
-# variables should also be set.
-
-# SET(MINIZIP_SOURCE "<My Minizip Source>" CACHE STRING "Minizip source")
