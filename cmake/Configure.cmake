@@ -604,6 +604,7 @@ CHUCHO_FIND_PACKAGE(RABBITMQ INCLUDE amqp.h LIBS rabbitmq PKG_CONFIG_NAME librab
     amqp_basic_consume amqp_consume_message amqp_empty_bytes amqp_empty_table
     amqp_destroy_envelope)
 
+# This must appear after the above package searches
 CHUCHO_GENERATE_PKG_CONFIG_FILE()
 
 # doxygen
