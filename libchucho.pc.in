@@ -1,0 +1,10 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+include_dir=${prefix}/include
+lib_dir=${prefix}/lib
+
+Name: libchucho
+Description: Logging library
+Version: @CHUCHO_VERSION@
+Libs: -L${libdir} -lchucho
+@CHUCHO_NON_PKG_CONFIG_DEPS@@CHUCHO_NON_PKG_CONFIG_CFLAGS@@CHUCHO_PKG_CONFIG_PUBLIC_DEPS@@CHUCHO_PKG_CONFIG_PRIVATE_DEPS@

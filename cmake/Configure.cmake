@@ -25,6 +25,7 @@ INCLUDE(CheckTypeSize)
 INCLUDE(CheckStructHasMember)
 INCLUDE(ChuchoFindProgram)
 INCLUDE(ChuchoFindPackage)
+INCLUDE(ChuchoGeneratePkgConfigFile)
 
 # framework or not
 SET(CHUCHO_NEEDS_TO_USE_THE_FRAMEWORK_VARIABLE_OR_CMAKE_COMPLAINS ${ENABLE_FRAMEWORK})
@@ -564,6 +565,7 @@ int main()
     ENDIF()
 ENDIF()
 
+# Things Chucho may or may not depend on
 CHUCHO_FIND_PACKAGE(CURL)
 CHUCHO_FIND_PACKAGE(Ruby)
 CHUCHO_FIND_PACKAGE(Protobuf)
@@ -571,7 +573,7 @@ CHUCHO_FIND_PACKAGE(Protobuf)
 FIND_PACKAGE(CapnProto)
 CHUCHO_FIND_PACKAGE(ZLIB)
 CHUCHO_FIND_PACKAGE(BZip2)
-CHUCHO_FIND_PACKAGE(LIBARCHIVE INCLUDE archive.h LIBS archive SYMBOLS
+CHUCHO_FIND_PACKAGE(LIBARCHIVE INCLUDE archive.h LIBS archive PKG_CONFIG_NAME libarchive SYMBOLS
     archive_write_new archive_write_set_format_zip archive_write_open_filename
     archive_write_header archive_write_data archive_write_close archive_write_free
     archive_error_string)
@@ -601,6 +603,9 @@ CHUCHO_FIND_PACKAGE(RABBITMQ INCLUDE amqp.h LIBS rabbitmq PKG_CONFIG_NAME librab
     amqp_destroy_connection amqp_error_string2 amqp_cstring_bytes amqp_queue_declare
     amqp_basic_consume amqp_consume_message amqp_empty_bytes amqp_empty_table
     amqp_destroy_envelope)
+
+# This must appear after the above package searches
+CHUCHO_GENERATE_PKG_CONFIG_FILE()
 
 # doxygen
 FIND_PACKAGE(Doxygen)
