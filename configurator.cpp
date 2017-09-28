@@ -32,6 +32,7 @@
 #include <chucho/level_filter_factory.hpp>
 #include <chucho/level_threshold_filter_factory.hpp>
 #include <chucho/logger_factory.hpp>
+#include <chucho/lzma_file_compressor_factory.hpp>
 #include <chucho/named_pipe_writer_factory.hpp>
 #include <chucho/noop_compressor_factory.hpp>
 #include <chucho/numbered_file_roller_factory.hpp>
@@ -182,6 +183,8 @@ void configurator::initialize_impl()
     add_configurable_factory("chucho::interval_file_roll_trigger", fact);
     fact.reset(new formatted_message_serializer_factory());
     add_configurable_factory("chucho::formatted_message_serializer", fact);
+    fact.reset(new lzma_file_compressor_factory());
+    add_configurable_factory("chucho::lzma_file_compressor", fact);
 #if defined(CHUCHO_WINDOWS)
     fact.reset(new windows_event_log_writer_factory());
     add_configurable_factory("chucho::windows_event_log_writer", fact);

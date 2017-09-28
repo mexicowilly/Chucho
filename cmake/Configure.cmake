@@ -573,6 +573,7 @@ CHUCHO_FIND_PACKAGE(Protobuf)
 FIND_PACKAGE(CapnProto)
 CHUCHO_FIND_PACKAGE(ZLIB)
 CHUCHO_FIND_PACKAGE(BZip2)
+CHUCHO_FIND_PACKAGE(LibLZMA)
 CHUCHO_FIND_PACKAGE(LIBARCHIVE INCLUDE archive.h LIBS archive PKG_CONFIG_NAME libarchive SYMBOLS
     archive_write_new archive_write_set_format_zip archive_write_open_filename
     archive_write_header archive_write_data archive_write_close archive_write_free
