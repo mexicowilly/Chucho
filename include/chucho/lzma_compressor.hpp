@@ -1,12 +1,12 @@
 /*
  * Copyright 2013-2017 Will Mason
- * 
+ *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,40 +14,34 @@
  *    limitations under the License.
  */
 
-#if !defined(LZMA_FILE_COMPRESSOR_HPP__)
-#define LZMA_FILE_COMPRESSOR_HPP__
+#if !defined(CHUCHO_LZMA_COMPRESSOR_HPP__)
+#define CHUCHO_LZMA_COMPRESSOR_HPP__
 
-#include <chucho/file_compressor.hpp>
+#include <chucho/compressor.hpp>
 
 namespace chucho
 {
 
 /**
- * @class lzma_file_compressor lzma_file_compressor.hpp chucho/lzma_file_compressor.hpp 
- * Compress using the LZMA format and a file name extension of
- * @c .xz.
- * 
- * @ingroup fcompressors
+ * @class lzma_compressor lzma_compressor.hpp chucho/lzma_compressor.hpp
+ * A compressor that uses lzma.
+ *
+ * @ingroup compressors
  */
-class CHUCHO_EXPORT lzma_file_compressor : public file_compressor
+class CHUCHO_EXPORT lzma_compressor : public compressor
 {
 public:
     /**
      * @name Constructor
+     * @{
      */
-    //@{
     /**
-     * Construct a compressor.
-     * 
-     * @param min_idx the minimum index at which to start 
-     *                compressing
-     *  
-     * @sa get_min_index 
+     * Construct a lzma compressor.
      */
-    lzma_file_compressor(unsigned min_idx);
-    //@}
+    lzma_compressor();
+    /** @} */
 
-    virtual void compress(const std::string& file_name) override;
+    virtual std::vector<std::uint8_t> compress(const std::vector<std::uint8_t>& in) override;
 };
 
 }

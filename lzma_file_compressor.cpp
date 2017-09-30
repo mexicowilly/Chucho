@@ -18,23 +18,14 @@
 #include <chucho/exception.hpp>
 #include <chucho/file.hpp>
 #include <fstream>
-#include <cstdio>
 #include <lzma.h>
 
 namespace chucho
 {
 
 lzma_file_compressor::lzma_file_compressor(unsigned min_idx)
-    : file_compressor(min_idx, ".xz"),
-      lzma_(LZMA_STREAM_INIT)
+    : file_compressor(min_idx, ".xz")
 {
-    if (lzma_easy_encoder(&lzma_, 6, LZMA_CHECK_CRC64) == LZMA_MEM_ERROR)
-        throw std::runtime_error("Out of memory");
-}
-
-lzma_file_compressor::~lzma_file_compressor()
-{
-    lzma_end(&lzma_);
 }
 
 void lzma_file_compressor::compress(const std::string& file_name)
@@ -46,33 +37,42 @@ void lzma_file_compressor::compress(const std::string& file_name)
     std::ofstream out(to_write.c_str(), std::ios::out | std::ios::binary);
     if (!out.is_open())
         throw exception("Could not open " + to_write + " for reading");
+    lzma_stream lzma = LZMA_STREAM_INIT;
+    struct sentry
+    {
+        sentry(lzma_stream* lp) : lzmap(lp) {}
+        ~sentry() { lzma_end(lzmap); }
+        lzma_stream* lzmap;
+    } sent(&lzma);
+    if (lzma_easy_encoder(&lzma, 6, LZMA_CHECK_CRC64) == LZMA_MEM_ERROR)
+        throw std::runtime_error("Out of memory");
     lzma_action action = LZMA_RUN;
     std::uint8_t in_buf[BUFSIZ];
     std::uint8_t out_buf[BUFSIZ];
-    lzma_.next_in = nullptr;
-    lzma_.avail_in = 0;
-    lzma_.next_out = out_buf;
-    lzma_.avail_out = sizeof(out_buf);
+    lzma.next_in = nullptr;
+    lzma.avail_in = 0;
+    lzma.next_out = out_buf;
+    lzma.avail_out = sizeof(out_buf);
     while (true)
     {
-        if (lzma_.avail_in == 0 && !in.eof())
+        if (lzma.avail_in == 0 && !in.eof())
         {
             in.read(reinterpret_cast<char*>(in_buf), sizeof(in_buf));
             if (in.eof())
                 action = LZMA_FINISH;
             else if (!in)
                 throw exception("Error reading " + file_name);
-            lzma_.next_in = in_buf;
-            lzma_.avail_in = in.gcount();
+            lzma.next_in = in_buf;
+            lzma.avail_in = in.gcount();
         }
-        lzma_ret rc = lzma_code(&lzma_, action);
-        if (lzma_.avail_out == 0 || rc == LZMA_STREAM_END)
+        lzma_ret rc = lzma_code(&lzma, action);
+        if (lzma.avail_out == 0 || rc == LZMA_STREAM_END)
         {
-            out.write(reinterpret_cast<char*>(out_buf), sizeof(out_buf) - lzma_.avail_out);
+            out.write(reinterpret_cast<char*>(out_buf), sizeof(out_buf) - lzma.avail_out);
             if (!out)
                 throw exception("Error writing " + to_write);
-            lzma_.next_out = out_buf;
-            lzma_.avail_out = sizeof(out_buf);
+            lzma.next_out = out_buf;
+            lzma.avail_out = sizeof(out_buf);
         }
         if (rc != LZMA_OK)
         {

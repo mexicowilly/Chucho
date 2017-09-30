@@ -363,7 +363,7 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
 
 IF(LIBLZMA_FOUND)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
-         # include/chucho/bzip2_compressor.hpp
+         include/chucho/lzma_compressor.hpp
          include/chucho/lzma_file_compressor.hpp)
     IF(C_API)
 #    LIST(APPEND CHUCHO_PUBLIC_HEADERS
@@ -1208,8 +1208,8 @@ ENDIF()
 
 IF(LIBLZMA_FOUND)
     LIST(APPEND CHUCHO_SOURCES
-         lzma_file_compressor.cpp)
-#zlib_compressor.cpp
+         lzma_file_compressor.cpp
+         lzma_compressor.cpp)
 #zlib_compressor_factory.cpp
 #zlib_compressor_memento.cpp
 #include/chucho/zlib_compressor_factory.hpp
