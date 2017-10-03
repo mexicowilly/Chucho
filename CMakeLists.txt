@@ -1209,11 +1209,9 @@ ENDIF()
 IF(LIBLZMA_FOUND)
     LIST(APPEND CHUCHO_SOURCES
          lzma_file_compressor.cpp
-         lzma_compressor.cpp)
-#zlib_compressor_factory.cpp
-#zlib_compressor_memento.cpp
-#include/chucho/zlib_compressor_factory.hpp
-#include/chucho/zlib_compressor_memento.hpp)
+         lzma_compressor.cpp
+         lzma_compressor_factory.cpp
+         include/chucho/lzma_compressor_factory.hpp)
 #    IF(C_API)
 #        LIST(APPEND CHUCHO_SOURCES
 #             c_gzip_file_compressor.cpp

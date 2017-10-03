@@ -79,10 +79,10 @@ IF(CHUCHO_HAVE_LIBARCHIVE)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_LIBARCHIVE)
 ENDIF()
 
-IF(ZLIB_FOUND)
+IF(LIBLZMA_FOUND)
     LIST(APPEND CHUCHO_TEST_COMPRESSION_SOURCES
-         lzma_file_compressor_test.cpp)
-#            zlib_compressor_test.cpp)
+         lzma_file_compressor_test.cpp
+         lzma_compressor_test.cpp)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_LZMA)
 ENDIF()
 
