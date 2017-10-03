@@ -95,6 +95,9 @@
 #if defined(CHUCHO_HAVE_CAPN_PROTO)
 #include <chucho/capn_proto_serializer_factory.hpp>
 #endif
+#if defined(CHUCHO_HAVE_LZMA)
+#include <chucho/lzma_compressor_factory.hpp>
+#endif
 
 #include <cstring>
 #include <mutex>
@@ -250,6 +253,10 @@ void configurator::initialize_impl()
 #if defined(CHUCHO_HAVE_CAPN_PROTO)
     fact.reset(new capn_proto_serializer_factory());
     add_configurable_factory("chucho::capn_proto_serializer", fact);
+#endif
+#if defined(CHUCHO_HAVE_LZMA)
+    fact.reset(new lzma_compressor_factory());
+    add_configurable_factory("chucho::lzma_compressor", fact);
 #endif
 }
 
