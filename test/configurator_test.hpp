@@ -59,6 +59,7 @@ protected:
     void level_filter_body(const std::string& tmpl);
     void level_threshold_filter_body();
     void logger_body();
+    void lzma_file_compressor_body();
     void multiple_writer_body();
 #if defined(CHUCHO_HAVE_MYSQL)
     void mysql_writer_full_body();

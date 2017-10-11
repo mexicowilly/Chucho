@@ -401,6 +401,24 @@ TEST_F(yaml_configurator, logger)
     logger_body();
 }
 
+TEST_F(yaml_configurator, lzma_file_compressor)
+{
+    configure("chucho::logger:\n"
+                  "    name: will\n"
+                  "    chucho::rolling_file_writer:\n"
+                  "        chucho::pattern_formatter:\n"
+                  "            pattern: '%m%n'\n"
+                  "        chucho::numbered_file_roller:\n"
+                  "            min_index: 3\n"
+                  "            max_index: 5\n"
+                  "            chucho::lzma_file_compressor:\n"
+                  "                min_index: 1\n"
+                  "        chucho::size_file_roll_trigger:\n"
+                  "            max_size: 5000\n"
+                  "        file_name: what.log");
+    lzma_file_compressor_body();
+}
+
 TEST_F(yaml_configurator, multiple_writer)
 {
     configure("chucho::logger:\n"

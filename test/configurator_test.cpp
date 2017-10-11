@@ -39,6 +39,9 @@
 #if defined(CHUCHO_HAVE_LIBARCHIVE)
 #include <chucho/zip_file_compressor.hpp>
 #endif
+#if defined(CHUCHO_HAVE_LZMA)
+#include <chucho/lzma_file_compressor.hpp>
+#endif
 #include <chucho/async_writer.hpp>
 #include <chucho/sliding_numbered_file_roller.hpp>
 #if defined(CHUCHO_WINDOWS)
@@ -457,6 +460,28 @@ void configurator::logger_body()
     ASSERT_TRUE(static_cast<bool>(lgr->get_level()));
     EXPECT_EQ(*chucho::level::FATAL_(), *lgr->get_level());
     EXPECT_FALSE(lgr->writes_to_ancestors());
+}
+
+void configurator::lzma_file_compressor_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
+    auto fwrt = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(fwrt));
+    auto rlr = fwrt->get_file_roller();
+    ASSERT_EQ(typeid(chucho::numbered_file_roller), typeid(*rlr));
+    auto nrlr = std::static_pointer_cast<chucho::numbered_file_roller>(rlr);
+    ASSERT_TRUE(static_cast<bool>(nrlr));
+    auto cmp = nrlr->get_file_compressor();
+    ASSERT_TRUE(static_cast<bool>(cmp));
+#if defined(CHUCHO_HAVE_LZMA)
+    ASSERT_EQ(typeid(chucho::lzma_file_compressor), typeid(*cmp));
+    EXPECT_EQ(1, cmp->get_min_index());
+#else
+    ASSERT_EQ(typeid(chucho::noop_file_compressor), typeid(*cmp));
+    chucho::status_manager::get()->clear();
+#endif
 }
 
 void configurator::multiple_writer_body()
