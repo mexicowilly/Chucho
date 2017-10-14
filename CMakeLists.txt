@@ -366,17 +366,17 @@ IF(LIBLZMA_FOUND)
          include/chucho/lzma_compressor.hpp
          include/chucho/lzma_file_compressor.hpp)
     IF(C_API)
-#    LIST(APPEND CHUCHO_PUBLIC_HEADERS
-#         include/chucho/bzip2_file_compressor.h
-#         include/chucho/bzip2_compressor.h)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/lzma_file_compressor.h
+         include/chucho/lzma_compressor.h)
     ENDIF()
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
-#include/chucho/bzip2_compressor.hpp
-     include/chucho/lzma_file_compressor.hpp)
-#include/chucho/bzip2_file_compressor.h
-#include/chucho/bzip2_compressor.h)
+     include/chucho/lzma_compressor.hpp
+     include/chucho/lzma_file_compressor.hpp
+     include/chucho/lzma_file_compressor.h
+     include/chucho/lzma_compressor.h)
 
 IF(CHUCHO_HAVE_ORACLE)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/oracle_writer.hpp)
@@ -1215,15 +1215,11 @@ IF(LIBLZMA_FOUND)
          lzma_compressor.cpp
          lzma_compressor_factory.cpp
          include/chucho/lzma_compressor_factory.hpp)
-#    IF(C_API)
-#        LIST(APPEND CHUCHO_SOURCES
-#             c_gzip_file_compressor.cpp
-#             c_zlib_compressor.cpp)
-#    ENDIF()
-#IF(MSVC)
-#SET_SOURCE_FILES_PROPERTIES(gzip_file_compressor.cpp PROPERTIES
-#COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
-#ENDIF()
+    IF(C_API)
+        LIST(APPEND CHUCHO_SOURCES
+             c_lzma_file_compressor.cpp
+             c_lzma_compressor.cpp)
+    ENDIF()
     SET_SOURCE_FILES_PROPERTIES(lzma_file_compressor_factory.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_HAVE_LZMA)
 ENDIF()
