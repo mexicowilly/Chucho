@@ -63,7 +63,8 @@ enum feature
     YAML_CONFIGURATION,         /**< YAML config file format configuration */
     ZEROMQ_WRITER,              /**< ZeroMQ */
     ZLIB_COMPRESSION,           /**< Zlib */
-    LIBARCHIVE_COMPRESSION,    /**< Libarchive, which is used for zip file format compression after Version 1.11 */
+    LIBARCHIVE_COMPRESSION,     /**< Libarchive, which is used for zip file format compression after Version 1.11 */
+    LZMA_COMPRESSION,           /**< LZMA compression */
     FEATURE_COUNT               /**< Do not use. This is just so I can know how many there are. */
 };
 

@@ -54,6 +54,9 @@ TEST(optional_features, simple)
 #if defined(CHUCHO_HAVE_LIBARCHIVE)
     EXPECT_FEATURE(chucho::optional_features::LIBARCHIVE_COMPRESSION);
 #endif
+#if defined(CHUCHO_HAVE_LZMA)
+    EXPECT_FEATURE(chucho::optional_features::LZMA_COMPRESSION);
+#endif
 #if defined(CHUCHO_HAVE_MYSQL)
     EXPECT_FEATURE(chucho::optional_features::MYSQL_WRITER);
 #endif

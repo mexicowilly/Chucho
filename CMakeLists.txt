@@ -361,6 +361,23 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/zip_file_compressor.hpp
      include/chucho/zip_file_compressor.h)
 
+IF(LIBLZMA_FOUND)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/lzma_compressor.hpp
+         include/chucho/lzma_file_compressor.hpp)
+    IF(C_API)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/lzma_file_compressor.h
+         include/chucho/lzma_compressor.h)
+    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/lzma_compressor.hpp
+     include/chucho/lzma_file_compressor.hpp
+     include/chucho/lzma_file_compressor.h
+     include/chucho/lzma_compressor.h)
+
 IF(CHUCHO_HAVE_ORACLE)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/oracle_writer.hpp)
     LIST(APPEND CHUCHO_DATABASE_SOURCES
@@ -834,6 +851,7 @@ SET(CHUCHO_SOURCES
     logger.cpp
     logger_factory.cpp
     logger_memento.cpp
+    lzma_file_compressor_factory.cpp
     marker.cpp
     memento.cpp
     memento_key_set.cpp
@@ -917,6 +935,7 @@ SET(CHUCHO_SOURCES
     include/chucho/line_ending.hpp
     include/chucho/logger_factory.hpp
     include/chucho/logger_memento.hpp
+    include/chucho/lzma_file_compressor_factory.hpp
     include/chucho/memento_key_set.hpp
     include/chucho/message_queue_writer_memento.hpp
     include/chucho/named_pipe_writer_factory.hpp
@@ -1041,6 +1060,10 @@ IF(BZIP2_FOUND)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_BZIP2)
 ENDIF()
 
+IF(LIBLZMA_FOUND)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_LZMA)
+ENDIF()
+
 IF(CHUCHO_HAVE_DOORS)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_DOORS)
 ENDIF()
@@ -1107,6 +1130,9 @@ IF(BZIP2_FOUND)
 ENDIF()
 IF(CHUCHO_HAVE_LIBARCHIVE)
     LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_LIBARCHIVE_COMPRESSION)
+ENDIF()
+IF(LIBLZMA_FOUND)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_LZMA_COMPRESSION)
 ENDIF()
 IF(DEFINED CHUCHO_FEATURE_DEFS)
     SET_SOURCE_FILES_PROPERTIES(optional_features.cpp PROPERTIES
@@ -1181,6 +1207,21 @@ IF(CHUCHO_HAVE_LIBARCHIVE)
     ENDIF()
     SET_SOURCE_FILES_PROPERTIES(zip_file_compressor_factory.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_HAVE_LIBARCHIVE)
+ENDIF()
+
+IF(LIBLZMA_FOUND)
+    LIST(APPEND CHUCHO_SOURCES
+         lzma_file_compressor.cpp
+         lzma_compressor.cpp
+         lzma_compressor_factory.cpp
+         include/chucho/lzma_compressor_factory.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_SOURCES
+             c_lzma_file_compressor.cpp
+             c_lzma_compressor.cpp)
+    ENDIF()
+    SET_SOURCE_FILES_PROPERTIES(lzma_file_compressor_factory.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_HAVE_LZMA)
 ENDIF()
 
 IF(ENABLE_SHARED)
@@ -1276,6 +1317,10 @@ ENDIF()
 
 IF(BZIP2_FOUND)
     TARGET_LINK_LIBRARIES(chucho ${BZIP2_LIBRARIES})
+ENDIF()
+
+IF(LIBLZMA_FOUND)
+    TARGET_LINK_LIBRARIES(chucho ${LIBLZMA_LIBRARIES})
 ENDIF()
 
 TARGET_LINK_LIBRARIES(chucho ${CMAKE_THREAD_LIBS_INIT})

@@ -450,6 +450,28 @@ TEST_F(chucho_config_file_configurator, logger)
     logger_body();
 }
 
+TEST_F(chucho_config_file_configurator, lzma_file_compressor)
+{
+    configure("chucho.logger = will\n"
+                  "chucho.logger.will.writer = rfw\n"
+                  "chucho.writer.rfw = chucho::rolling_file_writer\n"
+                  "chucho.writer.rfw.formatter = pf\n"
+                  "chucho.writer.rfw.file_roller = nfr\n"
+                  "chucho.writer.rfw.file_roll_trigger = sfrt\n"
+                  "chucho.writer.rfw.file_name = what.log\n"
+                  "chucho.formatter.pf = chucho::pattern_formatter\n"
+                  "chucho.formatter.pf.pattern = %m%n\n"
+                  "chucho.file_roller.nfr = chucho::numbered_file_roller\n"
+                  "chucho.file_roller.nfr.min_index = 3\n"
+                  "chucho.file_roller.nfr.max_index = 5\n"
+                  "chucho.file_roller.nfr.file_compressor = lz\n"
+                  "chucho.file_compressor.lz = chucho::lzma_file_compressor\n"
+                  "chucho.file_compressor.lz.min_index = 1\n"
+                  "chucho.file_roll_trigger.sfrt = chucho::size_file_roll_trigger\n"
+                  "chucho.file_roll_trigger.sfrt.max_size = 5000");
+    lzma_file_compressor_body();
+}
+
 #if defined(CHUCHO_HAVE_MYSQL)
 
 TEST_F(chucho_config_file_configurator, mysql_writer_full)
