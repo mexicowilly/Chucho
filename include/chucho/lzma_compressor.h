@@ -32,7 +32,7 @@ extern "C"
 #endif
 
 /**
- * Create a lzma compressor.
+ * Create an LZMA compressor.
  *
  * @post Ownership of the cmp paramter is transferred to the
  *       caller, and it must be released with the @ref

@@ -24,7 +24,7 @@ namespace chucho
 
 /**
  * @class lzma_compressor lzma_compressor.hpp chucho/lzma_compressor.hpp
- * A compressor that uses lzma.
+ * A compressor that uses LZMA.
  *
  * @ingroup compressors
  */
@@ -36,7 +36,7 @@ public:
      * @{
      */
     /**
-     * Construct a lzma compressor.
+     * Construct an LZMA compressor.
      */
     lzma_compressor();
     /** @} */
