@@ -123,6 +123,7 @@ OPTION(LOG4CPLUS_CONFIG "Whether to support reading log4cplus configuration file
 # curl: email_writer, email_trigger, level_threshold_email_trigger
 # db2: db2_writer
 # libarchive: zip_file_compressor
+# liblzma: lzma_compressor, lzma_file_compressor
 # mysql: mysql_writer
 # oracle: oracle_writer
 # postgres: postgres_writer
@@ -134,4 +135,4 @@ OPTION(LOG4CPLUS_CONFIG "Whether to support reading log4cplus configuration file
 # zlib: zlib_compressor, gzip_file_compressor
 #
 
-# SET(WITH_LIBS <Your libraries>)
+# SET(WITH_LIBS <Your libraries, semi-colon separated>)
