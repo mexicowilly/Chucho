@@ -20,7 +20,7 @@ FIND_PACKAGE(PkgConfig QUIET)
 
 LIST(APPEND WITH_LIBS $ENV{CHUCHO_WITH_LIBS})
 STRING(TOLOWER "${WITH_LIBS}" LOWER_WITH_LIBS)
-SET(CHUCHO_BUILT_INS curl protobuf ruby zlib bzip2 liblzma)
+SET(CHUCHO_BUILT_INS curl protobuf ruby zlib bzip2 liblzma libarchive)
 
 # This cannot be a function, because then FIND_PACKAGE will fail
 # to put its variables in the right scope
