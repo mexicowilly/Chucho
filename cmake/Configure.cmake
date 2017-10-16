@@ -575,6 +575,8 @@ CHUCHO_FIND_PACKAGE(ZLIB)
 CHUCHO_FIND_PACKAGE(BZip2)
 CHUCHO_FIND_PACKAGE(LibLZMA)
 CHUCHO_FIND_PACKAGE(LibArchive)
+CHUCHO_FIND_PACKAGE(LZ4 INCLUDE lz4.h LIBS lz4 PKG_CONFIG_NAME liblz4 SYMBOLS
+    LZ4_compressBound LZ4_compress_default LZ4_decompress_safe)
 CHUCHO_FIND_PACKAGE(SQLITE INCLUDE sqlite3.h LIBS sqlite3 PKG_CONFIG_NAME sqlite3 SYMBOLS
     sqlite3_threadsafe sqlite3_open sqlite3_prepare_v2 sqlite3_reset sqlite3_bind_text
     sqlite3_bind_int64 sqlite3_bind_int sqlite3_step sqlite3_finalize sqlite3_close

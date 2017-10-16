@@ -94,6 +94,9 @@ ENDIF()
 IF(LibArchive_FOUND)
     INCLUDE_DIRECTORIES("${LibArchive_INCLUDE_DIRS}")
 ENDIF()
+IF(CHUCHO_HAVE_LZ4)
+    INCLUDE_DIRECTORIES("${LZ4_INCLUDE_DIR}")
+ENDIF()
 
 IF(CHUCHO_POSIX)
     SET(CHUCHO_PLATFORM_SOURCES
@@ -389,6 +392,21 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/lzma_file_compressor.hpp
      include/chucho/lzma_file_compressor.h
      include/chucho/lzma_compressor.h)
+
+IF(CHUCHO_HAVE_LZ4)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/lz4_compressor.hpp)
+#    IF(C_API)
+#        LIST(APPEND CHUCHO_PUBLIC_HEADERS
+#             include/chucho/lz4_compressor.h)
+#    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/lz4_compressor.hpp)
+#     include/chucho/lzma_file_compressor.hpp
+#     include/chucho/lzma_file_compressor.h
+#     include/chucho/lzma_compressor.h)
 
 IF(CHUCHO_HAVE_ORACLE)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/oracle_writer.hpp)
@@ -1076,6 +1094,10 @@ IF(LIBLZMA_FOUND)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_LZMA)
 ENDIF()
 
+IF(CHUCHO_HAVE_LZ4)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_LZ4)
+ENDIF()
+
 IF(CHUCHO_HAVE_DOORS)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_DOORS)
 ENDIF()
@@ -1145,6 +1167,9 @@ IF(LibArchive_FOUND)
 ENDIF()
 IF(LIBLZMA_FOUND)
     LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_LZMA_COMPRESSION)
+ENDIF()
+IF(CHUCHO_HAVE_LZ4)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_LZ4_COMPRESSION)
 ENDIF()
 IF(DEFINED CHUCHO_FEATURE_DEFS)
     SET_SOURCE_FILES_PROPERTIES(optional_features.cpp PROPERTIES
@@ -1234,6 +1259,18 @@ IF(LIBLZMA_FOUND)
     ENDIF()
     SET_SOURCE_FILES_PROPERTIES(lzma_file_compressor_factory.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_HAVE_LZMA)
+ENDIF()
+
+IF(CHUCHO_HAVE_LZ4)
+    LIST(APPEND CHUCHO_SOURCES
+         lz4_compressor.cpp
+         lz4_compressor_factory.cpp
+         include/chucho/lz4_compressor_factory.hpp)
+#IF(C_API)
+#LIST(APPEND CHUCHO_SOURCES
+#c_lzma_file_compressor.cpp
+#c_lzma_compressor.cpp)
+#ENDIF()
 ENDIF()
 
 IF(ENABLE_SHARED)
@@ -1333,6 +1370,10 @@ ENDIF()
 
 IF(LIBLZMA_FOUND)
     TARGET_LINK_LIBRARIES(chucho ${LIBLZMA_LIBRARIES})
+ENDIF()
+
+IF(CHUCHO_HAVE_LZ4)
+    TARGET_LINK_LIBRARIES(chucho ${LZ4_LIBS})
 ENDIF()
 
 TARGET_LINK_LIBRARIES(chucho ${CMAKE_THREAD_LIBS_INIT})
