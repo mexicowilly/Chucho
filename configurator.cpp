@@ -98,6 +98,9 @@
 #if defined(CHUCHO_HAVE_LZMA)
 #include <chucho/lzma_compressor_factory.hpp>
 #endif
+#if defined(CHUCHO_HAVE_LZ4)
+#include <chucho/lz4_compressor_factory.hpp>
+#endif
 
 #include <cstring>
 #include <mutex>
@@ -257,6 +260,10 @@ void configurator::initialize_impl()
 #if defined(CHUCHO_HAVE_LZMA)
     fact.reset(new lzma_compressor_factory());
     add_configurable_factory("chucho::lzma_compressor", fact);
+#endif
+#if defined(CHUCHO_HAVE_LZ4)
+    fact.reset(new lz4_compressor_factory());
+    add_configurable_factory("chucho::lz4_compressor", fact);
 #endif
 }
 
