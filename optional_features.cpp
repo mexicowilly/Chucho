@@ -85,6 +85,9 @@ void init_feature_set(chucho::optional_features::feature_set& fs)
 #if defined(CHUCHO_HAVE_LZMA_COMPRESSION)
     fs.set(chucho::optional_features::LZMA_COMPRESSION);
 #endif
+#if defined(CHUCHO_HAVE_LZ4_COMPRESSION)
+    fs.set(chucho::optional_features::LZ4_COMPRESSION);
+#endif
 }
 
 }
