@@ -396,17 +396,15 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
 IF(CHUCHO_HAVE_LZ4)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
          include/chucho/lz4_compressor.hpp)
-#    IF(C_API)
-#        LIST(APPEND CHUCHO_PUBLIC_HEADERS
-#             include/chucho/lz4_compressor.h)
-#    ENDIF()
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS
+             include/chucho/lz4_compressor.h)
+    ENDIF()
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
-     include/chucho/lz4_compressor.hpp)
-#     include/chucho/lzma_file_compressor.hpp
-#     include/chucho/lzma_file_compressor.h
-#     include/chucho/lzma_compressor.h)
+     include/chucho/lz4_compressor.hpp
+     include/chucho/lz4_compressor.h)
 
 IF(CHUCHO_HAVE_ORACLE)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/oracle_writer.hpp)
@@ -1266,11 +1264,10 @@ IF(CHUCHO_HAVE_LZ4)
          lz4_compressor.cpp
          lz4_compressor_factory.cpp
          include/chucho/lz4_compressor_factory.hpp)
-#IF(C_API)
-#LIST(APPEND CHUCHO_SOURCES
-#c_lzma_file_compressor.cpp
-#c_lzma_compressor.cpp)
-#ENDIF()
+    IF(C_API)
+        LIST(APPEND CHUCHO_SOURCES
+             c_lz4_compressor.cpp)
+    ENDIF()
 ENDIF()
 
 IF(ENABLE_SHARED)
