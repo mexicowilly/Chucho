@@ -122,6 +122,7 @@ OPTION(LOG4CPLUS_CONFIG "Whether to support reading log4cplus configuration file
 # capnproto: capn_proto_serializer
 # curl: email_writer, email_trigger, level_threshold_email_trigger
 # db2: db2_writer
+# flatbuffers: flatbuffers_serializer
 # libarchive: zip_file_compressor
 # liblzma: lzma_compressor, lzma_file_compressor
 # mysql: mysql_writer

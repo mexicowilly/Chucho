@@ -45,12 +45,16 @@ std::vector<std::uint8_t> flatbuffers_serializer::finish_blob()
     handle_->builder.Finish(flatb::Createlog_eventsDirect(handle_->builder, &handle_->events));
     auto result = std::vector<std::uint8_t>(handle_->builder.GetBufferPointer(),
                                             handle_->builder.GetBufferPointer() + handle_->builder.GetSize());
+    handle_->events.clear();
     handle_->builder.Reset();
     return result;
 }
 
 void flatbuffers_serializer::serialize(const event& evt, std::shared_ptr<formatter> fmt)
 {
+    // Strings cannot be created during the time that the builder is active.
+    // So, create them before and then start the builder. Flatbuffers gets very
+    // angry if you try to nest them.
     auto msg = handle_->builder.CreateString(utf8::escape_invalid(fmt->format(evt)));
     auto fn = handle_->builder.CreateString(utf8::escape_invalid(evt.get_file_name()));
     auto func = handle_->builder.CreateString(utf8::escape_invalid(evt.get_function_name()));
