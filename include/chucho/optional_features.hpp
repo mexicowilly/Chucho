@@ -66,6 +66,7 @@ enum feature
     LIBARCHIVE_COMPRESSION,     /**< Libarchive, which is used for zip file format compression after Version 1.11 */
     LZMA_COMPRESSION,           /**< LZMA compression */
     LZ4_COMPRESSION,            /**< LZ4 compression */
+    FLATBUFFERS_SERIALIZER,     /**< Flatbuffers serialization */
     FEATURE_COUNT               /**< Do not use. This is just so I can know how many there are. */
 };
 

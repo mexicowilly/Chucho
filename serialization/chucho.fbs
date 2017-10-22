@@ -14,7 +14,7 @@
 //    limitations under the License.
 //
 
-namespace chucho.flatbuffers;
+namespace chucho.flatb;
 
 table log_events {
     events: [log_event];
