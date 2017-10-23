@@ -594,9 +594,9 @@ IF(CHUCHO_HAVE_FLATBUFFERS)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
          include/chucho/flatbuffers_serializer.hpp)
     LIST(APPEND CHUCHO_SERIALIZER_SOURCES
-         flatbuffers_serializer.cpp)
-#capn_proto_serializer_factory.cpp
-#include/chucho/capn_proto_serializer_factory.hpp)
+         flatbuffers_serializer.cpp
+         flatbuffers_serializer_factory.cpp
+         include/chucho/flatbuffers_serializer_factory.hpp)
 #IF(C_API)
 #LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/capn_proto_serializer.h)
 #LIST(APPEND CHUCHO_SERIALIZER_SOURCES c_capn_proto_serializer.cpp)

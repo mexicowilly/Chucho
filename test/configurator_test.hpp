@@ -107,6 +107,9 @@ protected:
 #if defined(CHUCHO_HAVE_PROTOBUF)
     void zeromq_writer_protobuf_body();
 #endif
+#if defined(CHUCHO_HAVE_FLATBUFFERS)
+    void zeromq_writer_flatbuffers_body();
+#endif
 #endif
     void zip_file_compressor_body();
 };

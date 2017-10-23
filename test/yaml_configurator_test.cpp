@@ -876,6 +876,23 @@ TEST_F(yaml_configurator, zeromq_writer_protobuf)
 
 #endif
 
+#if defined(CHUCHO_HAVE_FLATBUFFERS)
+
+TEST_F(yaml_configurator, zeromq_writer_flatbuffers)
+{
+    configure("- chucho::logger:\n"
+              "    - name: will\n"
+              "    - chucho::zeromq_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            - pattern: '%m'\n"
+              "        - chucho::flatbuffers_serializer\n"
+              "        - endpoint: 'tcp://127.0.0.1:7781'\n"
+              "        - prefix: Hi");
+    zeromq_writer_flatbuffers_body();
+}
+
+#endif
+
 #endif
 
 TEST_F(yaml_configurator, zip_file_compressor)
