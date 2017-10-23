@@ -87,5 +87,11 @@ TEST(optional_features, simple)
 #if defined(CHUCHO_HAVE_ZLIB)
     EXPECT_FEATURE(chucho::optional_features::ZLIB_COMPRESSION);
 #endif
+#if defined(CHUCHO_HAVE_LZ4)
+    EXPECT_FEATURE(chucho::optional_features::LZ4_COMPRESSION);
+#endif
+#if defined(CHUCHO_HAVE_FLATBUFFERS)
+    EXPECT_FEATURE(chucho::optional_features::FLATBUFFERS_SERIALIZER);
+#endif
     EXPECT_TRUE(fs.none());
 }

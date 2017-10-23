@@ -935,6 +935,25 @@ TEST_F(chucho_config_file_configurator, zeromq_writer_protobuf)
 
 #endif
 
+#if defined(CHUCHO_HAVE_FLATBUFFERS)
+
+TEST_F(chucho_config_file_configurator, zeromq_writer_protobuf)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = zw\n"
+              "chucho.writer.zw = chucho::zeromq_writer\n"
+              "chucho.writer.zw.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.zw.serializer = ps\n"
+              "chucho.serializer.ps = chucho::flatbuffers_serializer\n"
+              "chucho.writer.zw.endpoint = tcp://127.0.0.1:7781\n"
+              "chucho.writer.zw.prefix = Hi");
+    zeromq_writer_flatbuffers_body();
+}
+
+#endif
+
 #endif
 
 TEST_F(chucho_config_file_configurator, zip_file_compressor)

@@ -98,6 +98,9 @@
 #if defined(CHUCHO_HAVE_CAPN_PROTO)
 #include <chucho/capn_proto_serializer.hpp>
 #endif
+#if defined(CHUCHO_HAVE_FLATBUFFERS)
+#include <chucho/flatbuffers_serializer.hpp>
+#endif
 
 namespace chucho
 {
@@ -1032,6 +1035,26 @@ void configurator::zeromq_writer_protobuf_body()
     ASSERT_TRUE(static_cast<bool>(ser));
     EXPECT_EQ(typeid(chucho::protobuf_serializer), typeid(*ser));
     EXPECT_EQ(std::string("tcp://127.0.0.1:7779"), zw->get_endpoint());
+    std::string pfx_str("Hi");
+    std::vector<std::uint8_t> pfx(pfx_str.begin(), pfx_str.end());
+    EXPECT_EQ(pfx, zw->get_prefix());
+}
+
+#endif
+
+#if defined(CHUCHO_HAVE_FLATBUFFERS)
+
+void configurator::zeromq_writer_flatbuffers_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::zeromq_writer), typeid(*wrts[0]));
+    auto zw = std::static_pointer_cast<chucho::zeromq_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(zw));
+    auto ser = zw->get_serializer();
+    ASSERT_TRUE(static_cast<bool>(ser));
+    EXPECT_EQ(typeid(chucho::flatbuffers_serializer), typeid(*ser));
+    EXPECT_EQ(std::string("tcp://127.0.0.1:7781"), zw->get_endpoint());
     std::string pfx_str("Hi");
     std::vector<std::uint8_t> pfx(pfx_str.begin(), pfx_str.end());
     EXPECT_EQ(pfx, zw->get_prefix());

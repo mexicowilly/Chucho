@@ -101,6 +101,9 @@
 #if defined(CHUCHO_HAVE_LZ4)
 #include <chucho/lz4_compressor_factory.hpp>
 #endif
+#if defined(CHUCHO_HAVE_FLATBUFFERS)
+#include <chucho/flatbuffers_serializer_factory.hpp>
+#endif
 
 #include <cstring>
 #include <mutex>
@@ -264,6 +267,10 @@ void configurator::initialize_impl()
 #if defined(CHUCHO_HAVE_LZ4)
     fact.reset(new lz4_compressor_factory());
     add_configurable_factory("chucho::lz4_compressor", fact);
+#endif
+#if defined(CHUCHO_HAVE_FLATBUFFERS)
+    fact.reset(new flatbuffers_serializer_factory());
+    add_configurable_factory("chucho::flatbuffers_serializer", fact);
 #endif
 }
 
