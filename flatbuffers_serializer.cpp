@@ -17,6 +17,7 @@
 #include <chucho/flatbuffers_serializer.hpp>
 #include <chucho/utf8.hpp>
 #include <chucho/logger.hpp>
+#include <chucho/host.hpp>
 #include "chucho_generated.h"
 #include <sstream>
 #include <thread>
@@ -42,7 +43,9 @@ flatbuffers_serializer::~flatbuffers_serializer()
 
 std::vector<std::uint8_t> flatbuffers_serializer::finish_blob()
 {
-    handle_->builder.Finish(flatb::Createlog_eventsDirect(handle_->builder, &handle_->events));
+    handle_->builder.Finish(flatb::Createlog_eventsDirect(handle_->builder,
+                                                          &handle_->events,
+                                                          host::get_full_name().c_str()));
     auto result = std::vector<std::uint8_t>(handle_->builder.GetBufferPointer(),
                                             handle_->builder.GetBufferPointer() + handle_->builder.GetSize());
     handle_->events.clear();

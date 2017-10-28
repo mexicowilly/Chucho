@@ -17,6 +17,7 @@
 #include <chucho/protobuf_serializer.hpp>
 #include <chucho/utf8.hpp>
 #include <chucho/logger.hpp>
+#include <chucho/host.hpp>
 #include "chucho.pb.h"
 #include <cstring>
 #include <sstream>
@@ -33,6 +34,7 @@ struct protobuf_serializer::handle
 protobuf_serializer::protobuf_serializer()
     : handle_(new handle)
 {
+    handle_->events.set_host_name(host::get_full_name());
 }
 
 // Don't remove this. It has to be defined here.

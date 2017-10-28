@@ -18,6 +18,7 @@
 #include <chucho/flatbuffers_serializer.hpp>
 #include <chucho/pattern_formatter.hpp>
 #include <chucho/logger.hpp>
+#include <chucho/host.hpp>
 #include "chucho_generated.h"
 #include <thread>
 #include <sstream>
@@ -40,6 +41,8 @@ chucho::event evt(chucho::logger::get("capn_proto_serializer_test"),
         auto log_events = chucho::flatb::Getlog_events(res.data());
         flatbuffers::Verifier ver(res.data(), res.size());
         ASSERT_EQ(100, log_events->events()->size());
+        ASSERT_FALSE(log_events->host() == nullptr);
+        EXPECT_STREQ(chucho::host::get_full_name().c_str(), log_events->host()->c_str());
         ASSERT_TRUE(log_events->Verify(ver));
         for (int j = 0; j < 100; j++)
         {

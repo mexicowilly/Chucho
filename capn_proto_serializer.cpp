@@ -17,6 +17,7 @@
 #include <chucho/capn_proto_serializer.hpp>
 #include <chucho/utf8.hpp>
 #include <chucho/logger.hpp>
+#include <chucho/host.hpp>
 #include <capnp/serialize.h>
 #include "chucho.capnp.h"
 #include <cstring>
@@ -59,6 +60,7 @@ std::vector<std::uint8_t> capn_proto_serializer::finish_blob()
 {
     ::capnp::MallocMessageBuilder message;
     capnp::Events::Builder events = message.initRoot<capnp::Events>();
+    events.setHostName(host::get_full_name());
     auto cevts = events.initEvents(handle_->events.size());
     for (auto i = 0; i < handle_->events.size(); i++)
     {
