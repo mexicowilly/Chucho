@@ -23,12 +23,27 @@
 #include <sstream>
 #include <thread>
 
+namespace
+{
+
+struct event_store
+{
+    event_store(const chucho::event& e, const std::string& fm, const std::string& thr)
+        : evt(e), formatted_message(fm), thread(thr) { }
+
+    chucho::event evt;
+    std::string formatted_message;
+    std::string thread;
+};
+
+}
+
 namespace chucho
 {
 
 struct capn_proto_serializer::handle
 {
-    std::vector<std::pair<event, std::string>> events;
+    std::vector<event_store> events;
 };
 
 capn_proto_serializer::capn_proto_serializer()
@@ -48,8 +63,8 @@ std::vector<std::uint8_t> capn_proto_serializer::finish_blob()
     for (auto i = 0; i < handle_->events.size(); i++)
     {
         capnp::Event::Builder evt = cevts[i];
-        const auto& chevt = handle_->events[i].first;
-        evt.setFormattedMessage(handle_->events[i].second);
+        const auto& chevt = handle_->events[i].evt;
+        evt.setFormattedMessage(handle_->events[i].formatted_message);
         evt.setSecondsSinceEpoch(event::clock_type::to_time_t(chevt.get_time()));
         evt.setFileName(utf8::escape_invalid(chevt.get_file_name()));
         evt.setLineNumber(chevt.get_line_number());
@@ -62,9 +77,7 @@ std::vector<std::uint8_t> capn_proto_serializer::finish_blob()
             mstream << *chevt.get_marker();
             evt.setMarker(utf8::escape_invalid(mstream.str()));
         }
-        std::ostringstream tstream;
-        tstream << std::this_thread::get_id();
-        evt.setThread(utf8::escape_invalid(tstream.str()));
+        evt.setThread(handle_->events[i].thread);
 
     }
     handle_->events.clear();
@@ -75,7 +88,11 @@ std::vector<std::uint8_t> capn_proto_serializer::finish_blob()
 
 void capn_proto_serializer::serialize(const event& evt, std::shared_ptr<formatter> fmt)
 {
-    handle_->events.push_back(std::make_pair(evt, utf8::escape_invalid(fmt->format(evt))));
+    std::ostringstream tstream;
+    tstream << std::this_thread::get_id();
+    handle_->events.emplace_back(evt,
+                                 utf8::escape_invalid(fmt->format(evt)),
+                                 utf8::escape_invalid(tstream.str()));
 }
 
 }

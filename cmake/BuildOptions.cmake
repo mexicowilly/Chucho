@@ -119,7 +119,7 @@ OPTION(LOG4CPLUS_CONFIG "Whether to support reading log4cplus configuration file
 #
 # activemq: activemq_writer
 # bzip2: bzip2_compressor, bzip2_file_compressor
-# capnproto: capn_proto_serializer
+# capn_proto: capn_proto_serializer
 # curl: email_writer, email_trigger, level_threshold_email_trigger
 # db2: db2_writer
 # flatbuffers: flatbuffers_serializer
