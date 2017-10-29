@@ -301,7 +301,7 @@ void oracle_writer::write_impl(const event& evt)
                        0, 0, 0, 0, 0,
                        OCI_DEFAULT);
     react(rc, "Unable to bind host name", false);
-     rc = OCIStmtExecute(ctx_, insert_evt_, err_, 1, 0, 0, 0, OCI_COMMIT_ON_SUCCESS);
+    rc = OCIStmtExecute(ctx_, insert_evt_, err_, 1, 0, 0, 0, OCI_COMMIT_ON_SUCCESS);
     react(rc, "Unable to insert into database", false);
 }
 

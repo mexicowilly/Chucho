@@ -254,9 +254,7 @@ void email_writer::init()
         }
 
         #if !defined(NDEBUG)
-
         set_verbose(true);
-
         #endif
     }
     catch (exception&)

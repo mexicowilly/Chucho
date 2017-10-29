@@ -34,7 +34,6 @@ struct protobuf_serializer::handle
 protobuf_serializer::protobuf_serializer()
     : handle_(new handle)
 {
-    handle_->events.set_host_name(host::get_full_name());
 }
 
 // Don't remove this. It has to be defined here.
@@ -45,6 +44,7 @@ protobuf_serializer::~protobuf_serializer()
 std::vector<std::uint8_t> protobuf_serializer::finish_blob()
 {
     std::vector<std::uint8_t> result;
+    handle_->events.set_host_name(host::get_full_name());
     std::string tmp = handle_->events.SerializeAsString();
     handle_->events.clear_events();
     return std::vector<std::uint8_t>(tmp.begin(), tmp.end());

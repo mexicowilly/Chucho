@@ -51,7 +51,6 @@ std::vector<std::uint8_t> capn_proto_serializer::finish_blob()
             evt.setMarker(utf8::escape_invalid(mstream.str()));
         }
         evt.setThread(events_[i].thread);
-
     }
     events_.clear();
     auto words = ::capnp::messageToFlatArray(message);
