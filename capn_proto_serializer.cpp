@@ -24,49 +24,20 @@
 #include <sstream>
 #include <thread>
 
-namespace
-{
-
-struct event_store
-{
-    event_store(const chucho::event& e, const std::string& fm, const std::string& thr)
-        : evt(e), formatted_message(fm), thread(thr) { }
-
-    chucho::event evt;
-    std::string formatted_message;
-    std::string thread;
-};
-
-}
-
 namespace chucho
 {
-
-struct capn_proto_serializer::handle
-{
-    std::vector<event_store> events;
-};
-
-capn_proto_serializer::capn_proto_serializer()
-    : handle_(new handle)
-{
-}
-
-capn_proto_serializer::~capn_proto_serializer()
-{
-}
 
 std::vector<std::uint8_t> capn_proto_serializer::finish_blob()
 {
     ::capnp::MallocMessageBuilder message;
     capnp::Events::Builder events = message.initRoot<capnp::Events>();
     events.setHostName(host::get_full_name());
-    auto cevts = events.initEvents(handle_->events.size());
-    for (auto i = 0; i < handle_->events.size(); i++)
+    auto cevts = events.initEvents(events_.size());
+    for (auto i = 0; i < events_.size(); i++)
     {
         capnp::Event::Builder evt = cevts[i];
-        const auto& chevt = handle_->events[i].evt;
-        evt.setFormattedMessage(handle_->events[i].formatted_message);
+        const auto& chevt = events_[i].evt;
+        evt.setFormattedMessage(events_[i].formatted_message);
         evt.setSecondsSinceEpoch(event::clock_type::to_time_t(chevt.get_time()));
         evt.setFileName(utf8::escape_invalid(chevt.get_file_name()));
         evt.setLineNumber(chevt.get_line_number());
@@ -79,10 +50,10 @@ std::vector<std::uint8_t> capn_proto_serializer::finish_blob()
             mstream << *chevt.get_marker();
             evt.setMarker(utf8::escape_invalid(mstream.str()));
         }
-        evt.setThread(handle_->events[i].thread);
+        evt.setThread(events_[i].thread);
 
     }
-    handle_->events.clear();
+    events_.clear();
     auto words = ::capnp::messageToFlatArray(message);
     auto bytes = words.asBytes();
     return std::vector<std::uint8_t>(bytes.begin(), bytes.end());
@@ -92,9 +63,9 @@ void capn_proto_serializer::serialize(const event& evt, std::shared_ptr<formatte
 {
     std::ostringstream tstream;
     tstream << std::this_thread::get_id();
-    handle_->events.emplace_back(evt,
-                                 utf8::escape_invalid(fmt->format(evt)),
-                                 utf8::escape_invalid(tstream.str()));
+    events_.emplace_back(evt,
+                         utf8::escape_invalid(fmt->format(evt)),
+                         utf8::escape_invalid(tstream.str()));
 }
 
 }

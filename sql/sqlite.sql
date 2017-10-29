@@ -30,6 +30,7 @@ CREATE TABLE chucho_event
    logger TEXT NOT NULL,
    level_name TEXT NOT NULL,
    marker TEXT,
-   thread TEXT NOT NULL
+   thread TEXT NOT NULL,
+   host_name TEXT NOT NULL
 );
 COMMIT;

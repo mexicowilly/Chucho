@@ -110,6 +110,7 @@ private:
     OCIBind* level_;
     OCIBind* marker_;
     OCIBind* thread_name_;
+    OCIBind* host_name_;
 };
 
 inline const std::string& oracle_writer::get_database() const
