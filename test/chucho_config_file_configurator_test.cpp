@@ -937,7 +937,7 @@ TEST_F(chucho_config_file_configurator, zeromq_writer_protobuf)
 
 #if defined(CHUCHO_HAVE_FLATBUFFERS)
 
-TEST_F(chucho_config_file_configurator, zeromq_writer_protobuf)
+TEST_F(chucho_config_file_configurator, zeromq_writer_flatbuffers)
 {
     configure("chucho.logger = will\n"
               "chucho.logger.will.writer = zw\n"

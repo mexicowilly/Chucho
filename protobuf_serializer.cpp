@@ -17,6 +17,7 @@
 #include <chucho/protobuf_serializer.hpp>
 #include <chucho/utf8.hpp>
 #include <chucho/logger.hpp>
+#include <chucho/host.hpp>
 #include "chucho.pb.h"
 #include <cstring>
 #include <sstream>
@@ -43,6 +44,7 @@ protobuf_serializer::~protobuf_serializer()
 std::vector<std::uint8_t> protobuf_serializer::finish_blob()
 {
     std::vector<std::uint8_t> result;
+    handle_->events.set_host_name(host::get_full_name());
     std::string tmp = handle_->events.SerializeAsString();
     handle_->events.clear_events();
     return std::vector<std::uint8_t>(tmp.begin(), tmp.end());

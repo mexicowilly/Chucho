@@ -18,10 +18,9 @@
 #include <chucho/sqlite_writer.hpp>
 #include <chucho/pattern_formatter.hpp>
 #include <chucho/logger.hpp>
-#include <iostream>
 #include <thread>
 
-TEST(sqlite_wrtier_test, sqlite)
+TEST(sqlite_writer_test, sqlite)
 {
     chucho::logger::remove_unused_loggers();
     auto wrt = std::make_shared<chucho::sqlite_writer>(std::make_shared<chucho::pattern_formatter>("%m"),

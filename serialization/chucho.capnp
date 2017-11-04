@@ -21,6 +21,7 @@ $Cxx.namespace("chucho::capnp");
 
 struct Events {
     events @0 :List(Event);
+    hostName @1 :Text;
 }
 
 struct Event {

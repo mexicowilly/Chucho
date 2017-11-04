@@ -19,6 +19,7 @@
 #include <chucho/exception.hpp>
 #include <chucho/calendar.hpp>
 #include <chucho/logger.hpp>
+#include <chucho/host.hpp>
 #include <cstring>
 #include <sstream>
 #include <thread>
@@ -67,7 +68,7 @@ db2_writer::db2_writer(std::shared_ptr<formatter> fmt,
     rc = SQLAllocHandle(SQL_HANDLE_STMT, dbc_, &stmt_);
     if (!SQL_SUCCEEDED(rc))
         throw exception("Unable to allocate statement handle: " + get_error_message(SQL_HANDLE_DBC));
-    std::string sql("INSERT INTO chucho_event ( formatted_message, timestmp, file_name, line_number, function_name, logger, level_name, marker, thread ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? );");
+    std::string sql("INSERT INTO chucho_event ( formatted_message, timestmp, file_name, line_number, function_name, logger, level_name, marker, thread, host_name ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );");
     rc = SQLPrepare(stmt_, get_sqlchar(sql.c_str()), sql.length());
     if (!SQL_SUCCEEDED(rc))
         throw exception("Unable to prepare SQL statement: " + get_error_message(SQL_HANDLE_STMT));
@@ -294,6 +295,19 @@ void db2_writer::write_impl(const event& evt)
                           NULL);
     if (!SQL_SUCCEEDED(rc))
         throw exception("Unable to bind thread parameter: " + get_error_message(SQL_HANDLE_STMT));
+    std::string hname = host::get_full_name();
+    rc = SQLBindParameter(stmt_,
+                          10,
+                          SQL_PARAM_INPUT,
+                          SQL_C_CHAR,
+                          SQL_VARCHAR,
+                          hname.length(),
+                          0,
+                          const_cast<char*>(hname.data()),
+                          hname.length(),
+                          NULL);
+    if (!SQL_SUCCEEDED(rc))
+        throw exception("Unable to bind host_name parameter: " + get_error_message(SQL_HANDLE_STMT));
     rc = SQLExecute(stmt_);
     if (!SQL_SUCCEEDED(rc))
         throw exception("Unable to execute prepared statement (INSERT): " + get_error_message(SQL_HANDLE_STMT));

@@ -18,6 +18,7 @@
 #include <chucho/exception.hpp>
 #include <chucho/calendar.hpp>
 #include <chucho/logger.hpp>
+#include <chucho/host.hpp>
 #include <sstream>
 #include <thread>
 
@@ -41,8 +42,8 @@ postgres_writer::postgres_writer(std::shared_ptr<formatter> fmt, const std::stri
     }
     PGresult* res = PQprepare(connection_,
                               "chucho_insert_event",
-                              "INSERT INTO chucho_event ( formatted_message, timestamp, file_name, line_number, function_name, logger, level_name, marker, thread ) VALUES ( $1, $2, $3, $4, $5, $6, $7, $8, $9 )",
-                              9,
+                              "INSERT INTO chucho_event ( formatted_message, timestamp, file_name, line_number, function_name, logger, level_name, marker, thread, host_name ) VALUES ( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10 )",
+                              10,
                               nullptr); 
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
     {
@@ -82,7 +83,8 @@ void postgres_writer::write_impl(const event& evt)
     std::ostringstream stream;
     stream << '\'' << std::this_thread::get_id() << '\'';
     std::string tid = stream.str();
-    const char* params[9] =
+    std::string host_name = std::string("'") + host::get_full_name() + "'";
+    const char* params[10] =
     {
         msg.c_str(),
         timestamp.c_str(),
@@ -92,11 +94,12 @@ void postgres_writer::write_impl(const event& evt)
         lg.c_str(),
         lvl.c_str(),
         c_marker,
-        tid.c_str()
+        tid.c_str(),
+        host_name.c_str()
     };
     PGresult* res = PQexecPrepared(connection_,
                                    "chucho_insert_event",
-                                   9,
+                                   10,
                                    params,
                                    nullptr,
                                    nullptr,

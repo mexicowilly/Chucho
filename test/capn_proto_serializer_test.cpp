@@ -18,6 +18,7 @@
 #include <chucho/capn_proto_serializer.hpp>
 #include <chucho/pattern_formatter.hpp>
 #include <chucho/logger.hpp>
+#include <chucho/host.hpp>
 #include "chucho.capnp.h"
 #include <capnp/serialize.h>
 #include <thread>
@@ -42,6 +43,8 @@ TEST(capn_proto_serializer, no_marker)
         capnp::FlatArrayMessageReader reader(ptr);
         chucho::capnp::Events::Reader cevts = reader.getRoot<chucho::capnp::Events>();
         ASSERT_EQ(100, cevts.getEvents().size());
+        ASSERT_TRUE(cevts.hasHostName());
+        EXPECT_STREQ(chucho::host::get_full_name().c_str(), cevts.getHostName().cStr());
         for (int j = 0; j < 100; j++)
         {
             auto cevt = cevts.getEvents()[j];

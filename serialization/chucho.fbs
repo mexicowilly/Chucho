@@ -18,6 +18,7 @@ namespace chucho.flatb;
 
 table log_events {
     events: [log_event];
+    host: string;
 }
 
 table log_event {
