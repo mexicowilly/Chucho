@@ -708,6 +708,13 @@ void configurator::rolling_file_writer_body()
     EXPECT_EQ(5000, strg->get_max_size());
 }
 
+void configurator::root_alias_body()
+{
+    auto wrts = chucho::logger::get("")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    EXPECT_EQ(typeid(chucho::cout_writer), typeid(*wrts[0]));
+}
+
 #if defined(CHUCHO_HAVE_RUBY)
 
 void configurator::ruby_evaluator_filter_body()

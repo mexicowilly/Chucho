@@ -626,6 +626,17 @@ TEST_F(yaml_configurator, rolling_file_writer)
     rolling_file_writer_body();
 }
 
+TEST_F(yaml_configurator, root_alias)
+{
+    chucho::logger::get("")->remove_all_writers();
+    configure("chucho::logger:\n"
+                  "    name: <root>\n"
+                  "    chucho::cout_writer:\n"
+                  "        chucho::pattern_formatter:\n"
+                  "            pattern: '%m%n'");
+    root_alias_body();
+}
+
 #if defined(CHUCHO_HAVE_RUBY)
 
 TEST_F(yaml_configurator, ruby_evaluator_filter)

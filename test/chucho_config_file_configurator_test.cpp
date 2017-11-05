@@ -698,6 +698,18 @@ TEST_F(chucho_config_file_configurator, rolling_file_writer)
     rolling_file_writer_body();
 }
 
+TEST_F(chucho_config_file_configurator, root_alias)
+{
+    chucho::logger::get("")->remove_all_writers();
+    configure("chucho.logger = <root>\n"
+              "chucho.logger.<root>.writer = ce\n"
+              "chucho.writer.ce = chucho::cout_writer\n"
+              "chucho.writer.ce.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m%n");
+    root_alias_body();
+}
+
 #if defined(CHUCHO_HAVE_RUBY)
 
 TEST_F(chucho_config_file_configurator, ruby_evaluator_filter)
