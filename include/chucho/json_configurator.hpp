@@ -22,6 +22,9 @@
 #endif
 
 #include <chucho/configurator.hpp>
+#include <chucho/configurable.hpp>
+#include <chucho/configurable_factory.hpp>
+#include <cJSON.h>
 
 namespace chucho
 {
@@ -32,6 +35,12 @@ public:
     json_configurator(const security_policy& sec_pol);
 
     virtual void configure(std::istream &in) override;
+
+private:
+    std::shared_ptr<configurable> create_subobject(const cJSON* json, std::shared_ptr<configurable_factory> fact);
+    std::shared_ptr<configurable> create_writer(const cJSON* json);
+    std::shared_ptr<configurable_factory> get_factory(const char* const str);
+    std::string value_to_text(const cJSON* json);
 };
 
 }
