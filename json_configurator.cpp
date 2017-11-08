@@ -1,5 +1,6 @@
 #include <chucho/json_configurator.hpp>
 #include <cstring>
+#include <algorithm>
 
 namespace chucho
 {
@@ -44,58 +45,57 @@ void json_configurator::configure(std::istream& in)
         {
             if (std::strcmp(lgr_child->string, "writers") == 0)
             {
+                std::vector<std::string> wsubs;
+                wsubs.push_back("filters");
                 auto arr = lgr_child->child;
                 if (!cJSON_IsArray(arr))
-                {
-                    // error
-                }
+                    throw std::runtime_error("writers must be an array");
                 for (int i = 0; i < cJSON_GetArraySize(arr); i++)
                 {
                     auto jwrt = cJSON_GetArrayItem(arr, i);
+                    auto fact = get_factory(jwrt->string);
+                    lgr_mnto->handle(create_subobject(jwrt, fact, wsubs));
                 }
-            }
-            else if (std::strcmp(lgr_child->string, "writes_to_ancestors") == 0)
-            {
-                lgr_mnto->handle("write_to_ancestors", value_to_text(lgr_child));
             }
             else
             {
-                // This should just be level, but we'll let it error out on other values
-                lgr_mnto->handle(lgr_child->string, lgr_child->valuestring);
+                lgr_mnto->handle(lgr_child->string, value_to_text(lgr_child));
             }
             lgr_child = lgr_child->next;
         }
+        lgr_fact->create_configurable(lgr_mnto);
         jlgr = jlgr->next;
     }
 }
 
 std::shared_ptr<configurable> json_configurator::create_subobject(const cJSON* json,
-                                                                  std::shared_ptr<configurable_factory> fact)
+                                                                  std::shared_ptr<configurable_factory> fact,
+                                                                  const std::vector<std::string>& subtypes)
 {
+    auto facts = get_factories();
     auto mnto = fact->create_memento(*this);
-    return fact->create_configurable(mnto);
-}
-
-std::shared_ptr<configurable> json_configurator::create_writer(const cJSON* json)
-{
-    auto fact = get_factory(json->string);
-    auto mnto = fact->create_memento(*this);
-    auto sub = json->child;
-    while (sub != nullptr)
+    while (json != nullptr)
     {
-        if (std::strcmp(sub->string, "filters") == 0)
+        if (std::find(subtypes.begin(), subtypes.end(), json->string) != subtypes.end())
         {
-
+            auto arr = json->child;
+            if (!cJSON_IsArray(arr))
+                throw std::runtime_error(std::string(json->string) + " must be an array");
+            for (int i = 0; i < cJSON_GetArraySize(arr); i++)
+            {
+                auto cur = cJSON_GetArrayItem(arr, i);
+                mnto->handle(create_subobject(cur, get_factory(cur->string)));
+            }
         }
         else
         {
-            auto found = get_factories().find(sub->string);
-            if (found == get_factories().end())
-                mnto->handle(sub->string, value_to_text(sub));
+            auto found = facts.find(json->string);
+            if (found == facts.end())
+                mnto->handle(json->string, value_to_text(json));
             else
-                mnto->handle(create_subobject(sub->child, found->second));
+                mnto->handle(create_subobject(json->child, found->second));
+            json = json->next;
         }
-        sub = sub->next;
     }
     return fact->create_configurable(mnto);
 }

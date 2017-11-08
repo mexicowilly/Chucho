@@ -33,6 +33,9 @@
 #include <chucho/config_file_configurator.hpp>
 #include <chucho/properties.hpp>
 #endif
+#if defined(CHUCHO_JSON_CONFIG)
+#include <cJSON.h>
+#endif
 
 #include <fstream>
 #include <algorithm>
@@ -127,6 +130,7 @@ enum class format
 {
     YAML,
     CONFIG_FILE,
+    JSON,
     DONT_KNOW
 };
 
