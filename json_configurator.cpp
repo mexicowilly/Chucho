@@ -45,8 +45,6 @@ void json_configurator::configure(std::istream& in)
         {
             if (std::strcmp(lgr_child->string, "writers") == 0)
             {
-                std::vector<std::string> wsubs;
-                wsubs.push_back("filters");
                 auto arr = lgr_child->child;
                 if (!cJSON_IsArray(arr))
                     throw std::runtime_error("writers must be an array");
@@ -54,7 +52,7 @@ void json_configurator::configure(std::istream& in)
                 {
                     auto jwrt = cJSON_GetArrayItem(arr, i);
                     auto fact = get_factory(jwrt->string);
-                    lgr_mnto->handle(create_subobject(jwrt, fact, wsubs));
+                    lgr_mnto->handle(create_subobject(jwrt, fact));
                 }
             }
             else
@@ -69,33 +67,18 @@ void json_configurator::configure(std::istream& in)
 }
 
 std::shared_ptr<configurable> json_configurator::create_subobject(const cJSON* json,
-                                                                  std::shared_ptr<configurable_factory> fact,
-                                                                  const std::vector<std::string>& subtypes)
+                                                                  std::shared_ptr<configurable_factory> fact)
 {
     auto facts = get_factories();
     auto mnto = fact->create_memento(*this);
     while (json != nullptr)
     {
-        if (std::find(subtypes.begin(), subtypes.end(), json->string) != subtypes.end())
-        {
-            auto arr = json->child;
-            if (!cJSON_IsArray(arr))
-                throw std::runtime_error(std::string(json->string) + " must be an array");
-            for (int i = 0; i < cJSON_GetArraySize(arr); i++)
-            {
-                auto cur = cJSON_GetArrayItem(arr, i);
-                mnto->handle(create_subobject(cur, get_factory(cur->string)));
-            }
-        }
+        auto found = facts.find(json->string);
+        if (found == facts.end())
+            mnto->handle(json->string, value_to_text(json));
         else
-        {
-            auto found = facts.find(json->string);
-            if (found == facts.end())
-                mnto->handle(json->string, value_to_text(json));
-            else
-                mnto->handle(create_subobject(json->child, found->second));
-            json = json->next;
-        }
+            mnto->handle(create_subobject(json->child, found->second));
+        json = json->next;
     }
     return fact->create_configurable(mnto);
 }

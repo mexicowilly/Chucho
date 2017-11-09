@@ -774,8 +774,9 @@ IF(JSON_CONFIG)
     LIST(APPEND CHUCHO_CONFIGURATOR_SOURCES
         json_configurator.cpp
         include/chucho/json_configurator.hpp)
+    GET_SOURCE_FILE_PROPERTY(CHUCHO_CONFIGURATION_DEFS configuration.cpp COMPILE_DEFINITIONS)
     SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
-                                COMPILE_DEFINITIONS CHUCHO_JSON_CONFIG)
+                                COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATION_DEFS};CHUCHO_JSON_CONFIG")
     MESSAGE(STATUS "Chucho has JSON configuration parsing enabled")
 ENDIF()
 
