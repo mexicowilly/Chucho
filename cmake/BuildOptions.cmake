@@ -108,6 +108,10 @@ OPTION(CONFIG_FILE_CONFIG "Whether to include the config file configuration pars
 
 OPTION(LOG4CPLUS_CONFIG "Whether to support reading log4cplus configuration files" OFF)
 
+# JSON file format
+
+OPTION(JSON_CONFIG "Whether to support reading JSON configuration files" OFF)
+
 # OPTIONAL FEATURES
 # ================================================================================
 #     Optional features can be enabled by linking to third-party libraries. If any

@@ -33,6 +33,9 @@
 #include <chucho/config_file_configurator.hpp>
 #include <chucho/properties.hpp>
 #endif
+#if defined(CHUCHO_JSON_CONFIG)
+#include <cJSON.h>
+#endif
 
 #include <fstream>
 #include <algorithm>
@@ -127,14 +130,16 @@ enum class format
 {
     YAML,
     CONFIG_FILE,
+    JSON,
     DONT_KNOW
 };
 
-format detect_format(std::istream& stream_1, std::istream& stream_2)
+format detect_text_format(const std::string& text)
 {
-    #if defined(CHUCHO_YAML_CONFIG)
+#if defined(CHUCHO_YAML_CONFIG)
 
-    chucho::yaml_parser prs(stream_1);
+    std::istringstream stream1(text);
+    chucho::yaml_parser prs(stream1);
     yaml_document_t doc;
     if (yaml_parser_load(prs, &doc))
     {
@@ -144,34 +149,39 @@ format detect_format(std::istream& stream_1, std::istream& stream_2)
         // Chucho YAML config will not have any scalar nodes at the
         // top level.
         if (tp != YAML_SCALAR_NODE)
-            return format::YAML; 
+            return format::YAML;
     }
 
-    #endif
+#endif
 
-    #if defined(CHUCHO_CONFIG_FILE_CONFIG)
+#if defined(CHUCHO_JSON_CONFIG)
 
-    chucho::properties props(stream_2);
+    auto json = cJSON_Parse(text.c_str());
+    if (json != nullptr)
+    {
+        cJSON_Delete(json);
+        return format::JSON;
+    }
+
+#endif
+
+#if defined(CHUCHO_CONFIG_FILE_CONFIG)
+
+    std::istringstream stream2(text);
+    chucho::properties props(stream2);
     if (props.size() > 0)
         return format::CONFIG_FILE;
 
-    #endif
+#endif
 
-    return format::DONT_KNOW; 
+    return format::DONT_KNOW;
 }
 
 format detect_file_format(const std::string& file_name)
 {
-    std::ifstream stream_1(file_name);
-    std::ifstream stream_2(file_name);
-    return detect_format(stream_1, stream_2);
-}
-
-format detect_text_format(const std::string& text)
-{
-    std::istringstream stream_1(text);
-    std::istringstream stream_2(text);
-    return detect_format(stream_1, stream_2);
+    std::ifstream stream(file_name);
+    std::string str((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+    return detect_text_format(str);
 }
 
 }

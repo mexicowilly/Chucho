@@ -728,12 +728,12 @@ ENDMACRO()
 # Configurator settings
 IF(YAML_CONFIG)
     CHUCHO_SET_YAML_SOURCES(CHUCHO_EMBEDDED_SOURCES)
-    SET(CHUCHO_CONFIGURATOR_SOURCES
-        yaml_configurator.cpp
-        yaml_parser.cpp
-        include/chucho/utf8.hpp
-        include/chucho/yaml_configurator.hpp
-        include/chucho/yaml_parser.hpp)
+    LIST(APPEND CHUCHO_CONFIGURATOR_SOURCES
+         yaml_configurator.cpp
+         yaml_parser.cpp
+         include/chucho/utf8.hpp
+         include/chucho/yaml_configurator.hpp
+         include/chucho/yaml_parser.hpp)
     SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
                                 COMPILE_DEFINITIONS "CHUCHO_YAML_CONFIG;YAML_DECLARE_STATIC")
     SET_SOURCE_FILES_PROPERTIES(yaml_parser.cpp PROPERTIES
@@ -765,6 +765,19 @@ IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
                                 COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATOR_DEFS}")
     SET_SOURCE_FILES_PROPERTIES(memento_key_set.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_CONFIG_FILE_CONFIG)
+ENDIF()
+
+IF(JSON_CONFIG)
+    LIST(APPEND CHUCHO_EMBEDDED_SOURCES
+         "${CMAKE_SOURCE_DIR}/embedded/cJSON/cJSON.c"
+         "${CMAKE_SOURCE_DIR}/embedded/include/cJSON.h")
+    LIST(APPEND CHUCHO_CONFIGURATOR_SOURCES
+        json_configurator.cpp
+        include/chucho/json_configurator.hpp)
+    GET_SOURCE_FILE_PROPERTY(CHUCHO_CONFIGURATION_DEFS configuration.cpp COMPILE_DEFINITIONS)
+    SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
+                                COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATION_DEFS};CHUCHO_JSON_CONFIG")
+    MESSAGE(STATUS "Chucho has JSON configuration parsing enabled")
 ENDIF()
 
 IF(C_API)
