@@ -34,7 +34,7 @@ void json_configurator::configure(std::istream& in)
     auto cl = cJSON_GetObjectItemCaseSensitive(json, "chucho_loggers");
     if (json == nullptr)
         throw std::runtime_error("Could not find \"chucho_loggers\" element in the JSON configuration");
-    auto lgr_fact = get_factories().find("chucho::logger")->second;
+    auto lgr_fact = get_factory("chucho::logger");
     auto jlgr = cl->child;
     while (jlgr != nullptr)
     {
@@ -45,14 +45,13 @@ void json_configurator::configure(std::istream& in)
         {
             if (std::strcmp(lgr_child->string, "writers") == 0)
             {
-                auto arr = lgr_child->child;
-                if (!cJSON_IsArray(arr))
+                if (!cJSON_IsArray(lgr_child))
                     throw std::runtime_error("writers must be an array");
-                for (int i = 0; i < cJSON_GetArraySize(arr); i++)
+                for (int i = 0; i < cJSON_GetArraySize(lgr_child); i++)
                 {
-                    auto jwrt = cJSON_GetArrayItem(arr, i);
+                    auto jwrt = cJSON_GetArrayItem(lgr_child, i)->child;
                     auto fact = get_factory(jwrt->string);
-                    lgr_mnto->handle(create_subobject(jwrt, fact));
+                    lgr_mnto->handle(create_subobject(jwrt->child, fact));
                 }
             }
             else
