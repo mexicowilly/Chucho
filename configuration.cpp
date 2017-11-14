@@ -34,7 +34,7 @@
 #include <chucho/properties.hpp>
 #endif
 #if defined(CHUCHO_JSON_CONFIG)
-#include <cJSON.h>
+#include <chucho/json_configurator.hpp>
 #endif
 
 #include <fstream>
@@ -210,6 +210,16 @@ bool configuration::configure_from_file(const std::string& file_name, reporter& 
 
     #endif
 
+    #if defined(CHUCHO_JSON_CONFIG)
+
+    if (fmt == format::JSON)
+    {
+        report.info("The file, " + file_name + ", is in JSON format");
+        cfg.reset(new json_configurator(data().security_policy_));
+    }
+
+    #endif
+
     #if defined(CHUCHO_CONFIG_FILE_CONFIG)
 
     if (fmt == format::CONFIG_FILE)
@@ -264,6 +274,18 @@ bool configuration::configure_from_text(const std::string& cfg, reporter& report
             std::istringstream in(cfg);
             yam.configure(in);
             report.info("Using the YAML format configuration"); 
+        }
+
+        #endif
+
+        #if defined(CHUCHO_JSON_CONFIG)
+
+        if (fmt == format::JSON)
+        {
+            json_configurator js(sd.security_policy_);
+            std::istringstream in(cfg);
+            js.configure(in);
+            report.info("Using the JSON format configuration");
         }
 
         #endif
@@ -338,7 +360,7 @@ configuration::unknown_handler_type configuration::get_unknown_handler()
 
 void configuration::initialize_security_policy()
 {
-    #if defined(CHUCHO_YAML_CONFIG) || defined(CHUCHO_CONFIG_FILE_CONFIG)
+    #if defined(CHUCHO_YAML_CONFIG) || defined(CHUCHO_CONFIG_FILE_CONFIG) | defined(CHUCHO_JSON_CONFIG)
 
     #if defined(CHUCHO_YAML_CONFIG)
 
@@ -347,6 +369,10 @@ void configuration::initialize_security_policy()
     #elif defined(CHUCHO_CONFIG_FILE_CONFIG)
 
     config_file_configurator cnf(data().security_policy_);
+
+    #elif defined(CHUCHO_JSON_CONFIG)
+
+    json_configurator cnf(data().security_policy_);
 
     #else
 
@@ -373,7 +399,7 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
         return;
     }
 
-    #if defined(CHUCHO_YAML_CONFIG) || defined(CHUCHO_CONFIG_FILE_CONFIG)
+    #if defined(CHUCHO_YAML_CONFIG) || defined(CHUCHO_CONFIG_FILE_CONFIG) || defined(CHUCHO_JSON_CONFIG)
 
     configurator::initialize();
     std::string fn;
