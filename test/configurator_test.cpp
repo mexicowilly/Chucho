@@ -36,8 +36,11 @@
 #if defined(CHUCHO_HAVE_ZLIB)
 #include <chucho/gzip_file_compressor.hpp>
 #endif
-#if defined(CHUCHO_HAVE_MINIZIP)
+#if defined(CHUCHO_HAVE_LIBARCHIVE)
 #include <chucho/zip_file_compressor.hpp>
+#endif
+#if defined(CHUCHO_HAVE_LZMA)
+#include <chucho/lzma_file_compressor.hpp>
 #endif
 #include <chucho/async_writer.hpp>
 #include <chucho/sliding_numbered_file_roller.hpp>
@@ -95,6 +98,9 @@
 #if defined(CHUCHO_HAVE_CAPN_PROTO)
 #include <chucho/capn_proto_serializer.hpp>
 #endif
+#if defined(CHUCHO_HAVE_FLATBUFFERS)
+#include <chucho/flatbuffers_serializer.hpp>
+#endif
 
 namespace chucho
 {
@@ -145,6 +151,22 @@ void configurator::activemq_writer_topic_body()
     EXPECT_EQ(std::string("tcp://127.0.0.1:61616"), aw->get_broker());
     EXPECT_EQ(activemq_writer::consumer_type::TOPIC, aw->get_consumer_type());
     EXPECT_EQ(std::string("MonkeyBalls"), aw->get_topic_or_queue());
+}
+
+void configurator::activemq_writer_topic_coalesce_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::activemq_writer), typeid(*wrts[0]));
+    auto aw = std::static_pointer_cast<chucho::activemq_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(aw));
+    auto ser = aw->get_serializer();
+    ASSERT_TRUE(static_cast<bool>(ser));
+    EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(*ser));
+    EXPECT_EQ(std::string("tcp://127.0.0.1:61616"), aw->get_broker());
+    EXPECT_EQ(activemq_writer::consumer_type::TOPIC, aw->get_consumer_type());
+    EXPECT_EQ(std::string("MonkeyBalls"), aw->get_topic_or_queue());
+    EXPECT_EQ(301, aw->get_coalesce_max());
 }
 
 #endif
@@ -443,6 +465,28 @@ void configurator::logger_body()
     EXPECT_FALSE(lgr->writes_to_ancestors());
 }
 
+void configurator::lzma_file_compressor_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
+    auto fwrt = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(fwrt));
+    auto rlr = fwrt->get_file_roller();
+    ASSERT_EQ(typeid(chucho::numbered_file_roller), typeid(*rlr));
+    auto nrlr = std::static_pointer_cast<chucho::numbered_file_roller>(rlr);
+    ASSERT_TRUE(static_cast<bool>(nrlr));
+    auto cmp = nrlr->get_file_compressor();
+    ASSERT_TRUE(static_cast<bool>(cmp));
+#if defined(CHUCHO_HAVE_LZMA)
+    ASSERT_EQ(typeid(chucho::lzma_file_compressor), typeid(*cmp));
+    EXPECT_EQ(1, cmp->get_min_index());
+#else
+    ASSERT_EQ(typeid(chucho::noop_file_compressor), typeid(*cmp));
+    chucho::status_manager::get()->clear();
+#endif
+}
+
 void configurator::multiple_writer_body()
 {
     auto wrts = chucho::logger::get("will")->get_writers();
@@ -577,6 +621,19 @@ void configurator::rabbitmq_writer_body()
     EXPECT_TRUE(pwrt->get_routing_key().empty());
 }
 
+void configurator::rabbitmq_writer_coalesce_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::rabbitmq_writer), typeid(*wrts[0]));
+    auto pwrt = std::static_pointer_cast<chucho::rabbitmq_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(pwrt));
+    EXPECT_EQ(std::string("amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc"), pwrt->get_url());
+    EXPECT_EQ(std::string("logs"), pwrt->get_exchange());
+    EXPECT_TRUE(pwrt->get_routing_key().empty());
+    EXPECT_EQ(302, pwrt->get_coalesce_max());
+}
+
 #if defined(CHUCHO_HAVE_CAPN_PROTO)
 
 void configurator::rabbitmq_writer_capn_proto_body()
@@ -649,6 +706,13 @@ void configurator::rolling_file_writer_body()
     auto strg = std::static_pointer_cast<chucho::size_file_roll_trigger>(trg);
     ASSERT_TRUE(static_cast<bool>(strg));
     EXPECT_EQ(5000, strg->get_max_size());
+}
+
+void configurator::root_alias_body()
+{
+    auto wrts = chucho::logger::get("")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    EXPECT_EQ(typeid(chucho::cout_writer), typeid(*wrts[0]));
 }
 
 #if defined(CHUCHO_HAVE_RUBY)
@@ -915,6 +979,23 @@ void configurator::zeromq_writer_body()
     EXPECT_EQ(pfx, zw->get_prefix());
 }
 
+void configurator::zeromq_writer_coalesce_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::zeromq_writer), typeid(*wrts[0]));
+    auto zw = std::static_pointer_cast<chucho::zeromq_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(zw));
+    auto ser = zw->get_serializer();
+    ASSERT_TRUE(static_cast<bool>(ser));
+    EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(*ser));
+    EXPECT_EQ(std::string("tcp://127.0.0.1:7780"), zw->get_endpoint());
+    std::string pfx_str("Hi");
+    std::vector<std::uint8_t> pfx(pfx_str.begin(), pfx_str.end());
+    EXPECT_EQ(pfx, zw->get_prefix());
+    EXPECT_EQ(zw->get_coalesce_max(), 300);
+}
+
 void configurator::zeromq_writer_with_compressor_body()
 {
     auto wrts = chucho::logger::get("will")->get_writers();
@@ -968,6 +1049,26 @@ void configurator::zeromq_writer_protobuf_body()
 
 #endif
 
+#if defined(CHUCHO_HAVE_FLATBUFFERS)
+
+void configurator::zeromq_writer_flatbuffers_body()
+{
+    auto wrts = chucho::logger::get("will")->get_writers();
+    ASSERT_EQ(1, wrts.size());
+    ASSERT_EQ(typeid(chucho::zeromq_writer), typeid(*wrts[0]));
+    auto zw = std::static_pointer_cast<chucho::zeromq_writer>(wrts[0]);
+    ASSERT_TRUE(static_cast<bool>(zw));
+    auto ser = zw->get_serializer();
+    ASSERT_TRUE(static_cast<bool>(ser));
+    EXPECT_EQ(typeid(chucho::flatbuffers_serializer), typeid(*ser));
+    EXPECT_EQ(std::string("tcp://127.0.0.1:7781"), zw->get_endpoint());
+    std::string pfx_str("Hi");
+    std::vector<std::uint8_t> pfx(pfx_str.begin(), pfx_str.end());
+    EXPECT_EQ(pfx, zw->get_prefix());
+}
+
+#endif
+
 #endif
 
 void configurator::zip_file_compressor_body()
@@ -983,7 +1084,7 @@ void configurator::zip_file_compressor_body()
     ASSERT_TRUE(static_cast<bool>(trlr));
     auto cmp = trlr->get_file_compressor();
     ASSERT_TRUE(static_cast<bool>(cmp));
-#if defined(CHUCHO_HAVE_MINIZIP)
+#if defined(CHUCHO_HAVE_LIBARCHIVE)
     ASSERT_EQ(typeid(chucho::zip_file_compressor), typeid(*cmp));
     EXPECT_EQ(700, cmp->get_min_index());
 #else

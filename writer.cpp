@@ -45,6 +45,10 @@ void writer::clear_filters()
     filters_.clear();
 }
 
+void writer::flush()
+{
+}
+
 std::vector<std::shared_ptr<filter>> writer::get_filters()
 {
     std::lock_guard<std::recursive_mutex> lg(guard_);

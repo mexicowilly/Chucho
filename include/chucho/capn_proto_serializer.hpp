@@ -35,15 +35,21 @@ namespace chucho
 class CHUCHO_EXPORT capn_proto_serializer : public serializer
 {
 public:
-    /**
-     * Serialize the event into a protobuf message.
-     * 
-     * @param evt the event
-     * @param fmt the formatter
-     * @return the blob containing only the formatted message
-     */
-    virtual std::vector<std::uint8_t> serialize(const event& evt,
-                                                std::shared_ptr<formatter> fmt) override;
+    virtual std::vector<std::uint8_t> finish_blob() override;
+    virtual void serialize(const event& evt, std::shared_ptr<formatter> fmt) override;
+
+private:
+    struct event_store
+    {
+        event_store(const chucho::event& e, const std::string& fm, const std::string& thr)
+            : evt(e), formatted_message(fm), thread(thr) { }
+
+        chucho::event evt;
+        std::string formatted_message;
+        std::string thread;
+    };
+
+    std::vector<event_store> events_;
 };
 
 }

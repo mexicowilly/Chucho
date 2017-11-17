@@ -19,6 +19,11 @@
 using Cxx = import "/capnp/c++.capnp";
 $Cxx.namespace("chucho::capnp");
 
+struct Events {
+    events @0 :List(Event);
+    hostName @1 :Text;
+}
+
 struct Event {
     formattedMessage @0 :Text;
     secondsSinceEpoch @1 :UInt64;

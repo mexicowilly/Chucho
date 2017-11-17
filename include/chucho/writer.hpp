@@ -79,6 +79,10 @@ public:
      */
     void clear_filters();
     /**
+     * Flush any buffers or caches.
+     */
+    virtual void flush();
+    /**
      * Receive the collection of all filters.
      * @return the filters
      */

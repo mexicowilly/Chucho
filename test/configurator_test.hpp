@@ -33,6 +33,7 @@ protected:
 #if defined(CHUCHO_HAVE_ACTIVEMQ)
     void activemq_writer_queue_body();
     void activemq_writer_topic_body();
+    void activemq_writer_topic_coalesce_body();
 #endif
     void async_writer_body();
     void async_writer_with_opts_body();
@@ -58,6 +59,7 @@ protected:
     void level_filter_body(const std::string& tmpl);
     void level_threshold_filter_body();
     void logger_body();
+    void lzma_file_compressor_body();
     void multiple_writer_body();
 #if defined(CHUCHO_HAVE_MYSQL)
     void mysql_writer_full_body();
@@ -74,6 +76,7 @@ protected:
 #endif
 #if defined(CHUCHO_HAVE_RABBITMQ)
     void rabbitmq_writer_body();
+    void rabbitmq_writer_coalesce_body();
 #if defined(CHUCHO_HAVE_CAPN_PROTO)
     void rabbitmq_writer_capn_proto_body();
 #endif
@@ -83,6 +86,7 @@ protected:
     void ruby_evaluator_filter_body();
 #endif
     void rolling_file_writer_body();
+    void root_alias_body();
     void size_file_roll_trigger_body(const std::string& tmpl);
     void sliding_numbered_file_roller_body();
 #if defined(CHUCHO_HAVE_SQLITE)
@@ -98,10 +102,14 @@ protected:
 #endif
 #if defined(CHUCHO_HAVE_ZEROMQ)
     void zeromq_writer_body();
+    void zeromq_writer_coalesce_body();
     void zeromq_writer_with_compressor_body();
     void zeromq_writer_no_prefix_body();
 #if defined(CHUCHO_HAVE_PROTOBUF)
     void zeromq_writer_protobuf_body();
+#endif
+#if defined(CHUCHO_HAVE_FLATBUFFERS)
+    void zeromq_writer_flatbuffers_body();
 #endif
 #endif
     void zip_file_compressor_body();

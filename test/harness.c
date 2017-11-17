@@ -21,7 +21,7 @@
 #include "file_writer_test.h"
 #include "configuration_test.h"
 #include "async_writer_test.h"
-#if defined(CHUCHO_HAVE_ZLIB) || defined(CHUCHO_HAVE_BZIP2) || defined(CHUCHO_HAVE_MINIZIP)
+#if defined(CHUCHO_HAVE_ZLIB) || defined(CHUCHO_HAVE_BZIP2) || defined(CHUCHO_HAVE_LIBARCHIVE)
 #include "file_compressor_test.h"
 #endif
 #include "cerr_writer_test.h"
@@ -91,7 +91,7 @@ int main()
     run_file_writer_test();
     run_configuration_test();
     run_async_writer_test();
-    #if defined(CHUCHO_HAVE_ZLIB) || defined(CHUCHO_HAVE_BZIP2) || defined(CHUCHO_HAVE_MINIZIP)
+    #if defined(CHUCHO_HAVE_ZLIB) || defined(CHUCHO_HAVE_BZIP2) || defined(CHUCHO_HAVE_LIBARCHIVE)
     run_file_compressor_test();
     #endif
     run_cerr_writer_test();

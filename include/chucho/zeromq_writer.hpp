@@ -55,6 +55,22 @@ public:
                   const std::vector<std::uint8_t>& prefix = std::vector<std::uint8_t>());
     /**
      * Construct a ZeroMQ writer.
+     *
+     * @param fmt the formatter
+     * @param ser the serializer
+     * @param coalesce_max the maximum number of events to write in a single ZermoMQ message
+     * @param endpoint the ZeroMQ endpoint to which to bind the publishing socket
+     * @param prefix the message prefix, which will be used as the "topic". If a
+     * prefix is provided, then each event will be published as a two-part message,
+     * first prefix, then event.
+     */
+    zeromq_writer(std::shared_ptr<formatter> fmt,
+                  std::shared_ptr<serializer> ser,
+                  std::size_t coalesce_max,
+                  const std::string& endpoint,
+                  const std::vector<std::uint8_t>& prefix = std::vector<std::uint8_t>());
+    /**
+     * Construct a ZeroMQ writer.
      * 
      * @param fmt the formatter
      * @param ser the serializer
@@ -66,6 +82,24 @@ public:
      */
     zeromq_writer(std::shared_ptr<formatter> fmt,
                   std::shared_ptr<serializer> ser,
+                  std::shared_ptr<compressor> cmp,
+                  const std::string& endpoint,
+                  const std::vector<std::uint8_t>& prefix = std::vector<std::uint8_t>());
+    /**
+     * Construct a ZeroMQ writer.
+     *
+     * @param fmt the formatter
+     * @param ser the serializer
+     * @param coalesce_max the maximum number of events to write in a single ZermoMQ message
+     * @param cmp the compressor
+     * @param endpoint the ZeroMQ endpoint to which to bind the publishing socket
+     * @param prefix the message prefix, which will be used as the "topic". If a
+     * prefix is provided, then each event will be published as a two-part message,
+     * first prefix, then event.
+     */
+    zeromq_writer(std::shared_ptr<formatter> fmt,
+                  std::shared_ptr<serializer> ser,
+                  std::size_t coalesce_max,
                   std::shared_ptr<compressor> cmp,
                   const std::string& endpoint,
                   const std::vector<std::uint8_t>& prefix = std::vector<std::uint8_t>());
@@ -91,7 +125,7 @@ public:
     const std::vector<std::uint8_t>& get_prefix() const;
 
 protected:
-    virtual void write_impl(const event& evt) override;
+    virtual void flush_impl(const std::vector<std::uint8_t>& bytes) override;
 
 private:
     CHUCHO_NO_EXPORT void init();

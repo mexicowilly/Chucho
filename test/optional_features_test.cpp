@@ -51,8 +51,11 @@ TEST(optional_features, simple)
 #if defined(CHUCHO_LOG4CPLUS_CONFIG)
     EXPECT_FEATURE(chucho::optional_features::LOG4CPLUS_CONFIGURATION);
 #endif
-#if defined(CHUCHO_HAVE_MINIZIP)
-    EXPECT_FEATURE(chucho::optional_features::MINIZIP_COMPRESSION);
+#if defined(CHUCHO_HAVE_LIBARCHIVE)
+    EXPECT_FEATURE(chucho::optional_features::LIBARCHIVE_COMPRESSION);
+#endif
+#if defined(CHUCHO_HAVE_LZMA)
+    EXPECT_FEATURE(chucho::optional_features::LZMA_COMPRESSION);
 #endif
 #if defined(CHUCHO_HAVE_MYSQL)
     EXPECT_FEATURE(chucho::optional_features::MYSQL_WRITER);
@@ -83,6 +86,12 @@ TEST(optional_features, simple)
 #endif
 #if defined(CHUCHO_HAVE_ZLIB)
     EXPECT_FEATURE(chucho::optional_features::ZLIB_COMPRESSION);
+#endif
+#if defined(CHUCHO_HAVE_LZ4)
+    EXPECT_FEATURE(chucho::optional_features::LZ4_COMPRESSION);
+#endif
+#if defined(CHUCHO_HAVE_FLATBUFFERS)
+    EXPECT_FEATURE(chucho::optional_features::FLATBUFFERS_SERIALIZER);
 #endif
     EXPECT_TRUE(fs.none());
 }

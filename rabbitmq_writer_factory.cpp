@@ -44,6 +44,7 @@ std::shared_ptr<configurable> rabbitmq_writer_factory::create_configurable(std::
         rk = am->get_routing_key();
     auto aw = std::make_shared<rabbitmq_writer>(am->get_formatter(),
                                                 am->get_serializer(),
+                                                am->get_coalesce_max(),
                                                 am->get_compressor(),
                                                 am->get_url(),
                                                 am->get_exchange(),

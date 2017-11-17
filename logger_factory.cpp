@@ -36,7 +36,10 @@ std::shared_ptr<configurable> logger_factory::create_configurable(std::shared_pt
     assert(lm);
     if (!lm->get_name())
         throw exception("logger_memento: The logger's name must be set");
-    auto lgr = logger::get(*lm->get_name());
+    auto nm = *lm->get_name();
+    if (nm == "<root>")
+        nm.clear();
+    auto lgr = logger::get(nm);
     if (lm->get_level())
         lgr->set_level(lm->get_level());
     std::for_each(lm->get_writers().begin(),
@@ -45,7 +48,8 @@ std::shared_ptr<configurable> logger_factory::create_configurable(std::shared_pt
     if (lm->get_writes_to_ancestors())
         lgr->set_writes_to_ancestors(*lm->get_writes_to_ancestors());
     std::shared_ptr<configurable> cnf = std::static_pointer_cast<configurable>(lgr);
-    report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)) + " named " + lgr->get_name());
+    if (!nm.empty())
+        report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)) + " named " + nm);
     return cnf;
 }
 

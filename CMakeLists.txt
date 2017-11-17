@@ -22,11 +22,13 @@ ENDIF()
 PROJECT(chucho CXX C)
 
 SET(CHUCHO_MAJOR_VERSION 1)
-SET(CHUCHO_MINOR_VERSION 10)
+SET(CHUCHO_MINOR_VERSION 11)
 SET(CHUCHO_VERSION ${CHUCHO_MAJOR_VERSION}.${CHUCHO_MINOR_VERSION})
 
-INCLUDE(BuildOptions.cmake)
-INCLUDE(Configure.cmake)
+LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+
+INCLUDE(BuildOptions)
+INCLUDE(Configure)
 
 # We can release stuff
 SET(CPACK_PACKAGE_VERSION_MAJOR ${CHUCHO_MAJOR_VERSION})
@@ -56,14 +58,17 @@ ENDIF()
 IF(CHUCHO_HAVE_POSTGRES)
     INCLUDE_DIRECTORIES("${POSTGRES_INCLUDE_DIR}")
 ENDIF()
-IF(CHUCHO_CURL_INCLUDE_DIR)
-    INCLUDE_DIRECTORIES("${CHUCHO_CURL_INCLUDE_DIR}")
+IF(CURL_FOUND)
+    INCLUDE_DIRECTORIES(${CURL_INCLUDE_DIRS})
 ENDIF()
-IF(CHUCHO_HAVE_PROTOBUF)
-    INCLUDE_DIRECTORIES("${PROTOBUF_INCLUDE_DIR}")
+IF(PROTOBUF_FOUND)
+    INCLUDE_DIRECTORIES(${PROTOBUF_INCLUDE_DIRS})
 ENDIF()
 IF(CHUCHO_HAVE_CAPN_PROTO)
     INCLUDE_DIRECTORIES("${CAPN_PROTO_INCLUDE_DIR}")
+ENDIF()
+IF(CHUCHO_HAVE_FLATBUFFERS)
+    INCLUDE_DIRECTORIES("${FLATBUFFERS_INCLUDE_DIR}")
 ENDIF()
 IF(CHUCHO_HAVE_ZEROMQ)
     INCLUDE_DIRECTORIES("${ZEROMQ_INCLUDE_DIR}")
@@ -76,6 +81,24 @@ IF(CHUCHO_HAVE_DB2)
 ENDIF()
 IF(CHUCHO_HAVE_RABBITMQ)
     INCLUDE_DIRECTORIES("${RABBITMQ_INCLUDE_DIR}")
+ENDIF()
+IF(RUBY_FOUND)
+    INCLUDE_DIRECTORIES("${RUBY_INCLUDE_DIRS}")
+ENDIF()
+IF(ZLIB_FOUND)
+    INCLUDE_DIRECTORIES("${ZLIB_INCLUDE_DIRS}")
+ENDIF()
+IF(BZIP2_FOUND)
+    INCLUDE_DIRECTORIES("${BZIP2_INCLUDE_DIR}")
+ENDIF()
+IF(LZMA_FOUND)
+    INCLUDE_DIRECTORIES("${LZMA_INCLUDE_DIRS}")
+ENDIF()
+IF(LibArchive_FOUND)
+    INCLUDE_DIRECTORIES("${LibArchive_INCLUDE_DIRS}")
+ENDIF()
+IF(CHUCHO_HAVE_LZ4)
+    INCLUDE_DIRECTORIES("${LZ4_INCLUDE_DIR}")
 ENDIF()
 
 IF(CHUCHO_POSIX)
@@ -271,6 +294,7 @@ SET(CHUCHO_C_HEADERS
     include/chucho/level_threshold_filter.h
     include/chucho/log.h
     include/chucho/logger.h
+    include/chucho/message_queue_writer.h
     include/chucho/named_pipe_writer.h
     include/chucho/noop_compressor.h
     include/chucho/numbered_file_roller.h
@@ -310,7 +334,7 @@ ENDIF()
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/windows_event_log_writer.hpp)
 
-IF(CHUCHO_HAVE_ZLIB)
+IF(ZLIB_FOUND)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
          include/chucho/gzip_file_compressor.hpp
          include/chucho/zlib_compressor.hpp)
@@ -327,7 +351,7 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/zlib_compressor.hpp
      include/chucho/zlib_compressor.h)
 
-IF(CHUCHO_HAVE_BZIP2)
+IF(BZIP2_FOUND)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
          include/chucho/bzip2_compressor.hpp
          include/chucho/bzip2_file_compressor.hpp)
@@ -344,7 +368,7 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/bzip2_file_compressor.h
      include/chucho/bzip2_compressor.h)
 
-IF(CHUCHO_HAVE_MINIZIP)
+IF(LibArchive_FOUND)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/zip_file_compressor.hpp)
     IF(C_API)
         LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/zip_file_compressor.h)
@@ -354,6 +378,36 @@ ENDIF()
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/zip_file_compressor.hpp
      include/chucho/zip_file_compressor.h)
+
+IF(LIBLZMA_FOUND)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/lzma_compressor.hpp
+         include/chucho/lzma_file_compressor.hpp)
+    IF(C_API)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/lzma_file_compressor.h
+         include/chucho/lzma_compressor.h)
+    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/lzma_compressor.hpp
+     include/chucho/lzma_file_compressor.hpp
+     include/chucho/lzma_file_compressor.h
+     include/chucho/lzma_compressor.h)
+
+IF(CHUCHO_HAVE_LZ4)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/lz4_compressor.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS
+             include/chucho/lz4_compressor.h)
+    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/lz4_compressor.hpp
+     include/chucho/lz4_compressor.h)
 
 IF(CHUCHO_HAVE_ORACLE)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/oracle_writer.hpp)
@@ -445,7 +499,7 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/db2_writer.hpp
      include/chucho/db2_writer.h)
 
-IF(CHUCHO_HAVE_RUBY)
+IF(RUBY_FOUND)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/ruby_evaluator_filter.hpp)
     LIST(APPEND CHUCHO_EVALUATOR_SOURCES
          ruby_evaluator_filter.cpp
@@ -456,13 +510,6 @@ IF(CHUCHO_HAVE_RUBY)
     IF(C_API)
         LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/ruby_evaluator_filter.h)
         LIST(APPEND CHUCHO_EVALUATOR_SOURCES c_ruby_evaluator_filter.cpp)
-    ENDIF()
-    IF(RUBY_FRAMEWORK)
-        SET_SOURCE_FILES_PROPERTIES(ruby_evaluator_filter.cpp PROPERTIES
-                                    COMPILE_DEFINITIONS CHUCHO_RUBY_FRAMEWORK)
-    ELSEIF(RUBY_INCLUDE_DIR)
-        SET_SOURCE_FILES_PROPERTIES(ruby_evaluator_filter.cpp PROPERTIES
-                                    COMPILE_FLAGS "-I\"${RUBY_INCLUDE_DIR}\" -I\"${CHUCHO_RUBY_CONFIG_DIR}\"")
     ENDIF()
 ENDIF()
 
@@ -509,7 +556,7 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/email_trigger.h
      include/chucho/level_threshold_email_trigger.h)
 
-IF(CHUCHO_HAVE_PROTOBUF)
+IF(PROTOBUF_FOUND)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
          include/chucho/protobuf_serializer.hpp)
     LIST(APPEND CHUCHO_SERIALIZER_SOURCES
@@ -542,6 +589,23 @@ ENDIF()
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/capn_proto_serializer.h
      include/chucho/capn_proto_serializer.hpp)
+
+IF(CHUCHO_HAVE_FLATBUFFERS)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/flatbuffers_serializer.hpp)
+    LIST(APPEND CHUCHO_SERIALIZER_SOURCES
+         flatbuffers_serializer.cpp
+         flatbuffers_serializer_factory.cpp
+         include/chucho/flatbuffers_serializer_factory.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/flatbuffers_serializer.h)
+        LIST(APPEND CHUCHO_SERIALIZER_SOURCES c_flatbuffers_serializer.cpp)
+    ENDIF()
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/flatbuffers_serializer.h
+     include/chucho/flatbuffers_serializer.hpp)
 
 IF(CHUCHO_HAVE_ZEROMQ)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
@@ -664,12 +728,12 @@ ENDMACRO()
 # Configurator settings
 IF(YAML_CONFIG)
     CHUCHO_SET_YAML_SOURCES(CHUCHO_EMBEDDED_SOURCES)
-    SET(CHUCHO_CONFIGURATOR_SOURCES
-        yaml_configurator.cpp
-        yaml_parser.cpp
-        include/chucho/utf8.hpp
-        include/chucho/yaml_configurator.hpp
-        include/chucho/yaml_parser.hpp)
+    LIST(APPEND CHUCHO_CONFIGURATOR_SOURCES
+         yaml_configurator.cpp
+         yaml_parser.cpp
+         include/chucho/utf8.hpp
+         include/chucho/yaml_configurator.hpp
+         include/chucho/yaml_parser.hpp)
     SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
                                 COMPILE_DEFINITIONS "CHUCHO_YAML_CONFIG;YAML_DECLARE_STATIC")
     SET_SOURCE_FILES_PROPERTIES(yaml_parser.cpp PROPERTIES
@@ -703,6 +767,19 @@ IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
                                 COMPILE_DEFINITIONS CHUCHO_CONFIG_FILE_CONFIG)
 ENDIF()
 
+IF(JSON_CONFIG)
+    LIST(APPEND CHUCHO_EMBEDDED_SOURCES
+         "${CMAKE_SOURCE_DIR}/embedded/cJSON/cJSON.c"
+         "${CMAKE_SOURCE_DIR}/embedded/include/cJSON.h")
+    LIST(APPEND CHUCHO_CONFIGURATOR_SOURCES
+        json_configurator.cpp
+        include/chucho/json_configurator.hpp)
+    GET_SOURCE_FILE_PROPERTY(CHUCHO_CONFIGURATION_DEFS configuration.cpp COMPILE_DEFINITIONS)
+    SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
+                                COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATION_DEFS};CHUCHO_JSON_CONFIG")
+    MESSAGE(STATUS "Chucho has JSON configuration parsing enabled")
+ENDIF()
+
 IF(C_API)
     SET(CHUCHO_C_SOURCES
         c_async_writer.cpp
@@ -727,6 +804,7 @@ IF(C_API)
         c_level_threshold_filter.cpp
         c_log.cpp
         c_logger.cpp
+        c_message_queue_writer.cpp
         c_named_pipe_writer.cpp
         c_noop_compressor.cpp
         c_numbered_file_roller.cpp
@@ -768,6 +846,29 @@ IF(MSVC)
                                 COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
     SET_SOURCE_FILES_PROPERTIES(c_file_roller.cpp PROPERTIES
                                 COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
+ENDIF()
+
+IF(PROTOBUF_FOUND)
+    PROTOBUF_GENERATE_CPP(CHUCHO_PROTO_SOURCE CHUCHO_PROTO_HEADER serialization/chucho.proto)
+    LIST(APPEND CHUCHO_MQ_GEN_SOURCES "${CHUCHO_PROTO_HEADER}" "${CHUCHO_PROTO_SOURCE}")
+ENDIF()
+
+IF(CHUCHO_HAVE_CAPN_PROTO)
+    SET(CHUCHO_CAPN_PROTO_SOURCES "${CMAKE_BINARY_DIR}/chucho.capnp.c++" "${CMAKE_BINARY_DIR}/chucho.capnp.h")
+    ADD_CUSTOM_COMMAND(OUTPUT ${CHUCHO_CAPN_PROTO_SOURCES}
+                       COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_SOURCE_DIR}/serialization/chucho.capnp" "${CMAKE_BINARY_DIR}"
+                       COMMAND "${CHUCHO_CAPNP}" compile "--output=${CHUCHO_CAPNPC_CXX}" "${CMAKE_BINARY_DIR}/chucho.capnp"
+                       DEPENDS "${CMAKE_SOURCE_DIR}/serialization/chucho.capnp")
+    LIST(APPEND CHUCHO_MQ_GEN_SOURCES ${CHUCHO_CAPN_PROTO_SOURCES})
+    SET_SOURCE_FILES_PROPERTIES(${CHUCHO_CAPN_PROTO_SOURCES} PROPERTIES GENERATED TRUE)
+ENDIF()
+
+IF(CHUCHO_HAVE_FLATBUFFERS)
+    ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/chucho_generated.h"
+                       COMMAND "${CHUCHO_FLATC}" --cpp -o "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}/serialization/chucho.fbs"
+                       DEPENDS "${CMAKE_SOURCE_DIR}/serialization/chucho.fbs")
+    LIST(APPEND CHUCHO_MQ_GEN_SOURCES "${CMAKE_BINARY_DIR}/chucho_generated.h")
+    SET_SOURCE_FILES_PROPERTIES("${CMAKE_BINARY_DIR}/chucho_generated.h" PROPERTIES GENERATED TRUE)
 ENDIF()
 
 SET(CHUCHO_SOURCES
@@ -820,6 +921,7 @@ SET(CHUCHO_SOURCES
     logger.cpp
     logger_factory.cpp
     logger_memento.cpp
+    lzma_file_compressor_factory.cpp
     marker.cpp
     memento.cpp
     memento_key_set.cpp
@@ -903,6 +1005,7 @@ SET(CHUCHO_SOURCES
     include/chucho/line_ending.hpp
     include/chucho/logger_factory.hpp
     include/chucho/logger_memento.hpp
+    include/chucho/lzma_file_compressor_factory.hpp
     include/chucho/memento_key_set.hpp
     include/chucho/message_queue_writer_memento.hpp
     include/chucho/named_pipe_writer_factory.hpp
@@ -948,7 +1051,8 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_EMAIL_SOURCES}
     ${CHUCHO_SERIALIZER_SOURCES}
     ${CHUCHO_MESSAGE_QUEUE_SOURCES}
-    ${CHUCHO_DOOR_SOURCES})
+    ${CHUCHO_DOOR_SOURCES}
+    ${CHUCHO_MQ_GEN_SOURCES})
 
 IF(CHUCHO_HAVE_PUT_TIME)
     SET_SOURCE_FILES_PROPERTIES(calendar.cpp PROPERTIES
@@ -987,7 +1091,7 @@ IF(CHUCHO_HAVE_DB2)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_DB2)
 ENDIF()
 
-IF(CHUCHO_HAVE_RUBY)
+IF(RUBY_FOUND)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RUBY)
 ENDIF()
 
@@ -998,12 +1102,16 @@ IF(CURL_FOUND)
     ENDIF()
 ENDIF()
 
-IF(CHUCHO_HAVE_PROTOBUF)
+IF(PROTOBUF_FOUND)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_PROTOBUF)
 ENDIF()
 
 IF(CHUCHO_HAVE_CAPN_PROTO)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_CAPN_PROTO)
+ENDIF()
+
+IF(CHUCHO_HAVE_FLATBUFFERS)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_FLATBUFFERS)
 ENDIF()
 
 IF(CHUCHO_HAVE_ZEROMQ)
@@ -1018,12 +1126,20 @@ IF(CHUCHO_HAVE_RABBITMQ)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RABBITMQ)
 ENDIF()
 
-IF(CHUCHO_HAVE_ZLIB)
+IF(ZLIB_FOUND)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ZLIB)
 ENDIF()
 
-IF(CHUCHO_HAVE_BZIP2)
+IF(BZIP2_FOUND)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_BZIP2)
+ENDIF()
+
+IF(LIBLZMA_FOUND)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_LZMA)
+ENDIF()
+
+IF(CHUCHO_HAVE_LZ4)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_LZ4)
 ENDIF()
 
 IF(CHUCHO_HAVE_DOORS)
@@ -1066,7 +1182,7 @@ ENDIF()
 IF(CHUCHO_HAVE_SQLITE)
     LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_SQLITE_WRITER)
 ENDIF()
-IF(CHUCHO_HAVE_RUBY)
+IF(RUBY_FOUND)
     LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_RUBY_EVALUATOR_FILTER)
 ENDIF()
 IF(CHUCHO_HAVE_ACTIVEMQ)
@@ -1078,20 +1194,29 @@ ENDIF()
 IF(CHUCHO_HAVE_RABBITMQ)
     LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_RABBITMQ_WRITER)
 ENDIF()
-IF(CHUCHO_HAVE_PROTOBUF)
+IF(PROTOBUF_FOUND)
     LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_PROTOBUF_SERIALIZER)
 ENDIF()
 IF(CHUCHO_HAVE_CAPN_PROTO)
     LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_CAPN_PROTO_SERIALIZER)
 ENDIF()
-IF(CHUCHO_HAVE_ZLIB)
+IF(CHUCHO_HAVE_FLATBUFFERS)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_FLATBUFFERS)
+ENDIF()
+IF(ZLIB_FOUND)
     LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_ZLIB_COMPRESSION)
 ENDIF()
-IF(CHUCHO_HAVE_BZIP2)
+IF(BZIP2_FOUND)
     LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_BZIP2_COMPRESSION)
 ENDIF()
-IF(CHUCHO_HAVE_MINIZIP)
-    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_MINIZIP_COMPRESSION)
+IF(LibArchive_FOUND)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_LIBARCHIVE_COMPRESSION)
+ENDIF()
+IF(LIBLZMA_FOUND)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_LZMA_COMPRESSION)
+ENDIF()
+IF(CHUCHO_HAVE_LZ4)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_LZ4_COMPRESSION)
 ENDIF()
 IF(DEFINED CHUCHO_FEATURE_DEFS)
     SET_SOURCE_FILES_PROPERTIES(optional_features.cpp PROPERTIES
@@ -1122,15 +1247,14 @@ ELSE()
     MESSAGE(FATAL_ERROR "You don't have regular expressions")
 ENDIF()
 
-IF(CHUCHO_HAVE_ZLIB)
+IF(ZLIB_FOUND)
     LIST(APPEND CHUCHO_SOURCES
          gzip_file_compressor.cpp
          zlib_compressor.cpp
          zlib_compressor_factory.cpp
          zlib_compressor_memento.cpp
          include/chucho/zlib_compressor_factory.hpp
-         include/chucho/zlib_compressor_memento.hpp
-         ${CHUCHO_ZLIB_SOURCES})
+         include/chucho/zlib_compressor_memento.hpp)
     IF(C_API)
         LIST(APPEND CHUCHO_SOURCES
              c_gzip_file_compressor.cpp
@@ -1142,41 +1266,14 @@ IF(CHUCHO_HAVE_ZLIB)
     ENDIF()
     SET_SOURCE_FILES_PROPERTIES(gzip_file_compressor_factory.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_HAVE_ZLIB)
-    IF(ZLIB_SOURCE)
-        INCLUDE_DIRECTORIES("${ZLIB_SOURCE}")
-    ELSEIF(ZLIB_INCLUDE_DIR)
-        INCLUDE_DIRECTORIES("${ZLIB_INCLUDE_DIR}")
-    ENDIF()
-    IF(CHUCHO_ZLIB_SOURCES)
-        IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_COMPILER_IS_GNUCXX)
-            IF(CHUCHO_PRIV_EXPORT)
-                SET(CHUCHO_ZLIB_FLAGS -fvisibility=default)
-                SET_SOURCE_FILES_PROPERTIES(${CHUCHO_ZLIB_SOURCES}
-                                            PROPERTIES
-                                            COMPILE_FLAGS ${CHUCHO_ZLIB_FLAGS})
-            ENDIF()
-            SET_SOURCE_FILES_PROPERTIES("${ZLIB_SOURCE}/gzlib.c"
-                                        "${ZLIB_SOURCE}/gzread.c"
-                                        "${ZLIB_SOURCE}/gzwrite.c"
-                                        PROPERTIES
-                                        COMPILE_FLAGS "${CHUCHO_ZLIB_FLAGS} -Wno-implicit-function-declaration")
-        ELSEIF(MSVC)
-            SET_SOURCE_FILES_PROPERTIES("${ZLIB_SOURCE}/gzlib.c"
-                                        "${ZLIB_SOURCE}/gzread.c"
-                                        "${ZLIB_SOURCE}/gzwrite.c"
-                                        PROPERTIES
-                                        COMPILE_FLAGS /wd4996)
-        ENDIF()
-    ENDIF()
 ENDIF()
 
-IF(CHUCHO_HAVE_BZIP2)
+IF(BZIP2_FOUND)
     LIST(APPEND CHUCHO_SOURCES
          bzip2_compressor.cpp
          bzip2_compressor_factory.cpp
          bzip2_file_compressor.cpp
-         include/chucho/bzip2_compressor_factory.hpp
-         ${CHUCHO_BZIP2_SOURCES})
+         include/chucho/bzip2_compressor_factory.hpp)
     IF(C_API)
         LIST(APPEND CHUCHO_SOURCES
              c_bzip2_file_compressor.cpp
@@ -1184,47 +1281,41 @@ IF(CHUCHO_HAVE_BZIP2)
     ENDIF()
     SET_SOURCE_FILES_PROPERTIES(bzip2_file_compressor_factory.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_HAVE_BZIP2)
-    IF(BZIP2_SOURCE)
-        INCLUDE_DIRECTORIES("${BZIP2_SOURCE}")
-    ELSEIF(BZIP2_INCLUDE_DIR)
-        INCLUDE_DIRECTORIES("${BZIP2_INCLUDE_DIR}")
-    ENDIF()
-    IF(MSVC)
-        SET_SOURCE_FILES_PROPERTIES(bzip2_file_compressor.cpp PROPERTIES
-                                    COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
-        IF(CHUCHO_BZIP2_SOURCES)
-            SET_SOURCE_FILES_PROPERTIES("${BZIP2_SOURCE}/bzlib.c" PROPERTIES
-                                        COMPILE_FLAGS /wd4996)
-        ENDIF()
-    ELSEIF(CMAKE_COMPILER_IS_GNUCXX AND CHUCHO_BZIP2_SOURCES)
-        SET_SOURCE_FILES_PROPERTIES("${BZIP2_SOURCE}/bzlib.c" PROPERTIES
-                                    COMPILE_FLAGS -Wno-implicit-function-declaration)
-    ENDIF()
 ENDIF()
 
-IF(CHUCHO_HAVE_MINIZIP)
+IF(LibArchive_FOUND)
     LIST(APPEND CHUCHO_SOURCES
-         zip_file_compressor.cpp
-         ${CHUCHO_MINIZIP_SOURCES})
+         zip_file_compressor.cpp)
     IF(C_API)
         LIST(APPEND CHUCHO_SOURCES c_zip_file_compressor.cpp)
     ENDIF()
     SET_SOURCE_FILES_PROPERTIES(zip_file_compressor_factory.cpp PROPERTIES
-                                COMPILE_DEFINITIONS CHUCHO_HAVE_MINIZIP)
-    INCLUDE_DIRECTORIES("${MINIZIP_SOURCE}")
-    IF(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-        SET_SOURCE_FILES_PROPERTIES("${MINIZIP_SOURCE}/zip.c"
-                                    PROPERTIES
-                                    COMPILE_FLAGS "-Wno-parentheses-equality -Wno-incompatible-pointer-types")
+                                COMPILE_DEFINITIONS CHUCHO_HAVE_LIBARCHIVE)
+ENDIF()
+
+IF(LIBLZMA_FOUND)
+    LIST(APPEND CHUCHO_SOURCES
+         lzma_file_compressor.cpp
+         lzma_compressor.cpp
+         lzma_compressor_factory.cpp
+         include/chucho/lzma_compressor_factory.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_SOURCES
+             c_lzma_file_compressor.cpp
+             c_lzma_compressor.cpp)
     ENDIF()
-    IF(CHUCHO_SOLARIS)
-        SET_SOURCE_FILES_PROPERTIES(${CHUCHO_MINIZIP_SOURCES}
-                                    PROPERTIES
-                                    COMPILE_DEFINITIONS "_LARGEFILE_SOURCE;_FILE_OFFSET_BITS=64")
-    ELSEIF(NOT CHUCHO_HAVE_FOPEN64)
-        SET_SOURCE_FILES_PROPERTIES(${CHUCHO_MINIZIP_SOURCES}
-                                    PROPERTIES
-                                    COMPILE_DEFINITIONS USE_FILE32API)
+    SET_SOURCE_FILES_PROPERTIES(lzma_file_compressor_factory.cpp PROPERTIES
+                                COMPILE_DEFINITIONS CHUCHO_HAVE_LZMA)
+ENDIF()
+
+IF(CHUCHO_HAVE_LZ4)
+    LIST(APPEND CHUCHO_SOURCES
+         lz4_compressor.cpp
+         lz4_compressor_factory.cpp
+         include/chucho/lz4_compressor_factory.hpp)
+    IF(C_API)
+        LIST(APPEND CHUCHO_SOURCES
+             c_lz4_compressor.cpp)
     ENDIF()
 ENDIF()
 
@@ -1239,22 +1330,6 @@ IF(ENABLE_SHARED)
         SET_TARGET_PROPERTIES(chucho PROPERTIES
                               COMPILE_FLAGS "${CHUCHO_SO_FLAGS}")
     ENDIF()
-    IF(CHUCHO_HAVE_ORACLE)
-        TARGET_LINK_LIBRARIES(chucho "${ORACLE_CLIENT_LIB}")
-    ENDIF()
-    IF(CHUCHO_HAVE_POSTGRES)
-        TARGET_LINK_LIBRARIES(chucho "${POSTGRES_CLIENT_LIB}")
-    ENDIF()
-    IF(CHUCHO_HAVE_DB2)
-        TARGET_LINK_LIBRARIES(chucho "${DB2_CLIENT_LIB}")
-    ENDIF()
-    IF(CHUCHO_HAVE_RUBY)
-        TARGET_LINK_LIBRARIES(chucho "${RUBY_LIB}")
-    ENDIF()
-    IF(CURL_FOUND)
-        TARGET_LINK_LIBRARIES(chucho ${CURL_LIBRARIES})
-    ENDIF()
-
     IF(CMAKE_GENERATOR STREQUAL Xcode AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         SET_TARGET_PROPERTIES(chucho PROPERTIES
                               LINK_FLAGS "-std=c++11 -stdlib=libc++")
@@ -1280,67 +1355,75 @@ ELSE()
 ENDIF()
 
 IF(CHUCHO_HAVE_MYSQL)
-    TARGET_LINK_LIBRARIES(chucho "${MYSQL_CLIENT_LIB}")
+    TARGET_LINK_LIBRARIES(chucho ${MYSQL_LIBS})
 ENDIF()
 
 IF(CHUCHO_HAVE_ORACLE)
-    TARGET_LINK_LIBRARIES(chucho "${ORACLE_CLIENT_LIB}")
+    TARGET_LINK_LIBRARIES(chucho ${ORACLE_LIBS})
 ENDIF()
 
 IF(CHUCHO_HAVE_SQLITE)
-    TARGET_LINK_LIBRARIES(chucho "${SQLITE_CLIENT_LIB}")
+    TARGET_LINK_LIBRARIES(chucho ${SQLITE_LIBS})
 ENDIF()
 
 IF(CHUCHO_HAVE_POSTGRES)
-    TARGET_LINK_LIBRARIES(chucho "${POSTGRES_CLIENT_LIB}")
+    TARGET_LINK_LIBRARIES(chucho ${POSTGRES_LIBS})
 ENDIF()
 
 IF(CHUCHO_HAVE_DB2)
-    TARGET_LINK_LIBRARIES(chucho "${DB2_CLIENT_LIB}")
+    TARGET_LINK_LIBRARIES(chucho ${DB2_LIBS})
 ENDIF()
 
-IF(CHUCHO_HAVE_RUBY AND NOT RUBY_FRAMEWORK)
-    TARGET_LINK_LIBRARIES(chucho "${RUBY_LIB}")
+IF(RUBY_FOUND)
+    TARGET_LINK_LIBRARIES(chucho ${RUBY_LIBRARY})
 ENDIF()
 
 IF(CURL_FOUND)
     TARGET_LINK_LIBRARIES(chucho ${CURL_LIBRARIES})
 ENDIF()
 
-IF(CHUCHO_HAVE_PROTOBUF)
-    TARGET_LINK_LIBRARIES(chucho "${PROTOBUF_LIB}")
+IF(PROTOBUF_FOUND)
+    TARGET_LINK_LIBRARIES(chucho ${PROTOBUF_LIBRARIES})
 ENDIF()
 
 IF(CHUCHO_HAVE_CAPN_PROTO)
-    TARGET_LINK_LIBRARIES(chucho "${CAPN_PROTO_LIB}" "${CAPN_PROTO_KJ_LIB}")
+    TARGET_LINK_LIBRARIES(chucho ${CAPN_PROTO_LIBS})
+ENDIF()
+
+IF(CHUCHO_HAVE_FLATBUFFERS)
+    TARGET_LINK_LIBRARIES(chucho ${FLATBUFFERS_LIBS})
 ENDIF()
 
 IF(CHUCHO_HAVE_ZEROMQ)
-    TARGET_LINK_LIBRARIES(chucho "${ZEROMQ_LIB}")
+    TARGET_LINK_LIBRARIES(chucho ${ZEROMQ_LIBS})
 ENDIF()
 
 IF(CHUCHO_HAVE_ACTIVEMQ)
-    TARGET_LINK_LIBRARIES(chucho "${ACTIVEMQ_LIB}")
-    IF(APR_LIB)
-        TARGET_LINK_LIBRARIES(chucho "${APR_LIB}")
-    ENDIF()
-    IF(CHUCHO_NEEDS_SENDFILE)
-        TARGET_LINK_LIBRARIES(chucho sendfile)
-    ENDIF()
+    TARGET_LINK_LIBRARIES(chucho ${ACTIVEMQ_LIBS})
 ENDIF()
 
 IF(CHUCHO_HAVE_RABBITMQ)
-    TARGET_LINK_LIBRARIES(chucho "${RABBITMQ_LIB}")
+    TARGET_LINK_LIBRARIES(chucho ${RABBITMQ_LIBS})
 ENDIF()
 
-IF(ZLIB_LIB_DIR)
-    LINK_DIRECTORIES("${ZLIB_LIB_DIR}")
-    TARGET_LINK_LIBRARIES(chucho z)
+IF(LibArchive_FOUND)
+    TARGET_LINK_LIBRARIES(chucho ${LibArchive_LIBRARIES})
 ENDIF()
 
-IF(BZIP2_LIB_DIR)
-    LINK_DIRECTORIES("${BZIP2_LIB_DIR}")
-    TARGET_LINK_LIBRARIES(chucho bz2)
+IF(ZLIB_FOUND)
+    TARGET_LINK_LIBRARIES(chucho ${ZLIB_LIBRARIES})
+ENDIF()
+
+IF(BZIP2_FOUND)
+    TARGET_LINK_LIBRARIES(chucho ${BZIP2_LIBRARIES})
+ENDIF()
+
+IF(LIBLZMA_FOUND)
+    TARGET_LINK_LIBRARIES(chucho ${LIBLZMA_LIBRARIES})
+ENDIF()
+
+IF(CHUCHO_HAVE_LZ4)
+    TARGET_LINK_LIBRARIES(chucho ${LZ4_LIBS})
 ENDIF()
 
 TARGET_LINK_LIBRARIES(chucho ${CMAKE_THREAD_LIBS_INIT})
@@ -1369,20 +1452,6 @@ IF(CHUCHO_WINDOWS)
     ADD_DEPENDENCIES(chucho event_log)
     INSTALL(TARGETS event_log
             RUNTIME DESTINATION bin)
-ENDIF()
-
-IF(CHUCHO_HAVE_PROTOBUF)
-    ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/chucho.pb.cc" "${CMAKE_BINARY_DIR}/chucho.pb.h"
-                       COMMAND "${CHUCHO_PROTOC}" "--cpp_out=${CMAKE_BINARY_DIR}" chucho.proto
-                       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/serialization"
-                       DEPENDS "${CMAKE_SOURCE_DIR}/serialization/chucho.proto")
-ENDIF()
-
-IF(CHUCHO_HAVE_CAPN_PROTO)
-    ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/chucho.capnp.c++" "${CMAKE_BINARY_DIR}/chucho.capnp.h"
-                       COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_SOURCE_DIR}/serialization/chucho.capnp" "${CMAKE_BINARY_DIR}"
-                       COMMAND "${CHUCHO_CAPNP}" compile "--output=${CHUCHO_CAPNPC_CXX}" "${CMAKE_BINARY_DIR}/chucho.capnp"
-                       DEPENDS "${CMAKE_SOURCE_DIR}/serialization/chucho.capnp")
 ENDIF()
 
 ADD_SUBDIRECTORY(test)

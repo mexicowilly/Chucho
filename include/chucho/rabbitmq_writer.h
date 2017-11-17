@@ -62,6 +62,8 @@ extern "C"
  * @param[out] wrt the RabbitMQ writer to create
  * @param[in] fmt the formatter
  * @param[in] ser the serializer
+ * @param[in] coalesce_max The maximum number of log events to hold in
+ * cache before sending them. If -1, then the default of 25 will be used.
  * @param[in] cmp the compressor, which may be NULL
  * @param[in] url the URL of the RabbitMQ instance
  * @param[in] exchange the exchange to which to post messages
@@ -72,6 +74,7 @@ extern "C"
 CHUCHO_EXPORT chucho_rc chucho_create_rabbitmq_writer(chucho_writer** wrt,
                                                       chucho_formatter* fmt,
                                                       chucho_serializer* ser,
+                                                      int coalesce_max,
                                                       chucho_compressor* cmp,
                                                       const char* const url,
                                                       const char* const exchange,

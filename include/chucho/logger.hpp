@@ -109,6 +109,7 @@ public:
      */
     static std::string type_to_logger_name(const std::type_info& info);
 
+    virtual ~logger();
    /**
     * Add a writer. This writer will be written in subsequent event 
     * writes from this logger. 

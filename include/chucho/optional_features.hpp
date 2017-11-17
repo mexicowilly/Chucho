@@ -39,7 +39,7 @@ namespace optional_features
 
 /**
  * Features that may or may not be present. Please refer to the file
- * @c BuildOptions.cmake for information about how to enable or disable
+ * @c cmake/BuildOptions.cmake for information about how to enable or disable
  * optional features.
  */
 enum feature
@@ -52,7 +52,7 @@ enum feature
     CONFIG_FILE_CONFIGURATION,  /**< Config file format configuration */
     EMAIL_WRITER,               /**< Whether CURL is present */
     LOG4CPLUS_CONFIGURATION,    /**< Log4cplus config file format configuration */
-    MINIZIP_COMPRESSION,        /**< Minizip, which is used for zip file format compression */
+    MINIZIP_COMPRESSION,        /**< Minizip, which is used for zip file format compression. Version 1.11 and later will never have this option. */
     MYSQL_WRITER,               /**< MySQL */
     ORACLE_WRITER,              /**< Oracle */
     POSTGRESQL_WRITER,          /**< PostgreSQL */
@@ -63,6 +63,10 @@ enum feature
     YAML_CONFIGURATION,         /**< YAML config file format configuration */
     ZEROMQ_WRITER,              /**< ZeroMQ */
     ZLIB_COMPRESSION,           /**< Zlib */
+    LIBARCHIVE_COMPRESSION,     /**< Libarchive, which is used for zip file format compression after Version 1.11 */
+    LZMA_COMPRESSION,           /**< LZMA compression */
+    LZ4_COMPRESSION,            /**< LZ4 compression */
+    FLATBUFFERS_SERIALIZER,     /**< Flatbuffers serialization */
     FEATURE_COUNT               /**< Do not use. This is just so I can know how many there are. */
 };
 

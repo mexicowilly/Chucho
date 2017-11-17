@@ -27,9 +27,9 @@
 
 int main(int argc, char* argv[])
 {
-    if (argc != 4 && argc != 5)
+    if (argc != 5 && argc != 6)
     {
-        std::cout << "ZeroMQ helper requires three arguments: endpoint, topic and message" << std::endl;
+        std::cout << "ZeroMQ helper requires four arguments: endpoint, topic, count and message" << std::endl;
         std::cout << "It also allows an optional compressor name" << std::endl;
         return EXIT_FAILURE;
     }
@@ -39,10 +39,10 @@ int main(int argc, char* argv[])
     auto fmt = std::make_shared<chucho::pattern_formatter>("%m");
     auto ser = std::make_shared<chucho::formatted_message_serializer>();
     std::shared_ptr<chucho::compressor> cmp;
-    if (argc == 5)
+    if (argc == 6)
     {
-        if (std::strcmp(argv[4], "noop") == 0)
-            cmp == std::make_shared<chucho::noop_compressor>();
+        if (std::strcmp(argv[5], "noop") == 0)
+            cmp = std::make_shared<chucho::noop_compressor>();
     }
     std::unique_ptr<chucho::zeromq_writer> wrt;
     if (cmp)
@@ -51,13 +51,16 @@ int main(int argc, char* argv[])
         wrt.reset(new chucho::zeromq_writer(fmt, ser, argv[1], pfx));
     chucho::event evt(chucho::logger::get("zeromq_writer_test"),
                       chucho::level::INFO_(),
-                      argv[3],
+                      argv[4],
                       __FILE__,
                       __LINE__,
                       __FUNCTION__);
     // Wait for the client to establish connection
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    wrt->write(evt);
+    auto count = std::stoul(argv[3]);
+    for (decltype(count) i = 0; i < count; i++)
+        wrt->write(evt);
+    wrt->flush();
     // Wait for client to receive message
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     return EXIT_SUCCESS;

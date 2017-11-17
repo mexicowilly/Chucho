@@ -19,8 +19,10 @@
 #include <chucho/logger.hpp>
 #include <chucho/garbage_cleaner.hpp>
 #include <chucho/calendar.hpp>
+#include <chucho/host.hpp>
 #include <sstream>
 #include <thread>
+#include <cstring>
 
 namespace chucho
 {
@@ -45,7 +47,8 @@ oracle_writer::oracle_writer(std::shared_ptr<formatter> fmt,
       logger_(nullptr),
       level_(nullptr),
       marker_(nullptr),
-      thread_name_(nullptr)
+      thread_name_(nullptr),
+      host_name_(nullptr)
 {
     static std::once_flag once;
 
@@ -70,7 +73,7 @@ oracle_writer::oracle_writer(std::shared_ptr<formatter> fmt,
     react(rc, "Unable to logon", true);
     rc = OCIHandleAlloc(env_, reinterpret_cast<void**>(&insert_evt_), OCI_HTYPE_STMT, 0, 0);
     react(rc, "Unable to create statement handle", true);
-    std::string sql("INSERT INTO chucho_event ( formatted_message, timestmp, file_name, line_number, function_name, logger, level_name, marker, thread ) VALUES ( :formatted_message, :timestmp, :file_name, :line_number, :function_name, :logger, :level_name, :marker, :thread )");
+    std::string sql("INSERT INTO chucho_event ( formatted_message, timestmp, file_name, line_number, function_name, logger, level_name, marker, thread, host_name ) VALUES ( :formatted_message, :timestmp, :file_name, :line_number, :function_name, :logger, :level_name, :marker, :thread, :host_name )");
     rc = OCIStmtPrepare(insert_evt_,
                         err_,
                         reinterpret_cast<const OraText*>(sql.data()),
@@ -285,6 +288,19 @@ void oracle_writer::write_impl(const event& evt)
                        0, 0, 0, 0, 0,
                        OCI_DEFAULT);
     react(rc, "Unable to bind thread name", false);
+    param = ":host_name";
+    std::string hname = host::get_full_name();
+    rc = OCIBindByName(insert_evt_,
+                       &host_name_,
+                       err_,
+                       reinterpret_cast<const OraText*>(param.data()),
+                       param.length(),
+                       reinterpret_cast<void*>(const_cast<char*>(hname.data())),
+                       hname.length(),
+                       SQLT_CHR,
+                       0, 0, 0, 0, 0,
+                       OCI_DEFAULT);
+    react(rc, "Unable to bind host name", false);
     rc = OCIStmtExecute(ctx_, insert_evt_, err_, 1, 0, 0, 0, OCI_COMMIT_ON_SUCCESS);
     react(rc, "Unable to insert into database", false);
 }

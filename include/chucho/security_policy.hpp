@@ -103,7 +103,7 @@ namespace chucho
  *         <td>4</td></tr>
  *     <tr><td>file_writer::file_name</td>
  *         <td><i>default</i></td></tr>
- *     <tr><td>file_writer::flush</td>
+ *     <tr><td>%file_writer::flush</td>
  *         <td>5</td></tr>
  *     <tr><td>%file_writer::on_start</td>
  *         <td>8</td></tr>
@@ -127,6 +127,10 @@ namespace chucho
  *         <td><i>default</i></td></tr>
  *     <tr><td>%logger::writes_to_ancestors</td>
  *         <td>5</td></tr>
+ *     <tr><td>message_queue_writer::coalesce_max</td>
+ *         <td>[0, 10000]</td></tr>
+ *     <tr><td>message_queue_writer::coalesce_max(text)</td>
+ *         <td>5</td></tr>
  *     <tr><td>mysql_writer::host</td>
  *         <td>253</td></tr>
  *     <tr><td>mysql_writer::user</td>
@@ -147,7 +151,7 @@ namespace chucho
  *         <td><i>default</i></td></tr>
  *     <tr><td>mysql_writer::flush_on_destruct</td>
  *         <td>5</td></tr>
- *     <tr><td>named_pipe_writer::flush</td>
+ *     <tr><td>%named_pipe_writer::flush</td>
  *         <td>5</td></tr>
  *     <tr><td>named_pipe_writer::name</td>
  *         <td><i>default</i></td></tr>
@@ -167,7 +171,7 @@ namespace chucho
  *         <td>512</td></tr>
  *     <tr><td>pattern_formatter::pattern</td>
  *         <td><i>default</i></td></tr>
- *     <tr><td>pipe_writer::flush</td>
+ *     <tr><td>%pipe_writer::flush</td>
  *         <td>5</td></tr>
  *     <tr><td>postgres_writer::uri</td>
  *         <td>8000</td></tr>

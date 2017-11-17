@@ -18,6 +18,7 @@
 #include <chucho/exception.hpp>
 #include <chucho/calendar.hpp>
 #include <chucho/logger.hpp>
+#include <chucho/host.hpp>
 #include <mysql.h>
 #include <sstream>
 #include <cstring>
@@ -71,7 +72,7 @@ real_mysql_writer::real_mysql_writer(std::shared_ptr<chucho::formatter> fmt,
     insert_ = mysql_stmt_init(mysql_);
     if (insert_ == nullptr) 
         throw std::bad_alloc();
-    std::string sql("INSERT INTO chucho_event ( formatted_message, timestmp, file_name, line_number, function_name, logger, level_name, marker, thread ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? );");
+    std::string sql("INSERT INTO chucho_event ( formatted_message, timestmp, file_name, line_number, function_name, logger, level_name, marker, thread, host_name ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );");
     if (mysql_stmt_prepare(insert_, sql.c_str(), sql.length()) != 0) 
     {
         std::string msg = mysql_error(mysql_);
@@ -89,7 +90,7 @@ real_mysql_writer::~real_mysql_writer()
 
 void real_mysql_writer::write_impl(const chucho::event& evt)
 {
-    MYSQL_BIND params[9];
+    MYSQL_BIND params[10];
     std::memset(params, 0, sizeof(params));
 
     std::string msg = formatter_->format(evt);
@@ -195,6 +196,15 @@ void real_mysql_writer::write_impl(const chucho::event& evt)
     params[8].buffer_length = p8_len;
     params[8].length = &p8_len;
     params[8].is_null = &p8_null;
+
+    std::string hname = chucho::host::get_full_name();
+    unsigned long p9_len = hname.length();
+    my_bool p9_null = 0;
+    params[9].buffer = reinterpret_cast<void*>(const_cast<char*>(hname.data()));
+    params[9].buffer_type = MYSQL_TYPE_STRING;
+    params[9].buffer_length = p9_len;
+    params[9].length = &p9_len;
+    params[9].is_null = &p9_null;
 
     if (mysql_stmt_bind_param(insert_, params) != 0) 
         throw chucho::exception(std::string("Unable to bind insert statement: ") + mysql_error(mysql_));

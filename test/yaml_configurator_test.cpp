@@ -101,6 +101,21 @@ TEST_F(yaml_configurator, activemq_writer_topic)
     activemq_writer_topic_body();
 }
 
+TEST_F(yaml_configurator, activemq_writer_topic_coalesce)
+{
+    configure("- chucho::logger:\n"
+                  "    - name: will\n"
+                  "    - chucho::activemq_writer:\n"
+                  "        - chucho::pattern_formatter:\n"
+                  "            - pattern: '%m'\n"
+                  "        - chucho::formatted_message_serializer\n"
+                  "        - broker: 'tcp://127.0.0.1:61616'\n"
+                  "        - consumer_type: topic\n"
+                  "        - coalesce_max: 301\n"
+                  "        - topic_or_queue: MonkeyBalls");
+    activemq_writer_topic_coalesce_body();
+}
+
 #endif
 
 TEST_F(yaml_configurator, async_writer)
@@ -386,6 +401,24 @@ TEST_F(yaml_configurator, logger)
     logger_body();
 }
 
+TEST_F(yaml_configurator, lzma_file_compressor)
+{
+    configure("chucho::logger:\n"
+                  "    name: will\n"
+                  "    chucho::rolling_file_writer:\n"
+                  "        chucho::pattern_formatter:\n"
+                  "            pattern: '%m%n'\n"
+                  "        chucho::numbered_file_roller:\n"
+                  "            min_index: 3\n"
+                  "            max_index: 5\n"
+                  "            chucho::lzma_file_compressor:\n"
+                  "                min_index: 1\n"
+                  "        chucho::size_file_roll_trigger:\n"
+                  "            max_size: 5000\n"
+                  "        file_name: what.log");
+    lzma_file_compressor_body();
+}
+
 TEST_F(yaml_configurator, multiple_writer)
 {
     configure("chucho::logger:\n"
@@ -523,6 +556,20 @@ TEST_F(yaml_configurator, rabbitmq_writer)
     rabbitmq_writer_body();
 }
 
+TEST_F(yaml_configurator, rabbitmq_writer_coalesce)
+{
+    configure("chucho::logger:\n"
+                  "    - name: will\n"
+                  "    - chucho::rabbitmq_writer:\n"
+                  "        - coalesce_max: 302\n"
+                  "        - chucho::pattern_formatter:\n"
+                  "            - pattern: '%m'\n"
+                  "        - chucho::formatted_message_serializer\n"
+                  "        - url: 'amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc'\n"
+                  "        - exchange: logs");
+    rabbitmq_writer_coalesce_body();
+}
+
 #if defined(CHUCHO_HAVE_CAPN_PROTO)
 
 TEST_F(yaml_configurator, rabbitmq_writer_capn_proto)
@@ -577,6 +624,17 @@ TEST_F(yaml_configurator, rolling_file_writer)
               "        on_start: TruNCAte\n"
               "        flush: false");
     rolling_file_writer_body();
+}
+
+TEST_F(yaml_configurator, root_alias)
+{
+    chucho::logger::get("")->remove_all_writers();
+    configure("chucho::logger:\n"
+                  "    name: <root>\n"
+                  "    chucho::cout_writer:\n"
+                  "        chucho::pattern_formatter:\n"
+                  "            pattern: '%m%n'");
+    root_alias_body();
 }
 
 #if defined(CHUCHO_HAVE_RUBY)
@@ -772,6 +830,20 @@ TEST_F(yaml_configurator, zeromq_writer)
     zeromq_writer_body();
 }
 
+TEST_F(yaml_configurator, zeromq_writer_coalesce)
+{
+    configure("- chucho::logger:\n"
+                  "    - name: will\n"
+                  "    - chucho::zeromq_writer:\n"
+                  "        - chucho::pattern_formatter:\n"
+                  "            - pattern: '%m'\n"
+                  "        - chucho::formatted_message_serializer\n"
+                  "        - endpoint: 'tcp://127.0.0.1:7780'\n"
+                  "        - coalesce_max: 300\n"
+                  "        - prefix: Hi");
+    zeromq_writer_coalesce_body();
+}
+
 TEST_F(yaml_configurator, zeromq_writer_no_prefix)
 {
     configure("- chucho::logger:\n"
@@ -811,6 +883,23 @@ TEST_F(yaml_configurator, zeromq_writer_protobuf)
               "        - endpoint: 'tcp://127.0.0.1:7779'\n"
               "        - prefix: Hi");
     zeromq_writer_protobuf_body();
+}
+
+#endif
+
+#if defined(CHUCHO_HAVE_FLATBUFFERS)
+
+TEST_F(yaml_configurator, zeromq_writer_flatbuffers)
+{
+    configure("- chucho::logger:\n"
+              "    - name: will\n"
+              "    - chucho::zeromq_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            - pattern: '%m'\n"
+              "        - chucho::flatbuffers_serializer\n"
+              "        - endpoint: 'tcp://127.0.0.1:7781'\n"
+              "        - prefix: Hi");
+    zeromq_writer_flatbuffers_body();
 }
 
 #endif

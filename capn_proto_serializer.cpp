@@ -17,6 +17,7 @@
 #include <chucho/capn_proto_serializer.hpp>
 #include <chucho/utf8.hpp>
 #include <chucho/logger.hpp>
+#include <chucho/host.hpp>
 #include <capnp/serialize.h>
 #include "chucho.capnp.h"
 #include <cstring>
@@ -26,30 +27,44 @@
 namespace chucho
 {
 
-std::vector<std::uint8_t> capn_proto_serializer::serialize(const event& evt,
-                                                           std::shared_ptr<formatter> fmt)
+std::vector<std::uint8_t> capn_proto_serializer::finish_blob()
 {
     ::capnp::MallocMessageBuilder message;
-    capnp::Event::Builder cevt = message.initRoot<capnp::Event>();
-    cevt.setFormattedMessage(utf8::escape_invalid(fmt->format(evt)));
-    cevt.setSecondsSinceEpoch(event::clock_type::to_time_t(evt.get_time()));
-    cevt.setFileName(utf8::escape_invalid(evt.get_file_name()));
-    cevt.setLineNumber(evt.get_line_number());
-    cevt.setFunctionName(utf8::escape_invalid(evt.get_function_name()));
-    cevt.setLogger(utf8::escape_invalid(evt.get_logger()->get_name()));
-    cevt.setLevelName(utf8::escape_invalid(evt.get_level()->get_name()));
-    if (evt.get_marker())
+    capnp::Events::Builder events = message.initRoot<capnp::Events>();
+    events.setHostName(host::get_full_name());
+    auto cevts = events.initEvents(events_.size());
+    for (auto i = 0; i < events_.size(); i++)
     {
-        std::ostringstream mstream;
-        mstream << *evt.get_marker();
-        cevt.setMarker(utf8::escape_invalid(mstream.str()));
+        capnp::Event::Builder evt = cevts[i];
+        const auto& chevt = events_[i].evt;
+        evt.setFormattedMessage(events_[i].formatted_message);
+        evt.setSecondsSinceEpoch(event::clock_type::to_time_t(chevt.get_time()));
+        evt.setFileName(utf8::escape_invalid(chevt.get_file_name()));
+        evt.setLineNumber(chevt.get_line_number());
+        evt.setFunctionName(utf8::escape_invalid(chevt.get_function_name()));
+        evt.setLogger(utf8::escape_invalid(chevt.get_logger()->get_name()));
+        evt.setLevelName(utf8::escape_invalid(chevt.get_level()->get_name()));
+        if (chevt.get_marker())
+        {
+            std::ostringstream mstream;
+            mstream << *chevt.get_marker();
+            evt.setMarker(utf8::escape_invalid(mstream.str()));
+        }
+        evt.setThread(events_[i].thread);
     }
-    std::ostringstream tstream;
-    tstream << std::this_thread::get_id();
-    cevt.setThread(utf8::escape_invalid(tstream.str()));
+    events_.clear();
     auto words = ::capnp::messageToFlatArray(message);
     auto bytes = words.asBytes();
     return std::vector<std::uint8_t>(bytes.begin(), bytes.end());
+}
+
+void capn_proto_serializer::serialize(const event& evt, std::shared_ptr<formatter> fmt)
+{
+    std::ostringstream tstream;
+    tstream << std::this_thread::get_id();
+    events_.emplace_back(evt,
+                         utf8::escape_invalid(fmt->format(evt)),
+                         utf8::escape_invalid(tstream.str()));
 }
 
 }

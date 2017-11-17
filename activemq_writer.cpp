@@ -42,11 +42,48 @@ activemq_writer::activemq_writer(std::shared_ptr<formatter> fmt,
 
 activemq_writer::activemq_writer(std::shared_ptr<formatter> fmt,
                                  std::shared_ptr<serializer> ser,
+                                 std::size_t coalesce_max,
+                                 const std::string& broker,
+                                 consumer_type tp,
+                                 const std::string& topic_or_queue)
+    : message_queue_writer(fmt, ser, coalesce_max),
+      broker_(broker),
+      type_(tp),
+      topic_or_queue_(topic_or_queue),
+      connection_(nullptr),
+      session_(nullptr),
+      destination_(nullptr),
+      producer_(nullptr)
+{
+    init();
+}
+
+activemq_writer::activemq_writer(std::shared_ptr<formatter> fmt,
+                                 std::shared_ptr<serializer> ser,
                                  std::shared_ptr<compressor> cmp,
                                  const std::string& broker,
                                  consumer_type tp,
                                  const std::string& topic_or_queue)
     : message_queue_writer(fmt, ser, cmp),
+      broker_(broker),
+      type_(tp),
+      topic_or_queue_(topic_or_queue),
+      connection_(nullptr),
+      session_(nullptr),
+      destination_(nullptr),
+      producer_(nullptr)
+{
+    init();
+}
+
+activemq_writer::activemq_writer(std::shared_ptr<formatter> fmt,
+                                 std::shared_ptr<serializer> ser,
+                                 std::size_t coalesce_max,
+                                 std::shared_ptr<compressor> cmp,
+                                 const std::string& broker,
+                                 consumer_type tp,
+                                 const std::string& topic_or_queue)
+    : message_queue_writer(fmt, ser, coalesce_max, cmp),
       broker_(broker),
       type_(tp),
       topic_or_queue_(topic_or_queue),
@@ -98,9 +135,8 @@ void activemq_writer::onException(const cms::CMSException& e)
     report_error("ActiveMQ error: " + e.getMessage());
 }
 
-void activemq_writer::write_impl(const event& evt)
+void activemq_writer::flush_impl(const std::vector<std::uint8_t>& bytes)
 {
-    auto bytes = serialize_and_compress(evt);
     std::unique_ptr<cms::BytesMessage> msg(session_->createBytesMessage());
     msg->setBodyBytes(&bytes[0], bytes.size());
     producer_->send(msg.get());
