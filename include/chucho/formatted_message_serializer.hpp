@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_FORMATTED_MESSAGE_SERIALIZER_HPP__)
 #define CHUCHO_FORMATTED_MESSAGE_SERIALIZER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/serializer.hpp>
 
 namespace chucho
@@ -53,5 +58,9 @@ private:
 };
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif
