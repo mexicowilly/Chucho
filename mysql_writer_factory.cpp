@@ -33,6 +33,8 @@ std::shared_ptr<configurable> mysql_writer_factory::create_configurable(std::sha
 {
     auto mwm = std::dynamic_pointer_cast<mysql_writer_memento>(mnto);
     assert(mwm);
+    if (mwm->get_name().empty())
+        throw exception("mysql_writer_factory: The name is not set");
     if (!mwm->get_formatter())
         throw exception("mysql_writer_factory: The writer's formatter is not set");
     if (mwm->get_host().empty()) 
@@ -51,7 +53,8 @@ std::shared_ptr<configurable> mysql_writer_factory::create_configurable(std::sha
         mwm->get_discard_threshold() : level::INFO_();
     bool flsh = mwm->get_flush_on_destruct() ?
         *mwm->get_flush_on_destruct() : true;
-    auto mw = std::make_shared<mysql_writer>(mwm->get_formatter(),
+    auto mw = std::make_shared<mysql_writer>(mwm->get_name(),
+                                             mwm->get_formatter(),
                                              mwm->get_host(),
                                              mwm->get_user(),
                                              mwm->get_password(),

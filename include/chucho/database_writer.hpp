@@ -38,11 +38,12 @@ protected:
     /**
      * Construct a database writer.
      *
+     * @param name the name of the writer
      * @param fmt the formatter
      * @throw std::invalid_argument if fmt is an uninitialized 
      *        std::shared_ptr
      */
-    database_writer(std::shared_ptr<formatter> fmt);
+    database_writer(const std::string& name, std::shared_ptr<formatter> fmt);
     //@}
 };
 

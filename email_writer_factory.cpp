@@ -33,6 +33,8 @@ std::shared_ptr<configurable> email_writer_factory::create_configurable(std::sha
 {
     auto ewm = std::dynamic_pointer_cast<email_writer_memento>(mnto);
     assert(ewm);
+    if (ewm->get_name().empty())
+        throw exception("email_writer_factory: The name is not set");
     if (!ewm->get_formatter())
         throw exception("email_writer_factory: The writer's formatter is not set");
     if (!ewm->get_connection_type()) 
@@ -52,7 +54,8 @@ std::shared_ptr<configurable> email_writer_factory::create_configurable(std::sha
     std::shared_ptr<email_writer> wrt;
     if (ewm->get_user().empty() && ewm->get_password().empty())
     {
-        wrt = std::make_shared<email_writer>(ewm->get_formatter(),
+        wrt = std::make_shared<email_writer>(ewm->get_name(),
+                                             ewm->get_formatter(),
                                              ewm->get_host(),
                                              *ewm->get_connection_type(),
                                              ewm->get_to(),
@@ -61,11 +64,11 @@ std::shared_ptr<configurable> email_writer_factory::create_configurable(std::sha
                                              ewm->get_email_trigger(),
                                              port,
                                              buf_size);
-
     }
     else
     {
-        wrt = std::make_shared<email_writer>(ewm->get_formatter(),
+        wrt = std::make_shared<email_writer>(ewm->get_name(),
+                                             ewm->get_formatter(),
                                              ewm->get_host(),
                                              *ewm->get_connection_type(),
                                              ewm->get_to(),

@@ -19,8 +19,8 @@
 namespace chucho
 {
 
-database_writer::database_writer(std::shared_ptr<formatter> fmt)
-    : writer(fmt)
+database_writer::database_writer(const std::string& name, std::shared_ptr<formatter> fmt)
+    : writer(name, fmt)
 {
 }
 

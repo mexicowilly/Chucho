@@ -38,11 +38,12 @@ namespace chucho
 
 const std::size_t async_writer::DEFAULT_QUEUE_CAPACITY = 256;
 
-async_writer::async_writer(std::shared_ptr<writer> wrt,
+async_writer::async_writer(const std::string& name,
+                           std::shared_ptr<writer> wrt,
                            std::size_t capacity,
                            std::shared_ptr<level> discard_threshold,
                            bool flush_on_destruct)
-    : writer(std::make_shared<noop_formatter>()),
+    : writer(name, std::make_shared<noop_formatter>()),
       writer_(wrt),
       capacity_(capacity),
       discard_threshold_(discard_threshold),

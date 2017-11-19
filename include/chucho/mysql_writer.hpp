@@ -60,7 +60,8 @@ public:
     //@{
     /**
      * Construct a MySQL writer.
-     * 
+     *
+     * @param name the name of the writer
      * @param fmt the formatter
      * @param host the host on which MySQL is running
      * @param user the user name for the database
@@ -84,7 +85,8 @@ public:
      *  
      * @sa async_writer 
      */
-    mysql_writer(std::shared_ptr<formatter> fmt,
+    mysql_writer(const std::string& name,
+                 std::shared_ptr<formatter> fmt,
                  const std::string& host,
                  const std::string& user,
                  const std::string& password,

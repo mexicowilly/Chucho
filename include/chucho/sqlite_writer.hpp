@@ -49,6 +49,7 @@ public:
     /**
      * Create a SQLite writer.
      *
+     * @param name the name of the writer
      * @param fmt the formatter to use
      * @param file_name the name of the file that does or will hold 
      *                  the database
@@ -56,7 +57,7 @@ public:
      *        std::shared_ptr
      * @throw exception if the SQLite database cannot be opened
      */
-    sqlite_writer(std::shared_ptr<formatter> fmt, const std::string& file_name);
+    sqlite_writer(const std::string& name, std::shared_ptr<formatter> fmt, const std::string& file_name);
     /**
      * Destroy a SQLite writer.
      */

@@ -33,6 +33,8 @@ std::shared_ptr<configurable> db2_writer_factory::create_configurable(std::share
 {
     auto dwm = std::dynamic_pointer_cast<db2_writer_memento>(mnto);
     assert(dwm);
+    if (dwm->get_name().empty())
+        throw exception("db2_writer_factory: The name is not set");
     if (!dwm->get_formatter())
         throw exception("db2_writer_factory: The writer's formatter is not set");
     if (dwm->get_user().empty()) 
@@ -41,7 +43,8 @@ std::shared_ptr<configurable> db2_writer_factory::create_configurable(std::share
         throw exception("db2_writer_factory: The DB2 user password must be set");
     if (dwm->get_database().empty()) 
         throw exception("db2_writer_factory: The DB2 database name must be set");
-    auto dw = std::make_shared<db2_writer>(dwm->get_formatter(),
+    auto dw = std::make_shared<db2_writer>(dwn->get_name(),
+                                           dwm->get_formatter(),
                                            dwm->get_database(),
                                            dwm->get_user(),
                                            dwm->get_password());

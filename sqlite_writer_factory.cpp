@@ -33,11 +33,14 @@ std::shared_ptr<configurable> sqlite_writer_factory::create_configurable(std::sh
 {
     auto swm = std::dynamic_pointer_cast<sqlite_writer_memento>(mnto);
     assert(swm);
+    if (swm->get_name().empty())
+        throw exception("sqlite_writer_factory: The name is not set");
     if (!swm->get_formatter())
         throw exception("sqlite_writer_factory: The writer's formatter is not set");
     if (swm->get_file_name().empty()) 
         throw exception("sqlite_writer_factory: The SQLite file name must be set");
-    auto sw = std::make_shared<sqlite_writer>(swm->get_formatter(),
+    auto sw = std::make_shared<sqlite_writer>(swm->get_name(),
+                                              swm->get_formatter(),
                                               swm->get_file_name());
     set_filters(sw, swm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*sw)));

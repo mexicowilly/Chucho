@@ -45,7 +45,8 @@ public:
      */
     /**
      * Construct a DB2 writer.
-     * 
+     *
+     * @param name the name of the writer
      * @param fmt the formatter
      * @param database the database to which to connect
      * @param user the user name for the database
@@ -56,7 +57,8 @@ public:
      * @throw exception if there is a problem connecting to the 
      *        database
      */
-    db2_writer(std::shared_ptr<formatter> fmt,
+    db2_writer(const std::string& name,
+               std::shared_ptr<formatter> fmt,
                const std::string& database,
                const std::string& user,
                const std::string& password);

@@ -67,11 +67,13 @@ public:
      * @return the formatter
      */
     std::shared_ptr<formatter> get_formatter() const;
+    const std::string& get_name() const;
     virtual void handle(std::shared_ptr<configurable> cnf) override;
 
 private:
     std::shared_ptr<formatter> fmt_;
     std::vector<std::shared_ptr<filter>> filters_;
+    std::string name_;
 };
 
 inline const std::vector<std::shared_ptr<filter>>& writer_memento::get_filters() const
@@ -82,6 +84,10 @@ inline const std::vector<std::shared_ptr<filter>>& writer_memento::get_filters()
 inline std::shared_ptr<formatter> writer_memento::get_formatter() const
 {
     return fmt_;
+}
+
+inline const std::string& writer_memento::get_name() const {
+    return name_;
 }
 
 }

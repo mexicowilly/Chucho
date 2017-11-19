@@ -33,11 +33,13 @@ std::shared_ptr<configurable> postgres_writer_factory::create_configurable(std::
 {
     auto pwm = std::dynamic_pointer_cast<postgres_writer_memento>(mnto);
     assert(pwm);
+    if (pwm->get_name().empty())
+        throw exception("postgres_writer_factory: The name is not set");
     if (!pwm->get_formatter())
         throw exception("postgres_writer_factory: The writer's formatter is not set");
     if (pwm->get_uri().empty()) 
         throw exception("postgres_writer_factory: The Postgres URI must be set");
-    auto pw = std::make_shared<postgres_writer>(pwm->get_formatter(), pwm->get_uri());
+    auto pw = std::make_shared<postgres_writer>(pwm->get_name(), pwm->get_formatter(), pwm->get_uri());
     set_filters(pw, pwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*pw)));
     return pw;

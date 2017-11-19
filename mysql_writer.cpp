@@ -219,7 +219,8 @@ namespace chucho
 
 const std::uint16_t mysql_writer::DEFAULT_PORT = 3306;
 
-mysql_writer::mysql_writer(std::shared_ptr<formatter> fmt,
+mysql_writer::mysql_writer(const std::string& name,
+                           std::shared_ptr<formatter> fmt,
                            const std::string& host,
                            const std::string& user,
                            const std::string& password,
@@ -228,7 +229,7 @@ mysql_writer::mysql_writer(std::shared_ptr<formatter> fmt,
                            std::size_t capacity,
                            std::shared_ptr<level> discard_threshold,
                            bool flush_on_destruct)
-    : database_writer(fmt),
+    : database_writer(name, fmt),
       host_(host),
       user_(user),
       password_(password),

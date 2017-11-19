@@ -33,6 +33,8 @@ std::shared_ptr<configurable> async_writer_factory::create_configurable(std::sha
 {
     auto awm = std::dynamic_pointer_cast<async_writer_memento>(mnto);
     assert(awm);
+    if (awm->get_name().empty())
+        throw exception("async_writer_factory: The name is not set");
     if (!awm->get_writer())
         throw exception("async_writer: The async writer's writer must be set");
     std::size_t queue_cap = awm->get_queue_capacity() ?
@@ -41,7 +43,7 @@ std::shared_ptr<configurable> async_writer_factory::create_configurable(std::sha
         awm->get_discard_threshold() : level::INFO_();
     bool flsh = awm->get_flush_on_destruct() ?
         *awm->get_flush_on_destruct() : true;
-    auto aw = std::make_shared<async_writer>(awm->get_writer(), queue_cap, dis, flsh);
+    auto aw = std::make_shared<async_writer>(awm->get_name(), awm->get_writer(), queue_cap, dis, flsh);
     report_info("Created a " + demangle::get_demangled_name(typeid(*aw)));
     return aw;
 }

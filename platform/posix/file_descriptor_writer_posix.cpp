@@ -24,21 +24,18 @@
 namespace chucho
 {
 
-file_descriptor_writer::file_descriptor_writer(std::shared_ptr<formatter> fmt,
+file_descriptor_writer::file_descriptor_writer(const std::string& name,
+                                               std::shared_ptr<formatter> fmt,
                                                bool flsh)
-    : writer(fmt),
-      num_(0),
-      fd_(-1),
-      flush_(flsh),
-      allow_close_(true)
+    : file_descriptor_writer(name, fmt, -1, flsh)
 {
-    set_status_origin("file_descriptor_writer");
 }
 
-file_descriptor_writer::file_descriptor_writer(std::shared_ptr<formatter> fmt,
+file_descriptor_writer::file_descriptor_writer(const std::string& name,
+                                               std::shared_ptr<formatter> fmt,
                                                int fd,
                                                bool flsh)
-    : writer(fmt),
+    : writer(name, fmt),
       num_(0),
       fd_(fd),
       flush_(flsh),

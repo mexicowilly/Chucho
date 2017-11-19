@@ -47,7 +47,8 @@ public:
     //@{
     /**
      * Construct an Oracle writer.
-     * 
+     *
+     * @param name the name of the writer
      * @param fmt the formatter
      * @param user the user name for the database
      * @param password the password of the user for the database
@@ -58,7 +59,8 @@ public:
      * @throw exception if there is a problem connecting to the 
      *        database
      */
-    oracle_writer(std::shared_ptr<formatter> fmt,
+    oracle_writer(const std::string& name,
+                  std::shared_ptr<formatter> fmt,
                   const std::string& user,
                   const std::string& password,
                   const std::string& database);

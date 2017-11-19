@@ -104,7 +104,8 @@ public:
      */
     /**
      * Construct an email writer.
-     * 
+     *
+     * @param name the name of the writer
      * @param fmt the formatter
      * @param host the SMTP host
      * @param connect the connection type
@@ -118,7 +119,8 @@ public:
      * @param buffer_capacity the capacity of the buffer that holds
      *        events until the @ref email_trigger is triggered
      */
-    email_writer(std::shared_ptr<formatter> fmt,
+    email_writer(const std::string& name,
+                 std::shared_ptr<formatter> fmt,
                  const std::string& host,
                  connection_type connect,
                  const std::vector<std::string>& to,

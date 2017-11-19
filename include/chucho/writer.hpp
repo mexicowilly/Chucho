@@ -56,16 +56,20 @@ public:
      * Construct a writer with the given formatter. All events will
      * be formatted using the formatter before being written. 
      *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @throw std::invalid_argument if fmt is an uninitialized 
      *        std::shared_ptr
      */
-    writer(std::shared_ptr<formatter> fmt);
+    writer(const std::string& name, std::shared_ptr<formatter> fmt);
+    writer(writer&& wrt) = default;
     /**
      * Destroy a writer.
      */
     virtual ~writer();
     //@}
+
+    bool operator< (const writer& wrt) const;
 
     /**
      * Add a filter. Filters are visited in the order in which they 
@@ -93,6 +97,7 @@ public:
      * @return the formatter
      */
     std::shared_ptr<formatter> get_formatter() const;
+    const std::string& get_name() const;
     /**
      * Write an event. This non-virtual method takes care of all the 
      * common housekeeping that writers must undertake when writing 
@@ -130,13 +135,23 @@ private:
     CHUCHO_NO_EXPORT bool permits(const event& evt);
 
     std::vector<std::shared_ptr<filter>> filters_;
-    std::recursive_mutex guard_;
+    std::unique_ptr<std::recursive_mutex> guard_;
     bool i_am_writing_;
+    std::string name_;
 };
+
+inline bool writer::operator< (const writer& wrt) const
+{
+    return name_ < wrt.name_;
+}
 
 inline std::shared_ptr<formatter> writer::get_formatter() const
 {
     return formatter_;
+}
+
+inline const std::string& writer::get_name() const {
+    return name_;
 }
 
 }

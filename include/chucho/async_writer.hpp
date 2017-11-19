@@ -68,7 +68,8 @@ public:
     //@{
     /**
      * Construct an asynchronous writer.
-     * 
+     *
+     * @param name the name of the writer
      * @param wrt the underlying slow writer
      * @param capacity the capacity of the blocking queue
      * @param discard_threshold the level at which to discard events 
@@ -79,7 +80,8 @@ public:
      * @throw std::invalid_argument if fmt is an uninitialized 
      *        std::shared_ptr
      */
-    async_writer(std::shared_ptr<writer> wrt,
+    async_writer(const std::string& name,
+                 std::shared_ptr<writer> wrt,
                  std::size_t capacity = DEFAULT_QUEUE_CAPACITY,
                  std::shared_ptr<level> discard_threshold = level::INFO_(),
                  bool flush_on_destruct = true);

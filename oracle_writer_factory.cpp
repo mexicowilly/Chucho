@@ -33,6 +33,8 @@ std::shared_ptr<configurable> oracle_writer_factory::create_configurable(std::sh
 {
     auto owm = std::dynamic_pointer_cast<oracle_writer_memento>(mnto);
     assert(owm);
+    if (owm->get_name().empty())
+        throw exception("oracle_writer_factory: The name is not set");
     if (!owm->get_formatter())
         throw exception("oracle_writer_factory: The writer's formatter is not set");
     if (owm->get_user().empty()) 
@@ -41,7 +43,8 @@ std::shared_ptr<configurable> oracle_writer_factory::create_configurable(std::sh
         throw exception("oracle_writer_factory: The Oracle user password must be set");
     if (owm->get_database().empty()) 
         throw exception("oracle_writer_factory: The Oracle database name must be set");
-    auto ow = std::make_shared<oracle_writer>(owm->get_formatter(),
+    auto ow = std::make_shared<oracle_writer>(owm->get_name(),
+                                              owm->get_formatter(),
                                               owm->get_user(),
                                               owm->get_password(),
                                               owm->get_database());

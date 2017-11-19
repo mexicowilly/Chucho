@@ -25,6 +25,8 @@ writer_memento::writer_memento(configurator& cfg)
     : memento(cfg)
 {
     set_status_origin("writer_memento");
+    cfg.get_security_policy().set_text("writer::name", 256);
+    set_handler("name", [this] (const std::string& name) { name_  = validate("writer::name", name); });
 }
 
 void writer_memento::handle(std::shared_ptr<configurable> cnf)

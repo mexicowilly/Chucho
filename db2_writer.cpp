@@ -39,11 +39,12 @@ SQLCHAR* get_sqlchar(const std::string& str)
 namespace chucho
 {
 
-db2_writer::db2_writer(std::shared_ptr<formatter> fmt,
+db2_writer::db2_writer(const std::string& name,
+                       std::shared_ptr<formatter> fmt,
                        const std::string& database,
                        const std::string& user,
                        const std::string& password)
-    : database_writer(fmt),
+    : database_writer(name, fmt),
       database_(database),
       user_(user),
       password_(password)
