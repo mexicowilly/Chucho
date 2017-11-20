@@ -33,6 +33,8 @@ std::shared_ptr<configurable> rolling_file_writer_factory::create_configurable(s
 {
     auto rfwm = std::dynamic_pointer_cast<rolling_file_writer_memento>(mnto);
     assert(rfwm);
+    if (rfwm->get_name().empty())
+        throw exception("rolling_file_writer_factory: The name is not set");
     if (!rfwm->get_file_roller())
         throw exception("rolling_file_writer_factory: A file_roller is required when creating a rolling_file");
     if (!rfwm->get_formatter())
@@ -42,7 +44,8 @@ std::shared_ptr<configurable> rolling_file_writer_factory::create_configurable(s
     {
         if (rfwm->get_on_start() && rfwm->get_flush())
         {
-            cnf.reset(new rolling_file_writer(rfwm->get_formatter(),
+            cnf.reset(new rolling_file_writer(rfwm->get_name(),
+                                              rfwm->get_formatter(),
                                               *rfwm->get_on_start(),
                                               *rfwm->get_flush(),
                                               rfwm->get_file_roller(),
@@ -50,7 +53,8 @@ std::shared_ptr<configurable> rolling_file_writer_factory::create_configurable(s
         }
         else if (rfwm->get_flush())
         {
-            cnf.reset(new rolling_file_writer(rfwm->get_formatter(),
+            cnf.reset(new rolling_file_writer(rfwm->get_name(),
+                                              rfwm->get_formatter(),
                                               file_writer::on_start::APPEND,
                                               *rfwm->get_flush(),
                                               rfwm->get_file_roller(),
@@ -58,7 +62,8 @@ std::shared_ptr<configurable> rolling_file_writer_factory::create_configurable(s
         }
         else if (rfwm->get_on_start())
         {
-            cnf.reset(new rolling_file_writer(rfwm->get_formatter(),
+            cnf.reset(new rolling_file_writer(rfwm->get_name(),
+                                              rfwm->get_formatter(),
                                               *rfwm->get_on_start(),
                                               true,
                                               rfwm->get_file_roller(),
@@ -66,7 +71,8 @@ std::shared_ptr<configurable> rolling_file_writer_factory::create_configurable(s
         }
         else
         {
-            cnf.reset(new rolling_file_writer(rfwm->get_formatter(),
+            cnf.reset(new rolling_file_writer(rfwm->get_name(),
+                                              rfwm->get_formatter(),
                                               rfwm->get_file_roller(),
                                               rfwm->get_file_roll_trigger()));
         }
@@ -75,7 +81,8 @@ std::shared_ptr<configurable> rolling_file_writer_factory::create_configurable(s
     {
         if (rfwm->get_on_start() && rfwm->get_flush())
         {
-            cnf.reset(new rolling_file_writer(rfwm->get_formatter(),
+            cnf.reset(new rolling_file_writer(rfwm->get_name(),
+                                              rfwm->get_formatter(),
                                               rfwm->get_file_name(),
                                               *rfwm->get_on_start(),
                                               *rfwm->get_flush(),
@@ -84,7 +91,8 @@ std::shared_ptr<configurable> rolling_file_writer_factory::create_configurable(s
         }
         else if (rfwm->get_flush())
         {
-            cnf.reset(new rolling_file_writer(rfwm->get_formatter(),
+            cnf.reset(new rolling_file_writer(rfwm->get_name(),
+                                              rfwm->get_formatter(),
                                               rfwm->get_file_name(),
                                               file_writer::on_start::APPEND,
                                               *rfwm->get_flush(),
@@ -93,7 +101,8 @@ std::shared_ptr<configurable> rolling_file_writer_factory::create_configurable(s
         }
         else if (rfwm->get_on_start())
         {
-            cnf.reset(new rolling_file_writer(rfwm->get_formatter(),
+            cnf.reset(new rolling_file_writer(rfwm->get_name(),
+                                              rfwm->get_formatter(),
                                               rfwm->get_file_name(),
                                               *rfwm->get_on_start(),
                                               true,
@@ -102,7 +111,8 @@ std::shared_ptr<configurable> rolling_file_writer_factory::create_configurable(s
         }
         else
         {
-            cnf.reset(new rolling_file_writer(rfwm->get_formatter(),
+            cnf.reset(new rolling_file_writer(rfwm->get_name(),
+                                              rfwm->get_formatter(),
                                               rfwm->get_file_name(),
                                               rfwm->get_file_roller(),
                                               rfwm->get_file_roll_trigger()));

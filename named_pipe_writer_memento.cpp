@@ -25,7 +25,7 @@ named_pipe_writer_memento::named_pipe_writer_memento(configurator& cfg)
     set_status_origin("named_pipe_writer_memento");
     cfg.get_security_policy().set_text("named_pipe_writer::flush", 5);
     set_handler("flush", [this] (const std::string& val) { flush_ = boolean_value(validate("named_pipe_writer::flush", val)); });
-    set_handler("name", [this] (const std::string& val) { name_ = validate("named_pipe_writer::name", val); });
+    set_handler("pipe_name", [this] (const std::string& val) { pipe_name_ = validate("named_pipe_writer::pipe_name", val); });
 }
 
 }

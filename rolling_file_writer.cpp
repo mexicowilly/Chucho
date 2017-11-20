@@ -20,11 +20,11 @@
 namespace chucho
 {
 
-// TODO: Support fowarded constructors when Microsoft supports it
-rolling_file_writer::rolling_file_writer(std::shared_ptr<formatter> fmt,
+rolling_file_writer::rolling_file_writer(const std::string& name,
+                                         std::shared_ptr<formatter> fmt,
                                          std::shared_ptr<file_roller> roller,
                                          std::shared_ptr<file_roll_trigger> trigger)
-    : file_writer(fmt, file_writer::on_start::APPEND, true),
+    : file_writer(name, fmt, file_writer::on_start::APPEND, true),
       roller_(roller),
       trigger_(trigger)
 {
@@ -35,37 +35,39 @@ rolling_file_writer::rolling_file_writer(std::shared_ptr<formatter> fmt,
     open(fn);
 }
 
-// TODO: Support fowarded constructors when Microsoft supports it
-rolling_file_writer::rolling_file_writer(std::shared_ptr<formatter> fmt,
+rolling_file_writer::rolling_file_writer(const std::string& name,
+                                         std::shared_ptr<formatter> fmt,
                                          const std::string& file_name,
                                          std::shared_ptr<file_roller> roller,
                                          std::shared_ptr<file_roll_trigger> trigger)
-    : file_writer(fmt, file_name, file_writer::on_start::APPEND, true),
+    : file_writer(name, fmt, file_name, file_writer::on_start::APPEND, true),
       roller_(roller),
       trigger_(trigger)
 {
     init();
 }
 
-rolling_file_writer::rolling_file_writer(std::shared_ptr<formatter> fmt,
+rolling_file_writer::rolling_file_writer(const std::string& name,
+                                         std::shared_ptr<formatter> fmt,
                                          const std::string& file_name,
                                          on_start start,
                                          bool flush,
                                          std::shared_ptr<file_roller> roller,
                                          std::shared_ptr<file_roll_trigger> trigger)
-    : file_writer(fmt, file_name, start, flush),
+    : file_writer(name, fmt, file_name, start, flush),
       roller_(roller),
       trigger_(trigger)
 {
     init();
 }
 
-rolling_file_writer::rolling_file_writer(std::shared_ptr<formatter> fmt,
+rolling_file_writer::rolling_file_writer(const std::string& name,
+                                         std::shared_ptr<formatter> fmt,
                                          on_start start,
                                          bool flush,
                                          std::shared_ptr<file_roller> roller,
                                          std::shared_ptr<file_roll_trigger> trigger)
-    : file_writer(fmt, start, flush),
+    : file_writer(name, fmt, start, flush),
       roller_(roller),
       trigger_(trigger)
 {

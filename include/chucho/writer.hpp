@@ -62,14 +62,11 @@ public:
      *        std::shared_ptr
      */
     writer(const std::string& name, std::shared_ptr<formatter> fmt);
-    writer(writer&& wrt) = default;
     /**
      * Destroy a writer.
      */
     virtual ~writer();
     //@}
-
-    bool operator< (const writer& wrt) const;
 
     /**
      * Add a filter. Filters are visited in the order in which they 
@@ -97,6 +94,11 @@ public:
      * @return the formatter
      */
     std::shared_ptr<formatter> get_formatter() const;
+    /**
+     * Return this writer's name.
+     *
+     * @return the name
+     */
     const std::string& get_name() const;
     /**
      * Write an event. This non-virtual method takes care of all the 
@@ -139,11 +141,6 @@ private:
     bool i_am_writing_;
     std::string name_;
 };
-
-inline bool writer::operator< (const writer& wrt) const
-{
-    return name_ < wrt.name_;
-}
 
 inline std::shared_ptr<formatter> writer::get_formatter() const
 {

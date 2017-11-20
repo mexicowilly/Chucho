@@ -70,7 +70,8 @@ public:
     //@{
     /**
      * Construct a rolling_file_writer.
-     * 
+     *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param roller the roller
      * @param trigger the optional trigger
@@ -81,12 +82,14 @@ public:
      * @throw std::invalid_argument if the trigger cannot be 
      *        resolved
      */
-    rolling_file_writer(std::shared_ptr<formatter> fmt,
+    rolling_file_writer(const std::string& name,
+                        std::shared_ptr<formatter> fmt,
                         std::shared_ptr<file_roller> roller,
                         std::shared_ptr<file_roll_trigger> trigger = std::shared_ptr<file_roll_trigger>());
     /**
      * Construct a rolling_file_writer.
      * 
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param file_name the active file name
      * @param roller the roller
@@ -98,13 +101,15 @@ public:
      * @throw std::invalid_argument if the trigger cannot be 
      *        resolved
      */
-    rolling_file_writer(std::shared_ptr<formatter> fmt,
+    rolling_file_writer(const std::string& name,
+                        std::shared_ptr<formatter> fmt,
                         const std::string& file_name,
                         std::shared_ptr<file_roller> roller,
                         std::shared_ptr<file_roll_trigger> trigger = std::shared_ptr<file_roll_trigger>());
     /**
      * Construct a rolling_file_writer.
      * 
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param file_name the active file name
      * @param start action to take on start
@@ -118,7 +123,8 @@ public:
      * @throw std::invalid_argument if the trigger cannot be 
      *        resolved
      */
-    rolling_file_writer(std::shared_ptr<formatter> fmt,
+    rolling_file_writer(const std::string& name,
+                        std::shared_ptr<formatter> fmt,
                         const std::string& file_name,
                         on_start start,
                         bool flush,
@@ -127,6 +133,7 @@ public:
     /**
      * Construct a rolling_file_writer.
      * 
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param start action to take on start
      * @param flush whether to flush the 
@@ -139,7 +146,8 @@ public:
      * @throw std::invalid_argument if the trigger cannot be 
      *        resolved
      */
-    rolling_file_writer(std::shared_ptr<formatter> fmt,
+    rolling_file_writer(const std::string& name,
+                        std::shared_ptr<formatter> fmt,
                         on_start start,
                         bool flush,
                         std::shared_ptr<file_roller> roller,

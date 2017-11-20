@@ -42,12 +42,13 @@ public:
     //@{
     /**
      * Construct a cerr_writer.
-     * 
+     *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @throw std::invalid_argument if fmt is an uninitialized 
      *        std::shared_ptr
      */
-    cerr_writer(std::shared_ptr<formatter> fmt);
+    cerr_writer(const std::string& name, std::shared_ptr<formatter> fmt);
     //@}
 };
 

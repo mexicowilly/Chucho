@@ -33,16 +33,19 @@ std::shared_ptr<configurable> pipe_writer_factory::create_configurable(std::shar
     std::shared_ptr<configurable> cnf;
     auto pwm = std::dynamic_pointer_cast<pipe_writer_memento>(mnto);
     assert(pwm);
+    if (pwm->get_name().empty())
+        throw exception("pipe_writer_factory: The name is not set");
     if (!pwm->get_formatter())
         throw exception("pipe_writer_factory: The writer's formatter is not set");
     if (pwm->get_flush())
     {
-        cnf.reset(new pipe_writer(pwm->get_formatter(),
+        cnf.reset(new pipe_writer(pwm->get_name(),
+                                  pwm->get_formatter(),
                                   *pwm->get_flush()));
     }
     else
     {
-        cnf.reset(new pipe_writer(pwm->get_formatter()));
+        cnf.reset(new pipe_writer(pwm->get_name(), pwm->get_formatter()));
     }
     set_filters(cnf, pwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
@@ -54,4 +57,5 @@ std::shared_ptr<memento> pipe_writer_factory::create_memento(configurator& cfg)
     std::shared_ptr<memento> mnto = std::make_shared<pipe_writer_memento>(cfg);
     return mnto;
 }
+
 }

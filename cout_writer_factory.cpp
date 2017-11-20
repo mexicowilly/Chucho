@@ -32,9 +32,11 @@ std::shared_ptr<configurable> cout_writer_factory::create_configurable(std::shar
 {
     auto cwm = std::dynamic_pointer_cast<writer_memento>(mnto);
     assert(cwm);
+    if (cwm->get_name().empty())
+        throw exception("cout_writer_factory: The name is not set");
     if (!cwm->get_formatter())
         throw exception("cout_writer_factory: The writer's formatter is not set");
-    std::shared_ptr<configurable> cnf(new cout_writer(cwm->get_formatter()));
+    std::shared_ptr<configurable> cnf(new cout_writer(cwm->get_name(), cwm->get_formatter()));
     set_filters(cnf, cwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
     return cnf;

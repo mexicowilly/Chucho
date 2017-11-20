@@ -33,11 +33,14 @@ std::shared_ptr<configurable> door_writer_factory::create_configurable(std::shar
     std::shared_ptr<configurable> cnf;
     auto dwm = std::dynamic_pointer_cast<door_writer_memento>(mnto);
     assert(dwm);
+    if (dwm->get_name().empty())
+        throw exception("door_writer_factory: The name is not set");
     if (!dwm->get_formatter())
         throw exception("door_writer_factory: The writer's formatter is not set");
     if (dwm->get_file_name().empty())
         throw exception("door_writer_factory: The door's file name must be set");
-    cnf.reset(new door_writer(dwm->get_formatter(),
+    cnf.reset(new door_writer(dwm->get_name(),
+                              dwm->get_formatter(),
                               dwm->get_file_name()));
     set_filters(cnf, dwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
