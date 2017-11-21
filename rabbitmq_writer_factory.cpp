@@ -33,6 +33,8 @@ std::shared_ptr<configurable> rabbitmq_writer_factory::create_configurable(std::
 {
     auto am = std::dynamic_pointer_cast<rabbitmq_writer_memento>(mnto);
     assert(am);
+    if (am->get_name().empty())
+        throw exception("rabbitmq_writer_factory: The name is not set");
     if (!am->get_formatter())
         throw exception("rabbitmq_writer_factory: The writer's formatter is not set");
     if (!am->get_serializer())
@@ -42,7 +44,8 @@ std::shared_ptr<configurable> rabbitmq_writer_factory::create_configurable(std::
     optional<std::string> rk;
     if (!am->get_routing_key().empty())
         rk = am->get_routing_key();
-    auto aw = std::make_shared<rabbitmq_writer>(am->get_formatter(),
+    auto aw = std::make_shared<rabbitmq_writer>(am->get_name(),
+                                                am->get_formatter(),
                                                 am->get_serializer(),
                                                 am->get_coalesce_max(),
                                                 am->get_compressor(),

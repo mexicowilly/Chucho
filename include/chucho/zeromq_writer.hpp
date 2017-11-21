@@ -41,7 +41,8 @@ public:
      */
     /**
      * Construct a ZeroMQ writer.
-     * 
+     *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param ser the serializer
      * @param endpoint the ZeroMQ endpoint to which to bind the publishing socket
@@ -49,13 +50,15 @@ public:
      * prefix is provided, then each event will be published as a two-part message,
      * first prefix, then event.
      */
-    zeromq_writer(std::shared_ptr<formatter> fmt,
+    zeromq_writer(const std::string& name,
+                  std::shared_ptr<formatter> fmt,
                   std::shared_ptr<serializer> ser,
                   const std::string& endpoint,
                   const std::vector<std::uint8_t>& prefix = std::vector<std::uint8_t>());
     /**
      * Construct a ZeroMQ writer.
      *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param ser the serializer
      * @param coalesce_max the maximum number of events to write in a single ZermoMQ message
@@ -64,7 +67,8 @@ public:
      * prefix is provided, then each event will be published as a two-part message,
      * first prefix, then event.
      */
-    zeromq_writer(std::shared_ptr<formatter> fmt,
+    zeromq_writer(const std::string& name,
+                  std::shared_ptr<formatter> fmt,
                   std::shared_ptr<serializer> ser,
                   std::size_t coalesce_max,
                   const std::string& endpoint,
@@ -72,6 +76,7 @@ public:
     /**
      * Construct a ZeroMQ writer.
      * 
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param ser the serializer
      * @param cmp the compressor
@@ -80,7 +85,8 @@ public:
      * prefix is provided, then each event will be published as a two-part message,
      * first prefix, then event.
      */
-    zeromq_writer(std::shared_ptr<formatter> fmt,
+    zeromq_writer(const std::string& name,
+                  std::shared_ptr<formatter> fmt,
                   std::shared_ptr<serializer> ser,
                   std::shared_ptr<compressor> cmp,
                   const std::string& endpoint,
@@ -88,6 +94,7 @@ public:
     /**
      * Construct a ZeroMQ writer.
      *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param ser the serializer
      * @param coalesce_max the maximum number of events to write in a single ZermoMQ message
@@ -97,7 +104,8 @@ public:
      * prefix is provided, then each event will be published as a two-part message,
      * first prefix, then event.
      */
-    zeromq_writer(std::shared_ptr<formatter> fmt,
+    zeromq_writer(const std::string& name,
+                  std::shared_ptr<formatter> fmt,
                   std::shared_ptr<serializer> ser,
                   std::size_t coalesce_max,
                   std::shared_ptr<compressor> cmp,

@@ -21,10 +21,11 @@ namespace chucho
 
 const std::size_t message_queue_writer::DEFAULT_COALESCE_MAX = 25;
 
-message_queue_writer::message_queue_writer(std::shared_ptr<formatter> fmt,
+message_queue_writer::message_queue_writer(const std::string& name,
+                                           std::shared_ptr<formatter> fmt,
                                            std::shared_ptr<serializer> ser,
                                            std::shared_ptr<compressor> cmp)
-    : writer(fmt),
+    : writer(name, fmt),
       serializer_(ser),
       compressor_(cmp),
       coalesce_max_(DEFAULT_COALESCE_MAX),
@@ -32,11 +33,12 @@ message_queue_writer::message_queue_writer(std::shared_ptr<formatter> fmt,
 {
 }
 
-message_queue_writer::message_queue_writer(std::shared_ptr<formatter> fmt,
+message_queue_writer::message_queue_writer(const std::string& name,
+                                           std::shared_ptr<formatter> fmt,
                                            std::shared_ptr<serializer> ser,
                                            std::size_t coalesce_max,
                                            std::shared_ptr<compressor> cmp)
-    : writer(fmt),
+    : writer(name, fmt),
       serializer_(ser),
       compressor_(cmp),
       coalesce_max_(coalesce_max),

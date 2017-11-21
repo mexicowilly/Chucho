@@ -39,14 +39,16 @@ public:
     */
     /**
      * Construct a RabbitMQ writer.
-     * 
+     *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param ser the serializer
      * @param url the URL to the RabbitMQ instance
      * @param exchange the exchange to which to publish
      * @param routing_key the routing key
      */
-    rabbitmq_writer(std::shared_ptr<formatter> fmt,
+    rabbitmq_writer(const std::string& name,
+                    std::shared_ptr<formatter> fmt,
                     std::shared_ptr<serializer> ser,
                     const std::string& url,
                     const std::string& exchange,
@@ -54,6 +56,7 @@ public:
     /**
      * Construct a RabbitMQ writer.
      *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param ser the serializer
      * @param coalesce_max the maximum number of events to write in a single RabbitMQ message
@@ -61,7 +64,8 @@ public:
      * @param exchange the exchange to which to publish
      * @param routing_key the routing key
      */
-    rabbitmq_writer(std::shared_ptr<formatter> fmt,
+    rabbitmq_writer(const std::string& name,
+                    std::shared_ptr<formatter> fmt,
                     std::shared_ptr<serializer> ser,
                     std::size_t coalesce_max,
                     const std::string& url,
@@ -70,6 +74,7 @@ public:
     /**
      * Construct a RabbitMQ writer.
      * 
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param ser the serializer
      * @param cmp the compressor
@@ -77,7 +82,8 @@ public:
      * @param exchange the exchange to which to publish
      * @param routing_key the routing key
      */
-    rabbitmq_writer(std::shared_ptr<formatter> fmt,
+    rabbitmq_writer(const std::string& name,
+                    std::shared_ptr<formatter> fmt,
                     std::shared_ptr<serializer> ser,
                     std::shared_ptr<compressor> cmp,
                     const std::string& url,
@@ -86,6 +92,7 @@ public:
     /**
      * Construct a RabbitMQ writer.
      *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param ser the serializer
      * @param coalesce_max the maximum number of events to write in a single RabbitMQ message
@@ -94,7 +101,8 @@ public:
      * @param exchange the exchange to which to publish
      * @param routing_key the routing key
      */
-    rabbitmq_writer(std::shared_ptr<formatter> fmt,
+    rabbitmq_writer(const std::string& name,
+                    std::shared_ptr<formatter> fmt,
                     std::shared_ptr<serializer> ser,
                     std::size_t coalesce_max,
                     std::shared_ptr<compressor> cmp,

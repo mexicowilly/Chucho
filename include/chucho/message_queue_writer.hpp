@@ -95,23 +95,27 @@ protected:
      */
     /**
      * Construct a message queue writer.
-     * 
+     *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param ser the serializer
      * @param cmp the compressor
      */
-    message_queue_writer(std::shared_ptr<formatter> fmt,
+    message_queue_writer(const std::string& name,
+                         std::shared_ptr<formatter> fmt,
                          std::shared_ptr<serializer> ser,
                          std::shared_ptr<compressor> cmp = std::shared_ptr<compressor>());
     /**
      * Construct a message queue writer.
-     * 
+     *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param ser the serializer
      * @param coalesce_max the maximum number of events to collect before sending
      * @param cmp the compressor
      */
-    message_queue_writer(std::shared_ptr<formatter> fmt,
+    message_queue_writer(const std::string& name,
+                         std::shared_ptr<formatter> fmt,
                          std::shared_ptr<serializer> ser,
                          std::size_t coalesce_max,
                          std::shared_ptr<compressor> cmp = std::shared_ptr<compressor>());

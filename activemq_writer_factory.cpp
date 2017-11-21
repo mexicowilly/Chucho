@@ -32,6 +32,8 @@ std::shared_ptr<configurable> activemq_writer_factory::create_configurable(std::
 {
     auto am = std::dynamic_pointer_cast<activemq_writer_memento>(mnto);
     assert(am);
+    if (am->get_name().empty())
+        throw exception("activemq_writer_factory: The name is not set");
     if (!am->get_formatter())
         throw exception("activemq_writer_factory: The writer's formatter is not set");
     if (!am->get_serializer())
@@ -42,7 +44,8 @@ std::shared_ptr<configurable> activemq_writer_factory::create_configurable(std::
         throw exception("activemq_writer_factory: The consumer type is not set");
     if (am->get_topic_or_queue().empty())
         throw exception("activemq_writer_factory: The topic or queue name is not set");
-    auto aw = std::make_shared<activemq_writer>(am->get_formatter(),
+    auto aw = std::make_shared<activemq_writer>(am->get_name(),
+                                                am->get_formatter(),
                                                 am->get_serializer(),
                                                 am->get_coalesce_max(),
                                                 am->get_compressor(),

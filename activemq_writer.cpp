@@ -23,12 +23,13 @@
 namespace chucho
 {
 
-activemq_writer::activemq_writer(std::shared_ptr<formatter> fmt,
+activemq_writer::activemq_writer(const std::string& name,
+                                 std::shared_ptr<formatter> fmt,
                                  std::shared_ptr<serializer> ser,
                                  const std::string& broker,
                                  consumer_type tp,
                                  const std::string& topic_or_queue)
-    : message_queue_writer(fmt, ser),
+    : message_queue_writer(name, fmt, ser),
       broker_(broker),
       type_(tp),
       topic_or_queue_(topic_or_queue),
@@ -40,13 +41,14 @@ activemq_writer::activemq_writer(std::shared_ptr<formatter> fmt,
     init();
 }
 
-activemq_writer::activemq_writer(std::shared_ptr<formatter> fmt,
+activemq_writer::activemq_writer(const std::string& name,
+                                 std::shared_ptr<formatter> fmt,
                                  std::shared_ptr<serializer> ser,
                                  std::size_t coalesce_max,
                                  const std::string& broker,
                                  consumer_type tp,
                                  const std::string& topic_or_queue)
-    : message_queue_writer(fmt, ser, coalesce_max),
+    : message_queue_writer(name, fmt, ser, coalesce_max),
       broker_(broker),
       type_(tp),
       topic_or_queue_(topic_or_queue),
@@ -58,7 +60,8 @@ activemq_writer::activemq_writer(std::shared_ptr<formatter> fmt,
     init();
 }
 
-activemq_writer::activemq_writer(std::shared_ptr<formatter> fmt,
+activemq_writer::activemq_writer(const std::string& name,
+                                 std::shared_ptr<formatter> fmt,
                                  std::shared_ptr<serializer> ser,
                                  std::shared_ptr<compressor> cmp,
                                  const std::string& broker,
@@ -76,7 +79,8 @@ activemq_writer::activemq_writer(std::shared_ptr<formatter> fmt,
     init();
 }
 
-activemq_writer::activemq_writer(std::shared_ptr<formatter> fmt,
+activemq_writer::activemq_writer(const std::string& name,
+                                 std::shared_ptr<formatter> fmt,
                                  std::shared_ptr<serializer> ser,
                                  std::size_t coalesce_max,
                                  std::shared_ptr<compressor> cmp,

@@ -33,13 +33,16 @@ std::shared_ptr<configurable> zeromq_writer_factory::create_configurable(std::sh
 {
     auto zm = std::dynamic_pointer_cast<zeromq_writer_memento>(mnto);
     assert(zm);
+    if (zm->get_name().empty())
+        throw exception("zeromq_writer_factory: The name is not set");
     if (!zm->get_formatter())
         throw exception("zeromq_writer_factory: The writer's formatter is not set");
     if (!zm->get_serializer())
         throw exception("zeromq_writer_factory: The writer's serializer is not set");
     if (zm->get_endpoint().empty())
         throw exception("zeromq_writer_factory: The endpoint is not set");
-    auto zw = std::make_shared<zeromq_writer>(zm->get_formatter(),
+    auto zw = std::make_shared<zeromq_writer>(zm->get_name(),
+                                              zm->get_formatter(),
                                               zm->get_serializer(),
                                               zm->get_coalesce_max(),
                                               zm->get_compressor(),

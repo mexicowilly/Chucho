@@ -39,48 +39,52 @@ void* get_zmq_context()
 namespace chucho
 {
 
-zeromq_writer::zeromq_writer(std::shared_ptr<formatter> fmt,
+zeromq_writer::zeromq_writer(const std::string& name,
+                             std::shared_ptr<formatter> fmt,
                              std::shared_ptr<serializer> ser,
                              const std::string& endpoint,
                              const std::vector<std::uint8_t>& prefix)
-    : message_queue_writer(fmt, ser),
+    : message_queue_writer(name, fmt, ser),
       endpoint_(endpoint),
       prefix_(prefix)
 {
     init();
 }
 
-zeromq_writer::zeromq_writer(std::shared_ptr<formatter> fmt,
+zeromq_writer::zeromq_writer(const std::string& name,
+                             std::shared_ptr<formatter> fmt,
                              std::shared_ptr<serializer> ser,
                              std::size_t coalesce_max,
                              const std::string& endpoint,
                              const std::vector<std::uint8_t>& prefix)
-    : message_queue_writer(fmt, ser, coalesce_max),
+    : message_queue_writer(name, fmt, ser, coalesce_max),
       endpoint_(endpoint),
       prefix_(prefix)
 {
     init();
 }
 
-zeromq_writer::zeromq_writer(std::shared_ptr<formatter> fmt,
+zeromq_writer::zeromq_writer(const std::string& name,
+                             std::shared_ptr<formatter> fmt,
                              std::shared_ptr<serializer> ser,
                              std::shared_ptr<compressor> cmp,
                              const std::string& endpoint,
                              const std::vector<std::uint8_t>& prefix)
-    : message_queue_writer(fmt, ser, cmp),
+    : message_queue_writer(name, fmt, ser, cmp),
       endpoint_(endpoint),
       prefix_(prefix)
 {
     init();
 }
 
-zeromq_writer::zeromq_writer(std::shared_ptr<formatter> fmt,
+zeromq_writer::zeromq_writer(const std::string& name,
+                             std::shared_ptr<formatter> fmt,
                              std::shared_ptr<serializer> ser,
                              std::size_t coalesce_max,
                              std::shared_ptr<compressor> cmp,
                              const std::string& endpoint,
                              const std::vector<std::uint8_t>& prefix)
-    : message_queue_writer(fmt, ser, coalesce_max, cmp),
+    : message_queue_writer(name, fmt, ser, coalesce_max, cmp),
       endpoint_(endpoint),
       prefix_(prefix)
 {
