@@ -31,10 +31,11 @@ namespace chucho
 const std::uint16_t remote_writer::DEFAULT_PORT(21012);
 const std::size_t remote_writer::DEFAULT_UNSENT_CACHE_MAX(1000);
 
-remote_writer::remote_writer(const std::string& host,
+remote_writer::remote_writer(const std::string& name,
+                             const std::string& host,
                              std::uint16_t port,
                              std::size_t unsent_cache_max)
-    : writer(std::make_shared<yaml_formatter>()),
+    : writer(name, std::make_shared<yaml_formatter>()),
       host_(host),
       port_(port),
       unsent_cache_max_(unsent_cache_max)

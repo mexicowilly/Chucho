@@ -97,9 +97,10 @@ DWORD query_registry(HKEY key, const char* const name, std::vector<BYTE>& bytes)
 namespace chucho
 {
 
-windows_event_log_writer::windows_event_log_writer(std::shared_ptr<formatter> fmt,
+windows_event_log_writer::windows_event_log_writer(const std::string& name,
+                                                   std::shared_ptr<formatter> fmt,
                                                    const std::string& source)
-    : writer(fmt),
+    : writer(name, fmt),
       handle_(nullptr),
       user_(nullptr),
       log_("Application"),
@@ -108,10 +109,11 @@ windows_event_log_writer::windows_event_log_writer(std::shared_ptr<formatter> fm
     init();
 }
 
-windows_event_log_writer::windows_event_log_writer(std::shared_ptr<formatter> fmt,
+windows_event_log_writer::windows_event_log_writer(const std::string& name,
+                                                   std::shared_ptr<formatter> fmt,
                                                    const std::string& log,
                                                    const std::string& source)
-    : writer(fmt),
+    : writer(name, fmt),
       handle_(nullptr),
       user_(nullptr),
       log_(log),
@@ -120,11 +122,12 @@ windows_event_log_writer::windows_event_log_writer(std::shared_ptr<formatter> fm
     init();
 }
 
-windows_event_log_writer::windows_event_log_writer(std::shared_ptr<formatter> fmt,
+windows_event_log_writer::windows_event_log_writer(const std::string& name,
+                                                   std::shared_ptr<formatter> fmt,
                                                    const std::string& log,
                                                    const std::string& source,
                                                    const std::string& host)
-    : writer(fmt),
+    : writer(name, fmt),
       handle_(nullptr),
       user_(nullptr),
       log_(log),

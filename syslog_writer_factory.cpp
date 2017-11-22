@@ -34,27 +34,32 @@ std::shared_ptr<configurable> syslog_writer_factory::create_configurable(std::sh
     std::shared_ptr<configurable> cnf;
     auto swm = std::dynamic_pointer_cast<syslog_writer_memento>(mnto);
     assert(swm);
+    if (swm->get_name().empty())
+        throw exception("syslog_writer_factory: The name is not set");
     if (!swm->get_formatter())
         throw exception("syslog_writer_factory: The writer's formatter is not set");
     if (!swm->get_facility())
         throw exception("syslog_writer_factory: The writer's facility is not set");
     if (swm->get_host_name().empty())
     {
-        cnf.reset(new syslog_writer(swm->get_formatter(),
+        cnf.reset(new syslog_writer(swm->get_name(),
+                                    swm->get_formatter(),
                                     *swm->get_facility()));
     }
     else
     {
         if (swm->get_port())
         {
-            cnf.reset(new syslog_writer(swm->get_formatter(),
+            cnf.reset(new syslog_writer(swm->get_name(),
+                                        swm->get_formatter(),
                                         *swm->get_facility(),
                                         swm->get_host_name(),
                                         *swm->get_port()));
         }
         else
         {
-            cnf.reset(new syslog_writer(swm->get_formatter(),
+            cnf.reset(new syslog_writer(swm->get_name(),
+                                        swm->get_formatter(),
                                         *swm->get_facility(),
                                         swm->get_host_name()));
         }

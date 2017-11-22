@@ -33,22 +33,27 @@ std::shared_ptr<configurable> windows_event_log_writer_factory::create_configura
     std::shared_ptr<configurable> cnf;
     auto welwm = std::dynamic_pointer_cast<windows_event_log_writer_memento>(mnto);
     assert(welwm);
+    if (welwm->get_name().empty())
+        throw exception("windows_event_log_writer_factory: The name is not set");
     if (!welwm->get_formatter())
         throw exception("windows_event_log_writer_factory: The writer's formatter is not set");
     if (welwm->get_log().empty() && welwm->get_host().empty())
     {
-        cnf.reset(new windows_event_log_writer(welwm->get_formatter(),
+        cnf.reset(new windows_event_log_writer(welwm->get_name(),
+                                               welwm->get_formatter(),
                                                welwm->get_source()));
     }
     else if (welwm->get_host().empty())
     {
-        cnf.reset(new windows_event_log_writer(welwm->get_formatter(),
+        cnf.reset(new windows_event_log_writer(welwm->get_name(),
+                                               welwm->get_formatter(),
                                                welwm->get_log(),
                                                welwm->get_source()));
     }
     else
     {
-        cnf.reset(new windows_event_log_writer(welwm->get_formatter(),
+        cnf.reset(new windows_event_log_writer(welwm->get_name(),
+                                               welwm->get_formatter(),
                                                welwm->get_log(),
                                                welwm->get_source(),
                                                welwm->get_host()));

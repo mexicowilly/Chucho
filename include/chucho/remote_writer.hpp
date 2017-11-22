@@ -83,7 +83,8 @@ public:
     //@{
     /**
      * Construct a remote_writer.
-     * 
+     *
+     * @param name the name of this writer
      * @param host the host on which the chucho server is running
      * @param port the port on which the chucho server is listening
      * @param unsent_cache_max the maximum size of the unsent event 
@@ -93,7 +94,8 @@ public:
      * @throw std::invalid_argument if the host name is empty
      * @throw std::invalid_argument if the port is zero
      */
-    remote_writer(const std::string& host,
+    remote_writer(const std::string& name,
+                  const std::string& host,
                   std::uint16_t port = DEFAULT_PORT,
                   std::size_t unsent_cache_max = DEFAULT_UNSENT_CACHE_MAX);
     /**

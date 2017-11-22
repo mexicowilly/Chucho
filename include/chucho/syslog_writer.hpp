@@ -55,7 +55,8 @@ public:
      *  
      * If the system does not support the syslog C interface, then 
      * UDP over a socket is used to connect to the local host. 
-     * 
+     *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param fcl the syslog facility
      * @throw std::invalid_argument if fmt is an uninitialized 
@@ -63,12 +64,14 @@ public:
      * @throw exception if the connection to the syslog cannot be 
      *        established
      */
-    syslog_writer(std::shared_ptr<formatter> fmt,
+    syslog_writer(const std::string& name,
+                  std::shared_ptr<formatter> fmt,
                   syslog::facility fcl);
     /**
      * Construct a syslog_writer. When this constructor is used, 
      * then syslog messages are sent over a UDP socket. 
      * 
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param fcl the syslog facility
      * @param host the syslog host 
@@ -78,7 +81,8 @@ public:
      * @throw exception if the connection to the syslog cannot be 
      *        established
      */
-    syslog_writer(std::shared_ptr<formatter> fmt,
+    syslog_writer(const std::string& name,
+                  std::shared_ptr<formatter> fmt,
                   syslog::facility fcl,
                   const std::string& host,
                   std::uint16_t port = syslog::DEFAULT_PORT);

@@ -47,7 +47,8 @@ public:
     //@{
     /**
      * Construct a writer.
-     * 
+     *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param source the name of the source, which becomes a 
      *               registry key
@@ -57,11 +58,13 @@ public:
      * @throw exception if there is a problem registering the event 
      *        source
      */
-    windows_event_log_writer(std::shared_ptr<formatter> fmt,
+    windows_event_log_writer(const std::string& name,
+                             std::shared_ptr<formatter> fmt,
                              const std::string& source);
     /**
      * Construct a writer.
      * 
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param log the name of the log, which becomes a registry key
      * @param source the name of the source, which becomes a 
@@ -72,12 +75,14 @@ public:
      * @throw exception if there is a problem registering the event 
      *        source
      */
-    windows_event_log_writer(std::shared_ptr<formatter> fmt,
+    windows_event_log_writer(const std::string& name,
+                             std::shared_ptr<formatter> fmt,
                              const std::string& log,
                              const std::string& source);
     /**
      * Construct a writer.
      * 
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param log the name of the log, which becomes a registry key
      * @param source the name of the source, which becomes a 
@@ -89,7 +94,8 @@ public:
      * @throw exception if there is a problem registering the event 
      *        source
      */
-    windows_event_log_writer(std::shared_ptr<formatter> fmt,
+    windows_event_log_writer(const std::string& name,
+                             std::shared_ptr<formatter> fmt,
                              const std::string& log,
                              const std::string& source,
                              const std::string& host);
