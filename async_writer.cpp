@@ -55,13 +55,14 @@ async_writer::async_writer(const std::string& name,
         worker_.reset(new std::thread(std::bind(&async_writer::thread_main, this)));
 }
 
-async_writer::async_writer(std::shared_ptr<writer> wrt,
+async_writer::async_writer(const std::string& name,
+                           std::shared_ptr<writer> wrt,
                            std::size_t capacity,
                            std::shared_ptr<level> discard_threshold,
                            bool flush_on_destruct,
                            std::function<void()> enter_thread_cb,
                            std::function<void()> leave_thread_cb)
-    : writer(std::make_shared<noop_formatter>()),
+    : writer(name, std::make_shared<noop_formatter>()),
       writer_(wrt),
       capacity_(capacity),
       discard_threshold_(discard_threshold),

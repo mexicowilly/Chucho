@@ -121,7 +121,7 @@ void set_default_config(std::shared_ptr<chucho::logger> root_logger)
     {
         std::shared_ptr<chucho::formatter> fmt(
             new chucho::pattern_formatter("%d{%H:%M:%S.%q} %-5p %.36c - %m%n"));
-        std::shared_ptr<chucho::writer> wrt(new chucho::cout_writer(fmt));
+        std::shared_ptr<chucho::writer> wrt(new chucho::cout_writer("chucho::cout_writer", fmt));
         root_logger->add_writer(wrt);
     }
 }

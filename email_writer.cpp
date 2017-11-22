@@ -103,7 +103,8 @@ email_writer::email_writer(const std::string& name,
     init();
 }
 
-email_writer::email_writer(std::shared_ptr<formatter> fmt,
+email_writer::email_writer(const std::string& name,
+                           std::shared_ptr<formatter> fmt,
                            const std::string& host,
                            connection_type connect,
                            const std::vector<std::string>& to,
@@ -114,7 +115,7 @@ email_writer::email_writer(std::shared_ptr<formatter> fmt,
                            const std::string& password,
                            std::uint16_t port,
                            std::size_t buffer_size)
-    : writer(fmt),
+    : writer(name, fmt),
       evts_(buffer_size),
       curl_(nullptr),
       trigger_(trigger),

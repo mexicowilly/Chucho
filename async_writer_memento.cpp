@@ -31,7 +31,7 @@ async_writer_memento::async_writer_memento(configurator& cfg)
     set_handler("discard_threshold", [this] (const std::string& name) { discard_threshold_ = level::from_text(validate("async_writer::discard_threshold", name)); });
     set_handler("queue_capacity", [this] (const std::string& cap) { queue_capacity_ = validate("async_writer::queue_capacity", std::stoul(validate("async_writer::queue_capacity(text)", cap))); });
     set_handler("flush_on_destruct", [this] (const std::string& val) { flush_on_destruct_ = boolean_value(validate("async_writer::flush_on_destruct", val)); });
-    set_handler("name", [this] (const std::string& name) { name_ = validate("async_writer::name", name)); });
+    set_handler("name", [this] (const std::string& name) { name_ = validate("async_writer::name", name); });
 }
 
 void async_writer_memento::handle(std::shared_ptr<configurable> cnf)

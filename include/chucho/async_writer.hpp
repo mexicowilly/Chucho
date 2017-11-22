@@ -133,7 +133,8 @@ protected:
 private:
     friend class mysql_writer;
 
-    CHUCHO_NO_EXPORT async_writer(std::shared_ptr<writer> wrt,
+    CHUCHO_NO_EXPORT async_writer(const std::string& name,
+                                  std::shared_ptr<writer> wrt,
                                   std::size_t capacity,
                                   std::shared_ptr<level> discard_threshold,
                                   bool flush_on_destruct,

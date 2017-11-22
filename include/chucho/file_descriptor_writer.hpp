@@ -113,12 +113,14 @@ protected:
     /**
      * Construct a file descriptor writer without an associated
      * file descriptor. This constructor is only used by subclasses.
-     * 
+     *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param flsh whether to flush the buffer after every event has
      * been written
      */
-    file_descriptor_writer(std::shared_ptr<formatter> fmt,
+    file_descriptor_writer(const std::string& name,
+                           std::shared_ptr<formatter> fmt,
                            bool flsh = true);
     /**
      * @}
