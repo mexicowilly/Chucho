@@ -21,7 +21,8 @@ namespace chucho
 {
 
 async_writer_memento::async_writer_memento(configurator& cfg)
-    : memento(cfg)
+    : memento(cfg),
+      name_("async_writer")
 {
     set_status_origin("async_writer_memento");
     cfg.get_security_policy().set_integer("async_writer::queue_capacity", 10, 32 * 1024);

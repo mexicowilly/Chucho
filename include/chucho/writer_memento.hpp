@@ -67,6 +67,11 @@ public:
      * @return the formatter
      */
     std::shared_ptr<formatter> get_formatter() const;
+    /**
+     * Return the name of the writer.
+     *
+     * @return the name
+     */
     const std::string& get_name() const;
     virtual void handle(std::shared_ptr<configurable> cnf) override;
 

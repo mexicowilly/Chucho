@@ -113,7 +113,7 @@ logger::logger(const std::string& name, std::shared_ptr<level> lvl)
 
 logger::~logger()
 {
-    for (auto w : writers_)
+    for (auto& w : writers_)
     {
         try
         {
@@ -126,12 +126,12 @@ logger::~logger()
     }
 }
 
-void logger::add_writer(std::shared_ptr<writer> wrt)
+void logger::add_writer(std::unique_ptr<writer>&& wrt)
 {
     if (!wrt)
-        throw std::invalid_argument("The writer cannot be an uninitialized std::shared_ptr");
+        throw std::invalid_argument("The writer cannot be an uninitialized std::unique_ptr");
     std::lock_guard<std::recursive_mutex> lg(guard_);
-    writers_.push_back(wrt);
+    writers_.insert(std::move(wrt));
 }
 
 std::shared_ptr<logger> logger::get(const std::string& name)
@@ -184,10 +184,13 @@ std::shared_ptr<level> logger::get_level()
     return level_;
 }
 
-std::vector<std::shared_ptr<writer>> logger::get_writers()
+std::vector<std::string> logger::get_writer_names()
 {
+    std::vector<std::string> result;
     std::lock_guard<std::recursive_mutex> lg(guard_);
-    return writers_;
+    for (const auto& w : writers_)
+        result.push_back(w->get_name());
+    return result;
 }
 
 void logger::initialize()
@@ -246,10 +249,12 @@ void logger::remove_unused_loggers()
         sd.all_loggers_.erase(tgt);
 }
 
-void logger::remove_writer(std::shared_ptr<writer> wrt)
+void logger::remove_writer(const std::string& wrt)
 {
     std::lock_guard<std::recursive_mutex> lg(guard_);
-    auto found = std::find(writers_.begin(), writers_.end(), wrt);
+    auto found = std::find_if(writers_.begin(),
+                              writers_.end(),
+                              [&wrt] (const std::unique_ptr<writer>& w) { return w->get_name() == wrt; });
     if (found != writers_.end())
         writers_.erase(found);
 }
@@ -302,7 +307,7 @@ std::string logger::type_to_logger_name(const std::type_info& info)
 void logger::write(const event& evt)
 {
     std::unique_lock<std::recursive_mutex> ul(guard_);
-    for (std::shared_ptr<writer> w : writers_)
+    for (auto& w : writers_)
         w->write(evt);
     ul.unlock();
     if (parent_ && writes_to_ancestors_)

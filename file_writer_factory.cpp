@@ -18,7 +18,6 @@
 #include <chucho/file_writer_memento.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
-#include <assert.h>
 
 namespace chucho
 {
@@ -28,55 +27,54 @@ file_writer_factory::file_writer_factory()
     set_status_origin("file_writer_factory");
 }
 
-std::shared_ptr<configurable> file_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> file_writer_factory::create_configurable(const memento& mnto)
 {
-    std::shared_ptr<configurable> cnf;
-    auto fwm = std::dynamic_pointer_cast<file_writer_memento>(mnto);
-    assert(fwm);
-    if (fwm->get_name().empty())
+    std::unique_ptr<configurable> cnf;
+    auto fwm = dynamic_cast<const file_writer_memento&>(mnto);
+    if (fwm.get_name().empty())
         throw exception("file_writer_factory: The name is not set");
-    if (!fwm->get_formatter())
+    if (!fwm.get_formatter())
         throw exception("file_writer_factory: The writer's formatter is not set");
-    if (fwm->get_file_name().empty())
+    if (fwm.get_file_name().empty())
         throw exception("file_writer_factory: The file name is not set");
-    if (fwm->get_on_start() && fwm->get_flush())
+    if (fwm.get_on_start() && fwm.get_flush())
     {
-        cnf.reset(new file_writer(fwm->get_name(),
-                                  fwm->get_formatter(),
-                                  fwm->get_file_name(),
-                                  *fwm->get_on_start(),
-                                  *fwm->get_flush()));
+        cnf = std::make_unique<file_writer>(fwm.get_name(),
+                                            fwm.get_formatter(),
+                                            fwm.get_file_name(),
+                                            *fwm.get_on_start(),
+                                            *fwm.get_flush()));
     }
-    else if (fwm->get_flush())
+    else if (fwm.get_flush())
     {
-        cnf.reset(new file_writer(fwm->get_name(),
-                                  fwm->get_formatter(),
-                                  fwm->get_file_name(),
-                                  file_writer::on_start::APPEND,
-                                  *fwm->get_flush()));
+        cnf = std::make_unique<file_writer>(fwm.get_name(),
+                                            fwm.get_formatter(),
+                                            fwm.get_file_name(),
+                                            file_writer::on_start::APPEND,
+                                            *fwm.get_flush()));
     }
-    else if (fwm->get_on_start())
+    else if (fwm.get_on_start())
     {
-        cnf.reset(new file_writer(fwm->get_name(),
-                                  fwm->get_formatter(),
-                                  fwm->get_file_name(),
-                                  *fwm->get_on_start()));
+        cnf = std::make_unique<file_writer>(fwm.get_name(),
+                                            fwm.get_formatter(),
+                                            fwm.get_file_name(),
+                                            *fwm.get_on_start()));
     }
     else
     {
-        cnf.reset(new file_writer(fwm->get_name(),
-                                  fwm->get_formatter(),
-                                  fwm->get_file_name()));
+        cnf = std::make_unique<file_writer>(fwm.get_name(),
+                                            fwm.get_formatter(),
+                                            fwm.get_file_name()));
     }
-    set_filters(cnf, fwm);
+    set_filters(*cnf, fwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
-    return cnf;
+    return std::move(cnf);
 }
 
-std::shared_ptr<memento> file_writer_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> file_writer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto = std::make_shared<file_writer_memento>(cfg, get_memento_key_set(cfg));
-    return mnto;
+    auto mnto = std::make_unique<file_writer_memento>(cfg, get_memento_key_set(cfg));
+    return std::move(mnto);
 }
 
 }

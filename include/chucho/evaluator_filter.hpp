@@ -35,7 +35,14 @@ namespace chucho
 
 class evaluator_filter : public filter
 {
+protected:
+    evaluator_filter(const std::string& name);
 };
+
+inline evaluator_filter::evaluator_filter(const std::string& name)
+    : filter(name)
+{
+}
 
 }
 

@@ -23,7 +23,7 @@
 #endif
 
 #include <chucho/writer.hpp>
-#include <vector>
+#include <set>
 
 namespace chucho
 {
@@ -116,9 +116,9 @@ public:
     * 
     * @param wrt the writer
     * @throw std::invalid_argument if wrt is an uninitialized 
-    *        std::shared_ptr
+    *        std::unique_ptr
     */
-    void add_writer(std::shared_ptr<writer> wrt);
+    void add_writer(std::unique_ptr<writer>&& wrt);
    /**
     * Return the effective level. The effective level is the level 
     * of this logger, if it has one, or the level of the nearest 
@@ -147,11 +147,11 @@ public:
      */
     const std::string& get_name() const;
     /**
-     * Return the writers.
+     * Return the name of the writers.
      * 
-     * @return the writers
+     * @return the writers' names
      */
-    std::vector<std::shared_ptr<writer>> get_writers();
+    std::vector<std::string> get_writer_names();
     /**
      * Does this logger permit a level? If the level is greater than
      * or equal to the effective level of this logger, then the 
@@ -170,7 +170,7 @@ public:
      * 
      * @param wrt the writer to remove
      */
-    void remove_writer(std::shared_ptr<writer> wrt);
+    void remove_writer(const std::string& wrt);
     /**
      * Reset this logger to default settings. This method removes a 
      * set level, removes all writers, and sets 
@@ -226,7 +226,7 @@ private:
     std::shared_ptr<logger> parent_;
     std::string name_;
     std::shared_ptr<level> level_;
-    std::vector<std::shared_ptr<writer>> writers_;
+    std::set<std::unique_ptr<writer>> writers_;
     std::recursive_mutex guard_;
     bool writes_to_ancestors_;
 };

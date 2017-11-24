@@ -31,8 +31,8 @@ class cout_writer_factory : public writer_factory
 public:
     cout_writer_factory();
 
-    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
-    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
+    virtual std::unique_ptr<configurable> create_configurable(const memento& mnto) override;
+    virtual std::unique_ptr<memento> create_memento(configurator& cfg) override;
 };
 
 }

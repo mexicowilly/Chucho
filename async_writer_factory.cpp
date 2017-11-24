@@ -19,7 +19,6 @@
 #include <chucho/async_writer.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
-#include <assert.h>
 
 namespace chucho
 {
@@ -29,29 +28,28 @@ async_writer_factory::async_writer_factory()
     set_status_origin("async_writer_factory");
 }
 
-std::shared_ptr<configurable> async_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> async_writer_factory::create_configurable(const memento& mnto)
 {
-    auto awm = std::dynamic_pointer_cast<async_writer_memento>(mnto);
-    assert(awm);
-    if (awm->get_name().empty())
+    auto awm = dynamic_cast<const async_writer_memento&>(mnto);
+    if (awm.get_name().empty())
         throw exception("async_writer_factory: The name is not set");
-    if (!awm->get_writer())
+    if (!awm.get_writer())
         throw exception("async_writer: The async writer's writer must be set");
-    std::size_t queue_cap = awm->get_queue_capacity() ?
-        *awm->get_queue_capacity() : async_writer::DEFAULT_QUEUE_CAPACITY;
-    std::shared_ptr<level> dis = awm->get_discard_threshold() ?
-        awm->get_discard_threshold() : level::INFO_();
-    bool flsh = awm->get_flush_on_destruct() ?
-        *awm->get_flush_on_destruct() : true;
-    auto aw = std::make_shared<async_writer>(awm->get_name(), awm->get_writer(), queue_cap, dis, flsh);
+    std::size_t queue_cap = awm.get_queue_capacity() ?
+        *awm.get_queue_capacity() : async_writer::DEFAULT_QUEUE_CAPACITY;
+    std::shared_ptr<level> dis = awm.get_discard_threshold() ?
+        awm.get_discard_threshold() : level::INFO_();
+    bool flsh = awm.get_flush_on_destruct() ?
+        *awm.get_flush_on_destruct() : true;
+    auto aw = std::make_unique<async_writer>(awm.get_name(), awm.get_writer(), queue_cap, dis, flsh);
     report_info("Created a " + demangle::get_demangled_name(typeid(*aw)));
-    return aw;
+    return std::move(aw);
 }
 
-std::shared_ptr<memento> async_writer_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> async_writer_factory::create_memento(configurator& cfg)
 {
-    auto mnto = std::make_shared<async_writer_memento>(cfg);
-    return mnto;
+    auto mnto = std::make_unique<async_writer_memento>(cfg);
+    return std::move(mnto);
 }
 
 }

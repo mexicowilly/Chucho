@@ -221,6 +221,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/file_roll_trigger.hpp
     include/chucho/file_writer.hpp
     include/chucho/filter.hpp
+    include/chucho/filter_memento.hpp
     include/chucho/finalize.hpp
     include/chucho/formatted_message_serializer.hpp
     include/chucho/formatter.hpp
@@ -900,6 +901,7 @@ SET(CHUCHO_SOURCES
     file_writer.cpp
     file_writer_factory.cpp
     file_writer_memento.cpp
+    filter_memento.cpp
     finalize.cpp
     formatted_message_serializer.cpp
     formatted_message_serializer_factory.cpp

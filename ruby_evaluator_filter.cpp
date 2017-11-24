@@ -64,8 +64,10 @@ VALUE report_exception(VALUE rprt, VALUE except)
 namespace chucho
 {
 
-ruby_evaluator_filter::ruby_evaluator_filter(const std::string& expression)
-    : expression_(expression)
+ruby_evaluator_filter::ruby_evaluator_filter(const std::string& name,
+                                             const std::string& expression)
+    : evaluator_filter(name),
+      expression_(expression)
 {
 }
 

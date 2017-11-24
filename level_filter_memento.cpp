@@ -23,7 +23,7 @@ namespace chucho
 {
 
 level_filter_memento::level_filter_memento(configurator& cfg, memento_key_set ks)
-    : memento(cfg)
+    : filter_memento(cfg)
 {
     set_status_origin("level_filter_memento");
     cfg.get_security_policy().set_text("level_filter::on_match", 7);

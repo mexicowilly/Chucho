@@ -21,12 +21,12 @@
 #error "This header is private"
 #endif
 
-#include <chucho/memento.hpp>
+#include <chucho/filter_memento.hpp>
 
 namespace chucho
 {
 
-class ruby_evaluator_filter_memento : public memento
+class ruby_evaluator_filter_memento : public filter_memento
 {
 public:
     ruby_evaluator_filter_memento(configurator& cfg);

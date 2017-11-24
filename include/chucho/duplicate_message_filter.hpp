@@ -47,7 +47,7 @@ public:
     /**
      * Construct a duplicate_message_filter.
      */
-    duplicate_message_filter();
+    duplicate_message_filter(const std::string& name);
     //@}
 
     /**
