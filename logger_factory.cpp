@@ -19,7 +19,6 @@
 #include <chucho/logger.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
-#include <assert.h>
 #include <algorithm>
 
 namespace chucho
@@ -30,33 +29,32 @@ logger_factory::logger_factory()
     set_status_origin("logger_factory");
 }
 
-std::shared_ptr<configurable> logger_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> logger_factory::create_configurable(const memento& mnto)
 {
-    auto lm = std::dynamic_pointer_cast<logger_memento>(mnto);
-    assert(lm);
-    if (!lm->get_name())
+    auto lm = dynamic_cast<const logger_memento&>(mnto);
+    if (!lm.get_name())
         throw exception("logger_memento: The logger's name must be set");
-    auto nm = *lm->get_name();
+    auto nm = *lm.get_name();
     if (nm == "<root>")
         nm.clear();
     auto lgr = logger::get(nm);
-    if (lm->get_level())
-        lgr->set_level(lm->get_level());
-    std::for_each(lm->get_writers().begin(),
-                  lm->get_writers().end(),
+    if (lm.get_level())
+        lgr->set_level(lm.get_level());
+    std::for_each(lm.get_writers().begin(),
+                  lm.get_writers().end(),
                   [&] (std::shared_ptr<writer> w) { lgr->add_writer(w); });
-    if (lm->get_writes_to_ancestors())
-        lgr->set_writes_to_ancestors(*lm->get_writes_to_ancestors());
+    if (lm.get_writes_to_ancestors())
+        lgr->set_writes_to_ancestors(*lm.get_writes_to_ancestors());
     std::shared_ptr<configurable> cnf = std::static_pointer_cast<configurable>(lgr);
     if (!nm.empty())
         report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)) + " named " + nm);
     return cnf;
 }
 
-std::shared_ptr<memento> logger_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> logger_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto(new logger_memento(cfg));
-    return mnto;
+    auto mnto = std::make_unique<logger_memento>(cfg);
+    return std::move(mnto);
 }
 
 }
