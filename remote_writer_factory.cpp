@@ -19,7 +19,6 @@
 #include <chucho/remote_writer.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
-#include <assert.h>
 
 namespace chucho
 {
@@ -29,27 +28,26 @@ remote_writer_factory::remote_writer_factory()
     set_status_origin("remote_writer_factory");
 }
 
-std::shared_ptr<configurable> remote_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> remote_writer_factory::create_configurable(const memento& mnto)
 {
-    auto rwm = std::dynamic_pointer_cast<remote_writer_memento>(mnto);
-    assert(rwm);
-    if (rwm->get_name().empty())
+    auto rwm = dynamic_cast<const remote_writer_memento&>(mnto);
+    if (rwm.get_name().empty())
         throw exception("remote_writer_factory: The name is not set");
-    if (rwm->get_host().empty())
+    if (rwm.get_host().empty())
         throw exception("remote_writer_factory: The writer's host is not set");
-    std::size_t uns = rwm->get_unsent_cache_max() ?
-        *rwm->get_unsent_cache_max() : remote_writer::DEFAULT_UNSENT_CACHE_MAX;
-    std::uint16_t prt = rwm->get_port() ?
-        *rwm->get_port() : remote_writer::DEFAULT_PORT;
-    std::shared_ptr<configurable> cnf(new remote_writer(rwm->get_name(), rwm->get_host(), prt, uns));
+    std::size_t uns = rwm.get_unsent_cache_max() ?
+        *rwm.get_unsent_cache_max() : remote_writer::DEFAULT_UNSENT_CACHE_MAX;
+    std::uint16_t prt = rwm.get_port() ?
+        *rwm.get_port() : remote_writer::DEFAULT_PORT;
+    auto cnf = std::make_unique<remote_writer>(rwm.get_name(), rwm.get_host(), prt, uns);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
-    return cnf;
+    return std::move(cnf);
 }
 
-std::shared_ptr<memento> remote_writer_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> remote_writer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto = std::make_shared<remote_writer_memento>(cfg, get_memento_key_set(cfg));
-    return mnto;
+    auto mnto = std::make_unique<remote_writer_memento>(cfg, get_memento_key_set(cfg));
+    return std::move(mnto);
 }
 
 }

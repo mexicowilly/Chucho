@@ -19,7 +19,6 @@
 #include <chucho/sliding_numbered_file_roller.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
-#include <assert.h>
 
 namespace chucho
 {
@@ -29,32 +28,31 @@ sliding_numbered_file_roller_factory::sliding_numbered_file_roller_factory()
     set_status_origin("sliding_numbered_file_roller_factory");
 }
 
-std::shared_ptr<configurable> sliding_numbered_file_roller_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> sliding_numbered_file_roller_factory::create_configurable(const memento& mnto)
 {
-    auto snfrm = std::dynamic_pointer_cast<sliding_numbered_file_roller_memento>(mnto);
-    assert(snfrm);
-    if (!snfrm->get_max_count())
+    auto snfrm = dynamic_cast<const sliding_numbered_file_roller_memento&>(mnto);
+    if (!snfrm.get_max_count())
         throw exception("sliding_numbered_file_roller_factory: The max_count field must be set");
-    std::shared_ptr<sliding_numbered_file_roller> snfr;
-    if (snfrm->get_min_index())
+    std::unique_ptr<configurable> snfr;
+    if (snfrm.get_min_index())
     {
-        snfr.reset(new sliding_numbered_file_roller(*snfrm->get_min_index(),
-                                                    *snfrm->get_max_count(),
-                                                    snfrm->get_file_compressor()));
+        snfr = std::make_unique<sliding_numbered_file_roller>(*snfrm.get_min_index(),
+                                                              *snfrm.get_max_count(),
+                                                              snfrm.get_file_compressor()));
     }
     else
     {
-        snfr.reset(new sliding_numbered_file_roller(*snfrm->get_max_count(),
-                                                    snfrm->get_file_compressor()));
+        snfr = std::make_unique<sliding_numbered_file_roller>(*snfrm.get_max_count(),
+                                                              snfrm.get_file_compressor()));
     }
     report_info("Created a " + demangle::get_demangled_name(typeid(*snfr)));
-    return snfr;
+    return std::move(snfr);
 }
 
-std::shared_ptr<memento> sliding_numbered_file_roller_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> sliding_numbered_file_roller_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto(new sliding_numbered_file_roller_memento(cfg));
-    return mnto;
+    auto mnto = std::make_unique<sliding_numbered_file_roller_memento>(cfg);
+    return std::move(mnto);
 }
 
 }

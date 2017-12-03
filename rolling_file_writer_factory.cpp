@@ -19,7 +19,6 @@
 #include <chucho/rolling_file_writer.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
-#include <assert.h>
 
 namespace chucho
 {
@@ -29,104 +28,103 @@ rolling_file_writer_factory::rolling_file_writer_factory()
     set_status_origin("rolling_file_writer_factory");
 }
 
-std::shared_ptr<configurable> rolling_file_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> rolling_file_writer_factory::create_configurable(const memento& mnto)
 {
-    auto rfwm = std::dynamic_pointer_cast<rolling_file_writer_memento>(mnto);
-    assert(rfwm);
-    if (rfwm->get_name().empty())
+    auto rfwm = dynamic_cast<const rolling_file_writer_memento&>(mnto);
+    if (rfwm.get_name().empty())
         throw exception("rolling_file_writer_factory: The name is not set");
-    if (!rfwm->get_file_roller())
+    if (!rfwm.get_file_roller())
         throw exception("rolling_file_writer_factory: A file_roller is required when creating a rolling_file");
-    if (!rfwm->get_formatter())
+    if (!rfwm.get_formatter())
         throw exception("rolling_file_writer_factory: The writer's formatter is not set");
-    std::shared_ptr<configurable> cnf;
-    if (rfwm->get_file_name().empty())
+    std::unique_ptr<configurable> cnf;
+    if (rfwm.get_file_name().empty())
     {
-        if (rfwm->get_on_start() && rfwm->get_flush())
+        if (rfwm.get_on_start() && rfwm.get_flush())
         {
-            cnf.reset(new rolling_file_writer(rfwm->get_name(),
-                                              rfwm->get_formatter(),
-                                              *rfwm->get_on_start(),
-                                              *rfwm->get_flush(),
-                                              rfwm->get_file_roller(),
-                                              rfwm->get_file_roll_trigger()));
+            cnf = std::make_unique<rolling_file_writer>(rfwm.get_name(),
+                                                        rfwm.get_formatter(),
+                                                        *rfwm.get_on_start(),
+                                                        *rfwm.get_flush(),
+                                                        rfwm.get_file_roller(),
+                                                        rfwm.get_file_roll_trigger()));
         }
-        else if (rfwm->get_flush())
+        else if (rfwm.get_flush())
         {
-            cnf.reset(new rolling_file_writer(rfwm->get_name(),
-                                              rfwm->get_formatter(),
-                                              file_writer::on_start::APPEND,
-                                              *rfwm->get_flush(),
-                                              rfwm->get_file_roller(),
-                                              rfwm->get_file_roll_trigger()));
+            cnf = std::make_unique<rolling_file_writer>(rfwm.get_name(),
+                                                        rfwm.get_formatter(),
+                                                        file_writer::on_start::APPEND,
+                                                        *rfwm.get_flush(),
+                                                        rfwm.get_file_roller(),
+                                                        rfwm.get_file_roll_trigger()));
         }
-        else if (rfwm->get_on_start())
+        else if (rfwm.get_on_start())
         {
-            cnf.reset(new rolling_file_writer(rfwm->get_name(),
-                                              rfwm->get_formatter(),
-                                              *rfwm->get_on_start(),
-                                              true,
-                                              rfwm->get_file_roller(),
-                                              rfwm->get_file_roll_trigger()));
+            cnf = std::make_unique<rolling_file_writer>(rfwm.get_name(),
+                                                        rfwm.get_formatter(),
+                                                        *rfwm.get_on_start(),
+                                                        true,
+                                                        rfwm.get_file_roller(),
+                                                        rfwm.get_file_roll_trigger()));
         }
         else
         {
-            cnf.reset(new rolling_file_writer(rfwm->get_name(),
-                                              rfwm->get_formatter(),
-                                              rfwm->get_file_roller(),
-                                              rfwm->get_file_roll_trigger()));
+            cnf = std::make_unique<rolling_file_writer>(rfwm.get_name(),
+                                                        rfwm.get_formatter(),
+                                                        rfwm.get_file_roller(),
+                                                        rfwm.get_file_roll_trigger()));
         }
     }
     else
     {
-        if (rfwm->get_on_start() && rfwm->get_flush())
+        if (rfwm.get_on_start() && rfwm.get_flush())
         {
-            cnf.reset(new rolling_file_writer(rfwm->get_name(),
-                                              rfwm->get_formatter(),
-                                              rfwm->get_file_name(),
-                                              *rfwm->get_on_start(),
-                                              *rfwm->get_flush(),
-                                              rfwm->get_file_roller(),
-                                              rfwm->get_file_roll_trigger()));
+            cnf = std::make_unique<rolling_file_writer>(rfwm.get_name(),
+                                                        rfwm.get_formatter(),
+                                                        rfwm.get_file_name(),
+                                                        *rfwm.get_on_start(),
+                                                        *rfwm.get_flush(),
+                                                        rfwm.get_file_roller(),
+                                                        rfwm.get_file_roll_trigger()));
         }
-        else if (rfwm->get_flush())
+        else if (rfwm.get_flush())
         {
-            cnf.reset(new rolling_file_writer(rfwm->get_name(),
-                                              rfwm->get_formatter(),
-                                              rfwm->get_file_name(),
-                                              file_writer::on_start::APPEND,
-                                              *rfwm->get_flush(),
-                                              rfwm->get_file_roller(),
-                                              rfwm->get_file_roll_trigger()));
+            cnf = std::make_unique<rolling_file_writer>(rfwm.get_name(),
+                                                        rfwm.get_formatter(),
+                                                        rfwm.get_file_name(),
+                                                        file_writer::on_start::APPEND,
+                                                        *rfwm.get_flush(),
+                                                        rfwm.get_file_roller(),
+                                                        rfwm.get_file_roll_trigger()));
         }
-        else if (rfwm->get_on_start())
+        else if (rfwm.get_on_start())
         {
-            cnf.reset(new rolling_file_writer(rfwm->get_name(),
-                                              rfwm->get_formatter(),
-                                              rfwm->get_file_name(),
-                                              *rfwm->get_on_start(),
-                                              true,
-                                              rfwm->get_file_roller(),
-                                              rfwm->get_file_roll_trigger()));
+            cnf = std::make_unique<rolling_file_writer>(rfwm.get_name(),
+                                                        rfwm.get_formatter(),
+                                                        rfwm.get_file_name(),
+                                                        *rfwm.get_on_start(),
+                                                        true,
+                                                        rfwm.get_file_roller(),
+                                                        rfwm.get_file_roll_trigger()));
         }
         else
         {
-            cnf.reset(new rolling_file_writer(rfwm->get_name(),
-                                              rfwm->get_formatter(),
-                                              rfwm->get_file_name(),
-                                              rfwm->get_file_roller(),
-                                              rfwm->get_file_roll_trigger()));
+            cnf = std::make_unique<rolling_file_writer>(rfwm.get_name(),
+                                                        rfwm.get_formatter(),
+                                                        rfwm.get_file_name(),
+                                                        rfwm.get_file_roller(),
+                                                        rfwm.get_file_roll_trigger()));
         }
     }
-    set_filters(cnf, rfwm);
+    set_filters(*cnf, rfwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
-    return cnf;
+    return std::move(cnf);
 }
 
-std::shared_ptr<memento> rolling_file_writer_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> rolling_file_writer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto(new rolling_file_writer_memento(cfg));
-    return mnto;
+    auto mnto = std::make_unique<rolling_file_writer_memento>(cfg);
+    return std::move(mnto);
 }
 
 }

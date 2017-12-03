@@ -31,7 +31,7 @@ class ruby_evaluator_filter_factory : public configurable_factory
 public:
     ruby_evaluator_filter_factory();
 
-    virtual std::unique_ptr<configurable> create_configurable(const std::unique_ptr<const memento>& mnto) override;
+    virtual std::unique_ptr<configurable> create_configurable(const memento& mnto) override;
     virtual std::unique_ptr<memento> create_memento(configurator& cfg) override;
 };
 

@@ -19,7 +19,6 @@
 #include <chucho/numbered_file_roller.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
-#include <assert.h>
 
 namespace chucho
 {
@@ -29,25 +28,31 @@ numbered_file_roller_factory::numbered_file_roller_factory()
     set_status_origin("numbered_file_roller_factory");
 }
 
-std::shared_ptr<configurable> numbered_file_roller_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> numbered_file_roller_factory::create_configurable(const memento& mnto)
 {
-    auto nfrm = std::dynamic_pointer_cast<numbered_file_roller_memento>(mnto);
-    assert(nfrm);
+    auto nfrm = dynamic_cast<const numbered_file_roller_memento&>(mnto);
     if (!nfrm->get_max_index())
         throw exception("numbered_file_roller_factory: The max_index field must be set");
-    std::shared_ptr<numbered_file_roller> nfr;
+    std::unique_ptr<numbered_file_roller> nfr;
     if (nfrm->get_min_index())
-        nfr.reset(new numbered_file_roller(*nfrm->get_min_index(), *nfrm->get_max_index(), nfrm->get_file_compressor()));
+    {
+        nfr = std::make_unique<numbered_file_roller>(*nfrm->get_min_index(),
+                                                     *nfrm->get_max_index(),
+                                                     nfrm->get_file_compressor()));
+    }
     else
-        nfr.reset(new numbered_file_roller(*nfrm->get_max_index(), nfrm->get_file_compressor()));
+    {
+        nfr = std::make_unique<numbered_file_roller>(*nfrm->get_max_index(),
+                                                     nfrm->get_file_compressor()));
+    }
     report_info("Created a " + demangle::get_demangled_name(typeid(*nfr)));
-    return std::static_pointer_cast<configurable>(nfr);
+    return std::move(nfr);
 }
 
-std::shared_ptr<memento> numbered_file_roller_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> numbered_file_roller_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto(new numbered_file_roller_memento(cfg));
-    return mnto;
+    auto mnto = std::make_unique<numbered_file_roller_memento>(cfg));
+    return std::move(mnto);
 }
 
 }

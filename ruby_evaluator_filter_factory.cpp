@@ -19,7 +19,6 @@
 #include <chucho/ruby_evaluator_filter.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
-#include <assert.h>
 
 namespace chucho
 {
@@ -29,15 +28,14 @@ ruby_evaluator_filter_factory::ruby_evaluator_filter_factory()
     set_status_origin("ruby_evaluator_filter_factory");
 }
 
-std::unique_ptr<configurable> ruby_evaluator_filter_factory::create_configurable(const std::unique_ptr<const memento>& mnto)
+std::unique_ptr<configurable> ruby_evaluator_filter_factory::create_configurable(const memento& mnto)
 {
-    auto refm = dynamic_cast<const ruby_evaluator_filter*>(mnto.get());
-    assert(refm);
-    if (refm->get_name().empty())
+    auto refm = dynamic_cast<const ruby_evaluator_filter&>(mnto);
+    if (refm.get_name().empty())
         throw exception("ruby_evaluator_filter_factory: The name must be set");
-    if (refm->get_expression().empty())
+    if (refm.get_expression().empty())
         throw exception("ruby_evaluator_filter_factory: The expression must be set");
-    auto cnf = std::make_unique<ruby_evaluator_filter>(refm->get_name(), refm->get_expression());
+    auto cnf = std::make_unique<ruby_evaluator_filter>(refm.get_name(), refm.get_expression());
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
     return std::move(cnf);
 }
