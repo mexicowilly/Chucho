@@ -28,7 +28,7 @@ remote_writer_factory::remote_writer_factory()
     set_status_origin("remote_writer_factory");
 }
 
-std::unique_ptr<configurable> remote_writer_factory::create_configurable(const memento& mnto)
+std::unique_ptr<configurable> remote_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
     auto rwm = dynamic_cast<const remote_writer_memento&>(mnto);
     if (rwm.get_name().empty())

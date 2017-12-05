@@ -1010,6 +1010,7 @@ SET(CHUCHO_SOURCES
     include/chucho/lzma_file_compressor_factory.hpp
     include/chucho/memento_key_set.hpp
     include/chucho/message_queue_writer_memento.hpp
+    include/chucho/move_util.hpp
     include/chucho/named_pipe_writer_factory.hpp
     include/chucho/named_pipe_writer_memento.hpp
     include/chucho/noop_compressor_factory.hpp

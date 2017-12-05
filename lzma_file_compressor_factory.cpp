@@ -31,7 +31,7 @@ lzma_file_compressor_factory::lzma_file_compressor_factory()
     set_status_origin("lzma_file_compressor_factory");
 }
 
-std::unique_ptr<configurable> lzma_file_compressor_factory::create_configurable(const memento& mnto)
+std::unique_ptr<configurable> lzma_file_compressor_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
 #if defined(CHUCHO_HAVE_LZMA)
     auto fcm = dynamic_cast<const file_compressor_memento&>(mnto);

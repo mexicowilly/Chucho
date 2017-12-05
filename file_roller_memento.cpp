@@ -16,6 +16,7 @@
 
 #include <chucho/file_roller_memento.hpp>
 #include <chucho/demangle.hpp>
+#include <chucho/move_util.hpp>
 
 namespace chucho
 {
@@ -26,13 +27,13 @@ file_roller_memento::file_roller_memento(configurator& cfg)
     set_status_origin("file_roller_memento");
 }
 
-void file_roller_memento::handle(std::shared_ptr<configurable> cnf)
+void file_roller_memento::handle(std::unique_ptr<configurable>&& cnf)
 {
-    auto comp = std::dynamic_pointer_cast<file_compressor>(cnf);
+    auto comp = dynamic_move<file_compressor>(std::move(cnf));
     if (comp)
-        compressor_ = comp;
+        compressor_ = std::move(comp);
     else
-        memento::handle(cnf);
+        memento::handle(std::move(cnf));
 }
 
 }

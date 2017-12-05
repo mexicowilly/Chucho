@@ -39,31 +39,31 @@ namespace chucho
 const std::size_t async_writer::DEFAULT_QUEUE_CAPACITY = 256;
 
 async_writer::async_writer(const std::string& name,
-                           std::shared_ptr<writer> wrt,
+                           std::unique_ptr<writer>&& wrt,
                            std::size_t capacity,
                            std::shared_ptr<level> discard_threshold,
                            bool flush_on_destruct)
-    : writer(name, std::make_shared<noop_formatter>()),
-      writer_(wrt),
+    : writer(name, std::move(std::make_unique<noop_formatter>())),
+      writer_(std::move(wrt)),
       capacity_(capacity),
       discard_threshold_(discard_threshold),
       stop_(false),
       flush_on_destruct_(flush_on_destruct)
 {
     set_status_origin("async_writer");
-    if (writer_.get() != nullptr)
-        worker_.reset(new std::thread(std::bind(&async_writer::thread_main, this)));
+    if (writer_)
+        worker_ = std::make_unique<std::thread>(std::bind(&async_writer::thread_main, this));
 }
 
 async_writer::async_writer(const std::string& name,
-                           std::shared_ptr<writer> wrt,
+                           std::unique_ptr<writer>&& wrt,
                            std::size_t capacity,
                            std::shared_ptr<level> discard_threshold,
                            bool flush_on_destruct,
                            std::function<void()> enter_thread_cb,
                            std::function<void()> leave_thread_cb)
-    : writer(name, std::make_shared<noop_formatter>()),
-      writer_(wrt),
+    : writer(name, std::move(std::make_unique<noop_formatter>())),
+      writer_(std::move(wrt)),
       capacity_(capacity),
       discard_threshold_(discard_threshold),
       stop_(false),
@@ -72,8 +72,8 @@ async_writer::async_writer(const std::string& name,
       flush_on_destruct_(flush_on_destruct)
 {
     set_status_origin("async_writer");
-    if (writer_.get() != nullptr)
-        worker_.reset(new std::thread(std::bind(&async_writer::thread_main, this)));
+    if (writer_)
+        worker_ = std::make_unique<std::thread>(std::bind(&async_writer::thread_main, this));
 }
 
 async_writer::~async_writer()

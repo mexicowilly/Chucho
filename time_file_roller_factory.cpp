@@ -28,7 +28,7 @@ time_file_roller_factory::time_file_roller_factory()
     set_status_origin("time_file_roller_factory");
 }
 
-std::unique_ptr<configurable> time_file_roller_factory::create_configurable(const memento& mnto)
+std::unique_ptr<configurable> time_file_roller_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
     auto tfrm = dynamic_cast<const time_file_roller_memento&>(mnto);
     if (tfrm.get_file_name_pattern().empty())

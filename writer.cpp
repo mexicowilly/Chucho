@@ -21,8 +21,8 @@
 namespace chucho
 {
 
-writer::writer(const std::string& name, std::shared_ptr<formatter> fmt)
-    : formatter_(fmt),
+writer::writer(const std::string& name, std::unique_ptr<formatter>&& fmt)
+    : formatter_(std::move(fmt)),
       guard_(std::make_unique<std::recursive_mutex>()),
       i_am_writing_(false),
       name_(name)
@@ -35,10 +35,10 @@ writer::~writer()
 {
 }
 
-void writer::add_filter(std::shared_ptr<filter> flt)
+void writer::add_filter(std::unique_ptr<filter>&& flt)
 {
     std::lock_guard<std::recursive_mutex> lg(*guard_);
-    filters_.push_back(flt);
+    filters_.push_back(std::move(flt));
 }
 
 void writer::clear_filters()
@@ -51,10 +51,13 @@ void writer::flush()
 {
 }
 
-std::vector<std::shared_ptr<filter>> writer::get_filters()
+std::vector<std::string> writer::get_filter_names()
 {
+    std::vector<std::string> result;
     std::lock_guard<std::recursive_mutex> lg(*guard_);
-    return filters_;
+    for (const auto& f : filters_)
+        result.push_back(f->get_name());
+    return result;
 }
 
 bool writer::permits(const event& evt)
@@ -68,6 +71,12 @@ bool writer::permits(const event& evt)
             return true;
     }
     return true;
+}
+
+void writer::remove_filter(const std::string& name)
+{
+    std::lock_guard<std::recursive_mutex> lg(*guard_);
+    filters_.remove_if([&name] (const std::unique_ptr<filter>& f) { f->get_name() == name; });
 }
 
 void writer::write(const event& evt)
@@ -85,7 +94,7 @@ void writer::write(const event& evt)
         } s(i_am_writing_);
         try
         {
-            if (formatter_ && permits(evt))
+            if (permits(evt))
                 write_impl(evt);
         }
         catch (std::exception& e)

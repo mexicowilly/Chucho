@@ -65,7 +65,7 @@ public:
      * 
      * @param cnf the configurable to handle
      */
-    virtual void handle(std::shared_ptr<configurable> cnf) override;
+    virtual void handle(std::unique_ptr<configurable>&& cnf) override;
 
 private:
     std::shared_ptr<file_compressor> compressor_;

@@ -19,7 +19,6 @@
 #include <chucho/zeromq_writer.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
-#include <assert.h>
 
 namespace chucho
 {
@@ -29,34 +28,33 @@ zeromq_writer_factory::zeromq_writer_factory()
     set_status_origin("zeromq_writer_factory");
 }
 
-std::shared_ptr<configurable> zeromq_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> zeromq_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    auto zm = std::dynamic_pointer_cast<zeromq_writer_memento>(mnto);
-    assert(zm);
-    if (zm->get_name().empty())
+    auto zm = dynamic_cast<const zeromq_writer_memento&>(mnto);
+    if (zm.get_name().empty())
         throw exception("zeromq_writer_factory: The name is not set");
-    if (!zm->get_formatter())
+    if (!zm.get_formatter())
         throw exception("zeromq_writer_factory: The writer's formatter is not set");
-    if (!zm->get_serializer())
+    if (!zm.get_serializer())
         throw exception("zeromq_writer_factory: The writer's serializer is not set");
-    if (zm->get_endpoint().empty())
+    if (zm.get_endpoint().empty())
         throw exception("zeromq_writer_factory: The endpoint is not set");
-    auto zw = std::make_shared<zeromq_writer>(zm->get_name(),
-                                              zm->get_formatter(),
-                                              zm->get_serializer(),
-                                              zm->get_coalesce_max(),
-                                              zm->get_compressor(),
-                                              zm->get_endpoint(),
-                                              zm->get_prefix());
-    set_filters(zw, zm);
+    auto zw = std::make_unique<zeromq_writer>(zm.get_name(),
+                                              zm.get_formatter(),
+                                              zm.get_serializer(),
+                                              zm.get_coalesce_max(),
+                                              zm.get_compressor(),
+                                              zm.get_endpoint(),
+                                              zm.get_prefix());
+    set_filters(*zw, zm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*zw)));
-    return zw;
+    return std::move(zw);
 }
 
-std::shared_ptr<memento> zeromq_writer_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> zeromq_writer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto = std::make_shared<zeromq_writer_memento>(cfg);
-    return mnto;
+    auto mnto = std::make_unique<zeromq_writer_memento>(cfg);
+    return std::move(mnto);
 }
 
 }

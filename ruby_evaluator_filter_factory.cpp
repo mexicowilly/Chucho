@@ -28,7 +28,7 @@ ruby_evaluator_filter_factory::ruby_evaluator_filter_factory()
     set_status_origin("ruby_evaluator_filter_factory");
 }
 
-std::unique_ptr<configurable> ruby_evaluator_filter_factory::create_configurable(const memento& mnto)
+std::unique_ptr<configurable> ruby_evaluator_filter_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
     auto refm = dynamic_cast<const ruby_evaluator_filter&>(mnto);
     if (refm.get_name().empty())

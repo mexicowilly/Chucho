@@ -31,7 +31,7 @@ class lzma_file_compressor_factory : public file_compressor_factory
 public:
     lzma_file_compressor_factory();
 
-    virtual std::unique_ptr<configurable> create_configurable(const memento& mnto) override;
+    virtual std::unique_ptr<configurable> create_configurable(std::unique_ptr<memento>& mnto) override;
 };
 
 }

@@ -88,7 +88,7 @@ public:
      * 
      * @param cnf the configurable
      */
-    virtual void handle(std::shared_ptr<configurable> cnf);
+    virtual void handle(std::unique_ptr<configurable>&& cnf);
 
 protected:
     /**

@@ -15,8 +15,8 @@
  */
 
 #include <chucho/writer_memento.hpp>
-#include <chucho/demangle.hpp>
 #include <chucho/exception.hpp>
+#include <chucho/move_util.hpp>
 
 namespace chucho
 {
@@ -29,20 +29,20 @@ writer_memento::writer_memento(configurator& cfg)
     set_handler("name", [this] (const std::string& name) { name_  = validate("writer::name", name); });
 }
 
-void writer_memento::handle(std::shared_ptr<configurable> cnf)
+void writer_memento::handle(std::unique_ptr<configurable>&& cnf)
 {
-    auto fmt = std::dynamic_pointer_cast<formatter>(cnf);
+    auto fmt = dynamic_move<formatter>(std::move(cnf));
     if (fmt)
     {
-        fmt_ = fmt;
+        fmt_ = std::move(fmt);
     }
     else
     {
-        auto flt = std::dynamic_pointer_cast<filter>(cnf);
+        auto flt = dynamic_move<filter>(std::move(cnf));
         if (flt)
-            filters_.push_back(flt);
+            filters_.push_back(std::move(flt));
         else
-            memento::handle(cnf);
+            memento::handle(std::move(cnf));
     }
 }
 

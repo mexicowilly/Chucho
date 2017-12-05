@@ -63,7 +63,7 @@ public:
      * @param mnto the memento
      * @return the configurable
      */
-    virtual std::unique_ptr<configurable> create_configurable(const memento& mnto) = 0;
+    virtual std::unique_ptr<configurable> create_configurable(std::unique_ptr<memento>& mnto) = 0;
     /**
      * Create an instance of a memento. The memento is used by the 
      * @ref configurator to gather enough information to create the 

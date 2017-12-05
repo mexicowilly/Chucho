@@ -28,7 +28,7 @@ rolling_file_writer_factory::rolling_file_writer_factory()
     set_status_origin("rolling_file_writer_factory");
 }
 
-std::unique_ptr<configurable> rolling_file_writer_factory::create_configurable(const memento& mnto)
+std::unique_ptr<configurable> rolling_file_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
     auto rfwm = dynamic_cast<const rolling_file_writer_memento&>(mnto);
     if (rfwm.get_name().empty())

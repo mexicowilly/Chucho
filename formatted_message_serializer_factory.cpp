@@ -26,7 +26,7 @@ formatted_message_serializer_factory::formatted_message_serializer_factory()
     set_status_origin("formatted_message_serializer_factory");
 }
 
-std::shared_ptr<configurable> formatted_message_serializer_factory::create_configurable(const memento& mnto)
+std::unique_ptr<configurable> formatted_message_serializer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
     auto cnf = std::make_unique<formatted_message_serializer>();
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
@@ -35,7 +35,7 @@ std::shared_ptr<configurable> formatted_message_serializer_factory::create_confi
 
 std::unique_ptr<memento> formatted_message_serializer_factory::create_memento(configurator& cfg)
 {
-    auto mnto = std::make_unique<memento>();
+    auto mnto = std::make_unique<memento>(cfg);
     return std::move(mnto);
 }
 

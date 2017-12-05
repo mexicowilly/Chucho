@@ -18,6 +18,7 @@
 #include <chucho/cerr_writer.hpp>
 #include <chucho/demangle.hpp>
 #include <chucho/exception.hpp>
+#include <assert.h>
 
 namespace chucho
 {
@@ -27,15 +28,16 @@ cerr_writer_factory::cerr_writer_factory()
     set_status_origin("cerr_writer_factory");
 }
 
-std::unique_ptr<configurable> cerr_writer_factory::create_configurable(const memento& mnto)
+std::unique_ptr<configurable> cerr_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    auto cwm = dynamic_cast<const writer_memento&>(mnto);
-    if (cwm.get_name().empty())
+    auto cwm = dynamic_cast<writer_memento*>(mnto.get());
+    assert(cwm != nullptr);
+    if (cwm->get_name().empty())
         throw exception("cerr_writer_factory: The name is not set");
-    if (!cwm.get_formatter())
+    if (!cwm->get_formatter())
         throw exception("cerr_writer_factory: The writer's formatter is not set");
-    auto cnf = std::make_unique<cerr_writer>(cwm.get_name(), cwm.get_formatter());
-    set_filters(*cnf, cwm);
+    auto cnf = std::make_unique<cerr_writer>(cwm->get_name(), std::move(cwm->get_formatter()));
+    set_filters(*cnf, *cwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
     return std::move(cnf);
 }

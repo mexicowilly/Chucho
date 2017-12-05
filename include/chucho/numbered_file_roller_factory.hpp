@@ -31,7 +31,7 @@ class numbered_file_roller_factory : public configurable_factory
 public:
     numbered_file_roller_factory();
 
-    virtual std::unique_ptr<configurable> create_configurable(const memento& mnto) override;
+    virtual std::unique_ptr<configurable> create_configurable(std::unique_ptr<memento>& mnto) override;
     virtual std::unique_ptr<memento> create_memento(configurator& cfg) override;
 };
 

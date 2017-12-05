@@ -50,7 +50,7 @@ void memento::handle(const std::string& key, const std::string& value)
         found->second(value);
 }
 
-void memento::handle(std::shared_ptr<configurable> cnf)
+void memento::handle(std::unique_ptr<configurable>&& cnf)
 {
     report_error(demangle::get_demangled_name(typeid(*this)) + " cannot handle a type of " +
         demangle::get_demangled_name(typeid(*cnf)));

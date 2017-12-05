@@ -213,7 +213,7 @@ bool logger::permits(std::shared_ptr<level> lvl)
     return *lvl >= *get_effective_level();
 }
 
-void logger::remove_all_writers()
+void logger::clear_writers()
 {
     std::lock_guard<std::recursive_mutex> lg(guard_);
     writers_.clear();

@@ -28,7 +28,7 @@ sliding_numbered_file_roller_factory::sliding_numbered_file_roller_factory()
     set_status_origin("sliding_numbered_file_roller_factory");
 }
 
-std::unique_ptr<configurable> sliding_numbered_file_roller_factory::create_configurable(const memento& mnto)
+std::unique_ptr<configurable> sliding_numbered_file_roller_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
     auto snfrm = dynamic_cast<const sliding_numbered_file_roller_memento&>(mnto);
     if (!snfrm.get_max_count())

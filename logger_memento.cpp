@@ -15,7 +15,7 @@
  */
 
 #include <chucho/logger_memento.hpp>
-#include <chucho/demangle.hpp>
+#include <chucho/move_util.hpp>
 
 namespace chucho
 {
@@ -30,13 +30,13 @@ logger_memento::logger_memento(configurator& cfg)
     set_handler("writes_to_ancestors", [this] (const std::string& name) { writes_to_ancestors_ = boolean_value(validate("logger::writer_to_ancestors", name)); });
 }
 
-void logger_memento::handle(std::shared_ptr<configurable> cnf)
+void logger_memento::handle(std::unique_ptr<configurable>&& cnf)
 {
-    auto wrt = std::dynamic_pointer_cast<writer>(cnf);
+    auto wrt = dynamic_move<writer>(std::move(cnf));
     if (wrt)
-        writers_.push_back(wrt);
+        writers_.push_back(std::move(wrt));
     else
-        memento::handle(cnf);
+        memento::handle(std::move(cnf));
 }
 
 }

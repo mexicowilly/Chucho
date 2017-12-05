@@ -28,7 +28,7 @@ numbered_file_roller_factory::numbered_file_roller_factory()
     set_status_origin("numbered_file_roller_factory");
 }
 
-std::unique_ptr<configurable> numbered_file_roller_factory::create_configurable(const memento& mnto)
+std::unique_ptr<configurable> numbered_file_roller_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
     auto nfrm = dynamic_cast<const numbered_file_roller_memento&>(mnto);
     if (!nfrm->get_max_index())

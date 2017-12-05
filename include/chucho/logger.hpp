@@ -119,6 +119,10 @@ public:
     *        std::unique_ptr
     */
     void add_writer(std::unique_ptr<writer>&& wrt);
+    /**
+     * Remove all writers from this logger.
+     */
+    void clear_writers();
    /**
     * Return the effective level. The effective level is the level 
     * of this logger, if it has one, or the level of the nearest 
@@ -162,13 +166,9 @@ public:
      */
     bool permits(std::shared_ptr<level> lvl);
     /**
-     * Remove all writers from this logger.
-     */
-    void remove_all_writers();
-    /**
      * Remove a specific writer from this logger.
      * 
-     * @param wrt the writer to remove
+     * @param wrt the name of the writer to remove
      */
     void remove_writer(const std::string& wrt);
     /**

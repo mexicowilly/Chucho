@@ -31,7 +31,7 @@ zip_file_compressor_factory::zip_file_compressor_factory()
     set_status_origin("zip_file_compressor_factory");
 }
 
-std::unique_ptr<configurable> zip_file_compressor_factory::create_configurable(const memento& mnto)
+std::unique_ptr<configurable> zip_file_compressor_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
 #if defined(CHUCHO_HAVE_LIBARCHIVE)
     auto fcm = dynamic_cast<const file_compressor_memento&>(mnto);

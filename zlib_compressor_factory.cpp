@@ -18,7 +18,6 @@
 #include <chucho/zlib_compressor_memento.hpp>
 #include <chucho/zlib_compressor.hpp>
 #include <chucho/demangle.hpp>
-#include <assert.h>
 
 namespace chucho
 {
@@ -28,24 +27,23 @@ zlib_compressor_factory::zlib_compressor_factory()
     set_status_origin("zlib_compressor_factory");
 }
 
-std::shared_ptr<configurable> zlib_compressor_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> zlib_compressor_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    auto zcm = std::dynamic_pointer_cast<zlib_compressor_memento>(mnto);
-    assert(zcm);
-    optional<int> lvl = zcm->get_compression_level();
-    std::shared_ptr<configurable> cnf;
+    auto zcm = dynamic_cast<const zlib_compressor_memento&>(mnto);
+    optional<int> lvl = zcm.get_compression_level();
+    std::unique_ptr<configurable> cnf;
     if (lvl)
-        cnf = std::make_shared<zlib_compressor>(*lvl);
+        cnf = std::make_unique<zlib_compressor>(*lvl);
     else
-        cnf = std::make_shared<zlib_compressor>();
+        cnf = std::make_unique<zlib_compressor>();
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
-    return cnf;
+    return std::move(cnf);
 }
 
-std::shared_ptr<memento> zlib_compressor_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> zlib_compressor_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto(new zlib_compressor_memento(cfg));
-    return mnto;
+    auto mnto = std::make_unique<zlib_compressor_memento>(cfg);
+    return std::move(mnto);
 }
 
 }

@@ -59,34 +59,34 @@ public:
      * 
      * @return the filters
      */
-    const std::vector<std::shared_ptr<filter>>& get_filters() const;
+    std::vector<std::unique_ptr<filter>>& get_filters();
     /**
      * Return the formatter that has been discovered during 
      * configuration time. 
      * 
      * @return the formatter
      */
-    std::shared_ptr<formatter> get_formatter() const;
+    std::unique_ptr<formatter>& get_formatter();
     /**
      * Return the name of the writer.
      *
      * @return the name
      */
     const std::string& get_name() const;
-    virtual void handle(std::shared_ptr<configurable> cnf) override;
+    virtual void handle(std::unique_ptr<configurable>&& cnf) override;
 
 private:
-    std::shared_ptr<formatter> fmt_;
-    std::vector<std::shared_ptr<filter>> filters_;
+    std::unique_ptr<formatter> fmt_;
+    std::vector<std::unique_ptr<filter>> filters_;
     std::string name_;
 };
 
-inline const std::vector<std::shared_ptr<filter>>& writer_memento::get_filters() const
+inline std::vector<std::unique_ptr<filter>>& writer_memento::get_filters()
 {
     return filters_;
 }
 
-inline std::shared_ptr<formatter> writer_memento::get_formatter() const
+inline std::unique_ptr<formatter>& writer_memento::get_formatter()
 {
     return fmt_;
 }

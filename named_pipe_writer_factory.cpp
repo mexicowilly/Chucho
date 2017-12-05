@@ -27,7 +27,7 @@ named_pipe_writer_factory::named_pipe_writer_factory()
     set_status_origin("named_pipe_writer_factory");
 }
 
-std::unique_ptr<configurable> named_pipe_writer_factory::create_configurable(const memento& mnto)
+std::unique_ptr<configurable> named_pipe_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
     std::unique_ptr<configurable> cnf;
     auto npwm = dynamic_cast<const named_pipe_writer_memento&>(mnto);

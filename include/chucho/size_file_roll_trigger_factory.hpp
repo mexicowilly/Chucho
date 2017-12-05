@@ -31,7 +31,7 @@ class size_file_roll_trigger_factory : public configurable_factory
 public:
     size_file_roll_trigger_factory();
 
-    virtual std::unique_ptr<configurable> create_configurable(const memento& mnto) override;
+    virtual std::unique_ptr<configurable> create_configurable(std::unique_ptr<memento>& mnto) override;
     virtual std::unique_ptr<memento> create_memento(configurator& cfg) override;
 };
 

@@ -31,7 +31,7 @@ class duplicate_message_filter_factory : public configurable_factory
 public:
     duplicate_message_filter_factory();
 
-    virtual std::unique_ptr<configurable> create_configurable(const memento& mnto) override;
+    virtual std::unique_ptr<configurable> create_configurable(std::unique_ptr<memento>& mnto) override;
     virtual std::unique_ptr<memento> create_memento(configurator& cfg) override;
 };
 

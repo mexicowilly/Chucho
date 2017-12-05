@@ -26,7 +26,7 @@ noop_compressor_factory::noop_compressor_factory()
     set_status_origin("noop_compressor_factory");
 }
 
-std::unique_ptr<configurable> noop_compressor_factory::create_configurable(const memento& mnto)
+std::unique_ptr<configurable> noop_compressor_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
     auto cnf = std::make_unique<noop_compressor>();
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));

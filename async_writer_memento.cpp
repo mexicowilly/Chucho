@@ -15,7 +15,7 @@
  */
 
 #include <chucho/async_writer_memento.hpp>
-#include <chucho/demangle.hpp>
+#include <chucho/move_util.hpp>
 
 namespace chucho
 {
@@ -35,13 +35,13 @@ async_writer_memento::async_writer_memento(configurator& cfg)
     set_handler("name", [this] (const std::string& name) { name_ = validate("async_writer::name", name); });
 }
 
-void async_writer_memento::handle(std::shared_ptr<configurable> cnf)
+void async_writer_memento::handle(std::unique_ptr<configurable>&& cnf)
 {
-    auto wrt = std::dynamic_pointer_cast<writer>(cnf);
+    auto wrt = dynamic_move<writer>(std::move(cnf));
     if (wrt)
-        writer_ = wrt;
+        writer_ = std::move(wrt);
     else
-        memento::handle(cnf);
+        memento::handle(std::move(cnf));
 }
 
 }

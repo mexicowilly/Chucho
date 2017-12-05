@@ -81,7 +81,7 @@ public:
      *        std::shared_ptr
      */
     async_writer(const std::string& name,
-                 std::shared_ptr<writer> wrt,
+                 std::unique_ptr<writer>&& wrt,
                  std::size_t capacity = DEFAULT_QUEUE_CAPACITY,
                  std::shared_ptr<level> discard_threshold = level::INFO_(),
                  bool flush_on_destruct = true);
@@ -125,7 +125,7 @@ public:
      * 
      * @return the slow writer
      */
-    std::shared_ptr<writer> get_writer() const;
+    writer& get_writer() const;
 
 protected:
     virtual void write_impl(const event& evt) override;
@@ -134,7 +134,7 @@ private:
     friend class mysql_writer;
 
     CHUCHO_NO_EXPORT async_writer(const std::string& name,
-                                  std::shared_ptr<writer> wrt,
+                                  std::unique_ptr<writer>&& wrt,
                                   std::size_t capacity,
                                   std::shared_ptr<level> discard_threshold,
                                   bool flush_on_destruct,
@@ -144,7 +144,7 @@ private:
     CHUCHO_NO_EXPORT void thread_main();
 
     std::deque<event> queue_;
-    std::shared_ptr<writer> writer_;
+    std::unique_ptr<writer> writer_;
     std::size_t capacity_;
     std::mutex guard_;
     std::condition_variable full_condition_;
@@ -172,9 +172,9 @@ inline std::size_t async_writer::get_queue_capacity() const
     return capacity_;
 }
 
-inline std::shared_ptr<writer> async_writer::get_writer() const
+inline writer& async_writer::get_writer() const
 {
-    return writer_;
+    return *writer_;
 }
 
 }

@@ -19,6 +19,7 @@
 #include <chucho/filter_memento.hpp>
 #include <chucho/demangle.hpp>
 #include <chucho/exception.hpp>
+#include <assert.h>
 
 namespace chucho
 {
@@ -28,12 +29,13 @@ duplicate_message_filter_factory::duplicate_message_filter_factory()
     set_status_origin("duplicate_message_filter_factory");
 }
 
-std::unique_ptr<configurable> duplicate_message_filter_factory::create_configurable(const memento& mnto)
+std::unique_ptr<configurable> duplicate_message_filter_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    auto m = dynamic_cast<const filter_memento&>(mnto);
-    if (m.get_name().empty())
+    auto m = dynamic_cast<filter_memento*>(mnto.get());
+    assert(m != nullptr);
+    if (m->get_name().empty())
         throw exception("duplicate_message_filter_factory: The filter's name is not set");
-    auto cnf = std::make_unique<duplicate_message_filter>(m.get_name());
+    auto cnf = std::make_unique<duplicate_message_filter>(m->get_name());
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
     return std::move(cnf);
 }

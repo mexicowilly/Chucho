@@ -19,6 +19,7 @@
 #include <chucho/level_filter.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
+#include <assert.h>
 
 namespace chucho
 {
@@ -28,21 +29,22 @@ level_filter_factory::level_filter_factory()
     set_status_origin("level_filter_factory");
 }
 
-std::unique_ptr<configurable> level_filter_factory::create_configurable(const memento& mnto)
+std::unique_ptr<configurable> level_filter_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    auto lfm = dynamic_cast<const level_filter_memento&>(mnto);
-    if (!lfm.get_name())
+    auto lfm = dynamic_cast<level_filter_memento*>(mnto.get());
+    assert(lfm != nullptr);
+    if (lfm->get_name().empty())
         throw exception("level_filter_factory: The name must be set");
-    if (!lfm.get_level())
+    if (!lfm->get_level())
         throw exception("level_filter_factory: The level must be set");
-    if (!lfm.get_on_match())
+    if (!lfm->get_on_match())
         throw exception("level_filter_factory: The on_match key must be set");
-    if (!lfm.get_on_mismatch())
+    if (!lfm->get_on_mismatch())
         throw exception("level_filter_factory: The on_mismatch key must be set");
-    auto cnf = std::make_unique<level_filter>(lfm.get_name(),
-                                              lfm.get_level(),
-                                              *lfm.get_on_match(),
-                                              *lfm.get_on_mismatch());
+    auto cnf = std::make_unique<level_filter>(lfm->get_name(),
+                                              lfm->get_level(),
+                                              *lfm->get_on_match(),
+                                              *lfm->get_on_mismatch());
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
     return std::move(cnf);
 }

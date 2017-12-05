@@ -26,8 +26,9 @@
 #include <chucho/formatter.hpp>
 #include <chucho/configurable.hpp>
 #include <chucho/non_copyable.hpp>
-#include <vector>
+#include <list>
 #include <mutex>
+#include <vector>
 
 namespace chucho
 {
@@ -61,7 +62,7 @@ public:
      * @throw std::invalid_argument if fmt is an uninitialized 
      *        std::shared_ptr
      */
-    writer(const std::string& name, std::shared_ptr<formatter> fmt);
+    writer(const std::string& name, std::unique_ptr<formatter>&& fmt);
     /**
      * Destroy a writer.
      */
@@ -74,7 +75,7 @@ public:
      * 
      * @param flt the filter
      */
-    void add_filter(std::shared_ptr<filter> flt);
+    void add_filter(std::unique_ptr<filter>&& flt);
     /**
      * Remove all filters.
      */
@@ -87,19 +88,25 @@ public:
      * Receive the collection of all filters.
      * @return the filters
      */
-    std::vector<std::shared_ptr<filter>> get_filters();
+    std::vector<std::string> get_filter_names();
     /**
      * Return this writer's formatter.
      * 
      * @return the formatter
      */
-    std::shared_ptr<formatter> get_formatter() const;
+    formatter& get_formatter() const;
     /**
      * Return this writer's name.
      *
      * @return the name
      */
     const std::string& get_name() const;
+    /**
+     * Remove a named filter.
+     *
+     * @param name the name of the filter to remove
+     */
+    void remove_filter(const std::string& name);
     /**
      * Write an event. This non-virtual method takes care of all the 
      * common housekeeping that writers must undertake when writing 
@@ -126,7 +133,7 @@ protected:
     /**
      * The formatter used to turn events into text.
      */
-    std::shared_ptr<formatter> formatter_;
+    std::unique_ptr<formatter> formatter_;
 
 private:
     /**
@@ -136,15 +143,15 @@ private:
      */
     CHUCHO_NO_EXPORT bool permits(const event& evt);
 
-    std::vector<std::shared_ptr<filter>> filters_;
+    std::list<std::unique_ptr<filter>> filters_;
     std::unique_ptr<std::recursive_mutex> guard_;
     bool i_am_writing_;
     std::string name_;
 };
 
-inline std::shared_ptr<formatter> writer::get_formatter() const
+inline formatter& writer::get_formatter() const
 {
-    return formatter_;
+    return *formatter_;
 }
 
 inline const std::string& writer::get_name() const {

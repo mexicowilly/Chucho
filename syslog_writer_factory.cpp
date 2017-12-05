@@ -28,7 +28,7 @@ syslog_writer_factory::syslog_writer_factory()
     set_status_origin("syslog_writer_factory");
 }
 
-std::unique_ptr<configurable> syslog_writer_factory::create_configurable(const memento& mnto)
+std::unique_ptr<configurable> syslog_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
     std::unique_ptr<configurable> cnf;
     auto swm = dynamic_cast<const syslog_writer_memento&>(mnto);

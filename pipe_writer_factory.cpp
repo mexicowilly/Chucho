@@ -27,7 +27,7 @@ pipe_writer_factory::pipe_writer_factory()
     set_status_origin("pipe_writer_factory");
 }
 
-std::unique_ptr<configurable> pipe_writer_factory::create_configurable(const memento& mnto)
+std::unique_ptr<configurable> pipe_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
     auto pwm = dynamic_cast<const pipe_writer_memento&>(mnto);
     if (pwm.get_name().empty())

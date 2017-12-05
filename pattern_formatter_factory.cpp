@@ -28,7 +28,7 @@ pattern_formatter_factory::pattern_formatter_factory()
     set_status_origin("pattern_formatter_factory");
 }
 
-std::unique_ptr<configurable> pattern_formatter_factory::create_configurable(const memento& mnto)
+std::unique_ptr<configurable> pattern_formatter_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
     auto pfm = dynamic_cast<const pattern_formatter_memento&>(mnto);
     if (pfm.get_pattern().empty())

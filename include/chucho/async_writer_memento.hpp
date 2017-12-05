@@ -38,13 +38,13 @@ public:
     const optional<bool>& get_flush_on_destruct() const;
     const std::string& get_name() const;
     const optional<std::size_t>& get_queue_capacity() const;
-    std::shared_ptr<writer> get_writer() const;
-    virtual void handle(std::shared_ptr<configurable> cnf) override;
+    std::unique_ptr<writer>& get_writer();
+    virtual void handle(std::unique_ptr<configurable>&& cnf) override;
 
 private:
     std::shared_ptr<level> discard_threshold_;
     optional<std::size_t> queue_capacity_;
-    std::shared_ptr<writer> writer_;
+    std::unique_ptr<writer> writer_;
     optional<bool> flush_on_destruct_;
     std::string name_;
 };
@@ -69,7 +69,7 @@ inline const optional<std::size_t>& async_writer_memento::get_queue_capacity() c
     return queue_capacity_;
 }
 
-inline std::shared_ptr<writer> async_writer_memento::get_writer() const
+inline std::unique_ptr<writer>& async_writer_memento::get_writer()
 {
     return writer_;
 }

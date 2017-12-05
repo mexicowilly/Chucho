@@ -28,7 +28,7 @@ size_file_roll_trigger_factory::size_file_roll_trigger_factory()
     set_status_origin("size_file_roll_trigger_factory");
 }
 
-std::unique_ptr<configurable> size_file_roll_trigger_factory::create_configurable(const memento& mnto)
+std::unique_ptr<configurable> size_file_roll_trigger_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
     auto sfrtm = dynamic_cast<const size_file_roll_trigger_memento&>(mnto);
     if (!sfrtm.get_max_size())
