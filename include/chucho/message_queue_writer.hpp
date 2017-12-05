@@ -65,7 +65,7 @@ public:
      * 
      * @return the compressor
      */
-    std::shared_ptr<compressor> get_compressor() const;
+    std::unique_ptr<compressor>& get_compressor();
     /**
      * Get the current number of events that have been added
      * to the outgoing message but not yet sent.
@@ -78,7 +78,7 @@ public:
      * 
      * @return the serializer
      */
-    std::shared_ptr<serializer> get_serializer() const;
+    serializer& get_serializer();
     /**
      * Set the maximum number of events that can be added to
      * an outgoing message before it is flushed to the message
@@ -102,9 +102,9 @@ protected:
      * @param cmp the compressor
      */
     message_queue_writer(const std::string& name,
-                         std::shared_ptr<formatter> fmt,
-                         std::shared_ptr<serializer> ser,
-                         std::shared_ptr<compressor> cmp = std::shared_ptr<compressor>());
+                         std::unique_ptr<formatter>&& fmt,
+                         std::unique_ptr<serializer>&& ser,
+                         std::unique_ptr<compressor>&& cmp = std::move(std::unique_ptr<compressor>()));
     /**
      * Construct a message queue writer.
      *
@@ -115,10 +115,10 @@ protected:
      * @param cmp the compressor
      */
     message_queue_writer(const std::string& name,
-                         std::shared_ptr<formatter> fmt,
-                         std::shared_ptr<serializer> ser,
+                         std::unique_ptr<formatter>&& fmt,
+                         std::unique_ptr<serializer>&& ser,
                          std::size_t coalesce_max,
-                         std::shared_ptr<compressor> cmp = std::shared_ptr<compressor>());
+                         std::unique_ptr<compressor>&& cmp = std::move(std::unique_ptr<compressor>()));
     /**
      * Destroy the writer.
      */
@@ -136,11 +136,11 @@ protected:
     /**
      * The serializer
      */
-    std::shared_ptr<serializer> serializer_;
+    std::unique_ptr<serializer> serializer_;
     /**
      * The compressor
      */
-    std::shared_ptr<compressor> compressor_;
+    std::unique_ptr<compressor> compressor_;
     /**
      * The maximum number of events to coalesce.
      */
@@ -156,7 +156,7 @@ inline std::size_t message_queue_writer::get_coalesce_max() const
     return coalesce_max_;
 }
 
-inline std::shared_ptr<compressor> message_queue_writer::get_compressor() const
+inline std::unique_ptr<compressor>& message_queue_writer::get_compressor()
 {
     return compressor_;
 }
@@ -166,9 +166,9 @@ inline std::size_t message_queue_writer::get_number_coalesced() const
     return number_coalesced_;
 }
 
-inline std::shared_ptr<serializer> message_queue_writer::get_serializer() const
+inline serializer& message_queue_writer::get_serializer()
 {
-    return serializer_;
+    return *serializer_;
 }
 
 inline void message_queue_writer::set_coalesce_max(std::size_t num)

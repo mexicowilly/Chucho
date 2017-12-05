@@ -22,28 +22,32 @@ namespace chucho
 const std::size_t message_queue_writer::DEFAULT_COALESCE_MAX = 25;
 
 message_queue_writer::message_queue_writer(const std::string& name,
-                                           std::shared_ptr<formatter> fmt,
-                                           std::shared_ptr<serializer> ser,
-                                           std::shared_ptr<compressor> cmp)
-    : writer(name, fmt),
-      serializer_(ser),
-      compressor_(cmp),
+                                           std::unique_ptr<formatter>&& fmt,
+                                           std::unique_ptr<serializer>&& ser,
+                                           std::unique_ptr<compressor>&& cmp)
+    : writer(name, std::move(fmt)),
+      serializer_(std::move(ser)),
+      compressor_(std::move(cmp)),
       coalesce_max_(DEFAULT_COALESCE_MAX),
       number_coalesced_(0)
 {
+    if (!ser)
+        throw std::invalid_argument("The serializer must be set");
 }
 
 message_queue_writer::message_queue_writer(const std::string& name,
-                                           std::shared_ptr<formatter> fmt,
-                                           std::shared_ptr<serializer> ser,
+                                           std::unique_ptr<formatter>&& fmt,
+                                           std::unique_ptr<serializer>&& ser,
                                            std::size_t coalesce_max,
-                                           std::shared_ptr<compressor> cmp)
-    : writer(name, fmt),
-      serializer_(ser),
-      compressor_(cmp),
+                                           std::unique_ptr<compressor>&& cmp)
+    : writer(name, std::move(fmt)),
+      serializer_(std::move(ser)),
+      compressor_(std::move(cmp)),
       coalesce_max_(coalesce_max),
       number_coalesced_(0)
 {
+    if (!ser)
+        throw std::invalid_argument("The serializer must be set");
 }
 
 message_queue_writer::~message_queue_writer()
@@ -63,7 +67,7 @@ void message_queue_writer::flush()
 
 void message_queue_writer::write_impl(const event& evt)
 {
-    serializer_->serialize(evt, formatter_);
+    serializer_->serialize(evt, *formatter_);
     if (++number_coalesced_ == coalesce_max_)
         flush();
 }

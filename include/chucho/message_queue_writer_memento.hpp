@@ -36,7 +36,7 @@ public:
     std::size_t get_coalesce_max() const;
     std::shared_ptr<compressor> get_compressor() const;
     std::shared_ptr<serializer> get_serializer() const;
-    virtual void handle(std::shared_ptr<configurable> cnf) override;
+    virtual void handle(std::unique_ptr<configurable>&& cnf) override;
 
 private:
     std::shared_ptr<serializer> serializer_;

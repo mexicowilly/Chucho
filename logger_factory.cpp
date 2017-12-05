@@ -44,13 +44,13 @@ std::unique_ptr<configurable> logger_factory::create_configurable(std::unique_pt
         lgr->set_level(lm->get_level());
     std::for_each(lm->get_writers().begin(),
                   lm->get_writers().end(),
-                  [&] (std::shared_ptr<writer> w) { lgr->add_writer(w); });
+                  [&] (std::unique_ptr<writer>& w) { lgr->add_writer(std::move(w)); });
     if (lm->get_writes_to_ancestors())
         lgr->set_writes_to_ancestors(*lm->get_writes_to_ancestors());
     std::shared_ptr<configurable> cnf = std::static_pointer_cast<configurable>(lgr);
     if (!nm.empty())
         report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)) + " named " + nm);
-    return cnf;
+    return std::move(std::unique_ptr<configurable>());
 }
 
 std::unique_ptr<memento> logger_factory::create_memento(configurator& cfg)

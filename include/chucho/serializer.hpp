@@ -53,7 +53,7 @@ public:
      * @param evt the event to blobify
      * @param fmt the formatter used to create the formatted message
      */
-    virtual void serialize(const event& evt, std::shared_ptr<formatter> fmt) = 0;
+    virtual void serialize(const event& evt, formatter& fmt) = 0;
 };
 
 }

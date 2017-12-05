@@ -37,7 +37,7 @@ public:
 
     std::shared_ptr<level> get_level() const;
     const optional<std::string>& get_name() const;
-    const std::vector<std::unique_ptr<writer>>& get_writers() const;
+    std::vector<std::unique_ptr<writer>>& get_writers();
     const optional<bool>& get_writes_to_ancestors() const;
     virtual void handle(std::unique_ptr<configurable>&& cnf) override;
 
@@ -58,7 +58,7 @@ inline const optional<std::string>& logger_memento::get_name() const
     return name_;
 }
 
-inline const std::vector<std::unique_ptr<writer>>& logger_memento::get_writers() const
+inline std::vector<std::unique_ptr<writer>>& logger_memento::get_writers()
 {
     return writers_;
 }

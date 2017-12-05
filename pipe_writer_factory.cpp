@@ -18,6 +18,7 @@
 #include <chucho/pipe_writer_memento.hpp>
 #include <chucho/pipe_writer.hpp>
 #include <chucho/demangle.hpp>
+#include <assert.h>
 
 namespace chucho
 {
@@ -29,23 +30,24 @@ pipe_writer_factory::pipe_writer_factory()
 
 std::unique_ptr<configurable> pipe_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    auto pwm = dynamic_cast<const pipe_writer_memento&>(mnto);
-    if (pwm.get_name().empty())
+    auto pwm = dynamic_cast<pipe_writer_memento*>(mnto.get());
+    assert(pwm != nullptr);
+    if (pwm->get_name().empty())
         throw exception("pipe_writer_factory: The name is not set");
-    if (!pwm.get_formatter())
+    if (!pwm->get_formatter())
         throw exception("pipe_writer_factory: The writer's formatter is not set");
     std::unique_ptr<configurable> cnf;
-    if (pwm.get_flush())
+    if (pwm->get_flush())
     {
-        cnf = std::make_unique<pipe_writer>(pwm.get_name(),
-                                            pwm.get_formatter(),
-                                            *pwm.get_flush()));
+        cnf = std::make_unique<pipe_writer>(pwm->get_name(),
+                                            std::move(pwm->get_formatter()),
+                                            *pwm->get_flush());
     }
     else
     {
-        cnf = std::make_unique<pipe_writer>(pwm.get_name(), pwm.get_formatter()));
+        cnf = std::make_unique<pipe_writer>(pwm->get_name(), std::move(pwm->get_formatter()));
     }
-    set_filters(*cnf, pwm);
+    set_filters(*cnf, *pwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
     return std::move(cnf);
 }

@@ -19,6 +19,7 @@
 #include <chucho/pattern_formatter.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
+#include <assert.h>
 
 namespace chucho
 {
@@ -30,10 +31,11 @@ pattern_formatter_factory::pattern_formatter_factory()
 
 std::unique_ptr<configurable> pattern_formatter_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    auto pfm = dynamic_cast<const pattern_formatter_memento&>(mnto);
-    if (pfm.get_pattern().empty())
+    auto pfm = dynamic_cast<pattern_formatter_memento*>(mnto.get());
+    assert(pfm != nullptr);
+    if (pfm->get_pattern().empty())
         throw exception("pattern_formatter_factory: The pattern must be set");
-    auto cnf = std::make_unique<pattern_formatter>(pfm.get_pattern());
+    auto cnf = std::make_unique<pattern_formatter>(pfm->get_pattern());
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
     return std::move(cnf);
 }
