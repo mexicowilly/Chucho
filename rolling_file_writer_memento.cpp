@@ -17,6 +17,7 @@
 #include <chucho/rolling_file_writer_memento.hpp>
 #include <chucho/demangle.hpp>
 #include <chucho/exception.hpp>
+#include <chucho/move_util.hpp>
 
 namespace chucho
 {
@@ -27,20 +28,20 @@ rolling_file_writer_memento::rolling_file_writer_memento(configurator& cfg)
     set_status_origin("rolling_file_writer_memento");
 }
 
-void rolling_file_writer_memento::handle(std::shared_ptr<configurable> cnf)
+void rolling_file_writer_memento::handle(std::unique_ptr<configurable>&& cnf)
 {
-    auto roller = std::dynamic_pointer_cast<file_roller>(cnf);
+    auto roller = dynamic_move<file_roller>(std::move(cnf));
     if (roller)
     {
-        roller_ = roller;
+        roller_ = std::move(roller);
     }
     else
     {
-        auto trigger = std::dynamic_pointer_cast<file_roll_trigger>(cnf);
+        auto trigger = dynamic_move<file_roll_trigger>(std::move(cnf));
         if (trigger)
-            trigger_ = trigger;
+            trigger_ = std::move(trigger);
         else
-            file_writer_memento::handle(cnf);
+            file_writer_memento::handle(std::move(cnf));
     }
 }
 

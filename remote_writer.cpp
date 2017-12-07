@@ -35,7 +35,7 @@ remote_writer::remote_writer(const std::string& name,
                              const std::string& host,
                              std::uint16_t port,
                              std::size_t unsent_cache_max)
-    : writer(name, std::make_shared<yaml_formatter>()),
+    : writer(name, std::move(std::make_unique<yaml_formatter>())),
       host_(host),
       port_(port),
       unsent_cache_max_(unsent_cache_max)

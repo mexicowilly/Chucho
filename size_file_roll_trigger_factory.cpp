@@ -19,6 +19,7 @@
 #include <chucho/size_file_roll_trigger.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
+#include <assert.h>
 
 namespace chucho
 {
@@ -30,17 +31,18 @@ size_file_roll_trigger_factory::size_file_roll_trigger_factory()
 
 std::unique_ptr<configurable> size_file_roll_trigger_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    auto sfrtm = dynamic_cast<const size_file_roll_trigger_memento&>(mnto);
-    if (!sfrtm.get_max_size())
+    auto sfrtm = dynamic_cast<size_file_roll_trigger_memento*>(mnto.get());
+    assert(sfrtm != nullptr);
+    if (!sfrtm->get_max_size())
         throw exception("size_file_roll_trigger_factory: The max_size field must be set to create a size_file_roll_trigger");
-    auto cnf = std::make_unique<size_file_roll_trigger>(*sfrtm.get_max_size()));
+    auto cnf = std::make_unique<size_file_roll_trigger>(*sfrtm->get_max_size());
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
     return std::move(cnf);
 }
 
 std::unique_ptr<memento> size_file_roll_trigger_factory::create_memento(configurator& cfg)
 {
-    auto mnto = std::make_unique<size_file_roll_trigger_memento>(cfg));
+    auto mnto = std::make_unique<size_file_roll_trigger_memento>(cfg);
     return std::move(mnto);
 }
 

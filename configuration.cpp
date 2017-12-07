@@ -349,7 +349,7 @@ void configuration::initialize_security_policy()
     // The mementos are where each configurable configures
     // its security policy.
     auto& facts(configurator::get_factories());
-    for (auto fact : facts)
+    for (const auto& fact : facts)
         fact.second->create_memento(cnf);
 
     #endif

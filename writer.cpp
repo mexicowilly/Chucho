@@ -62,7 +62,7 @@ std::vector<std::string> writer::get_filter_names()
 
 bool writer::permits(const event& evt)
 {
-    for (std::shared_ptr<filter> f : filters_)
+    for (const auto& f : filters_)
     {
         filter::result res = f->evaluate(evt);
         if (res == filter::result::DENY)
@@ -76,7 +76,7 @@ bool writer::permits(const event& evt)
 void writer::remove_filter(const std::string& name)
 {
     std::lock_guard<std::recursive_mutex> lg(*guard_);
-    filters_.remove_if([&name] (const std::unique_ptr<filter>& f) { f->get_name() == name; });
+    filters_.remove_if([&name] (const std::unique_ptr<filter>& f) { return f->get_name() == name; });
 }
 
 void writer::write(const event& evt)

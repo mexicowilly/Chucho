@@ -65,7 +65,7 @@ public:
      *        established
      */
     syslog_writer(const std::string& name,
-                  std::shared_ptr<formatter> fmt,
+                  std::unique_ptr<formatter>&& fmt,
                   syslog::facility fcl);
     /**
      * Construct a syslog_writer. When this constructor is used, 
@@ -82,7 +82,7 @@ public:
      *        established
      */
     syslog_writer(const std::string& name,
-                  std::shared_ptr<formatter> fmt,
+                  std::unique_ptr<formatter>&& fmt,
                   syslog::facility fcl,
                   const std::string& host,
                   std::uint16_t port = syslog::DEFAULT_PORT);

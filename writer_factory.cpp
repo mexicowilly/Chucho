@@ -16,17 +16,17 @@
 
 #include <chucho/writer_factory.hpp>
 #include <chucho/writer.hpp>
-#include <algorithm>
+#include <assert.h>
 
 namespace chucho
 {
 
-void writer_factory::set_filters(configurable& cnf, const writer_memento& mnto)
+void writer_factory::set_filters(configurable& cnf, writer_memento& mnto)
 {
-    auto wrt = dynamic_cast<writer&>(cnf);
-    std::for_each(mnto.get_filters().begin(),
-                  mnto.get_filters().end(),
-                  [&] (std::unique_ptr<filter>& f) { wrt.add_filter(std::move(f)); });
+    auto wrt = dynamic_cast<writer*>(&cnf);
+    assert(wrt != nullptr);
+    for (auto& f : mnto.get_filters())
+        wrt->add_filter(std::move(f));
 }
 
 }

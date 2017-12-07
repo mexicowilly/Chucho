@@ -19,6 +19,7 @@
 #include <chucho/time_file_roller.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
+#include <assert.h>
 
 namespace chucho
 {
@@ -30,14 +31,15 @@ time_file_roller_factory::time_file_roller_factory()
 
 std::unique_ptr<configurable> time_file_roller_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    auto tfrm = dynamic_cast<const time_file_roller_memento&>(mnto);
-    if (tfrm.get_file_name_pattern().empty())
+    auto tfrm = dynamic_cast<time_file_roller_memento*>(mnto.get());
+    assert(tfrm != nullptr);
+    if (tfrm->get_file_name_pattern().empty())
         throw exception("time_file_roller_factory: The file_name_pattern field must be set");
-    if (!tfrm.get_max_history())
+    if (!tfrm->get_max_history())
         throw exception("time_file_roller_factory: The max_history field must be set");
-    auto cnf = std::make_unique<time_file_roller>(tfrm.get_file_name_pattern(),
-                                                  *tfrm.get_max_history(),
-                                                  tfrm.get_file_compressor()));
+    auto cnf = std::make_unique<time_file_roller>(tfrm->get_file_name_pattern(),
+                                                  *tfrm->get_max_history(),
+                                                  std::move(tfrm->get_file_compressor()));
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
     return std::move(cnf);
 }

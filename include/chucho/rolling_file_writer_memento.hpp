@@ -35,7 +35,7 @@ public:
 
     std::shared_ptr<file_roller> get_file_roller() const;
     std::shared_ptr<file_roll_trigger> get_file_roll_trigger() const;
-    virtual void handle(std::shared_ptr<configurable> cnf) override;
+    virtual void handle(std::unique_ptr<configurable>&& cnf) override;
 
 private:
     std::shared_ptr<file_roller> roller_;

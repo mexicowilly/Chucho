@@ -43,7 +43,7 @@ protected:
      * @param cnf the @ref writer that wants filters
      * @param mnto the @ref memento that has the filters
      */
-    void set_filters(configurable& cnf, const writer_memento& mnto);
+    void set_filters(configurable& cnf, writer_memento& mnto);
 };
 
 }

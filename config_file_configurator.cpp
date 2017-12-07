@@ -25,6 +25,7 @@
 #include <chucho/text_util.hpp>
 #include <chucho/file_writer_memento.hpp>
 #include <chucho/level_threshold_filter.hpp>
+#include <chucho/move_util.hpp>
 #include <algorithm>
 #include <assert.h>
 
@@ -120,19 +121,19 @@ config_file_configurator::chucho_properties_processor::chucho_properties_process
     cfg_.report_info("Using Chucho-style config file configuration");
 }
 
-std::shared_ptr<configurable> config_file_configurator::chucho_properties_processor::create_configurable(const std::string& type,
+std::unique_ptr<configurable> config_file_configurator::chucho_properties_processor::create_configurable(const std::string& type,
                                                                                                          const std::string& name,
                                                                                                          const properties& props)
 {
     auto fact = get_factory(type, name, props);
-    auto mnto = fact->create_memento(cfg_);
+    auto mnto = std::move(fact->create_memento(cfg_));
     auto cur_props = props.get_subset(type + '.' + name + '.');
     for (auto cur : cur_props)
         mnto->handle(cur.first, cur.second);
-    return fact->create_configurable(mnto);
+    return std::move(fact->create_configurable(mnto));
 }
 
-std::shared_ptr<configurable> config_file_configurator::chucho_properties_processor::create_file_roller(const std::string& name,
+std::unique_ptr<configurable> config_file_configurator::chucho_properties_processor::create_file_roller(const std::string& name,
                                                                                                         const properties& props)
 {
     std::string type("file_roller");
@@ -149,12 +150,12 @@ std::shared_ptr<configurable> config_file_configurator::chucho_properties_proces
     return fact->create_configurable(mnto); 
 }
 
-std::shared_ptr<configurable> config_file_configurator::chucho_properties_processor::create_writer(const std::string& name,
+std::unique_ptr<configurable> config_file_configurator::chucho_properties_processor::create_writer(const std::string& name,
                                                                                                    const properties& props)
 {
     std::string type("writer");
     auto fact = get_factory(type, name, props); 
-    auto mnto = fact->create_memento(cfg_);
+    auto mnto = std::move(fact->create_memento(cfg_));
     auto cur_props = props.get_subset(type + '.' + name + '.');
     std::vector<std::string> generics;
     // VS2012 does not support initializer lists. Piece of shit.
@@ -166,18 +167,18 @@ std::shared_ptr<configurable> config_file_configurator::chucho_properties_proces
     #if defined(CHUCHO_HAVE_EMAIL_WRITER)
     generics.push_back("email_trigger");
     #endif
-    for (auto cur : cur_props)
+    for (const auto& cur : cur_props)
     {
         if (cur.first == "file_roller")
-            mnto->handle(create_file_roller(cur.second, props));
+            mnto->handle(std::move(create_file_roller(cur.second, props)));
         else if (cur.first == "writer")
-            mnto->handle(create_writer(cur.second, props));
+            mnto->handle(std::move(create_writer(cur.second, props)));
         else if (std::count(generics.begin(), generics.end(), cur.first) > 0)
-            mnto->handle(create_configurable(cur.first, cur.second, props));
+            mnto->handle(std::move(create_configurable(cur.first, cur.second, props)));
         else if (cur.first.find('.') == std::string::npos)
             mnto->handle(cur.first, cur.second); 
     }
-    return fact->create_configurable(mnto); 
+    return std::move(fact->create_configurable(mnto));
 }
 
 std::shared_ptr<configurable_factory> config_file_configurator::chucho_properties_processor::get_factory(const std::string& type,
@@ -240,7 +241,7 @@ config_file_configurator::log4cplus_properties_processor::log4cplus_properties_p
     factory_keys_["log4cplus::NTEventLogAppender"] = "chucho::windows_event_log_writer";
 }
 
-void config_file_configurator::log4cplus_properties_processor::add_filters(std::shared_ptr<writer> wrt,
+void config_file_configurator::log4cplus_properties_processor::add_filters(writer& wrt,
                                                                            const properties& props)
 {
     auto flts = props.get_subset("filters.");
@@ -251,8 +252,8 @@ void config_file_configurator::log4cplus_properties_processor::add_filters(std::
     {
         if (*type == "log4cplus::spi::DenyAllFilter")
         {
-            auto flt = std::make_shared<level_threshold_filter>(level::OFF_());
-            wrt->add_filter(flt);
+            auto flt = std::make_unique<level_threshold_filter>(level::OFF_());
+            wrt.add_filter(std::move(flt));
         }
         else if (*type == "log4cplus::spi::StringMatchFilter") 
         {
@@ -269,14 +270,16 @@ void config_file_configurator::log4cplus_properties_processor::add_filters(std::
             {
                 auto fact = cfg_.get_factories().find(key->second);
                 assert(fact != cfg_.get_factories().end());
-                auto mnto = fact->second->create_memento(cfg_);
+                auto mnto = std::move(fact->second->create_memento(cfg_));
                 auto flt_props = get_non_empty_subset(flts, name + ".");
                 for (auto prp : flt_props)
                 {
                     if (prp.second.find(*type) != 0)
                         mnto->handle(prp.first, prp.second); 
                 }
-                wrt->add_filter(std::dynamic_pointer_cast<filter>(fact->second->create_configurable(mnto)));
+                auto filt = dynamic_move<filter>(fact->second->create_configurable(mnto));
+                assert(filt);
+                wrt.add_filter(std::move(filt));
             }
         }
         name = std::to_string(++num);
@@ -290,64 +293,64 @@ bool config_file_configurator::log4cplus_properties_processor::boolean_value(con
     return low == "0" || low == "false" ? false : true;
 }
 
-std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_processor::create_async_writer(const properties& top_props,
+std::unique_ptr<configurable> config_file_configurator::log4cplus_properties_processor::create_async_writer(const properties& top_props,
                                                                                                             const properties& wrt_props)
 {
     assert(cfg_.get_factories().find("chucho::async_writer") != cfg_.get_factories().end());
     auto fact = cfg_.get_factories().find("chucho::async_writer")->second;
-    auto mnto = fact->create_memento(cfg_);
+    auto mnto = std::move(fact->create_memento(cfg_));
     auto app = wrt_props.get_one("Appender");
     if (app)
-        mnto->handle(create_writer(*app, top_props));
-    return fact->create_configurable(mnto);
+        mnto->handle(std::move(create_writer(*app, top_props)));
+    return std::move(fact->create_configurable(mnto));
 }
 
-std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_processor::create_console_writer(std::shared_ptr<formatter> fmt,
+std::unique_ptr<configurable> config_file_configurator::log4cplus_properties_processor::create_console_writer(std::unique_ptr<formatter>&& fmt,
                                                                                                               const properties& props)
 {
     auto type = props.get_one("logToStdErr");
-    std::shared_ptr<configurable> result;
+    std::unique_ptr<configurable> result;
     if (type && boolean_value(*type))
-        result = std::make_shared<cerr_writer>(fmt);
+        result = std::make_unique<cerr_writer>(std::move(fmt));
     else
-        result = std::make_shared<cout_writer>(fmt);
-    return result;
+        result = std::make_unique<cout_writer>(std::move(fmt));
+    return std::move(result);
 }
 
-std::shared_ptr<formatter> config_file_configurator::log4cplus_properties_processor::create_formatter(const std::string& type,
+std::unique_ptr<formatter> config_file_configurator::log4cplus_properties_processor::create_formatter(const std::string& type,
                                                                                                       const properties& props)
 {
-    std::shared_ptr<formatter> result;
+    std::unique_ptr<formatter> result;
     if (type == "log4cplus::PatternLayout")
     {
         auto pat = props.get_one("ConversionPattern");
         if (pat)
-            result = std::make_shared<pattern_formatter>(*pat); 
+            result = std::make_unique<pattern_formatter>(*pat);
         else
             throw exception("A log4cplus::PatternLayout requires a ConversionPattern property");
     }
     else if (type == "log4cplus::SimpleLayout")
     {
-        result = std::make_shared<pattern_formatter>("%p - %m%n");
+        result = std::make_unique<pattern_formatter>("%p - %m%n");
     }
     else if (type == "log4cplus::TTCCLayout")
     {
-        result = std::make_shared<pattern_formatter>("%r %t %p %c - %m%n");
+        result = std::make_unique<pattern_formatter>("%r %t %p %c - %m%n");
     }
     else
     {
         throw exception("The layout type " + type + " is not recognized as a known log4cplus type");
     }
-    return result;
+    return std::move(result);
 }
 
-std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_processor::create_logger(const std::string& name,
-                                                                                                      const std::string& desc,
-                                                                                                      const properties& props)
+void config_file_configurator::log4cplus_properties_processor::create_logger(const std::string& name,
+                                                                             const std::string& desc,
+                                                                             const properties& props)
 {
     assert(get_factories().find("chucho::logger") != get_factories().end());
     auto lgr_fact = get_factories().find("chucho::logger")->second;
-    auto mnto = lgr_fact->create_memento(cfg_);
+    auto mnto = std::move(lgr_fact->create_memento(cfg_));
     mnto->handle("name", name);
     auto tokens = split_logger_descriptor(desc);
     if (!tokens.empty())
@@ -357,88 +360,90 @@ std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_pro
     {
         for (auto tok : tokens)
         {
-            auto wrt = create_writer(tok, props);
+            auto wrt = std::move(create_writer(tok, props));
             if (wrt)
-                mnto->handle(wrt);
+                mnto->handle(std::move(wrt));
         }
     }
-    return lgr_fact->create_configurable(mnto); 
+    lgr_fact->create_configurable(mnto);
 }
 
-std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_processor::create_size_rolling_writer(std::shared_ptr<formatter> fmt,
+std::unique_ptr<configurable> config_file_configurator::log4cplus_properties_processor::create_size_rolling_writer(std::unique_ptr<formatter>&& fmt,
                                                                                                                    const properties& props)
 {
     assert(cfg_.get_factories().find("chucho::rolling_file_writer") != cfg_.get_factories().end());
     auto fact = cfg_.get_factories().find("chucho::rolling_file_writer")->second;
-    auto mnto = fact->create_memento(cfg_);
-    fill_file_writer_memento(mnto, fmt, props);
+    auto mnto = std::move(fact->create_memento(cfg_));
+    fill_file_writer_memento(mnto, std::move(fmt), props);
     assert(cfg_.get_factories().find("chucho::numbered_file_roller") != cfg_.get_factories().end()); 
     auto roller_fact = cfg_.get_factories().find("chucho::numbered_file_roller")->second;
-    auto roller_mnto = roller_fact->create_memento(cfg_);
+    auto roller_mnto = std::move(roller_fact->create_memento(cfg_));
     auto prop = props.get_one("MaxBackupIndex");
     roller_mnto->handle("max_index", (prop ? *prop : "1"));
-    mnto->handle(roller_fact->create_configurable(roller_mnto));
+    mnto->handle(std::move(fact->create_configurable(roller_mnto)));
     assert(cfg_.get_factories().find("chucho::size_file_roll_trigger") != cfg_.get_factories().end()); 
     auto trigger_fact = cfg_.get_factories().find("chucho::size_file_roll_trigger")->second;
-    auto trigger_mnto = trigger_fact->create_memento(cfg_);
+    auto trigger_mnto = std::move(trigger_fact->create_memento(cfg_));
     prop = props.get_one("MaxFileSize");
     trigger_mnto->handle("max_size", (prop ? *prop : "10m"));
-    mnto->handle(trigger_fact->create_configurable(trigger_mnto));
-    return fact->create_configurable(mnto); 
+    mnto->handle(std::move(trigger_fact->create_configurable(trigger_mnto)));
+    return std::move(fact->create_configurable(mnto));
 }
 
-std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_processor::create_time_rolling_writer(std::shared_ptr<formatter> fmt,
+std::unique_ptr<configurable> config_file_configurator::log4cplus_properties_processor::create_time_rolling_writer(std::unique_ptr<formatter>&& fmt,
                                                                                                                    const properties& props)
 {
     assert(cfg_.get_factories().find("chucho::rolling_file_writer") != cfg_.get_factories().end());
     auto fact = cfg_.get_factories().find("chucho::rolling_file_writer")->second;
-    auto mnto = fact->create_memento(cfg_);
-    fill_file_writer_memento(mnto, fmt, props);
+    auto mnto = std::move(fact->create_memento(cfg_));
+    fill_file_writer_memento(mnto, std::move(fmt), props);
     assert(cfg_.get_factories().find("chucho::time_file_roller") != cfg_.get_factories().end()); 
     auto roller_fact = cfg_.get_factories().find("chucho::time_file_roller")->second;
-    auto roller_mnto = roller_fact->create_memento(cfg_);
+    auto roller_mnto = std::move(roller_fact->create_memento(cfg_));
     auto prop = props.get_one("MaxBackupIndex");
     roller_mnto->handle("max_history", prop ? *prop : "10");
-    std::string fn = std::dynamic_pointer_cast<file_writer_memento>(mnto)->get_file_name();
+    auto fwm = dynamic_cast<file_writer_memento*>(mnto.get());
+    assert(fwm != nullptr);
+    std::string fn = fwm->get_file_name();
     roller_mnto->handle("file_name_pattern", time_pattern_from_log4cplus_schedule(props.get_one("Schedule"), fn));
-    mnto->handle(roller_fact->create_configurable(roller_mnto));
-    return fact->create_configurable(mnto); 
+    mnto->handle(std::move(roller_fact->create_configurable(roller_mnto)));
+    return std::move(fact->create_configurable(mnto));
 }
 
-std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_processor::create_writer(const std::string& name,
+std::unique_ptr<configurable> config_file_configurator::log4cplus_properties_processor::create_writer(const std::string& name,
                                                                                                       const properties& props)
 {
-    std::shared_ptr<configurable> result;
+    std::unique_ptr<configurable> result;
     auto type = props.get_one("appender." + name); 
     if (!type)
         throw exception("There is no definition of appender " + name);
     auto wrt_props = props.get_subset("appender." + name + "."); 
     auto fmt_type = wrt_props.get_one("layout"); 
-    std::shared_ptr<formatter> fmt;
+    std::unique_ptr<formatter> fmt;
     if (fmt_type)
     {
         auto fmt_props = wrt_props.get_subset("layout.");
-        fmt = create_formatter(*fmt_type, fmt_props);
+        fmt = std::move(create_formatter(*fmt_type, fmt_props));
     }
     if (*type == "log4cplus::ConsoleAppender") 
     {
-        result = create_console_writer(fmt, wrt_props);
+        result = std::move(create_console_writer(std::move(fmt), wrt_props));
     }
     else if (*type == "log4cplus::RollingFileAppender")
     {
-        result = create_size_rolling_writer(fmt, wrt_props);
+        result = std::move(create_size_rolling_writer(std::move(fmt), wrt_props));
     }
     else if (*type == "log4cplus::DailyRollingFileAppender")
     {
-        result = create_time_rolling_writer(fmt, wrt_props);
+        result = std::move(create_time_rolling_writer(std::move(fmt), wrt_props));
     }
     else if (*type == "log4cplus::AsyncAppender")
     {
-        result = create_async_writer(props, wrt_props);
+        result = std::move(create_async_writer(props, wrt_props));
     }
     else if (*type == "log4cplus::NullAppender")
     {
-        return result;
+        return std::move(result);
     }
     else 
     {
@@ -451,29 +456,31 @@ std::shared_ptr<configurable> config_file_configurator::log4cplus_properties_pro
         {
             auto fact = cfg_.get_factories().find(key->second);
             assert(fact != cfg_.get_factories().end());
-            auto mnto = fact->second->create_memento(cfg_);
+            auto mnto = std::move(fact->second->create_memento(cfg_));
             if (fmt)
-                mnto->handle(fmt); 
+                mnto->handle(std::move(fmt));
             for (auto prp : wrt_props)
             {
                 if (prp.first.find("layout") != 0 && prp.first.find("filters") != 0)
                     mnto->handle(prp.first, prp.second); 
             }
-            result = fact->second->create_configurable(mnto);
+            result = std::move(fact->second->create_configurable(mnto));
         }
     }
     if (!result)
         throw writer_creation_exception(name);
-    add_filters(std::dynamic_pointer_cast<writer>(result), wrt_props); 
-    return result; 
+    writer* wrt = dynamic_cast<writer*>(result.get());
+    assert(wrt != nullptr);
+    add_filters(*wrt, wrt_props);
+    return std::move(result);
 }
 
-void config_file_configurator::log4cplus_properties_processor::fill_file_writer_memento(std::shared_ptr<memento> mnto,
-                                                                                        std::shared_ptr<formatter> fmt,
+void config_file_configurator::log4cplus_properties_processor::fill_file_writer_memento(std::unique_ptr<memento>& mnto,
+                                                                                        std::unique_ptr<formatter>&& fmt,
                                                                                         const properties& props)
 {
     if (fmt) 
-        mnto->handle(fmt);
+        mnto->handle(std::move(fmt));
     auto prop = props.get_one("Append");
     if (prop)
         mnto->handle("Append", *prop);

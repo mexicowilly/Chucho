@@ -42,7 +42,7 @@ private:
                 const yaml_node_t& node,
                 int level,
                 const std::string& key,
-                std::shared_ptr<memento> mnto);
+                std::unique_ptr<memento>& mnto);
 };
 
 }
