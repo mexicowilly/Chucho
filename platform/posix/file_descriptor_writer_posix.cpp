@@ -25,17 +25,17 @@ namespace chucho
 {
 
 file_descriptor_writer::file_descriptor_writer(const std::string& name,
-                                               std::shared_ptr<formatter> fmt,
+                                               std::unique_ptr<formatter>&& fmt,
                                                bool flsh)
-    : file_descriptor_writer(name, fmt, -1, flsh)
+    : file_descriptor_writer(name, std::move(fmt), -1, flsh)
 {
 }
 
 file_descriptor_writer::file_descriptor_writer(const std::string& name,
-                                               std::shared_ptr<formatter> fmt,
+                                               std::unique_ptr<formatter>&& fmt,
                                                int fd,
                                                bool flsh)
-    : writer(name, fmt),
+    : writer(name, std::move(fmt)),
       num_(0),
       fd_(fd),
       flush_(flsh),

@@ -43,7 +43,7 @@ public:
      * @throw std::invalid_argument if fmt is an uninitialized 
      *        std::shared_ptr
      */
-    cout_writer(const std::string& name, std::shared_ptr<formatter> fmt);
+    cout_writer(const std::string& name, std::unique_ptr<formatter>&& fmt);
     //@}
 };
 

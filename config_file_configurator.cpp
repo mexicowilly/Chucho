@@ -252,7 +252,7 @@ void config_file_configurator::log4cplus_properties_processor::add_filters(write
     {
         if (*type == "log4cplus::spi::DenyAllFilter")
         {
-            auto flt = std::make_unique<level_threshold_filter>(level::OFF_());
+            auto flt = std::make_unique<level_threshold_filter>("level_threshold_filter", level::OFF_());
             wrt.add_filter(std::move(flt));
         }
         else if (*type == "log4cplus::spi::StringMatchFilter") 
@@ -311,9 +311,9 @@ std::unique_ptr<configurable> config_file_configurator::log4cplus_properties_pro
     auto type = props.get_one("logToStdErr");
     std::unique_ptr<configurable> result;
     if (type && boolean_value(*type))
-        result = std::make_unique<cerr_writer>(std::move(fmt));
+        result = std::make_unique<cerr_writer>("cerr_writer", std::move(fmt));
     else
-        result = std::make_unique<cout_writer>(std::move(fmt));
+        result = std::make_unique<cout_writer>("cout_writer", std::move(fmt));
     return std::move(result);
 }
 

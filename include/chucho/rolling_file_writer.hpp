@@ -83,9 +83,9 @@ public:
      *        resolved
      */
     rolling_file_writer(const std::string& name,
-                        std::shared_ptr<formatter> fmt,
-                        std::shared_ptr<file_roller> roller,
-                        std::shared_ptr<file_roll_trigger> trigger = std::shared_ptr<file_roll_trigger>());
+                        std::unique_ptr<formatter>&& fmt,
+                        std::unique_ptr<file_roller>&& roller,
+                        std::unique_ptr<file_roll_trigger>&& trigger = std::move(std::unique_ptr<file_roll_trigger>()));
     /**
      * Construct a rolling_file_writer.
      * 
@@ -102,10 +102,10 @@ public:
      *        resolved
      */
     rolling_file_writer(const std::string& name,
-                        std::shared_ptr<formatter> fmt,
+                        std::unique_ptr<formatter>&& fmt,
                         const std::string& file_name,
-                        std::shared_ptr<file_roller> roller,
-                        std::shared_ptr<file_roll_trigger> trigger = std::shared_ptr<file_roll_trigger>());
+                        std::unique_ptr<file_roller>&& roller,
+                        std::unique_ptr<file_roll_trigger>&& trigger = std::move(std::unique_ptr<file_roll_trigger>()));
     /**
      * Construct a rolling_file_writer.
      * 
@@ -124,12 +124,12 @@ public:
      *        resolved
      */
     rolling_file_writer(const std::string& name,
-                        std::shared_ptr<formatter> fmt,
+                        std::unique_ptr<formatter>&& fmt,
                         const std::string& file_name,
                         on_start start,
                         bool flush,
-                        std::shared_ptr<file_roller> roller,
-                        std::shared_ptr<file_roll_trigger> trigger = std::shared_ptr<file_roll_trigger>());
+                        std::unique_ptr<file_roller>&& roller,
+                        std::unique_ptr<file_roll_trigger>&& trigger = std::move(std::unique_ptr<file_roll_trigger>()));
     /**
      * Construct a rolling_file_writer.
      * 
@@ -147,11 +147,11 @@ public:
      *        resolved
      */
     rolling_file_writer(const std::string& name,
-                        std::shared_ptr<formatter> fmt,
+                        std::unique_ptr<formatter>&& fmt,
                         on_start start,
                         bool flush,
-                        std::shared_ptr<file_roller> roller,
-                        std::shared_ptr<file_roll_trigger> trigger = std::shared_ptr<file_roll_trigger>());
+                        std::unique_ptr<file_roller>&& roller,
+                        std::unique_ptr<file_roll_trigger>&& trigger = std::move(std::unique_ptr<file_roll_trigger>()));
     //@}
 
     /**
@@ -159,13 +159,13 @@ public:
      * 
      * @return the roller
      */
-    std::shared_ptr<file_roller> get_file_roller() const;
+    file_roller& get_file_roller() const;
     /**
      * Return the trigger.
      * 
      * @return the trigger
      */
-    std::shared_ptr<file_roll_trigger> get_file_roll_trigger() const;
+    file_roll_trigger& get_file_roll_trigger() const;
 
 protected:
     virtual void write_impl(const event& evt) override;
@@ -173,18 +173,19 @@ protected:
 private:
     CHUCHO_NO_EXPORT void init();
 
-    std::shared_ptr<file_roller> roller_;
-    std::shared_ptr<file_roll_trigger> trigger_;
+    std::unique_ptr<file_roller> roller_;
+    std::unique_ptr<file_roll_trigger> trigger_;
+    file_roll_trigger* effective_trigger_;
 };
 
-inline std::shared_ptr<file_roller> rolling_file_writer::get_file_roller() const
+inline file_roller& rolling_file_writer::get_file_roller() const
 {
-    return roller_;
+    return *roller_;
 }
 
-inline std::shared_ptr<file_roll_trigger> rolling_file_writer::get_file_roll_trigger() const
+inline file_roll_trigger& rolling_file_writer::get_file_roll_trigger() const
 {
-    return trigger_;
+    return *effective_trigger_;
 }
 
 }

@@ -32,10 +32,10 @@ namespace chucho
 {
 
 file_writer::file_writer(const std::string& name,
-                         std::shared_ptr<formatter> fmt,
+                         std::unique_ptr<formatter>&& fmt,
                          on_start start,
                          bool flsh)
-    : file_descriptor_writer(name, fmt, flsh),
+    : file_descriptor_writer(name, std::move(fmt), flsh),
       start_(start),
       next_access_check_(std::chrono::steady_clock::now()),
       is_open_(false),
@@ -46,11 +46,11 @@ file_writer::file_writer(const std::string& name,
 }
 
 file_writer::file_writer(const std::string& name,
-                         std::shared_ptr<formatter> fmt,
+                         std::unique_ptr<formatter>&& fmt,
                          const std::string& file_name,
                          on_start start,
                          bool flsh)
-    : file_descriptor_writer(name, fmt, flsh),
+    : file_descriptor_writer(name, std::move(fmt), flsh),
       initial_file_name_(file_name),
       start_(start),
       next_access_check_(std::chrono::steady_clock::now()),

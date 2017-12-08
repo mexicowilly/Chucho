@@ -86,9 +86,8 @@ void set_default_config(std::shared_ptr<chucho::logger> root_logger)
 {
     if (root_logger->get_writer_names().empty())
     {
-        std::shared_ptr<chucho::formatter> fmt(
-            new chucho::pattern_formatter("%d{%H:%M:%S.%q} %-5p %.36c - %m%n"));
-        auto wrt = std::make_unique<chucho::cout_writer>("chucho::cout_writer", fmt);
+        auto fmt = std::make_unique<chucho::pattern_formatter>("%d{%H:%M:%S.%q} %-5p %.36c - %m%n");
+        auto wrt = std::make_unique<chucho::cout_writer>("chucho::cout_writer", std::move(fmt));
         root_logger->add_writer(std::move(wrt));
     }
 }

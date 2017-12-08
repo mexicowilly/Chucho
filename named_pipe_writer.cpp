@@ -20,10 +20,10 @@ namespace chucho
 {
 
 named_pipe_writer::named_pipe_writer(const std::string& name,
-                                     std::shared_ptr<formatter> fmt,
+                                     std::unique_ptr<formatter>&& fmt,
                                      const std::string& pipe_name,
                                      bool flsh)
-    : file_writer(name, fmt, on_start::APPEND, flsh)
+    : file_writer(name, std::move(fmt), on_start::APPEND, flsh)
 {
     set_status_origin("named_pipe_writer");
     set_allow_creation(false);

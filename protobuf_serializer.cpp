@@ -50,10 +50,10 @@ std::vector<std::uint8_t> protobuf_serializer::finish_blob()
     return std::vector<std::uint8_t>(tmp.begin(), tmp.end());
 }
 
-void protobuf_serializer::serialize(const event& evt, std::shared_ptr<formatter> fmt)
+void protobuf_serializer::serialize(const event& evt, formatter& fmt)
 {
     proto::log_event& pevt(*handle_->events.add_events());
-    pevt.set_formatted_message(utf8::escape_invalid(fmt->format(evt)));
+    pevt.set_formatted_message(utf8::escape_invalid(fmt.format(evt)));
     pevt.set_seconds_since_epoch(event::clock_type::to_time_t(evt.get_time()));
     pevt.set_file_name(utf8::escape_invalid(evt.get_file_name()));
     pevt.set_line_number(evt.get_line_number());

@@ -16,6 +16,7 @@
 
 #include <chucho/email_writer_memento.hpp>
 #include <chucho/text_util.hpp>
+#include <chucho/move_util.hpp>
 
 namespace chucho
 {
@@ -49,13 +50,13 @@ email_writer_memento::email_writer_memento(configurator& cfg)
     set_handler("verbose", [this] (const std::string& val) { verbose_ = boolean_value(validate("email_writer::verbose", val)); });
 }
 
-void email_writer_memento::handle(std::shared_ptr<configurable> cnf)
+void email_writer_memento::handle(std::unique_ptr<configurable>&& cnf)
 {
-    auto trg = std::dynamic_pointer_cast<email_trigger>(cnf);
+    auto trg = dynamic_move<email_trigger>(std::move(cnf));
     if (trg)
-        trigger_ = trg;
+        trigger_ = std::move(trg);
     else
-        writer_memento::handle(cnf);
+        writer_memento::handle(std::move(cnf));
 }
 
 void email_writer_memento::set_connection_type(const std::string& connect)

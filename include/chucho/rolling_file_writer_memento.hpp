@@ -33,23 +33,23 @@ class rolling_file_writer_memento : public file_writer_memento
 public:
     rolling_file_writer_memento(configurator& cfg);
 
-    std::shared_ptr<file_roller> get_file_roller() const;
-    std::shared_ptr<file_roll_trigger> get_file_roll_trigger() const;
+    std::unique_ptr<file_roller> get_file_roller();
+    std::unique_ptr<file_roll_trigger> get_file_roll_trigger();
     virtual void handle(std::unique_ptr<configurable>&& cnf) override;
 
 private:
-    std::shared_ptr<file_roller> roller_;
-    std::shared_ptr<file_roll_trigger> trigger_;
+    std::unique_ptr<file_roller> roller_;
+    std::unique_ptr<file_roll_trigger> trigger_;
 };
 
-inline std::shared_ptr<file_roller> rolling_file_writer_memento::get_file_roller() const
+inline std::unique_ptr<file_roller> rolling_file_writer_memento::get_file_roller()
 {
-    return roller_;
+    return std::move(roller_);
 }
 
-inline std::shared_ptr<file_roll_trigger> rolling_file_writer_memento::get_file_roll_trigger() const
+inline std::unique_ptr<file_roll_trigger> rolling_file_writer_memento::get_file_roll_trigger()
 {
-    return trigger_;
+    return std::move(trigger_);
 }
 
 }

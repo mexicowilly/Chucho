@@ -120,13 +120,13 @@ public:
      *        events until the @ref email_trigger is triggered
      */
     email_writer(const std::string& name,
-                 std::shared_ptr<formatter> fmt,
+                 std::unique_ptr<formatter>&& fmt,
                  const std::string& host,
                  connection_type connect,
                  const std::vector<std::string>& to,
                  const std::string& from,
                  const std::string& subject,
-                 std::shared_ptr<email_trigger> trigger,
+                 std::unique_ptr<email_trigger>&& trigger,
                  std::uint16_t port = DEFAULT_PORT,
                  std::size_t buffer_capacity = DEFAULT_BUFFER_CAPACITY);
     /**
@@ -149,13 +149,13 @@ public:
      *        events until the @ref email_trigger is triggered
      */
     email_writer(const std::string& name,
-                 std::shared_ptr<formatter> fmt,
+                 std::unique_ptr<formatter>&& fmt,
                  const std::string& host,
                  connection_type connect,
                  const std::vector<std::string>& to,
                  const std::string& from,
                  const std::string& subject,
-                 std::shared_ptr<email_trigger> trigger,
+                 std::unique_ptr<email_trigger>&& trigger,
                  const std::string& user,
                  const std::string& password,
                  std::uint16_t port = DEFAULT_PORT,

@@ -61,7 +61,7 @@ public:
      * each event
      */
     pipe_writer(const std::string& name,
-                std::shared_ptr<formatter> fmt,
+                std::unique_ptr<formatter>&& fmt,
                 bool flsh = true);
     /**
      * Destroy the pipe, closing both the input and output

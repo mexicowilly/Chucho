@@ -35,11 +35,13 @@ std::unique_ptr<configurable> email_writer_factory::create_configurable(std::uni
     assert(ewm != nullptr);
     if (ewm->get_name().empty())
         throw exception("email_writer_factory: The name is not set");
-    if (!ewm->get_formatter())
+    auto fmt = std::move(ewm->get_formatter());
+    if (fmt)
         throw exception("email_writer_factory: The writer's formatter is not set");
     if (!ewm->get_connection_type()) 
         throw exception("email_writer_factory: The connection type must be set");
-    if (!ewm->get_email_trigger()) 
+    auto trg = std::move(ewm->get_email_trigger());
+    if (trg)
         throw exception("email_writer_factory: The email trigger must be set");
     if (ewm->get_from().empty()) 
         throw exception("email_writer_factory: The from field must be set");
@@ -55,26 +57,26 @@ std::unique_ptr<configurable> email_writer_factory::create_configurable(std::uni
     if (ewm->get_user().empty() && ewm->get_password().empty())
     {
         wrt = std::make_unique<email_writer>(ewm->get_name(),
-                                             std::move(ewm->get_formatter()),
+                                             std::move(fmt),
                                              ewm->get_host(),
                                              *ewm->get_connection_type(),
                                              ewm->get_to(),
                                              ewm->get_from(),
                                              ewm->get_subject(),
-                                             ewm->get_email_trigger(),
+                                             std::move(trg),
                                              port,
                                              buf_size);
     }
     else
     {
         wrt = std::make_unique<email_writer>(ewm->get_name(),
-                                             std::move(ewm->get_formatter()),
+                                             std::move(fmt),
                                              ewm->get_host(),
                                              *ewm->get_connection_type(),
                                              ewm->get_to(),
                                              ewm->get_from(),
                                              ewm->get_subject(),
-                                             ewm->get_email_trigger(),
+                                             std::move(trg),
                                              ewm->get_user(),
                                              ewm->get_password(),
                                              port,

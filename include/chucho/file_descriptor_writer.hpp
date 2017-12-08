@@ -67,7 +67,7 @@ public:
      * event is written or not
      */
     file_descriptor_writer(const std::string& name,
-                           std::shared_ptr<formatter> fmt,
+                           std::unique_ptr<formatter>&& fmt,
                            int fd,
                            bool flsh = true);
     #if defined(_WIN32) || defined(CHUCHO_DOXYGEN_SPECIAL)
@@ -120,7 +120,7 @@ protected:
      * been written
      */
     file_descriptor_writer(const std::string& name,
-                           std::shared_ptr<formatter> fmt,
+                           std::unique_ptr<formatter>&& fmt,
                            bool flsh = true);
     /**
      * @}

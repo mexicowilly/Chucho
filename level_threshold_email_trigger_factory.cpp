@@ -30,10 +30,10 @@ level_threshold_email_trigger_factory::level_threshold_email_trigger_factory()
 
 std::unique_ptr<configurable> level_threshold_email_trigger_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    auto ltetm = dynamic_cast<const level_threshold_email_trigger_memento&>(mnto);
-    if (!ltetm.get_level())
+    auto ltetm = dynamic_cast<level_threshold_email_trigger_memento*>(mnto.get());
+    if (!ltetm->get_level())
         throw exception("level_threshold_email_trigger_factory: The level must be set");
-    auto cnf = std::make_unique<level_threshold_email_trigger>(ltetm.get_level());
+    auto cnf = std::make_unique<level_threshold_email_trigger>(ltetm->get_level());
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
     return std::move(cnf);
 }

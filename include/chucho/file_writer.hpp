@@ -70,7 +70,7 @@ public:
      *        std::shared_ptr
      */
     file_writer(const std::string& name,
-                std::shared_ptr<formatter> fmt,
+                std::unique_ptr<formatter>&& fmt,
                 const std::string& file_name,
                 on_start start = on_start::APPEND,
                 bool flsh = true);
@@ -121,7 +121,7 @@ protected:
      *        std::shared_ptr
      */
     file_writer(const std::string& name,
-                std::shared_ptr<formatter> fmt,
+                std::unique_ptr<formatter>&& fmt,
                 on_start start,
                 bool flsh);
     //@}
