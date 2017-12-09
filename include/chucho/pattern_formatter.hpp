@@ -396,14 +396,14 @@ private:
         std::string key_;
     };
 
-    CHUCHO_NO_EXPORT std::shared_ptr<piece> create_piece(std::string::const_iterator& pos,
+    CHUCHO_NO_EXPORT std::unique_ptr<piece> create_piece(std::string::const_iterator& pos,
                                                          std::string::const_iterator end,
                                                          const format_params& params);
     CHUCHO_NO_EXPORT void parse(const std::string& pattern);
     CHUCHO_NO_EXPORT std::string get_argument(std::string::const_iterator& pos,
                                               std::string::const_iterator end);
 
-    std::vector<std::shared_ptr<piece>> pieces_;
+    std::vector<std::unique_ptr<piece>> pieces_;
 };
 
 }
