@@ -86,7 +86,7 @@ public:
      * @sa async_writer 
      */
     mysql_writer(const std::string& name,
-                 std::shared_ptr<formatter> fmt,
+                 std::unique_ptr<formatter>&& fmt,
                  const std::string& host,
                  const std::string& user,
                  const std::string& password,
@@ -105,7 +105,7 @@ public:
      * 
      * @return the @ref async_writer
      */
-    std::shared_ptr<async_writer> get_async_writer() const;
+    async_writer& get_async_writer() const;
     /**
      * Return the name of the database.
      * 
@@ -141,7 +141,7 @@ protected:
     virtual void write_impl(const event& evt) override;
 
 private:
-    std::shared_ptr<async_writer> async_;
+    std::unique_ptr<async_writer> async_;
     std::string host_;
     std::string user_;
     std::string password_;
@@ -149,9 +149,9 @@ private:
     std::uint16_t port_;
 };
 
-inline std::shared_ptr<async_writer> mysql_writer::get_async_writer() const
+inline async_writer& mysql_writer::get_async_writer() const
 {
-    return async_;
+    return *async_;
 }
 
 inline const std::string& mysql_writer::get_database() const

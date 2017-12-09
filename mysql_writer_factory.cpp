@@ -29,13 +29,14 @@ mysql_writer_factory::mysql_writer_factory()
     set_status_origin("mysql_writer_factory");
 }
 
-std::shared_ptr<configurable> mysql_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> mysql_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    auto mwm = std::dynamic_pointer_cast<mysql_writer_memento>(mnto);
-    assert(mwm);
+    auto mwm = dynamic_cast<mysql_writer_memento*>(mnto.get());
+    assert(mwm != nullptr);
     if (mwm->get_name().empty())
         throw exception("mysql_writer_factory: The name is not set");
-    if (!mwm->get_formatter())
+    auto fmt = std::move(mwm->get_formatter());
+    if (!fmt)
         throw exception("mysql_writer_factory: The writer's formatter is not set");
     if (mwm->get_host().empty()) 
         throw exception("mysql_writer_factory: The MySQL host name must be set");
@@ -53,8 +54,8 @@ std::shared_ptr<configurable> mysql_writer_factory::create_configurable(std::sha
         mwm->get_discard_threshold() : level::INFO_();
     bool flsh = mwm->get_flush_on_destruct() ?
         *mwm->get_flush_on_destruct() : true;
-    auto mw = std::make_shared<mysql_writer>(mwm->get_name(),
-                                             mwm->get_formatter(),
+    auto mw = std::make_unique<mysql_writer>(mwm->get_name(),
+                                             std::move(fmt),
                                              mwm->get_host(),
                                              mwm->get_user(),
                                              mwm->get_password(),
@@ -63,15 +64,15 @@ std::shared_ptr<configurable> mysql_writer_factory::create_configurable(std::sha
                                              queue_cap,
                                              dis,
                                              flsh);
-    set_filters(mw, mwm);
+    set_filters(*mw, *mwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*mw)));
-    return mw;
+    return std::move(mw);
 }
 
-std::shared_ptr<memento> mysql_writer_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> mysql_writer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto = std::make_shared<mysql_writer_memento>(cfg);
-    return mnto;
+    std::unique_ptr<memento> mnto = std::make_unique<mysql_writer_memento>(cfg);
+    return std::move(mnto);
 }
 
 }

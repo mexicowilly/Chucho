@@ -35,21 +35,22 @@ std::unique_ptr<configurable> named_pipe_writer_factory::create_configurable(std
     assert(npwm != nullptr);
     if (npwm->get_name().empty())
         throw exception("named_pipe_writer_factory: The name is not set");
-    if (!npwm->get_formatter())
+    auto fmt = std::move(npwm->get_formatter());
+    if (!fmt)
         throw exception("named_pipe_writer_factory: The writer's formatter is not set");
     if (npwm->get_pipe_name().empty())
         throw exception("named_pipe_writer_factory: The pipe's name must be set");
     if (npwm->get_flush())
     {
         cnf = std::make_unique<named_pipe_writer>(npwm->get_name(),
-                                                  std::move(npwm->get_formatter()),
+                                                  std::move(fmt),
                                                   npwm->get_pipe_name(),
                                                   *npwm->get_flush());
     }
     else
     {
         cnf = std::make_unique<named_pipe_writer>(npwm->get_name(),
-                                                  std::move(npwm->get_formatter()),
+                                                  std::move(fmt),
                                                   npwm->get_pipe_name());
     }
     set_filters(*cnf, *npwm);
