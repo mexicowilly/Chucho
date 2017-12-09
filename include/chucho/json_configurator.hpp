@@ -33,7 +33,7 @@ namespace chucho
 class CHUCHO_PRIV_EXPORT json_configurator : public configurator
 {
 public:
-    json_configurator(const security_policy& sec_pol);
+    json_configurator(security_policy& sec_pol);
 
     virtual void configure(std::istream &in) override;
 

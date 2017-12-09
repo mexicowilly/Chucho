@@ -32,7 +32,7 @@ class memento;
 class CHUCHO_PRIV_EXPORT yaml_configurator : public configurator
 {
 public:
-    yaml_configurator(const security_policy& sec_pol);
+    yaml_configurator(security_policy& sec_pol);
 
     virtual void configure(std::istream& in) override;
 

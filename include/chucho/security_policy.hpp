@@ -24,6 +24,7 @@
 
 #include <chucho/exception.hpp>
 #include <chucho/optional.hpp>
+#include <chucho/non_copyable.hpp>
 #include <map>
 #include <string>
 #include <sstream>
@@ -217,7 +218,7 @@ namespace chucho
  * 
  * @ingroup miscellaneous
  */
-class CHUCHO_EXPORT security_policy
+class CHUCHO_EXPORT security_policy : non_copyable
 {
 public:
     /**
@@ -358,7 +359,7 @@ private:
     };
 
     std::map<std::string, std::size_t> text_maxes_;
-    std::map<std::string, std::shared_ptr<basic_range>> int_ranges_;
+    std::map<std::string, std::unique_ptr<basic_range>> int_ranges_;
     std::size_t default_text_max_;
 };
 
@@ -370,7 +371,7 @@ inline std::size_t security_policy::get_default_text_max() const
 template <typename val_type>
 void security_policy::override_integer(const std::string& key, val_type low, val_type high)
 {
-    int_ranges_[key] = std::make_shared<range<val_type>>(low, high);
+    int_ranges_[key] = std::move(std::make_unique<range<val_type>>(low, high));
 }
 
 inline void security_policy::override_text(const std::string& key, std::size_t max_len)

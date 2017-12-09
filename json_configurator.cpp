@@ -5,7 +5,7 @@
 namespace chucho
 {
 
-json_configurator::json_configurator(const security_policy& sec_pol)
+json_configurator::json_configurator(security_policy& sec_pol)
     : configurator(sec_pol)
 {
     set_status_origin("json_configurator");

@@ -39,7 +39,7 @@ class formatter;
 class CHUCHO_PRIV_EXPORT config_file_configurator : public configurator
 {
 public:
-    config_file_configurator(const security_policy& sec_pol);
+    config_file_configurator(security_policy& sec_pol);
 
     virtual void configure(std::istream& in) override;
     memento_key_set get_memento_key_set() const;
