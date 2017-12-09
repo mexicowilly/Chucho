@@ -23,8 +23,8 @@ namespace chucho
 {
 
 sliding_numbered_file_roller::sliding_numbered_file_roller(std::size_t max_count,
-                                                           std::shared_ptr<file_compressor> cmp)
-    : file_roller(cmp),
+                                                           std::unique_ptr<file_compressor>&& cmp)
+    : file_roller(std::move(cmp)),
       max_count_(max_count),
       cur_index_(0),
       min_index_(1)
@@ -34,8 +34,8 @@ sliding_numbered_file_roller::sliding_numbered_file_roller(std::size_t max_count
 
 sliding_numbered_file_roller::sliding_numbered_file_roller(int min_index,
                                                            std::size_t max_count,
-                                                           std::shared_ptr<file_compressor> cmp)
-    : file_roller(cmp),
+                                                           std::unique_ptr<file_compressor>&& cmp)
+    : file_roller(std::move(cmp)),
       max_count_(max_count),
       cur_index_(min_index - 1),
       min_index_(min_index)

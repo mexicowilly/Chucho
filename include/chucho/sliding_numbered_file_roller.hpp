@@ -66,7 +66,7 @@ public:
      * @param cmp the compressor
      */
     sliding_numbered_file_roller(std::size_t max_count,
-                                 std::shared_ptr<file_compressor> cmp = std::shared_ptr<file_compressor>());
+                                 std::unique_ptr<file_compressor>&& cmp = std::move(std::unique_ptr<file_compressor>()));
     /**
      * Construct a sliding roller with a minimum index, a maximum 
      * count and optional compressor. 
@@ -78,7 +78,7 @@ public:
      */
     sliding_numbered_file_roller(int min_index,
                                  std::size_t max_count,
-                                 std::shared_ptr<file_compressor> cmp = std::shared_ptr<file_compressor>());
+                                 std::unique_ptr<file_compressor>&& cmp = std::move(std::unique_ptr<file_compressor>()));
     //@}
 
     virtual std::string get_active_file_name() override;

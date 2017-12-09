@@ -41,7 +41,7 @@ protected:
      * @param name the name of the writer
      * @param fmt the formatter
      * @throw std::invalid_argument if fmt is an uninitialized 
-     *        std::shared_ptr
+     *        std::unique_ptr
      */
     database_writer(const std::string& name, std::unique_ptr<formatter>&& fmt);
     //@}

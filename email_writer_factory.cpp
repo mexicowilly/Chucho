@@ -41,7 +41,7 @@ std::unique_ptr<configurable> email_writer_factory::create_configurable(std::uni
     if (!ewm->get_connection_type()) 
         throw exception("email_writer_factory: The connection type must be set");
     auto trg = std::move(ewm->get_email_trigger());
-    if (trg)
+    if (!trg)
         throw exception("email_writer_factory: The email trigger must be set");
     if (ewm->get_from().empty()) 
         throw exception("email_writer_factory: The from field must be set");

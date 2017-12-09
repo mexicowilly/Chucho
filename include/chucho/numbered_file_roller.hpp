@@ -47,7 +47,7 @@ public:
      *        1 is greater than max_index
      */
     numbered_file_roller(int max_index,
-                         std::shared_ptr<file_compressor> cmp = std::shared_ptr<file_compressor>());
+                         std::unique_ptr<file_compressor>&& cmp = std::move(std::unique_ptr<file_compressor>()));
     /**
      * Construct a numbered_file_roller with both a minimum and a 
      * maximum index. 
@@ -61,7 +61,7 @@ public:
      */
     numbered_file_roller(int min_index,
                          int max_index,
-                         std::shared_ptr<file_compressor> cmp = std::shared_ptr<file_compressor>());
+                         std::unique_ptr<file_compressor>&& cmp = std::move(std::unique_ptr<file_compressor>()));
     //@}
 
     virtual std::string get_active_file_name() override;

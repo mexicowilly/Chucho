@@ -235,7 +235,7 @@ public:
      * 
      * @return the trigger
      */
-    std::shared_ptr<email_trigger> get_trigger() const;
+    email_trigger& get_trigger() const;
     /**
      * Return the user used for user/password
      * authentication, if there is one.
@@ -302,7 +302,7 @@ private:
 
     fixed_size_queue evts_;
     CURL* curl_;
-    std::shared_ptr<email_trigger> trigger_;
+    std::unique_ptr<email_trigger> trigger_;
     std::string from_;
     std::vector<std::string> to_;
     std::string host_;
@@ -360,9 +360,9 @@ inline const std::string& email_writer::get_subject() const
     return subject_;
 }
 
-inline std::shared_ptr<email_trigger> email_writer::get_trigger() const
+inline email_trigger& email_writer::get_trigger() const
 {
-    return trigger_;
+    return *trigger_;
 }
 
 inline const optional<std::string>& email_writer::get_user() const

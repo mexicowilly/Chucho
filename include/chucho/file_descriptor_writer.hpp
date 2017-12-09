@@ -81,7 +81,8 @@ public:
      * @param flsh whether to flush the buffer after every
      * event is written or not
      */
-    file_descriptor_writer(std::shared_ptr<formatter> fmt,
+    file_descriptor_writer(const std::string& name,
+                           std::unique_ptr<formatter>&& fmt,
                            HANDLE hnd,
                            bool flsh = true);
     #endif

@@ -49,7 +49,7 @@ public:
      * @param file_name the file to which the door is attached
      */
     door_writer(const std::string& name,
-                std::shared_ptr<formatter> fmt,
+                std::unique_ptr<formatter>&& fmt,
                 const std::string& file_name);
     /**
      * @}

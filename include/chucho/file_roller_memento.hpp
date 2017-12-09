@@ -57,7 +57,7 @@ public:
      * 
      * @return the @ref file_compressor
      */
-    std::shared_ptr<file_compressor> get_file_compressor() const;
+    std::unique_ptr<file_compressor> get_file_compressor();
     /**
      * Handle only the case of a @ref file_compressor. If other 
      * types can be handled by subclasses, then this method should 
@@ -68,12 +68,12 @@ public:
     virtual void handle(std::unique_ptr<configurable>&& cnf) override;
 
 private:
-    std::shared_ptr<file_compressor> compressor_;
+    std::unique_ptr<file_compressor> compressor_;
 };
 
-inline std::shared_ptr<file_compressor> file_roller_memento::get_file_compressor() const
+inline std::unique_ptr<file_compressor> file_roller_memento::get_file_compressor()
 {
-    return compressor_;
+    return std::move(compressor_);
 }
 
 }

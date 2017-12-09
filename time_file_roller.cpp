@@ -81,8 +81,8 @@ namespace chucho
 
 time_file_roller::time_file_roller(const std::string& file_name_pattern,
                                    std::size_t max_history,
-                                   std::shared_ptr<file_compressor> cmp)
-    : file_roller(cmp),
+                                   std::unique_ptr<file_compressor>&& cmp)
+    : file_roller(std::move(cmp)),
       max_history_(max_history),
       file_name_pattern_(file_name_pattern)
 {
