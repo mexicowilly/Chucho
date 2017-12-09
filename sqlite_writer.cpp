@@ -24,8 +24,8 @@
 namespace chucho
 {
 
-sqlite_writer::sqlite_writer(const std::string& name, std::shared_ptr<formatter> fmt, const std::string& file_name)
-    : database_writer(name, fmt),
+sqlite_writer::sqlite_writer(const std::string& name, std::unique_ptr<formatter>&& fmt, const std::string& file_name)
+    : database_writer(name, std::move(fmt)),
       file_name_(file_name),
       db_(nullptr),
       insert_(nullptr)

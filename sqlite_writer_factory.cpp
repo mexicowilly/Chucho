@@ -29,28 +29,29 @@ sqlite_writer_factory::sqlite_writer_factory()
     set_status_origin("sqlite_writer_factory");
 }
 
-std::shared_ptr<configurable> sqlite_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> sqlite_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    auto swm = std::dynamic_pointer_cast<sqlite_writer_memento>(mnto);
-    assert(swm);
+    auto swm = dynamic_cast<sqlite_writer_memento*>(mnto.get());
+    assert(swm != nullptr);
     if (swm->get_name().empty())
         throw exception("sqlite_writer_factory: The name is not set");
-    if (!swm->get_formatter())
+    auto fmt = std::move(swm->get_formatter());
+    if (!fmt)
         throw exception("sqlite_writer_factory: The writer's formatter is not set");
     if (swm->get_file_name().empty()) 
         throw exception("sqlite_writer_factory: The SQLite file name must be set");
-    auto sw = std::make_shared<sqlite_writer>(swm->get_name(),
-                                              swm->get_formatter(),
+    auto sw = std::make_unique<sqlite_writer>(swm->get_name(),
+                                              std::move(fmt),
                                               swm->get_file_name());
-    set_filters(sw, swm);
+    set_filters(*sw, *swm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*sw)));
-    return sw;
+    return std::move(sw);
 }
 
-std::shared_ptr<memento> sqlite_writer_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> sqlite_writer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto = std::make_shared<sqlite_writer_memento>(cfg);
-    return mnto;
+    std::unique_ptr<memento> mnto = std::make_unique<sqlite_writer_memento>(cfg);
+    return std::move(mnto);
 }
 
 }

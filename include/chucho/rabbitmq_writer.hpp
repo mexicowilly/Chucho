@@ -48,8 +48,8 @@ public:
      * @param routing_key the routing key
      */
     rabbitmq_writer(const std::string& name,
-                    std::shared_ptr<formatter> fmt,
-                    std::shared_ptr<serializer> ser,
+                    std::unique_ptr<formatter>&& fmt,
+                    std::unique_ptr<serializer>&& ser,
                     const std::string& url,
                     const std::string& exchange,
                     const optional<std::string>& routing_key = optional<std::string>());
@@ -65,8 +65,8 @@ public:
      * @param routing_key the routing key
      */
     rabbitmq_writer(const std::string& name,
-                    std::shared_ptr<formatter> fmt,
-                    std::shared_ptr<serializer> ser,
+                    std::unique_ptr<formatter>&& fmt,
+                    std::unique_ptr<serializer>&& ser,
                     std::size_t coalesce_max,
                     const std::string& url,
                     const std::string& exchange,
@@ -83,9 +83,9 @@ public:
      * @param routing_key the routing key
      */
     rabbitmq_writer(const std::string& name,
-                    std::shared_ptr<formatter> fmt,
-                    std::shared_ptr<serializer> ser,
-                    std::shared_ptr<compressor> cmp,
+                    std::unique_ptr<formatter>&& fmt,
+                    std::unique_ptr<serializer>&& ser,
+                    std::unique_ptr<compressor>&& cmp,
                     const std::string& url,
                     const std::string& exchange,
                     const optional<std::string>& routing_key = optional<std::string>());
@@ -102,10 +102,10 @@ public:
      * @param routing_key the routing key
      */
     rabbitmq_writer(const std::string& name,
-                    std::shared_ptr<formatter> fmt,
-                    std::shared_ptr<serializer> ser,
+                    std::unique_ptr<formatter>&& fmt,
+                    std::unique_ptr<serializer>&& ser,
                     std::size_t coalesce_max,
-                    std::shared_ptr<compressor> cmp,
+                    std::unique_ptr<compressor>&& cmp,
                     const std::string& url,
                     const std::string& exchange,
                     const optional<std::string>& routing_key = optional<std::string>());

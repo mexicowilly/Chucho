@@ -29,26 +29,27 @@ postgres_writer_factory::postgres_writer_factory()
     set_status_origin("postgres_writer_factory");
 }
 
-std::shared_ptr<configurable> postgres_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> postgres_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    auto pwm = std::dynamic_pointer_cast<postgres_writer_memento>(mnto);
-    assert(pwm);
+    auto pwm = dynamic_cast<postgres_writer_memento*>(mnto.get());
+    assert(pwm != nullptr);
     if (pwm->get_name().empty())
         throw exception("postgres_writer_factory: The name is not set");
-    if (!pwm->get_formatter())
+    auto fmt = std::move(pwm->get_formatter());
+    if (!fmt)
         throw exception("postgres_writer_factory: The writer's formatter is not set");
     if (pwm->get_uri().empty()) 
         throw exception("postgres_writer_factory: The Postgres URI must be set");
-    auto pw = std::make_shared<postgres_writer>(pwm->get_name(), pwm->get_formatter(), pwm->get_uri());
-    set_filters(pw, pwm);
+    auto pw = std::make_unique<postgres_writer>(pwm->get_name(), std::move(fmt), pwm->get_uri());
+    set_filters(*pw, *pwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*pw)));
-    return pw;
+    return std::move(pw);
 }
 
-std::shared_ptr<memento> postgres_writer_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> postgres_writer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto = std::make_shared<postgres_writer_memento>(cfg);
-    return mnto;
+    std::unique_ptr<memento> mnto = std::make_unique<postgres_writer_memento>(cfg);
+    return std::move(mnto);
 }
 
 }

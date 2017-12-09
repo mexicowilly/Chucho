@@ -57,7 +57,7 @@ public:
      *        std::shared_ptr
      * @throw exception if the SQLite database cannot be opened
      */
-    sqlite_writer(const std::string& name, std::shared_ptr<formatter> fmt, const std::string& file_name);
+    sqlite_writer(const std::string& name, std::unique_ptr<formatter>&& fmt, const std::string& file_name);
     /**
      * Destroy a SQLite writer.
      */

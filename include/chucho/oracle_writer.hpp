@@ -60,7 +60,7 @@ public:
      *        database
      */
     oracle_writer(const std::string& name,
-                  std::shared_ptr<formatter> fmt,
+                  std::unique_ptr<formatter>&& fmt,
                   const std::string& user,
                   const std::string& password,
                   const std::string& database);

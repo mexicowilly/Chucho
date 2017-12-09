@@ -29,13 +29,14 @@ db2_writer_factory::db2_writer_factory()
     set_status_origin("db2_writer_factory");
 }
 
-std::shared_ptr<configurable> db2_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> db2_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    auto dwm = std::dynamic_pointer_cast<db2_writer_memento>(mnto);
-    assert(dwm);
+    auto dwm = dynamic_cast<db2_writer_memento*>(mnto.get());
+    assert(dwm != nullptr);
     if (dwm->get_name().empty())
         throw exception("db2_writer_factory: The name is not set");
-    if (!dwm->get_formatter())
+    auto fmt = std::move(dwm->get_formatter());
+    if (!fmt)
         throw exception("db2_writer_factory: The writer's formatter is not set");
     if (dwm->get_user().empty()) 
         throw exception("db2_writer_factory: The DB2 user name must be set");
@@ -43,20 +44,20 @@ std::shared_ptr<configurable> db2_writer_factory::create_configurable(std::share
         throw exception("db2_writer_factory: The DB2 user password must be set");
     if (dwm->get_database().empty()) 
         throw exception("db2_writer_factory: The DB2 database name must be set");
-    auto dw = std::make_shared<db2_writer>(dwn->get_name(),
-                                           dwm->get_formatter(),
+    auto dw = std::make_unique<db2_writer>(dwm->get_name(),
+                                           std::move(fmt),
                                            dwm->get_database(),
                                            dwm->get_user(),
                                            dwm->get_password());
-    set_filters(dw, dwm);
+    set_filters(*dw, *dwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*dw)));
-    return dw;
+    return std::move(dw);
 }
 
-std::shared_ptr<memento> db2_writer_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> db2_writer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto = std::make_shared<db2_writer_memento>(cfg);
-    return mnto;
+    std::unique_ptr<memento> mnto = std::make_unique<db2_writer_memento>(cfg);
+    return std::move(mnto);
 }
 
 }
