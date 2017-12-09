@@ -51,8 +51,8 @@ public:
      * first prefix, then event.
      */
     zeromq_writer(const std::string& name,
-                  std::shared_ptr<formatter> fmt,
-                  std::shared_ptr<serializer> ser,
+                  std::unique_ptr<formatter>&& fmt,
+                  std::unique_ptr<serializer>&& ser,
                   const std::string& endpoint,
                   const std::vector<std::uint8_t>& prefix = std::vector<std::uint8_t>());
     /**
@@ -68,8 +68,8 @@ public:
      * first prefix, then event.
      */
     zeromq_writer(const std::string& name,
-                  std::shared_ptr<formatter> fmt,
-                  std::shared_ptr<serializer> ser,
+                  std::unique_ptr<formatter>&& fmt,
+                  std::unique_ptr<serializer>&& ser,
                   std::size_t coalesce_max,
                   const std::string& endpoint,
                   const std::vector<std::uint8_t>& prefix = std::vector<std::uint8_t>());
@@ -86,9 +86,9 @@ public:
      * first prefix, then event.
      */
     zeromq_writer(const std::string& name,
-                  std::shared_ptr<formatter> fmt,
-                  std::shared_ptr<serializer> ser,
-                  std::shared_ptr<compressor> cmp,
+                  std::unique_ptr<formatter>&& fmt,
+                  std::unique_ptr<serializer>&& ser,
+                  std::unique_ptr<compressor>&& cmp,
                   const std::string& endpoint,
                   const std::vector<std::uint8_t>& prefix = std::vector<std::uint8_t>());
     /**
@@ -105,10 +105,10 @@ public:
      * first prefix, then event.
      */
     zeromq_writer(const std::string& name,
-                  std::shared_ptr<formatter> fmt,
-                  std::shared_ptr<serializer> ser,
+                  std::unique_ptr<formatter>&& fmt,
+                  std::unique_ptr<serializer>&& ser,
                   std::size_t coalesce_max,
-                  std::shared_ptr<compressor> cmp,
+                  std::unique_ptr<compressor>&& cmp,
                   const std::string& endpoint,
                   const std::vector<std::uint8_t>& prefix = std::vector<std::uint8_t>());
     /**

@@ -26,7 +26,7 @@ bzip2_compressor_factory::bzip2_compressor_factory()
     set_status_origin("bzip2_compressor_factory");
 }
 
-std::shared_ptr<configurable> bzip2_compressor_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> bzip2_compressor_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
     auto cnf = std::make_unique<bzip2_compressor>();
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));

@@ -30,23 +30,25 @@ zeromq_writer_factory::zeromq_writer_factory()
 
 std::unique_ptr<configurable> zeromq_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    auto zm = dynamic_cast<const zeromq_writer_memento&>(mnto);
-    if (zm.get_name().empty())
+    auto zm = dynamic_cast<zeromq_writer_memento*>(mnto.get());
+    if (zm->get_name().empty())
         throw exception("zeromq_writer_factory: The name is not set");
-    if (!zm.get_formatter())
+    auto fmt = std::move(zm->get_formatter());
+    if (!fmt)
         throw exception("zeromq_writer_factory: The writer's formatter is not set");
-    if (!zm.get_serializer())
+    auto ser = std::move(zm->get_serializer());
+    if (!ser)
         throw exception("zeromq_writer_factory: The writer's serializer is not set");
-    if (zm.get_endpoint().empty())
+    if (zm->get_endpoint().empty())
         throw exception("zeromq_writer_factory: The endpoint is not set");
-    auto zw = std::make_unique<zeromq_writer>(zm.get_name(),
-                                              zm.get_formatter(),
-                                              zm.get_serializer(),
-                                              zm.get_coalesce_max(),
-                                              zm.get_compressor(),
-                                              zm.get_endpoint(),
-                                              zm.get_prefix());
-    set_filters(*zw, zm);
+    auto zw = std::make_unique<zeromq_writer>(zm->get_name(),
+                                              std::move(fmt),
+                                              std::move(ser),
+                                              zm->get_coalesce_max(),
+                                              std::move(zm->get_compressor()),
+                                              zm->get_endpoint(),
+                                              zm->get_prefix());
+    set_filters(*zw, *zm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*zw)));
     return std::move(zw);
 }
