@@ -35,7 +35,8 @@ std::unique_ptr<configurable> async_writer_factory::create_configurable(std::uni
     assert(awm != nullptr);
     if (awm->get_name().empty())
         throw exception("async_writer_factory: The name is not set");
-    if (!awm->get_writer())
+    auto wrt = std::move(awm->get_writer());
+    if (!wrt)
         throw exception("async_writer: The async writer's writer must be set");
     std::size_t queue_cap = awm->get_queue_capacity() ?
         *awm->get_queue_capacity() : async_writer::DEFAULT_QUEUE_CAPACITY;
@@ -43,7 +44,7 @@ std::unique_ptr<configurable> async_writer_factory::create_configurable(std::uni
         awm->get_discard_threshold() : level::INFO_();
     bool flsh = awm->get_flush_on_destruct() ?
         *awm->get_flush_on_destruct() : true;
-    auto aw = std::make_unique<async_writer>(awm->get_name(), std::move(awm->get_writer()), queue_cap, dis, flsh);
+    auto aw = std::make_unique<async_writer>(awm->get_name(), std::move(wrt), queue_cap, dis, flsh);
     report_info("Created a " + demangle::get_demangled_name(typeid(*aw)));
     return std::move(aw);
 }

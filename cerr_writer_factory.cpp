@@ -34,9 +34,10 @@ std::unique_ptr<configurable> cerr_writer_factory::create_configurable(std::uniq
     assert(cwm != nullptr);
     if (cwm->get_name().empty())
         throw exception("cerr_writer_factory: The name is not set");
-    if (!cwm->get_formatter())
+    auto fmt = std::move(cwm->get_formatter());
+    if (!fmt)
         throw exception("cerr_writer_factory: The writer's formatter is not set");
-    auto cnf = std::make_unique<cerr_writer>(cwm->get_name(), std::move(cwm->get_formatter()));
+    auto cnf = std::make_unique<cerr_writer>(cwm->get_name(), std::move(fmt));
     set_filters(*cnf, *cwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
     return std::move(cnf);

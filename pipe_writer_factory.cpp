@@ -34,18 +34,19 @@ std::unique_ptr<configurable> pipe_writer_factory::create_configurable(std::uniq
     assert(pwm != nullptr);
     if (pwm->get_name().empty())
         throw exception("pipe_writer_factory: The name is not set");
-    if (!pwm->get_formatter())
+    auto fmt = std::move(pwm->get_formatter());
+    if (!fmt)
         throw exception("pipe_writer_factory: The writer's formatter is not set");
     std::unique_ptr<configurable> cnf;
     if (pwm->get_flush())
     {
         cnf = std::make_unique<pipe_writer>(pwm->get_name(),
-                                            std::move(pwm->get_formatter()),
+                                            std::move(fmt),
                                             *pwm->get_flush());
     }
     else
     {
-        cnf = std::make_unique<pipe_writer>(pwm->get_name(), std::move(pwm->get_formatter()));
+        cnf = std::make_unique<pipe_writer>(pwm->get_name(), std::move(fmt));
     }
     set_filters(*cnf, *pwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));

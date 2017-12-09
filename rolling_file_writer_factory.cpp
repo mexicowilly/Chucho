@@ -35,9 +35,11 @@ std::unique_ptr<configurable> rolling_file_writer_factory::create_configurable(s
     assert(rfwm != nullptr);
     if (rfwm->get_name().empty())
         throw exception("rolling_file_writer_factory: The name is not set");
-    if (!rfwm->get_file_roller())
+    auto rlr = std::move(rfwm->get_file_roller());
+    if (!rlr)
         throw exception("rolling_file_writer_factory: A file_roller is required when creating a rolling_file");
-    if (!rfwm->get_formatter())
+    auto fmt = std::move(rfwm->get_formatter());
+    if (!fmt)
         throw exception("rolling_file_writer_factory: The writer's formatter is not set");
     std::unique_ptr<configurable> cnf;
     if (rfwm->get_file_name().empty())
@@ -45,35 +47,35 @@ std::unique_ptr<configurable> rolling_file_writer_factory::create_configurable(s
         if (rfwm->get_on_start() && rfwm->get_flush())
         {
             cnf = std::make_unique<rolling_file_writer>(rfwm->get_name(),
-                                                        std::move(rfwm->get_formatter()),
+                                                        std::move(fmt),
                                                         *rfwm->get_on_start(),
                                                         *rfwm->get_flush(),
-                                                        std::move(rfwm->get_file_roller()),
+                                                        std::move(rlr),
                                                         std::move(rfwm->get_file_roll_trigger()));
         }
         else if (rfwm->get_flush())
         {
             cnf = std::make_unique<rolling_file_writer>(rfwm->get_name(),
-                                                        std::move(rfwm->get_formatter()),
+                                                        std::move(fmt),
                                                         file_writer::on_start::APPEND,
                                                         *rfwm->get_flush(),
-                                                        std::move(rfwm->get_file_roller()),
+                                                        std::move(rlr),
                                                         std::move(rfwm->get_file_roll_trigger()));
         }
         else if (rfwm->get_on_start())
         {
             cnf = std::make_unique<rolling_file_writer>(rfwm->get_name(),
-                                                        std::move(rfwm->get_formatter()),
+                                                        std::move(fmt),
                                                         *rfwm->get_on_start(),
                                                         true,
-                                                        std::move(rfwm->get_file_roller()),
+                                                        std::move(rlr),
                                                         std::move(rfwm->get_file_roll_trigger()));
         }
         else
         {
             cnf = std::make_unique<rolling_file_writer>(rfwm->get_name(),
-                                                        std::move(rfwm->get_formatter()),
-                                                        std::move(rfwm->get_file_roller()),
+                                                        std::move(fmt),
+                                                        std::move(rlr),
                                                         std::move(rfwm->get_file_roll_trigger()));
         }
     }
@@ -82,39 +84,39 @@ std::unique_ptr<configurable> rolling_file_writer_factory::create_configurable(s
         if (rfwm->get_on_start() && rfwm->get_flush())
         {
             cnf = std::make_unique<rolling_file_writer>(rfwm->get_name(),
-                                                        std::move(rfwm->get_formatter()),
+                                                        std::move(fmt),
                                                         rfwm->get_file_name(),
                                                         *rfwm->get_on_start(),
                                                         *rfwm->get_flush(),
-                                                        std::move(rfwm->get_file_roller()),
+                                                        std::move(rlr),
                                                         std::move(rfwm->get_file_roll_trigger()));
         }
         else if (rfwm->get_flush())
         {
             cnf = std::make_unique<rolling_file_writer>(rfwm->get_name(),
-                                                        std::move(rfwm->get_formatter()),
+                                                        std::move(fmt),
                                                         rfwm->get_file_name(),
                                                         file_writer::on_start::APPEND,
                                                         *rfwm->get_flush(),
-                                                        std::move(rfwm->get_file_roller()),
+                                                        std::move(rlr),
                                                         std::move(rfwm->get_file_roll_trigger()));
         }
         else if (rfwm->get_on_start())
         {
             cnf = std::make_unique<rolling_file_writer>(rfwm->get_name(),
-                                                        std::move(rfwm->get_formatter()),
+                                                        std::move(fmt),
                                                         rfwm->get_file_name(),
                                                         *rfwm->get_on_start(),
                                                         true,
-                                                        std::move(rfwm->get_file_roller()),
+                                                        std::move(rlr),
                                                         std::move(rfwm->get_file_roll_trigger()));
         }
         else
         {
             cnf = std::make_unique<rolling_file_writer>(rfwm->get_name(),
-                                                        std::move(rfwm->get_formatter()),
+                                                        std::move(fmt),
                                                         rfwm->get_file_name(),
-                                                        std::move(rfwm->get_file_roller()),
+                                                        std::move(rlr),
                                                         std::move(rfwm->get_file_roll_trigger()));
         }
     }

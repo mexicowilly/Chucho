@@ -36,14 +36,15 @@ std::unique_ptr<configurable> syslog_writer_factory::create_configurable(std::un
     assert(swm != nullptr);
     if (swm->get_name().empty())
         throw exception("syslog_writer_factory: The name is not set");
-    if (!swm->get_formatter())
+    auto fmt = std::move(swm->get_formatter());
+    if (!fmt)
         throw exception("syslog_writer_factory: The writer's formatter is not set");
     if (!swm->get_facility())
         throw exception("syslog_writer_factory: The writer's facility is not set");
     if (swm->get_host_name().empty())
     {
         cnf = std::make_unique<syslog_writer>(swm->get_name(),
-                                              std::move(swm->get_formatter()),
+                                              std::move(fmt),
                                               *swm->get_facility());
     }
     else
@@ -51,7 +52,7 @@ std::unique_ptr<configurable> syslog_writer_factory::create_configurable(std::un
         if (swm->get_port())
         {
             cnf = std::make_unique<syslog_writer>(swm->get_name(),
-                                                  std::move(swm->get_formatter()),
+                                                  std::move(fmt),
                                                   *swm->get_facility(),
                                                   swm->get_host_name(),
                                                   *swm->get_port());
@@ -59,7 +60,7 @@ std::unique_ptr<configurable> syslog_writer_factory::create_configurable(std::un
         else
         {
             cnf = std::make_unique<syslog_writer>(swm->get_name(),
-                                                  std::move(swm->get_formatter()),
+                                                  std::move(fmt),
                                                   *swm->get_facility(),
                                                   swm->get_host_name());
         }

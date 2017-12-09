@@ -35,14 +35,15 @@ std::unique_ptr<configurable> file_writer_factory::create_configurable(std::uniq
     assert(fwm != nullptr);
     if (fwm->get_name().empty())
         throw exception("file_writer_factory: The name is not set");
-    if (!fwm->get_formatter())
+    auto fmt = std::move(fwm->get_formatter());
+    if (!fmt)
         throw exception("file_writer_factory: The writer's formatter is not set");
     if (fwm->get_file_name().empty())
         throw exception("file_writer_factory: The file name is not set");
     if (fwm->get_on_start() && fwm->get_flush())
     {
         cnf = std::make_unique<file_writer>(fwm->get_name(),
-                                            std::move(fwm->get_formatter()),
+                                            std::move(fmt),
                                             fwm->get_file_name(),
                                             *fwm->get_on_start(),
                                             *fwm->get_flush());
@@ -50,7 +51,7 @@ std::unique_ptr<configurable> file_writer_factory::create_configurable(std::uniq
     else if (fwm->get_flush())
     {
         cnf = std::make_unique<file_writer>(fwm->get_name(),
-                                            std::move(fwm->get_formatter()),
+                                            std::move(fmt),
                                             fwm->get_file_name(),
                                             file_writer::on_start::APPEND,
                                             *fwm->get_flush());
@@ -58,14 +59,14 @@ std::unique_ptr<configurable> file_writer_factory::create_configurable(std::uniq
     else if (fwm->get_on_start())
     {
         cnf = std::make_unique<file_writer>(fwm->get_name(),
-                                            std::move(fwm->get_formatter()),
+                                            std::move(fmt),
                                             fwm->get_file_name(),
                                             *fwm->get_on_start());
     }
     else
     {
         cnf = std::make_unique<file_writer>(fwm->get_name(),
-                                            std::move(fwm->get_formatter()),
+                                            std::move(fmt),
                                             fwm->get_file_name());
     }
     set_filters(*cnf, *fwm);
