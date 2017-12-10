@@ -79,7 +79,7 @@ public:
      *                          the underlying @ref async_writer
      *                          when this writer is destroyed
      * @throw std::invalid_argument if fmt is an uninitialized 
-     *        std::shared_ptr
+     *        std::unique_ptr
      * @throw exception if there is a problem connecting to the 
      *        MySQL database
      *  

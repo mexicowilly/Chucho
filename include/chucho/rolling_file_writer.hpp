@@ -76,9 +76,9 @@ public:
      * @param roller the roller
      * @param trigger the optional trigger
      * @throw std::invalid_argument if fmt is an uninitialized 
-     *        std::shared_ptr
+     *        std::unique_ptr
      * @throw std::invalid_argument if the roller is an 
-     *        uninitialized std::shared_ptr
+     *        uninitialized std::unique_ptr
      * @throw std::invalid_argument if the trigger cannot be 
      *        resolved
      */
@@ -95,9 +95,9 @@ public:
      * @param roller the roller
      * @param trigger the optional trigger
      * @throw std::invalid_argument if fmt is an uninitialized 
-     *        std::shared_ptr
+     *        std::unique_ptr
      * @throw std::invalid_argument if the roller is an 
-     *        uninitialized std::shared_ptr
+     *        uninitialized std::unique_ptr
      * @throw std::invalid_argument if the trigger cannot be 
      *        resolved
      */
@@ -117,9 +117,9 @@ public:
      * @param roller the roller
      * @param trigger the optional trigger
      * @throw std::invalid_argument if fmt is an uninitialized 
-     *        std::shared_ptr
+     *        std::unique_ptr
      * @throw std::invalid_argument if the roller is an 
-     *        uninitialized std::shared_ptr
+     *        uninitialized std::unique_ptr
      * @throw std::invalid_argument if the trigger cannot be 
      *        resolved
      */
@@ -140,9 +140,9 @@ public:
      * @param roller the roller
      * @param trigger the optional trigger
      * @throw std::invalid_argument if fmt is an uninitialized 
-     *        std::shared_ptr
+     *        std::unique_ptr
      * @throw std::invalid_argument if the roller is an 
-     *        uninitialized std::shared_ptr
+     *        uninitialized std::unique_ptr
      * @throw std::invalid_argument if the trigger cannot be 
      *        resolved
      */

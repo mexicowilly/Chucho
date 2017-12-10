@@ -67,7 +67,7 @@ public:
      * @param flsh whether to flush the file stream after each 
      *             event is written
      * @throw std::invalid_argument if fmt is an uninitialized 
-     *        std::shared_ptr
+     *        std::unique_ptr
      */
     file_writer(const std::string& name,
                 std::unique_ptr<formatter>&& fmt,
@@ -118,7 +118,7 @@ protected:
      * @param flsh whether to flush the file stream after each
      *             event is written
      * @throw std::invalid_argument if fmt is an uninitialized 
-     *        std::shared_ptr
+     *        std::unique_ptr
      */
     file_writer(const std::string& name,
                 std::unique_ptr<formatter>&& fmt,

@@ -78,7 +78,7 @@ public:
      * @param flush_on_destruct whether to flush the pending events 
      *                          when the writer is destroyed
      * @throw std::invalid_argument if fmt is an uninitialized 
-     *        std::shared_ptr
+     *        std::unique_ptr
      */
     async_writer(const std::string& name,
                  std::unique_ptr<writer>&& wrt,

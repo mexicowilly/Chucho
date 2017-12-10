@@ -90,7 +90,7 @@ public:
      * @param unsent_cache_max the maximum size of the unsent event 
      *                         cache
      * @throw std::invalid_argument if fmt is an uninitialized 
-     *        std::shared_ptr
+     *        std::unique_ptr
      * @throw std::invalid_argument if the host name is empty
      * @throw std::invalid_argument if the port is zero
      */

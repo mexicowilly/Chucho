@@ -54,7 +54,7 @@ public:
      * @param file_name the name of the file that does or will hold 
      *                  the database
      * @throw std::invalid_argument if fmt is an uninitialized 
-     *        std::shared_ptr
+     *        std::unique_ptr
      * @throw exception if the SQLite database cannot be opened
      */
     sqlite_writer(const std::string& name, std::unique_ptr<formatter>&& fmt, const std::string& file_name);
