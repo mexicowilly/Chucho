@@ -23,7 +23,7 @@
 #endif
 
 #include <chucho/writer.hpp>
-#include <set>
+#include <list>
 
 namespace chucho
 {
@@ -226,7 +226,7 @@ private:
     std::shared_ptr<logger> parent_;
     std::string name_;
     std::shared_ptr<level> level_;
-    std::set<std::unique_ptr<writer>> writers_;
+    std::list<std::unique_ptr<writer>> writers_;
     std::recursive_mutex guard_;
     bool writes_to_ancestors_;
 };

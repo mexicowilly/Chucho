@@ -131,7 +131,7 @@ void logger::add_writer(std::unique_ptr<writer>&& wrt)
     if (!wrt)
         throw std::invalid_argument("The writer cannot be an uninitialized std::unique_ptr");
     std::lock_guard<std::recursive_mutex> lg(guard_);
-    writers_.insert(std::move(wrt));
+    writers_.push_back(std::move(wrt));
 }
 
 std::shared_ptr<logger> logger::get(const std::string& name)
@@ -252,11 +252,7 @@ void logger::remove_unused_loggers()
 void logger::remove_writer(const std::string& wrt)
 {
     std::lock_guard<std::recursive_mutex> lg(guard_);
-    auto found = std::find_if(writers_.begin(),
-                              writers_.end(),
-                              [&wrt] (const std::unique_ptr<writer>& w) { return w->get_name() == wrt; });
-    if (found != writers_.end())
-        writers_.erase(found);
+    writers_.remove_if([&wrt] (const std::unique_ptr<writer>& w) { return w->get_name() == wrt; });
 }
 
 void logger::reset()
