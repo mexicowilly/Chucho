@@ -27,6 +27,7 @@ file_writer_memento::file_writer_memento(configurator& cfg, memento_key_set ks)
       flush_(true)
 {
     set_status_origin("file_writer_memento");
+    set_default_name(typeid(file_writer));
     cfg.get_security_policy().set_text("file_writer::flush", 5);
     cfg.get_security_policy().set_text("file_writer::on_start", 8);
     handler fn_hnd = [this] (const std::string& name) { file_name_ = validate("file_writer::file_name", name); };

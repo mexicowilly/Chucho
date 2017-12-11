@@ -22,7 +22,7 @@
 #pragma warning(disable:4251)
 #endif
 
-#include <chucho/memento.hpp>
+#include <chucho/nameable_memento.hpp>
 #include <chucho/filter.hpp>
 #include <chucho/formatter.hpp>
 #include <vector>
@@ -38,7 +38,7 @@ namespace chucho
  *  
  * @ingroup configuration 
  */
-class CHUCHO_EXPORT writer_memento : public memento
+class CHUCHO_EXPORT writer_memento : public nameable_memento
 {
 public:
     /**
@@ -67,18 +67,11 @@ public:
      * @return the formatter
      */
     std::unique_ptr<formatter>& get_formatter();
-    /**
-     * Return the name of the writer.
-     *
-     * @return the name
-     */
-    const std::string& get_name() const;
     virtual void handle(std::unique_ptr<configurable>&& cnf) override;
 
 private:
     std::unique_ptr<formatter> fmt_;
     std::vector<std::unique_ptr<filter>> filters_;
-    std::string name_;
 };
 
 inline std::vector<std::unique_ptr<filter>>& writer_memento::get_filters()
@@ -89,10 +82,6 @@ inline std::vector<std::unique_ptr<filter>>& writer_memento::get_filters()
 inline std::unique_ptr<formatter>& writer_memento::get_formatter()
 {
     return fmt_;
-}
-
-inline const std::string& writer_memento::get_name() const {
-    return name_;
 }
 
 }

@@ -15,6 +15,7 @@
  */
 
 #include <chucho/rolling_file_writer_memento.hpp>
+#include <chucho/rolling_file_writer.hpp>
 #include <chucho/demangle.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/move_util.hpp>
@@ -26,6 +27,7 @@ rolling_file_writer_memento::rolling_file_writer_memento(configurator& cfg)
     : file_writer_memento(cfg, get_memento_key_set(cfg))
 {
     set_status_origin("rolling_file_writer_memento");
+    set_default_name(typeid(rolling_file_writer));
 }
 
 void rolling_file_writer_memento::handle(std::unique_ptr<configurable>&& cnf)

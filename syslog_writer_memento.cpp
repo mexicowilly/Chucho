@@ -15,17 +15,18 @@
  */
 
 #include <chucho/syslog_writer_memento.hpp>
+#include <chucho/syslog_writer.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/text_util.hpp>
 
 namespace chucho
 {
 
-
 syslog_writer_memento::syslog_writer_memento(configurator& cfg)
     : writer_memento(cfg)
 {
     set_status_origin("syslog_writer_memento");
+    set_default_name(typeid(syslog_writer));
     cfg.get_security_policy().set_integer("syslog_writer::port", static_cast<std::uint16_t>(1), static_cast<std::uint16_t>(65535));
     cfg.get_security_policy().set_text("syslog_writer::port(text)", 5);
     cfg.get_security_policy().set_text("syslog_writer::facility", 8);

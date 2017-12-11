@@ -42,7 +42,8 @@ std::unique_ptr<configurable> duplicate_message_filter_factory::create_configura
 
 std::unique_ptr<memento> duplicate_message_filter_factory::create_memento(configurator& cfg)
 {
-    auto mnto = std::make_unique<memento>(cfg);
+    auto mnto = std::make_unique<filter_memento>(cfg);
+    mnto->set_default_name(typeid(duplicate_message_filter));
     return std::move(mnto);
 }
 

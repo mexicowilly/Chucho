@@ -15,6 +15,7 @@
  */
 
 #include <chucho/oracle_writer_memento.hpp>
+#include <chucho/oracle_writer.hpp>
 
 namespace chucho
 {
@@ -23,6 +24,7 @@ oracle_writer_memento::oracle_writer_memento(configurator& cfg)
     : writer_memento(cfg)
 {
     set_status_origin("oracle_writer_memento");
+    set_default_name(typeid(oracle_writer));
     cfg.get_security_policy().set_text("oracle_writer::database", 512);
     cfg.get_security_policy().set_text("oracle_writer::user", 30);
     cfg.get_security_policy().set_text("oracle_writer::password", 30);

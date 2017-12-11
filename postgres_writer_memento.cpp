@@ -15,6 +15,7 @@
  */
 
 #include <chucho/postgres_writer_memento.hpp>
+#include <chucho/postgres_writer.hpp>
 
 namespace chucho
 {
@@ -23,6 +24,7 @@ postgres_writer_memento::postgres_writer_memento(configurator& cfg)
     : writer_memento(cfg)
 {
     set_status_origin("postgres_writer_memento");
+    set_default_name(typeid(postgres_writer));
     cfg.get_security_policy().set_text("postgres_writer::uri", 8000);
     set_handler("uri", [this] (const std::string& uri) { uri_ = validate("postgres_writer::uri", uri); });
 }

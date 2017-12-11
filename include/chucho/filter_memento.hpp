@@ -1,12 +1,12 @@
 #ifndef CHUCHO_FILTER_MEMENTO_HPP__
 #define CHUCHO_FILTER_MEMENTO_HPP__
 
-#include <chucho/memento.hpp>
+#include <chucho/nameable_memento.hpp>
 
 namespace chucho
 {
 
-class CHUCHO_EXPORT filter_memento : public memento
+class CHUCHO_EXPORT filter_memento : public nameable_memento
 {
 public:
     /**
@@ -20,21 +20,7 @@ public:
      */
     filter_memento(configurator& cfg);
     //@}
-    /**
-     * Return the name of the writer.
-     *
-     * @return the name
-     */
-    const std::string& get_name() const;
-
-private:
-    std::string name_;
 };
-
-inline const std::string& filter_memento::get_name() const
-{
-    return name_;
-}
 
 }
 

@@ -238,6 +238,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/marker.hpp
     include/chucho/memento.hpp
     include/chucho/message_queue_writer.hpp
+    include/chucho/nameable_memento.hpp
     include/chucho/named_pipe_writer.hpp
     include/chucho/non_copyable.hpp
     include/chucho/noop_compressor.hpp
@@ -929,6 +930,7 @@ SET(CHUCHO_SOURCES
     memento_key_set.cpp
     message_queue_writer.cpp
     message_queue_writer_memento.cpp
+    nameable_memento.cpp
     named_pipe_writer.cpp
     named_pipe_writer_factory.cpp
     named_pipe_writer_memento.cpp

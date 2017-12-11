@@ -15,7 +15,7 @@
  */
 
 #include <chucho/level_threshold_filter_memento.hpp>
-#include <chucho/exception.hpp>
+#include <chucho/level_threshold_filter.hpp>
 
 namespace chucho
 {
@@ -24,6 +24,7 @@ level_threshold_filter_memento::level_threshold_filter_memento(configurator& cfg
     : filter_memento(cfg)
 {
     set_status_origin("level_threshold_filter_memento");
+    set_default_name(typeid(level_threshold_filter));
     handler lvl_hnd = [this](const std::string& name) { level_ = level::from_text(validate("level_threshold_filter::level", name)); };
     if (ks == memento_key_set::CHUCHO)
         set_handler("level", lvl_hnd);

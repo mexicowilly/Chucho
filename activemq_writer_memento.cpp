@@ -25,6 +25,7 @@ activemq_writer_memento::activemq_writer_memento(configurator& cfg)
     : message_queue_writer_memento(cfg)
 {
     set_status_origin("activemq_writer_memento");
+    set_default_name(typeid(activemq_writer));
     set_handler("broker", [this] (const std::string& val) { broker_ = validate("activemq_writer::broker", val); });
     set_handler("topic_or_queue", [this] (const std::string& val) { topic_or_queue_ = validate("activemq_writer::topic_or_queue", val); });
     set_handler("consumer_type", std::bind(&activemq_writer_memento::set_topic_or_queue, this, std::placeholders::_1));

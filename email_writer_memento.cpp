@@ -25,6 +25,7 @@ email_writer_memento::email_writer_memento(configurator& cfg)
     : writer_memento(cfg)
 {
     set_status_origin("email_writer_memento");
+    set_default_name(typeid(email_writer));
     cfg.get_security_policy().set_text("email_writer::from", 320);
     cfg.get_security_policy().set_text("email_writer::host", 253);
     cfg.get_security_policy().set_integer("email_writer::port", static_cast<std::uint16_t>(1), static_cast<uint16_t>(65535));

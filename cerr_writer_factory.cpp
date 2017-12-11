@@ -46,6 +46,7 @@ std::unique_ptr<configurable> cerr_writer_factory::create_configurable(std::uniq
 std::unique_ptr<memento> cerr_writer_factory::create_memento(configurator& cfg)
 {
     auto mnto = std::make_unique<writer_memento>(cfg);
+    mnto->set_default_name(typeid(cerr_writer));
     return std::move(mnto);
 }
 
