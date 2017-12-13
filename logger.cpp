@@ -184,6 +184,17 @@ std::shared_ptr<level> logger::get_level()
     return level_;
 }
 
+writer& logger::get_writer(const std::string& name)
+{
+    std::lock_guard<std::recursive_mutex> lg(guard_);
+    auto found = std::find_if(writers_.begin(),
+                              writers_.end(),
+                              [&name](const std::unique_ptr<writer>& w) { return w->get_name() == name; });
+    if (found == writers_.end())
+        throw std::invalid_argument("Writer " + name + " was not found");
+    return **found;
+}
+
 std::vector<std::string> logger::get_writer_names()
 {
     std::vector<std::string> result;

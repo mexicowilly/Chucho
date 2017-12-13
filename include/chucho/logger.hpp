@@ -151,6 +151,13 @@ public:
      */
     const std::string& get_name() const;
     /**
+     * Return a writer.
+     *
+     * @param name the name of the writer
+     * @throws std::invalid_argument if the writer does not exist
+     */
+    writer& get_writer(const std::string& name);
+    /**
      * Return the name of the writers.
      * 
      * @return the writers' names

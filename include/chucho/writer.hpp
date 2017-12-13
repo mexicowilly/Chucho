@@ -85,6 +85,13 @@ public:
      */
     virtual void flush();
     /**
+     * Return a filter.
+     *
+     * @param name the name of the filter
+     * @throws std::invalid_argument if the filter does not exist
+     */
+    filter& get_filter(const std::string& name);
+    /**
      * Receive the collection of all filters.
      * @return the filters
      */

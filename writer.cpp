@@ -17,6 +17,7 @@
 #include <chucho/writer.hpp>
 #include <chucho/exception.hpp>
 #include <stdexcept>
+#include <algorithm>
 
 namespace chucho
 {
@@ -49,6 +50,17 @@ void writer::clear_filters()
 
 void writer::flush()
 {
+}
+
+filter& writer::get_filter(const std::string& name)
+{
+    std::lock_guard<std::recursive_mutex> lg(*guard_);
+    auto found = std::find_if(filters_.begin(),
+                              filters_.end(),
+                              [&name] (const std::unique_ptr<filter>& f) { return f->get_name() == name; });
+    if (found == filters_.end())
+        throw std::invalid_argument("The filter" + name + " could not be found");
+    return **found;
 }
 
 std::vector<std::string> writer::get_filter_names()

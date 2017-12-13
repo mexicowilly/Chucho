@@ -36,19 +36,32 @@ int main(int argc, char* argv[])
     chucho::configuration::set_style(chucho::configuration::style::OFF);
     std::string topic(argv[2]);
     std::vector<std::uint8_t> pfx(topic.begin(), topic.end());
-    auto fmt = std::make_shared<chucho::pattern_formatter>("%m");
-    auto ser = std::make_shared<chucho::formatted_message_serializer>();
-    std::shared_ptr<chucho::compressor> cmp;
+    auto fmt = std::make_unique<chucho::pattern_formatter>("%m");
+    auto ser = std::make_unique<chucho::formatted_message_serializer>();
+    std::unique_ptr<chucho::compressor> cmp;
     if (argc == 6)
     {
         if (std::strcmp(argv[5], "noop") == 0)
-            cmp = std::make_shared<chucho::noop_compressor>();
+            cmp = std::make_unique<chucho::noop_compressor>();
     }
     std::unique_ptr<chucho::zeromq_writer> wrt;
     if (cmp)
-        wrt.reset(new chucho::zeromq_writer(fmt, ser, cmp, argv[1], pfx));
+    {
+        wrt = std::make_unique<chucho::zeromq_writer>("zero",
+                                                      std::move(fmt),
+                                                      std::move(ser),
+                                                      std::move(cmp),
+                                                      argv[1],
+                                                      pfx);
+    }
     else
-        wrt.reset(new chucho::zeromq_writer(fmt, ser, argv[1], pfx));
+    {
+        wrt = std::make_unique<chucho::zeromq_writer>("zero",
+                                                      std::move(fmt),
+                                                      std::move(ser),
+                                                      argv[1],
+                                                      pfx);
+    }
     chucho::event evt(chucho::logger::get("zeromq_writer_test"),
                       chucho::level::INFO_(),
                       argv[4],
