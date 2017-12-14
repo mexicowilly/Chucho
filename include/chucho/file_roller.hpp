@@ -69,6 +69,14 @@ public:
      */
     virtual std::string get_active_file_name() = 0;
     /**
+     * Return the file compressor.
+     *
+     * @post You do not own this pointer.
+     *
+     * @return the file compressor or nullptr
+     */
+    file_compressor* get_file_compressor() const;
+    /**
      * Roll the files.
      */
     virtual void roll() = 0;
@@ -102,6 +110,11 @@ protected:
      */
     std::unique_ptr<file_compressor> compressor_;
 };
+
+inline file_compressor* file_roller::get_file_compressor() const
+{
+    return compressor_.get();
+}
 
 }
 
