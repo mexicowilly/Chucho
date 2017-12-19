@@ -515,12 +515,14 @@ TEST_F(chucho_config_file_configurator, multiple_writer)
     configure("chucho.logger = will\n"
               "chucho.logger.will.writer = fw1\n"
               "chucho.writer.fw1 = chucho::file_writer\n"
+              "chucho.writer.fw1.name = one\n"
               "chucho.writer.fw1.formatter = pf\n"
               "chucho.formatter.pf = chucho::pattern_formatter\n"
               "chucho.formatter.pf.pattern = %m%n\n"
               "chucho.writer.fw1.file_name = one.log\n"
               "chucho.logger.will.writer = fw2\n"
               "chucho.writer.fw2 = chucho::file_writer\n"
+              "chucho.writer.fw2.name = two\n"
               "chucho.writer.fw2.formatter = pf\n"
               "chucho.writer.fw2.file_name = two.log");
     multiple_writer_body();

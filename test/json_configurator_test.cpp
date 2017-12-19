@@ -131,11 +131,13 @@ configure(R"cnf(
             "writers" : [
                 { "chucho::file_writer" : {
                     "chucho::pattern_formatter" : { "pattern" : "%m%n" },
-                    "file_name" : "one.log"
+                    "file_name" : "one.log",
+                    "name" : "one"
                 } },
                 { "chucho::file_writer" : {
                     "chucho::pattern_formatter" : { "pattern" : "%m%n" },
                     "file_name" : "two.log"
+                    "name" : "two"
                 } }
             ]
         }

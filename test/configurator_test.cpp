@@ -265,58 +265,47 @@ void configurator::duplicate_message_filter_body()
 
 void configurator::email_writer_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::email_writer), typeid(*wrts[0]));
-    auto ewrt = std::static_pointer_cast<chucho::email_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(ewrt));
-    EXPECT_EQ(7000, ewrt->get_buffer_capacity());
-    EXPECT_EQ(0, ewrt->get_buffer_size());
-    EXPECT_EQ(chucho::email_writer::connection_type::CLEAR, ewrt->get_connection_type());
-    EXPECT_STREQ("whistler@mctweaky.com", ewrt->get_from().c_str());
-    EXPECT_STREQ("mail.dummy.com", ewrt->get_host().c_str());
-    ASSERT_TRUE(ewrt->get_password());
-    EXPECT_STREQ("lumpy", ewrt->get_password()->c_str());
-    EXPECT_EQ(123, ewrt->get_port());
-    EXPECT_STREQ("%c", ewrt->get_subject().c_str());
-    ASSERT_EQ(2, ewrt->get_to().size());
-    EXPECT_STREQ("one@blubbery.com", ewrt->get_to()[0].c_str());
-    EXPECT_STREQ("two@humid.org", ewrt->get_to()[1].c_str());
-    ASSERT_EQ(typeid(chucho::level_threshold_email_trigger), typeid(*ewrt->get_trigger()));
-    auto ltet = std::static_pointer_cast<chucho::level_threshold_email_trigger>(ewrt->get_trigger());
-    ASSERT_TRUE(static_cast<bool>(ltet));
-    EXPECT_EQ(*chucho::level::ERROR_(), *ltet->get_level());
-    ASSERT_TRUE(ewrt->get_user());
-    EXPECT_STREQ("scrumpy", ewrt->get_user()->c_str());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& ewrt = dynamic_cast<chucho::email_writer&>(lgr->get_writer("chucho::email_writer"));
+    EXPECT_EQ(7000, ewrt.get_buffer_capacity());
+    EXPECT_EQ(0, ewrt.get_buffer_size());
+    EXPECT_EQ(chucho::email_writer::connection_type::CLEAR, ewrt.get_connection_type());
+    EXPECT_STREQ("whistler@mctweaky.com", ewrt.get_from().c_str());
+    EXPECT_STREQ("mail.dummy.com", ewrt.get_host().c_str());
+    ASSERT_TRUE(ewrt.get_password());
+    EXPECT_STREQ("lumpy", ewrt.get_password()->c_str());
+    EXPECT_EQ(123, ewrt.get_port());
+    EXPECT_STREQ("%c", ewrt.get_subject().c_str());
+    ASSERT_EQ(2, ewrt.get_to().size());
+    EXPECT_STREQ("one@blubbery.com", ewrt.get_to()[0].c_str());
+    EXPECT_STREQ("two@humid.org", ewrt.get_to()[1].c_str());
+    auto& ltet = dynamic_cast<chucho::level_threshold_email_trigger&>(ewrt.get_trigger());
+    EXPECT_EQ(*chucho::level::ERROR_(), *ltet.get_level());
+    ASSERT_TRUE(ewrt.get_user());
+    EXPECT_STREQ("scrumpy", ewrt.get_user()->c_str());
 }
 
 #endif
 
 void configurator::file_writer_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::file_writer), typeid(*wrts[0]));
-    auto fwrt = std::static_pointer_cast<chucho::file_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(fwrt));
-    EXPECT_EQ(std::string("hello.log"), fwrt->get_file_name());
-    EXPECT_FALSE(fwrt->get_flush());
-    EXPECT_EQ(chucho::file_writer::on_start::TRUNCATE, fwrt->get_on_start());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& fwrt = dynamic_cast<chucho::file_writer&>(lgr->get_writer("chucho::email_writer"));
+    EXPECT_EQ(std::string("hello.log"), fwrt.get_file_name());
+    EXPECT_FALSE(fwrt.get_flush());
+    EXPECT_EQ(chucho::file_writer::on_start::TRUNCATE, fwrt.get_on_start());
 }
 
 void configurator::gzip_file_compressor_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
-    auto fwrt = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(fwrt));
-    auto rlr = fwrt->get_file_roller();
-    ASSERT_EQ(typeid(chucho::time_file_roller), typeid(*rlr));
-    auto trlr = std::static_pointer_cast<chucho::time_file_roller>(rlr);
-    ASSERT_TRUE(static_cast<bool>(trlr));
-    auto cmp = trlr->get_file_compressor();
-    ASSERT_TRUE(static_cast<bool>(cmp));
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& fwrt = dynamic_cast<chucho::rolling_file_writer&>(lgr->get_writer("chucho::rolling_file_writer"));
+    auto& rlr = fwrt.get_file_roller();
+    auto cmp = rlr.get_file_compressor();
+    ASSERT_TRUE(cmp != nullptr);
 #if defined(CHUCHO_HAVE_ZLIB)
     ASSERT_EQ(typeid(chucho::gzip_file_compressor), typeid(*cmp));
     EXPECT_EQ(7, cmp->get_min_index());
@@ -409,27 +398,26 @@ void configurator::level_filter_body(const std::string& tmpl)
         std::string rep = tmpl;
         rep.replace(pos, 6, good[i].first);
         configure(rep.c_str());
-        auto wrts = chucho::logger::get("will")->get_writers();
-        ASSERT_EQ(1, wrts.size());
-        auto flts = wrts[0]->get_filters();
-        ASSERT_EQ(1, flts.size());
-        ASSERT_EQ(typeid(chucho::level_filter), typeid(*flts[0]));
-        auto lf = std::static_pointer_cast<chucho::level_filter>(flts[0]);
-        EXPECT_EQ(*chucho::level::INFO_(), *lf->get_level());
-        EXPECT_EQ(chucho::filter::result::NEUTRAL, lf->get_on_match());
-        EXPECT_EQ(good[i++].second, lf->get_on_mismatch());
+        auto lgr = chucho::logger::get("will");
+        ASSERT_EQ(1, lgr->get_writer_names().size());
+        auto& wrt = lgr->get_writer("chucho::rolling_file_writer");
+        auto& flt = dynamic_cast<chucho::level_filter&>(wrt.get_filter("chucho::level_filter"));
+        EXPECT_EQ(*chucho::level::INFO_(), *flt.get_level());
+        EXPECT_EQ(chucho::filter::result::NEUTRAL, flt.get_on_match());
+        EXPECT_EQ(good[i++].second, flt.get_on_mismatch());
     }
 }
 
 void configurator::level_threshold_filter_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    auto flts = wrts[0]->get_filters();
-    ASSERT_EQ(1, flts.size());
-    ASSERT_EQ(typeid(chucho::level_threshold_filter), typeid(*flts[0]));
-    auto thresh = std::static_pointer_cast<chucho::level_threshold_filter>(flts[0]);
-    EXPECT_EQ(*chucho::level::FATAL_(), *thresh->get_level());
+    auto lgr = chucho::logger::get("will");
+    auto names = lgr->get_writer_names();
+    ASSERT_EQ(1, names.size());
+    auto& wrt = lgr->get_writer(names[0]);
+    auto fnames = wrt.get_filter_names();
+    ASSERT_EQ(1, fnames.size());
+    auto& flt = dynamic_cast<chucho::level_threshold_filter&>(wrt.get_filter(fnames[0]));
+    EXPECT_EQ(*chucho::level::FATAL_(), *flt.get_level());
 }
 
 void configurator::logger_body()
@@ -443,20 +431,15 @@ void configurator::logger_body()
 
 void configurator::lzma_file_compressor_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
-    auto fwrt = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(fwrt));
-    auto rlr = fwrt->get_file_roller();
-    ASSERT_EQ(typeid(chucho::numbered_file_roller), typeid(*rlr));
-    auto nrlr = std::static_pointer_cast<chucho::numbered_file_roller>(rlr);
-    ASSERT_TRUE(static_cast<bool>(nrlr));
-    auto cmp = nrlr->get_file_compressor();
-    ASSERT_TRUE(static_cast<bool>(cmp));
-#if defined(CHUCHO_HAVE_LZMA)
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& fwrt = dynamic_cast<chucho::rolling_file_writer&>(lgr->get_writer("chucho::rolling_file_writer"));
+    auto& rlr = fwrt.get_file_roller();
+    auto cmp = rlr.get_file_compressor();
+    ASSERT_TRUE(cmp != nullptr);
+#if defined(CHUCHO_HAVE_ZLIB)
     ASSERT_EQ(typeid(chucho::lzma_file_compressor), typeid(*cmp));
-    EXPECT_EQ(1, cmp->get_min_index());
+    EXPECT_EQ(7, cmp->get_min_index());
 #else
     ASSERT_EQ(typeid(chucho::noop_file_compressor), typeid(*cmp));
     chucho::status_manager::get()->clear();
@@ -465,66 +448,57 @@ void configurator::lzma_file_compressor_body()
 
 void configurator::multiple_writer_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
+    auto lgr = chucho::logger::get("will");
+    auto wrts = lgr->get_writer_names();
     ASSERT_EQ(2, wrts.size());
-    EXPECT_EQ(typeid(chucho::file_writer), typeid(*wrts[0]));
-    auto fwrt = std::static_pointer_cast<chucho::file_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(fwrt));
-    EXPECT_EQ(std::string("one.log"), fwrt->get_file_name());
-    EXPECT_EQ(typeid(chucho::file_writer), typeid(*wrts[1]));
-    fwrt = std::static_pointer_cast<chucho::file_writer>(wrts[1]);
-    ASSERT_TRUE(static_cast<bool>(fwrt));
-    EXPECT_EQ(std::string("two.log"), fwrt->get_file_name());
+    auto& wrt1 = dynamic_cast<chucho::file_writer&>(lgr->get_writer(wrts[0]));
+    EXPECT_EQ(std::string("one.log"), wrt1.get_file_name());
+    auto& wrt2 = dynamic_cast<chucho::file_writer&>(lgr->get_writer(wrts[1]));
+    EXPECT_EQ(std::string("two.log"), wrt2.get_file_name());
 }
 
 #if defined(CHUCHO_HAVE_MYSQL)
 
 void configurator::mysql_writer_full_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::mysql_writer), typeid(*wrts[0]));
-    auto mwrt = std::static_pointer_cast<chucho::mysql_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(mwrt));
-    EXPECT_EQ(std::string("test"), mwrt->get_database());
-    EXPECT_EQ(std::string("192.168.56.101"), mwrt->get_host());
-    EXPECT_EQ(std::string("test_user"), mwrt->get_user());
-    EXPECT_EQ(std::string("password"), mwrt->get_password());
-    auto aw = mwrt->get_async_writer();
-    EXPECT_EQ(*chucho::level::INFO_(), *aw->get_discard_threshold());
-    EXPECT_EQ(912, aw->get_queue_capacity());
-    EXPECT_EQ(false, aw->get_flush_on_destruct());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& mwrt = dynamic_cast<chucho::mysql_writer&>(lgr->get_writer("chucho::mysql_writer"));
+    EXPECT_EQ(std::string("test"), mwrt.get_database());
+    EXPECT_EQ(std::string("192.168.56.101"), mwrt.get_host());
+    EXPECT_EQ(std::string("test_user"), mwrt.get_user());
+    EXPECT_EQ(std::string("password"), mwrt.get_password());
+    auto& aw = mwrt.get_async_writer();
+    EXPECT_EQ(*chucho::level::INFO_(), *aw.get_discard_threshold());
+    EXPECT_EQ(912, aw.get_queue_capacity());
+    EXPECT_EQ(false, aw.get_flush_on_destruct());
 }
 
 void configurator::mysql_writer_minimal_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::mysql_writer), typeid(*wrts[0]));
-    auto mwrt = std::static_pointer_cast<chucho::mysql_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(mwrt));
-    EXPECT_EQ(std::string("test"), mwrt->get_database());
-    EXPECT_EQ(std::string("192.168.56.101"), mwrt->get_host());
-    EXPECT_EQ(std::string("test_user"), mwrt->get_user());
-    EXPECT_EQ(std::string("password"), mwrt->get_password());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& mwrt = dynamic_cast<chucho::mysql_writer&>(lgr->get_writer("chucho::mysql_writer"));
+    EXPECT_EQ(std::string("test"), mwrt.get_database());
+    EXPECT_EQ(std::string("192.168.56.101"), mwrt.get_host());
+    EXPECT_EQ(std::string("test_user"), mwrt.get_user());
+    EXPECT_EQ(std::string("password"), mwrt.get_password());
 }
 
 #endif
 
 void configurator::named_pipe_writer_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::named_pipe_writer), typeid(*wrts[0]));
-    auto npwrt = std::static_pointer_cast<chucho::named_pipe_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(npwrt));
-    EXPECT_FALSE(npwrt->get_flush());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& npwrt = dynamic_cast<chucho::named_pipe_writer&>(lgr->get_writer("chucho::named_pipe_writer"));
+    EXPECT_FALSE(npwrt.get_flush());
     #if defined(CHUCHO_WINDOWS)
     std::string pname("\\\\.\\pipe\\monkeyballs");
     #else
     std::string pname("monkeyballs");
     #endif
-    EXPECT_EQ(pname, npwrt->get_file_name());
+    EXPECT_EQ(pname, npwrt.get_file_name());
     chucho::status_manager::get()->clear();
 }
 

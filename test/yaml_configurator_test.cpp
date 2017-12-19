@@ -424,10 +424,12 @@ TEST_F(yaml_configurator, multiple_writer)
     configure("chucho::logger:\n"
               "    - name: will\n"
               "    - chucho::file_writer:\n"
+              "        name: one\n"
               "        chucho::pattern_formatter:\n"
               "            pattern: '%m%n'\n"
               "        file_name: one.log\n"
               "    - chucho::file_writer:\n"
+                  "    name: two\n"
               "        chucho::pattern_formatter:\n"
               "            pattern: '%m%n'\n"
               "        file_name: two.log\n");
