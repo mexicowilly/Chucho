@@ -504,55 +504,44 @@ void configurator::named_pipe_writer_body()
 
 void configurator::numbered_file_roller_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
-    auto fwrt = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(fwrt));
-    auto rlr = fwrt->get_file_roller();
-    ASSERT_EQ(typeid(chucho::numbered_file_roller), typeid(*rlr));
-    auto nrlr = std::static_pointer_cast<chucho::numbered_file_roller>(rlr);
-    ASSERT_TRUE(static_cast<bool>(nrlr));
-    EXPECT_EQ(5, nrlr->get_max_index());
-    EXPECT_EQ(-3, nrlr->get_min_index());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& fwrt = dynamic_cast<chucho::rolling_file_writer&>(lgr->get_writer("chucho::rolling_file_writer"));
+    auto& nrlr = dynamic_cast<chucho::numbered_file_roller&>(fwrt.get_file_roller());
+    EXPECT_EQ(5, nrlr.get_max_index());
+    EXPECT_EQ(-3, nrlr.get_min_index());
 }
 
 #if defined(CHUCHO_HAVE_ORACLE)
 
 void configurator::oracle_writer_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::oracle_writer), typeid(*wrts[0]));
-    auto owrt = std::static_pointer_cast<chucho::oracle_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(owrt));
-    EXPECT_EQ(std::string("192.168.56.102/pdb1"), owrt->get_database());
-    EXPECT_EQ(std::string("test_user"), owrt->get_user());
-    EXPECT_EQ(std::string("password"), owrt->get_password());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& owrt = dynamic_cast<chucho::oracle_writer&>(lgr->get_writer("chucho::oracle_writer"));
+    EXPECT_EQ(std::string("192.168.56.102/pdb1"), owrt.get_database());
+    EXPECT_EQ(std::string("test_user"), owrt.get_user());
+    EXPECT_EQ(std::string("password"), owrt.get_password());
 }
 
 #endif
 
 void configurator::pipe_writer_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::pipe_writer), typeid(*wrts[0]));
-    auto pwrt = std::static_pointer_cast<chucho::pipe_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(pwrt));
-    EXPECT_FALSE(pwrt->get_flush());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& pwrt = dynamic_cast<chucho::pipe_writer&>(lgr->get_writer("chucho::pipe_writer"));
+    EXPECT_FALSE(pwrt.get_flush());
 }
 
 #if defined(CHUCHO_HAVE_POSTGRES)
 
 void configurator::postgres_writer_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::postgres_writer), typeid(*wrts[0]));
-    auto pwrt = std::static_pointer_cast<chucho::postgres_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(pwrt));
-    EXPECT_EQ(std::string("postgres://test_user:password@192.168.56.101/postgres"), pwrt->get_uri());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& pwrt = dynamic_cast<chucho::postgres_writer&>(lgr->get_writer("chucho::postgres_writer"));
+    EXPECT_EQ(std::string("postgres://test_user:password@192.168.56.101/postgres"), pwrt.get_uri());
 }
 
 #endif
@@ -561,27 +550,23 @@ void configurator::postgres_writer_body()
 
 void configurator::rabbitmq_writer_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::rabbitmq_writer), typeid(*wrts[0]));
-    auto pwrt = std::static_pointer_cast<chucho::rabbitmq_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(pwrt));
-    EXPECT_EQ(std::string("amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc"), pwrt->get_url());
-    EXPECT_EQ(std::string("logs"), pwrt->get_exchange());
-    EXPECT_TRUE(pwrt->get_routing_key().empty());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& pwrt = dynamic_cast<chucho::rabbitmq_writer&>(lgr->get_writer("chucho::rabbitmq_writer"));
+    EXPECT_EQ(std::string("amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc"), pwrt.get_url());
+    EXPECT_EQ(std::string("logs"), pwrt.get_exchange());
+    EXPECT_TRUE(pwrt.get_routing_key().empty());
 }
 
 void configurator::rabbitmq_writer_coalesce_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::rabbitmq_writer), typeid(*wrts[0]));
-    auto pwrt = std::static_pointer_cast<chucho::rabbitmq_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(pwrt));
-    EXPECT_EQ(std::string("amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc"), pwrt->get_url());
-    EXPECT_EQ(std::string("logs"), pwrt->get_exchange());
-    EXPECT_TRUE(pwrt->get_routing_key().empty());
-    EXPECT_EQ(302, pwrt->get_coalesce_max());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& pwrt = dynamic_cast<chucho::rabbitmq_writer&>(lgr->get_writer("chucho::rabbitmq_writer"));
+    EXPECT_EQ(std::string("amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc"), pwrt.get_url());
+    EXPECT_EQ(std::string("logs"), pwrt.get_exchange());
+    EXPECT_TRUE(pwrt.get_routing_key().empty());
+    EXPECT_EQ(302, pwrt.get_coalesce_max());
 }
 
 #if defined(CHUCHO_HAVE_CAPN_PROTO)
