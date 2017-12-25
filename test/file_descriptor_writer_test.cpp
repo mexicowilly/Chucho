@@ -59,8 +59,8 @@ public:
 
     std::shared_ptr<chucho::file_descriptor_writer> get_writer(bool flsh)
     {
-        std::shared_ptr<chucho::formatter> f = std::make_shared<chucho::pattern_formatter>("%m");
-        std::shared_ptr<chucho::file_descriptor_writer> w = std::make_shared<chucho::file_descriptor_writer>(f, fd_, flsh);
+        auto f = std::make_unique<chucho::pattern_formatter>("%m");
+        auto w = std::make_shared<chucho::file_descriptor_writer>("fd", std::move(f), fd_, flsh);
         return w;
     }
 
