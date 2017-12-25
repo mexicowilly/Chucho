@@ -44,11 +44,11 @@ public:
         chucho::file::remove(file_name_);
     }
 
-    std::shared_ptr<chucho::file_writer> get_writer(chucho::file_writer::on_start start = chucho::file_writer::on_start::APPEND)
+    std::unique_ptr<chucho::file_writer> get_writer(chucho::file_writer::on_start start = chucho::file_writer::on_start::APPEND)
     {
-        std::shared_ptr<chucho::formatter> f = std::make_shared<chucho::pattern_formatter>("%m%n");
-        std::shared_ptr<chucho::file_writer> w = std::make_shared<chucho::file_writer>(f, file_name_, start);
-        return w;
+        auto f = std::make_unique<chucho::pattern_formatter>("%m%n");
+        auto w = std::make_unique<chucho::file_writer>("fw", std::move(f), file_name_, start);
+        return std::move(w);
     }
 
 protected:
