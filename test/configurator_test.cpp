@@ -573,17 +573,13 @@ void configurator::rabbitmq_writer_coalesce_body()
 
 void configurator::rabbitmq_writer_capn_proto_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::rabbitmq_writer), typeid(*wrts[0]));
-    auto pwrt = std::static_pointer_cast<chucho::rabbitmq_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(pwrt));
-    auto ser = pwrt->get_serializer();
-    ASSERT_TRUE(static_cast<bool>(ser));
-    EXPECT_EQ(typeid(chucho::capn_proto_serializer), typeid(*ser));
-    EXPECT_EQ(std::string("amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc"), pwrt->get_url());
-    EXPECT_EQ(std::string("logs"), pwrt->get_exchange());
-    EXPECT_TRUE(pwrt->get_routing_key().empty());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& pwrt = dynamic_cast<chucho::rabbitmq_writer&>(lgr->get_writer("chucho::rabbitmq_writer"));
+    EXPECT_EQ(typeid(chucho::capn_proto_serializer), typeid(pwrt.get_serializer()));
+    EXPECT_EQ(std::string("amqp://tjpxhjkc:U51Ue5F_w70sGV945992OmA51WAdT-gs@hyena.rmq.cloudamqp.com/tjpxhjkc"), pwrt.get_url());
+    EXPECT_EQ(std::string("logs"), pwrt.get_exchange());
+    EXPECT_TRUE(pwrt.get_routing_key().empty());
 }
 
 #endif
@@ -592,75 +588,63 @@ void configurator::rabbitmq_writer_capn_proto_body()
 
 void configurator::remote_writer_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::remote_writer), typeid(*wrts[0]));
-    auto rw = std::static_pointer_cast<chucho::remote_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(rw));
-    EXPECT_EQ(std::string("motherboy"), rw->get_host());
-    EXPECT_EQ(chucho::remote_writer::DEFAULT_PORT, rw->get_port());
-    EXPECT_EQ(chucho::remote_writer::DEFAULT_UNSENT_CACHE_MAX, rw->get_unsent_cache_max());
-    wrts = chucho::logger::get("will2")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::remote_writer), typeid(*wrts[0]));
-    rw = std::static_pointer_cast<chucho::remote_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(rw));
-    EXPECT_EQ(std::string("motherboy"), rw->get_host());
-    EXPECT_EQ(19567, rw->get_port());
-    EXPECT_EQ(chucho::remote_writer::DEFAULT_UNSENT_CACHE_MAX, rw->get_unsent_cache_max());
-    wrts = chucho::logger::get("will3")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::remote_writer), typeid(*wrts[0]));
-    rw = std::static_pointer_cast<chucho::remote_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(rw));
-    EXPECT_EQ(std::string("motherboy"), rw->get_host());
-    EXPECT_EQ(chucho::remote_writer::DEFAULT_PORT, rw->get_port());
-    EXPECT_EQ(750, rw->get_unsent_cache_max());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& rw = dynamic_cast<chucho::remote_writer&>(lgr->get_writer("chucho::remote_writer"));
+    EXPECT_EQ(std::string("motherboy"), rw.get_host());
+    EXPECT_EQ(chucho::remote_writer::DEFAULT_PORT, rw.get_port());
+    EXPECT_EQ(chucho::remote_writer::DEFAULT_UNSENT_CACHE_MAX, rw.get_unsent_cache_max());
+    lgr = chucho::logger::get("will2");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& rw2 = dynamic_cast<chucho::remote_writer&>(lgr->get_writer("chucho::remote_writer"));
+    EXPECT_EQ(std::string("motherboy"), rw2.get_host());
+    EXPECT_EQ(19567, rw2.get_port());
+    EXPECT_EQ(chucho::remote_writer::DEFAULT_UNSENT_CACHE_MAX, rw.get_unsent_cache_max());
+    lgr = chucho::logger::get("will3");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& rw3 = dynamic_cast<chucho::remote_writer&>(lgr->get_writer("chucho::remote_writer"));
+    EXPECT_EQ(std::string("motherboy"), rw3.get_host());
+    EXPECT_EQ(chucho::remote_writer::DEFAULT_PORT, rw3.get_port());
+    EXPECT_EQ(750, rw3.get_unsent_cache_max());
     // clear the status because we generated some warnings
     chucho::status_manager::get()->clear();
 }
 
 void configurator::rolling_file_writer_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
-    auto fwrt = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(fwrt));
-    EXPECT_EQ(std::string("what.log"), fwrt->get_file_name());
-    EXPECT_EQ(chucho::file_writer::on_start::TRUNCATE, fwrt->get_on_start());
-    EXPECT_FALSE(fwrt->get_flush());
-    auto rlr = fwrt->get_file_roller();
-    ASSERT_EQ(typeid(chucho::numbered_file_roller), typeid(*rlr));
-    auto nrlr = std::static_pointer_cast<chucho::numbered_file_roller>(rlr);
-    ASSERT_TRUE(static_cast<bool>(nrlr));
-    EXPECT_EQ(3, nrlr->get_min_index());
-    EXPECT_EQ(5, nrlr->get_max_index());
-    auto trg = fwrt->get_file_roll_trigger();
-    ASSERT_EQ(typeid(chucho::size_file_roll_trigger), typeid(*trg));
-    auto strg = std::static_pointer_cast<chucho::size_file_roll_trigger>(trg);
-    ASSERT_TRUE(static_cast<bool>(strg));
-    EXPECT_EQ(5000, strg->get_max_size());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& fwrt = dynamic_cast<chucho::rolling_file_writer&>(lgr->get_writer("chucho::rolling_file_writer"));
+    EXPECT_EQ(std::string("what.log"), fwrt.get_file_name());
+    EXPECT_EQ(chucho::file_writer::on_start::TRUNCATE, fwrt.get_on_start());
+    EXPECT_FALSE(fwrt.get_flush());
+    auto& nrlr = dynamic_cast<chucho::numbered_file_roller&>(fwrt.get_file_roller());
+    EXPECT_EQ(3, nrlr.get_min_index());
+    EXPECT_EQ(5, nrlr.get_max_index());
+    auto& strg = dynamic_cast<chucho::size_file_roll_trigger&>(fwrt.get_file_roll_trigger());
+    EXPECT_EQ(5000, strg.get_max_size());
 }
 
 void configurator::root_alias_body()
 {
-    auto wrts = chucho::logger::get("")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    EXPECT_EQ(typeid(chucho::cout_writer), typeid(*wrts[0]));
+    auto lgr = chucho::logger::get("");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    EXPECT_EQ(typeid(chucho::cout_writer), typeid(lgr->get_writer("chucho::cout_writer")));
+
 }
 
 #if defined(CHUCHO_HAVE_RUBY)
 
 void configurator::ruby_evaluator_filter_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    auto flts = wrts[0]->get_filters();
-    ASSERT_EQ(1, flts.size());
-    ASSERT_EQ(typeid(chucho::ruby_evaluator_filter), typeid(*flts[0]));
-    auto rb = std::static_pointer_cast<chucho::ruby_evaluator_filter>(flts[0]);
-    EXPECT_EQ(std::string("$logger == \"will\""), rb->get_expression());
+    auto lgr = chucho::logger::get("will");
+    auto names = lgr->get_writer_names();
+    ASSERT_EQ(1, names.size());
+    auto& wrt = lgr->get_writer(names[0]);
+    auto fnames = wrt.get_filter_names();
+    ASSERT_EQ(1, fnames.size());
+    auto& flt = dynamic_cast<chucho::ruby_evaluator_filter&>(wrt.get_filter(fnames[0]));
+    EXPECT_EQ(std::string("$logger == \"will\""), flt.get_expression());
 }
 
 #endif
@@ -668,30 +652,18 @@ void configurator::ruby_evaluator_filter_body()
 void configurator::size_file_roll_trigger_body(const std::string& tmpl)
 {
     std::size_t pos = tmpl.find("SIZE");
-    // Visual Studio 2012 does not have initializer lists
-    const char* bad[] =
-    {
-        "",
-        "Willy",
-        "5000x",
-        "5000gx",
-        "5000gbx",
-        nullptr
-    };
-    int i = 0;
-    while (bad[i] != nullptr)
+    std::vector<const char*> bads{ "", "Willy", "5000x", "5000gx", "5000gbx" };
+    for (auto bad : bads)
     {
         chucho::logger::remove_unused_loggers();
         chucho::status_manager::get()->clear();
         std::string rep = tmpl;
-        rep.replace(pos, 4, bad[i++]);
+        rep.replace(pos, 4, bad);
         configure(rep.c_str());
         EXPECT_EQ(chucho::status::level::ERROR_, chucho::status_manager::get()->get_level());
     }
     chucho::status_manager::get()->clear();
-    // Visual Studio 2012 does not have initializer lists
-    struct { const char* first; std::uintmax_t second; } good[] =
-    {
+    std::vector<std::pair<const char*, std::uintmax_t>> goods{
         { "5000", 5000 },
         { "5001b", 5001 },
         { "2k", 1024 * 2 },
@@ -709,56 +681,42 @@ void configurator::size_file_roll_trigger_body(const std::string& tmpl)
         { "1g", 1024ULL * 1024ULL * 1024ULL },
         { "1Gb", 1024ULL * 1024ULL * 1024ULL },
         { "1GB", 1024ULL * 1024ULL * 1024ULL },
-        { "1gB", 1024ULL * 1024ULL * 1024ULL },
-        { nullptr, 0 }
+        { "1gB", 1024ULL * 1024ULL * 1024ULL }
     };
-    i = 0;
-    while (good[i].first != nullptr)
+    for (const auto& good : goods)
     {
         chucho::logger::remove_unused_loggers();
         std::string rep = tmpl;
-        rep.replace(pos, 4, good[i].first);
+        rep.replace(pos, 4, good.first);
         configure(rep.c_str());
-        auto wrts = chucho::logger::get("will")->get_writers();
-        ASSERT_EQ(1, wrts.size());
-        ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
-        auto fwrt = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
-        ASSERT_TRUE(static_cast<bool>(fwrt));
-        auto trg = fwrt->get_file_roll_trigger();
-        ASSERT_EQ(typeid(chucho::size_file_roll_trigger), typeid(*trg));
-        auto strg = std::static_pointer_cast<chucho::size_file_roll_trigger>(trg);
-        ASSERT_TRUE(static_cast<bool>(strg));
-        EXPECT_EQ(good[i++].second, strg->get_max_size());
+        auto lgr = chucho::logger::get("will");
+        ASSERT_EQ(1, lgr->get_writer_names().size());
+        auto& fwrt = dynamic_cast<chucho::rolling_file_writer&>(lgr->get_writer("chucho::rolling_file_writer"));
+        auto& strg = dynamic_cast<chucho::size_file_roll_trigger&>(fwrt.get_file_roll_trigger());
+        EXPECT_EQ(good.second, strg.get_max_size());
     }
 }
 
 void configurator::sliding_numbered_file_roller_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
-    auto fwrt = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(fwrt));
-    auto rlr = fwrt->get_file_roller();
-    ASSERT_EQ(typeid(chucho::sliding_numbered_file_roller), typeid(*rlr));
-    auto srlr = std::static_pointer_cast<chucho::sliding_numbered_file_roller>(rlr);
-    ASSERT_TRUE(static_cast<bool>(srlr));
-    EXPECT_EQ(5, srlr->get_max_count());
-    EXPECT_EQ(-3, srlr->get_min_index());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& fwrt = dynamic_cast<chucho::rolling_file_writer&>(lgr->get_writer("chucho::rolling_file_writer"));
+    auto& srlr = dynamic_cast<chucho::sliding_numbered_file_roller&>(fwrt.get_file_roller());
+    EXPECT_EQ(5, srlr.get_max_count());
+    EXPECT_EQ(-3, srlr.get_min_index());
 }
 
 #if defined(CHUCHO_HAVE_SQLITE)
 
 void configurator::sqlite_writer_body()
 {
-    auto will = chucho::logger::get("will");
-    auto wrts = will->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    EXPECT_EQ(typeid(chucho::sqlite_writer), typeid(*wrts[0]));
-    auto wrt = std::static_pointer_cast<chucho::sqlite_writer>(wrts[0]);
-    EXPECT_EQ(std::string("database.sqlite"), wrt->get_file_name());
-    will->remove_writer(wrt);
-    wrt.reset();
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& wrt = dynamic_cast<chucho::sqlite_writer&>(lgr->get_writer("chucho::sqlite_writer"));
+    EXPECT_EQ(std::string("database.sqlite"), wrt.get_file_name());
+    lgr->remove_writer("chucho::sqlite_writer");
+    lgr.reset();
     chucho::file::remove("database.sqlite");
 }
 
@@ -766,40 +724,30 @@ void configurator::sqlite_writer_body()
 
 void configurator::syslog_writer_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    EXPECT_EQ(typeid(chucho::syslog_writer), typeid(*wrts[0]));
-    auto wrt = std::static_pointer_cast<chucho::syslog_writer>(wrts[0]);
-    EXPECT_EQ(chucho::syslog::facility::LOCAL0, wrt->get_facility());
-    EXPECT_EQ(std::string("localhost"), wrt->get_host_name());
-    ASSERT_TRUE(wrt->get_port());
-    EXPECT_EQ(514, *wrt->get_port());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& wrt = dynamic_cast<chucho::syslog_writer&>(lgr->get_writer("chucho::syslog_writer"));
+    EXPECT_EQ(chucho::syslog::facility::LOCAL0, wrt.get_facility());
+    EXPECT_EQ(std::string("localhost"), wrt.get_host_name());
+    ASSERT_TRUE(wrt.get_port());
+    EXPECT_EQ(514, *wrt.get_port());
 }
 
 void configurator::syslog_writer_facility_body(const std::string& tmpl)
 {
     std::size_t pos = tmpl.find("FCL");
-    // Visual Studio 2012 does not have initializer lists
-    const char* bad[] =
-    {
-        "kernel",
-        "my dog has fleas",
-        "",
-        nullptr
-    };
-    int i = 0;
-    while (bad[i] != nullptr)
+    std::vector<const char*> bads{ "kernel", "my dog has fleas", "" };
+    for (auto bad : bads)
     {
         chucho::logger::remove_unused_loggers();
         chucho::status_manager::get()->clear();
         std::string rep = tmpl;
-        rep.replace(pos, 3, bad[i++]);
+        rep.replace(pos, 3, bad);
         configure(rep.c_str());
         EXPECT_EQ(chucho::status::level::ERROR_, chucho::status_manager::get()->get_level());
     }
     // Visual Studio 2012 does not have initializer lists
-    struct { const char* first; chucho::syslog::facility second; } good[] =
-    {
+    std::vector<std::pair<const char*, chucho::syslog::facility>> goods{
         { "kern", chucho::syslog::facility::KERN },
         { "USER", chucho::syslog::facility::USER },
         { "mAiL", chucho::syslog::facility::MAIL },
@@ -819,51 +767,42 @@ void configurator::syslog_writer_facility_body(const std::string& tmpl)
         { "Local4", chucho::syslog::facility::LOCAL4 },
         { "loCAl5", chucho::syslog::facility::LOCAL5 },
         { "loCal6", chucho::syslog::facility::LOCAL6 },
-        { "LoCal7", chucho::syslog::facility::LOCAL7 },
-        { nullptr, chucho::syslog::facility::LOCAL7 }
+        { "LoCal7", chucho::syslog::facility::LOCAL7 }
     };
-    i = 0;
-    while (good[i].first != nullptr)
+    for (const auto& good : goods)
     {
         chucho::logger::remove_unused_loggers();
         chucho::status_manager::get()->clear();
         std::string rep = tmpl;
-        rep.replace(pos, 3, good[i].first);
+        rep.replace(pos, 3, good.first);
         configure(rep.c_str());
-        auto wrts = chucho::logger::get("will")->get_writers();
-        ASSERT_EQ(1, wrts.size());
-        EXPECT_EQ(typeid(chucho::syslog_writer), typeid(*wrts[0]));
-        auto wrt = std::static_pointer_cast<chucho::syslog_writer>(wrts[0]);
-        EXPECT_EQ(good[i++].second, wrt->get_facility());
+        auto lgr = chucho::logger::get("will");
+        ASSERT_EQ(1, lgr->get_writer_names().size());
+        auto& wrt = dynamic_cast<chucho::syslog_writer&>(lgr->get_writer("chucho::syslog_writer"));
+        EXPECT_EQ(good.second, wrt.get_facility());
     }
 }
 
 void configurator::syslog_writer_port_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    EXPECT_EQ(typeid(chucho::syslog_writer), typeid(*wrts[0]));
-    auto wrt = std::static_pointer_cast<chucho::syslog_writer>(wrts[0]);
-    EXPECT_EQ(chucho::syslog::facility::LOCAL0, wrt->get_facility());
-    EXPECT_EQ(std::string("localhost"), wrt->get_host_name());
-    ASSERT_TRUE(wrt->get_port());
-    EXPECT_EQ(19567, *wrt->get_port());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& wrt = dynamic_cast<chucho::syslog_writer&>(lgr->get_writer("chucho::syslog_writer"));
+    EXPECT_EQ(chucho::syslog::facility::LOCAL0, wrt.get_facility());
+    EXPECT_EQ(std::string("localhost"), wrt.get_host_name());
+    ASSERT_TRUE(wrt.get_port());
+    EXPECT_EQ(19567, *wrt.get_port());
 }
 
 void configurator::time_file_roller_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
-    auto fwrt = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(fwrt));
-    auto rlr = fwrt->get_file_roller();
-    ASSERT_EQ(typeid(chucho::time_file_roller), typeid(*rlr));
-    auto trlr = std::static_pointer_cast<chucho::time_file_roller>(rlr);
-    ASSERT_TRUE(static_cast<bool>(trlr));
-    EXPECT_EQ(std::string("%d{%d}"), trlr->get_file_name_pattern());
-    EXPECT_EQ(5, trlr->get_max_history());
-    EXPECT_EQ(trlr, fwrt->get_file_roll_trigger());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& fwrt = dynamic_cast<chucho::rolling_file_writer&>(lgr->get_writer("chucho::rolling_file_writer"));
+    auto& trlr = dynamic_cast<chucho::time_file_roller&>(fwrt.get_file_roller());
+    EXPECT_EQ(std::string("%d{%d}"), trlr.get_file_name_pattern());
+    EXPECT_EQ(5, trlr.get_max_history());
+    EXPECT_EQ(&trlr, &fwrt.get_file_roll_trigger());
 }
 
 #if defined(CHUCHO_WINDOWS)
@@ -900,86 +839,66 @@ void configurator::windows_event_log_writer_no_log_body()
 
 void configurator::zeromq_writer_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::zeromq_writer), typeid(*wrts[0]));
-    auto zw = std::static_pointer_cast<chucho::zeromq_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(zw));
-    auto ser = zw->get_serializer();
-    ASSERT_TRUE(static_cast<bool>(ser));
-    EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(*ser));
-    EXPECT_EQ(std::string("tcp://127.0.0.1:7777"), zw->get_endpoint());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& zw = dynamic_cast<chucho::zeromq_writer&>(lgr->get_writer("chucho::zeromq_writer"));
+    EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(zw.get_serializer()));
+    EXPECT_EQ(std::string("tcp://127.0.0.1:7777"), zw.get_endpoint());
     std::string pfx_str("Hi");
     std::vector<std::uint8_t> pfx(pfx_str.begin(), pfx_str.end());
-    EXPECT_EQ(pfx, zw->get_prefix());
+    EXPECT_EQ(pfx, zw.get_prefix());
 }
 
 void configurator::zeromq_writer_coalesce_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::zeromq_writer), typeid(*wrts[0]));
-    auto zw = std::static_pointer_cast<chucho::zeromq_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(zw));
-    auto ser = zw->get_serializer();
-    ASSERT_TRUE(static_cast<bool>(ser));
-    EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(*ser));
-    EXPECT_EQ(std::string("tcp://127.0.0.1:7780"), zw->get_endpoint());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& zw = dynamic_cast<chucho::zeromq_writer&>(lgr->get_writer("chucho::zeromq_writer"));
+    EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(zw.get_serializer()));
+    EXPECT_EQ(std::string("tcp://127.0.0.1:7780"), zw.get_endpoint());
     std::string pfx_str("Hi");
     std::vector<std::uint8_t> pfx(pfx_str.begin(), pfx_str.end());
-    EXPECT_EQ(pfx, zw->get_prefix());
-    EXPECT_EQ(zw->get_coalesce_max(), 300);
+    EXPECT_EQ(pfx, zw.get_prefix());
+    EXPECT_EQ(zw.get_coalesce_max(), 300);
 }
 
 void configurator::zeromq_writer_with_compressor_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::zeromq_writer), typeid(*wrts[0]));
-    auto zw = std::static_pointer_cast<chucho::zeromq_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(zw));
-    auto ser = zw->get_serializer();
-    ASSERT_TRUE(static_cast<bool>(ser));
-    EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(*ser));
-    auto cmp = zw->get_compressor();
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& zw = dynamic_cast<chucho::zeromq_writer&>(lgr->get_writer("chucho::zeromq_writer"));
+    EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(zw.get_serializer()));
+    auto& cmp = zw.get_compressor();
     ASSERT_TRUE(static_cast<bool>(cmp));
     EXPECT_EQ(typeid(chucho::noop_compressor), typeid(*cmp));
-    EXPECT_EQ(std::string("tcp://127.0.0.1:7776"), zw->get_endpoint());
+    EXPECT_EQ(std::string("tcp://127.0.0.1:7776"), zw.get_endpoint());
     std::string pfx_str("Hi");
     std::vector<std::uint8_t> pfx(pfx_str.begin(), pfx_str.end());
-    EXPECT_EQ(pfx, zw->get_prefix());
+    EXPECT_EQ(pfx, zw.get_prefix());
 }
 
 void configurator::zeromq_writer_no_prefix_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::zeromq_writer), typeid(*wrts[0]));
-    auto zw = std::static_pointer_cast<chucho::zeromq_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(zw));
-    auto ser = zw->get_serializer();
-    ASSERT_TRUE(static_cast<bool>(ser));
-    EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(*ser));
-    EXPECT_EQ(std::string("tcp://127.0.0.1:7778"), zw->get_endpoint());
-    EXPECT_TRUE(zw->get_prefix().empty());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& zw = dynamic_cast<chucho::zeromq_writer&>(lgr->get_writer("chucho::zeromq_writer"));
+    EXPECT_EQ(typeid(chucho::formatted_message_serializer), typeid(zw.get_serializer()));
+    EXPECT_EQ(std::string("tcp://127.0.0.1:7778"), zw.get_endpoint());
+    EXPECT_TRUE(zw.get_prefix().empty());
 }
 
 #if defined(CHUCHO_HAVE_PROTOBUF)
 
 void configurator::zeromq_writer_protobuf_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::zeromq_writer), typeid(*wrts[0]));
-    auto zw = std::static_pointer_cast<chucho::zeromq_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(zw));
-    auto ser = zw->get_serializer();
-    ASSERT_TRUE(static_cast<bool>(ser));
-    EXPECT_EQ(typeid(chucho::protobuf_serializer), typeid(*ser));
-    EXPECT_EQ(std::string("tcp://127.0.0.1:7779"), zw->get_endpoint());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& zw = dynamic_cast<chucho::zeromq_writer&>(lgr->get_writer("chucho::zeromq_writer"));
+    EXPECT_EQ(typeid(chucho::protobuf_serializer), typeid(zw.get_serializer()));
+    EXPECT_EQ(std::string("tcp://127.0.0.1:7779"), zw.get_endpoint());
     std::string pfx_str("Hi");
     std::vector<std::uint8_t> pfx(pfx_str.begin(), pfx_str.end());
-    EXPECT_EQ(pfx, zw->get_prefix());
+    EXPECT_EQ(pfx, zw.get_prefix());
 }
 
 #endif
@@ -988,18 +907,14 @@ void configurator::zeromq_writer_protobuf_body()
 
 void configurator::zeromq_writer_flatbuffers_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::zeromq_writer), typeid(*wrts[0]));
-    auto zw = std::static_pointer_cast<chucho::zeromq_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(zw));
-    auto ser = zw->get_serializer();
-    ASSERT_TRUE(static_cast<bool>(ser));
-    EXPECT_EQ(typeid(chucho::flatbuffers_serializer), typeid(*ser));
-    EXPECT_EQ(std::string("tcp://127.0.0.1:7781"), zw->get_endpoint());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& zw = dynamic_cast<chucho::zeromq_writer&>(lgr->get_writer("chucho::zeromq_writer"));
+    EXPECT_EQ(typeid(chucho::flatbuffers_serializer), typeid(zw.get_serializer()));
+    EXPECT_EQ(std::string("tcp://127.0.0.1:7781"), zw.get_endpoint());
     std::string pfx_str("Hi");
     std::vector<std::uint8_t> pfx(pfx_str.begin(), pfx_str.end());
-    EXPECT_EQ(pfx, zw->get_prefix());
+    EXPECT_EQ(pfx, zw.get_prefix());
 }
 
 #endif
@@ -1008,16 +923,11 @@ void configurator::zeromq_writer_flatbuffers_body()
 
 void configurator::zip_file_compressor_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
-    auto fwrt = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(fwrt));
-    auto rlr = fwrt->get_file_roller();
-    ASSERT_EQ(typeid(chucho::time_file_roller), typeid(*rlr));
-    auto trlr = std::static_pointer_cast<chucho::time_file_roller>(rlr);
-    ASSERT_TRUE(static_cast<bool>(trlr));
-    auto cmp = trlr->get_file_compressor();
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& fwrt = dynamic_cast<chucho::rolling_file_writer&>(lgr->get_writer("chucho::rolling_file_writer"));
+    auto& trlr = dynamic_cast<chucho::time_file_roller&>(fwrt.get_file_roller());
+    auto cmp = trlr.get_file_compressor();
     ASSERT_TRUE(static_cast<bool>(cmp));
 #if defined(CHUCHO_HAVE_LIBARCHIVE)
     ASSERT_EQ(typeid(chucho::zip_file_compressor), typeid(*cmp));

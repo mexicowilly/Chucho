@@ -95,6 +95,7 @@ OPTION(CLANG_LIBSTDCXX "Whether to use libstdc++ with the Clang compiler" OFF)
 #     test/yaml_configurator_test.cpp
 #     test/chucho_config_file_configurator_test.cpp
 #     test/log4cplus_config_file_configurator_test.cpp
+#     test/json_configurator_test.cpp
 
 # YAML configuration.
 
@@ -129,6 +130,7 @@ OPTION(JSON_CONFIG "Whether to support reading JSON configuration files" OFF)
 # flatbuffers: flatbuffers_serializer
 # libarchive: zip_file_compressor
 # liblzma: lzma_compressor, lzma_file_compressor
+# lz4: lz4_compressor
 # mysql: mysql_writer
 # oracle: oracle_writer
 # postgres: postgres_writer
