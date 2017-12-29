@@ -175,7 +175,7 @@ TEST_F(json_configurator, rolling_file_writer)
 
 TEST_F(json_configurator, root_alias)
 {
-    chucho::logger::get("")->remove_all_writers();
+    chucho::logger::get("")->clear_writers();
     configure(R"cnf(
 {
     "chucho_loggers" : {

@@ -361,19 +361,18 @@ TEST_F(chucho_config_file_configurator, filter_order)
               "chucho.writer.co.filter = m\n"
               "chucho.filter.m = chucho::level_threshold_filter\n"
               "chucho.filter.m.level = warn");
-    auto wrts = chucho::logger::get("will")->get_writers();
+    auto lgr = chucho::logger::get("will");
+    auto wrts = lgr->get_writer_names();
     ASSERT_EQ(1, wrts.size());
-    auto flts = wrts[0]->get_filters();
+    auto& wrt = lgr->get_writer(wrts[0]);
+    auto flts = wrt.get_filter_names();
     ASSERT_EQ(3, flts.size());
-    ASSERT_EQ(typeid(chucho::level_threshold_filter), typeid(*flts[0]));
-    auto thresh = std::static_pointer_cast<chucho::level_threshold_filter>(flts[0]);
-    EXPECT_EQ(*chucho::level::FATAL_(), *thresh->get_level());
-    ASSERT_EQ(typeid(chucho::level_threshold_filter), typeid(*flts[1]));
-    thresh = std::static_pointer_cast<chucho::level_threshold_filter>(flts[1]);
-    EXPECT_EQ(*chucho::level::DEBUG_(), *thresh->get_level());
-    ASSERT_EQ(typeid(chucho::level_threshold_filter), typeid(*flts[2]));
-    thresh = std::static_pointer_cast<chucho::level_threshold_filter>(flts[2]);
-    EXPECT_EQ(*chucho::level::WARN_(), *thresh->get_level());
+    EXPECT_EQ(*chucho::level::FATAL_(),
+              *dynamic_cast<chucho::level_threshold_filter&>(wrt.get_filter(flts[0])).get_level());
+    EXPECT_EQ(*chucho::level::DEBUG_(),
+              *dynamic_cast<chucho::level_threshold_filter&>(wrt.get_filter(flts[1])).get_level());
+    EXPECT_EQ(*chucho::level::WARN_(),
+              *dynamic_cast<chucho::level_threshold_filter&>(wrt.get_filter(flts[2])).get_level());
 }
 
 TEST_F(chucho_config_file_configurator, gzip_file_compressor)
@@ -702,7 +701,7 @@ TEST_F(chucho_config_file_configurator, rolling_file_writer)
 
 TEST_F(chucho_config_file_configurator, root_alias)
 {
-    chucho::logger::get("")->remove_all_writers();
+    chucho::logger::get("")->clear_writers();
     configure("chucho.logger = <root>\n"
               "chucho.logger.<root>.writer = ce\n"
               "chucho.writer.ce = chucho::cout_writer\n"

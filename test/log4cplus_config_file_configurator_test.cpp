@@ -115,16 +115,10 @@ TEST_F(log4cplus_config_file_configurator, daily_rolling_file_appender)
         rep.replace(rep_loc, 8, exp[i].first);
         struct std::tm now = chucho::calendar::get_utc(time(nullptr));
         configure(rep.c_str());
-        auto wrts = chucho::logger::get("will")->get_writers();
-        ASSERT_EQ(1, wrts.size());
-        ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
-        auto rfw = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
-        ASSERT_TRUE(static_cast<bool>(rfw));
-        auto rlr = rfw->get_file_roller();
-        ASSERT_EQ(typeid(chucho::time_file_roller), typeid(*rlr));
-        auto tfr = std::static_pointer_cast<chucho::time_file_roller>(rlr);
-        ASSERT_TRUE(static_cast<bool>(tfr));
-        std::string fn = tfr->get_active_file_name();
+        auto& rfw = dynamic_cast<chucho::rolling_file_writer&>(
+            chucho::logger::get("will")->get_writer("chucho::rolling_file_writer"));
+        auto& tfr = dynamic_cast<chucho::time_file_roller&>(rfw.get_file_roller());
+        std::string fn = tfr.get_active_file_name();
         EXPECT_EQ("." + chucho::calendar::format(now, exp[i].second), fn);
         i++;
     }
