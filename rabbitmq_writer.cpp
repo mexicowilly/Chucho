@@ -153,8 +153,8 @@ void rabbitmq_writer::init()
     }
     catch (...)
     {
-        amqp_channel_close(cxn_, CHUCHO_CHANNEL, AMQP_REPLY_SUCCESS);
-        amqp_connection_close(cxn_, AMQP_REPLY_SUCCESS);
+        //amqp_channel_close(cxn_, CHUCHO_CHANNEL, AMQP_REPLY_SUCCESS);
+        //amqp_connection_close(cxn_, AMQP_REPLY_SUCCESS);
         amqp_destroy_connection(cxn_);
         throw;
     }

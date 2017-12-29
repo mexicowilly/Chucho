@@ -31,7 +31,7 @@ message_queue_writer::message_queue_writer(const std::string& name,
       coalesce_max_(DEFAULT_COALESCE_MAX),
       number_coalesced_(0)
 {
-    if (!ser)
+    if (!serializer_)
         throw std::invalid_argument("The serializer must be set");
 }
 
@@ -46,7 +46,7 @@ message_queue_writer::message_queue_writer(const std::string& name,
       coalesce_max_(coalesce_max),
       number_coalesced_(0)
 {
-    if (!ser)
+    if (!serializer_)
         throw std::invalid_argument("The serializer must be set");
 }
 

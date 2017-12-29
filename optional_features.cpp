@@ -55,8 +55,8 @@ void init_feature_set(chucho::optional_features::feature_set& fs)
 #if defined(CHUCHO_HAVE_ORACLE_WRITER)
     fs.set(chucho::optional_features::ORACLE_WRITER);
 #endif
-#if defined(CHUCHO_HAVE_POSTRESQL_WRITER)
-    fs.set(chucho::optional_features::POSTRESQL_WRITER);
+#if defined(CHUCHO_HAVE_POSTGRESQL_WRITER)
+    fs.set(chucho::optional_features::POSTGRESQL_WRITER);
 #endif
 #if defined(CHUCHO_HAVE_PROTOBUF_SERIALIZER)
     fs.set(chucho::optional_features::PROTOBUF_SERIALIZER);

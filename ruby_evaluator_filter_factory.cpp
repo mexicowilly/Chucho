@@ -31,7 +31,7 @@ ruby_evaluator_filter_factory::ruby_evaluator_filter_factory()
 
 std::unique_ptr<configurable> ruby_evaluator_filter_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    auto refm = dynamic_cast<ruby_evaluator_filter*>(mnto.get());
+    auto refm = dynamic_cast<ruby_evaluator_filter_memento*>(mnto.get());
     assert(refm != nullptr);
     if (refm->get_name().empty())
         throw exception("ruby_evaluator_filter_factory: The name must be set");
@@ -44,7 +44,7 @@ std::unique_ptr<configurable> ruby_evaluator_filter_factory::create_configurable
 
 std::unique_ptr<memento> ruby_evaluator_filter_factory::create_memento(configurator& cfg)
 {
-    auto  mnto = std::make_unique<ruby_evaluator_filter_memento>(cfg);
+    auto mnto = std::make_unique<ruby_evaluator_filter_memento>(cfg);
     return std::move(mnto);
 }
 

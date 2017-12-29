@@ -311,9 +311,9 @@ std::unique_ptr<configurable> config_file_configurator::log4cplus_properties_pro
     auto type = props.get_one("logToStdErr");
     std::unique_ptr<configurable> result;
     if (type && boolean_value(*type))
-        result = std::make_unique<cerr_writer>("cerr_writer", std::move(fmt));
+        result = std::make_unique<cerr_writer>("chucho::cerr_writer", std::move(fmt));
     else
-        result = std::make_unique<cout_writer>("cout_writer", std::move(fmt));
+        result = std::make_unique<cout_writer>("chucho::cout_writer", std::move(fmt));
     return std::move(result);
 }
 
@@ -380,7 +380,7 @@ std::unique_ptr<configurable> config_file_configurator::log4cplus_properties_pro
     auto roller_mnto = std::move(roller_fact->create_memento(cfg_));
     auto prop = props.get_one("MaxBackupIndex");
     roller_mnto->handle("max_index", (prop ? *prop : "1"));
-    mnto->handle(std::move(fact->create_configurable(roller_mnto)));
+    mnto->handle(std::move(roller_fact->create_configurable(roller_mnto)));
     assert(cfg_.get_factories().find("chucho::size_file_roll_trigger") != cfg_.get_factories().end()); 
     auto trigger_fact = cfg_.get_factories().find("chucho::size_file_roll_trigger")->second;
     auto trigger_mnto = std::move(trigger_fact->create_memento(cfg_));

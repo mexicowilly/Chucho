@@ -31,7 +31,7 @@ chucho::event evt(chucho::logger::get("capn_proto_serializer_test"),
                   __FILE__,
                   __LINE__,
                   __FUNCTION__);
-    auto fmt = std::make_shared<chucho::pattern_formatter>("%m");
+    auto fmt = chucho::pattern_formatter("%m");
     chucho::flatbuffers_serializer ser;
     for (int i = 0; i < 5; i++)
     {
@@ -78,7 +78,7 @@ TEST(flatbuffers_serializer, with_marker)
                       __LINE__,
                       __FUNCTION__,
                       "marky");
-    auto fmt = std::make_shared<chucho::pattern_formatter>("%m");
+    auto fmt = chucho::pattern_formatter("%m");
     chucho::flatbuffers_serializer ser;
     ser.serialize(evt, fmt);
     auto res = ser.finish_blob();
