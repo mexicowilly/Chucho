@@ -21,7 +21,7 @@
 #include <chucho/environment.hpp>
 #include <iostream>
 
-TEST(oracle_wrtier_test, oracle)
+TEST(db2_wrtier_test, db2)
 {
     chucho::logger::remove_unused_loggers();
     auto user = chucho::environment::get("DB2_USER");
@@ -29,16 +29,17 @@ TEST(oracle_wrtier_test, oracle)
     auto db = chucho::environment::get("DB2_SERVER");
     if (user && pass && db) 
     {
-        auto wrt = std::make_shared<chucho::db2_writer>(std::make_shared<chucho::pattern_formatter>("%m"),
+        auto wrt = std::make_unique<chucho::db2_writer>("db2",
+                                                        std::move(std::make_unique<chucho::pattern_formatter>("%m")),
                                                         *db,
                                                         *user,
                                                         *pass);
         auto log = chucho::logger::get("db2_writer_test");
-        log->add_writer(wrt);
+        log->add_writer(std::move(wrt));
         chucho::event evt(log, chucho::level::ERROR_(), "chucho db2_writer test no mark", __FILE__, __LINE__, __FUNCTION__);
-        wrt->write(evt);
+        log->get_writer("db2").write(evt);
         evt = chucho::event(log, chucho::level::INFO_(), "chucho db2_writer test with mark", __FILE__, __LINE__, __FUNCTION__, "marky");
-        wrt->write(evt);
+        log->get_writer("db2").write(evt);
     }
     else
     {
