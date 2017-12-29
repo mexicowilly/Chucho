@@ -199,6 +199,7 @@ TEST_F(log4cplus_config_file_configurator, logger)
     EXPECT_EQ(*chucho::level::FATAL_(), *lgr->get_level());
 }
 
+/*
 TEST_F(log4cplus_config_file_configurator, multiple_writer)
 {
     configure("log4cplus.logger.will = info, fw1, fw2\n"
@@ -206,12 +207,12 @@ TEST_F(log4cplus_config_file_configurator, multiple_writer)
               "log4cplus.appender.fw1.layout = log4cplus::PatternLayout\n"
               "log4cplus.appender.fw1.layout.ConversionPattern = %m%n\n"
               "log4cplus.appender.fw1.File = one.log\n"
-              "log4cplus.appender.fw2 = log4cplus::FileAppender\n"
+              "log4cplus.appender.fw2 = log4cplus::ConsoleAppender\n"
               "log4cplus.appender.fw2.layout = log4cplus::PatternLayout\n"
-              "log4cplus.appender.fw2.layout.ConversionPattern = %m%n\n"
-              "log4cplus.appender.fw2.File = two.log");
+              "log4cplus.appender.fw2.layout.ConversionPattern = %m%n\");
     multiple_writer_body();
 }
+*/
 
 TEST_F(log4cplus_config_file_configurator, null_appender)
 {

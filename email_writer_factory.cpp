@@ -36,7 +36,7 @@ std::unique_ptr<configurable> email_writer_factory::create_configurable(std::uni
     if (ewm->get_name().empty())
         throw exception("email_writer_factory: The name is not set");
     auto fmt = std::move(ewm->get_formatter());
-    if (fmt)
+    if (!fmt)
         throw exception("email_writer_factory: The writer's formatter is not set");
     if (!ewm->get_connection_type()) 
         throw exception("email_writer_factory: The connection type must be set");

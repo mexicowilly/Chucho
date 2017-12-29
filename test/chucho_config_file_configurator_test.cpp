@@ -355,12 +355,15 @@ TEST_F(chucho_config_file_configurator, filter_order)
               "chucho.writer.co.filter = z\n"
               "chucho.filter.z = chucho::level_threshold_filter\n"
               "chucho.filter.z.level = fatal\n"
+              "chucho.filter.z.name = one\n"
               "chucho.writer.co.filter = a\n"
               "chucho.filter.a = chucho::level_threshold_filter\n"
               "chucho.filter.a.level = debug\n"
+              "chucho.filter.a.name = two\n"
               "chucho.writer.co.filter = m\n"
               "chucho.filter.m = chucho::level_threshold_filter\n"
-              "chucho.filter.m.level = warn");
+              "chucho.filter.m.level = warn\n"
+              "chucho.filter.m.name = three");
     auto lgr = chucho::logger::get("will");
     auto wrts = lgr->get_writer_names();
     ASSERT_EQ(1, wrts.size());
@@ -368,11 +371,11 @@ TEST_F(chucho_config_file_configurator, filter_order)
     auto flts = wrt.get_filter_names();
     ASSERT_EQ(3, flts.size());
     EXPECT_EQ(*chucho::level::FATAL_(),
-              *dynamic_cast<chucho::level_threshold_filter&>(wrt.get_filter(flts[0])).get_level());
+              *dynamic_cast<chucho::level_threshold_filter&>(wrt.get_filter("one")).get_level());
     EXPECT_EQ(*chucho::level::DEBUG_(),
-              *dynamic_cast<chucho::level_threshold_filter&>(wrt.get_filter(flts[1])).get_level());
+              *dynamic_cast<chucho::level_threshold_filter&>(wrt.get_filter("two")).get_level());
     EXPECT_EQ(*chucho::level::WARN_(),
-              *dynamic_cast<chucho::level_threshold_filter&>(wrt.get_filter(flts[2])).get_level());
+              *dynamic_cast<chucho::level_threshold_filter&>(wrt.get_filter("three")).get_level());
 }
 
 TEST_F(chucho_config_file_configurator, gzip_file_compressor)
@@ -535,7 +538,7 @@ TEST_F(chucho_config_file_configurator, named_pipe_writer)
               "chucho.writer.npw.formatter = pf\n"
               "chucho.formatter.pf = chucho::pattern_formatter\n"
               "chucho.formatter.pf.pattern = %m%n\n"
-              "chucho.writer.npw.name = monkeyballs\n"
+              "chucho.writer.npw.pipe_name = monkeyballs\n"
               "chucho.writer.npw.flush = false");
     named_pipe_writer_body();
 }

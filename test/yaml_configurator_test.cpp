@@ -429,7 +429,7 @@ TEST_F(yaml_configurator, multiple_writer)
               "            pattern: '%m%n'\n"
               "        file_name: one.log\n"
               "    - chucho::file_writer:\n"
-                  "    name: two\n"
+              "        name: two\n"
               "        chucho::pattern_formatter:\n"
               "            pattern: '%m%n'\n"
               "        file_name: two.log\n");
@@ -479,7 +479,7 @@ TEST_F(yaml_configurator, named_pipe_writer)
               "    chucho::named_pipe_writer:\n"
               "        chucho::pattern_formatter:\n"
               "            pattern: '%m%n'\n"
-              "        name: monkeyballs\n"
+              "        pipe_name: monkeyballs\n"
               "        flush: false");
     named_pipe_writer_body();
 }

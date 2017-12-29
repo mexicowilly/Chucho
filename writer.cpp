@@ -59,7 +59,7 @@ filter& writer::get_filter(const std::string& name)
                               filters_.end(),
                               [&name] (const std::unique_ptr<filter>& f) { return f->get_name() == name; });
     if (found == filters_.end())
-        throw std::invalid_argument("The filter" + name + " could not be found");
+        throw std::invalid_argument("The filter " + name + " could not be found");
     return **found;
 }
 
