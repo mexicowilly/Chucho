@@ -42,7 +42,11 @@ public:
 
     virtual void TearDown() override
     {
+        // The SunPro compiler has a bug that causes it to segv
+        // in the destructor of security_policy.
+        #if !defined(__SUNPRO_CC)
         chucho::finalize();
+        #endif
     }
 
 private:

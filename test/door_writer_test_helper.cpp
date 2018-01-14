@@ -29,14 +29,14 @@ int main(int argc, char* argv[])
             std::cout << "Arguments are door name, message and optional marker" << std::endl;
             return EXIT_FAILURE;
         }
-        auto fmt = std::make_shared<chucho::pattern_formatter>("%m");
-        auto wrt = std::make_shared<chucho::door_writer>(fmt, argv[1]);
+        auto fmt = std::make_unique<chucho::pattern_formatter>("%m");
+        chucho::door_writer wrt("door", std::move(fmt), argv[1]);
         std::shared_ptr<chucho::logger> log = chucho::logger::get("door_writer_test");
         chucho::optional<chucho::marker> mrk;
         if (argc == 4)
             mrk = std::string(argv[3]);
         chucho::event evt(log, chucho::level::INFO_(), argv[2], __FILE__, __LINE__, __FUNCTION__, mrk);
-        wrt->write(evt);
+        wrt.write(evt);
     }
     catch (std::exception& e)
     {

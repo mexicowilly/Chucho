@@ -41,7 +41,7 @@ std::unique_ptr<configurable> door_writer_factory::create_configurable(std::uniq
         throw exception("door_writer_factory: The door's file name must be set");
     auto cnf = std::make_unique<door_writer>(dwm->get_name(),
                                              std::move(fmt),
-                                             dwm->get_file_name()));
+                                             dwm->get_file_name());
     set_filters(*cnf, *dwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
     return std::move(cnf);

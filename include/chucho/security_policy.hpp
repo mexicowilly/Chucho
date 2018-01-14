@@ -27,8 +27,6 @@
 #include <chucho/non_copyable.hpp>
 #include <map>
 #include <string>
-#include <sstream>
-#include <memory>
 #include <cstdint>
 
 namespace chucho
@@ -222,7 +220,7 @@ class CHUCHO_EXPORT security_policy : non_copyable
 {
 public:
     /**
-     * @name Constructor 
+     * @name Constructor
      * @{ 
      */
     /**
@@ -267,8 +265,7 @@ public:
      * @param low the minimum value of the range
      * @param high the maximum value of the range
      */
-    template <typename val_type>
-    void override_integer(const std::string& key, val_type low, val_type high);
+    void override_integer(const std::string& key, std::intmax_t  low, std::intmax_t high);
     /**
      * Set a text maximum length. This method clobbers any existing 
      * text value for the key. The method @ref set_text will not set
@@ -296,8 +293,7 @@ public:
      * @param low the minimum value of the range
      * @param high the maximum value of the range
      */
-    template <typename val_type>
-    void set_integer(const std::string& key, val_type low, val_type high);
+    void set_integer(const std::string& key, std::intmax_t low, std::intmax_t high);
     /**
      * Set a text maximum length. This method will not replace an 
      * existing maximum length for the key. If you wish to 
@@ -329,37 +325,26 @@ public:
      * @throw exception if the value does not conform to the 
      *        security policy
      */
-    template <typename val_type>
-    val_type validate(const std::string& key, const val_type& val) const;
+    std::intmax_t validate(const std::string& key, const std::intmax_t& val) const;
 
 private:
-    class CHUCHO_NO_EXPORT basic_range
+    class CHUCHO_NO_EXPORT range
     {
     public:
-    	virtual ~basic_range() { };
+        range() = default;
+        range(std::intmax_t low, std::intmax_t high);
 
-        virtual std::pair<std::intmax_t, std::intmax_t> get_range() const = 0;
-        virtual bool in_range(std::uintmax_t val) const = 0;
-        virtual std::string to_text() const = 0;
-    };
-
-    template <typename int_type>
-    class CHUCHO_NO_EXPORT range : public basic_range
-    {
-    public:
-        range(int_type low, int_type high);
-
-        virtual std::pair<std::intmax_t, std::intmax_t> get_range() const override;
-        virtual bool in_range(std::uintmax_t val) const override;
-        virtual std::string to_text() const override;
+        std::pair<std::intmax_t, std::intmax_t> get_range() const;
+        bool in_range(std::intmax_t val) const;
+        std::string to_text() const;
 
     private:
-        int_type low_;
-        int_type high_;
+        std::intmax_t low_{0};
+        std::intmax_t high_{0};
     };
 
+    std::map<std::string, range> int_ranges_;
     std::map<std::string, std::size_t> text_maxes_;
-    std::map<std::string, std::unique_ptr<basic_range>> int_ranges_;
     std::size_t default_text_max_;
 };
 
@@ -368,10 +353,9 @@ inline std::size_t security_policy::get_default_text_max() const
     return default_text_max_;
 }
 
-template <typename val_type>
-void security_policy::override_integer(const std::string& key, val_type low, val_type high)
+inline void security_policy::override_integer(const std::string& key, std::intmax_t low, std::intmax_t high)
 {
-    int_ranges_[key] = std::move(std::make_unique<range<val_type>>(low, high));
+    int_ranges_[key] = range(low, high);
 }
 
 inline void security_policy::override_text(const std::string& key, std::size_t max_len)
@@ -384,55 +368,26 @@ inline void security_policy::set_default_text_max(std::size_t dflt)
     default_text_max_ = dflt;
 }
 
-template <typename val_type>
-void security_policy::set_integer(const std::string& key, val_type low, val_type high)
+inline void security_policy::set_integer(const std::string& key, std::intmax_t low, std::intmax_t high)
 {
     if (int_ranges_.count(key) == 0)
         override_integer(key, low, high);
 }
 
-template <typename val_type>
-val_type security_policy::validate(const std::string& key, const val_type& val) const
-{
-    auto found = int_ranges_.find(key);
-    if (found == int_ranges_.end())
-        throw exception("The key " + key + " could not be found in the security policy, so its value cannot be tested");
-    if (!found->second->in_range(val))
-    {
-        std::ostringstream stream;
-        stream << "The value," << val << ", of key, " << key << ", lies outside the range," <<
-            found->second->to_text() << ", permitted by the security policy";
-        throw exception(stream.str());
-    }
-    return val;
-}
-
-template <typename int_type>
-security_policy::range<int_type>::range(int_type low, int_type high)
+inline security_policy::range::range(std::intmax_t low, std::intmax_t high)
     : low_(low),
       high_(high)
 {
 }
 
-template <typename int_type>
-std::pair<std::intmax_t, std::intmax_t> security_policy::range<int_type>::get_range() const
+inline std::pair<std::intmax_t, std::intmax_t> security_policy::range::get_range() const
 {
-    return std::make_pair(static_cast<std::intmax_t>(low_), static_cast<std::intmax_t>(high_));
+    return std::make_pair(low_, high_);
 }
 
-template <typename int_type>
-bool security_policy::range<int_type>::in_range(std::uintmax_t val) const
+inline bool security_policy::range::in_range(std::intmax_t val) const
 {
-    int_type cval = static_cast<int_type>(val);
-    return cval >= low_ && cval <= high_;
-}
-
-template <typename int_type>
-std::string security_policy::range<int_type>::to_text() const
-{
-    std::ostringstream stream;
-    stream << '(' << low_ << ", " << high_ << ')';
-    return stream.str();
+    return val >= low_ && val <= high_;
 }
 
 }

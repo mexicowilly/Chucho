@@ -15,6 +15,7 @@
  */
 
 #include <chucho/security_policy.hpp>
+#include <sstream>
 
 namespace chucho
 {
@@ -29,7 +30,7 @@ optional<std::pair<std::intmax_t, std::intmax_t>> security_policy::get_integer_r
     optional<std::pair<std::intmax_t, std::intmax_t>> result;
     auto found = int_ranges_.find(key);
     if (found != int_ranges_.end())
-        result = found->second->get_range();
+        result = found->second.get_range();
     return result;
 }
 
@@ -43,6 +44,21 @@ void security_policy::set_text(const std::string& key, std::size_t max_len)
 {
     if (text_maxes_.count(key) == 0)
         override_text(key, max_len);
+}
+
+std::intmax_t security_policy::validate(const std::string& key, const std::intmax_t& val) const
+{
+    auto found = int_ranges_.find(key);
+    if (found == int_ranges_.end())
+        throw exception("The key " + key + " could not be found in the security policy, so its value cannot be tested");
+    if (!found->second.in_range(val))
+    {
+        std::ostringstream stream;
+        stream << "The value," << val << ", of key, " << key << ", lies outside the range," <<
+            found->second.to_text() << ", permitted by the security policy";
+        throw exception(stream.str());
+    }
+    return val;
 }
 
 std::string security_policy::validate(const std::string& key, const std::string& val) const
@@ -74,6 +90,13 @@ std::string security_policy::validate(const std::string& key, const std::string&
         throw exception(stream.str());
     }
     return std::string(val);
+}
+
+std::string security_policy::range::to_text() const
+{
+    std::ostringstream stream;
+    stream << '(' << low_ << ", " << high_ << ')';
+    return stream.str();
 }
 
 }

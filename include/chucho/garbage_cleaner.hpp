@@ -22,7 +22,7 @@
 #endif
 
 #include <functional>
-#include <vector>
+#include <stack>
 #include <mutex>
 
 namespace chucho
@@ -40,7 +40,7 @@ public:
     void add(cleaner_type cln);
 
 private:
-    std::vector<cleaner_type> cleaners_;
+    std::stack<cleaner_type> cleaners_;
     std::mutex guard_;
 };
 
