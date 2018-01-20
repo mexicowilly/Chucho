@@ -279,7 +279,7 @@ std::string configurator::resolve_variables(const std::string& val)
     static regex::expression re("\\$([Ee][Nn][Vv])?\\{([^{]+)\\}");
 
     std::string result(val);
-    int pos_offset = 0;
+    std::size_t pos_offset = 0;
     regex::iterator itor(val, re);
     regex::iterator end;
     while (itor != end)
@@ -287,8 +287,7 @@ std::string configurator::resolve_variables(const std::string& val)
         const regex::match& m(*itor);
         if (m[1].begin() > 0)
         {
-            optional<std::string> env = environment::get(
-                val.substr(m[2].begin(), m[2].length()).c_str());
+            auto env = environment::get(val.substr(m[2].begin(), m[2].length()).c_str());
             if (env)
             {
                 result.replace(m[0].begin() + pos_offset, m[0].length(), *env);

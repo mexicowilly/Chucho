@@ -809,27 +809,23 @@ void configurator::time_file_roller_body()
 
 void configurator::windows_event_log_writer_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::windows_event_log_writer), typeid(*wrts[0]));
-    auto welw = std::static_pointer_cast<chucho::windows_event_log_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(welw));
-    EXPECT_TRUE(welw->get_host().empty());
-    EXPECT_EQ(std::string("what"), welw->get_source());
-    EXPECT_EQ(std::string("hello"), welw->get_log());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& welw = dynamic_cast<chucho::windows_event_log_writer&>(lgr->get_writer("chucho::windows_event_log_writer"));
+    EXPECT_TRUE(welw.get_host().empty());
+    EXPECT_EQ(std::string("what"), welw.get_source());
+    EXPECT_EQ(std::string("hello"), welw.get_log());
     chucho::status_manager::get()->clear();
 }
 
 void configurator::windows_event_log_writer_no_log_body()
 {
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::windows_event_log_writer), typeid(*wrts[0]));
-    auto welw = std::static_pointer_cast<chucho::windows_event_log_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(welw));
-    EXPECT_TRUE(welw->get_host().empty());
-    EXPECT_EQ(std::string("what"), welw->get_source());
-    EXPECT_EQ(std::string("Application"), welw->get_log());
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& welw = dynamic_cast<chucho::windows_event_log_writer&>(lgr->get_writer("chucho::windows_event_log_writer"));
+    EXPECT_TRUE(welw.get_host().empty());
+    EXPECT_EQ(std::string("what"), welw.get_source());
+    EXPECT_EQ(std::string("Application"), welw.get_log());
     chucho::status_manager::get()->clear();
 }
 

@@ -71,10 +71,11 @@ file_descriptor_writer::file_descriptor_writer(const std::string& name,
     set_status_origin("file_descriptor_writer");
 }
 
-file_descriptor_writer::file_descriptor_writer(std::shared_ptr<formatter> fmt,
+file_descriptor_writer::file_descriptor_writer(const std::string& name,
+                                               std::unique_ptr<formatter>&& fmt,
                                                HANDLE hnd,
                                                bool flsh)
-    : writer(fmt),
+    : writer(name, std::move(fmt)),
       num_(0),
       handle_(hnd),
       fd_(-1),
@@ -121,7 +122,7 @@ void file_descriptor_writer::flush()
         DWORD written;
         if (!WriteFile(handle_,
                        buf_.data(),
-                       num_,
+                       static_cast<DWORD>(num_),
                        &written,
                        NULL))
         {

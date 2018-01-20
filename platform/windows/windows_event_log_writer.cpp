@@ -29,13 +29,13 @@ std::string get_dll_name()
     std::vector<char> env(1024);
     DWORD rc = GetEnvironmentVariableA("CHUCHO_EVENT_LOG_DLL",
                                        &env[0],
-                                       env.size());
+                                       static_cast<DWORD>(env.size()));
     if (rc > env.size() - 1)
     {
         env.resize(rc);
         rc = GetEnvironmentVariableA("CHUCHO_EVENT_LOG_DLL",
                                      &env[0],
-                                     env.size());
+                                     static_cast<DWORD>(env.size()));
     }
     if (rc == 0)
     {
@@ -56,7 +56,7 @@ std::string get_dll_name()
 
 DWORD query_registry(HKEY key, const char* const name, std::vector<BYTE>& bytes)
 {
-    DWORD count = bytes.size();
+    DWORD count = static_cast<DWORD>(bytes.size());
     DWORD type;
     BYTE* bp = bytes.empty() ? nullptr : &bytes[0];
     LONG rc = RegQueryValueExA(key,
@@ -98,9 +98,9 @@ namespace chucho
 {
 
 windows_event_log_writer::windows_event_log_writer(const std::string& name,
-                                                   std::shared_ptr<formatter> fmt,
+                                                   std::unique_ptr<formatter>&& fmt,
                                                    const std::string& source)
-    : writer(name, fmt),
+    : writer(name, std::move(fmt)),
       handle_(nullptr),
       user_(nullptr),
       log_("Application"),
@@ -110,10 +110,10 @@ windows_event_log_writer::windows_event_log_writer(const std::string& name,
 }
 
 windows_event_log_writer::windows_event_log_writer(const std::string& name,
-                                                   std::shared_ptr<formatter> fmt,
+                                                   std::unique_ptr<formatter>&& fmt,
                                                    const std::string& log,
                                                    const std::string& source)
-    : writer(name, fmt),
+    : writer(name, std::move(fmt)),
       handle_(nullptr),
       user_(nullptr),
       log_(log),
@@ -123,11 +123,11 @@ windows_event_log_writer::windows_event_log_writer(const std::string& name,
 }
 
 windows_event_log_writer::windows_event_log_writer(const std::string& name,
-                                                   std::shared_ptr<formatter> fmt,
+                                                   std::unique_ptr<formatter>&& fmt,
                                                    const std::string& log,
                                                    const std::string& source,
                                                    const std::string& host)
-    : writer(name, fmt),
+    : writer(name, std::move(fmt)),
       handle_(nullptr),
       user_(nullptr),
       log_(log),
@@ -243,7 +243,7 @@ void windows_event_log_writer::prepare_registry()
                             0,
                             REG_SZ,
                             reinterpret_cast<const BYTE*>(cdll),
-                            dll.length() + 1);
+                            static_cast<DWORD>(dll.length() + 1));
         if (rc != ERROR_SUCCESS)
         {
             throw exception("Unable to set registry value EventMessageFile for key " +

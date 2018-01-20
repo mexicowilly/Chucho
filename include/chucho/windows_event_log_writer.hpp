@@ -59,7 +59,7 @@ public:
      *        source
      */
     windows_event_log_writer(const std::string& name,
-                             std::shared_ptr<formatter> fmt,
+                             std::unique_ptr<formatter>&& fmt,
                              const std::string& source);
     /**
      * Construct a writer.
@@ -76,7 +76,7 @@ public:
      *        source
      */
     windows_event_log_writer(const std::string& name,
-                             std::shared_ptr<formatter> fmt,
+                             std::unique_ptr<formatter>&& fmt,
                              const std::string& log,
                              const std::string& source);
     /**
@@ -95,7 +95,7 @@ public:
      *        source
      */
     windows_event_log_writer(const std::string& name,
-                             std::shared_ptr<formatter> fmt,
+                             std::unique_ptr<formatter>&& fmt,
                              const std::string& log,
                              const std::string& source,
                              const std::string& host);

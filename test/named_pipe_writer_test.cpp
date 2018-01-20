@@ -56,7 +56,8 @@ public:
         #if defined(CHUCHO_POSIX)
         chucho::file::remove(file_name_);
         #elif defined(CHUCHO_WINDOWS)
-        CloseHandle(read_handle_);
+		if (!helper_name_.empty())
+		    CloseHandle(read_handle_);
         #endif
     }
 

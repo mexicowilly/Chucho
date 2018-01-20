@@ -731,6 +731,11 @@ ExternalProject_Add(gtest-external
                     ${CHUCHO_GTEST_PACKAGE_ARGS}
                     CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} ${CHUCHO_ADDL_GTEST_CXX_FLAGS}" -DBUILD_GTEST=ON -DBUILD_GMOCK=OFF "-DCMAKE_INSTALL_PREFIX=${CHUCHO_EXTERNAL_PREFIX}" ${CHUCHO_GTEST_CMAKE_FLAGS}
                     CMAKE_GENERATOR "${CHUCHO_GTEST_GENERATOR}")
+IF(MSVC)
+    ExternalProject_Add_Step(gtest-external patch-for-msvc
+                             DEPENDEES download DEPENDERS configure
+                             COMMAND "${CMAKE_COMMAND}" -DFILE_NAME=<SOURCE_DIR>/googletest/cmake/internal_utils.cmake -P "${CMAKE_SOURCE_DIR}/cmake/UpdateGtestForMsvc.cmake")
+ENDIF()
 ADD_LIBRARY(gtest STATIC IMPORTED)
 IF(CHUCHO_WINDOWS)
     SET_TARGET_PROPERTIES(gtest PROPERTIES

@@ -66,7 +66,7 @@ void sliding_numbered_file_roller::roll()
     std::string fn;
     try
     {
-        int cut = ++cur_index_ - max_count_;
+        int cut = static_cast<int>(++cur_index_ - max_count_);
         if (cut >= min_index_ - 1)
         {
             fn = get_file_name(cut, true);

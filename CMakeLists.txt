@@ -718,9 +718,11 @@ MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
                                 PROPERTIES
                                 COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
     IF(MSVC)
-        # Microsoft doesn't want libyaml to use strdup
-        SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
-                                    COMPILE_FLAGS /wd4996)
+        SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/loader.c"
+                                    "${CMAKE_SOURCE_DIR}/embedded/libyaml/scanner.c"
+                                    "${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c"
+                                    PROPERTIES
+                                    COMPILE_FLAGS "/wd4996 /wd4267 /wd4244")
     ELSEIF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER_ID STREQUAL Clang)
         SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
                                     COMPILE_FLAGS "-Wno-implicit-function-declaration -Wno-int-to-pointer-cast")

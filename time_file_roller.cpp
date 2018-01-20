@@ -383,7 +383,7 @@ void time_file_roller::cleaner::clean(const time_type& now, const std::string& a
     int actual_oldest = roller_.file_writer_->get_initial_file_name().empty() ?
         oldest_period_offset_ : oldest_period_offset_ + 1;
     for (std::size_t i = 0; i < periods; i++)
-        clean_one(now, actual_oldest - i, cleaned, active_file_name);
+        clean_one(now, static_cast<int>(actual_oldest - i), cleaned, active_file_name);
     last_clean_ = now;
 }
 
