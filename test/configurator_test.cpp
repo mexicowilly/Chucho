@@ -113,12 +113,12 @@ configurator::configurator()
     chucho::logger::remove_unused_loggers();
     // This ensures that all factories are registered
     chucho::logger::get("");
-    chucho::status_manager::get()->clear();
+    chucho::status_manager::get().clear();
 }
 
 configurator::~configurator()
 {
-    EXPECT_LT(chucho::status_manager::get()->get_level(), chucho::status::level::WARNING_);
+    EXPECT_LT(chucho::status_manager::get().get_level(), chucho::status::level::WARNING_);
 }
 
 #if defined(CHUCHO_HAVE_ACTIVEMQ)
@@ -193,7 +193,7 @@ void configurator::bzip2_file_compressor_body()
     EXPECT_EQ(1, cmp->get_min_index());
 #else
     ASSERT_EQ(typeid(chucho::noop_file_compressor), typeid(*cmp));
-    chucho::status_manager::get()->clear();
+    chucho::status_manager::get().clear();
 #endif
 }
 
@@ -214,8 +214,8 @@ void configurator::configure(const char* const cnf)
 void configurator::configure_with_error(const char* const cnf)
 {
     configure(cnf);
-    EXPECT_EQ(chucho::status::level::ERROR_, chucho::status_manager::get()->get_level());
-    chucho::status_manager::get()->clear();
+    EXPECT_EQ(chucho::status::level::ERROR_, chucho::status_manager::get().get_level());
+    chucho::status_manager::get().clear();
 }
 
 void configurator::cout_writer_body()
@@ -248,7 +248,7 @@ void configurator::door_writer_body()
     ASSERT_EQ(1, lgr->get_writer_names().size());
     auto& dwrt = dynamic_cast<chucho::door_writer&>(lgr->get_writer("chucho::door_writer"));
     EXPECT_STREQ("gargle", dwrt.get_file_name().c_str());
-    chucho::status_manager::get()->clear();
+    chucho::status_manager::get().clear();
 }
 
 #endif
@@ -311,7 +311,7 @@ void configurator::gzip_file_compressor_body()
     EXPECT_EQ(7, cmp->get_min_index());
 #else
     ASSERT_EQ(typeid(chucho::noop_file_compressor), typeid(*cmp));
-    chucho::status_manager::get()->clear();
+    chucho::status_manager::get().clear();
 #endif
 }
 
@@ -329,13 +329,13 @@ void configurator::interval_file_roll_trigger_body(const std::string& tmpl)
     while (bad[i] != nullptr)
     {
         chucho::logger::remove_unused_loggers();
-        chucho::status_manager::get()->clear();
+        chucho::status_manager::get().clear();
         std::string rep = tmpl;
         rep.replace(pos, 6, bad[i++]);
         configure(rep.c_str());
-        EXPECT_EQ(chucho::status::level::ERROR_, chucho::status_manager::get()->get_level());
+        EXPECT_EQ(chucho::status::level::ERROR_, chucho::status_manager::get().get_level());
     }
-    chucho::status_manager::get()->clear();
+    chucho::status_manager::get().clear();
     const char* good[] =
     {
         "2 MinUTeS",
@@ -349,11 +349,11 @@ void configurator::interval_file_roll_trigger_body(const std::string& tmpl)
     while (good[i] != nullptr)
     {
         chucho::logger::remove_unused_loggers();
-        chucho::status_manager::get()->clear();
+        chucho::status_manager::get().clear();
         std::string rep = tmpl;
         rep.replace(pos, 6, good[i++]);
         configure(rep.c_str());
-        EXPECT_EQ(chucho::status::level::INFO_, chucho::status_manager::get()->get_level());
+        EXPECT_EQ(chucho::status::level::INFO_, chucho::status_manager::get().get_level());
     }
 }
 
@@ -372,13 +372,13 @@ void configurator::level_filter_body(const std::string& tmpl)
     while (bad[i] != nullptr)
     {
         chucho::logger::remove_unused_loggers();
-        chucho::status_manager::get()->clear();
+        chucho::status_manager::get().clear();
         std::string rep = tmpl;
         rep.replace(pos, 6, bad[i++]);
         configure(rep.c_str());
-        EXPECT_EQ(chucho::status::level::ERROR_, chucho::status_manager::get()->get_level());
+        EXPECT_EQ(chucho::status::level::ERROR_, chucho::status_manager::get().get_level());
     }
-    chucho::status_manager::get()->clear();
+    chucho::status_manager::get().clear();
     // Visual Studio 2012 does not have initializer lists
     struct { const char* first; chucho::filter::result second; } good[] =
     {
@@ -394,7 +394,7 @@ void configurator::level_filter_body(const std::string& tmpl)
     while (good[i].first != nullptr)
     {
         chucho::logger::remove_unused_loggers();
-        chucho::status_manager::get()->clear();
+        chucho::status_manager::get().clear();
         std::string rep = tmpl;
         rep.replace(pos, 6, good[i].first);
         configure(rep.c_str());
@@ -442,7 +442,7 @@ void configurator::lzma_file_compressor_body()
     EXPECT_EQ(1, cmp->get_min_index());
 #else
     ASSERT_EQ(typeid(chucho::noop_file_compressor), typeid(*cmp));
-    chucho::status_manager::get()->clear();
+    chucho::status_manager::get().clear();
 #endif
 }
 
@@ -499,7 +499,7 @@ void configurator::named_pipe_writer_body()
     std::string pname("monkeyballs");
     #endif
     EXPECT_EQ(pname, npwrt.get_file_name());
-    chucho::status_manager::get()->clear();
+    chucho::status_manager::get().clear();
 }
 
 void configurator::numbered_file_roller_body()
@@ -607,7 +607,7 @@ void configurator::remote_writer_body()
     EXPECT_EQ(chucho::remote_writer::DEFAULT_PORT, rw3.get_port());
     EXPECT_EQ(750, rw3.get_unsent_cache_max());
     // clear the status because we generated some warnings
-    chucho::status_manager::get()->clear();
+    chucho::status_manager::get().clear();
 }
 
 void configurator::rolling_file_writer_body()
@@ -656,13 +656,13 @@ void configurator::size_file_roll_trigger_body(const std::string& tmpl)
     for (auto bad : bads)
     {
         chucho::logger::remove_unused_loggers();
-        chucho::status_manager::get()->clear();
+        chucho::status_manager::get().clear();
         std::string rep = tmpl;
         rep.replace(pos, 4, bad);
         configure(rep.c_str());
-        EXPECT_EQ(chucho::status::level::ERROR_, chucho::status_manager::get()->get_level());
+        EXPECT_EQ(chucho::status::level::ERROR_, chucho::status_manager::get().get_level());
     }
-    chucho::status_manager::get()->clear();
+    chucho::status_manager::get().clear();
     std::vector<std::pair<const char*, std::uintmax_t>> goods{
         { "5000", 5000 },
         { "5001b", 5001 },
@@ -740,11 +740,11 @@ void configurator::syslog_writer_facility_body(const std::string& tmpl)
     for (auto bad : bads)
     {
         chucho::logger::remove_unused_loggers();
-        chucho::status_manager::get()->clear();
+        chucho::status_manager::get().clear();
         std::string rep = tmpl;
         rep.replace(pos, 3, bad);
         configure(rep.c_str());
-        EXPECT_EQ(chucho::status::level::ERROR_, chucho::status_manager::get()->get_level());
+        EXPECT_EQ(chucho::status::level::ERROR_, chucho::status_manager::get().get_level());
     }
     // Visual Studio 2012 does not have initializer lists
     std::vector<std::pair<const char*, chucho::syslog::facility>> goods{
@@ -772,7 +772,7 @@ void configurator::syslog_writer_facility_body(const std::string& tmpl)
     for (const auto& good : goods)
     {
         chucho::logger::remove_unused_loggers();
-        chucho::status_manager::get()->clear();
+        chucho::status_manager::get().clear();
         std::string rep = tmpl;
         rep.replace(pos, 3, good.first);
         configure(rep.c_str());
@@ -815,7 +815,7 @@ void configurator::windows_event_log_writer_body()
     EXPECT_TRUE(welw.get_host().empty());
     EXPECT_EQ(std::string("what"), welw.get_source());
     EXPECT_EQ(std::string("hello"), welw.get_log());
-    chucho::status_manager::get()->clear();
+    chucho::status_manager::get().clear();
 }
 
 void configurator::windows_event_log_writer_no_log_body()
@@ -826,7 +826,7 @@ void configurator::windows_event_log_writer_no_log_body()
     EXPECT_TRUE(welw.get_host().empty());
     EXPECT_EQ(std::string("what"), welw.get_source());
     EXPECT_EQ(std::string("Application"), welw.get_log());
-    chucho::status_manager::get()->clear();
+    chucho::status_manager::get().clear();
 }
 
 #endif
@@ -930,7 +930,7 @@ void configurator::zip_file_compressor_body()
     EXPECT_EQ(700, cmp->get_min_index());
 #else
     ASSERT_EQ(typeid(chucho::noop_file_compressor), typeid(*cmp));
-    chucho::status_manager::get()->clear();
+    chucho::status_manager::get().clear();
 #endif
 }
 

@@ -104,7 +104,7 @@ chucho_rc chucho_status_add_observer(chucho_status_observer obs)
     {
         auto cobs = std::make_shared<c_status_observer>(obs);
         data().c_observers_.push_back(cobs);
-        chucho::status_manager::get()->add(cobs);
+        chucho::status_manager::get().add(cobs);
     }
     catch (...) 
     {
@@ -115,7 +115,7 @@ chucho_rc chucho_status_add_observer(chucho_status_observer obs)
 
 chucho_rc chucho_status_clear(void)
 {
-    chucho::status_manager::get()->clear();
+    chucho::status_manager::get().clear();
     return CHUCHO_NO_ERROR;
 }
 
@@ -123,7 +123,7 @@ chucho_rc chucho_status_get_count(size_t* cnt)
 {
     if (cnt == nullptr) 
         return CHUCHO_NULL_POINTER;
-    *cnt = chucho::status_manager::get()->get_count();
+    *cnt = chucho::status_manager::get().get_count();
     return CHUCHO_NO_ERROR;
 }
 
@@ -131,7 +131,7 @@ chucho_rc chucho_status_get_level(chucho_status_level* lvl)
 {
     if (lvl == nullptr) 
         return CHUCHO_NULL_POINTER;
-    auto cpplvl = chucho::status_manager::get()->get_level();
+    auto cpplvl = chucho::status_manager::get().get_level();
     if (cpplvl == chucho::status::level::INFO_) 
         *lvl = chucho_status_level_info;
     else if (cpplvl == chucho::status::level::WARNING_) 
@@ -152,7 +152,7 @@ chucho_rc chucho_status_remove_observer(chucho_status_observer obs)
                               std::bind(c_status_observer::equal, std::placeholders::_1, obs));
     if (found != sd.c_observers_.end()) 
     {
-        chucho::status_manager::get()->remove(*found);
+        chucho::status_manager::get().remove(*found);
         sd.c_observers_.erase(found);
     }
     return CHUCHO_NO_ERROR;

@@ -41,7 +41,7 @@ protected:
         if (chucho::file::exists(dir_name_))
             chucho::file::remove_all(dir_name_);
         chucho::file::create_directory(dir_name_);
-        chucho::status_manager::get()->clear();
+        chucho::status_manager::get().clear();
     }
 
     ~rolling_file_writer_test()
@@ -241,7 +241,7 @@ TEST_F(rolling_file_writer_test, time_names)
     std::string fname;
     for (char c : std::string("MHdmY"))
     {
-        chucho::status_manager::get()->clear();
+        chucho::status_manager::get().clear();
         std::string simple("%d{%$}");
         std::replace(simple.begin(), simple.end(), '$', c);
         roll = std::make_unique<chucho::time_file_roller>(get_file_name(simple), 1);
@@ -249,7 +249,7 @@ TEST_F(rolling_file_writer_test, time_names)
                                                           std::move(std::make_unique<chucho::pattern_formatter>("%m%n")),
                                                           std::move(roll));
         w->write(get_event("one"));
-        EXPECT_EQ(0, chucho::status_manager::get()->get_count());
+        EXPECT_EQ(0, chucho::status_manager::get().get_count());
         fname = get_file_name(get_time(std::string("%") + c));
         EXPECT_TRUE(chucho::file::exists(fname));
         w.reset();
@@ -260,18 +260,18 @@ TEST_F(rolling_file_writer_test, time_names)
                                                       std::move(std::make_unique<chucho::pattern_formatter>("%m%n")),
                                                       std::move(roll));
     w->write(get_event("one"));
-    EXPECT_EQ(0, chucho::status_manager::get()->get_count());
+    EXPECT_EQ(0, chucho::status_manager::get().get_count());
     fname = get_file_name("sub1/sub2/" + get_time("%Y") + "/" + get_time("%m"));
     EXPECT_TRUE(chucho::file::exists(fname));
 }
 
 TEST_F(rolling_file_writer_test, time_name_errors)
 {
-    auto smgr = chucho::status_manager::get();
+    auto& smgr = chucho::status_manager::get();
     std::array<const char*, 5> names = { "%d{%m, aux}", "%d{%m} %d{%Y}", "%d{%S}", "", "my dog has fleas" };
     for (auto name : names)
     {
-        smgr->clear();
+        smgr.clear();
         EXPECT_THROW(chucho::time_file_roller(name, 1), chucho::exception);
     }
 }

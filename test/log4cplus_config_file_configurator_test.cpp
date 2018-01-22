@@ -110,7 +110,7 @@ TEST_F(log4cplus_config_file_configurator, daily_rolling_file_appender)
     while (exp[i].first != nullptr)
     {
         chucho::logger::remove_unused_loggers();
-        chucho::status_manager::get()->clear();
+        chucho::status_manager::get().clear();
         std::string rep = tmpl;
         rep.replace(rep_loc, 8, exp[i].first);
         struct std::tm now = chucho::calendar::get_utc(time(nullptr));
@@ -123,7 +123,7 @@ TEST_F(log4cplus_config_file_configurator, daily_rolling_file_appender)
         i++;
     }
     // clear the status because we generated some warnings
-    chucho::status_manager::get()->clear();
+    chucho::status_manager::get().clear();
 }
 
 TEST_F(log4cplus_config_file_configurator, file_writer)
@@ -278,7 +278,7 @@ TEST_F(log4cplus_config_file_configurator, remote_writer)
     EXPECT_EQ(19567, rw->get_port());
     EXPECT_EQ(chucho::remote_writer::DEFAULT_UNSENT_CACHE_MAX, rw->get_unsent_cache_max());
     // clear the status because we generated some warnings
-    chucho::status_manager::get()->clear();
+    chucho::status_manager::get().clear();
 }
 */
 

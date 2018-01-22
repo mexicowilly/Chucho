@@ -1,6 +1,7 @@
 #include <chucho/json_configurator.hpp>
 #include <cstring>
 #include <algorithm>
+#include <sstream>
 
 namespace chucho
 {
