@@ -89,6 +89,26 @@ TEST_F(pattern_formatter_test, message)
     EXPECT_STREQ("hi", f.format(evt_).c_str());
 }
 
+TEST_F(pattern_formatter_test, microseconds)
+{
+    chucho::pattern_formatter f("%d{%Q}");
+    auto micros = std::chrono::duration_cast<std::chrono::microseconds>(evt_.get_time().time_since_epoch());
+    auto fmt = f.format(evt_);
+    std::ostringstream stream;
+    stream << std::setfill('0') << std::setw(6) << (micros.count() % 1000000);
+    EXPECT_EQ(stream.str(), fmt);
+}
+
+TEST_F(pattern_formatter_test, milliseconds)
+{
+    chucho::pattern_formatter f("%d{%q}");
+    auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(evt_.get_time().time_since_epoch());
+    auto fmt = f.format(evt_);
+    std::ostringstream stream;
+    stream << std::setfill('0') << std::setw(3) << (millis.count() % 1000);
+    EXPECT_EQ(stream.str(), fmt);
+}
+
 TEST_F(pattern_formatter_test, function)
 {
     chucho::pattern_formatter f("%M");

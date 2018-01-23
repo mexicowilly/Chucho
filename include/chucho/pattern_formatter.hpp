@@ -248,8 +248,14 @@ private:
         virtual void to_calendar(time_t t, calendar::pieces& cal) const = 0;
 
     private:
+        enum class frac_type
+        {
+            MILLI,
+            MICRO
+        };
+
         std::string date_pattern_;
-        std::vector<std::size_t> milli_positions_;
+        std::vector<std::tuple<frac_type, std::size_t>> frac_positions_;
     };
 
     class CHUCHO_NO_EXPORT utc_date_time_piece : public date_time_piece
