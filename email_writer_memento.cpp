@@ -16,6 +16,7 @@
 
 #include <chucho/email_writer_memento.hpp>
 #include <chucho/text_util.hpp>
+#include <chucho/move_util.hpp>
 
 namespace chucho
 {
@@ -24,6 +25,7 @@ email_writer_memento::email_writer_memento(configurator& cfg)
     : writer_memento(cfg)
 {
     set_status_origin("email_writer_memento");
+    set_default_name(typeid(email_writer));
     cfg.get_security_policy().set_text("email_writer::from", 320);
     cfg.get_security_policy().set_text("email_writer::host", 253);
     cfg.get_security_policy().set_integer("email_writer::port", static_cast<std::uint16_t>(1), static_cast<uint16_t>(65535));
@@ -49,13 +51,13 @@ email_writer_memento::email_writer_memento(configurator& cfg)
     set_handler("verbose", [this] (const std::string& val) { verbose_ = boolean_value(validate("email_writer::verbose", val)); });
 }
 
-void email_writer_memento::handle(std::shared_ptr<configurable> cnf)
+void email_writer_memento::handle(std::unique_ptr<configurable>&& cnf)
 {
-    auto trg = std::dynamic_pointer_cast<email_trigger>(cnf);
+    auto trg = dynamic_move<email_trigger>(std::move(cnf));
     if (trg)
-        trigger_ = trg;
+        trigger_ = std::move(trg);
     else
-        writer_memento::handle(cnf);
+        writer_memento::handle(std::move(cnf));
 }
 
 void email_writer_memento::set_connection_type(const std::string& connect)

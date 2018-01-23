@@ -28,30 +28,35 @@ pipe_writer_factory::pipe_writer_factory()
     set_status_origin("pipe_writer_factory");
 }
 
-std::shared_ptr<configurable> pipe_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> pipe_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    std::shared_ptr<configurable> cnf;
-    auto pwm = std::dynamic_pointer_cast<pipe_writer_memento>(mnto);
-    assert(pwm);
-    if (!pwm->get_formatter())
+    auto pwm = dynamic_cast<pipe_writer_memento*>(mnto.get());
+    assert(pwm != nullptr);
+    if (pwm->get_name().empty())
+        throw exception("pipe_writer_factory: The name is not set");
+    auto fmt = std::move(pwm->get_formatter());
+    if (!fmt)
         throw exception("pipe_writer_factory: The writer's formatter is not set");
+    std::unique_ptr<configurable> cnf;
     if (pwm->get_flush())
     {
-        cnf.reset(new pipe_writer(pwm->get_formatter(),
-                                  *pwm->get_flush()));
+        cnf = std::make_unique<pipe_writer>(pwm->get_name(),
+                                            std::move(fmt),
+                                            *pwm->get_flush());
     }
     else
     {
-        cnf.reset(new pipe_writer(pwm->get_formatter()));
+        cnf = std::make_unique<pipe_writer>(pwm->get_name(), std::move(fmt));
     }
-    set_filters(cnf, pwm);
+    set_filters(*cnf, *pwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
-    return cnf;
+    return std::move(cnf);
 }
 
-std::shared_ptr<memento> pipe_writer_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> pipe_writer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto = std::make_shared<pipe_writer_memento>(cfg);
-    return mnto;
+    auto mnto = std::make_unique<pipe_writer_memento>(cfg);
+    return std::move(mnto);
 }
+
 }

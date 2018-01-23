@@ -30,12 +30,13 @@ const amqp_channel_t CHUCHO_CHANNEL = 1;
 namespace chucho
 {
 
-rabbitmq_writer::rabbitmq_writer(std::shared_ptr<formatter> fmt,
-                                 std::shared_ptr<serializer> ser,
+rabbitmq_writer::rabbitmq_writer(const std::string& name,
+                                 std::unique_ptr<formatter>&& fmt,
+                                 std::unique_ptr<serializer>&& ser,
                                  const std::string& url,
                                  const std::string& exchange,
                                  const optional<std::string>& routing_key)
-    : message_queue_writer(fmt, ser),
+    : message_queue_writer(name, std::move(fmt), std::move(ser)),
       url_(url),
       exchange_(exchange),
       routing_key_(routing_key ? *routing_key : ""),
@@ -44,13 +45,14 @@ rabbitmq_writer::rabbitmq_writer(std::shared_ptr<formatter> fmt,
     init();
 }
 
-rabbitmq_writer::rabbitmq_writer(std::shared_ptr<formatter> fmt,
-                                 std::shared_ptr<serializer> ser,
+rabbitmq_writer::rabbitmq_writer(const std::string& name,
+                                 std::unique_ptr<formatter>&& fmt,
+                                 std::unique_ptr<serializer>&& ser,
                                  std::size_t coalesce_max,
                                  const std::string& url,
                                  const std::string& exchange,
                                  const optional<std::string>& routing_key)
-    : message_queue_writer(fmt, ser, coalesce_max),
+    : message_queue_writer(name, std::move(fmt), std::move(ser), coalesce_max),
       url_(url),
       exchange_(exchange),
       routing_key_(routing_key ? *routing_key : ""),
@@ -59,13 +61,14 @@ rabbitmq_writer::rabbitmq_writer(std::shared_ptr<formatter> fmt,
     init();
 }
 
-rabbitmq_writer::rabbitmq_writer(std::shared_ptr<formatter> fmt,
-                                 std::shared_ptr<serializer> ser,
-                                 std::shared_ptr<compressor> cmp,
+rabbitmq_writer::rabbitmq_writer(const std::string& name,
+                                 std::unique_ptr<formatter>&& fmt,
+                                 std::unique_ptr<serializer>&& ser,
+                                 std::unique_ptr<compressor>&& cmp,
                                  const std::string& url,
                                  const std::string& exchange,
                                  const optional<std::string>& routing_key)
-    : message_queue_writer(fmt, ser, cmp),
+    : message_queue_writer(name, std::move(fmt), std::move(ser), std::move(cmp)),
       url_(url),
       exchange_(exchange),
       routing_key_(routing_key ? *routing_key : ""),
@@ -74,14 +77,15 @@ rabbitmq_writer::rabbitmq_writer(std::shared_ptr<formatter> fmt,
     init();
 }
 
-rabbitmq_writer::rabbitmq_writer(std::shared_ptr<formatter> fmt,
-                                 std::shared_ptr<serializer> ser,
+rabbitmq_writer::rabbitmq_writer(const std::string& name,
+                                 std::unique_ptr<formatter>&& fmt,
+                                 std::unique_ptr<serializer>&& ser,
                                  std::size_t coalesce_max,
-                                 std::shared_ptr<compressor> cmp,
+                                 std::unique_ptr<compressor>&& cmp,
                                  const std::string& url,
                                  const std::string& exchange,
                                  const optional<std::string>& routing_key)
-    : message_queue_writer(fmt, ser, coalesce_max, cmp),
+    : message_queue_writer(name, std::move(fmt), std::move(ser), coalesce_max, std::move(cmp)),
       url_(url),
       exchange_(exchange),
       routing_key_(routing_key ? *routing_key : ""),
@@ -149,8 +153,8 @@ void rabbitmq_writer::init()
     }
     catch (...)
     {
-        amqp_channel_close(cxn_, CHUCHO_CHANNEL, AMQP_REPLY_SUCCESS);
-        amqp_connection_close(cxn_, AMQP_REPLY_SUCCESS);
+        //amqp_channel_close(cxn_, CHUCHO_CHANNEL, AMQP_REPLY_SUCCESS);
+        //amqp_connection_close(cxn_, AMQP_REPLY_SUCCESS);
         amqp_destroy_connection(cxn_);
         throw;
     }

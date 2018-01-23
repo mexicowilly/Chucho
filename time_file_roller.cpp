@@ -81,8 +81,8 @@ namespace chucho
 
 time_file_roller::time_file_roller(const std::string& file_name_pattern,
                                    std::size_t max_history,
-                                   std::shared_ptr<file_compressor> cmp)
-    : file_roller(cmp),
+                                   std::unique_ptr<file_compressor>&& cmp)
+    : file_roller(std::move(cmp)),
       max_history_(max_history),
       file_name_pattern_(file_name_pattern)
 {
@@ -383,7 +383,7 @@ void time_file_roller::cleaner::clean(const time_type& now, const std::string& a
     int actual_oldest = roller_.file_writer_->get_initial_file_name().empty() ?
         oldest_period_offset_ : oldest_period_offset_ + 1;
     for (std::size_t i = 0; i < periods; i++)
-        clean_one(now, actual_oldest - i, cleaned, active_file_name);
+        clean_one(now, static_cast<int>(actual_oldest - i), cleaned, active_file_name);
     last_clean_ = now;
 }
 

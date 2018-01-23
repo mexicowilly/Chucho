@@ -33,19 +33,33 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     chucho::configuration::set_style(chucho::configuration::style::OFF);
-    auto fmt = std::make_shared<chucho::pattern_formatter>("%m");
-    auto ser = std::make_shared<chucho::formatted_message_serializer>();
-    std::shared_ptr<chucho::compressor> cmp;
+    auto fmt = std::make_unique<chucho::pattern_formatter>("%m");
+    auto ser = std::make_unique<chucho::formatted_message_serializer>();
+    std::unique_ptr<chucho::compressor> cmp;
     if (argc == 5)
     {
         if (std::strcmp(argv[4], "noop") == 0)
-            cmp = std::make_shared<chucho::noop_compressor>();
+            cmp = std::make_unique<chucho::noop_compressor>();
     }
     std::unique_ptr<chucho::activemq_writer> wrt;
     if (cmp)
-        wrt.reset(new chucho::activemq_writer(fmt, ser, cmp, argv[1], chucho::activemq_writer::consumer_type::TOPIC, argv[2]));
+    {
+        wrt = std::make_unique<chucho::activemq_writer>("amq",
+                                                        std::move(fmt),
+                                                        std::move(ser),
+                                                        std::move(cmp),
+                                                        argv[1],
+                                                        chucho::activemq_writer::consumer_type::TOPIC,
+                                                        argv[2]);
+    }
     else
-        wrt.reset(new chucho::activemq_writer(fmt, ser, argv[1], chucho::activemq_writer::consumer_type::TOPIC, argv[2]));
+    {
+        wrt = std::make_unique<chucho::activemq_writer>("amq",
+                                                        std::move(fmt),
+                                                        std::move(ser),
+                                                        argv[1],
+                                                        chucho::activemq_writer::consumer_type::TOPIC, argv[2]);
+    }
     chucho::event evt(chucho::logger::get("activemq_writer_test"),
                       chucho::level::INFO_(),
                       argv[3],

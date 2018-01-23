@@ -104,7 +104,8 @@ public:
      */
     /**
      * Construct an email writer.
-     * 
+     *
+     * @param name the name of the writer
      * @param fmt the formatter
      * @param host the SMTP host
      * @param connect the connection type
@@ -118,18 +119,20 @@ public:
      * @param buffer_capacity the capacity of the buffer that holds
      *        events until the @ref email_trigger is triggered
      */
-    email_writer(std::shared_ptr<formatter> fmt,
+    email_writer(const std::string& name,
+                 std::unique_ptr<formatter>&& fmt,
                  const std::string& host,
                  connection_type connect,
                  const std::vector<std::string>& to,
                  const std::string& from,
                  const std::string& subject,
-                 std::shared_ptr<email_trigger> trigger,
+                 std::unique_ptr<email_trigger>&& trigger,
                  std::uint16_t port = DEFAULT_PORT,
                  std::size_t buffer_capacity = DEFAULT_BUFFER_CAPACITY);
     /**
      * Construct an email writer.
-     * 
+     *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param host the SMTP host
      * @param connect the connection type
@@ -145,13 +148,14 @@ public:
      * @param buffer_capacity the capacity of the buffer that holds
      *        events until the @ref email_trigger is triggered
      */
-    email_writer(std::shared_ptr<formatter> fmt,
+    email_writer(const std::string& name,
+                 std::unique_ptr<formatter>&& fmt,
                  const std::string& host,
                  connection_type connect,
                  const std::vector<std::string>& to,
                  const std::string& from,
                  const std::string& subject,
-                 std::shared_ptr<email_trigger> trigger,
+                 std::unique_ptr<email_trigger>&& trigger,
                  const std::string& user,
                  const std::string& password,
                  std::uint16_t port = DEFAULT_PORT,
@@ -231,7 +235,7 @@ public:
      * 
      * @return the trigger
      */
-    std::shared_ptr<email_trigger> get_trigger() const;
+    email_trigger& get_trigger() const;
     /**
      * Return the user used for user/password
      * authentication, if there is one.
@@ -298,7 +302,7 @@ private:
 
     fixed_size_queue evts_;
     CURL* curl_;
-    std::shared_ptr<email_trigger> trigger_;
+    std::unique_ptr<email_trigger> trigger_;
     std::string from_;
     std::vector<std::string> to_;
     std::string host_;
@@ -356,9 +360,9 @@ inline const std::string& email_writer::get_subject() const
     return subject_;
 }
 
-inline std::shared_ptr<email_trigger> email_writer::get_trigger() const
+inline email_trigger& email_writer::get_trigger() const
 {
-    return trigger_;
+    return *trigger_;
 }
 
 inline const optional<std::string>& email_writer::get_user() const

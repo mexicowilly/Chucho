@@ -24,11 +24,8 @@ namespace chucho
 
 /**
  * @class non_copyable non_copyable.hpp chucho/non_copyable.hpp
- * An object that cannot be copied. This class is unfortunately 
- * necessary as long as some compilers refuse to support "= 
- * delete". Specifically, this class exists in order to support 
- * Visual Studio 2012. 
- *  
+ * An object that cannot be copied.
+ *
  * @ingroup miscellaneous 
  */
 class CHUCHO_EXPORT non_copyable
@@ -36,9 +33,8 @@ class CHUCHO_EXPORT non_copyable
 public:
     non_copyable() { }
 
-private:
-    non_copyable(const non_copyable&);
-    non_copyable& operator= (const non_copyable&);
+    non_copyable(const non_copyable& nc) = delete;
+    non_copyable& operator= (const non_copyable& nc) = delete;
 };
 
 }

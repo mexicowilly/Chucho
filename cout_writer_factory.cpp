@@ -28,22 +28,26 @@ cout_writer_factory::cout_writer_factory()
     set_status_origin("cout_writer_factory");
 }
 
-std::shared_ptr<configurable> cout_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> cout_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    auto cwm = std::dynamic_pointer_cast<writer_memento>(mnto);
-    assert(cwm);
-    if (!cwm->get_formatter())
+    auto cwm = dynamic_cast<writer_memento*>(mnto.get());
+    assert(cwm != nullptr);
+    if (cwm->get_name().empty())
+        throw exception("cout_writer_factory: The name is not set");
+    auto fmt = std::move(cwm->get_formatter());
+    if (!fmt)
         throw exception("cout_writer_factory: The writer's formatter is not set");
-    std::shared_ptr<configurable> cnf(new cout_writer(cwm->get_formatter()));
-    set_filters(cnf, cwm);
+    auto cnf = std::make_unique<cout_writer>(cwm->get_name(), std::move(fmt));
+    set_filters(*cnf, *cwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
-    return cnf;
+    return std::move(cnf);
 }
 
-std::shared_ptr<memento> cout_writer_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> cout_writer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto(new writer_memento(cfg));
-    return mnto;
+    auto mnto = std::make_unique<writer_memento>(cfg);
+    mnto->set_default_name(typeid(cout_writer));
+    return std::move(mnto);
 }
 
 }

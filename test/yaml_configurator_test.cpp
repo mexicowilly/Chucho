@@ -424,10 +424,12 @@ TEST_F(yaml_configurator, multiple_writer)
     configure("chucho::logger:\n"
               "    - name: will\n"
               "    - chucho::file_writer:\n"
+              "        name: one\n"
               "        chucho::pattern_formatter:\n"
               "            pattern: '%m%n'\n"
               "        file_name: one.log\n"
               "    - chucho::file_writer:\n"
+              "        name: two\n"
               "        chucho::pattern_formatter:\n"
               "            pattern: '%m%n'\n"
               "        file_name: two.log\n");
@@ -477,7 +479,7 @@ TEST_F(yaml_configurator, named_pipe_writer)
               "    chucho::named_pipe_writer:\n"
               "        chucho::pattern_formatter:\n"
               "            pattern: '%m%n'\n"
-              "        name: monkeyballs\n"
+              "        pipe_name: monkeyballs\n"
               "        flush: false");
     named_pipe_writer_body();
 }
@@ -628,7 +630,7 @@ TEST_F(yaml_configurator, rolling_file_writer)
 
 TEST_F(yaml_configurator, root_alias)
 {
-    chucho::logger::get("")->remove_all_writers();
+    chucho::logger::get("")->clear_writers();
     configure("chucho::logger:\n"
                   "    name: <root>\n"
                   "    chucho::cout_writer:\n"

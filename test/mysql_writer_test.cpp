@@ -31,17 +31,19 @@ TEST(mysql_wrtier_test, mysql)
     auto db = chucho::environment::get("MYSQL_DATABASE");   // test
     if (host && user && pass && db) 
     {
-        auto wrt = std::make_shared<chucho::mysql_writer>(std::make_shared<chucho::pattern_formatter>("%m"),
+        auto wrt = std::make_unique<chucho::mysql_writer>("mysql",
+                                                          std::move(std::make_unique<chucho::pattern_formatter>("%m")),
                                                           *host,
                                                           *user,
                                                           *pass,
                                                           *db);
         auto log = chucho::logger::get("mysql_writer_test");
-        log->add_writer(wrt);
+        log->add_writer(std::move(wrt));
         chucho::event evt(log, chucho::level::ERROR_(), "chucho mysql_writer test no mark", __FILE__, __LINE__, __FUNCTION__);
-        wrt->write(evt);
+        auto& msql = dynamic_cast<chucho::mysql_writer&>(log->get_writer("mysql"));
+        msql.write(evt);
         evt = chucho::event(log, chucho::level::INFO_(), "chucho mysql_writer test with mark", __FILE__, __LINE__, __FUNCTION__, "marky");
-        wrt->write(evt);
+        msql.write(evt);
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
     else

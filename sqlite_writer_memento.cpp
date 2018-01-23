@@ -15,6 +15,7 @@
  */
 
 #include <chucho/sqlite_writer_memento.hpp>
+#include <chucho/sqlite_writer.hpp>
 
 namespace chucho
 {
@@ -23,6 +24,7 @@ sqlite_writer_memento::sqlite_writer_memento(configurator& cfg)
     : writer_memento(cfg)
 {
     set_status_origin("sqlite_writer_memento");
+    set_default_name(typeid(sqlite_writer));
     set_handler("file_name", [this] (const std::string& fn) { file_name_ = validate("sqlite_writer::file_name", fn); });
 }
 

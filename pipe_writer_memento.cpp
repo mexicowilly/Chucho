@@ -15,6 +15,7 @@
  */
 
 #include <chucho/pipe_writer_memento.hpp>
+#include <chucho/pipe_writer.hpp>
 
 namespace chucho
 {
@@ -23,6 +24,7 @@ pipe_writer_memento::pipe_writer_memento(configurator& cfg)
     : writer_memento(cfg)
 {
     set_status_origin("pipe_writer_memento");
+    set_default_name(typeid(pipe_writer));
     cfg.get_security_policy().set_text("pipe_writer::flush", 5);
     set_handler("flush", [this] (const std::string& val) { flush_ = boolean_value(validate("pipe_writer::flush", val)); });
 }

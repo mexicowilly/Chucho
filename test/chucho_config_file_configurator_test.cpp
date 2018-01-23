@@ -355,25 +355,27 @@ TEST_F(chucho_config_file_configurator, filter_order)
               "chucho.writer.co.filter = z\n"
               "chucho.filter.z = chucho::level_threshold_filter\n"
               "chucho.filter.z.level = fatal\n"
+              "chucho.filter.z.name = one\n"
               "chucho.writer.co.filter = a\n"
               "chucho.filter.a = chucho::level_threshold_filter\n"
               "chucho.filter.a.level = debug\n"
+              "chucho.filter.a.name = two\n"
               "chucho.writer.co.filter = m\n"
               "chucho.filter.m = chucho::level_threshold_filter\n"
-              "chucho.filter.m.level = warn");
-    auto wrts = chucho::logger::get("will")->get_writers();
+              "chucho.filter.m.level = warn\n"
+              "chucho.filter.m.name = three");
+    auto lgr = chucho::logger::get("will");
+    auto wrts = lgr->get_writer_names();
     ASSERT_EQ(1, wrts.size());
-    auto flts = wrts[0]->get_filters();
+    auto& wrt = lgr->get_writer(wrts[0]);
+    auto flts = wrt.get_filter_names();
     ASSERT_EQ(3, flts.size());
-    ASSERT_EQ(typeid(chucho::level_threshold_filter), typeid(*flts[0]));
-    auto thresh = std::static_pointer_cast<chucho::level_threshold_filter>(flts[0]);
-    EXPECT_EQ(*chucho::level::FATAL_(), *thresh->get_level());
-    ASSERT_EQ(typeid(chucho::level_threshold_filter), typeid(*flts[1]));
-    thresh = std::static_pointer_cast<chucho::level_threshold_filter>(flts[1]);
-    EXPECT_EQ(*chucho::level::DEBUG_(), *thresh->get_level());
-    ASSERT_EQ(typeid(chucho::level_threshold_filter), typeid(*flts[2]));
-    thresh = std::static_pointer_cast<chucho::level_threshold_filter>(flts[2]);
-    EXPECT_EQ(*chucho::level::WARN_(), *thresh->get_level());
+    EXPECT_EQ(*chucho::level::FATAL_(),
+              *dynamic_cast<chucho::level_threshold_filter&>(wrt.get_filter("one")).get_level());
+    EXPECT_EQ(*chucho::level::DEBUG_(),
+              *dynamic_cast<chucho::level_threshold_filter&>(wrt.get_filter("two")).get_level());
+    EXPECT_EQ(*chucho::level::WARN_(),
+              *dynamic_cast<chucho::level_threshold_filter&>(wrt.get_filter("three")).get_level());
 }
 
 TEST_F(chucho_config_file_configurator, gzip_file_compressor)
@@ -515,12 +517,14 @@ TEST_F(chucho_config_file_configurator, multiple_writer)
     configure("chucho.logger = will\n"
               "chucho.logger.will.writer = fw1\n"
               "chucho.writer.fw1 = chucho::file_writer\n"
+              "chucho.writer.fw1.name = one\n"
               "chucho.writer.fw1.formatter = pf\n"
               "chucho.formatter.pf = chucho::pattern_formatter\n"
               "chucho.formatter.pf.pattern = %m%n\n"
               "chucho.writer.fw1.file_name = one.log\n"
               "chucho.logger.will.writer = fw2\n"
               "chucho.writer.fw2 = chucho::file_writer\n"
+              "chucho.writer.fw2.name = two\n"
               "chucho.writer.fw2.formatter = pf\n"
               "chucho.writer.fw2.file_name = two.log");
     multiple_writer_body();
@@ -534,7 +538,7 @@ TEST_F(chucho_config_file_configurator, named_pipe_writer)
               "chucho.writer.npw.formatter = pf\n"
               "chucho.formatter.pf = chucho::pattern_formatter\n"
               "chucho.formatter.pf.pattern = %m%n\n"
-              "chucho.writer.npw.name = monkeyballs\n"
+              "chucho.writer.npw.pipe_name = monkeyballs\n"
               "chucho.writer.npw.flush = false");
     named_pipe_writer_body();
 }
@@ -700,7 +704,7 @@ TEST_F(chucho_config_file_configurator, rolling_file_writer)
 
 TEST_F(chucho_config_file_configurator, root_alias)
 {
-    chucho::logger::get("")->remove_all_writers();
+    chucho::logger::get("")->clear_writers();
     configure("chucho.logger = <root>\n"
               "chucho.logger.<root>.writer = ce\n"
               "chucho.writer.ce = chucho::cout_writer\n"

@@ -57,11 +57,11 @@ public:
         chucho::file::remove(file_name_);
     }
 
-    std::shared_ptr<chucho::file_descriptor_writer> get_writer(bool flsh)
+    std::unique_ptr<chucho::file_descriptor_writer> get_writer(bool flsh)
     {
-        std::shared_ptr<chucho::formatter> f = std::make_shared<chucho::pattern_formatter>("%m");
-        std::shared_ptr<chucho::file_descriptor_writer> w = std::make_shared<chucho::file_descriptor_writer>(f, fd_, flsh);
-        return w;
+        auto f = std::make_unique<chucho::pattern_formatter>("%m");
+        auto w = std::make_unique<chucho::file_descriptor_writer>("fd", std::move(f), fd_, flsh);
+        return std::move(w);
     }
 
     void verify(std::size_t count)
@@ -80,7 +80,7 @@ public:
         }
     }
 
-    void write(std::shared_ptr<chucho::file_descriptor_writer> w, std::size_t count)
+    void write(std::unique_ptr<chucho::file_descriptor_writer>& w, std::size_t count)
     {
         std::shared_ptr<chucho::logger> log = chucho::logger::get("file_descriptor_writer_test");
         std::string s;
@@ -110,7 +110,8 @@ private:
 
 TEST_F(file_descriptor_writer_test, big_flush)
 {
-    write(get_writer(true), 10 * 1024);
+    auto w = get_writer(true);
+    write(w, 10 * 1024);
     verify(10 * 1024);
 }
 
@@ -125,7 +126,8 @@ TEST_F(file_descriptor_writer_test, big_no_flush)
 
 TEST_F(file_descriptor_writer_test, small_flush)
 {
-    write(get_writer(true), 4 * 1024);
+    auto w = get_writer(true);
+    write(w, 4 * 1024);
     verify(4 * 1024);
 }
 

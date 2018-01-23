@@ -77,19 +77,20 @@ int curl_debug_callback(CURL* curl,
 const std::uint16_t email_writer::DEFAULT_PORT(25);
 const std::size_t email_writer::DEFAULT_BUFFER_CAPACITY(256);
 
-email_writer::email_writer(std::shared_ptr<formatter> fmt,
+email_writer::email_writer(const std::string& name,
+                           std::unique_ptr<formatter>&& fmt,
                            const std::string& host,
                            connection_type connect,
                            const std::vector<std::string>& to,
                            const std::string& from,
                            const std::string& subject,
-                           std::shared_ptr<email_trigger> trigger,
+                           std::unique_ptr<email_trigger>&& trigger,
                            std::uint16_t port,
                            std::size_t buffer_size)
-    : writer(fmt),
+    : writer(name, std::move(fmt)),
       evts_(buffer_size),
       curl_(nullptr),
-      trigger_(trigger),
+      trigger_(std::move(trigger)),
       from_(from),
       to_(to),
       host_(host),
@@ -102,21 +103,22 @@ email_writer::email_writer(std::shared_ptr<formatter> fmt,
     init();
 }
 
-email_writer::email_writer(std::shared_ptr<formatter> fmt,
+email_writer::email_writer(const std::string& name,
+                           std::unique_ptr<formatter>&& fmt,
                            const std::string& host,
                            connection_type connect,
                            const std::vector<std::string>& to,
                            const std::string& from,
                            const std::string& subject,
-                           std::shared_ptr<email_trigger> trigger,
+                           std::unique_ptr<email_trigger>&& trigger,
                            const std::string& user,
                            const std::string& password,
                            std::uint16_t port,
                            std::size_t buffer_size)
-    : writer(fmt),
+    : writer(name, std::move(fmt)),
       evts_(buffer_size),
       curl_(nullptr),
-      trigger_(trigger),
+      trigger_(std::move(trigger)),
       from_(from),
       to_(to),
       host_(host),
@@ -208,6 +210,8 @@ bool email_writer::get_ssl_supported()
 
 void email_writer::init()
 {
+    if (!trigger_)
+        throw std::invalid_argument("The trigger cannot be uninitialized");
     set_status_origin("email_writer");
     std::call_once(global_once, global_setup);
     if (!ssl_supported && connection_type_ != connection_type::CLEAR)

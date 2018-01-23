@@ -41,7 +41,7 @@ protected:
         if (chucho::file::exists(dir_name_))
             chucho::file::remove_all(dir_name_);
         chucho::file::create_directory(dir_name_);
-        chucho::status_manager::get()->clear();
+        chucho::status_manager::get().clear();
     }
 
     ~rolling_file_writer_test()
@@ -89,11 +89,11 @@ private:
 
 TEST_F(rolling_file_writer_test, numbered)
 {
-    std::shared_ptr<chucho::file_roll_trigger> trig(std::make_shared<chucho::size_file_roll_trigger>(5));
-    std::shared_ptr<chucho::file_roller> roll(new chucho::numbered_file_roller(1, 2));
+    auto trig = std::make_unique<chucho::size_file_roll_trigger>(5);
+    auto roll = std::make_unique<chucho::numbered_file_roller>(1, 2);
     std::string fn = get_file_name("num");
-    std::shared_ptr<chucho::formatter> fmt(new chucho::pattern_formatter("%m%n"));
-    chucho::rolling_file_writer w(fmt, fn, std::move(roll), trig);
+    auto fmt = std::make_unique<chucho::pattern_formatter>("%m%n");
+    chucho::rolling_file_writer w("rolling", std::move(fmt), fn, std::move(roll), std::move(trig));
     w.write(get_event("one:hello"));
     w.write(get_event("two:hello"));
     EXPECT_TRUE(chucho::file::exists(fn));
@@ -121,12 +121,12 @@ TEST_F(rolling_file_writer_test, numbered)
 
 TEST_F(rolling_file_writer_test, numbered_gzip)
 {
-    auto trig = std::make_shared<chucho::size_file_roll_trigger>(5);
-    auto comp = std::make_shared<chucho::gzip_file_compressor>(1);
-    auto roll = std::make_shared<chucho::numbered_file_roller>(1, comp);
+    auto trig = std::make_unique<chucho::size_file_roll_trigger>(5);
+    auto comp = std::make_unique<chucho::gzip_file_compressor>(1);
+    auto roll = std::make_unique<chucho::numbered_file_roller>(1, std::move(comp));
     auto fn = get_file_name("num_gzip");
-    auto fmt = std::make_shared<chucho::pattern_formatter>("%m%n");
-    chucho::rolling_file_writer w(fmt, fn, roll, trig);
+    auto fmt = std::make_unique<chucho::pattern_formatter>("%m%n");
+    chucho::rolling_file_writer w("rolling", std::move(fmt), fn, std::move(roll), std::move(trig));
     w.write(get_event("one:hello"));
     w.write(get_event("two:hello"));
     EXPECT_TRUE(chucho::file::exists(fn));
@@ -136,12 +136,12 @@ TEST_F(rolling_file_writer_test, numbered_gzip)
 
 TEST_F(rolling_file_writer_test, numbered_gzip_with_gap)
 {
-    auto trig = std::make_shared<chucho::size_file_roll_trigger>(5);
-    auto comp = std::make_shared<chucho::gzip_file_compressor>(2);
-    auto roll = std::make_shared<chucho::numbered_file_roller>(-1, 1, comp);
+    auto trig = std::make_unique<chucho::size_file_roll_trigger>(5);
+    auto comp = std::make_unique<chucho::gzip_file_compressor>(2);
+    auto roll = std::make_unique<chucho::numbered_file_roller>(-1, 1, std::move(comp));
     auto fn = get_file_name("num_gzip");
-    auto fmt = std::make_shared<chucho::pattern_formatter>("%m%n");
-    chucho::rolling_file_writer w(fmt, fn, roll, trig);
+    auto fmt = std::make_unique<chucho::pattern_formatter>("%m%n");
+    chucho::rolling_file_writer w("rolling", std::move(fmt), fn, std::move(roll), std::move(trig));
     w.write(get_event("one:hello"));
     w.write(get_event("two:hello"));
     w.write(get_event("three:hello"));
@@ -158,11 +158,11 @@ TEST_F(rolling_file_writer_test, numbered_gzip_with_gap)
 
 TEST_F(rolling_file_writer_test, sliding_numbered)
 {
-    std::shared_ptr<chucho::file_roll_trigger> trig(std::make_shared<chucho::size_file_roll_trigger>(5));
-    std::shared_ptr<chucho::file_roller> roll(new chucho::sliding_numbered_file_roller(3));
+    auto trig = std::make_unique<chucho::size_file_roll_trigger>(5);
+    auto roll = std::make_unique<chucho::sliding_numbered_file_roller>(3);
     std::string fn = get_file_name("slide");
-    std::shared_ptr<chucho::formatter> fmt(new chucho::pattern_formatter("%m%n"));
-    chucho::rolling_file_writer w(fmt, fn, roll, trig);
+    auto fmt = std::make_unique<chucho::pattern_formatter>("%m%n");
+    chucho::rolling_file_writer w("rolling", std::move(fmt), fn, std::move(roll), std::move(trig));
     w.write(get_event("one:hello"));
     w.write(get_event("two:hello"));
     auto fnn = fn + ".1";
@@ -196,12 +196,12 @@ TEST_F(rolling_file_writer_test, sliding_numbered)
 
 TEST_F(rolling_file_writer_test, sliding_numbered_gzip)
 {
-    auto trig = std::make_shared<chucho::size_file_roll_trigger>(5);
-    auto comp = std::make_shared<chucho::gzip_file_compressor>(1);
-    auto roll = std::make_shared<chucho::sliding_numbered_file_roller>(2, comp);
+    auto trig = std::make_unique<chucho::size_file_roll_trigger>(5);
+    auto comp = std::make_unique<chucho::gzip_file_compressor>(1);
+    auto roll = std::make_unique<chucho::sliding_numbered_file_roller>(2, std::move(comp));
     auto fn = get_file_name("slide_gzip");
-    auto fmt = std::make_shared<chucho::pattern_formatter>("%m%n");
-    chucho::rolling_file_writer w(fmt, fn, roll, trig);
+    auto fmt = std::make_unique<chucho::pattern_formatter>("%m%n");
+    chucho::rolling_file_writer w("rolling", std::move(fmt), fn, std::move(roll), std::move(trig));
     w.write(get_event("one:hello"));
     w.write(get_event("two:hello"));
     std::string fnn = fn + ".1";
@@ -212,12 +212,12 @@ TEST_F(rolling_file_writer_test, sliding_numbered_gzip)
 
 TEST_F(rolling_file_writer_test, sliding_numbered_gzip_with_gap)
 {
-    auto trig = std::make_shared<chucho::size_file_roll_trigger>(5);
-    auto comp = std::make_shared<chucho::gzip_file_compressor>(2);
-    auto roll = std::make_shared<chucho::sliding_numbered_file_roller>(-1, 2, comp);
+    auto trig = std::make_unique<chucho::size_file_roll_trigger>(5);
+    auto comp = std::make_unique<chucho::gzip_file_compressor>(2);
+    auto roll = std::make_unique<chucho::sliding_numbered_file_roller>(-1, 2, std::move(comp));
     auto fn = get_file_name("slide_gzip");
-    auto fmt = std::make_shared<chucho::pattern_formatter>("%m%n");
-    chucho::rolling_file_writer w(fmt, fn, roll, trig);
+    auto fmt = std::make_unique<chucho::pattern_formatter>("%m%n");
+    chucho::rolling_file_writer w("rolling", std::move(fmt), fn, std::move(roll), std::move(trig));
     w.write(get_event("one:hello"));
     w.write(get_event("two:hello"));
     w.write(get_event("three:hello"));
@@ -236,40 +236,42 @@ TEST_F(rolling_file_writer_test, sliding_numbered_gzip_with_gap)
 
 TEST_F(rolling_file_writer_test, time_names)
 {
-    std::shared_ptr<chucho::formatter> fmt(new chucho::pattern_formatter("%m%n"));
-    std::shared_ptr<chucho::file_roller> roll;
+    std::unique_ptr<chucho::file_roller> roll;
     std::unique_ptr<chucho::rolling_file_writer> w;
     std::string fname;
     for (char c : std::string("MHdmY"))
     {
-        chucho::status_manager::get()->clear();
+        chucho::status_manager::get().clear();
         std::string simple("%d{%$}");
         std::replace(simple.begin(), simple.end(), '$', c);
-        roll.reset(new chucho::time_file_roller(get_file_name(simple), 1));
-        w.reset(new chucho::rolling_file_writer(fmt, roll));
+        roll = std::make_unique<chucho::time_file_roller>(get_file_name(simple), 1);
+        w = std::make_unique<chucho::rolling_file_writer>("rolling",
+                                                          std::move(std::make_unique<chucho::pattern_formatter>("%m%n")),
+                                                          std::move(roll));
         w->write(get_event("one"));
-        EXPECT_EQ(0, chucho::status_manager::get()->get_count());
+        EXPECT_EQ(0, chucho::status_manager::get().get_count());
         fname = get_file_name(get_time(std::string("%") + c));
         EXPECT_TRUE(chucho::file::exists(fname));
         w.reset();
         EXPECT_NO_THROW(chucho::file::remove(fname));
     }
-    roll.reset(new chucho::time_file_roller(get_file_name("sub1/sub2/%d{%Y,aux}/%d{%m}"), 1));
-    w.reset(new chucho::rolling_file_writer(fmt, std::move(roll)));
+    roll = std::make_unique<chucho::time_file_roller>(get_file_name("sub1/sub2/%d{%Y,aux}/%d{%m}"), 1);
+    w = std::make_unique<chucho::rolling_file_writer>("rolling",
+                                                      std::move(std::make_unique<chucho::pattern_formatter>("%m%n")),
+                                                      std::move(roll));
     w->write(get_event("one"));
-    EXPECT_EQ(0, chucho::status_manager::get()->get_count());
+    EXPECT_EQ(0, chucho::status_manager::get().get_count());
     fname = get_file_name("sub1/sub2/" + get_time("%Y") + "/" + get_time("%m"));
     EXPECT_TRUE(chucho::file::exists(fname));
 }
 
 TEST_F(rolling_file_writer_test, time_name_errors)
 {
-    auto smgr = chucho::status_manager::get();
+    auto& smgr = chucho::status_manager::get();
     std::array<const char*, 5> names = { "%d{%m, aux}", "%d{%m} %d{%Y}", "%d{%S}", "", "my dog has fleas" };
-    std::shared_ptr<chucho::time_file_roller> r;
     for (auto name : names)
     {
-        smgr->clear();
-        EXPECT_THROW(r.reset(new chucho::time_file_roller(name, 1)), chucho::exception);
+        smgr.clear();
+        EXPECT_THROW(chucho::time_file_roller(name, 1), chucho::exception);
     }
 }

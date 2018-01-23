@@ -29,7 +29,7 @@ namespace
 class real_mysql_writer : public chucho::writer
 {
 public:
-    real_mysql_writer(std::shared_ptr<chucho::formatter> fmt,
+    real_mysql_writer(std::unique_ptr<chucho::formatter>&& fmt,
                       const std::string& host,
                       std::uint16_t port,
                       const std::string& user,
@@ -45,13 +45,13 @@ private:
     MYSQL_STMT* insert_;
 };
 
-real_mysql_writer::real_mysql_writer(std::shared_ptr<chucho::formatter> fmt,
+real_mysql_writer::real_mysql_writer(std::unique_ptr<chucho::formatter>&& fmt,
                                      const std::string& host,
                                      std::uint16_t port,
                                      const std::string& user,
                                      const std::string& password,
                                      const std::string& database)
-    : chucho::writer(fmt),
+    : chucho::writer("real_mysql_writer", std::move(fmt)),
       mysql_(mysql_init(nullptr)),
       insert_(nullptr)
 {
@@ -219,7 +219,8 @@ namespace chucho
 
 const std::uint16_t mysql_writer::DEFAULT_PORT = 3306;
 
-mysql_writer::mysql_writer(std::shared_ptr<formatter> fmt,
+mysql_writer::mysql_writer(const std::string& name,
+                           std::unique_ptr<formatter>&& fmt,
                            const std::string& host,
                            const std::string& user,
                            const std::string& password,
@@ -228,7 +229,7 @@ mysql_writer::mysql_writer(std::shared_ptr<formatter> fmt,
                            std::size_t capacity,
                            std::shared_ptr<level> discard_threshold,
                            bool flush_on_destruct)
-    : database_writer(fmt),
+    : database_writer(name, std::move(fmt)),
       host_(host),
       user_(user),
       password_(password),
@@ -236,11 +237,18 @@ mysql_writer::mysql_writer(std::shared_ptr<formatter> fmt,
       port_(port)
 {
     set_status_origin("mysql_writer");
-    std::shared_ptr<writer> real = std::make_shared<real_mysql_writer>(fmt, host, port, user, password, database);
+    auto real = std::make_unique<real_mysql_writer>(std::move(fmt), host, port, user, password, database);
     // std::function won't accept the bare C functions, so wrap them in lambdas
     std::function<void()> ent([] () { if (mysql_thread_init() != 0) throw exception("Unable to initialize thread for MySQL"); });
     std::function<void()> lv([] () { mysql_thread_end(); });
-    async_.reset(new async_writer(real, capacity, discard_threshold, flush_on_destruct, ent, lv));
+    // std::make_unique does not have access to this private constructor
+    async_.reset(new async_writer(name,
+                                  std::move(real),
+                                  capacity,
+                                  discard_threshold,
+                                  flush_on_destruct,
+                                  ent,
+                                  lv));
 }
 
 void mysql_writer::write_impl(const event& evt)

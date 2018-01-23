@@ -49,12 +49,14 @@ public:
     //@{
     /**
      * Construct a level_threshold_filter.
-     * 
+     *
+     * @param name the name of this filter
      * @param lvl the log level at which to filter
      * @throw std::invalid_argument if the level is an uninitialized 
      *        std::shared_ptr
      */
-    level_threshold_filter(std::shared_ptr<level> lvl);
+    level_threshold_filter(const std::string& name,
+                           std::shared_ptr<level> lvl);
     //@}
 
     /**

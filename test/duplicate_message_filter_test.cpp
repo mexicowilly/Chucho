@@ -42,7 +42,8 @@ private:
 
 TEST_F(duplicate_message_filter_test, evaluate)
 {
-    chucho::duplicate_message_filter f;
+    chucho::duplicate_message_filter f("dup");
+    EXPECT_STREQ("dup", f.get_name().c_str());
     EXPECT_EQ(chucho::filter::result::NEUTRAL, f.evaluate(get_event("one")));
     EXPECT_EQ(chucho::filter::result::NEUTRAL, f.evaluate(get_event("two")));
     EXPECT_EQ(chucho::filter::result::DENY, f.evaluate(get_event("two")));

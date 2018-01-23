@@ -61,11 +61,13 @@ public:
      */
     /**
      * Construct an evaluator.
-     * 
+     *
+     * @param name the name of this filter
      * @param expression the Ruby code that should be run to 
      *                   evaulate the filtration disposition
      */
-    ruby_evaluator_filter(const std::string& expression);
+    ruby_evaluator_filter(const std::string& name,
+                          const std::string& expression);
     /** @}  */
 
     virtual result evaluate(const event& evt) override;

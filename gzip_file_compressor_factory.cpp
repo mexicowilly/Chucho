@@ -32,11 +32,11 @@ gzip_file_compressor_factory::gzip_file_compressor_factory()
     set_status_origin("gzip_file_compressor_factory");
 }
 
-std::shared_ptr<configurable> gzip_file_compressor_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> gzip_file_compressor_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
 #if defined(CHUCHO_HAVE_ZLIB)
-    auto fcm = std::dynamic_pointer_cast<file_compressor_memento>(mnto);
-    assert(fcm);
+    auto fcm = dynamic_cast<file_compressor_memento*>(mnto.get());
+    assert(fcm != nullptr);
     if (!fcm->get_min_index())
         throw exception("gzip_file_compressor_factory: The min_index field must be set");
     unsigned mi = *fcm->get_min_index();
@@ -45,14 +45,13 @@ std::shared_ptr<configurable> gzip_file_compressor_factory::create_configurable(
         report_warning("A min_index of 0 was given, which will be reset to the minimum value of 1");
         mi = 1;
     }
-    auto gfc = std::make_shared<gzip_file_compressor>(mi);
+    auto gfc = std::make_unique<gzip_file_compressor>(mi);
 #else
     report_warning("A gzip_file_compressor was requested in the configuration, but this Chucho library was built without gzip support.");
-    auto gfc = std::make_shared<noop_file_compressor>();
+    auto gfc = std::make_unique<noop_file_compressor>();
 #endif
     report_info("Created a " + demangle::get_demangled_name(typeid(*gfc)));
-    return gfc;
+    return std::move(gfc);
 }
 
 }
-

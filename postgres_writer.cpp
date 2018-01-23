@@ -25,8 +25,8 @@
 namespace chucho
 {
 
-postgres_writer::postgres_writer(std::shared_ptr<formatter> fmt, const std::string& uri)
-    : database_writer(fmt),
+postgres_writer::postgres_writer(const std::string& name, std::unique_ptr<formatter>&& fmt, const std::string& uri)
+    : database_writer(name, std::move(fmt)),
       uri_(uri),
       connection_(PQconnectdb(uri.c_str()))
 {

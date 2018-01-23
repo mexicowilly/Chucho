@@ -63,9 +63,15 @@ public:
     };
 
     /**
-     * @name Destructor
+     * @name Constructor and Destructor
      * @{
      */
+    /**
+     * Construct a filter.
+     *
+     * @param name the name of this filter
+     */
+    filter(const std::string& name);
     /**
      * Destory the filter.
      */
@@ -79,7 +85,26 @@ public:
      * @return result the level of acceptance
      */
     virtual result evaluate(const event& evt) = 0;
+    /*
+     * Return the name of this filter.
+     *
+     * @return the name
+     */
+    const std::string& get_name() const;
+
+private:
+    std::string name_;
 };
+
+inline filter::filter(const std::string& name)
+    : name_(name)
+{
+}
+
+inline const std::string& filter::get_name() const
+{
+    return name_;
+}
 
 }
 

@@ -59,16 +59,18 @@ public:
     //@{
     /**
      * Construct a file_writer.
-     * 
+     *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param file_name the name of the file
      * @param start action to take at the start
      * @param flsh whether to flush the file stream after each 
      *             event is written
      * @throw std::invalid_argument if fmt is an uninitialized 
-     *        std::shared_ptr
+     *        std::unique_ptr
      */
-    file_writer(std::shared_ptr<formatter> fmt,
+    file_writer(const std::string& name,
+                std::unique_ptr<formatter>&& fmt,
                 const std::string& file_name,
                 on_start start = on_start::APPEND,
                 bool flsh = true);
@@ -109,15 +111,17 @@ protected:
      * 
      * @warning This constructor is for internal use. You probably 
      *          won't find it interesting.
-     * 
+     *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param start action to take at the start
      * @param flsh whether to flush the file stream after each
      *             event is written
      * @throw std::invalid_argument if fmt is an uninitialized 
-     *        std::shared_ptr
+     *        std::unique_ptr
      */
-    file_writer(std::shared_ptr<formatter> fmt,
+    file_writer(const std::string& name,
+                std::unique_ptr<formatter>&& fmt,
                 on_start start,
                 bool flsh);
     //@}

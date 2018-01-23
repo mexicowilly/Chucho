@@ -19,8 +19,9 @@
 namespace chucho
 {
 
-duplicate_message_filter::duplicate_message_filter()
-    : count_(0)
+duplicate_message_filter::duplicate_message_filter(const std::string& name)
+    : filter(name),
+      count_(0)
 {
 }
 

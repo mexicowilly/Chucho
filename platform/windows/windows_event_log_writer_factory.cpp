@@ -28,40 +28,45 @@ windows_event_log_writer_factory::windows_event_log_writer_factory()
     set_status_origin("windows_event_log_writer_factory");
 }
 
-std::shared_ptr<configurable> windows_event_log_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> windows_event_log_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    std::shared_ptr<configurable> cnf;
-    auto welwm = std::dynamic_pointer_cast<windows_event_log_writer_memento>(mnto);
-    assert(welwm);
+    std::unique_ptr<configurable> cnf;
+    auto welwm = dynamic_cast<windows_event_log_writer_memento*>(mnto.get());
+    assert(welwm != nullptr);
+    if (welwm->get_name().empty())
+        throw exception("windows_event_log_writer_factory: The name is not set");
     if (!welwm->get_formatter())
         throw exception("windows_event_log_writer_factory: The writer's formatter is not set");
     if (welwm->get_log().empty() && welwm->get_host().empty())
     {
-        cnf.reset(new windows_event_log_writer(welwm->get_formatter(),
-                                               welwm->get_source()));
+        cnf = std::make_unique<windows_event_log_writer>(welwm->get_name(),
+                                                         std::move(welwm->get_formatter()),
+                                                         welwm->get_source());
     }
     else if (welwm->get_host().empty())
     {
-        cnf.reset(new windows_event_log_writer(welwm->get_formatter(),
-                                               welwm->get_log(),
-                                               welwm->get_source()));
+        cnf = std::make_unique<windows_event_log_writer>(welwm->get_name(),
+                                                         std::move(welwm->get_formatter()),
+                                                         welwm->get_log(),
+                                                         welwm->get_source());
     }
     else
     {
-        cnf.reset(new windows_event_log_writer(welwm->get_formatter(),
-                                               welwm->get_log(),
-                                               welwm->get_source(),
-                                               welwm->get_host()));
+        cnf = std::make_unique<windows_event_log_writer>(welwm->get_name(),
+                                                         std::move(welwm->get_formatter()),
+                                                         welwm->get_log(),
+                                                         welwm->get_source(),
+                                                         welwm->get_host());
     }
-    set_filters(cnf, welwm);
+    set_filters(*cnf, *welwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
-    return cnf;
+    return std::move(cnf);
 }
 
-std::shared_ptr<memento> windows_event_log_writer_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> windows_event_log_writer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto = std::make_shared<windows_event_log_writer_memento>(cfg, get_memento_key_set(cfg));
-    return mnto;
+    auto mnto = std::make_unique<windows_event_log_writer_memento>(cfg, get_memento_key_set(cfg));
+    return std::move(mnto);
 }
 
 }

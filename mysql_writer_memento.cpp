@@ -15,6 +15,7 @@
  */
 
 #include <chucho/mysql_writer_memento.hpp>
+#include <chucho/mysql_writer.hpp>
 
 namespace chucho
 {
@@ -23,6 +24,7 @@ mysql_writer_memento::mysql_writer_memento(configurator& cfg)
     : writer_memento(cfg)
 {
     set_status_origin("mysql_writer_memento");
+    set_default_name(typeid(mysql_writer));
     cfg.get_security_policy().set_text("mysql_writer::user", 16);
     cfg.get_security_policy().set_integer("mysql_writer::port", static_cast<std::uint16_t>(1), static_cast<uint16_t>(65535));
     cfg.get_security_policy().set_text("mysql_writer::port(text)", 5);

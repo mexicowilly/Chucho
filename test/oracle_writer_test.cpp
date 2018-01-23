@@ -29,16 +29,18 @@ TEST(oracle_writer_test, oracle)
     auto db = chucho::environment::get("ORACLE_DATABASE");
     if (user && pass && db) 
     {
-        auto wrt = std::make_shared<chucho::oracle_writer>(std::make_shared<chucho::pattern_formatter>("%m"),
+        auto wrt = std::make_unique<chucho::oracle_writer>("oracle",
+                                                           std::move(std::make_unique<chucho::pattern_formatter>("%m")),
                                                            *user,
                                                            *pass,
                                                            *db);
         auto log = chucho::logger::get("oracle_writer_test");
-        log->add_writer(wrt);
+        log->add_writer(std::move(wrt));
         chucho::event evt(log, chucho::level::ERROR_(), "chucho oracle_writer test no mark", __FILE__, __LINE__, __FUNCTION__);
-        wrt->write(evt);
+        auto& oracle = dynamic_cast<chucho::oracle_writer&>(log->get_writer("oracle"));
+        oracle.write(evt);
         evt = chucho::event(log, chucho::level::INFO_(), "chucho oracle_writer test with mark", __FILE__, __LINE__, __FUNCTION__, "marky");
-        wrt->write(evt);
+        oracle.write(evt);
     }
     else
     {

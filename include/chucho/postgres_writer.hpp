@@ -47,13 +47,14 @@ public:
      */
     /**
      * Construct a PostgreSQL writer.
-     * 
+     *
+     * @param name the name of the writer
      * @param fmt the formatter
      * @param uri the <a 
  *       href="http://www.postgresql.org/docs/9.3/static/libpq-connect.html#LIBPQ-CONNSTRING">connection
  *       URI</a>
      */
-    postgres_writer(std::shared_ptr<formatter> fmt, const std::string& uri);
+    postgres_writer(const std::string& name, std::unique_ptr<formatter>&& fmt, const std::string& uri);
     /**
      * Destroy a PostgreSQL writer.
      */

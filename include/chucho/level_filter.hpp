@@ -46,13 +46,15 @@ public:
     //@{
     /**
      * Construct a level_filter.
-     * 
+     *
+     * @param name the name of this filter
      * @param lvl the log level to target
      * @param on_match the result if the event's level matches
      * @param on_mismatch the result if the event's level does not 
      *                    match
      */
-    level_filter(std::shared_ptr<level> lvl,
+    level_filter(const std::string& name,
+                 std::shared_ptr<level> lvl,
                  result on_match,
                  result on_mismatch);
     //@}

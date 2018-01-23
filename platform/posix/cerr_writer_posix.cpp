@@ -20,8 +20,8 @@
 namespace chucho
 {
 
-cerr_writer::cerr_writer(std::shared_ptr<formatter> fmt)
-    : file_descriptor_writer(fmt, STDERR_FILENO, true)
+cerr_writer::cerr_writer(const std::string& name, std::unique_ptr<formatter>&& fmt)
+    : file_descriptor_writer(name, std::move(fmt), STDERR_FILENO, true)
 {
     set_allow_close(false);
 }

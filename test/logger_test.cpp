@@ -95,36 +95,39 @@ TEST_F(log_test, levels)
 TEST_F(log_test, remove_writers)
 {
     auto lgr = chucho::logger::get("remove_writers");
-    std::shared_ptr<chucho::formatter> fmt = std::make_shared<chucho::pattern_formatter>("%m%n");
-    std::shared_ptr<chucho::writer> out = std::make_shared<chucho::cout_writer>(fmt);
-    std::shared_ptr<chucho::writer> err = std::make_shared<chucho::cerr_writer>(fmt);
-    lgr->add_writer(out);
-    lgr->add_writer(err);
-    auto wrts = lgr->get_writers();
+    auto fmt = std::make_unique<chucho::pattern_formatter>("%m%n");
+    auto out = std::make_unique<chucho::cout_writer>("out", std::move(fmt));
+    fmt = std::make_unique<chucho::pattern_formatter>("%m%n");
+    auto err = std::make_unique<chucho::cerr_writer>("err", std::move(fmt));
+    lgr->add_writer(std::move(out));
+    lgr->add_writer(std::move(err));
+    auto wrts = lgr->get_writer_names();
     EXPECT_EQ(2, wrts.size());
-    lgr->remove_writer(out);
-    wrts = lgr->get_writers();
+    lgr->remove_writer("out");
+    wrts = lgr->get_writer_names();
     EXPECT_EQ(1, wrts.size());
-    EXPECT_STREQ(typeid(chucho::cerr_writer).name(), typeid(*wrts[0]).name());
-    lgr->add_writer(out);
-    wrts = lgr->get_writers();
+    EXPECT_STREQ(typeid(chucho::cerr_writer).name(), typeid(lgr->get_writer(wrts[0])).name());
+    fmt = std::make_unique<chucho::pattern_formatter>("%m%n");
+    auto out2 = std::make_unique<chucho::cout_writer>("out2", std::move(fmt));
+    lgr->add_writer(std::move(out2));
+    wrts = lgr->get_writer_names();
     EXPECT_EQ(2, wrts.size());
-    lgr->remove_all_writers();
-    EXPECT_TRUE(lgr->get_writers().empty());
+    lgr->clear_writers();
+    EXPECT_TRUE(lgr->get_writer_names().empty());
 }
 
 TEST_F(log_test, reset)
 {
     auto lgr = chucho::logger::get("reset");
-    std::shared_ptr<chucho::formatter> fmt = std::make_shared<chucho::pattern_formatter>("%m%n");
-    lgr->add_writer(std::make_shared<chucho::cout_writer>(fmt));
+    auto fmt = std::make_unique<chucho::pattern_formatter>("%m%n");
+    lgr->add_writer(std::move(std::make_unique<chucho::cout_writer>("out", std::move(fmt))));
     lgr->set_level(chucho::level::WARN_());
     lgr->set_writes_to_ancestors(false);
-    EXPECT_EQ(1, lgr->get_writers().size());
+    EXPECT_EQ(1, lgr->get_writer_names().size());
     EXPECT_EQ(chucho::level::WARN_(), lgr->get_level());
     EXPECT_FALSE(lgr->writes_to_ancestors());
     lgr->reset();
-    EXPECT_TRUE(lgr->get_writers().empty());
+    EXPECT_TRUE(lgr->get_writer_names().empty());
     EXPECT_FALSE(static_cast<bool>(lgr->get_level()));
     EXPECT_TRUE(lgr->writes_to_ancestors());
 }

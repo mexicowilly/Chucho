@@ -111,7 +111,7 @@
 namespace chucho
 {
 
-configurator::configurator(const security_policy& sec_pol)
+configurator::configurator(security_policy& sec_pol)
     : security_policy_(sec_pol)
 {
     set_status_origin("configurator");
@@ -144,133 +144,133 @@ void configurator::initialize()
 
 void configurator::initialize_impl()
 {
-    std::shared_ptr<configurable_factory> fact(new cerr_writer_factory());
-    add_configurable_factory("chucho::cerr_writer", fact);
-    fact.reset(new cout_writer_factory());
-    add_configurable_factory("chucho::cout_writer", fact);
-    fact.reset(new duplicate_message_filter_factory());
-    add_configurable_factory("chucho::duplicate_message_filter", fact);
-    fact.reset(new file_writer_factory());
-    add_configurable_factory("chucho::file_writer", fact);
-    fact.reset(new level_filter_factory());
-    add_configurable_factory("chucho::level_filter", fact);
-    fact.reset(new level_threshold_filter_factory());
-    add_configurable_factory("chucho::level_threshold_filter", fact);
-    fact.reset(new logger_factory());
-    add_configurable_factory("chucho::logger", fact);
-    fact.reset(new named_pipe_writer_factory());
-    add_configurable_factory("chucho::named_pipe_writer", fact);
-    fact.reset(new noop_compressor_factory());
-    add_configurable_factory("chucho::noop_compressor", fact);
-    fact.reset(new numbered_file_roller_factory());
-    add_configurable_factory("chucho::numbered_file_roller", fact);
-    fact.reset(new pattern_formatter_factory());
-    add_configurable_factory("chucho::pattern_formatter", fact);
-    fact.reset(new pipe_writer_factory());
-    add_configurable_factory("chucho::pipe_writer", fact);
-    fact.reset(new rolling_file_writer_factory());
-    add_configurable_factory("chucho::rolling_file_writer", fact);
-    fact.reset(new size_file_roll_trigger_factory());
-    add_configurable_factory("chucho::size_file_roll_trigger", fact);
-    fact.reset(new time_file_roller_factory());
-    add_configurable_factory("chucho::time_file_roller", fact);
-    fact.reset(new syslog_writer_factory());
-    add_configurable_factory("chucho::syslog_writer", fact);
-    fact.reset(new remote_writer_factory());
-    add_configurable_factory("chucho::remote_writer", fact);
-    fact.reset(new bzip2_file_compressor_factory());
-    add_configurable_factory("chucho::bzip2_file_compressor", fact);
-    fact.reset(new gzip_file_compressor_factory());
-    add_configurable_factory("chucho::gzip_file_compressor", fact);
-    fact.reset(new zip_file_compressor_factory());
-    add_configurable_factory("chucho::zip_file_compressor", fact);
-    fact.reset(new async_writer_factory());
-    add_configurable_factory("chucho::async_writer", fact);
-    fact.reset(new sliding_numbered_file_roller_factory());
-    add_configurable_factory("chucho::sliding_numbered_file_roller", fact);
-    fact.reset(new interval_file_roll_trigger_factory());
-    add_configurable_factory("chucho::interval_file_roll_trigger", fact);
-    fact.reset(new formatted_message_serializer_factory());
-    add_configurable_factory("chucho::formatted_message_serializer", fact);
-    fact.reset(new lzma_file_compressor_factory());
-    add_configurable_factory("chucho::lzma_file_compressor", fact);
+    add_configurable_factory("chucho::cerr_writer",
+                             std::make_shared<cerr_writer_factory>());
+    add_configurable_factory("chucho::cout_writer",
+                             std::make_shared<cout_writer_factory>());
+    add_configurable_factory("chucho::duplicate_message_filter",
+                             std::make_shared<duplicate_message_filter_factory>());
+    add_configurable_factory("chucho::file_writer",
+                             std::make_shared<file_writer_factory>());
+    add_configurable_factory("chucho::level_filter",
+                             std::make_shared<level_filter_factory>());
+    add_configurable_factory("chucho::level_threshold_filter",
+                             std::make_shared<level_threshold_filter_factory>());
+    add_configurable_factory("chucho::logger",
+                             std::make_shared<logger_factory>());
+    add_configurable_factory("chucho::named_pipe_writer",
+                             std::make_shared<named_pipe_writer_factory>());
+    add_configurable_factory("chucho::noop_compressor",
+                             std::make_shared<noop_compressor_factory>());
+    add_configurable_factory("chucho::numbered_file_roller",
+                             std::make_shared<numbered_file_roller_factory>());
+    add_configurable_factory("chucho::pattern_formatter",
+                             std::make_shared<pattern_formatter_factory>());
+    add_configurable_factory("chucho::pipe_writer",
+                             std::make_shared<pipe_writer_factory>());
+    add_configurable_factory("chucho::rolling_file_writer",
+                             std::make_shared<rolling_file_writer_factory>());
+    add_configurable_factory("chucho::size_file_roll_trigger",
+                             std::make_shared<size_file_roll_trigger_factory>());
+    add_configurable_factory("chucho::time_file_roller",
+                             std::make_shared<time_file_roller_factory>());
+    add_configurable_factory("chucho::syslog_writer",
+                             std::make_shared<syslog_writer_factory>());
+    add_configurable_factory("chucho::remote_writer",
+                             std::make_shared<remote_writer_factory>());
+    add_configurable_factory("chucho::bzip2_file_compressor",
+                             std::make_shared<bzip2_file_compressor_factory>());
+    add_configurable_factory("chucho::gzip_file_compressor",
+                             std::make_shared<gzip_file_compressor_factory>());
+    add_configurable_factory("chucho::zip_file_compressor",
+                             std::make_shared<zip_file_compressor_factory>());
+    add_configurable_factory("chucho::async_writer",
+                             std::make_shared<async_writer_factory>());
+    add_configurable_factory("chucho::sliding_numbered_file_roller",
+                             std::make_shared<sliding_numbered_file_roller_factory>());
+    add_configurable_factory("chucho::interval_file_roll_trigger",
+                             std::make_shared<interval_file_roll_trigger_factory>());
+    add_configurable_factory("chucho::formatted_message_serializer",
+                             std::make_shared<formatted_message_serializer_factory>());
+    add_configurable_factory("chucho::lzma_file_compressor",
+                             std::make_shared<lzma_file_compressor_factory>());
 #if defined(CHUCHO_WINDOWS)
-    fact.reset(new windows_event_log_writer_factory());
-    add_configurable_factory("chucho::windows_event_log_writer", fact);
+    add_configurable_factory("chucho::windows_event_log_writer",
+                             std::make_shared<windows_event_log_writer_factory>());
 #endif
 #if defined(CHUCHO_HAVE_MYSQL)
-    fact.reset(new mysql_writer_factory());
-    add_configurable_factory("chucho::mysql_writer", fact);
+    add_configurable_factory("chucho::mysql_writer",
+                             std::make_shared<mysql_writer_factory>());
 #endif
 #if defined(CHUCHO_HAVE_ORACLE)
-    fact.reset(new oracle_writer_factory());
-    add_configurable_factory("chucho::oracle_writer", fact);
+    add_configurable_factory("chucho::oracle_writer",
+                             std::make_shared<oracle_writer_factory>());
 #endif
 #if defined(CHUCHO_HAVE_SQLITE)
-    fact.reset(new sqlite_writer_factory());
-    add_configurable_factory("chucho::sqlite_writer", fact);
+    add_configurable_factory("chucho::sqlite_writer",
+                             std::make_shared<sqlite_writer_factory>());
 #endif
 #if defined(CHUCHO_HAVE_POSTGRES)
-    fact.reset(new postgres_writer_factory());
-    add_configurable_factory("chucho::postgres_writer", fact);
+    add_configurable_factory("chucho::postgres_writer",
+                             std::make_shared<postgres_writer_factory>());
 #endif
 #if defined(CHUCHO_HAVE_DB2)
-    fact.reset(new db2_writer_factory());
-    add_configurable_factory("chucho::db2_writer", fact);
+    add_configurable_factory("chucho::db2_writer",
+                             std::make_shared<db2_writer_factory>());
 #endif
 #if defined(CHUCHO_HAVE_RUBY)
-    fact.reset(new ruby_evaluator_filter_factory());
-    add_configurable_factory("chucho::ruby_evaluator_filter", fact);
+    add_configurable_factory("chucho::ruby_evaluator_filter",
+                             std::make_shared<ruby_evaluator_filter_factory>());
 #endif
 #if defined(CHUCHO_HAVE_EMAIL_WRITER)
-    fact.reset(new email_writer_factory());
-    add_configurable_factory("chucho::email_writer", fact);
-    fact.reset(new level_threshold_email_trigger_factory());
-    add_configurable_factory("chucho::level_threshold_email_trigger", fact);
+    add_configurable_factory("chucho::email_writer",
+                             std::make_shared<email_writer_factory>());
+    add_configurable_factory("chucho::level_threshold_email_trigger",
+                             std::make_shared<level_threshold_email_trigger_factory>());
 #endif
 #if defined(CHUCHO_HAVE_PROTOBUF)
-    fact.reset(new protobuf_serializer_factory());
-    add_configurable_factory("chucho::protobuf_serializer", fact);
+    add_configurable_factory("chucho::protobuf_serializer",
+                             std::make_shared<protobuf_serializer_factory>());
 #endif
 #if defined(CHUCHO_HAVE_ZEROMQ)
-    fact.reset(new zeromq_writer_factory());
-    add_configurable_factory("chucho::zeromq_writer", fact);
+    add_configurable_factory("chucho::zeromq_writer",
+                             std::make_shared<zeromq_writer_factory>());
 #endif
 #if defined(CHUCHO_HAVE_ZLIB)
-    fact.reset(new zlib_compressor_factory());
-    add_configurable_factory("chucho::zlib_compressor", fact);
+    add_configurable_factory("chucho::zlib_compressor",
+                             std::make_shared<zlib_compressor_factory>());
 #endif
 #if defined(CHUCHO_HAVE_ACTIVEMQ)
-    fact.reset(new activemq_writer_factory());
-    add_configurable_factory("chucho::activemq_writer", fact);
+    add_configurable_factory("chucho::activemq_writer",
+                             std::make_shared<activemq_writer_factory>());
 #endif
 #if defined(CHUCHO_HAVE_DOORS)
-    fact.reset(new door_writer_factory());
-    add_configurable_factory("chucho::door_writer", fact);
+    add_configurable_factory("chucho::door_writer",
+                             std::make_shared<door_writer_factory>());
 #endif
 #if defined(CHUCHO_HAVE_RABBITMQ)
-    fact.reset(new rabbitmq_writer_factory());
-    add_configurable_factory("chucho::rabbitmq_writer", fact);
+    add_configurable_factory("chucho::rabbitmq_writer",
+                             std::make_shared<rabbitmq_writer_factory>());
 #endif
 #if defined(CHUCHO_HAVE_BZIP2)
-    fact.reset(new bzip2_compressor_factory());
-    add_configurable_factory("chucho::bzip2_compressor", fact);
+    add_configurable_factory("chucho::bzip2_compressor",
+                             std::make_shared<bzip2_compressor_factory>());
 #endif
 #if defined(CHUCHO_HAVE_CAPN_PROTO)
-    fact.reset(new capn_proto_serializer_factory());
-    add_configurable_factory("chucho::capn_proto_serializer", fact);
+    add_configurable_factory("chucho::capn_proto_serializer",
+                             std::make_shared<capn_proto_serializer_factory>());
 #endif
 #if defined(CHUCHO_HAVE_LZMA)
-    fact.reset(new lzma_compressor_factory());
-    add_configurable_factory("chucho::lzma_compressor", fact);
+    add_configurable_factory("chucho::lzma_compressor",
+                             std::make_shared<lzma_compressor_factory>());
 #endif
 #if defined(CHUCHO_HAVE_LZ4)
-    fact.reset(new lz4_compressor_factory());
-    add_configurable_factory("chucho::lz4_compressor", fact);
+    add_configurable_factory("chucho::lz4_compressor",
+                             std::make_shared<lz4_compressor_factory>());
 #endif
 #if defined(CHUCHO_HAVE_FLATBUFFERS)
-    fact.reset(new flatbuffers_serializer_factory());
-    add_configurable_factory("chucho::flatbuffers_serializer", fact);
+    add_configurable_factory("chucho::flatbuffers_serializer",
+                             std::make_shared<flatbuffers_serializer_factory>());
 #endif
 }
 
@@ -279,7 +279,7 @@ std::string configurator::resolve_variables(const std::string& val)
     static regex::expression re("\\$([Ee][Nn][Vv])?\\{([^{]+)\\}");
 
     std::string result(val);
-    int pos_offset = 0;
+    std::size_t pos_offset = 0;
     regex::iterator itor(val, re);
     regex::iterator end;
     while (itor != end)
@@ -287,8 +287,7 @@ std::string configurator::resolve_variables(const std::string& val)
         const regex::match& m(*itor);
         if (m[1].begin() > 0)
         {
-            optional<std::string> env = environment::get(
-                val.substr(m[2].begin(), m[2].length()).c_str());
+            auto env = environment::get(val.substr(m[2].begin(), m[2].length()).c_str());
             if (env)
             {
                 result.replace(m[0].begin() + pos_offset, m[0].length(), *env);

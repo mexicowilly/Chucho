@@ -16,6 +16,7 @@
 
 IF(MSVC)
     ADD_DEFINITIONS(-D_VARIADIC_MAX=10)
+    SET_DIRECTORY_PROPERTIES(PROPERTIES COMPILE_OPTIONS "/wd4996")
 ENDIF()
 
 IF(C_API)
@@ -443,10 +444,6 @@ ADD_EXECUTABLE(syslog-writer-test EXCLUDE_FROM_ALL
                syslog_writer_test.cpp)
 TARGET_LINK_LIBRARIES(syslog-writer-test chucho gtest)
 
-ADD_EXECUTABLE(remote-writer-test EXCLUDE_FROM_ALL
-               remote_writer_test.cpp)
-TARGET_LINK_LIBRARIES(remote-writer-test chucho)
-
 IF(CHUCHO_WINDOWS)
     ADD_EXECUTABLE(windows-event-log-writer-test EXCLUDE_FROM_ALL
                    harness.cpp
@@ -506,4 +503,4 @@ ADD_CUSTOM_TARGET(check-config
                   COMMAND "${CMAKE_COMMAND}" "-DCHUCHO_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -DCLANG_LIBSTDCXX=${CLANG_LIBSTDCXX} -P "${CMAKE_CURRENT_SOURCE_DIR}/CheckAllConfigs.cmake")
 
 ADD_CUSTOM_TARGET(all-test
-                  DEPENDS unit-test rolling-file-test syslog-writer-test remote-writer-test windows-event-log-writer-test)
+                  DEPENDS unit-test time-rolling-file-test syslog-writer-test windows-event-log-writer-test)

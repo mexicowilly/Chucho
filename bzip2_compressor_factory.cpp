@@ -26,17 +26,17 @@ bzip2_compressor_factory::bzip2_compressor_factory()
     set_status_origin("bzip2_compressor_factory");
 }
 
-std::shared_ptr<configurable> bzip2_compressor_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> bzip2_compressor_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    std::shared_ptr<configurable> cnf = std::make_shared<bzip2_compressor>();
+    auto cnf = std::make_unique<bzip2_compressor>();
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
-    return cnf;
+    return std::move(cnf);
 }
 
-std::shared_ptr<memento> bzip2_compressor_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> bzip2_compressor_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto(new memento(cfg));
-    return mnto;
+    auto mnto  = std::make_unique<memento>(cfg);
+    return std::move(mnto);
 }
 
 }

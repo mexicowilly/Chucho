@@ -41,7 +41,7 @@ private:
 };
 
 sink_writer::sink_writer()
-    : chucho::writer(std::make_shared<chucho::pattern_formatter>("%m%n"))
+    : chucho::writer("sink", std::move(std::make_unique<chucho::pattern_formatter>("%m%n")))
 {
 }
 
@@ -62,21 +62,20 @@ void sink_writer::write_impl(const chucho::event& evt)
     messages_.push_back(evt.get_message());
 }
 
-void thread_main(std::shared_ptr<sink_writer> wrt)
+void thread_main()
 {
     std::ostringstream stream;
     stream << "multithread." << std::this_thread::get_id();
     auto lg = chucho::logger::get(stream.str());
-    if (wrt)
-        lg->add_writer(wrt);
+    auto wrt = std::make_unique<sink_writer>();
+    lg->add_writer(std::move(wrt));
     std::vector<std::string> expected;
     for (std::size_t i = 0; i < 10000; i++)
     {
         expected.push_back(std::to_string(i));
         CHUCHO_INFO(lg, i);
     }
-    if (wrt)
-        wrt->verify(expected);
+    dynamic_cast<sink_writer&>(lg->get_writer("sink")).verify(expected);
 }
 
 }
@@ -86,20 +85,7 @@ TEST(multithread, logs)
     chucho::logger::remove_unused_loggers();
     std::vector<std::thread> threads;
     for (std::size_t i = 0; i < 5; i++)
-        threads.emplace(threads.end(), thread_main, std::make_shared<sink_writer>());
+        threads.emplace(threads.end(), thread_main);
     for (std::thread& t : threads)
         t.join();
-}
-
-TEST(multithread, shared_writer)
-{
-    chucho::logger::remove_unused_loggers();
-    auto wrt = std::make_shared<sink_writer>();
-    chucho::logger::get("multithread")->add_writer(wrt);
-    std::vector<std::thread> threads;
-    for (std::size_t i = 0; i < 5; i++)
-        threads.emplace(threads.end(), thread_main, std::shared_ptr<sink_writer>());
-    for (std::thread& t : threads)
-        t.join();
-    wrt->verify(50000);
 }

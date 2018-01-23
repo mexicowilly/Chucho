@@ -19,10 +19,12 @@
 namespace chucho
 {
 
-level_filter::level_filter(std::shared_ptr<level>lvl,
+level_filter::level_filter(const std::string& name,
+                           std::shared_ptr<level>lvl,
                            result on_match,
                            result on_mismatch)
-    : level_(lvl),
+    : filter(name),
+      level_(lvl),
       on_match_(on_match),
       on_mismatch_(on_mismatch)
 {

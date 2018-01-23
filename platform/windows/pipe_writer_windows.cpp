@@ -21,9 +21,10 @@
 namespace chucho
 {
 
-pipe_writer::pipe_writer(std::shared_ptr<formatter> fmt,
+pipe_writer::pipe_writer(const std::string& name,
+                         std::unique_ptr<formatter>&& fmt,
                          bool flsh)
-    : file_descriptor_writer(fmt, flsh),
+    : file_descriptor_writer(name, std::move(fmt), flsh),
       input_(INVALID_HANDLE_VALUE),
       output_(INVALID_HANDLE_VALUE)
 {

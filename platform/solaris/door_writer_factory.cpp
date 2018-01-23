@@ -28,26 +28,29 @@ door_writer_factory::door_writer_factory()
     set_status_origin("door_writer_factory");
 }
 
-std::shared_ptr<configurable> door_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> door_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    std::shared_ptr<configurable> cnf;
-    auto dwm = std::dynamic_pointer_cast<door_writer_memento>(mnto);
-    assert(dwm);
-    if (!dwm->get_formatter())
+    auto dwm = dynamic_cast<door_writer_memento*>(mnto.get());
+    assert(dwm != nullptr);
+    if (dwm->get_name().empty())
+        throw exception("door_writer_factory: The name is not set");
+    auto fmt = std::move(dwm->get_formatter());
+    if (!fmt)
         throw exception("door_writer_factory: The writer's formatter is not set");
     if (dwm->get_file_name().empty())
         throw exception("door_writer_factory: The door's file name must be set");
-    cnf.reset(new door_writer(dwm->get_formatter(),
-                              dwm->get_file_name()));
-    set_filters(cnf, dwm);
+    auto cnf = std::make_unique<door_writer>(dwm->get_name(),
+                                             std::move(fmt),
+                                             dwm->get_file_name());
+    set_filters(*cnf, *dwm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
-    return cnf;
+    return std::move(cnf);
 }
 
-std::shared_ptr<memento> door_writer_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> door_writer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto = std::make_shared<door_writer_memento>(cfg);
-    return mnto;
+    auto mnto = std::make_unique<door_writer_memento>(cfg);
+    return std::move(mnto);
 }
 }
 

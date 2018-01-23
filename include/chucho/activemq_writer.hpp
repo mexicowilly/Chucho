@@ -40,7 +40,7 @@ public:
      */
     enum class consumer_type
     {
-        QUEUE,  /**< PUblish to a queue */
+        QUEUE,  /**< Publish to a queue */
         TOPIC   /**< Publish to a topic */
     };
 
@@ -50,21 +50,24 @@ public:
      */
     /**
      * Construct an ActiveMQ writer.
-     * 
+     *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param ser the serializer
      * @param broker the URI of the ActiveMQ broker
      * @param tp whether to publish to a topic or queue
      * @param topic_or_queue the name of the topic or queue
      */
-    activemq_writer(std::shared_ptr<formatter> fmt,
-                    std::shared_ptr<serializer> ser,
+    activemq_writer(const std::string& name,
+                    std::unique_ptr<formatter>&& fmt,
+                    std::unique_ptr<serializer>&& ser,
                     const std::string& broker,
                     consumer_type tp,
                     const std::string& topic_or_queue);
     /**
      * Construct an ActiveMQ writer.
      *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param ser the serializer
      * @param coalesce_max the maximum number of events to write in a single ActiveMQ message
@@ -72,8 +75,9 @@ public:
      * @param tp whether to publish to a topic or queue
      * @param topic_or_queue the name of the topic or queue
      */
-    activemq_writer(std::shared_ptr<formatter> fmt,
-                    std::shared_ptr<serializer> ser,
+    activemq_writer(const std::string& name,
+                    std::unique_ptr<formatter>&& fmt,
+                    std::unique_ptr<serializer>&& ser,
                     std::size_t coalesce_max,
                     const std::string& broker,
                     consumer_type tp,
@@ -81,6 +85,7 @@ public:
     /**
      * Construct an ActiveMQ writer.
      * 
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param ser the serializer
      * @param cmp the compressor
@@ -88,15 +93,17 @@ public:
      * @param tp whether to publish to a topic or queue
      * @param topic_or_queue the name of the topic or queue
      */
-    activemq_writer(std::shared_ptr<formatter> fmt,
-                    std::shared_ptr<serializer> ser,
-                    std::shared_ptr<compressor> cmp,
+    activemq_writer(const std::string& name,
+                    std::unique_ptr<formatter>&& fmt,
+                    std::unique_ptr<serializer>&& ser,
+                    std::unique_ptr<compressor>&& cmp,
                     const std::string& broker,
                     consumer_type tp,
                     const std::string& topic_or_queue);
     /**
      * Construct an ActiveMQ writer.
      *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param ser the serializer
      * @param coalesce_max the maximum number of events to write in a single ActiveMQ message
@@ -105,10 +112,11 @@ public:
      * @param tp whether to publish to a topic or queue
      * @param topic_or_queue the name of the topic or queue
      */
-    activemq_writer(std::shared_ptr<formatter> fmt,
-                    std::shared_ptr<serializer> ser,
+    activemq_writer(const std::string& name,
+                    std::unique_ptr<formatter>&& fmt,
+                    std::unique_ptr<serializer>&& ser,
                     std::size_t coalesce_max,
-                    std::shared_ptr<compressor> cmp,
+                    std::unique_ptr<compressor>&& cmp,
                     const std::string& broker,
                     consumer_type tp,
                     const std::string& topic_or_queue);

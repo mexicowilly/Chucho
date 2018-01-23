@@ -104,10 +104,10 @@ void syslog_transport_handle::send(chucho::syslog::facility fcl,
     if (socket_ != INVALID_SOCKET &&
         sendto(socket_,
                message.data(),
-               message.length(),
+               static_cast<int>(message.length()),
                0,
                reinterpret_cast<struct sockaddr*>(&address_[0]),
-               address_.size()) == SOCKET_ERROR)
+               static_cast<int>(address_.size())) == SOCKET_ERROR)
     {
         throw socket_exception("Unable to send syslog data: ", WSAGetLastError());
     }

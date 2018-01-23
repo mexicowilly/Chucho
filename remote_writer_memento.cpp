@@ -15,6 +15,7 @@
  */
 
 #include <chucho/remote_writer_memento.hpp>
+#include <chucho/remote_writer.hpp>
 
 namespace chucho
 {
@@ -23,6 +24,7 @@ remote_writer_memento::remote_writer_memento(configurator& cfg, memento_key_set 
     : writer_memento(cfg)
 {
     set_status_origin("remote_writer_memento");
+    set_default_name(typeid(remote_writer));
     cfg.get_security_policy().set_integer("remote_writer::port", 1, 65535);
     cfg.get_security_policy().set_text("remote_writer::port(text)", 5);
     set_handler("host", [this] (const std::string& name) { host_ = name; });

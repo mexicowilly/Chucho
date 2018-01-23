@@ -67,11 +67,11 @@ pattern_formatter::pattern_formatter(const std::string& pattern)
     parse(pattern);
 }
 
-std::shared_ptr<pattern_formatter::piece> pattern_formatter::create_piece(std::string::const_iterator& pos,
+std::unique_ptr<pattern_formatter::piece> pattern_formatter::create_piece(std::string::const_iterator& pos,
                                                                           std::string::const_iterator end,
                                                                           const format_params& params)
 {
-    std::shared_ptr<piece> result;
+    std::unique_ptr<piece> result;
     std::string arg;
     char c = *pos;
     switch (c)
@@ -139,13 +139,13 @@ std::shared_ptr<pattern_formatter::piece> pattern_formatter::create_piece(std::s
         report_error(std::string("Unexpected character '") + c + "' in pattern");
         throw exception("Invalid parameter");
     }
-    return result;
+    return std::move(result);
 }
 
 std::string pattern_formatter::format(const event& evt)
 {
     std::string result;
-    for (std::shared_ptr<piece>& p : pieces_)
+    for (auto& p : pieces_)
         result += p->get_text(evt);
     return result;
 }
@@ -204,10 +204,7 @@ void pattern_formatter::parse(const std::string& pattern)
                     else
                     {
                         if (!text.empty())
-                        {
-                            std::shared_ptr<piece> p(new literal_piece(text));
-                            pieces_.push_back(p);
-                        }
+                            pieces_.emplace_back(std::make_unique<literal_piece>(text));
                         state = parser_state::BEGIN;
                         begin_pos = i;
                     }
@@ -237,7 +234,7 @@ void pattern_formatter::parse(const std::string& pattern)
                     }
                     else
                     {
-                        pieces_.push_back(create_piece(i, pattern.end(), params));
+                        pieces_.push_back(std::move(create_piece(i, pattern.end(), params)));
                         state = parser_state::LITERAL;
                         text.clear();
                         params.reset();
@@ -258,7 +255,7 @@ void pattern_formatter::parse(const std::string& pattern)
                     }
                     else
                     {
-                        pieces_.push_back(create_piece(i, pattern.end(), params));
+                        pieces_.push_back(std::move(create_piece(i, pattern.end(), params)));
                         state = parser_state::LITERAL;
                         text.clear();
                         params.reset();
@@ -290,7 +287,7 @@ void pattern_formatter::parse(const std::string& pattern)
                 else
                 {
                     params.max_width_ = std::stoi(text);
-                    pieces_.push_back(create_piece(i, pattern.end(), params));
+                    pieces_.push_back(std::move(create_piece(i, pattern.end(), params)));
                     state = parser_state::LITERAL;
                     text.clear();
                     params.reset();
@@ -300,8 +297,7 @@ void pattern_formatter::parse(const std::string& pattern)
         }
         catch (...)
         {
-            std::shared_ptr<piece> p(new literal_piece(std::string(begin_pos, i + 1)));
-            pieces_.push_back(p);
+            pieces_.emplace_back(std::make_unique<literal_piece>(std::string(begin_pos, i + 1)));
             state = parser_state::LITERAL;
             text.clear();
             params.reset();
@@ -309,8 +305,7 @@ void pattern_formatter::parse(const std::string& pattern)
     }
     if (!text.empty())
     {
-        std::shared_ptr<piece> p(new literal_piece(text));
-        pieces_.push_back(p);
+        pieces_.emplace_back(std::make_unique<literal_piece>(text));
     }
 }
 

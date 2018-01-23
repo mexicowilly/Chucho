@@ -91,8 +91,8 @@ ENDIF()
 IF(BZIP2_FOUND)
     INCLUDE_DIRECTORIES("${BZIP2_INCLUDE_DIR}")
 ENDIF()
-IF(LZMA_FOUND)
-    INCLUDE_DIRECTORIES("${LZMA_INCLUDE_DIRS}")
+IF(LIBLZMA_FOUND)
+    INCLUDE_DIRECTORIES("${LIBLZMA_INCLUDE_DIRS}")
 ENDIF()
 IF(LibArchive_FOUND)
     INCLUDE_DIRECTORIES("${LibArchive_INCLUDE_DIRS}")
@@ -221,6 +221,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/file_roll_trigger.hpp
     include/chucho/file_writer.hpp
     include/chucho/filter.hpp
+    include/chucho/filter_memento.hpp
     include/chucho/finalize.hpp
     include/chucho/formatted_message_serializer.hpp
     include/chucho/formatter.hpp
@@ -237,6 +238,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/marker.hpp
     include/chucho/memento.hpp
     include/chucho/message_queue_writer.hpp
+    include/chucho/nameable_memento.hpp
     include/chucho/named_pipe_writer.hpp
     include/chucho/non_copyable.hpp
     include/chucho/noop_compressor.hpp
@@ -716,9 +718,11 @@ MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
                                 PROPERTIES
                                 COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
     IF(MSVC)
-        # Microsoft doesn't want libyaml to use strdup
-        SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
-                                    COMPILE_FLAGS /wd4996)
+        SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/loader.c"
+                                    "${CMAKE_SOURCE_DIR}/embedded/libyaml/scanner.c"
+                                    "${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c"
+                                    PROPERTIES
+                                    COMPILE_FLAGS "/wd4996 /wd4267 /wd4244")
     ELSEIF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER_ID STREQUAL Clang)
         SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
                                     COMPILE_FLAGS "-Wno-implicit-function-declaration -Wno-int-to-pointer-cast")
@@ -900,6 +904,7 @@ SET(CHUCHO_SOURCES
     file_writer.cpp
     file_writer_factory.cpp
     file_writer_memento.cpp
+    filter_memento.cpp
     finalize.cpp
     formatted_message_serializer.cpp
     formatted_message_serializer_factory.cpp
@@ -927,6 +932,7 @@ SET(CHUCHO_SOURCES
     memento_key_set.cpp
     message_queue_writer.cpp
     message_queue_writer_memento.cpp
+    nameable_memento.cpp
     named_pipe_writer.cpp
     named_pipe_writer_factory.cpp
     named_pipe_writer_memento.cpp
@@ -1008,6 +1014,7 @@ SET(CHUCHO_SOURCES
     include/chucho/lzma_file_compressor_factory.hpp
     include/chucho/memento_key_set.hpp
     include/chucho/message_queue_writer_memento.hpp
+    include/chucho/move_util.hpp
     include/chucho/named_pipe_writer_factory.hpp
     include/chucho/named_pipe_writer_memento.hpp
     include/chucho/noop_compressor_factory.hpp

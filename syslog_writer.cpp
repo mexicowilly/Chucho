@@ -20,19 +20,21 @@
 namespace chucho
 {
 
-syslog_writer::syslog_writer(std::shared_ptr<formatter> fmt,
+syslog_writer::syslog_writer(const std::string& name,
+                             std::unique_ptr<formatter>&& fmt,
                              syslog::facility fcl)
-    : writer(fmt),
+    : writer(name, std::move(fmt)),
       facility_(fcl)
 {
     set_status_origin("syslog_writer");
 }
 
-syslog_writer::syslog_writer(std::shared_ptr<formatter> fmt,
+syslog_writer::syslog_writer(const std::string& name,
+                             std::unique_ptr<formatter>&& fmt,
                              syslog::facility fcl,
                              const std::string& host,
                              std::uint16_t port)
-    : writer(fmt),
+    : writer(name, std::move(fmt)),
       transport_(host, port),
       facility_(fcl),
       host_name_(host),

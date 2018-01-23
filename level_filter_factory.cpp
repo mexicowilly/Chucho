@@ -18,6 +18,7 @@
 #include <chucho/level_filter_memento.hpp>
 #include <chucho/level_filter.hpp>
 #include <chucho/exception.hpp>
+#include <chucho/demangle.hpp>
 #include <assert.h>
 
 namespace chucho
@@ -28,27 +29,30 @@ level_filter_factory::level_filter_factory()
     set_status_origin("level_filter_factory");
 }
 
-std::shared_ptr<configurable> level_filter_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> level_filter_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    assert(dynamic_cast<level_filter_memento*>(mnto.get()));
-    auto lfm = std::dynamic_pointer_cast<level_filter_memento>(mnto);
-    assert(lfm);
+    auto lfm = dynamic_cast<level_filter_memento*>(mnto.get());
+    assert(lfm != nullptr);
+    if (lfm->get_name().empty())
+        throw exception("level_filter_factory: The name must be set");
     if (!lfm->get_level())
         throw exception("level_filter_factory: The level must be set");
     if (!lfm->get_on_match())
         throw exception("level_filter_factory: The on_match key must be set");
     if (!lfm->get_on_mismatch())
         throw exception("level_filter_factory: The on_mismatch key must be set");
-    std::shared_ptr<configurable> cnf(new level_filter(lfm->get_level(),
-                                                       *lfm->get_on_match(),
-                                                       *lfm->get_on_mismatch()));
-    return cnf;
+    auto cnf = std::make_unique<level_filter>(lfm->get_name(),
+                                              lfm->get_level(),
+                                              *lfm->get_on_match(),
+                                              *lfm->get_on_mismatch());
+    report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
+    return std::move(cnf);
 }
 
-std::shared_ptr<memento> level_filter_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> level_filter_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto = std::make_shared<level_filter_memento>(cfg, get_memento_key_set(cfg));
-    return mnto;
+    auto mnto = std::make_unique<level_filter_memento>(cfg, get_memento_key_set(cfg));
+    return std::move(mnto);
 }
 
 }

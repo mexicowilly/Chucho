@@ -30,9 +30,9 @@ public:
     configuration()
     {
         chucho::logger::remove_unused_loggers();
-        std::shared_ptr<chucho::formatter> f = std::make_shared<chucho::pattern_formatter>("%m%n");
-        std::shared_ptr<chucho::writer> w = std::make_shared<chucho::cout_writer>(f);
-        get_logger()->add_writer(w);
+        auto f = std::make_unique<chucho::pattern_formatter>("%m%n");
+        auto w = std::make_unique<chucho::cout_writer>("chucho::cout_writer", std::move(f));
+        get_logger()->add_writer(std::move(w));
     }
 
     ~configuration()
@@ -66,9 +66,7 @@ TEST_F(configuration, set_config)
            << "chucho.formatter.pf = chucho::pattern_formatter" << std::endl
            << "chucho.formatter.pf.pattern = %m%n";
     ASSERT_TRUE(chucho::configuration::set(stream.str()));
-    auto wrts = get_logger()->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    EXPECT_TRUE(static_cast<bool>(std::dynamic_pointer_cast<chucho::cerr_writer>(wrts[0])));
+    EXPECT_NO_THROW(get_logger()->get_writer("chucho::cerr_writer"));
 }
 
 #endif
@@ -84,9 +82,7 @@ TEST_F(configuration, set_log4cplus)
            << "log4cplus.appender.ce.layout = log4cplus::PatternLayout\n"
            << "log4cplus.appender.ce.layout.ConversionPattern = %m%n";
     ASSERT_TRUE(chucho::configuration::set(stream.str()));
-    auto wrts = get_logger()->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    EXPECT_TRUE(static_cast<bool>(std::dynamic_pointer_cast<chucho::cerr_writer>(wrts[0])));
+    EXPECT_NO_THROW(get_logger()->get_writer("chucho::cerr_writer"));
 }
 
 #endif
@@ -102,9 +98,7 @@ TEST_F(configuration, set_yaml)
            << "        chucho::pattern_formatter:" << std::endl
            << "            pattern: '%m%n'";
     ASSERT_TRUE(chucho::configuration::set(stream.str()));
-    auto wrts = get_logger()->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    EXPECT_TRUE(static_cast<bool>(std::dynamic_pointer_cast<chucho::cerr_writer>(wrts[0])));
+    EXPECT_NO_THROW(get_logger()->get_writer("chucho::cerr_writer"));
 }
 
 TEST_F(configuration, set_yaml_error)
@@ -116,7 +110,7 @@ TEST_F(configuration, set_yaml_error)
            << "        chucho::monkey_balls:" << std::endl
            << "            pattern: '%m%n'";
     ASSERT_TRUE(chucho::configuration::set(stream.str()));
-    auto wrts = get_logger()->get_writers();
+    auto wrts = get_logger()->get_writer_names();
     EXPECT_EQ(0, wrts.size());
 }
 

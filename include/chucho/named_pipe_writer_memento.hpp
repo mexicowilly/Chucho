@@ -33,10 +33,10 @@ public:
     named_pipe_writer_memento(configurator& cfg);
 
     const optional<bool>& get_flush() const;
-    const std::string& get_name() const;
+    const std::string& get_pipe_name() const;
 
 private:
-    std::string name_;
+    std::string pipe_name_;
     optional<bool> flush_;
 };
 
@@ -45,9 +45,9 @@ inline const optional<bool>& named_pipe_writer_memento::get_flush() const
     return flush_;
 }
 
-inline const std::string& named_pipe_writer_memento::get_name() const
+inline const std::string& named_pipe_writer_memento::get_pipe_name() const
 {
-    return name_;
+    return pipe_name_;
 }
 
 }

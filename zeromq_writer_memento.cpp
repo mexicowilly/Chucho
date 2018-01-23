@@ -15,6 +15,7 @@
  */
 
 #include <chucho/zeromq_writer_memento.hpp>
+#include <chucho/zeromq_writer.hpp>
 #include <cstring>
 
 namespace chucho
@@ -24,6 +25,7 @@ zeromq_writer_memento::zeromq_writer_memento(configurator& cfg)
     : message_queue_writer_memento(cfg)
 {
     set_status_origin("zeromq_writer_memento");
+    set_default_name(typeid(zeromq_writer));
     set_handler("endpoint", [this] (const std::string& ep) { endpoint_ = validate("zeromq_writer::endpoint", ep); });
     set_handler("prefix", [this] (const std::string& arg)
                 {

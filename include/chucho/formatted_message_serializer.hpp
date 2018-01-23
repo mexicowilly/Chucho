@@ -51,7 +51,7 @@ public:
      * @param evt the event
      * @param fmt the formatter
      */
-    virtual void serialize(const event& evt, std::shared_ptr<formatter> fmt) override;
+    virtual void serialize(const event& evt, formatter& fmt) override;
 
 private:
     std::string events_;

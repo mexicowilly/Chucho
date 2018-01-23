@@ -29,45 +29,51 @@ syslog_writer_factory::syslog_writer_factory()
     set_status_origin("syslog_writer_factory");
 }
 
-std::shared_ptr<configurable> syslog_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> syslog_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    std::shared_ptr<configurable> cnf;
-    auto swm = std::dynamic_pointer_cast<syslog_writer_memento>(mnto);
-    assert(swm);
-    if (!swm->get_formatter())
+    std::unique_ptr<configurable> cnf;
+    auto swm = dynamic_cast<syslog_writer_memento*>(mnto.get());
+    assert(swm != nullptr);
+    if (swm->get_name().empty())
+        throw exception("syslog_writer_factory: The name is not set");
+    auto fmt = std::move(swm->get_formatter());
+    if (!fmt)
         throw exception("syslog_writer_factory: The writer's formatter is not set");
     if (!swm->get_facility())
         throw exception("syslog_writer_factory: The writer's facility is not set");
     if (swm->get_host_name().empty())
     {
-        cnf.reset(new syslog_writer(swm->get_formatter(),
-                                    *swm->get_facility()));
+        cnf = std::make_unique<syslog_writer>(swm->get_name(),
+                                              std::move(fmt),
+                                              *swm->get_facility());
     }
     else
     {
         if (swm->get_port())
         {
-            cnf.reset(new syslog_writer(swm->get_formatter(),
-                                        *swm->get_facility(),
-                                        swm->get_host_name(),
-                                        *swm->get_port()));
+            cnf = std::make_unique<syslog_writer>(swm->get_name(),
+                                                  std::move(fmt),
+                                                  *swm->get_facility(),
+                                                  swm->get_host_name(),
+                                                  *swm->get_port());
         }
         else
         {
-            cnf.reset(new syslog_writer(swm->get_formatter(),
-                                        *swm->get_facility(),
-                                        swm->get_host_name()));
+            cnf = std::make_unique<syslog_writer>(swm->get_name(),
+                                                  std::move(fmt),
+                                                  *swm->get_facility(),
+                                                  swm->get_host_name());
         }
     }
-    set_filters(cnf, swm);
+    set_filters(*cnf, *swm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
-    return cnf;
+    return std::move(cnf);
 }
 
-std::shared_ptr<memento> syslog_writer_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> syslog_writer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto(new syslog_writer_memento(cfg));
-    return mnto;
+    auto mnto = std::make_unique<syslog_writer_memento>(cfg);
+    return std::move(mnto);
 }
 
 }

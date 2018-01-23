@@ -31,13 +31,16 @@ TEST(postgres_wrtier_test, postgres)
     if (host && user && pass && db) 
     {
         std::string uri("postgres://" + *user + ":" + *pass + "@" + *host + "/" + *db);
-        auto wrt = std::make_shared<chucho::postgres_writer>(std::make_shared<chucho::pattern_formatter>("%m"), uri);
+        auto wrt = std::make_unique<chucho::postgres_writer>("postgres",
+                                                             std::move(std::make_unique<chucho::pattern_formatter>("%m")),
+                                                             uri);
         auto log = chucho::logger::get("postgres_writer_test");
-        log->add_writer(wrt);
+        log->add_writer(std::move(wrt));
         chucho::event evt(log, chucho::level::ERROR_(), "chucho postgres_writer test no mark", __FILE__, __LINE__, __FUNCTION__);
-        wrt->write(evt);
+        auto& pg = dynamic_cast<chucho::postgres_writer&>(log->get_writer("postgres"));
+        pg.write(evt);
         evt = chucho::event(log, chucho::level::INFO_(), "chucho postgres_writer test with mark", __FILE__, __LINE__, __FUNCTION__, "marky");
-        wrt->write(evt);
+        pg.write(evt);
     }
     else
     {

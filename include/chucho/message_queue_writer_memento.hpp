@@ -34,13 +34,13 @@ public:
     message_queue_writer_memento(configurator& cfg);
 
     std::size_t get_coalesce_max() const;
-    std::shared_ptr<compressor> get_compressor() const;
-    std::shared_ptr<serializer> get_serializer() const;
-    virtual void handle(std::shared_ptr<configurable> cnf) override;
+    std::unique_ptr<compressor> get_compressor();
+    std::unique_ptr<serializer> get_serializer();
+    virtual void handle(std::unique_ptr<configurable>&& cnf) override;
 
 private:
-    std::shared_ptr<serializer> serializer_;
-    std::shared_ptr<compressor> compressor_;
+    std::unique_ptr<serializer> serializer_;
+    std::unique_ptr<compressor> compressor_;
     std::size_t coalesce_max_;
 };
 
@@ -49,14 +49,14 @@ inline std::size_t message_queue_writer_memento::get_coalesce_max() const
     return coalesce_max_;
 }
 
-inline std::shared_ptr<compressor> message_queue_writer_memento::get_compressor() const
+inline std::unique_ptr<compressor> message_queue_writer_memento::get_compressor()
 {
-    return compressor_;
+    return std::move(compressor_);
 }
 
-inline std::shared_ptr<serializer> message_queue_writer_memento::get_serializer() const
+inline std::unique_ptr<serializer> message_queue_writer_memento::get_serializer()
 {
-    return serializer_;
+    return std::move(serializer_);
 }
 
 }

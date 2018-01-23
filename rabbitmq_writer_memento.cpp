@@ -15,6 +15,7 @@
  */
 
 #include <chucho/rabbitmq_writer_memento.hpp>
+#include <chucho/rabbitmq_writer.hpp>
 #include <chucho/text_util.hpp>
 #include <chucho/exception.hpp>
 
@@ -25,6 +26,7 @@ rabbitmq_writer_memento::rabbitmq_writer_memento(configurator& cfg)
     : message_queue_writer_memento(cfg)
 {
     set_status_origin("rabbitmq_writer_memento");
+    set_default_name(typeid(rabbitmq_writer));
     set_handler("url", [this] (const std::string& val) { url_ = validate("rabbitmq_writer::url", val); });
     set_handler("exchange", [this] (const std::string& val) { exchange_ = validate("rabbitmq_writer::exchange", val); });
     set_handler("routing_key", [this] (const std::string& val) { routing_key_ = validate("rabbitmq_writer::routing_key", val); });

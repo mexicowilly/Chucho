@@ -21,14 +21,18 @@ namespace chucho
 
 garbage_cleaner::~garbage_cleaner()
 {
-    for (auto cln : cleaners_)
-        cln();
+    std::lock_guard<std::mutex> lg(guard_);
+    while (!cleaners_.empty())
+    {
+        cleaners_.top()();
+        cleaners_.pop();
+    }
 }
 
 void garbage_cleaner::add(cleaner_type cln)
 {
     std::lock_guard<std::mutex> lg(guard_);
-    cleaners_.push_back(cln);
+    cleaners_.push(cln);
 }
 
 garbage_cleaner& garbage_cleaner::get()

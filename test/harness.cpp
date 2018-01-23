@@ -37,12 +37,16 @@ public:
     {
         chucho::configuration::set_allow_default(false);
         observer_.reset(new all_status());
-        chucho::status_manager::get()->add(observer_);
+        chucho::status_manager::get().add(observer_);
     }
 
     virtual void TearDown() override
     {
+        // The SunPro compiler has a bug that causes it to segv
+        // in the destructor of security_policy.
+        #if !defined(__SUNPRO_CC)
         chucho::finalize();
+        #endif
     }
 
 private:

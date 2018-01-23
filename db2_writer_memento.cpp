@@ -15,6 +15,7 @@
  */
 
 #include <chucho/db2_writer_memento.hpp>
+#include <chucho/db2_writer.hpp>
 
 namespace chucho
 {
@@ -23,6 +24,7 @@ db2_writer_memento::db2_writer_memento(configurator& cfg)
     : writer_memento(cfg)
 {
     set_status_origin("db2_writer_memento");
+    set_default_name(typeid(db2_writer));
     cfg.get_security_policy().set_text("db2_writer::database", 128);
     cfg.get_security_policy().set_text("db2_writer::user", 256);
     cfg.get_security_policy().set_text("db2_writer::password", 256);

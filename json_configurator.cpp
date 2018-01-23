@@ -1,11 +1,12 @@
 #include <chucho/json_configurator.hpp>
 #include <cstring>
 #include <algorithm>
+#include <sstream>
 
 namespace chucho
 {
 
-json_configurator::json_configurator(const security_policy& sec_pol)
+json_configurator::json_configurator(security_policy& sec_pol)
     : configurator(sec_pol)
 {
     set_status_origin("json_configurator");
@@ -65,21 +66,21 @@ void json_configurator::configure(std::istream& in)
     }
 }
 
-std::shared_ptr<configurable> json_configurator::create_subobject(const cJSON* json,
+std::unique_ptr<configurable> json_configurator::create_subobject(const cJSON* json,
                                                                   std::shared_ptr<configurable_factory> fact)
 {
     auto facts = get_factories();
-    auto mnto = fact->create_memento(*this);
+    auto mnto = std::move(fact->create_memento(*this));
     while (json != nullptr)
     {
         auto found = facts.find(json->string);
         if (found == facts.end())
             mnto->handle(json->string, value_to_text(json));
         else
-            mnto->handle(create_subobject(json->child, found->second));
+            mnto->handle(std::move(create_subobject(json->child, found->second)));
         json = json->next;
     }
-    return fact->create_configurable(mnto);
+    return std::move(fact->create_configurable(mnto));
 }
 
 std::shared_ptr<configurable_factory> json_configurator::get_factory(const char* const str)

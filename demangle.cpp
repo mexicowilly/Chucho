@@ -47,6 +47,12 @@ std::string get_demangled_name(const std::type_info& info)
     std::string lnm = std::string("_Z") + info.name();
     return (cplus_demangle(lnm.c_str(), buf, sizeof(buf)) == 0) ?
         std::string(buf) : info.name();
+#elif defined(_MSC_VER)
+    std::string result = info.name();
+    auto sp = result.find(' ');
+    if (sp != std::string::npos)
+        result.erase(0, sp + 1);
+    return result;
 #else
     return info.name();
 #endif

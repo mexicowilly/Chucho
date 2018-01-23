@@ -88,7 +88,7 @@ public:
      * 
      * @param cnf the configurable
      */
-    virtual void handle(std::shared_ptr<configurable> cnf);
+    virtual void handle(std::unique_ptr<configurable>&& cnf);
 
 protected:
     /**
@@ -161,7 +161,7 @@ inline std::string memento::validate(const std::string& key, const std::string& 
 template <typename val_type>
 val_type memento::validate(const std::string& key, const val_type& val) const
 {
-    return cfg_.get_security_policy().validate(key, val);
+    return static_cast<val_type>(cfg_.get_security_policy().validate(key, val));
 }
 
 }

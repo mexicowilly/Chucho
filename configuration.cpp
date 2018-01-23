@@ -82,47 +82,13 @@ static_data& data()
     return *sd;
 }
 
-// Not to be confused with the logger_memento class that can only be
-// used during configuration. This struct is like a GoF memento in
-// that is stores state for later reuse.
-class logger_state
-{
-public:
-    logger_state(std::shared_ptr<chucho::logger> lgr)
-        : name_(lgr->get_name()),
-          level_(lgr->get_level()),
-          writers_(lgr->get_writers()),
-          writes_to_ancestors_(lgr->writes_to_ancestors())
-    {
-    }
-
-    void restore(std::shared_ptr<chucho::logger> lgr)
-    {
-        assert(lgr->get_name() == name_);
-        lgr->reset();
-        lgr->set_level(level_);
-        std::for_each(writers_.begin(),
-                      writers_.end(),
-                      [&] (std::shared_ptr<chucho::writer> wrt) { lgr->add_writer(wrt); });
-        lgr->set_writes_to_ancestors(writes_to_ancestors_);
-
-    }
-
-private:
-    std::string name_;
-    std::shared_ptr<chucho::level> level_;
-    std::vector<std::shared_ptr<chucho::writer>> writers_;
-    bool writes_to_ancestors_;
-};
-
 void set_default_config(std::shared_ptr<chucho::logger> root_logger)
 {
-    if (root_logger->get_writers().empty())
+    if (root_logger->get_writer_names().empty())
     {
-        std::shared_ptr<chucho::formatter> fmt(
-            new chucho::pattern_formatter("%d{%H:%M:%S.%q} %-5p %.36c - %m%n"));
-        std::shared_ptr<chucho::writer> wrt(new chucho::cout_writer(fmt));
-        root_logger->add_writer(wrt);
+        auto fmt = std::make_unique<chucho::pattern_formatter>("%d{%H:%M:%S.%q} %-5p %.36c - %m%n");
+        auto wrt = std::make_unique<chucho::cout_writer>("chucho::cout_writer", std::move(fmt));
+        root_logger->add_writer(std::move(wrt));
     }
 }
 
@@ -382,7 +348,7 @@ void configuration::initialize_security_policy()
     // The mementos are where each configurable configures
     // its security policy.
     auto& facts(configurator::get_factories());
-    for (auto fact : facts)
+    for (const auto& fact : facts)
         fact.second->create_memento(cnf);
 
     #endif
@@ -472,21 +438,10 @@ bool configuration::reconfigure()
             else
             {
                 auto loggers = logger::get_existing_loggers();
-                std::vector<logger_state> states;
                 for (auto lgr : loggers)
-                {
-                    states.emplace_back(lgr);
                     lgr->reset();
-                }
                 if (configure_from_file(to_try, report))
-                {
                     result = true;
-                }
-                else
-                {
-                    for (unsigned i = 0; i < loggers.size(); i++)
-                        states[i].restore(loggers[i]);
-                }
             }
         }
         else
@@ -514,22 +469,11 @@ bool configuration::set(const std::string& cfg)
     else
     {
         auto loggers = logger::get_existing_loggers();
-        std::vector<logger_state> states;
         for (auto lgr : loggers)
-        {
-            states.emplace_back(lgr);
             lgr->reset();
-        }
         configurator::initialize();
         if (configure_from_text(cfg, report))
-        {
             result = true;
-        }
-        else
-        {
-            for (unsigned i = 0; i < loggers.size(); i++)
-                states[i].restore(loggers[i]);
-        }
     }
     return result;
 }

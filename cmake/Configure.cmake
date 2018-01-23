@@ -64,8 +64,10 @@ ENDIF()
 MESSAGE(STATUS "Build type -- ${CMAKE_BUILD_TYPE}")
 
 # Standards
-SET(CMAKE_CXX_STANDARD 11)
-SET(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+IF(NOT CMAKE_CXX_COMPILER_ID STREQUAL SunPro)
+    SET(CMAKE_CXX_STANDARD 14)
+    SET(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+ENDIF()
 SET(CMAKE_C_STANDARD 99)
 SET(CMAKE_C_STANDARD_REQUIRED TRUE)
 
@@ -115,16 +117,12 @@ ELSEIF(MSVC)
         SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4275 /EHsc")
     ENDIF()
 ELSEIF(CMAKE_CXX_COMPILER_ID STREQUAL SunPro)
-    IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.14.0)
-        MESSAGE(FATAL_ERROR "CC version 5.14.0 or later is required (the compiler that ships with Solaris Studio 12.5)")
+    IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.15.0)
+        MESSAGE(FATAL_ERROR "CC version 5.15.0 or later is required")
     ENDIF()
-    # CMake is supposed to do this with the standards flags. Jul 15 2017
-    CHECK_CXX_COMPILER_FLAG(-std=c++11 CHUCHO_HAVE_CXX11)
-    IF(CHUCHO_HAVE_CXX11)
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-    ELSE()
-        MESSAGE(FATAL_ERROR "-std=c++11 is required")
-    ENDIF()
+    # Set the flag unconditionally because of weirdness with setting
+    # the CXX standard to 14.
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
     CHECK_CXX_COMPILER_FLAG(-errtags=yes CHUCHO_HAVE_ERRTAGS)
     IF(CHUCHO_HAVE_ERRTAGS)
         SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -errtags=yes")
@@ -733,6 +731,11 @@ ExternalProject_Add(gtest-external
                     ${CHUCHO_GTEST_PACKAGE_ARGS}
                     CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} ${CHUCHO_ADDL_GTEST_CXX_FLAGS}" -DBUILD_GTEST=ON -DBUILD_GMOCK=OFF "-DCMAKE_INSTALL_PREFIX=${CHUCHO_EXTERNAL_PREFIX}" ${CHUCHO_GTEST_CMAKE_FLAGS}
                     CMAKE_GENERATOR "${CHUCHO_GTEST_GENERATOR}")
+IF(MSVC)
+    ExternalProject_Add_Step(gtest-external patch-for-msvc
+                             DEPENDEES download DEPENDERS configure
+                             COMMAND "${CMAKE_COMMAND}" -DFILE_NAME=<SOURCE_DIR>/googletest/cmake/internal_utils.cmake -P "${CMAKE_SOURCE_DIR}/cmake/UpdateGtestForMsvc.cmake")
+ENDIF()
 ADD_LIBRARY(gtest STATIC IMPORTED)
 IF(CHUCHO_WINDOWS)
     SET_TARGET_PROPERTIES(gtest PROPERTIES

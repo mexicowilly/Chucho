@@ -15,6 +15,7 @@
  */
 
 #include <chucho/door_writer_memento.hpp>
+#include <chucho/door_writer.hpp>
 
 namespace chucho
 {
@@ -23,6 +24,7 @@ door_writer_memento::door_writer_memento(configurator& cfg)
     : writer_memento(cfg)
 {
     set_status_origin("door_writer_memento");
+    set_default_name(typeid(door_writer));
     set_handler("file_name", [this] (const std::string& val) { file_name_ = validate("door_writer::file_name", val); });
 }
 

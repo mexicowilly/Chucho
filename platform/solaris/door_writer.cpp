@@ -26,13 +26,14 @@
 namespace chucho
 {
 
-door_writer::door_writer(std::shared_ptr<formatter> fmt,
-                         const std::string& name)
-    : file_writer(fmt, on_start::APPEND, true)
+door_writer::door_writer(const std::string& name,
+                         std::unique_ptr<formatter>&& fmt,
+                         const std::string& file_name)
+    : file_writer(name, std::move(fmt), on_start::APPEND, true)
 {
     set_status_origin("door_writer");
     set_allow_creation(false);
-    open(name);
+    open(file_name);
 }
 
 std::unique_ptr<char> door_writer::create_door_event(const event& evt) const

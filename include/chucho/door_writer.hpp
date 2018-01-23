@@ -43,12 +43,14 @@ public:
      */
     /**
      * Construct a door writer.
-     * 
+     *
+     * @param name the name of this writer
      * @param fmt the formatter
-     * @param name the file to which the door is attached
+     * @param file_name the file to which the door is attached
      */
-    door_writer(std::shared_ptr<formatter> fmt,
-                const std::string& name);
+    door_writer(const std::string& name,
+                std::unique_ptr<formatter>&& fmt,
+                const std::string& file_name);
     /**
      * @}
      */

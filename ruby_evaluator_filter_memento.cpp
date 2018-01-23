@@ -15,14 +15,16 @@
  */
 
 #include <chucho/ruby_evaluator_filter_memento.hpp>
+#include <chucho/ruby_evaluator_filter.hpp>
 
 namespace chucho
 {
 
 ruby_evaluator_filter_memento::ruby_evaluator_filter_memento(configurator& cfg)
-    : memento(cfg)
+    : filter_memento(cfg)
 {
     set_status_origin("ruby_evaluator_filter_memento");
+    set_default_name(typeid(ruby_evaluator_filter));
     set_handler("expression", [this] (const std::string& val) { expression_ = validate("ruby_evaluator_filter::expression", val); });
 }
 

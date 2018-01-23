@@ -50,15 +50,17 @@ public:
      */
     /**
      * Construct a named pipe writer.
-     * 
+     *
+     * @param name the name of this writer
      * @param fmt the formatter
-     * @param name the name of the writer, which can be an unadorned
+     * @param pipe_name the name of the writer, which can be an unadorned
      * name on Windows
      * @param flsh whether to flush the buffer after every event
      * is written
      */
-    named_pipe_writer(std::shared_ptr<formatter> fmt,
-                      const std::string& name,
+    named_pipe_writer(const std::string& name,
+                      std::unique_ptr<formatter>&& fmt,
+                      const std::string& pipe_name,
                       bool flsh = true);
     /**
      * @}

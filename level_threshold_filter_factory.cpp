@@ -29,22 +29,23 @@ level_threshold_filter_factory::level_threshold_filter_factory()
     set_status_origin("level_threshold_filter_factory");
 }
 
-std::shared_ptr<configurable> level_threshold_filter_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> level_threshold_filter_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    assert(dynamic_cast<level_threshold_filter_memento*>(mnto.get()));
-    auto ltfm = std::dynamic_pointer_cast<level_threshold_filter_memento>(mnto);
-    assert(ltfm);
+    auto ltfm = dynamic_cast<level_threshold_filter_memento*>(mnto.get());
+    assert(ltfm != nullptr);
+    if (ltfm->get_name().empty())
+        throw exception("level_threshold_filter_factory: The name must be set");
     if (!ltfm->get_level())
         throw exception("level_threshold_filter_factory: The level must be set");
-    std::shared_ptr<configurable> cnf(new level_threshold_filter(ltfm->get_level()));
+    auto cnf = std::make_unique<level_threshold_filter>(ltfm->get_name(), ltfm->get_level());
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
-    return cnf;
+    return std::move(cnf);
 }
 
-std::shared_ptr<memento> level_threshold_filter_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> level_threshold_filter_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto = std::make_shared<level_threshold_filter_memento>(cfg, get_memento_key_set(cfg));
-    return mnto;
+    auto mnto = std::make_unique<level_threshold_filter_memento>(cfg, get_memento_key_set(cfg));
+    return std::move(mnto);
 }
 
 }

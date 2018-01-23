@@ -139,36 +139,37 @@ public:
 std::string test::TOP_LEVEL_DIR("time_rolling_file_test/");
 bool no_compression = false;
 
-std::shared_ptr<chucho::file_compressor> create_compressor(int min_index)
+std::unique_ptr<chucho::file_compressor> create_compressor(int min_index)
 {
-    std::shared_ptr<chucho::file_compressor> result;
+    std::unique_ptr<chucho::file_compressor> result;
     if (no_compression)
     {
-        result = std::make_shared<chucho::noop_file_compressor>();
+        result = std::make_unique<chucho::noop_file_compressor>();
     }
     else
     {
 #if defined(CHUCHO_HAVE_ZLIB)
-        result = std::make_shared<chucho::gzip_file_compressor>(min_index);
+        result = std::make_unique<chucho::gzip_file_compressor>(min_index);
 #elif defined(CHUCHO_HAVE_BZIP2)
-        result = std::make_shared<chucho::bzip2_file_compressor>(min_index);
+        result = std::make_unique<chucho::bzip2_file_compressor>(min_index);
 #elif defined(CHUCHO_HAVE_LIBARCHIVE)
-        result = std::make_shared<chucho::zip_file_compressor>(min_index);
+        result = std::make_unique<chucho::zip_file_compressor>(min_index);
 #else
-        result = std::make_shared<chucho::noop_file_compressor>();
+        result = std::make_unique<chucho::noop_file_compressor>();
 #endif
     }
-    return result;
+    return std::move(result);
 }
 
 template <typename duration_type>
 test::test(const std::string& pattern,
            std::size_t max_history,
            const duration_type& dur)
-    : writer_(std::shared_ptr<chucho::formatter>(new chucho::pattern_formatter("%m%n")),
-              std::shared_ptr<chucho::file_roller>(new chucho::time_file_roller(TOP_LEVEL_DIR + pattern,
-                                                                                max_history,
-                                                                                create_compressor(max_history)))),
+    : writer_("time",
+              std::move(std::make_unique<chucho::pattern_formatter>("%m%n")),
+              std::move(std::make_unique<chucho::time_file_roller>(TOP_LEVEL_DIR + pattern,
+                                                                   max_history,
+                                                                   std::move(create_compressor(max_history))))),
       next_(std::chrono::system_clock::now()),
       end_(std::chrono::system_clock::now() + dur)
 {
@@ -180,11 +181,12 @@ test::test(const std::string& active,
            const std::string& pattern,
            std::size_t max_history,
            const duration_type& dur)
-    : writer_(std::shared_ptr<chucho::formatter>(new chucho::pattern_formatter("%m%n")),
+    : writer_("time",
+              std::move(std::make_unique<chucho::pattern_formatter>("%m%n")),
               TOP_LEVEL_DIR + active,
-              std::shared_ptr<chucho::file_roller>(new chucho::time_file_roller(TOP_LEVEL_DIR + pattern,
-                                                                                max_history,
-                                                                                create_compressor(max_history)))),
+              std::move(std::make_unique<chucho::time_file_roller>(TOP_LEVEL_DIR + pattern,
+                                                                   max_history,
+                                                                   std::move(create_compressor(max_history))))),
       next_(std::chrono::system_clock::now()),
       end_(std::chrono::system_clock::now() + dur)
 {
@@ -226,7 +228,7 @@ std::string test::format_file_name(const std::string& pattern)
 
 bool test::is_compressing() const
 {
-    return !std::dynamic_pointer_cast<chucho::noop_file_compressor>(writer_.get_file_roller()->get_file_compressor());
+    return dynamic_cast<chucho::noop_file_compressor*>(writer_.get_file_roller().get_file_compressor()) != nullptr;
 }
 
 std::chrono::system_clock::time_point& test::next()

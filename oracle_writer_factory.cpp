@@ -29,11 +29,14 @@ oracle_writer_factory::oracle_writer_factory()
     set_status_origin("oracle_writer_factory");
 }
 
-std::shared_ptr<configurable> oracle_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> oracle_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    auto owm = std::dynamic_pointer_cast<oracle_writer_memento>(mnto);
-    assert(owm);
-    if (!owm->get_formatter())
+    auto owm = dynamic_cast<oracle_writer_memento*>(mnto.get());
+    assert(owm != nullptr);
+    if (owm->get_name().empty())
+        throw exception("oracle_writer_factory: The name is not set");
+    auto fmt = std::move(owm->get_formatter());
+    if (!fmt)
         throw exception("oracle_writer_factory: The writer's formatter is not set");
     if (owm->get_user().empty()) 
         throw exception("oracle_writer_factory: The Oracle user name must be set");
@@ -41,19 +44,20 @@ std::shared_ptr<configurable> oracle_writer_factory::create_configurable(std::sh
         throw exception("oracle_writer_factory: The Oracle user password must be set");
     if (owm->get_database().empty()) 
         throw exception("oracle_writer_factory: The Oracle database name must be set");
-    auto ow = std::make_shared<oracle_writer>(owm->get_formatter(),
+    auto ow = std::make_unique<oracle_writer>(owm->get_name(),
+                                              std::move(fmt),
                                               owm->get_user(),
                                               owm->get_password(),
                                               owm->get_database());
-    set_filters(ow, owm);
+    set_filters(*ow, *owm);
     report_info("Created a " + demangle::get_demangled_name(typeid(*ow)));
-    return ow;
+    return std::move(ow);
 }
 
-std::shared_ptr<memento> oracle_writer_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> oracle_writer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto = std::make_shared<oracle_writer_memento>(cfg);
-    return mnto;
+    std::unique_ptr<memento> mnto = std::make_unique<oracle_writer_memento>(cfg);
+    return std::move(mnto);
 }
 
 }

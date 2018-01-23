@@ -42,13 +42,13 @@ private:
 class async_writer_test : public ::testing::Test
 {
 public:
-    chucho::event get_event(const std::string msg, std::shared_ptr<chucho::level> lvl = chucho::level::INFO_());
-    std::shared_ptr<chucho::async_writer> get_writer(std::chrono::milliseconds millis,
+    chucho::event get_event(const std::string& msg, std::shared_ptr<chucho::level> lvl = chucho::level::INFO_());
+    std::unique_ptr<chucho::async_writer> get_writer(std::chrono::milliseconds millis,
                                                      std::size_t capacity = chucho::async_writer::DEFAULT_QUEUE_CAPACITY);
 };
 
 slow_writer::slow_writer(std::chrono::milliseconds delay)
-    : chucho::writer(std::make_shared<chucho::pattern_formatter>("%m")),
+    : chucho::writer("slow", std::make_unique<chucho::pattern_formatter>("%m")),
       delay_(delay)
 {
 }
@@ -64,7 +64,7 @@ void slow_writer::write_impl(const chucho::event& evt)
     events_.push_back(formatter_->format(evt));
 }
 
-chucho::event async_writer_test::get_event(const std::string msg, std::shared_ptr<chucho::level> lvl)
+chucho::event async_writer_test::get_event(const std::string& msg, std::shared_ptr<chucho::level> lvl)
 {
     return chucho::event(chucho::logger::get("will"),
                          lvl,
@@ -74,12 +74,12 @@ chucho::event async_writer_test::get_event(const std::string msg, std::shared_pt
                          __FUNCTION__);
 }
 
-std::shared_ptr<chucho::async_writer> async_writer_test::get_writer(std::chrono::milliseconds millis,
+std::unique_ptr<chucho::async_writer> async_writer_test::get_writer(std::chrono::milliseconds millis,
                                                                     std::size_t capacity)
 {
-    auto wrt = std::make_shared<slow_writer>(millis);
-    auto as = std::make_shared<chucho::async_writer>(wrt, capacity);
-    return as;
+    auto wrt = std::make_unique<slow_writer>(millis);
+    auto as = std::make_unique<chucho::async_writer>("async", std::move(wrt), capacity);
+    return std::move(as);
 }
 
 }
@@ -92,10 +92,10 @@ TEST_F(async_writer_test, blocking)
     for (int i = 0; i < 20; i++)
         as->write(get_event(std::to_string(i), chucho::level::WARN_()));
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    auto slow = std::dynamic_pointer_cast<slow_writer>(as->get_writer());
-    ASSERT_EQ(20, slow->get_events().size());
+    auto& slow = dynamic_cast<slow_writer&>(as->get_writer());
+    ASSERT_EQ(20, slow.get_events().size());
     for (int i = 0; i < 20; i++)
-        EXPECT_EQ(i, std::stoi(slow->get_events()[i]));
+        EXPECT_EQ(i, std::stoi(slow.get_events()[i]));
 }
 
 TEST_F(async_writer_test, discard)
@@ -111,10 +111,10 @@ TEST_F(async_writer_test, discard)
         as->write(get_event(std::to_string(i), lvl));
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    auto slow = std::dynamic_pointer_cast<slow_writer>(as->get_writer());
-    EXPECT_LT(slow->get_events().size(), 20U);
-    std::cout << "Got " << slow->get_events().size() << " { ";
-    for (auto evt : slow->get_events())
+    auto& slow = dynamic_cast<slow_writer&>(as->get_writer());
+    EXPECT_LT(slow.get_events().size(), 20U);
+    std::cout << "Got " << slow.get_events().size() << " { ";
+    for (auto evt : slow.get_events())
         std::cout << evt << ' ';
     std::cout << '}' << std::endl;
 }
@@ -130,8 +130,8 @@ TEST_F(async_writer_test, slow)
     EXPECT_GT(as->get_queue_size(), 0U);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     EXPECT_EQ(0, as->get_queue_size());
-    auto slow = std::dynamic_pointer_cast<slow_writer>(as->get_writer());
-    ASSERT_EQ(10, slow->get_events().size());
+    auto& slow = dynamic_cast<slow_writer&>(as->get_writer());
+    ASSERT_EQ(10, slow.get_events().size());
     for (int i = 0; i < 10; i++)
-        EXPECT_EQ(i, std::stoi(slow->get_events()[i]));
+        EXPECT_EQ(i, std::stoi(slow.get_events()[i]));
 }

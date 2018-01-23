@@ -21,7 +21,7 @@
 #error "This header is private"
 #endif
 
-#include <chucho/memento.hpp>
+#include <chucho/filter_memento.hpp>
 #include <chucho/filter.hpp>
 #include <chucho/optional.hpp>
 #include <chucho/memento_key_set.hpp>
@@ -29,7 +29,7 @@
 namespace chucho
 {
 
-class level_filter_memento : public memento
+class level_filter_memento : public filter_memento
 {
 public:
     level_filter_memento(configurator& cfg, memento_key_set ks);

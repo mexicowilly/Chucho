@@ -39,7 +39,7 @@ public:
 namespace chucho
 {
 
-yaml_configurator::yaml_configurator(const security_policy& sec_pol)
+yaml_configurator::yaml_configurator(security_policy& sec_pol)
     : configurator(sec_pol)
 {
     set_status_origin("yaml_configurator");
@@ -63,7 +63,8 @@ void yaml_configurator::configure(std::istream& in)
         yaml_node_t* node = yaml_document_get_root_node(&doc);
         if (node == nullptr)
             break;
-        handle(doc, *node, 1, std::string(), std::shared_ptr<memento>());
+        auto mnto = std::unique_ptr<memento>();
+        handle(doc, *node, 1, std::string(), mnto);
     }
 }
 
@@ -117,7 +118,7 @@ void yaml_configurator::handle(yaml_document_t& doc,
                                const yaml_node_t& node,
                                int level,
                                const std::string& key,
-                               std::shared_ptr<memento> mnto)
+                               std::unique_ptr<memento>& mnto)
 {
     try
     {
@@ -141,7 +142,8 @@ void yaml_configurator::handle(yaml_document_t& doc,
                 }
                 else
                 {
-                    mnto->handle(found->second->create_configurable(found->second->create_memento(*this)));
+                    auto mnto2 = found->second->create_memento(*this);
+                    mnto->handle(std::move(found->second->create_configurable(mnto2)));
                 }
             }
             else if (configuration::get_unknown_handler() && !key.empty())
@@ -175,7 +177,7 @@ void yaml_configurator::handle(yaml_document_t& doc,
                                 // then the only nodes we can deal with are scalar mapped
                                 // values.
                                 if (val->type == YAML_SCALAR_NODE)
-                                    handle(doc, *val, level + 1, key, mnto); 
+                                    handle(doc, *val, level + 1, key, mnto);
                                 else
                                     report_error("Unknown YAML mapping: " + key);
                             }
@@ -183,17 +185,17 @@ void yaml_configurator::handle(yaml_document_t& doc,
                             {
                                 // If there is no memento, then this is an unknown, which
                                 // we'll handle properly in the scalar block.
-                                handle(doc, *val, level + 1, key, mnto); 
+                                handle(doc, *val, level + 1, key, mnto);
                             }
                         }
                         else
                         {
-                            std::shared_ptr<memento> sub = found->second->create_memento(*this);
+                            auto sub = found->second->create_memento(*this);
                             // pass empty key here because we've just consumed the key
                             handle(doc, *yaml_document_get_node(&doc, p->value), level + 1, "", sub);
                             auto cnf = found->second->create_configurable(sub);
                             if (mnto)
-                                mnto->handle(cnf);
+                                mnto->handle(std::move(cnf));
                         }
                     }
                 }

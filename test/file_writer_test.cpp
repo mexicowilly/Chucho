@@ -36,7 +36,7 @@ public:
         : file_name_("file_writer_test")
     {
         chucho::file::remove(file_name_);
-        chucho::status_manager::get()->clear();
+        chucho::status_manager::get().clear();
     }
 
     ~file_writer_test()
@@ -44,11 +44,11 @@ public:
         chucho::file::remove(file_name_);
     }
 
-    std::shared_ptr<chucho::file_writer> get_writer(chucho::file_writer::on_start start = chucho::file_writer::on_start::APPEND)
+    std::unique_ptr<chucho::file_writer> get_writer(chucho::file_writer::on_start start = chucho::file_writer::on_start::APPEND)
     {
-        std::shared_ptr<chucho::formatter> f = std::make_shared<chucho::pattern_formatter>("%m%n");
-        std::shared_ptr<chucho::file_writer> w = std::make_shared<chucho::file_writer>(f, file_name_, start);
-        return w;
+        auto f = std::make_unique<chucho::pattern_formatter>("%m%n");
+        auto w = std::make_unique<chucho::file_writer>("fw", std::move(f), file_name_, start);
+        return std::move(w);
     }
 
 protected:
@@ -95,14 +95,14 @@ TEST_F(file_writer_test, error)
 {
     chucho::file::create_directory(file_name_);
     get_writer();
-    EXPECT_EQ(1, chucho::status_manager::get()->get_count());
+    EXPECT_EQ(1, chucho::status_manager::get().get_count());
     chucho::file::remove(file_name_);
 }
 
 TEST_F(file_writer_test, open)
 {
     auto w = get_writer();
-    EXPECT_EQ(0, chucho::status_manager::get()->get_count());
+    EXPECT_EQ(0, chucho::status_manager::get().get_count());
     EXPECT_EQ(file_name_, w->get_file_name());
     EXPECT_EQ(file_name_, w->get_initial_file_name());
 }
@@ -113,11 +113,11 @@ TEST_F(file_writer_test, truncate)
     stream << "hello";
     stream.close();
     auto w = get_writer();
-    ASSERT_EQ(0, chucho::status_manager::get()->get_count());
+    ASSERT_EQ(0, chucho::status_manager::get().get_count());
     w.reset();
     EXPECT_EQ(5, chucho::file::size(file_name_));
     w = get_writer(chucho::file_writer::on_start::TRUNCATE);
-    ASSERT_EQ(0, chucho::status_manager::get()->get_count());
+    ASSERT_EQ(0, chucho::status_manager::get().get_count());
     w.reset();
     EXPECT_EQ(0, chucho::file::size(file_name_));
 }
@@ -125,7 +125,7 @@ TEST_F(file_writer_test, truncate)
 TEST_F(file_writer_test, write)
 {
     auto w = get_writer();
-    EXPECT_EQ(0, chucho::status_manager::get()->get_count());
+    EXPECT_EQ(0, chucho::status_manager::get().get_count());
     std::shared_ptr<chucho::logger> log = chucho::logger::get("file_writer_test");
     chucho::event evt(log, chucho::level::INFO_(), "hello", __FILE__, __LINE__, __FUNCTION__);
     w->write(evt);
@@ -151,7 +151,7 @@ TEST_F(file_writer_test, write)
 TEST_F(file_writer_test, writeable_non_writeable)
 {
     auto w = get_writer();
-    ASSERT_EQ(0, chucho::status_manager::get()->get_count());
+    ASSERT_EQ(0, chucho::status_manager::get().get_count());
     std::shared_ptr<chucho::logger> log = chucho::logger::get("file_writer_test");
     chucho::event evt(log, chucho::level::INFO_(), "hello", __FILE__, __LINE__, __FUNCTION__);
     w->write(evt);
@@ -159,12 +159,12 @@ TEST_F(file_writer_test, writeable_non_writeable)
     make_unwriteable(file_name_);
     std::this_thread::sleep_for(std::chrono::seconds(4));
     w->write(evt);
-    EXPECT_EQ(2, chucho::status_manager::get()->get_count());
+    EXPECT_EQ(2, chucho::status_manager::get().get_count());
     EXPECT_EQ(sz, chucho::file::size(file_name_));
     make_writeable(file_name_);
     std::this_thread::sleep_for(std::chrono::seconds(4));
     w->write(evt);
-    EXPECT_EQ(4, chucho::status_manager::get()->get_count());
+    EXPECT_EQ(4, chucho::status_manager::get().get_count());
     EXPECT_GT(chucho::file::size(file_name_), sz);
 }
 
@@ -173,7 +173,7 @@ TEST_F(file_writer_test, writeable_non_writeable)
 TEST_F(file_writer_test, writeable_removed)
 {
     auto w = get_writer();
-    ASSERT_EQ(0, chucho::status_manager::get()->get_count());
+    ASSERT_EQ(0, chucho::status_manager::get().get_count());
     std::shared_ptr<chucho::logger> log = chucho::logger::get("file_writer_test");
     chucho::event evt(log, chucho::level::INFO_(), "hello", __FILE__, __LINE__, __FUNCTION__);
     w->write(evt);

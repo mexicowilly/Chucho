@@ -44,66 +44,66 @@ private:
 
 TEST_F(ruby_evaluator_filter_test, file_name)
 {
-    chucho::ruby_evaluator_filter f1("$file_name.instance_of? String");
+    chucho::ruby_evaluator_filter f1("ruby", "$file_name.instance_of? String");
     EXPECT_EQ(chucho::filter::result::NEUTRAL, f1.evaluate(get_event("one")));
-    chucho::ruby_evaluator_filter f2(std::string("$file_name == '") + __FILE__ + "'");
+    chucho::ruby_evaluator_filter f2("ruby", std::string("$file_name == '") + __FILE__ + "'");
     EXPECT_EQ(chucho::filter::result::NEUTRAL, f2.evaluate(get_event("two")));
 }
 
 TEST_F(ruby_evaluator_filter_test, function_name)
 {
-    chucho::ruby_evaluator_filter f1("$function_name.instance_of? String");
+    chucho::ruby_evaluator_filter f1("ruby", "$function_name.instance_of? String");
     EXPECT_EQ(chucho::filter::result::NEUTRAL, f1.evaluate(get_event("one")));
-    chucho::ruby_evaluator_filter f2("$function_name == 'monkey'");
+    chucho::ruby_evaluator_filter f2("ruby", "$function_name == 'monkey'");
     EXPECT_EQ(chucho::filter::result::NEUTRAL, f2.evaluate(get_event("two")));
 }
 
 TEST_F(ruby_evaluator_filter_test, level)
 {
-    chucho::ruby_evaluator_filter f1("$level.instance_of? String");
+    chucho::ruby_evaluator_filter f1("ruby", "$level.instance_of? String");
     EXPECT_EQ(chucho::filter::result::NEUTRAL, f1.evaluate(get_event("one")));
-    chucho::ruby_evaluator_filter f2("$level == 'INFO'");
+    chucho::ruby_evaluator_filter f2("ruby", "$level == 'INFO'");
     EXPECT_EQ(chucho::filter::result::NEUTRAL, f2.evaluate(get_event("two")));
 }
 
 TEST_F(ruby_evaluator_filter_test, line_number)
 {
-    chucho::ruby_evaluator_filter f1("$line_number.instance_of? Fixnum");
+    chucho::ruby_evaluator_filter f1("ruby", "$line_number.instance_of? Fixnum");
     EXPECT_EQ(chucho::filter::result::NEUTRAL, f1.evaluate(get_event("one")));
-    chucho::ruby_evaluator_filter f2("$line_number == 36");
+    chucho::ruby_evaluator_filter f2("ruby", "$line_number == 36");
     EXPECT_EQ(chucho::filter::result::NEUTRAL, f2.evaluate(get_event("two")));
 }
 
 TEST_F(ruby_evaluator_filter_test, logger)
 {
-    chucho::ruby_evaluator_filter f1("$logger.instance_of? String");
+    chucho::ruby_evaluator_filter f1("ruby", "$logger.instance_of? String");
     EXPECT_EQ(chucho::filter::result::NEUTRAL, f1.evaluate(get_event("one")));
-    chucho::ruby_evaluator_filter f2("$logger == 'ruby_evaluator_filter_test'");
+    chucho::ruby_evaluator_filter f2("ruby", "$logger == 'ruby_evaluator_filter_test'");
     EXPECT_EQ(chucho::filter::result::NEUTRAL, f2.evaluate(get_event("two")));
 }
 
 TEST_F(ruby_evaluator_filter_test, marker)
 {
-    chucho::ruby_evaluator_filter f1("$marker.instance_of? String");
+    chucho::ruby_evaluator_filter f1("ruby", "$marker.instance_of? String");
     EXPECT_EQ(chucho::filter::result::NEUTRAL, f1.evaluate(get_event("one")));
-    chucho::ruby_evaluator_filter f2("$marker == 'marky'");
+    chucho::ruby_evaluator_filter f2("ruby", "$marker == 'marky'");
     EXPECT_EQ(chucho::filter::result::NEUTRAL, f2.evaluate(get_event("two")));
 }
 
 TEST_F(ruby_evaluator_filter_test, message)
 {
-    chucho::ruby_evaluator_filter f1("$message.instance_of? String");
+    chucho::ruby_evaluator_filter f1("ruby", "$message.instance_of? String");
     EXPECT_EQ(chucho::filter::result::NEUTRAL, f1.evaluate(get_event("one")));
-    chucho::ruby_evaluator_filter f2("$message == 'two'");
+    chucho::ruby_evaluator_filter f2("ruby", "$message == 'two'");
     EXPECT_EQ(chucho::filter::result::NEUTRAL, f2.evaluate(get_event("two")));
 }
 
 TEST_F(ruby_evaluator_filter_test, timestamp)
 {
-    chucho::ruby_evaluator_filter f1("$timestamp.instance_of? Time");
+    chucho::ruby_evaluator_filter f1("ruby", "$timestamp.instance_of? Time");
     EXPECT_EQ(chucho::filter::result::NEUTRAL, f1.evaluate(get_event("one")));
     auto evt = get_event("two");
     auto secs = chucho::event::clock_type::to_time_t(evt.get_time());
-    chucho::ruby_evaluator_filter f2("$timestamp.to_i == " + std::to_string(secs));
+    chucho::ruby_evaluator_filter f2("ruby", "$timestamp.to_i == " + std::to_string(secs));
     EXPECT_EQ(chucho::filter::result::NEUTRAL, f2.evaluate(evt));
 }
