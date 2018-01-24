@@ -93,10 +93,10 @@ struct pieces;
  *         href="http://en.cppreference.com/w/cpp/io/manip/put_time">std::put_time()</a>,
  *         which is very similar to the specifications used by
  *         the C function strftime(). A key difference is that
- *         the token "%q" may be used to insert the number of
- *         milliseconds. This is added due to the fact that <a
+ *         the tokens "%q" and "%Q% may be used to insert the number of
+ *         milliseconds or microseconds, respectively. This is added due to the fact that <a
  *         href="http://en.cppreference.com/w/cpp/io/manip/put_time">std::put_time()</a>
- *         does not support milliseconds.
+ *         does not support milliseconds or microseconds.
  *  
  *         If the spec argument is omitted, then a
  *         default of "%Y-%m-%d %H:%M:%S" will be
@@ -109,12 +109,11 @@ struct pieces;
  *         href="http://en.cppreference.com/w/cpp/io/manip/put_time">std::put_time()</a>,
  *         which is very similar to the specifications used by
  *         the C function strftime(). A key difference is that
- *         the token "%q" may be used to insert the number of
- *         milliseconds. This is added due to the fact that
- *         <a
+ *         the tokens "%q" and "%Q% may be used to insert the number of
+ *         milliseconds or microseconds, respectively. This is added due to the fact that <a
  *         href="http://en.cppreference.com/w/cpp/io/manip/put_time">std::put_time()</a>
- *         does not support milliseconds.
- *  
+ *         does not support milliseconds or microseconds.
+ *
  *         If the spec argument is omitted, then a
  *         default of "%Y-%m-%d %H:%M:%S" will be
  *         used.</td></tr>
