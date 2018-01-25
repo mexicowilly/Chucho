@@ -19,7 +19,6 @@
 #include <chucho/calendar.hpp>
 #include <chucho/file.hpp>
 #include <chucho/exception.hpp>
-#include <chucho/clock_util.hpp>
 #include <chucho/marker.hpp>
 #include <chucho/diagnostic_context.hpp>
 #include <chucho/line_ending.hpp>
@@ -31,6 +30,7 @@
 #include <thread>
 #include <cstdio>
 #include <iomanip>
+#include <algorithm>
 
 namespace
 {
@@ -372,38 +372,49 @@ pattern_formatter::date_time_piece::date_time_piece(const std::string& date_patt
     : piece(params),
       date_pattern_(date_pattern)
 {
-    std::size_t pos = date_pattern.rfind("%q");
-    while (pos != std::string::npos)
+    enum class state
     {
-        if (pos == 0 || date_pattern[pos - 1] != '%')
-            milli_positions_.push_back(pos);
-        if (pos == 0)
-            break;
-        pos = date_pattern.rfind("%q", pos - 1);
+        NORMAL,
+        PERCENT
+    };
+    auto st = state::NORMAL;
+    for (std::size_t i = 0; i < date_pattern.length(); i++)
+    {
+        if (st == state::NORMAL)
+        {
+            if (date_pattern[i] == '%')
+                st = state::PERCENT;
+        }
+        else if (st == state::PERCENT)
+        {
+            if (date_pattern[i] == 'q')
+                frac_positions_.emplace_back(frac_type::MILLI, i - 1);
+            else if (date_pattern[i] == 'Q')
+                frac_positions_.emplace_back(frac_type::MICRO, i - 1);
+            st = state::NORMAL;
+        }
     }
+    std::reverse(frac_positions_.begin(), frac_positions_.end());
 }
 
 std::string pattern_formatter::date_time_piece::get_text_impl(const event& evt) const
 {
-    auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(evt.get_time().time_since_epoch());
+    auto micros = std::chrono::duration_cast<std::chrono::microseconds>(evt.get_time().time_since_epoch());
     std::string pat = date_pattern_;
-    if (!milli_positions_.empty())
+    if (!frac_positions_.empty())
     {
-        if (clock_util::system_clock_supports_milliseconds)
-        {
-            std::ostringstream stream;
-            stream << std::setw(3) << std::setfill('0') << (millis.count() % 1000);
-            for (std::size_t p : milli_positions_)
-                pat.replace(p, 2, stream.str());
-        }
-        else
-        {
-            for (std::size_t p : milli_positions_)
-                pat.replace(p, 2, "");
-        }
+        std::ostringstream stream;
+        stream << std::setfill('0');
+        stream << std::setw(3) << ((micros.count() / 1000) % 1000);
+        auto milli_str = stream.str();
+        stream.str("");
+        stream << std::setw(6) << (micros.count() % 1000000);
+        auto micro_str = stream.str();
+        for (const auto& t : frac_positions_)
+            pat.replace(std::get<1>(t), 2, (std::get<0>(t) == frac_type::MILLI) ? milli_str : micro_str);
     }
     calendar::pieces cal;
-    to_calendar(millis.count() / 1000, cal);
+    to_calendar(micros.count() / 1000000, cal);
     return calendar::format(cal, pat);
 }
 

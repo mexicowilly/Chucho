@@ -22,7 +22,7 @@ ENDIF()
 PROJECT(chucho CXX C)
 
 SET(CHUCHO_MAJOR_VERSION 1)
-SET(CHUCHO_MINOR_VERSION 11)
+SET(CHUCHO_MINOR_VERSION 12)
 SET(CHUCHO_VERSION ${CHUCHO_MAJOR_VERSION}.${CHUCHO_MINOR_VERSION})
 
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -878,7 +878,6 @@ SET(CHUCHO_SOURCES
     bzip2_file_compressor_factory.cpp
     calendar.cpp
     cerr_writer_factory.cpp
-    clock_util.cpp
     configurable.cpp
     configurable_factory.cpp
     configuration.cpp
@@ -981,7 +980,6 @@ SET(CHUCHO_SOURCES
     include/chucho/bzip2_file_compressor_factory.hpp
     include/chucho/calendar.hpp
     include/chucho/cerr_writer_factory.hpp
-    include/chucho/clock_util.hpp
     include/chucho/configurator.hpp
     include/chucho/cout_writer_factory.hpp
     include/chucho/demangle.hpp

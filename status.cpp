@@ -17,7 +17,6 @@
 #include <chucho/status.hpp>
 #include <chucho/calendar.hpp>
 #include <chucho/exception.hpp>
-#include <chucho/clock_util.hpp>
 #include <sstream>
 #include <iomanip>
 
@@ -38,21 +37,12 @@ status::status(level lvl,
 
 std::ostream& operator<< (std::ostream& stream, const status& st)
 {
-    if (clock_util::system_clock_supports_milliseconds)
-    {
-        auto since = st.time_.time_since_epoch();
-        auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(since);
-        std::ostringstream fmt_stream;
-        fmt_stream << "%H.%M.%S." << (millis.count() % 1000);
-        calendar::pieces cal = calendar::get_utc(millis.count() / 1000);
-        stream << calendar::format(cal, fmt_stream.str());
-    }
-    else
-    {
-        calendar::pieces cal = calendar::get_utc(status::clock_type::to_time_t(st.time_));
-        stream << calendar::format(cal, "%H:%M:%S");
-
-    }
+    auto since = st.time_.time_since_epoch();
+    auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(since);
+    std::ostringstream fmt_stream;
+    fmt_stream << "%H.%M.%S." << (millis.count() % 1000);
+    calendar::pieces cal = calendar::get_utc(millis.count() / 1000);
+    stream << calendar::format(cal, fmt_stream.str());
     stream << ' ';
     if (st.level_ == status::level::INFO_)
         stream << "INFO";
