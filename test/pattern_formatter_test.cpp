@@ -65,34 +65,10 @@ TEST_F(pattern_formatter_test, base_file)
     EXPECT_STREQ("two", f.format(evt_).c_str());
 }
 
-TEST_F(pattern_formatter_test, logger)
+TEST_F(pattern_formatter_test, base_host)
 {
-    chucho::pattern_formatter f("%c");
-    EXPECT_STREQ("pattern logger", f.format(evt_).c_str());
-}
-
-TEST_F(pattern_formatter_test, full_file)
-{
-    chucho::pattern_formatter f("%F");
-    EXPECT_STREQ(file_name, f.format(evt_).c_str());
-}
-
-TEST_F(pattern_formatter_test, line_number)
-{
-    chucho::pattern_formatter f("%L");
-    EXPECT_STREQ("10", f.format(evt_).c_str());
-}
-
-TEST_F(pattern_formatter_test, message)
-{
-    chucho::pattern_formatter f("%m");
-    EXPECT_STREQ("hi", f.format(evt_).c_str());
-}
-
-TEST_F(pattern_formatter_test, function)
-{
-    chucho::pattern_formatter f("%M");
-    EXPECT_STREQ("dowdy", f.format(evt_).c_str());
+    chucho::pattern_formatter f("%h");
+    EXPECT_EQ(chucho::host::get_base_name(), f.format(evt_));
 }
 
 TEST_F(pattern_formatter_test, end_of_line)
@@ -101,10 +77,82 @@ TEST_F(pattern_formatter_test, end_of_line)
     EXPECT_STREQ(chucho::line_ending::EOL, f.format(evt_).c_str());
 }
 
+TEST_F(pattern_formatter_test, full_file)
+{
+    chucho::pattern_formatter f("%F");
+    EXPECT_STREQ(file_name, f.format(evt_).c_str());
+}
+
+TEST_F(pattern_formatter_test, full_host)
+{
+    chucho::pattern_formatter f("%H");
+    EXPECT_EQ(chucho::host::get_full_name(), f.format(evt_));
+}
+
+TEST_F(pattern_formatter_test, function)
+{
+    chucho::pattern_formatter f("%M");
+    EXPECT_STREQ("dowdy", f.format(evt_).c_str());
+}
+
 TEST_F(pattern_formatter_test, level)
 {
     chucho::pattern_formatter f("%p");
     EXPECT_STREQ("INFO", f.format(evt_).c_str());
+}
+
+TEST_F(pattern_formatter_test, line_number)
+{
+    chucho::pattern_formatter f("%L");
+    EXPECT_STREQ("10", f.format(evt_).c_str());
+}
+
+TEST_F(pattern_formatter_test, local_date_time)
+{
+    chucho::pattern_formatter f("%D");
+    std::time_t secs = std::chrono::duration_cast<std::chrono::seconds>(evt_.get_time().time_since_epoch()).count();
+    chucho::calendar::pieces cal = *std::localtime(&secs);
+    cal.is_utc = false;
+    EXPECT_EQ(chucho::calendar::format(cal, "%Y-%m-%d %H:%M:%S"), f.format(evt_));
+    f = chucho::pattern_formatter("%D{%Y}");
+    EXPECT_EQ(chucho::calendar::format(cal, "%Y"), f.format(evt_));
+}
+
+TEST_F(pattern_formatter_test, logger)
+{
+    chucho::pattern_formatter f("%c");
+    EXPECT_STREQ("pattern logger", f.format(evt_).c_str());
+}
+
+TEST_F(pattern_formatter_test, message)
+{
+    chucho::pattern_formatter f("%m");
+    EXPECT_STREQ("hi", f.format(evt_).c_str());
+}
+
+TEST_F(pattern_formatter_test, microseconds)
+{
+    chucho::pattern_formatter f("%d{%Q}");
+    auto micros = std::chrono::duration_cast<std::chrono::microseconds>(evt_.get_time().time_since_epoch()).count() % 1000000;
+    auto fmt = f.format(evt_);
+    std::ostringstream stream;
+    stream << std::setfill('0') << std::setw(6) << micros;
+    EXPECT_EQ(stream.str(), fmt);
+    f = chucho::pattern_formatter("%d{-%Q%%Qdoggy%%Q%%%Q}");
+    fmt = f.format(evt_);
+    stream.str("");
+    stream << std::setfill('0') << '-' << std::setw(6) << micros << "%Qdoggy%Q%" << std::setw(6) << micros;
+    EXPECT_EQ(stream.str(), fmt);
+}
+
+TEST_F(pattern_formatter_test, milliseconds)
+{
+    chucho::pattern_formatter f("%d{%q}");
+    auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(evt_.get_time().time_since_epoch());
+    auto fmt = f.format(evt_);
+    std::ostringstream stream;
+    stream << std::setfill('0') << std::setw(3) << (millis.count() % 1000);
+    EXPECT_EQ(stream.str(), fmt);
 }
 
 TEST_F(pattern_formatter_test, pid)
@@ -116,18 +164,6 @@ TEST_F(pattern_formatter_test, pid)
     #endif
     chucho::pattern_formatter f("%i");
     EXPECT_EQ(std::to_string(p), f.format(evt_));
-}
-
-TEST_F(pattern_formatter_test, base_host)
-{
-    chucho::pattern_formatter f("%h");
-    EXPECT_EQ(chucho::host::get_base_name(), f.format(evt_));
-}
-
-TEST_F(pattern_formatter_test, full_host)
-{
-    chucho::pattern_formatter f("%H");
-    EXPECT_EQ(chucho::host::get_full_name(), f.format(evt_));
 }
 
 TEST_F(pattern_formatter_test, thread)
@@ -146,17 +182,6 @@ TEST_F(pattern_formatter_test, utc_date_time)
     cal.is_utc = true;
     EXPECT_EQ(chucho::calendar::format(cal, "%Y-%m-%d %H:%M:%S"), f.format(evt_));
     f = chucho::pattern_formatter("%d{%Y}");
-    EXPECT_EQ(chucho::calendar::format(cal, "%Y"), f.format(evt_));
-}
-
-TEST_F(pattern_formatter_test, local_date_time)
-{
-    chucho::pattern_formatter f("%D");
-    std::time_t secs = std::chrono::duration_cast<std::chrono::seconds>(evt_.get_time().time_since_epoch()).count();
-    chucho::calendar::pieces cal = *std::localtime(&secs);
-    cal.is_utc = false;
-    EXPECT_EQ(chucho::calendar::format(cal, "%Y-%m-%d %H:%M:%S"), f.format(evt_));
-    f = chucho::pattern_formatter("%D{%Y}");
     EXPECT_EQ(chucho::calendar::format(cal, "%Y"), f.format(evt_));
 }
 
