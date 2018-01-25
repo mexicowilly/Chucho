@@ -93,7 +93,7 @@ struct pieces;
  *         href="http://en.cppreference.com/w/cpp/io/manip/put_time">std::put_time()</a>,
  *         which is very similar to the specifications used by
  *         the C function strftime(). A key difference is that
- *         the tokens "%q" and "%Q% may be used to insert the number of
+ *         the tokens "%q" and "%Q" may be used to insert the number of
  *         milliseconds or microseconds, respectively. This is added due to the fact that <a
  *         href="http://en.cppreference.com/w/cpp/io/manip/put_time">std::put_time()</a>
  *         does not support milliseconds or microseconds.
@@ -109,7 +109,7 @@ struct pieces;
  *         href="http://en.cppreference.com/w/cpp/io/manip/put_time">std::put_time()</a>,
  *         which is very similar to the specifications used by
  *         the C function strftime(). A key difference is that
- *         the tokens "%q" and "%Q% may be used to insert the number of
+ *         the tokens "%q" and "%Q" may be used to insert the number of
  *         milliseconds or microseconds, respectively. This is added due to the fact that <a
  *         href="http://en.cppreference.com/w/cpp/io/manip/put_time">std::put_time()</a>
  *         does not support milliseconds or microseconds.
