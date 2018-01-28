@@ -166,9 +166,6 @@ ELSE()
 ENDIF()
 MAKE_DIRECTORY("${CMAKE_BINARY_DIR}/chucho")
 CONFIGURE_FILE(include/chucho/export.hpp.in "${CMAKE_BINARY_DIR}/chucho/export.hpp")
-IF(C_API)
-    CONFIGURE_FILE(include/chucho/export.hpp.in "${CMAKE_BINARY_DIR}/chucho/export.h")
-ENDIF()
 
 # Configure our version header
 STRING(REGEX REPLACE "^([0-9]+)\\..+$" "\\1" CHUCHO_VERSION_MAJOR ${CHUCHO_VERSION})
@@ -447,91 +444,6 @@ ENDIF()
 
 # assert
 CHUCHO_REQUIRE_SYMBOLS(assert.h assert)
-
-# C API required stuff
-IF(C_API)
-    CHECK_C_SOURCE_COMPILES("
-#include <stdio.h>
-#define VA_CHK(...) printf(__VA_ARGS__)
-int main()
-{
-    VA_CHK(\"%s\", \"hello\");
-    return 0;
-}" CHUCHO_HAVE_VA_MACRO)
-    IF(NOT CHUCHO_HAVE_VA_MACRO)
-        MESSAGE(FATAL_ERROR "C macros with variadic arguments are required (standard C99)")
-    ENDIF()
-
-    # C headers
-    # (we already checked for stdlib.h)
-    FOREACH(HEAD stdio.h string.h)
-        CHECK_INCLUDE_FILE(${HEAD} HAVE_${HEAD})
-        IF (NOT HAVE_${HEAD})
-            MESSAGE(FATAL_ERROR "${HEAD} is required")
-        ENDIF()
-    ENDFOREACH()
-
-    # fopen/fgets/fclose/remove
-    CHUCHO_REQUIRE_C_SYMBOLS(stdio.h fopen fgets fclose remove fwrite)
-
-    # strdup/strstr/strcmp
-    CHUCHO_REQUIRE_C_SYMBOLS(string.h strstr strcmp strlen strcpy strcat)
-
-    # calloc/free/malloc
-    CHUCHO_REQUIRE_C_SYMBOLS(stdlib.h calloc free malloc)
-
-    # On Solaris we don't get the transitive linkage
-    # to the C++ runtime when linking a C program against a Chucho
-    # shared object. So, we need to figure out where the C++
-    # runtime is and add it to the target link libraries of the
-    # C unit test app.
-    IF(C_API AND ENABLE_SHARED AND CHUCHO_SOLARIS AND NOT DEFINED CHUCHO_STD_CXX_LIBS)
-        CHUCHO_FIND_PROGRAM(CHUCHO_LDD ldd)
-        IF(NOT CHUCHO_LDD)
-            MESSAGE(FATAL_ERROR "Could not find ldd")
-        ENDIF()
-        MESSAGE(STATUS "Looking for standard C++ libraries")
-        FILE(WRITE "${CMAKE_BINARY_DIR}/libstdc++-check.cpp"
-             "#include <string>\nint main() { std::string s; return 0; }")
-        TRY_COMPILE(CHUCHO_CXX_RESULT
-                    "${CMAKE_BINARY_DIR}/libstdc++-check.out"
-                    "${CMAKE_BINARY_DIR}/libstdc++-check.cpp"
-                    COPY_FILE "${CMAKE_BINARY_DIR}/libstdc++-check")
-        IF(NOT CHUCHO_CXX_RESULT)
-            MESSAGE(FATAL_ERROR "Could not compile the program to find libstdc++")
-        ENDIF()
-        EXECUTE_PROCESS(COMMAND "${CHUCHO_LDD}" "${CMAKE_BINARY_DIR}/libstdc++-check"
-                        RESULT_VARIABLE CHUCHO_LDD_RESULT
-                        OUTPUT_VARIABLE CHUCHO_LDD_OUTPUT)
-        IF(NOT CHUCHO_LDD_RESULT EQUAL 0)
-            MESSAGE(FATAL_ERROR "Error running ldd to find libstdc++")
-        ENDIF()
-        FILE(WRITE "${CMAKE_BINARY_DIR}/libstdc++-check-ldd.out"
-             "${CHUCHO_LDD_OUTPUT}")
-        FILE(STRINGS "${CMAKE_BINARY_DIR}/libstdc++-check-ldd.out" CHUCHO_LDD_OUTPUT)
-        FOREACH(LINE ${CHUCHO_LDD_OUTPUT})
-            IF(LINE MATCHES libstdc)
-                STRING(REGEX REPLACE
-                       "^.+=>[ \\\t]*(.+libstdc.+)$"
-                       "\\1"
-                       CHUCHO_LIBSTDCXX
-                       "${LINE}")
-            ENDIF()
-            IF(LINE MATCHES libCrun)
-                STRING(REGEX REPLACE
-                       "^.+=>[ \\\t]*(.+libCrun.+)$"
-                       "\\1"
-                       CHUCHO_LIBCRUN
-                       "${LINE}")
-            ENDIF()
-        ENDFOREACH()
-        SET(CHUCHO_STD_CXX_LIBS ${CHUCHO_LIBSTDCXX} ${CHUCHO_LIBCRUN} CACHE INTERNAL "The location of the stdandard C++ runtime library")
-        IF(NOT CHUCHO_STD_CXX_LIBS)
-            MESSAGE(WARNING "Could not determine the location of stdandard C++ runtime libraries. The C unit tests cannot be built.")
-        ENDIF()
-        MESSAGE(STATUS "Looking for standard C++ libraries - ${CHUCHO_STD_CXX_LIBS}")
-    ENDIF()
-ENDIF()
 
 # Things Chucho may or may not depend on
 CHUCHO_FIND_PACKAGE(CURL)

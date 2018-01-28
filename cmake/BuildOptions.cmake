@@ -63,19 +63,6 @@ OPTION(ENABLE_SHARED "Whether to build a shared object" OFF)
 
 OPTION(ENABLE_FRAMEWORK "Whether to build as a framework on Macintosh" ON)
 
-# Whether to install the Chucho server, chuchod, as a service on systems that
-# support system services. The operating systems on which the build system knows
-# how to install a service include Windows, Linux, Macintosh and FreeBSD. The
-# service installation may succeed on other systems, but they are untested.
-
-OPTION(INSTALL_SERVICE "Whether to install chuchod as a system service" OFF)
-
-# Whether to build the C API. Chucho supports a C99 interface if your program is
-# written in C or you are using a compiler that cannot understand C++11. This is
-# normally disabled, as it will increase the size of the Chucho library
-# significantly.
-
-OPTION(C_API "Whether the C API should be built into this Chucho" OFF)
 
 # Whether to use libstdc++ when compiling with Clang.
 OPTION(CLANG_LIBSTDCXX "Whether to use libstdc++ with the Clang compiler" OFF)
