@@ -28,7 +28,6 @@
 #include <chucho/time_file_roller.hpp>
 #include <chucho/duplicate_message_filter.hpp>
 #include <chucho/syslog_writer.hpp>
-#include <chucho/remote_writer.hpp>
 #include <chucho/noop_file_compressor.hpp>
 #if defined(CHUCHO_HAVE_BZIP2)
 #include <chucho/bzip2_file_compressor.hpp>
@@ -585,30 +584,6 @@ void configurator::rabbitmq_writer_capn_proto_body()
 #endif
 
 #endif
-
-void configurator::remote_writer_body()
-{
-    auto lgr = chucho::logger::get("will");
-    ASSERT_EQ(1, lgr->get_writer_names().size());
-    auto& rw = dynamic_cast<chucho::remote_writer&>(lgr->get_writer("chucho::remote_writer"));
-    EXPECT_EQ(std::string("motherboy"), rw.get_host());
-    EXPECT_EQ(chucho::remote_writer::DEFAULT_PORT, rw.get_port());
-    EXPECT_EQ(chucho::remote_writer::DEFAULT_UNSENT_CACHE_MAX, rw.get_unsent_cache_max());
-    lgr = chucho::logger::get("will2");
-    ASSERT_EQ(1, lgr->get_writer_names().size());
-    auto& rw2 = dynamic_cast<chucho::remote_writer&>(lgr->get_writer("chucho::remote_writer"));
-    EXPECT_EQ(std::string("motherboy"), rw2.get_host());
-    EXPECT_EQ(19567, rw2.get_port());
-    EXPECT_EQ(chucho::remote_writer::DEFAULT_UNSENT_CACHE_MAX, rw.get_unsent_cache_max());
-    lgr = chucho::logger::get("will3");
-    ASSERT_EQ(1, lgr->get_writer_names().size());
-    auto& rw3 = dynamic_cast<chucho::remote_writer&>(lgr->get_writer("chucho::remote_writer"));
-    EXPECT_EQ(std::string("motherboy"), rw3.get_host());
-    EXPECT_EQ(chucho::remote_writer::DEFAULT_PORT, rw3.get_port());
-    EXPECT_EQ(750, rw3.get_unsent_cache_max());
-    // clear the status because we generated some warnings
-    chucho::status_manager::get().clear();
-}
 
 void configurator::rolling_file_writer_body()
 {

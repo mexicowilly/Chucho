@@ -116,8 +116,6 @@ IF(CHUCHO_POSIX)
         platform/posix/named_pipe_writer_posix.cpp
         platform/posix/pattern_formatter_posix.cpp
         platform/posix/pipe_writer_posix.cpp
-        platform/posix/socket_connector_posix.cpp
-        platform/posix/socket_exception_posix.cpp
         platform/posix/syslog_writer_posix.cpp
         platform/posix/text_util_posix.cpp)
 
@@ -160,10 +158,6 @@ IF(CHUCHO_POSIX)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/file_writer_posix.cpp PROPERTIES
                                     COMPILE_DEFINITIONS CHUCHO_HAVE_O_LARGEFILE)
     ENDIF()
-    IF(CHUCHO_SOLARIS AND CMAKE_CXX_COMPILER_ID STREQUAL SunPro)
-        SET_SOURCE_FILES_PROPERTIES(platform/posix/socket_connector_posix.cpp PROPERTIES
-                                    COMPILE_DEFINITIONS _POSIX_PTHREAD_SEMANTICS)
-    ENDIF()
 ELSEIF(CHUCHO_WINDOWS)
     SET(CHUCHO_PLATFORM_SOURCES
         platform/windows/calendar_windows.cpp
@@ -181,8 +175,6 @@ ELSEIF(CHUCHO_WINDOWS)
         platform/windows/named_pipe_writer_windows.cpp
         platform/windows/pattern_formatter_windows.cpp
         platform/windows/pipe_writer_windows.cpp
-        platform/windows/socket_connector_windows.cpp
-        platform/windows/socket_exception_windows.cpp
         platform/windows/syslog_writer_windows.cpp
         platform/windows/text_util_windows.cpp
         platform/windows/windows_event_log_writer.cpp
@@ -248,7 +240,6 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/optional_features.hpp
     include/chucho/pattern_formatter.hpp
     include/chucho/pipe_writer.hpp
-    include/chucho/remote_writer.hpp
     include/chucho/rolling_file_writer.hpp
     include/chucho/ruby_evaluator_filter.hpp
     include/chucho/security_policy.hpp
@@ -267,8 +258,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     "${CMAKE_BINARY_DIR}/chucho/version.hpp"
     include/chucho/writer.hpp
     include/chucho/writer_factory.hpp
-    include/chucho/writer_memento.hpp
-    include/chucho/yaml_formatter.hpp)
+    include/chucho/writer_memento.hpp)
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS ${CHUCHO_PUBLIC_HEADERS})
 
@@ -302,7 +292,6 @@ SET(CHUCHO_C_HEADERS
     include/chucho/numbered_file_roller.h
     include/chucho/pattern_formatter.h
     include/chucho/pipe_writer.h
-    include/chucho/remote_writer.h
     include/chucho/return_code.h
     include/chucho/rolling_file_writer.h
     include/chucho/security_policy.h
@@ -814,7 +803,6 @@ IF(C_API)
         c_numbered_file_roller.cpp
         c_pattern_formatter.cpp
         c_pipe_writer.cpp
-        c_remote_writer.cpp
         c_return_code.cpp
         c_rolling_file_writer.cpp
         c_security_policy.cpp
@@ -949,9 +937,6 @@ SET(CHUCHO_SOURCES
     pipe_writer_memento.cpp
     regex.cpp
     regex_exception.cpp
-    remote_writer.cpp
-    remote_writer_factory.cpp
-    remote_writer_memento.cpp
     rolling_file_writer.cpp
     rolling_file_writer_factory.cpp
     rolling_file_writer_memento.cpp
@@ -979,7 +964,6 @@ SET(CHUCHO_SOURCES
     writer.cpp
     writer_factory.cpp
     writer_memento.cpp
-    yaml_formatter.cpp
     zip_file_compressor_factory.cpp
     include/chucho/async_writer_factory.hpp
     include/chucho/async_writer_memento.hpp
@@ -1024,16 +1008,12 @@ SET(CHUCHO_SOURCES
     include/chucho/pipe_writer_memento.hpp
     include/chucho/regex.hpp
     include/chucho/regex_exception.hpp
-    include/chucho/remote_writer_factory.hpp
-    include/chucho/remote_writer_memento.hpp
     include/chucho/rolling_file_writer_factory.hpp
     include/chucho/rolling_file_writer_memento.hpp
     include/chucho/size_file_roll_trigger_factory.hpp
     include/chucho/size_file_roll_trigger_memento.hpp
     include/chucho/sliding_numbered_file_roller_factory.hpp
     include/chucho/sliding_numbered_file_roller_memento.hpp
-    include/chucho/socket_connector.hpp
-    include/chucho/socket_exception.hpp
     include/chucho/status.hpp
     include/chucho/status_manager.hpp
     include/chucho/status_observer.hpp
@@ -1230,17 +1210,6 @@ ENDIF()
 
 SET_SOURCE_FILES_PROPERTIES(yaml_configurator.cpp PROPERTIES
                             COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
-
-IF(CHUCHO_HAVE_ARPA_INET_H)
-    SET_SOURCE_FILES_PROPERTIES(remote_writer.cpp PROPERTIES
-                                COMPILE_DEFINITIONS CHUCHO_HAVE_ARPA_INET_H)
-ENDIF()
-
-IF(CHUCHO_HAVE_WINSOCK2_H)
-    GET_SOURCE_FILE_PROPERTY(CHUCHO_REMOTE_WRITER_DEFS remote_writer.cpp COMPILE_DEFINITIONS)
-    SET_SOURCE_FILES_PROPERTIES(remote_writer.cpp PROPERTIES
-                                COMPILE_DEFINITIONS "${CHUCHO_REMOTE_WRITER_DEFS};CHUCHO_HAVE_WINSOCK2_H")
-ENDIF()
 
 IF(CHUCHO_HAVE_STD_REGEX)
     SET_SOURCE_FILES_PROPERTIES(regex.cpp PROPERTIES
@@ -1460,9 +1429,6 @@ IF(CHUCHO_WINDOWS)
 ENDIF()
 
 ADD_SUBDIRECTORY(test)
-IF(CHUCHOD)
-    ADD_SUBDIRECTORY(log-server)
-ENDIF()
 
 # Documentation
 IF(DOXYGEN_FOUND)

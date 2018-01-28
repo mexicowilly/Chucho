@@ -38,7 +38,6 @@
 #include <chucho/numbered_file_roller_factory.hpp>
 #include <chucho/pattern_formatter_factory.hpp>
 #include <chucho/pipe_writer_factory.hpp>
-#include <chucho/remote_writer_factory.hpp>
 #include <chucho/rolling_file_writer_factory.hpp>
 #include <chucho/size_file_roll_trigger_factory.hpp>
 #include <chucho/sliding_numbered_file_roller_factory.hpp>
@@ -176,8 +175,6 @@ void configurator::initialize_impl()
                              std::make_shared<time_file_roller_factory>());
     add_configurable_factory("chucho::syslog_writer",
                              std::make_shared<syslog_writer_factory>());
-    add_configurable_factory("chucho::remote_writer",
-                             std::make_shared<remote_writer_factory>());
     add_configurable_factory("chucho::bzip2_file_compressor",
                              std::make_shared<bzip2_file_compressor_factory>());
     add_configurable_factory("chucho::gzip_file_compressor",

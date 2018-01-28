@@ -398,8 +398,6 @@ IF(C_API)
                    pattern_formatter_test.h
                    pipe_writer_test.c
                    pipe_writer_test.h
-                   remote_writer_test.c
-                   remote_writer_test.h
                    rolling_file_writer_test.c
                    rolling_file_writer_test.h
                    security_policy_test.c

@@ -193,7 +193,7 @@ FIND_PACKAGE(Threads REQUIRED)
 # Now do platform checks
 IF(CHUCHO_POSIX)
     # headers
-    FOREACH(HEAD arpa/inet.h assert.h fcntl.h limits.h netdb.h poll.h pthread.h signal.h
+    FOREACH(HEAD assert.h fcntl.h limits.h netdb.h pthread.h signal.h
                  sys/socket.h sys/stat.h sys/utsname.h syslog.h time.h unistd.h)
         STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
         STRING(REPLACE / _ CHUCHO_HEAD_VAR_NAME ${CHUCHO_HEAD_VAR_NAME})
@@ -250,11 +250,11 @@ IF(CHUCHO_POSIX)
     # realpath
     CHUCHO_REQUIRE_SYMBOLS(stdlib.h realpath)
 
-    # getaddrinfo/freeaddrinfo/gai_strerror/getnameinfo
+    # getaddrinfo/freeaddrinfo/gai_strerror
     IF(CHUCHO_SOLARIS)
         SET(CMAKE_REQUIRED_LIBRARIES socket nsl)
     ENDIF()
-    CHUCHO_REQUIRE_SYMBOLS(netdb.h getaddrinfo freeaddrinfo gai_strerror getnameinfo)
+    CHUCHO_REQUIRE_SYMBOLS(netdb.h getaddrinfo freeaddrinfo gai_strerror)
     IF(CHUCHO_SOLARIS)
         UNSET(CMAKE_REQUIRED_LIBRARIES)
     ENDIF()
@@ -266,24 +266,13 @@ IF(CHUCHO_POSIX)
     IF(CHUCHO_SOLARIS)
         SET(CMAKE_REQUIRED_LIBRARIES socket)
     ENDIF()
-    CHUCHO_REQUIRE_SYMBOLS(sys/socket.h socket sendto connect shutdown send)
+    CHUCHO_REQUIRE_SYMBOLS(sys/socket.h socket sendto)
     IF(CHUCHO_SOLARIS)
         UNSET(CMAKE_REQUIRED_LIBRARIES)
     ENDIF()
 
-    # poll
-    CHUCHO_REQUIRE_SYMBOLS(poll.h poll)
-
-    # signal stuff
-    SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
-    CHUCHO_REQUIRE_SYMBOLS(signal.h sigemptyset sigwait sigpending sigismember pthread_sigmask)
-    UNSET(CMAKE_REQUIRED_LIBRARIES)
-
     # open/fcntl
     CHUCHO_REQUIRE_SYMBOLS(fcntl.h open fcntl)
-
-    # htonl
-    CHUCHO_REQUIRE_SYMBOLS(arpa/inet.h htonl)
 
     # timegm
     CHECK_CXX_SYMBOL_EXISTS(timegm time.h CHUCHO_HAVE_TIMEGM)
@@ -320,25 +309,6 @@ IF(CHUCHO_POSIX)
         ENDIF()
     ENDIF()
     CHECK_CXX_SYMBOL_EXISTS(O_LARGEFILE fcntl.h CHUCHO_HAVE_O_LARGEFILE)
-
-    IF(CHUCHOD)
-        CHECK_INCLUDE_FILE_CXX(pwd.h CHUCHO_HAVE_PWD_H)
-        IF(NOT ${CHUCHO_HAVE_PWD_H})
-            MESSAGE(FATAL_ERROR "The header pwd.h is required")
-        ENDIF()
-        CHUCHO_REQUIRE_SYMBOLS(unistd.h getuid fork setsid dup2 chdir _exit)
-        IF(CHUCHO_SOLARIS)
-            SET(CMAKE_REQUIRED_LIBRARIES socket)
-        ENDIF()
-        CHUCHO_REQUIRE_SYMBOLS(sys/socket.h recv bind listen accept)
-        IF(CHUCHO_SOLARIS)
-            UNSET(CMAKE_REQUIRED_LIBRARIES)
-        ENDIF()
-        CHUCHO_REQUIRE_SYMBOLS(pwd.h getpwuid)
-        SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
-        CHUCHO_REQUIRE_SYMBOLS(signal.h raise sigaddset sigaction kill)
-        UNSET(CMAKE_REQUIRED_LIBRARIES)
-    ENDIF()
 
     # Doors
     IF(CHUCHO_SOLARIS)
@@ -612,83 +582,6 @@ FIND_PACKAGE(Doxygen)
 
 # cppcheck
 CHUCHO_FIND_PROGRAM(CHUCHO_CPPCHECK cppcheck)
-
-# Solaris service stuff
-IF(CHUCHO_SOLARIS)
-    CHUCHO_FIND_PROGRAM(CHUCHO_SVCCFG svccfg)
-    IF(NOT CHUCHO_SVCCFG)
-        MESSAGE(FATAL_ERROR "svccfg is required")
-    ENDIF()
-    CHUCHO_FIND_PROGRAM(CHUCHO_SVCADM svcadm)
-    IF(NOT CHUCHO_SVCADM)
-        MESSAGE(FATAL_ERROR "svcadm is required")
-    ENDIF()
-ENDIF()
-
-# Macintosh launchd stuff
-IF(CHUCHO_MACINTOSH)
-    CHUCHO_FIND_PROGRAM(CHUCHO_LAUNCHCTL launchctl)
-    IF(NOT CHUCHO_LAUNCHCTL)
-        MESSAGE(FATAL_ERROR "launchctl is required")
-    ENDIF()
-    IF(INSTALL_SERVICE)
-        CHUCHO_REQUIRE_SYMBOLS(sys/event.h kqueue kevent EV_SET EVFILT_READ EV_ADD)
-        CHUCHO_REQUIRE_SYMBOLS(launch.h launch_data_new_string LAUNCH_KEY_CHECKIN
-                               launch_msg launch_data_free launch_data_get_type launch_data_get_errno
-                               launch_data_dict_lookup LAUNCH_JOBKEY_SOCKETS launch_data_array_get_count
-                               launch_data_array_get_index launch_data_get_fd)
-        SET(CMAKE_EXTRA_INCLUDE_FILES launch.h)
-        CHECK_TYPE_SIZE(launch_data_t CHUCHO_LAUNCH_DATA_T_SIZE)
-        IF(CHUCHO_LAUNCH_DATA_T_SIZE STREQUAL "")
-            MESSAGE(FATAL_ERROR "The launch_data_t type could not be found")
-        ENDIF()
-        UNSET(CMAKE_EXTRA_INCLUDE_FILES)
-    ENDIF()
-ENDIF()
-
-# Linux service stuff
-IF(CHUCHO_LINUX)
-    CHUCHO_FIND_PROGRAM(CHUCHO_INIT init)
-    IF(CHUCHO_INIT)
-        EXECUTE_PROCESS(COMMAND "${CHUCHO_INIT}" --version
-                        OUTPUT_VARIABLE CHUCHO_INIT_OUT
-                        ERROR_QUIET)
-    ENDIF()
-    IF(CHUCHO_INIT_OUT AND CHUCHO_INIT_OUT MATCHES upstart)
-        CHUCHO_FIND_PROGRAM(CHUCHO_INITCTL initctl)
-        IF(CHUCHO_INITCTL)
-            MESSAGE(STATUS "This Linux is using the Upstart init system")
-            SET(CHUCHO_UPSTART_INIT TRUE)
-        ELSE()
-            MESSAGE(WARNING "initctl is required when using the Upstart init system. The chuchod service will not be installed.")
-        ENDIF()
-    ELSE()
-        CHUCHO_FIND_PROGRAM(CHUCHO_SYSTEMCTL systemctl)
-        IF(CHUCHO_SYSTEMCTL)
-            EXECUTE_PROCESS(COMMAND "${CHUCHO_SYSTEMCTL}"
-                            OUTPUT_VARIABLE CHUCHO_SYSTEMCTL_OUT
-                            ERROR_QUIET)
-            IF(CHUCHO_SYSTEMCTL_OUT AND CHUCHO_SYSTEMCTL_OUT MATCHES "-\\.mount")
-                MESSAGE(STATUS "This Linux is using the systemd init system")
-                SET(CHUCHO_SYSTEMD_INIT TRUE)
-            ELSE()
-                MESSAGE(WARNING "systemctl is required when using the systemd init system. The chuchod service will not be installed.")
-            ENDIF()
-        ELSE()
-            MESSAGE(STATUS "Chucho only supports the Upstart and systemd init systems on Linux.")
-        ENDIF()
-    ENDIF()
-ENDIF()
-
-# BSD service stuff
-IF(CHUCHO_BSD AND EXISTS /etc/rc AND EXISTS /etc/rc.conf AND EXISTS /etc/rc.subr AND IS_DIRECTORY /etc/rc.d)
-    CHUCHO_FIND_PROGRAM(CHUCHO_SED sed)
-    IF(NOT CHUCHO_SED)
-        MESSAGE(FATAL_ERROR "sed is required when using the rc.d init system")
-    ENDIF()
-    MESSAGE(STATUS "This ${CMAKE_SYSTEM_NAME} is using the rc.d init system")
-    SET(CHUCHO_RC_INIT TRUE)
-ENDIF()
 
 #
 # External projects

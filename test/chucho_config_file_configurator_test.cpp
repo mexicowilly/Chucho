@@ -662,25 +662,6 @@ TEST_F(chucho_config_file_configurator, rabbitmq_writer_capn_proto)
 
 #endif
 
-TEST_F(chucho_config_file_configurator, remote_writer)
-{
-    configure("chucho.logger = will\n"
-              "chucho.logger.will.writer = rw1\n"
-              "chucho.writer.rw1 = chucho::remote_writer\n"
-              "chucho.writer.rw1.host = motherboy\n"
-              "chucho.logger = will2\n"
-              "chucho.logger.will2.writer = rw2\n"
-              "chucho.writer.rw2 = chucho::remote_writer\n"
-              "chucho.writer.rw2.host = motherboy\n"
-              "chucho.writer.rw2.port = 19567\n"
-              "chucho.logger = will3\n"
-              "chucho.logger.will3.writer = rw3\n"
-              "chucho.writer.rw3 = chucho::remote_writer\n"
-              "chucho.writer.rw3.host = motherboy\n"
-              "chucho.writer.rw3.unsent_cache_max = 750");
-    remote_writer_body();
-}
-
 TEST_F(chucho_config_file_configurator, rolling_file_writer)
 {
     configure("chucho.logger = will\n"

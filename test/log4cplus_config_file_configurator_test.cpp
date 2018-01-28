@@ -20,7 +20,6 @@
 #include <chucho/level_filter.hpp>
 #include <chucho/rolling_file_writer.hpp>
 #include <chucho/numbered_file_roller.hpp>
-#include <chucho/remote_writer.hpp>
 #include <chucho/status_manager.hpp>
 #include <chucho/pattern_formatter.hpp>
 #include <chucho/event.hpp>
@@ -250,37 +249,6 @@ TEST_F(log4cplus_config_file_configurator, numbered_file_roller_with_opts)
     EXPECT_EQ(72, nrlr.get_max_index());
     EXPECT_EQ(1, nrlr.get_min_index());
 }
-
-/*
-TEST_F(log4cplus_config_file_configurator, remote_writer)
-{
-    configure("log4cplus.logger.will = info, rw1\n"
-              "log4cplus.appender.rw1 = log4cplus::SocketAppender\n"
-              "log4cplus.appender.rw1.host = motherboy\n"
-              "log4cplus.logger.will2 = info, rw2\n"
-              "log4cplus.appender.rw2 = log4cplus::SocketAppender\n"
-              "log4cplus.appender.rw2.host = motherboy\n"
-              "log4cplus.appender.rw2.port = 19567");
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::remote_writer), typeid(*wrts[0]));
-    auto rw = std::static_pointer_cast<chucho::remote_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(rw));
-    EXPECT_EQ(std::string("motherboy"), rw->get_host());
-    EXPECT_EQ(chucho::remote_writer::DEFAULT_PORT, rw->get_port());
-    EXPECT_EQ(chucho::remote_writer::DEFAULT_UNSENT_CACHE_MAX, rw->get_unsent_cache_max());
-    wrts = chucho::logger::get("will2")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::remote_writer), typeid(*wrts[0]));
-    rw = std::static_pointer_cast<chucho::remote_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(rw));
-    EXPECT_EQ(std::string("motherboy"), rw->get_host());
-    EXPECT_EQ(19567, rw->get_port());
-    EXPECT_EQ(chucho::remote_writer::DEFAULT_UNSENT_CACHE_MAX, rw->get_unsent_cache_max());
-    // clear the status because we generated some warnings
-    chucho::status_manager::get().clear();
-}
-*/
 
 TEST_F(log4cplus_config_file_configurator, rolling_file_writer)
 {

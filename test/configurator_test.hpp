@@ -81,7 +81,6 @@ protected:
     void rabbitmq_writer_capn_proto_body();
 #endif
 #endif
-    void remote_writer_body();
 #if defined(CHUCHO_HAVE_RUBY)
     void ruby_evaluator_filter_body();
 #endif

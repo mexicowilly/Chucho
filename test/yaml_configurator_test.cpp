@@ -591,25 +591,6 @@ TEST_F(yaml_configurator, rabbitmq_writer_capn_proto)
 
 #endif
 
-TEST_F(yaml_configurator, remote_writer)
-{
-    configure("- chucho::logger:\n"
-              "    name: will\n"
-              "    chucho::remote_writer:\n"
-              "        host: motherboy\n"
-              "- chucho::logger:\n"
-              "    - name: will2\n"
-              "    - chucho::remote_writer:\n"
-              "        - host: motherboy\n"
-              "        - port: 19567\n"
-              "- chucho::logger:\n"
-              "    - name: will3\n"
-              "    - chucho::remote_writer:\n"
-              "        - host: motherboy\n"
-              "        - unsent_cache_max: 750");
-    remote_writer_body();
-}
-
 TEST_F(yaml_configurator, rolling_file_writer)
 {
     configure("chucho::logger:\n"
