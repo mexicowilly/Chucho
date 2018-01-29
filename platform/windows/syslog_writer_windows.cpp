@@ -15,13 +15,14 @@
  */
 
 #include <chucho/syslog_writer.hpp>
-#include <chucho/socket_exception.hpp>
 #include <chucho/host.hpp>
 #include <chucho/calendar.hpp>
-#include "winsock_startup.hpp"
-#include <sstream>
+#include <chucho/exception.hpp>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include "winsock_startup.hpp"
+#include "error_util.hpp"
+#include <sstream>
 
 namespace
 {
@@ -72,13 +73,13 @@ syslog_transport_handle::syslog_transport_handle(const std::string& host,
     struct addrinfo* info;
     int rc = getaddrinfo(host.c_str(), std::to_string(port).c_str(), nullptr, &info);
     if (rc != 0)
-        throw chucho::exception("Could not resolve address of " + host + ": " + gai_strerror(rc));
+        throw exception("Could not resolve address of " + host + ": " + gai_strerror(rc));
     address_.resize(info->ai_addrlen);
     std::memcpy(&address_[0], info->ai_addr, info->ai_addrlen);
     socket_ = socket(info->ai_family, info->ai_socktype, info->ai_protocol);
     freeaddrinfo(info);
     if (socket_ == INVALID_SOCKET)
-        throw socket_exception("Could not create socket", WSAGetLastError());
+        throw exception("Could not create socket: " + error_util::message(WSAGetLastError()));
 }
 
 syslog_transport_handle::~syslog_transport_handle()
@@ -109,7 +110,7 @@ void syslog_transport_handle::send(chucho::syslog::facility fcl,
                reinterpret_cast<struct sockaddr*>(&address_[0]),
                static_cast<int>(address_.size())) == SOCKET_ERROR)
     {
-        throw socket_exception("Unable to send syslog data: ", WSAGetLastError());
+        throw exception("Unable to send syslog data: " + error_util::message(WSAGetLastError()));
     }
 }
 
