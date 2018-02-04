@@ -195,6 +195,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/configurable.hpp
     include/chucho/configurable_factory.hpp
     include/chucho/configuration.hpp
+    include/chucho/configuration.h
     include/chucho/configurator.hpp
     include/chucho/cout_writer.hpp
     include/chucho/database_writer.hpp
@@ -640,6 +641,7 @@ SET(CHUCHO_SOURCES
     configurable.cpp
     configurable_factory.cpp
     configuration.cpp
+    c_configuration.cpp
     configurator.cpp
     cout_writer_factory.cpp
     demangle.cpp
