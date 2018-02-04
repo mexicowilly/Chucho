@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_SYSLOG_CONSTANTS_HPP__)
 #define CHUCHO_SYSLOG_CONSTANTS_HPP__
 
-#include <chucho/export.hpp>
+#include <chucho/export.h>
 #include <cstdint>
 
 namespace chucho

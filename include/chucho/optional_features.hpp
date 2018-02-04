@@ -25,7 +25,7 @@
  * @ingroup miscellaneous
  */
 
-#include <chucho/export.hpp>
+#include <chucho/export.h>
 #include <bitset>
 
 namespace chucho

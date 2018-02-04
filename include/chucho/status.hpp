@@ -22,7 +22,7 @@
 #pragma warning(disable:4251)
 #endif
 
-#include <chucho/export.hpp>
+#include <chucho/export.h>
 #include <memory>
 #include <chrono>
 #include <exception>

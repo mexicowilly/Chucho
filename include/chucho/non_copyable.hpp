@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_NON_COPYABLE_HPP__)
 #define CHUCHO_NON_COPYABLE_HPP__
 
-#include <chucho/export.hpp>
+#include <chucho/export.h>
 
 namespace chucho
 {

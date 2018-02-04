@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_OPTIONAL_HPP__)
 #define CHUCHO_OPTIONAL_HPP__
 
-#include <chucho/export.hpp>
+#include <chucho/export.h>
 #include <type_traits>
 #include <memory>
 

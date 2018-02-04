@@ -17,6 +17,12 @@
 #if !defined(CHUCHO_LOG_H__)
 #define CHUCHO_LOG_H__
 
+#if !defined(CHUCHO_BUILD) && defined(__cplusplus)
+#error "When using C++, you want the header log.hpp"
+#endif
+
+#include <chucho/export.h>
+
 /**
  * @file 
  * Logging macros functions that use the Chucho C API. These 
@@ -39,7 +45,7 @@ extern "C"
 #endif
 #endif
 
-typedef enum CHUCHO_LEVEL
+typedef enum
 {
     CHUCHO_TRACE,
     CHUCHO_DEBUG,
@@ -47,7 +53,7 @@ typedef enum CHUCHO_LEVEL
     CHUCHO_WARN,
     CHUCHO_ERROR,
     CHUCHO_FATAL
-};
+} chucho_level_t;
 
 /**
  * Log an event. 
@@ -65,7 +71,7 @@ typedef enum CHUCHO_LEVEL
  * @return a value from @ref return_code.h indicating success or
  *         failure
  */
-CHUCHO_EXPORT void chucho_log(const chucho_level* lvl,
+CHUCHO_EXPORT void chucho_log(chucho_level_t lvl,
                               const char* const lgr,
                               const char* const file,
                               int line,
@@ -89,7 +95,7 @@ CHUCHO_EXPORT void chucho_log(const chucho_level* lvl,
  * @return a value from @ref return_code.h indicating success or
  *         failure
  */
-CHUCHO_EXPORT void chucho_log_mark(const chucho_level* lvl,
+CHUCHO_EXPORT void chucho_log_mark(chucho_level_t lvl,
                                    const char* const lgr,
                                    const char* const file,
                                    int line,

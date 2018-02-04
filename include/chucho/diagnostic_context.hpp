@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_DIAGNOSTIC_CONTEXT_HPP__)
 #define CHUCHO_DIAGNOSTIC_CONTEXT_HPP__
 
-#include <chucho/export.hpp>
+#include <chucho/export.h>
 #include <string>
 #include <map>
 

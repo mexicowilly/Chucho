@@ -17,7 +17,11 @@
 #if !defined(CHUCHO_CONFIGURATION_H__)
 #define CHUCHO_CONFIGURATION_H__
 
-#include <chucho/export.hpp>
+#if !defined(CHUCHO_BUILD) && defined(__cplusplus)
+#error "When using C++, you should include   configuration.hpp"
+#endif
+
+#include <chucho/export.h>
 #include <stdbool.h>
 
 /**
