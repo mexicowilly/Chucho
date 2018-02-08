@@ -18,7 +18,7 @@
 #define CHUCHO_CONFIGURATION_H__
 
 #if !defined(CHUCHO_BUILD) && defined(__cplusplus)
-#error "When using C++, you should include   configuration.hpp"
+#error "When using C++, you should include configuration.hpp"
 #endif
 
 #include <chucho/export.h>

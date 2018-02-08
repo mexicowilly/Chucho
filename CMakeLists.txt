@@ -216,6 +216,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/filter.hpp
     include/chucho/filter_memento.hpp
     include/chucho/finalize.hpp
+    include/chucho/finalize.h
     include/chucho/formatted_message_serializer.hpp
     include/chucho/formatter.hpp
     include/chucho/function_name.hpp
@@ -643,6 +644,7 @@ SET(CHUCHO_SOURCES
     configurable_factory.cpp
     configuration.cpp
     c_configuration.cpp
+    c_finalize.cpp
     c_log.cpp
     configurator.cpp
     cout_writer_factory.cpp
