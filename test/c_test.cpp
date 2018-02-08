@@ -21,6 +21,9 @@
 TEST(c, simple)
 {
     std::string helper_name(std::string("test") + chucho::file::dir_sep + "c-test-helper");
+    #if defined(CHUCHO_WINDOWS)
+    helper_name += ".exe";
+    #endif
     ASSERT_TRUE(chucho::file::exists(helper_name));
     ASSERT_EQ(0, std::system((helper_name + " c-test.log").c_str()));
     ASSERT_TRUE(chucho::file::exists("c-test.log"));
@@ -32,6 +35,7 @@ TEST(c, simple)
         lines.emplace_back("");
         std::getline(stream, lines.back());
     }
+    stream.close();
     lines.pop_back();
     ASSERT_EQ(12, lines.size());
     EXPECT_STREQ("TRACE 1", lines[0].c_str());
