@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_LEVEL_HPP__)
 #define CHUCHO_LEVEL_HPP__
 
-#include <chucho/export.hpp>
+#include <chucho/export.h>
 #include <chucho/syslog_constants.hpp>
 #include <ostream>
 #include <memory>

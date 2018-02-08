@@ -1,12 +1,12 @@
 /*
  * Copyright 2013-2017 Will Mason
- * 
+ *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,27 +14,14 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_UTF8_HPP__)
-#define CHUCHO_UTF8_HPP__
+#include <chucho/finalize.hpp>
 
-#if !defined(CHUCHO_BUILD)
-#error "This header is private"
-#endif
-
-#include <chucho/export.h>
-#include <istream>
-
-namespace chucho
+extern "C"
 {
 
-namespace utf8
+void chucho_finalize()
 {
-
-CHUCHO_PRIV_EXPORT std::string escape_invalid(const std::string& text);
-CHUCHO_PRIV_EXPORT void validate(std::istream& stream);
-
+    chucho::finalize();
 }
 
 }
-
-#endif

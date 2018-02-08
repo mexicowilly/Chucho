@@ -21,7 +21,7 @@
 #error "This header is private"
 #endif
 
-#include <chucho/export.hpp>
+#include <chucho/export.h>
 #include <string>
 
 namespace chucho

@@ -165,7 +165,7 @@ ELSE()
     SET(CHUCHO_STATIC TRUE)
 ENDIF()
 MAKE_DIRECTORY("${CMAKE_BINARY_DIR}/chucho")
-CONFIGURE_FILE(include/chucho/export.hpp.in "${CMAKE_BINARY_DIR}/chucho/export.hpp")
+CONFIGURE_FILE(include/chucho/export.h.in "${CMAKE_BINARY_DIR}/chucho/export.h")
 
 # Configure our version header
 STRING(REGEX REPLACE "^([0-9]+)\\..+$" "\\1" CHUCHO_VERSION_MAJOR ${CHUCHO_VERSION})

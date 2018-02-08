@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_FINALIZE_HPP__)
 #define CHUCHO_FINALIZE_HPP__
 
-#include <chucho/export.hpp>
+#include <chucho/export.h>
 
 /**
  * @file 

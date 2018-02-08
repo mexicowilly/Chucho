@@ -26,7 +26,7 @@
 #pragma warning(disable:4251)
 #endif
 
-#include <chucho/export.hpp>
+#include <chucho/export.h>
 #include <chucho/non_copyable.hpp>
 #include <memory>
 #include <string>

@@ -39,7 +39,7 @@ SET(CPACK_SOURCE_GENERATOR TGZ ZIP)
 INCLUDE(CPack)
 
 # Include CMAKE_BINARY_DIR because that's where the generated file
-# export.hpp lives.
+# export.h lives.
 INCLUDE_DIRECTORIES(include
                     embedded/include
                     "${CMAKE_BINARY_DIR}")
@@ -195,6 +195,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/configurable.hpp
     include/chucho/configurable_factory.hpp
     include/chucho/configuration.hpp
+    include/chucho/configuration.h
     include/chucho/configurator.hpp
     include/chucho/cout_writer.hpp
     include/chucho/database_writer.hpp
@@ -203,7 +204,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/evaluator_filter.hpp
     include/chucho/event.hpp
     include/chucho/exception.hpp
-    "${CMAKE_BINARY_DIR}/chucho/export.hpp"
+    "${CMAKE_BINARY_DIR}/chucho/export.h"
     include/chucho/file_compressor.hpp
     include/chucho/file_compressor_factory.hpp
     include/chucho/file_compressor_memento.hpp
@@ -215,6 +216,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/filter.hpp
     include/chucho/filter_memento.hpp
     include/chucho/finalize.hpp
+    include/chucho/finalize.h
     include/chucho/formatted_message_serializer.hpp
     include/chucho/formatter.hpp
     include/chucho/function_name.hpp
@@ -225,6 +227,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/log_stream.hpp
     include/chucho/log_streambuf.hpp
     include/chucho/log.hpp
+    include/chucho/log.h
     include/chucho/loggable.hpp
     include/chucho/logger.hpp
     include/chucho/marker.hpp
@@ -640,6 +643,9 @@ SET(CHUCHO_SOURCES
     configurable.cpp
     configurable_factory.cpp
     configuration.cpp
+    c_configuration.cpp
+    c_finalize.cpp
+    c_log.cpp
     configurator.cpp
     cout_writer_factory.cpp
     demangle.cpp
