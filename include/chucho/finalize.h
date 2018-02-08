@@ -41,8 +41,6 @@ extern "C"
  * are using Chucho as a shared object or within an enclosing
  * shared object.
  *
- * Included by @p <chucho/finalize.hpp>.
- *
  * @note No Chucho APIs may be used after calling this function.
  *       The result is extremely undefined.
  * @ingroup c_miscellaneous

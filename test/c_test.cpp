@@ -20,6 +20,7 @@
 
 TEST(c, simple)
 {
+#if defined(CHUCHO_YAML_CONFIG)
     std::string helper_name(std::string("test") + chucho::file::dir_sep + "c-test-helper");
     #if defined(CHUCHO_WINDOWS)
     helper_name += ".exe";
@@ -51,4 +52,5 @@ TEST(c, simple)
     EXPECT_STREQ("FATAL 11", lines[10].c_str());
     EXPECT_STREQ("FATAL mark 12", lines[11].c_str());
     chucho::file::remove("c-test.log");
+#endif
 }
