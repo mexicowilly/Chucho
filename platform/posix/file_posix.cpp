@@ -16,6 +16,7 @@
 
 #include <chucho/file.hpp>
 #include <chucho/file_exception.hpp>
+#include <chucho/environment.hpp>
 #include <vector>
 #include <array>
 #include <cstring>
@@ -236,6 +237,15 @@ std::uintmax_t size(const std::string& name)
     if (stat(name.c_str(), &info) != 0)
         throw file_exception("Could not get size of " + name);
     return info.st_size;
+}
+
+std::string temporary_directory()
+{
+    auto env = environment::get("TMPDIR");
+    std::string result = env ? *env : P_tmpdir;
+    if (result[result.length() - 1] != '/')
+        result += '/';
+    return result;
 }
 
 }

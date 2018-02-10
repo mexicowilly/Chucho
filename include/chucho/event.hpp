@@ -102,63 +102,11 @@ public:
           const std::string& mark);
 
     /**
-     * Construct an event. The host name and thread ID parameters 
-     * are what set this constructor apart from the others. This 
-     * constructor is used by the remote logging server to store the 
-     * name of the host from which the event came. It is not used 
-     * when logging is done locally. 
-     * 
-     * @param lgr the logger
-     * @param lvl the level
-     * @param msg the message, which has already been formatted
-     * @param file_name the file name of in which the event occurred 
-     * @param line_number the line number in which the event 
-     *                    occurred
-     * @param function_name the function name in which the event 
-     *                      occured
-     * @param base_host_name the base name of the host from which 
-     *                       this event came
-     * @param full_host_name the full name of the host from which 
-     *                       this event came
-     * @param thread_id the textual representation of the thread 
-     *                  identifier from which this event came on the
-     *                  remote host
-     * @param mark the marker associated with the event
-     */
-    event(std::shared_ptr<logger> lgr,
-          std::shared_ptr<level> lvl,
-          const std::string& msg,
-          const char* const file_name,
-          unsigned line_number,
-          const char* const function_name,
-          const std::string& base_host_name,
-          const std::string& full_host_name,
-          const std::string& thread_id,
-          const optional<marker>& mark);
-    //@}
-
-    /**
-     * Return the base name of the host from which this event came. 
-     * If the event is a local event, then the host name will not be 
-     * set. 
-     * 
-     * @return the base host name
-     */
-    const optional<std::string>& get_base_host_name() const;
-    /**
      * Return the file name.
      * 
      * @return the file name
      */
     const char* get_file_name() const;
-    /**
-     * Return the full name of the host from which this event came. 
-     * If the event is a local event, then the host name will not be
-     * set. 
-     * 
-     * @return the full host name
-     */
-    const optional<std::string>& get_full_host_name() const;
     /**
      * Return the function name.
      * 
@@ -196,11 +144,10 @@ public:
      */
     const std::string& get_message() const;
     /**
-     * Return the thread identifier of this thread on the remote 
-     * host. If the event is a local one, then the thread identifier 
-     * is not set. 
-     * 
-     * @return the thread identifier
+     * Return the thread ID. This will only be set if the
+     * event has been read from an event cache.
+     *
+     * @return the ID
      */
     const optional<std::string>& get_thread_id() const;
     /**
@@ -211,6 +158,8 @@ public:
     const time_type& get_time() const;
 
 private:
+    friend class event_cache;
+
     std::shared_ptr<logger> logger_;
     std::shared_ptr<level> level_;
     std::string message_;
@@ -219,24 +168,15 @@ private:
     unsigned line_number_;
     const char* function_name_;
     optional<marker> marker_;
-    optional<std::string> base_host_name_;
-    optional<std::string> full_host_name_;
+    // These below are used by the event_cache.
     optional<std::string> thread_id_;
+    optional<std::string> file_name_store_;
+    optional<std::string> function_name_store_;
 };
-
-inline const optional<std::string>& event::get_base_host_name() const
-{
-    return base_host_name_;
-}
 
 inline const char* event::get_file_name() const
 {
     return file_name_;
-}
-
-inline const optional<std::string>& event::get_full_host_name() const
-{
-    return full_host_name_;
 }
 
 inline const char* event::get_function_name() const

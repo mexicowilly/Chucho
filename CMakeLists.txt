@@ -114,8 +114,8 @@ IF(CHUCHO_POSIX)
         platform/posix/host_posix.cpp
         platform/posix/line_ending_posix.cpp
         platform/posix/named_pipe_writer_posix.cpp
-        platform/posix/pattern_formatter_posix.cpp
         platform/posix/pipe_writer_posix.cpp
+        platform/posix/process_posix.cpp
         platform/posix/syslog_writer_posix.cpp
         platform/posix/text_util_posix.cpp)
 
@@ -173,7 +173,6 @@ ELSEIF(CHUCHO_WINDOWS)
         platform/windows/host_windows.cpp
         platform/windows/line_ending_windows.cpp
         platform/windows/named_pipe_writer_windows.cpp
-        platform/windows/pattern_formatter_windows.cpp
         platform/windows/pipe_writer_windows.cpp
         platform/windows/syslog_writer_windows.cpp
         platform/windows/text_util_windows.cpp
@@ -654,6 +653,7 @@ SET(CHUCHO_SOURCES
     duplicate_message_filter.cpp
     duplicate_message_filter_factory.cpp
     event.cpp
+    event_cache.cpp
     exception.cpp
     file_compressor_factory.cpp
     file_compressor_memento.cpp
@@ -748,6 +748,7 @@ SET(CHUCHO_SOURCES
     include/chucho/demangle.hpp
     include/chucho/duplicate_message_filter_factory.hpp
     include/chucho/environment.hpp
+    include/chucho/event_cache.hpp
     include/chucho/exception.hpp
     include/chucho/file.hpp
     include/chucho/file_exception.hpp
@@ -779,6 +780,7 @@ SET(CHUCHO_SOURCES
     include/chucho/pattern_formatter_memento.hpp
     include/chucho/pipe_writer_factory.hpp
     include/chucho/pipe_writer_memento.hpp
+    include/chucho/process.hpp
     include/chucho/regex.hpp
     include/chucho/regex_exception.hpp
     include/chucho/rolling_file_writer_factory.hpp

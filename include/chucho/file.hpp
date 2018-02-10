@@ -50,6 +50,7 @@ CHUCHO_PRIV_EXPORT bool is_fully_qualified(const std::string& name);
 CHUCHO_PRIV_EXPORT void remove(const std::string& name);
 CHUCHO_PRIV_EXPORT void remove_all(const std::string& name);
 CHUCHO_PRIV_EXPORT std::uintmax_t size(const std::string& name);
+CHUCHO_PRIV_EXPORT std::string temporary_directory();
 
 }
 

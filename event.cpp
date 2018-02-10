@@ -56,28 +56,4 @@ event::event(std::shared_ptr<logger> lgr,
 {
 }
 
-event::event(std::shared_ptr<logger> lgr,
-             std::shared_ptr<level> lvl,
-             const std::string& msg,
-             const char* const file_name,
-             unsigned line_number,
-             const char* const function_name,
-             const std::string& base_host_name,
-             const std::string& full_host_name,
-             const std::string& thread_id,
-             const optional<marker>& mark)
-    : logger_(lgr),
-      level_(lvl),
-      message_(msg),
-      time_(clock_type::now()),
-      file_name_(file_name),
-      line_number_(line_number),
-      function_name_(function_name),
-      marker_(mark),
-      base_host_name_(base_host_name),
-      full_host_name_(full_host_name),
-      thread_id_(thread_id)
-{
-}
-
 }
