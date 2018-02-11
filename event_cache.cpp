@@ -52,11 +52,12 @@ event_cache::event_cache(std::size_t chunk_size, std::size_t max_size)
       read_pos_(mem_chunk_.get()),
       write_pos_(mem_chunk_.get()),
       current_sequence_(0),
-      event_count_(0),
       should_stop_(false),
       total_size_(0),
       mem_chunk_occupied_(0)
 {
+    if (chunk_size_ >= max_size_)
+        throw std::invalid_argument("max_size must be greater than chunk_size");
     set_status_origin("event_cache");
 }
 
@@ -70,56 +71,74 @@ event_cache::~event_cache()
     }
 }
 
-std::size_t event_cache::get_event_count()
+void event_cache::cull()
 {
-    std::lock_guard<std::mutex> lock(guard_);
-    return event_count_;
+    std::size_t culled = 0;
+    if (mem_chunk_occupied_ > 0)
+    {
+        std::memset(mem_chunk_.get(), 0, chunk_size_);
+        culled = mem_chunk_occupied_;
+        mem_chunk_occupied_ = 0;
+    }
+    else
+    {
+        auto oldest = find_oldest_file();
+        culled = file::size(oldest);
+        file::remove(oldest);
+    }
+    total_size_ -= culled;
+    report_warning("The cache is full. Removed " + std::to_string(culled) + " oldest bytes.");
+}
+
+std::string event_cache::find_oldest_file()
+{
+    file::directory_iterator itor(directory_);
+    file::directory_iterator end;
+    std::vector<std::string> files;
+    while (itor != end)
+    {
+        files.push_back(*itor);
+        ++itor;
+    }
+    auto mn = std::min_element(files.begin(), files.end(),
+                               [] (const std::string& s1, const std::string& s2)
+                               {
+                                   return std::stoul(file::base_name(s1)) < std::stoul(file::base_name(s2));
+                               });
+    if (mn == files.end())
+        throw std::runtime_error("No event files were found");
+    return *mn;
 }
 
 optional<event> event_cache::pop()
 {
     optional<event> result;
     std::unique_lock<std::mutex> lock(guard_);
-    while (!should_stop_ && event_count_ == 0)
+    while (!should_stop_ && total_size_ == 0)
         read_cond_.wait_for(lock, 250ms);
     if (!should_stop_)
     {
         if (read_pos_ >= (mem_chunk_.get() + chunk_size_ - 4) || get_mem_buf<std::uint32_t>(0) == 0)
         {
-            file::directory_iterator itor(directory_);
-            file::directory_iterator end;
-            std::vector<std::string> files;
-            while (itor != end)
-            {
-                files.push_back(*itor);
-                ++itor;
-            }
-            auto mn = std::min_element(files.begin(), files.end(),
-                                       [] (const std::string& s1, const std::string& s2)
-                                       {
-                                           return std::stoul(file::base_name(s1)) < std::stoul(file::base_name(s2));
-                                       });
-            if (mn == files.end())
-                throw std::runtime_error("No event files were found");
+            auto oldest = find_oldest_file();
             std::memset(mem_chunk_.get(), 0, chunk_size_);
-            auto sz = file::size(*mn);
-            std::ifstream stream(*mn, std::ios::in | std::ios::binary);
+            auto sz = file::size(oldest);
+            std::ifstream stream(oldest, std::ios::in | std::ios::binary);
             stream.read(reinterpret_cast<char*>(mem_chunk_.get()), sz);
             stream.close();
             read_pos_ = mem_chunk_.get();
             mem_chunk_occupied_ = sz;
             assert(write_file_);
-            if (write_file_ && std::stoul(file::base_name(*mn)) == current_sequence_)
+            if (write_file_ && std::stoul(file::base_name(oldest)) == current_sequence_)
             {
                 write_pos_ = mem_chunk_.get() + static_cast<std::size_t>(write_file_->tellp());
                 write_file_.reset();
             }
-            file::remove(*mn);
-            report_info("Loaded file " + *mn);
+            file::remove(oldest);
+            report_info("Loaded file " + oldest);
         }
         std::size_t sz;
         result = unserialize(sz);
-        --event_count_;
         total_size_ -= sz;
     }
     return result;
@@ -128,6 +147,8 @@ optional<event> event_cache::pop()
 void event_cache::push(const event& evt)
 {
     std::lock_guard<std::mutex> lock(guard_);
+    if (total_size_ >= max_size_)
+        cull();
     auto sz = serialize(evt);
     if (write_pos_ != nullptr && (write_pos_ - mem_chunk_.get()) + sz <= chunk_size_)
     {
@@ -149,8 +170,8 @@ void event_cache::push(const event& evt)
         }
         else
         {
-            // This is the first file
-            file::create_directories(directory_);
+            if (!file::exists(directory_))
+                file::create_directories(directory_);
         }
         std::string fn = directory_ + std::to_string(++current_sequence_);
         write_file_ = std::make_unique<std::ofstream>(fn, std::ios::out | std::ios::binary);
@@ -160,7 +181,6 @@ void event_cache::push(const event& evt)
         write_file_->flush();
         report_info("Started new file " + fn);
     }
-    ++event_count_;
     total_size_ += sz;
     read_cond_.notify_one();
 }

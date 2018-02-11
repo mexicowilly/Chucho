@@ -42,12 +42,13 @@ public:
     event_cache(std::size_t chunk_size, std::size_t max_size);
     ~event_cache();
 
-    std::size_t get_event_count();
     optional<event> pop();
     void push(const event& evt);
     void stop();
 
 private:
+    void cull();
+    std::string find_oldest_file();
     template <typename int_type>
     int_type get_mem_buf(std::size_t idx)
     {
@@ -97,7 +98,6 @@ private:
     std::uint8_t* write_pos_;
     std::unique_ptr<std::ofstream> write_file_;
     std::uint32_t current_sequence_;
-    std::size_t event_count_;
     std::vector<std::uint8_t> ser_buf_;
     std::condition_variable read_cond_;
     bool should_stop_;
