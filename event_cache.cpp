@@ -20,6 +20,7 @@
 #include <chucho/logger.hpp>
 #include <sstream>
 #include <thread>
+#include <algorithm>
 #include <cassert>
 
 namespace
@@ -52,9 +53,21 @@ event_cache::event_cache(std::size_t chunk_size, std::size_t max_size)
       write_pos_(mem_chunk_.get()),
       current_sequence_(0),
       event_count_(0),
-      should_stop_(false)
+      should_stop_(false),
+      total_size_(0),
+      mem_chunk_occupied_(0)
 {
     set_status_origin("event_cache");
+}
+
+event_cache::~event_cache()
+{
+    try
+    {
+        stop();
+    } catch (...)
+    {
+    }
 }
 
 std::size_t event_cache::get_event_count()
@@ -68,15 +81,46 @@ optional<event> event_cache::pop()
     optional<event> result;
     std::unique_lock<std::mutex> lock(guard_);
     while (!should_stop_ && event_count_ == 0)
-        read_cond_.wait_for(lock, 500ms);
+        read_cond_.wait_for(lock, 250ms);
     if (!should_stop_)
     {
         if (read_pos_ >= (mem_chunk_.get() + chunk_size_ - 4) || get_mem_buf<std::uint32_t>(0) == 0)
         {
-            // load next file
+            file::directory_iterator itor(directory_);
+            file::directory_iterator end;
+            std::vector<std::string> files;
+            while (itor != end)
+            {
+                files.push_back(*itor);
+                ++itor;
+            }
+            auto mn = std::min_element(files.begin(), files.end(),
+                                       [] (const std::string& s1, const std::string& s2)
+                                       {
+                                           return std::stoul(file::base_name(s1)) < std::stoul(file::base_name(s2));
+                                       });
+            if (mn == files.end())
+                throw std::runtime_error("No event files were found");
+            std::memset(mem_chunk_.get(), 0, chunk_size_);
+            auto sz = file::size(*mn);
+            std::ifstream stream(*mn, std::ios::in | std::ios::binary);
+            stream.read(reinterpret_cast<char*>(mem_chunk_.get()), sz);
+            stream.close();
+            read_pos_ = mem_chunk_.get();
+            mem_chunk_occupied_ = sz;
+            assert(write_file_);
+            if (write_file_ && std::stoul(file::base_name(*mn)) == current_sequence_)
+            {
+                write_pos_ = mem_chunk_.get() + static_cast<std::size_t>(write_file_->tellp());
+                write_file_.reset();
+            }
+            file::remove(*mn);
+            report_info("Loaded file " + *mn);
         }
-        result = unserialize();
+        std::size_t sz;
+        result = unserialize(sz);
         --event_count_;
+        total_size_ -= sz;
     }
     return result;
 }
@@ -89,6 +133,7 @@ void event_cache::push(const event& evt)
     {
         std::memcpy(mem_chunk_.get(), &ser_buf_[0], sz);
         write_pos_ += sz;
+        mem_chunk_occupied_ += sz;
     }
     else
     {
@@ -98,6 +143,7 @@ void event_cache::push(const event& evt)
             if (static_cast<std::size_t>(write_file_->tellp()) + sz < chunk_size_)
             {
                 write_file_->write(reinterpret_cast<char*>(&ser_buf_[0]), sz);
+                write_file_->flush();
                 return;
             }
         }
@@ -111,8 +157,11 @@ void event_cache::push(const event& evt)
         if (!write_file_->is_open())
             throw std::runtime_error("Unable to open " + fn);
         write_file_->write(reinterpret_cast<char*>(&ser_buf_[0]), sz);
+        write_file_->flush();
+        report_info("Started new file " + fn);
     }
     ++event_count_;
+    total_size_ += sz;
     read_cond_.notify_one();
 }
 
@@ -193,8 +242,26 @@ std::size_t event_cache::serialized_size(const event& evt, std::string& mrk_text
     return sz;
 }
 
-event event_cache::unserialize()
+void event_cache::stop()
 {
+    std::lock_guard<std::mutex> lock(guard_);
+    should_stop_ = true;
+    write_file_.reset();
+    file::remove_all(directory_);
+    auto parent = file::directory_name(directory_);
+    bool empty = false;
+    {
+        file::directory_iterator itor(parent);
+        file::directory_iterator end;
+        empty = itor == end;
+    }
+    if (empty)
+        file::remove(parent);
+}
+
+event event_cache::unserialize(std::size_t& sz)
+{
+    sz = get_mem_buf<std::uint32_t>(0);
     std::size_t pos = 4;
     std::size_t len = get_mem_buf<std::uint16_t>(pos);
     pos += 2;

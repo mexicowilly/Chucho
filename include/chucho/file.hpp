@@ -46,9 +46,10 @@ struct directory_iterator_impl;
 class CHUCHO_PRIV_EXPORT directory_iterator : public std::iterator<std::forward_iterator_tag, std::string>
 {
 public:
-    directory_iterator() = default;
+    directory_iterator();
     directory_iterator(const std::string& directory);
     directory_iterator(const directory_iterator& it) = delete;
+    ~directory_iterator();
 
     directory_iterator& operator= (const directory_iterator& it) = delete;
     bool operator== (const directory_iterator& it) const;

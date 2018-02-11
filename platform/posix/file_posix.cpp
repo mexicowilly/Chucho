@@ -259,6 +259,14 @@ std::string temporary_directory()
     return result;
 }
 
+directory_iterator::directory_iterator()
+{
+}
+
+directory_iterator::~directory_iterator()
+{
+}
+
 directory_iterator::directory_iterator(const std::string& directory)
     : pimpl_(std::make_unique<directory_iterator_impl>(directory))
 {

@@ -40,10 +40,12 @@ class CHUCHO_PRIV_EXPORT event_cache : non_copyable, public status_reporter
 {
 public:
     event_cache(std::size_t chunk_size, std::size_t max_size);
+    ~event_cache();
 
     std::size_t get_event_count();
     optional<event> pop();
     void push(const event& evt);
+    void stop();
 
 private:
     template <typename int_type>
@@ -84,7 +86,7 @@ private:
         std::memcpy(&ser_buf_[idx], &val, sizeof(val));
     }
     // NOTE: guard_ must be locked on entry
-    event unserialize();
+    event unserialize(std::size_t& sz);
 
     std::size_t chunk_size_;
     std::size_t max_size_;
@@ -99,6 +101,8 @@ private:
     std::vector<std::uint8_t> ser_buf_;
     std::condition_variable read_cond_;
     bool should_stop_;
+    std::size_t total_size_;
+    std::size_t mem_chunk_occupied_;
 };
 
 inline std::string event_cache::get_mem_buf_str(std::size_t idx, std::size_t len)
