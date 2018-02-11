@@ -100,6 +100,21 @@ public:
           unsigned line_number,
           const char* const function_name,
           const std::string& mark);
+    /**
+     * Construct an event.
+     *
+     * @param evt the event to copy
+     */
+    event(const event& evt);
+    //@}
+
+    /**
+     * Copy an event.
+     *
+     * @param evt to copy
+     * @return this
+     */
+    event& operator= (const event& evt);
 
     /**
      * Return the file name.

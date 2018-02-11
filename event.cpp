@@ -56,4 +56,57 @@ event::event(std::shared_ptr<logger> lgr,
 {
 }
 
+event::event(const event& evt)
+    : logger_(evt.logger_),
+      level_(evt.level_),
+      message_(evt.message_),
+      time_(evt.time_),
+      file_name_(evt.file_name_),
+      line_number_(evt.line_number_),
+      function_name_(evt.function_name_),
+      marker_(evt.marker_),
+      thread_id_(evt.thread_id_)
+{
+    if (evt.file_name_store_)
+    {
+        file_name_store_ = evt.file_name_store_;
+        file_name_ = file_name_store_->c_str();
+    }
+    if (evt.function_name_store_)
+    {
+        function_name_store_ = evt.function_name_store_;
+        function_name_ = function_name_store_->c_str();
+    }
+}
+
+event& event::operator= (const event& evt)
+{
+    logger_ = evt.logger_;
+    level_ = evt.level_;
+    message_ = evt.message_;
+    time_ = evt.time_;
+    if (evt.file_name_store_)
+    {
+        file_name_store_ = evt.file_name_store_;
+        file_name_ = file_name_store_->c_str();
+    }
+    else
+    {
+        file_name_ = evt.file_name_;
+    }
+    line_number_ = evt.line_number_;
+    if (evt.function_name_store_)
+    {
+        function_name_store_ = evt.function_name_store_;
+        function_name_ = function_name_store_->c_str();
+    }
+    else
+    {
+        function_name_ = evt.function_name_;
+    }
+    marker_ = evt.marker_;
+    thread_id_ = evt.thread_id_;
+    return *this;
+}
+
 }
