@@ -254,7 +254,7 @@ std::string temporary_directory()
 {
     auto env = environment::get("TMPDIR");
     std::string result = env ? *env : P_tmpdir;
-    if (result[result.length() - 1] != '/')
+    if (result.empty() || result[result.length() - 1] != '/')
         result += '/';
     return result;
 }
@@ -297,7 +297,7 @@ directory_iterator& directory_iterator::operator++ ()
             {
                 if (std::strcmp(result->d_name, ".") != 0 && std::strcmp(result->d_name, "..") != 0)
                 {
-                    cur_ = pimpl_->parent_ + dir_sep + result->d_name;
+                    cur_ = pimpl_->parent_ + result->d_name;
                     break;
                 }
             }
@@ -312,6 +312,8 @@ directory_iterator_impl::directory_iterator_impl(const std::string& dir)
 {
     if (dir_ == nullptr)
         throw chucho::file_exception("Could not open directory " + dir + ": " + std::strerror(errno));
+    if (parent_[parent_.length() - 1] != '/')
+        parent_ += '/';
 #if defined(CHUCHO_DIRENT_NEEDS_NAME)
     dirent_bytes_ = std::make_unique<std::uint8_t[]>(sizeof(struct dirent) + pathconf(dir.c_str(), PC_NAME_MAX));
 #else

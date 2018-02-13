@@ -20,6 +20,29 @@
 #include <chucho/function_name.hpp>
 #include <thread>
 
+#include <iostream>
+
+namespace
+{
+
+void full_speed_main(chucho::event_cache& cache, std::size_t count)
+{
+    chucho::event e(chucho::logger::get("will"), chucho::level::INFO_(), "hi", __FILE__, __LINE__, CHUCHO_FUNCTION_NAME);
+    for (std::size_t i = 0; i < count; i++)
+        cache.push(e);
+}
+
+}
+
+TEST(event_cache, full_speed)
+{
+    chucho::event_cache cache(50 * 1024 * 1024, 100 * 1024 * 1024);
+    std::thread thr(full_speed_main, std::ref(cache), 200000);
+    for (std::size_t i = 0; i < 200000; i++)
+        cache.pop();
+    thr.join();
+}
+
 TEST(event_cache, serialization)
 {
     chucho::event_cache cache(1024 * 1024, 10 * 1024 * 1024);
@@ -33,7 +56,7 @@ TEST(event_cache, serialization)
     EXPECT_STREQ(e1.get_file_name(), e2->get_file_name());
     EXPECT_EQ(e1.get_line_number(), e2->get_line_number());
     EXPECT_STREQ(e1.get_function_name(), e2->get_function_name());
-    // close enough
+    // close enough (the cache only records microsecond precision)
     EXPECT_EQ(std::chrono::system_clock::to_time_t(e1.get_time()), std::chrono::system_clock::to_time_t(e2->get_time()));
     ASSERT_TRUE(e2->get_thread_id());
     std::ostringstream stream;

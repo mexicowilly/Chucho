@@ -118,6 +118,13 @@ optional<event> event_cache::pop()
         read_cond_.wait_for(lock, 250ms);
     if (!should_stop_)
     {
+//        if (mem_chunk_occupied_ > 200)
+//        {
+//            std::ofstream s("mem_chunk", std::ios::out | std::ios::binary);
+//            s.write((char*)mem_chunk_.get(), mem_chunk_occupied_);
+//            s.close();
+//            exit(0);
+//        }
         if (read_pos_ >= (mem_chunk_.get() + chunk_size_ - 4) || get_mem_buf<std::uint32_t>(0) == 0)
         {
             auto oldest = find_oldest_file();
@@ -140,6 +147,7 @@ optional<event> event_cache::pop()
         std::size_t sz;
         result = unserialize(sz);
         total_size_ -= sz;
+        read_pos_ += sz;
     }
     return result;
 }
@@ -152,34 +160,25 @@ void event_cache::push(const event& evt)
     auto sz = serialize(evt);
     if (write_pos_ != nullptr && (write_pos_ - mem_chunk_.get()) + sz <= chunk_size_)
     {
-        std::memcpy(mem_chunk_.get(), &ser_buf_[0], sz);
+        std::memcpy(write_pos_, &ser_buf_[0], sz);
         write_pos_ += sz;
         mem_chunk_occupied_ += sz;
     }
     else
     {
         write_pos_ = nullptr;
-        if (write_file_)
-        {
-            if (static_cast<std::size_t>(write_file_->tellp()) + sz < chunk_size_)
-            {
-                write_file_->write(reinterpret_cast<char*>(&ser_buf_[0]), sz);
-                write_file_->flush();
-                return;
-            }
-        }
-        else
+        if (!write_file_ || static_cast<std::size_t>(write_file_->tellp()) + sz > chunk_size_)
         {
             if (!file::exists(directory_))
                 file::create_directories(directory_);
+            std::string fn = directory_ + std::to_string(++current_sequence_);
+            write_file_ = std::make_unique<std::ofstream>(fn, std::ios::out | std::ios::binary);
+            if (!write_file_->is_open())
+                throw std::runtime_error("Unable to open " + fn);
+            report_info("Started new file " + fn);
         }
-        std::string fn = directory_ + std::to_string(++current_sequence_);
-        write_file_ = std::make_unique<std::ofstream>(fn, std::ios::out | std::ios::binary);
-        if (!write_file_->is_open())
-            throw std::runtime_error("Unable to open " + fn);
         write_file_->write(reinterpret_cast<char*>(&ser_buf_[0]), sz);
         write_file_->flush();
-        report_info("Started new file " + fn);
     }
     total_size_ += sz;
     read_cond_.notify_one();
@@ -276,7 +275,18 @@ void event_cache::stop()
         empty = itor == end;
     }
     if (empty)
+    {
         file::remove(parent);
+        auto grandparent = file::directory_name(parent);
+        empty = false;
+        {
+            file::directory_iterator itor(grandparent);
+            file::directory_iterator end;
+            empty = itor == end;
+        }
+        if (empty)
+            file::remove(grandparent);
+    }
 }
 
 event event_cache::unserialize(std::size_t& sz)
