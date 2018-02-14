@@ -43,7 +43,7 @@ namespace chucho
 
 using namespace std::chrono_literals;
 
-event_cache::event_cache(std::size_t chunk_size, std::size_t max_size)
+event_cache::event_cache(std::size_t chunk_size, std::size_t max_size, cull_callback cull_cb)
     : chunk_size_(chunk_size),
       max_size_(max_size),
       directory_(file::temporary_directory() + "chucho-cache" + file::dir_sep + std::to_string(process::id()) +
@@ -54,7 +54,8 @@ event_cache::event_cache(std::size_t chunk_size, std::size_t max_size)
       current_sequence_(0),
       should_stop_(false),
       total_size_(0),
-      mem_chunk_occupied_(0)
+      mem_chunk_occupied_(0),
+      cull_cb_(cull_cb)
 {
     if (chunk_size_ >= max_size_)
         throw std::invalid_argument("max_size must be greater than chunk_size");
@@ -88,6 +89,8 @@ void event_cache::cull()
     }
     total_size_ -= culled;
     report_warning("The cache is full. Removed " + std::to_string(culled) + " oldest bytes.");
+    if (cull_cb_)
+        cull_cb_(culled);
 }
 
 std::string event_cache::find_oldest_file()
@@ -118,13 +121,6 @@ optional<event> event_cache::pop()
         read_cond_.wait_for(lock, 250ms);
     if (!should_stop_)
     {
-//        if (mem_chunk_occupied_ > 200)
-//        {
-//            std::ofstream s("mem_chunk", std::ios::out | std::ios::binary);
-//            s.write((char*)mem_chunk_.get(), mem_chunk_occupied_);
-//            s.close();
-//            exit(0);
-//        }
         if (read_pos_ >= (mem_chunk_.get() + chunk_size_ - 4) || get_mem_buf<std::uint32_t>(0) == 0)
         {
             auto oldest = find_oldest_file();

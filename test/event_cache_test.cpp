@@ -20,8 +20,6 @@
 #include <chucho/function_name.hpp>
 #include <thread>
 
-#include <iostream>
-
 namespace
 {
 
@@ -36,9 +34,9 @@ void full_speed_main(chucho::event_cache& cache, std::size_t count)
 
 TEST(event_cache, full_speed)
 {
-    chucho::event_cache cache(50 * 1024 * 1024, 100 * 1024 * 1024);
-    std::thread thr(full_speed_main, std::ref(cache), 200000);
-    for (std::size_t i = 0; i < 200000; i++)
+    chucho::event_cache cache(1024 * 1024, 100 * 1024 * 1024);
+    std::thread thr(full_speed_main, std::ref(cache), 1000000);
+    for (std::size_t i = 0; i < 1000000; i++)
         cache.pop();
     thr.join();
 }
