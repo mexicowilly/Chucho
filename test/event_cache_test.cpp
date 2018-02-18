@@ -26,12 +26,13 @@ using namespace std::chrono_literals;
 namespace
 {
 
-void full_speed_main(chucho::event_cache& cache, std::size_t count)
+void full_speed_main(chucho::event_cache& cache, std::size_t count, std::chrono::milliseconds delay)
 {
     for (std::size_t i = 0; i < count; i++)
     {
         chucho::event e(chucho::logger::get("will"), chucho::level::INFO_(), std::to_string(i), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME);
         cache.push(e);
+        std::this_thread::sleep_for(delay);
     }
 }
 
@@ -60,7 +61,7 @@ TEST(event_cache, cull)
     std::size_t culled_bytes = 0;
     std::size_t popped = 0;
     chucho::event_cache cache(1024 * 1024, 2 * 1024 * 1024, [&culled_bytes] (const chucho::event_cache_stats& st, std::size_t cnt) { culled_bytes += cnt; });
-    std::thread thr(full_speed_main, std::ref(cache), 1000000);
+    std::thread thr(full_speed_main, std::ref(cache), 1000000, 0ms);
     chucho::optional<chucho::event> evt;
     std::this_thread::sleep_for(1s);
     do
@@ -80,7 +81,7 @@ TEST(event_cache, cull)
 TEST(event_cache, full_speed)
 {
     chucho::event_cache cache(1024 * 1024, 100 * 1024 * 1024);
-    std::thread thr(full_speed_main, std::ref(cache), 1000000);
+    std::thread thr(full_speed_main, std::ref(cache), 1000000, 0ms);
     for (std::size_t i = 0; i < 1000000; i++)
     {
         auto evt = cache.pop(250ms);
@@ -110,5 +111,19 @@ TEST(event_cache, serialization)
     std::ostringstream stream;
     stream << std::this_thread::get_id();
     EXPECT_STREQ(stream.str().c_str(), e2->get_thread_id()->c_str());
+}
+
+TEST(event_cache, slow_write)
+{
+    chucho::event_cache cache(1024 * 1024, 100 * 1024 * 1024);
+    std::thread thr(full_speed_main, std::ref(cache), 10000, 1ms);
+    for (std::size_t i = 0; i < 10000; i++)
+    {
+        auto evt = cache.pop(250ms);
+        ASSERT_TRUE(evt);
+        EXPECT_EQ(std::to_string(i), evt->get_message());
+    }
+    thr.join();
+    std::cout << cache.get_stats() << std::endl;
 }
 
