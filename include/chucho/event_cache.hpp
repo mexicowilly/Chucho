@@ -25,6 +25,7 @@
 #include <chucho/non_copyable.hpp>
 #include <chucho/status_reporter.hpp>
 #include <chucho/event.hpp>
+#include <chucho/event_cache_stats.hpp>
 #include <string>
 #include <memory>
 #include <mutex>
@@ -39,14 +40,12 @@ namespace chucho
 class CHUCHO_PRIV_EXPORT event_cache : non_copyable, public status_reporter
 {
 public:
-    typedef std::function<void(std::size_t)> cull_callback;
+    event_cache(std::size_t chunk_size, std::size_t max_size, event_cache_stats::cull_callback cull_cb = event_cache_stats::cull_callback());
+    virtual ~event_cache();
 
-    event_cache(std::size_t chunk_size, std::size_t max_size, cull_callback cull_cb = cull_callback());
-    ~event_cache();
-
-    optional<event> pop();
+    event_cache_stats get_stats();
+    optional<event> pop(std::chrono::milliseconds to_wait);
     void push(const event& evt);
-    void stop();
 
 private:
     void cull();
@@ -88,11 +87,10 @@ private:
     {
         std::memcpy(&ser_buf_[idx], &val, sizeof(val));
     }
+    void stop();
     // NOTE: guard_ must be locked on entry
     event unserialize(std::size_t& sz);
 
-    std::size_t chunk_size_;
-    std::size_t max_size_;
     std::string directory_;
     std::mutex guard_;
     std::unique_ptr<std::uint8_t[]> mem_chunk_;
@@ -102,10 +100,9 @@ private:
     std::uint32_t current_sequence_;
     std::vector<std::uint8_t> ser_buf_;
     std::condition_variable read_cond_;
-    bool should_stop_;
-    std::size_t total_size_;
     std::size_t mem_chunk_occupied_;
-    cull_callback cull_cb_;
+    event_cache_stats::cull_callback cull_cb_;
+    event_cache_stats stats_;
 };
 
 inline std::string event_cache::get_mem_buf_str(std::size_t idx, std::size_t len)

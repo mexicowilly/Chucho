@@ -19,17 +19,59 @@
 #include <chucho/logger.hpp>
 #include <chucho/function_name.hpp>
 #include <thread>
+#include <iostream>
+
+using namespace std::chrono_literals;
 
 namespace
 {
 
 void full_speed_main(chucho::event_cache& cache, std::size_t count)
 {
-    chucho::event e(chucho::logger::get("will"), chucho::level::INFO_(), "hi", __FILE__, __LINE__, CHUCHO_FUNCTION_NAME);
     for (std::size_t i = 0; i < count; i++)
+    {
+        chucho::event e(chucho::logger::get("will"), chucho::level::INFO_(), std::to_string(i), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME);
         cache.push(e);
+    }
 }
 
+std::ostream& operator<< (std::ostream& stream, const chucho::event_cache_stats& stats)
+{
+    stream <<
+        "  Chunk size: " << stats.get_chunk_size() << '\n' <<
+        "  Max size: " << stats.get_max_size() << '\n' <<
+        "  Total size: " << stats.get_total_size() << '\n' <<
+        "  Largest size: " << stats.get_largest_size() << '\n' <<
+        "  Files created: " << stats.get_files_created() << '\n' <<
+        "  Files destroyed: " << stats.get_files_destroyed() << '\n' <<
+        "  Bytes culled: " << stats.get_bytes_culled() << '\n' <<
+        "  Events read: " << stats.get_events_read() << '\n' <<
+        "  Events written: " << stats.get_events_written();
+    return stream;
+}
+
+}
+
+TEST(event_cache, cull)
+{
+    std::size_t culled_bytes = 0;
+    std::size_t popped = 0;
+    chucho::event_cache cache(1024 * 1024, 2 * 1024 * 1024, [&culled_bytes] (const chucho::event_cache_stats& st, std::size_t cnt) { culled_bytes += cnt; });
+    std::thread thr(full_speed_main, std::ref(cache), 1000000);
+    chucho::optional<chucho::event> evt;
+    std::this_thread::sleep_for(1s);
+    do
+    {
+        evt = cache.pop(250ms);
+        ++popped;
+    } while (evt);
+    thr.join();
+    EXPECT_GT(culled_bytes, 0);
+    --popped;
+    EXPECT_LT(popped, 1000000);
+    auto stats = cache.get_stats();
+    EXPECT_EQ(culled_bytes, stats.get_bytes_culled());
+    std::cout << cache.get_stats() << std::endl;
 }
 
 TEST(event_cache, full_speed)
@@ -37,8 +79,13 @@ TEST(event_cache, full_speed)
     chucho::event_cache cache(1024 * 1024, 100 * 1024 * 1024);
     std::thread thr(full_speed_main, std::ref(cache), 1000000);
     for (std::size_t i = 0; i < 1000000; i++)
-        cache.pop();
+    {
+        auto evt = cache.pop(250ms);
+        ASSERT_TRUE(evt);
+        EXPECT_EQ(std::to_string(i), evt->get_message());
+    }
     thr.join();
+    std::cout << cache.get_stats() << std::endl;
 }
 
 TEST(event_cache, serialization)
@@ -46,7 +93,7 @@ TEST(event_cache, serialization)
     chucho::event_cache cache(1024 * 1024, 10 * 1024 * 1024);
     chucho::event e1(chucho::logger::get("will"), chucho::level::INFO_(), "hi", __FILE__, __LINE__, CHUCHO_FUNCTION_NAME);
     cache.push(e1);
-    auto e2 = cache.pop();
+    auto e2 = cache.pop(250ms);
     ASSERT_TRUE(e2);
     EXPECT_STREQ(e1.get_logger()->get_name().c_str(), e2->get_logger()->get_name().c_str());
     EXPECT_EQ(e1.get_level(), e2->get_level());

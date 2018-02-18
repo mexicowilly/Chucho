@@ -202,6 +202,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/duplicate_message_filter.hpp
     include/chucho/evaluator_filter.hpp
     include/chucho/event.hpp
+    include/chucho/event_cache_stats.hpp
     include/chucho/exception.hpp
     "${CMAKE_BINARY_DIR}/chucho/export.h"
     include/chucho/file_compressor.hpp
