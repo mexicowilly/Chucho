@@ -46,7 +46,10 @@ std::ostream& operator<< (std::ostream& stream, const chucho::event_cache_stats&
         "  Files destroyed: " << stats.get_files_destroyed() << '\n' <<
         "  Bytes culled: " << stats.get_bytes_culled() << '\n' <<
         "  Events read: " << stats.get_events_read() << '\n' <<
-        "  Events written: " << stats.get_events_written();
+        "  Events written: " << stats.get_events_written() << '\n' <<
+        "  Smallest event: " << stats.get_smallest_event_size() << '\n' <<
+        "  Largest event: " << stats.get_largest_event_size() << '\n' <<
+        "  Average event size: " << stats.get_average_event_size();
     return stream;
 }
 

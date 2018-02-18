@@ -30,14 +30,17 @@ class CHUCHO_EXPORT event_cache_stats
 public:
     using cull_callback = std::function<void(const event_cache_stats&, std::size_t)>;
 
+    std::size_t get_average_event_size() const;
     std::size_t get_bytes_culled() const;
     std::size_t get_chunk_size() const;
     std::size_t get_events_read() const;
     std::size_t get_events_written() const;
     std::size_t get_files_created() const;
     std::size_t get_files_destroyed() const;
+    std::size_t get_largest_event_size() const;
     std::size_t get_largest_size() const;
     std::size_t get_max_size() const;
+    std::size_t get_smallest_event_size() const;
     std::size_t get_total_size() const;
 
 private:
@@ -54,12 +57,21 @@ private:
     std::size_t bytes_culled_{0};
     std::size_t events_read_{0};
     std::size_t events_written_{0};
+    std::size_t smallest_event_size_{std::numeric_limits<std::size_t>::max()};
+    std::size_t largest_event_size_{0};
+    std::size_t average_event_size_{0};
+    std::size_t total_bytes_written_{0};
 };
 
 inline event_cache_stats::event_cache_stats(std::size_t chunk_size, std::size_t max_size)
     : chunk_size_(chunk_size),
       max_size_(max_size)
 {
+}
+
+inline std::size_t event_cache_stats::get_average_event_size() const
+{
+    return average_event_size_;
 }
 
 inline std::size_t event_cache_stats::get_bytes_culled() const
@@ -97,9 +109,19 @@ inline std::size_t event_cache_stats::get_largest_size() const
     return largest_size_;
 }
 
+inline std::size_t event_cache_stats::get_largest_event_size() const
+{
+    return largest_event_size_;
+}
+
 inline std::size_t event_cache_stats::get_max_size() const
 {
     return max_size_;
+}
+
+inline std::size_t event_cache_stats::get_smallest_event_size() const
+{
+    return smallest_event_size_;
 }
 
 inline std::size_t event_cache_stats::get_total_size() const

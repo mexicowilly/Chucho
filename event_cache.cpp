@@ -121,6 +121,7 @@ std::string event_cache::find_oldest_file()
 event_cache_stats event_cache::get_stats()
 {
     std::lock_guard<std::mutex> lock(guard_);
+    stats_.average_event_size_ = stats_.total_bytes_written_ / stats_.events_written_;
     return stats_;
 }
 
@@ -192,6 +193,11 @@ void event_cache::push(const event& evt)
         cull();
     if (stats_.total_size_ > stats_.largest_size_)
         stats_.largest_size_ = stats_.total_size_;
+    if (stats_.largest_event_size_ < sz)
+        stats_.largest_event_size_ = sz;
+    if (stats_.smallest_event_size_ > sz)
+        stats_.smallest_event_size_ = sz;
+    stats_.total_bytes_written_ += sz;
     read_cond_.notify_one();
 }
 
