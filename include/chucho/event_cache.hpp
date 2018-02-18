@@ -40,7 +40,9 @@ namespace chucho
 class CHUCHO_PRIV_EXPORT event_cache : non_copyable, public status_reporter
 {
 public:
-    event_cache(std::size_t chunk_size, std::size_t max_size, event_cache_stats::cull_callback cull_cb = event_cache_stats::cull_callback());
+    event_cache(std::size_t chunk_size,
+                std::size_t max_size,
+                event_cache_stats::cull_callback cull_cb = event_cache_stats::cull_callback());
     virtual ~event_cache();
 
     event_cache_stats get_stats();
@@ -48,7 +50,9 @@ public:
     void push(const event& evt);
 
 private:
+    // NOTE: guard_ must be locked on entry
     void cull();
+    // NOTE: guard_ must be locked on entry
     std::string find_oldest_file();
     template <typename int_type>
     int_type get_mem_buf(std::size_t idx)

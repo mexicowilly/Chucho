@@ -162,8 +162,6 @@ optional<event> event_cache::pop(std::chrono::milliseconds to_wait)
 void event_cache::push(const event& evt)
 {
     std::lock_guard<std::mutex> lock(guard_);
-    if (stats_.total_size_ >= stats_.max_size_)
-        cull();
     auto sz = serialize(evt);
     if (write_pos_ != nullptr && (write_pos_ - mem_chunk_.get()) + sz <= stats_.chunk_size_)
     {
@@ -189,9 +187,11 @@ void event_cache::push(const event& evt)
         write_file_->flush();
     }
     stats_.total_size_ += sz;
-    if (sz > stats_.largest_size_)
-        stats_.largest_size_ = sz;
     ++stats_.events_written_;
+    if (stats_.total_size_ >= stats_.max_size_)
+        cull();
+    if (stats_.total_size_ > stats_.largest_size_)
+        stats_.largest_size_ = stats_.total_size_;
     read_cond_.notify_one();
 }
 
