@@ -23,9 +23,9 @@
 #endif
 
 #include <chucho/writer.hpp>
-#include <queue>
+#include <chucho/event_cache_provider.hpp>
 #include <thread>
-#include <condition_variable>
+#include <atomic>
 
 namespace chucho
 {
@@ -54,13 +54,11 @@ namespace chucho
  * 
  * @ingroup writers
  */
-class CHUCHO_EXPORT async_writer : public writer
+class CHUCHO_EXPORT async_writer : public writer, public event_cache_provider
 {
 public:
-    /**
-     * The default queue capacity, which is 256.
-     */
-    static const std::size_t DEFAULT_QUEUE_CAPACITY;
+    static constexpr std::size_t DEFAULT_CHUNK_SIZE = 1024 * 1024;
+    static constexpr std::size_t DEFAULT_MAX_CHUNKS = 2;
 
     /**
      * @name Constructor and destructor
@@ -71,19 +69,18 @@ public:
      *
      * @param name the name of the writer
      * @param wrt the underlying slow writer
-     * @param capacity the capacity of the blocking queue
-     * @param discard_threshold the level at which to discard events 
-     *                          once the queue is at 80% capacity or
-     *                          more
-     * @param flush_on_destruct whether to flush the pending events 
+     * @param flush_on_destruct whether to flush the pending events
      *                          when the writer is destroyed
      * @throw std::invalid_argument if fmt is an uninitialized 
      *        std::unique_ptr
      */
     async_writer(const std::string& name,
                  std::unique_ptr<writer>&& wrt,
-                 std::size_t capacity = DEFAULT_QUEUE_CAPACITY,
-                 std::shared_ptr<level> discard_threshold = level::INFO_(),
+                 bool flush_on_destruct = true);
+    async_writer(const std::string& name,
+                 std::unique_ptr<writer>&& wrt,
+                 std::size_t chunk_size,
+                 std::size_t max_chunks,
                  bool flush_on_destruct = true);
     /**
      * Destruct an asynchronous writer.
@@ -92,34 +89,12 @@ public:
     //@}
 
     /**
-     * Return the level at which events are discarded. Once the 
-     * queue has become 80% full, then events can be discarded. Any 
-     * event whose level is at or below the discard threshold will 
-     * be thrown away. This can be disabled with level OFF_. 
-     * 
-     * @return the discard threshold
-     */
-    std::shared_ptr<level> get_discard_threshold() const;
-    /**
      * Return whether this writer should flush any cached events at 
      * destruction time. 
      * 
      * @return whether the writer flushes on destruct
      */
     bool get_flush_on_destruct() const;
-    /**
-     * Return the queue capacity.
-     * 
-     * @return the queue capacity
-     */
-    std::size_t get_queue_capacity() const;
-    /**
-     * Return the queue size. This is the number of events that are 
-     * currently in the queue. 
-     * 
-     * @return the queue size
-     */
-    std::size_t get_queue_size();
     /**
      * Return the underlying slow writer.
      * 
@@ -135,41 +110,25 @@ private:
 
     CHUCHO_NO_EXPORT async_writer(const std::string& name,
                                   std::unique_ptr<writer>&& wrt,
-                                  std::size_t capacity,
-                                  std::shared_ptr<level> discard_threshold,
+                                  std::size_t chunk_size,
+                                  std::size_t max_chunks,
                                   bool flush_on_destruct,
                                   std::function<void()> enter_thread_cb,
                                   std::function<void()> leave_thread_cb);
 
     CHUCHO_NO_EXPORT void thread_main();
 
-    std::deque<event> queue_;
     std::unique_ptr<writer> writer_;
-    std::size_t capacity_;
-    std::mutex guard_;
-    std::condition_variable full_condition_;
-    std::condition_variable empty_condition_;
-    std::shared_ptr<level> discard_threshold_;
-    bool stop_;
+    std::atomic<bool> stop_;
     std::unique_ptr<std::thread> worker_;
     std::function<void()> enter_thread_cb_;
     std::function<void()> leave_thread_cb_;
     bool flush_on_destruct_;
 };
 
-inline std::shared_ptr<level> async_writer::get_discard_threshold() const
-{
-    return discard_threshold_;
-}
-
 inline bool async_writer::get_flush_on_destruct() const
 {
     return flush_on_destruct_;
-}
-
-inline std::size_t async_writer::get_queue_capacity() const
-{
-    return capacity_;
 }
 
 inline writer& async_writer::get_writer() const

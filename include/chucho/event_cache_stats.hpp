@@ -28,11 +28,21 @@ namespace chucho
 class CHUCHO_EXPORT event_cache_stats
 {
 public:
-    using cull_callback = std::function<void(const event_cache_stats&, std::size_t)>;
+    enum class progress_direction
+    {
+        UP,
+        DOWN
+    };
+
+    using progress_callback = std::function<void(const event_cache_stats&,
+                                                 progress_direction,
+                                                 double,
+                                                 std::size_t)>;
 
     std::size_t get_average_event_size() const;
     std::size_t get_bytes_culled() const;
     std::size_t get_chunk_size() const;
+    std::size_t get_current_size() const;
     std::size_t get_events_read() const;
     std::size_t get_events_written() const;
     std::size_t get_files_created() const;
@@ -41,7 +51,6 @@ public:
     std::size_t get_largest_size() const;
     std::size_t get_max_size() const;
     std::size_t get_smallest_event_size() const;
-    std::size_t get_total_size() const;
 
 private:
     friend class event_cache;
@@ -50,7 +59,7 @@ private:
 
     std::size_t chunk_size_{0};
     std::size_t max_size_{0};
-    std::size_t total_size_{0};
+    std::size_t current_size_{0};
     std::size_t largest_size_{0};
     std::size_t files_created_{0};
     std::size_t files_destroyed_{0};
@@ -60,7 +69,6 @@ private:
     std::size_t smallest_event_size_{std::numeric_limits<std::size_t>::max()};
     std::size_t largest_event_size_{0};
     std::size_t average_event_size_{0};
-    std::size_t total_bytes_written_{0};
 };
 
 inline event_cache_stats::event_cache_stats(std::size_t chunk_size, std::size_t max_size)
@@ -82,6 +90,11 @@ inline std::size_t event_cache_stats::get_bytes_culled() const
 inline std::size_t event_cache_stats::get_chunk_size() const
 {
     return chunk_size_;
+}
+
+inline std::size_t event_cache_stats::get_current_size() const
+{
+    return current_size_;
 }
 
 inline std::size_t event_cache_stats::get_events_read() const
@@ -122,11 +135,6 @@ inline std::size_t event_cache_stats::get_max_size() const
 inline std::size_t event_cache_stats::get_smallest_event_size() const
 {
     return smallest_event_size_;
-}
-
-inline std::size_t event_cache_stats::get_total_size() const
-{
-    return total_size_;
 }
 
 }

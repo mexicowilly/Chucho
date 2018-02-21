@@ -40,14 +40,12 @@ namespace chucho
 class CHUCHO_PRIV_EXPORT event_cache : non_copyable, public status_reporter
 {
 public:
-    event_cache(std::size_t chunk_size,
-                std::size_t max_size,
-                event_cache_stats::cull_callback cull_cb = event_cache_stats::cull_callback());
-    virtual ~event_cache();
+    event_cache(std::size_t chunk_size, std::size_t max_size);
 
     event_cache_stats get_stats();
     optional<event> pop(std::chrono::milliseconds to_wait);
     void push(const event& evt);
+    void set_progress_callback(event_cache_stats::progress_callback cb);
 
 private:
     // NOTE: guard_ must be locked on entry
@@ -62,6 +60,7 @@ private:
         return result;
     }
     std::string get_mem_buf_str(std::size_t idx, std::size_t len);
+    void report_progress(event_cache_stats::progress_direction dir);
     // I would prefer to use Flatbuffers, but I can't make Chucho
     // permanently depend on Flatbuffers.
     // The serialized format looks like:
@@ -105,8 +104,10 @@ private:
     std::vector<std::uint8_t> ser_buf_;
     std::condition_variable read_cond_;
     std::size_t mem_chunk_occupied_;
-    event_cache_stats::cull_callback cull_cb_;
+    event_cache_stats::progress_callback progress_cb_;
     event_cache_stats stats_;
+    std::size_t total_bytes_written_;
+    double last_fullness_threshold_;
 };
 
 inline std::string event_cache::get_mem_buf_str(std::size_t idx, std::size_t len)

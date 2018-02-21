@@ -202,6 +202,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/duplicate_message_filter.hpp
     include/chucho/evaluator_filter.hpp
     include/chucho/event.hpp
+    include/chucho/event_cache_provider.hpp
     include/chucho/event_cache_stats.hpp
     include/chucho/exception.hpp
     "${CMAKE_BINARY_DIR}/chucho/export.h"
@@ -655,6 +656,7 @@ SET(CHUCHO_SOURCES
     duplicate_message_filter_factory.cpp
     event.cpp
     event_cache.cpp
+    event_cache_provider.cpp
     exception.cpp
     file_compressor_factory.cpp
     file_compressor_memento.cpp

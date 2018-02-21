@@ -43,7 +43,7 @@ namespace chucho
 
 using namespace std::chrono_literals;
 
-event_cache::event_cache(std::size_t chunk_size, std::size_t max_size, event_cache_stats::cull_callback cull_cb)
+event_cache::event_cache(std::size_t chunk_size, std::size_t max_size)
     : directory_(file::temporary_directory() + "chucho-cache" + file::dir_sep + std::to_string(process::id()) +
                  file::dir_sep + std::to_string(get_random_number()) + file::dir_sep),
       mem_chunk_(std::make_unique<std::uint8_t[]>(chunk_size)),
@@ -51,8 +51,8 @@ event_cache::event_cache(std::size_t chunk_size, std::size_t max_size, event_cac
       write_pos_(mem_chunk_.get()),
       current_sequence_(0),
       mem_chunk_occupied_(0),
-      cull_cb_(cull_cb),
-      stats_(chunk_size, max_size)
+      stats_(chunk_size, max_size),
+      last_fullness_threshold_(0.0)
 {
     if (stats_.chunk_size_ >= stats_.max_size_)
         throw std::invalid_argument("max_size must be greater than chunk_size");
@@ -86,15 +86,19 @@ void event_cache::cull()
         file::remove(oldest);
         ++stats_.files_destroyed_;
     }
-    stats_.total_size_ -= culled;
+    stats_.current_size_ -= culled;
     std::ostringstream stream;
     stream << "The cache is full. Removed " << culled << " oldest bytes.";
     if (!oldest.empty())
         stream << " (file " << oldest << ")";
     report_warning(stream.str());
     stats_.bytes_culled_ += culled;
-    if (cull_cb_)
-        cull_cb_(stats_,culled);
+    if (progress_cb_)
+    {
+        stats_.average_event_size_ = total_bytes_written_ / stats_.events_written_;
+        progress_cb_(stats_, event_cache_stats::progress_direction::UP, 1.0, culled);
+        last_fullness_threshold_ = 1.0;
+    }
 }
 
 std::string event_cache::find_oldest_file()
@@ -121,7 +125,7 @@ std::string event_cache::find_oldest_file()
 event_cache_stats event_cache::get_stats()
 {
     std::lock_guard<std::mutex> lock(guard_);
-    stats_.average_event_size_ = stats_.total_bytes_written_ / stats_.events_written_;
+    stats_.average_event_size_ = total_bytes_written_ / stats_.events_written_;
     return stats_;
 }
 
@@ -129,7 +133,7 @@ optional<event> event_cache::pop(std::chrono::milliseconds to_wait)
 {
     optional<event> result;
     std::unique_lock<std::mutex> lock(guard_);
-    if (read_cond_.wait_for(lock, to_wait, [this] () { return stats_.total_size_ > 0; }))
+    if (read_cond_.wait_for(lock, to_wait, [this] () { return stats_.current_size_ > 0; }))
     {
         if (read_pos_ >= (mem_chunk_.get() + stats_.chunk_size_ - 4) || get_mem_buf<std::uint32_t>(0) == 0)
         {
@@ -152,10 +156,11 @@ optional<event> event_cache::pop(std::chrono::milliseconds to_wait)
         }
         std::size_t sz;
         result = unserialize(sz);
-        stats_.total_size_ -= sz;
+        stats_.current_size_ -= sz;
         read_pos_ += sz;
         mem_chunk_occupied_ -= sz;
         ++stats_.events_read_;
+        report_progress(event_cache_stats::progress_direction::DOWN);
     }
     return result;
 }
@@ -187,18 +192,55 @@ void event_cache::push(const event& evt)
         write_file_->write(reinterpret_cast<char*>(&ser_buf_[0]), sz);
         write_file_->flush();
     }
-    stats_.total_size_ += sz;
+    stats_.current_size_ += sz;
     ++stats_.events_written_;
-    if (stats_.total_size_ >= stats_.max_size_)
+    if (stats_.current_size_ >= stats_.max_size_)
         cull();
-    if (stats_.total_size_ > stats_.largest_size_)
-        stats_.largest_size_ = stats_.total_size_;
+    if (stats_.current_size_ > stats_.largest_size_)
+        stats_.largest_size_ = stats_.current_size_;
     if (stats_.largest_event_size_ < sz)
         stats_.largest_event_size_ = sz;
     if (stats_.smallest_event_size_ > sz)
         stats_.smallest_event_size_ = sz;
-    stats_.total_bytes_written_ += sz;
+    total_bytes_written_ += sz;
+    if (stats_.current_size_ >= stats_.max_size_)
+        cull();
+    else
+        report_progress(event_cache_stats::progress_direction::UP);
     read_cond_.notify_one();
+}
+
+void event_cache::report_progress(event_cache_stats::progress_direction dir)
+{
+    if (progress_cb_)
+    {
+        double full = static_cast<double>(stats_.current_size_) / static_cast<double>(stats_.max_size_);
+        bool report = false;
+        if (dir == event_cache_stats::progress_direction::UP)
+        {
+            if ((last_fullness_threshold_ < .8 && full >= .8) ||
+                (last_fullness_threshold_ >= .8 && full >= .9) ||
+                (last_fullness_threshold_ >= .9 && full >= .95))
+            {
+                report = true;
+            }
+        }
+        else
+        {
+            if ((last_fullness_threshold_ > .95 && full <= ..95) ||
+                (last_fullness_threshold_ <= .95 && full <= .9) ||
+                (last_fullness_threshold_ <= .9 && full <= .8))
+            {
+                report = true;
+            }
+        }
+        if (report)
+        {
+            stats_.average_event_size_ = total_bytes_written_ / stats_.events_written_;
+            progress_cb_(stats_, dir, full, 0);
+            last_fullness_threshold_ = full;
+        }
+    }
 }
 
 std::size_t event_cache::serialize(const event& evt)
@@ -276,6 +318,12 @@ std::size_t event_cache::serialized_size(const event& evt, std::string& mrk_text
     thr_text = stream.str();
     sz += thr_text.length();
     return sz;
+}
+
+void event_cache::set_progress_callback(event_cache_stats::progress_callback cb)
+{
+    std::lock_guard<std::mutex> lock(guard_);
+    progress_cb_ = cb;
 }
 
 void event_cache::stop()
