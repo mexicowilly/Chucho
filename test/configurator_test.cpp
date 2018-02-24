@@ -163,8 +163,9 @@ void configurator::async_writer_body()
     auto lgr = chucho::logger::get("will");
     ASSERT_EQ(1, lgr->get_writer_names().size());
     auto& awrt = dynamic_cast<chucho::async_writer&>(lgr->get_writer("chucho::async_writer"));
-    EXPECT_EQ(*chucho::level::INFO_(), *awrt.get_discard_threshold());
-    EXPECT_EQ(chucho::async_writer::DEFAULT_QUEUE_CAPACITY, awrt.get_queue_capacity());
+    auto stats = awrt.get_cache_stats();
+    EXPECT_EQ(chucho::async_writer::DEFAULT_CHUNK_SIZE, stats.get_chunk_size());
+    EXPECT_EQ(chucho::async_writer::DEFAULT_MAX_CHUNKS, stats.get_max_size() / stats.get_chunk_size());
     EXPECT_EQ(typeid(chucho::file_writer), typeid(awrt.get_writer()));
 }
 
@@ -173,8 +174,9 @@ void configurator::async_writer_with_opts_body()
     auto lgr = chucho::logger::get("will");
     ASSERT_EQ(1, lgr->get_writer_names().size());
     auto& awrt = dynamic_cast<chucho::async_writer&>(lgr->get_writer("chucho::async_writer"));
-    EXPECT_EQ(*chucho::level::ERROR_(), *awrt.get_discard_threshold());
-    EXPECT_EQ(700, awrt.get_queue_capacity());
+    auto stats = awrt.get_cache_stats();
+    EXPECT_EQ(700, stats.get_chunk_size());
+    EXPECT_EQ(10, stats.get_max_size() / stats.get_chunk_size());
     EXPECT_EQ(typeid(chucho::file_writer), typeid(awrt.get_writer()));
     EXPECT_FALSE(awrt.get_flush_on_destruct());
 }

@@ -41,7 +41,7 @@ std::ostream& operator<< (std::ostream& stream, const chucho::event_cache_stats&
     stream <<
         "  Chunk size: " << stats.get_chunk_size() << '\n' <<
         "  Max size: " << stats.get_max_size() << '\n' <<
-        "  Total size: " << stats.get_total_size() << '\n' <<
+        "  Total size: " << stats.get_current_size() << '\n' <<
         "  Largest size: " << stats.get_largest_size() << '\n' <<
         "  Files created: " << stats.get_files_created() << '\n' <<
         "  Files destroyed: " << stats.get_files_destroyed() << '\n' <<
@@ -60,7 +60,8 @@ TEST(event_cache, cull)
 {
     std::size_t culled_bytes = 0;
     std::size_t popped = 0;
-    chucho::event_cache cache(1024 * 1024, 2 * 1024 * 1024, [&culled_bytes] (const chucho::event_cache_stats& st, std::size_t cnt) { culled_bytes += cnt; });
+    chucho::event_cache cache(1024 * 1024, 2 * 1024 * 1024);
+    cache.set_progress_callback([&culled_bytes] (const chucho::event_cache_stats& st, chucho::event_cache_stats::progress_direction , double, std::size_t cnt) { culled_bytes += cnt; });
     std::thread thr(full_speed_main, std::ref(cache), 1000000, 0ms);
     chucho::optional<chucho::event> evt;
     std::this_thread::sleep_for(1s);

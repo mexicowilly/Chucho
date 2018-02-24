@@ -125,7 +125,7 @@ std::string event_cache::find_oldest_file()
 event_cache_stats event_cache::get_stats()
 {
     std::lock_guard<std::mutex> lock(guard_);
-    stats_.average_event_size_ = total_bytes_written_ / stats_.events_written_;
+    stats_.average_event_size_ = stats_.events_written_ == 0 ? 0 : total_bytes_written_ / stats_.events_written_;
     return stats_;
 }
 
@@ -227,7 +227,7 @@ void event_cache::report_progress(event_cache_stats::progress_direction dir)
         }
         else
         {
-            if ((last_fullness_threshold_ > .95 && full <= ..95) ||
+            if ((last_fullness_threshold_ > .95 && full <= .95) ||
                 (last_fullness_threshold_ <= .95 && full <= .9) ||
                 (last_fullness_threshold_ <= .9 && full <= .8))
             {

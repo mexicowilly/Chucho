@@ -24,7 +24,6 @@
 #include <chucho/memento.hpp>
 #include <chucho/optional.hpp>
 #include <chucho/writer.hpp>
-#include <chucho/level.hpp>
 
 namespace chucho
 {
@@ -34,24 +33,24 @@ class async_writer_memento : public memento
 public:
     async_writer_memento(configurator& cfg);
 
-    std::shared_ptr<level> get_discard_threshold() const;
+    const optional<std::size_t>& get_chunk_size() const;
     const optional<bool>& get_flush_on_destruct() const;
+    const optional<std::size_t>& get_max_chunks() const;
     const std::string& get_name() const;
-    const optional<std::size_t>& get_queue_capacity() const;
     std::unique_ptr<writer>& get_writer();
     virtual void handle(std::unique_ptr<configurable>&& cnf) override;
 
 private:
-    std::shared_ptr<level> discard_threshold_;
-    optional<std::size_t> queue_capacity_;
+    optional<std::size_t> chunk_size_;
+    optional<std::size_t> max_chunks_;
     std::unique_ptr<writer> writer_;
     optional<bool> flush_on_destruct_;
     std::string name_;
 };
 
-inline std::shared_ptr<level> async_writer_memento::get_discard_threshold() const
+inline const optional<std::size_t>& async_writer_memento::get_chunk_size() const
 {
-    return discard_threshold_;
+    return chunk_size_;
 }
 
 inline const optional<bool>& async_writer_memento::get_flush_on_destruct() const
@@ -59,14 +58,14 @@ inline const optional<bool>& async_writer_memento::get_flush_on_destruct() const
     return flush_on_destruct_;
 }
 
+inline const optional<std::size_t>& async_writer_memento::get_max_chunks() const
+{
+    return max_chunks_;
+}
+
 inline const std::string& async_writer_memento::get_name() const
 {
     return name_;
-}
-
-inline const optional<std::size_t>& async_writer_memento::get_queue_capacity() const
-{
-    return queue_capacity_;
 }
 
 inline std::unique_ptr<writer>& async_writer_memento::get_writer()

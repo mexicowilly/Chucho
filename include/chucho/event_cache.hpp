@@ -41,6 +41,7 @@ class CHUCHO_PRIV_EXPORT event_cache : non_copyable, public status_reporter
 {
 public:
     event_cache(std::size_t chunk_size, std::size_t max_size);
+    virtual ~event_cache();
 
     event_cache_stats get_stats();
     optional<event> pop(std::chrono::milliseconds to_wait);
