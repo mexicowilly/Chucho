@@ -95,7 +95,7 @@ void event_cache::cull()
     stats_.bytes_culled_ += culled;
     if (progress_cb_)
     {
-        stats_.average_event_size_ = total_bytes_written_ / stats_.events_written_;
+        stats_.average_event_size_ = stats_.events_written_ == 0 ? 0 : total_bytes_written_ / stats_.events_written_;
         progress_cb_(stats_, event_cache_stats::progress_direction::UP, 1.0, culled);
         last_fullness_threshold_ = 1.0;
     }
@@ -219,17 +219,17 @@ void event_cache::report_progress(event_cache_stats::progress_direction dir)
         if (dir == event_cache_stats::progress_direction::UP)
         {
             if ((last_fullness_threshold_ < .8 && full >= .8) ||
-                (last_fullness_threshold_ >= .8 && full >= .9) ||
-                (last_fullness_threshold_ >= .9 && full >= .95))
+                (last_fullness_threshold_< .9 && full >= .9) ||
+                (last_fullness_threshold_ < .95 && full >= .95))
             {
                 report = true;
             }
         }
         else
         {
-            if ((last_fullness_threshold_ > .95 && full <= .95) ||
-                (last_fullness_threshold_ <= .95 && full <= .9) ||
-                (last_fullness_threshold_ <= .9 && full <= .8))
+            if ((last_fullness_threshold_ >= .95 && full < .95) ||
+                (last_fullness_threshold_ >= .9 && full < .9) ||
+                (last_fullness_threshold_ >= .8 && full < .8))
             {
                 report = true;
             }

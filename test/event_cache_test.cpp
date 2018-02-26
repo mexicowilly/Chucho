@@ -93,6 +93,37 @@ TEST(event_cache, full_speed)
     std::cout << cache.get_stats() << std::endl;
 }
 
+TEST(event_cache, progress)
+{
+    chucho::event_cache cache(1024 * 1024, 2 * 1024 * 1024);
+    std::vector<std::tuple<chucho::event_cache_stats, chucho::event_cache_stats::progress_direction, double, std::size_t>> prg;
+    cache.set_progress_callback([&prg] (const chucho::event_cache_stats& s,
+                                        chucho::event_cache_stats::progress_direction d,
+                                        double f,
+                                        std::size_t c)
+                                {
+                                    prg.emplace_back(s, d, f, c);
+                                });
+    for (int i = 0; i < 1000000; i++)
+    {
+        chucho::event e(chucho::logger::get("will"), chucho::level::INFO_(), std::to_string(i), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME);
+        cache.push(e);
+        auto st = cache.get_stats();
+        if (st.get_current_size() > st.get_max_size() - st.get_average_event_size())
+            break;
+    }
+    ASSERT_EQ(3, prg.size());
+    EXPECT_EQ(chucho::event_cache_stats::progress_direction::UP, std::get<1>(prg[0]));
+    EXPECT_GT(std::get<2>(prg[0]), .8);
+    EXPECT_EQ(0, std::get<3>(prg[0]));
+    EXPECT_EQ(chucho::event_cache_stats::progress_direction::UP, std::get<1>(prg[1]));
+    EXPECT_GT(std::get<2>(prg[1]), .9);
+    EXPECT_EQ(0, std::get<3>(prg[1]));
+    EXPECT_EQ(chucho::event_cache_stats::progress_direction::UP, std::get<1>(prg[2]));
+    EXPECT_GT(std::get<2>(prg[2]), .95);
+    EXPECT_EQ(0, std::get<3>(prg[2]));
+}
+
 TEST(event_cache, serialization)
 {
     chucho::event_cache cache(1024 * 1024, 10 * 1024 * 1024);
