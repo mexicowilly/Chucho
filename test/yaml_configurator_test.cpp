@@ -153,8 +153,8 @@ TEST_F(yaml_configurator, async_writer_with_opts)
               "            chucho::pattern_formatter:\n"
               "                pattern: '%m%n'\n"
               "            file_name: hello.log\n"
-              "        discard_threshold: error\n"
-              "        queue_capacity: 700\n"
+              "        chunk_size: 7000\n"
+              "        max_chunks: 10\n"
               "        flush_on_destruct: false");
     async_writer_with_opts_body();
 }

@@ -43,8 +43,7 @@ class async_writer_test : public ::testing::Test
 {
 public:
     chucho::event get_event(const std::string& msg, std::shared_ptr<chucho::level> lvl = chucho::level::INFO_());
-    std::unique_ptr<chucho::async_writer> get_writer(std::chrono::milliseconds millis,
-                                                     std::size_t capacity = chucho::async_writer::DEFAULT_QUEUE_CAPACITY);
+    std::unique_ptr<chucho::async_writer> get_writer(std::chrono::milliseconds millis, bool flush = true);
 };
 
 slow_writer::slow_writer(std::chrono::milliseconds delay)
@@ -74,62 +73,66 @@ chucho::event async_writer_test::get_event(const std::string& msg, std::shared_p
                          __FUNCTION__);
 }
 
-std::unique_ptr<chucho::async_writer> async_writer_test::get_writer(std::chrono::milliseconds millis,
-                                                                    std::size_t capacity)
+std::unique_ptr<chucho::async_writer> async_writer_test::get_writer(std::chrono::milliseconds millis, bool flush)
 {
     auto wrt = std::make_unique<slow_writer>(millis);
-    auto as = std::make_unique<chucho::async_writer>("async", std::move(wrt), capacity);
+    auto as = std::make_unique<chucho::async_writer>("async", std::move(wrt), flush);
     return std::move(as);
 }
 
 }
 
-TEST_F(async_writer_test, blocking)
-{
-    auto as = get_writer(std::chrono::milliseconds(50), 5);
-    EXPECT_EQ(5, as->get_queue_capacity());
-    EXPECT_EQ(chucho::level::INFO_(), as->get_discard_threshold());
-    for (int i = 0; i < 20; i++)
-        as->write(get_event(std::to_string(i), chucho::level::WARN_()));
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    auto& slow = dynamic_cast<slow_writer&>(as->get_writer());
-    ASSERT_EQ(20, slow.get_events().size());
-    for (int i = 0; i < 20; i++)
-        EXPECT_EQ(i, std::stoi(slow.get_events()[i]));
-}
+using namespace std::chrono_literals;
 
-TEST_F(async_writer_test, discard)
+TEST_F(async_writer_test, flush_on_destruct)
 {
-    auto as = get_writer(std::chrono::milliseconds(50), 5);
-    EXPECT_EQ(5, as->get_queue_capacity());
-    EXPECT_EQ(chucho::level::INFO_(), as->get_discard_threshold());
-    for (int i = 0; i < 20; i++)
-    {
-        std::shared_ptr<chucho::level> lvl = chucho::level::INFO_();
-        if (i & 1)
-            lvl = chucho::level::WARN_();
-        as->write(get_event(std::to_string(i), lvl));
-    }
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    auto& slow = dynamic_cast<slow_writer&>(as->get_writer());
-    EXPECT_LT(slow.get_events().size(), 20U);
-    std::cout << "Got " << slow.get_events().size() << " { ";
-    for (auto evt : slow.get_events())
-        std::cout << evt << ' ';
-    std::cout << '}' << std::endl;
+    auto as = get_writer(1ms);
+    auto stats = as->get_cache_stats();
+    EXPECT_EQ(chucho::async_writer::DEFAULT_CHUNK_SIZE, stats.get_chunk_size());
+    EXPECT_EQ(chucho::async_writer::DEFAULT_MAX_CHUNKS, stats.get_max_size() / stats.get_chunk_size());
+    EXPECT_EQ(0, stats.get_current_size());
+    for (int i = 0; i < 1000; i++)
+        as->write(get_event(std::to_string(i)));
+    // we don't know how many are there
+    stats = as->get_cache_stats();
+    EXPECT_GT(stats.get_current_size(), 0U);
+    auto now = std::chrono::steady_clock::now();
+    as.reset();
+    auto then = std::chrono::steady_clock::now();
+    auto elap = std::chrono::duration_cast<std::chrono::milliseconds>(then - now);
+    EXPECT_GT(elap.count(), 500);
+    as = get_writer(1ms, false);
+    stats = as->get_cache_stats();
+    EXPECT_EQ(chucho::async_writer::DEFAULT_CHUNK_SIZE, stats.get_chunk_size());
+    EXPECT_EQ(chucho::async_writer::DEFAULT_MAX_CHUNKS, stats.get_max_size() / stats.get_chunk_size());
+    EXPECT_EQ(0, stats.get_current_size());
+    for (int i = 0; i < 1000; i++)
+        as->write(get_event(std::to_string(i)));
+    // we don't know how many are there
+    stats = as->get_cache_stats();
+    EXPECT_GT(stats.get_current_size(), 0U);
+    now = std::chrono::steady_clock::now();
+    as.reset();
+    then = std::chrono::steady_clock::now();
+    elap = std::chrono::duration_cast<std::chrono::milliseconds>(then - now);
+    EXPECT_LT(elap.count(), 10);
 }
 
 TEST_F(async_writer_test, slow)
 {
-    auto as = get_writer(std::chrono::milliseconds(50));
-    EXPECT_EQ(chucho::async_writer::DEFAULT_QUEUE_CAPACITY, as->get_queue_capacity());
-    EXPECT_EQ(chucho::level::INFO_(), as->get_discard_threshold());
+    auto as = get_writer(50ms);
+    auto stats = as->get_cache_stats();
+    EXPECT_EQ(chucho::async_writer::DEFAULT_CHUNK_SIZE, stats.get_chunk_size());
+    EXPECT_EQ(chucho::async_writer::DEFAULT_MAX_CHUNKS, stats.get_max_size() / stats.get_chunk_size());
+    EXPECT_EQ(0, stats.get_current_size());
     for (int i = 0; i < 10; i++)
         as->write(get_event(std::to_string(i)));
     // we don't know how many are there
-    EXPECT_GT(as->get_queue_size(), 0U);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    EXPECT_EQ(0, as->get_queue_size());
+    stats = as->get_cache_stats();
+    EXPECT_GT(stats.get_current_size(), 0U);
+    std::this_thread::sleep_for(2s);
+    stats = as->get_cache_stats();
+    EXPECT_EQ(0, stats.get_current_size());
     auto& slow = dynamic_cast<slow_writer&>(as->get_writer());
     ASSERT_EQ(10, slow.get_events().size());
     for (int i = 0; i < 10; i++)

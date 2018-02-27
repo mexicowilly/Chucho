@@ -16,6 +16,7 @@
 
 #include <chucho/file.hpp>
 #include <chucho/file_exception.hpp>
+#include <chucho/environment.hpp>
 #include <vector>
 #include <array>
 #include <cstring>
@@ -25,8 +26,8 @@
 #include <limits.h>
 // Needed for realpath, which is not in <cstdlib>
 #include <stdlib.h>
-#if defined(CHUCHO_NO_FTS)
 #include <dirent.h>
+#if defined(CHUCHO_NO_FTS)
 #include <cstdint>
 #else
 #include <fts.h>
@@ -97,6 +98,17 @@ namespace file
 {
 
 const char dir_sep = '/';
+
+struct directory_iterator_impl
+{
+    directory_iterator_impl(const std::string& dir);
+    ~directory_iterator_impl();
+
+    DIR* dir_;
+    std::unique_ptr<std::uint8_t[]> dirent_bytes_;
+    struct dirent* entry_;
+    std::string parent_;
+};
 
 std::string base_name(const std::string& name)
 {
@@ -236,6 +248,83 @@ std::uintmax_t size(const std::string& name)
     if (stat(name.c_str(), &info) != 0)
         throw file_exception("Could not get size of " + name);
     return info.st_size;
+}
+
+std::string temporary_directory()
+{
+    auto env = environment::get("TMPDIR");
+    std::string result = env ? *env : P_tmpdir;
+    if (result.empty() || result[result.length() - 1] != '/')
+        result += '/';
+    return result;
+}
+
+directory_iterator::directory_iterator()
+{
+}
+
+directory_iterator::~directory_iterator()
+{
+}
+
+directory_iterator::directory_iterator(const std::string& directory)
+    : pimpl_(std::make_unique<directory_iterator_impl>(directory))
+{
+    operator++();
+}
+
+bool directory_iterator::operator== (const directory_iterator& it) const
+{
+    return (!pimpl_ && !it.pimpl_) || (pimpl_ && it.pimpl_ && pimpl_->parent_ == it.pimpl_->parent_ && cur_ == it.cur_);
+}
+
+directory_iterator& directory_iterator::operator++ ()
+{
+    if (pimpl_)
+    {
+        while (true)
+        {
+            struct dirent *result;
+            if (readdir_r(pimpl_->dir_, pimpl_->entry_, &result) != 0)
+                throw chucho::file_exception("Could not read directory " + pimpl_->parent_ + ": " + std::strerror(errno));
+            if (result == nullptr)
+            {
+                pimpl_.reset();
+                cur_.clear();
+                break;
+            }
+            else
+            {
+                if (std::strcmp(result->d_name, ".") != 0 && std::strcmp(result->d_name, "..") != 0)
+                {
+                    cur_ = pimpl_->parent_ + result->d_name;
+                    break;
+                }
+            }
+        };
+    }
+    return *this;
+}
+
+directory_iterator_impl::directory_iterator_impl(const std::string& dir)
+    : dir_(opendir(dir.c_str())),
+      parent_(dir)
+{
+    if (dir_ == nullptr)
+        throw chucho::file_exception("Could not open directory " + dir + ": " + std::strerror(errno));
+    if (parent_[parent_.length() - 1] != '/')
+        parent_ += '/';
+#if defined(CHUCHO_DIRENT_NEEDS_NAME)
+    dirent_bytes_ = std::make_unique<std::uint8_t[]>(sizeof(struct dirent) + pathconf(dir.c_str(), PC_NAME_MAX));
+#else
+    dirent_bytes_ = std::make_unique<std::uint8_t[]>(sizeof(struct dirent));
+#endif
+    entry_ = reinterpret_cast<struct dirent*>(dirent_bytes_.get());
+}
+
+directory_iterator_impl::~directory_iterator_impl()
+{
+    closedir(dir_);
 }
 
 }

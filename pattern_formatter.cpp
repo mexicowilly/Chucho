@@ -24,6 +24,7 @@
 #include <chucho/line_ending.hpp>
 #include <chucho/host.hpp>
 #include <chucho/time_util.hpp>
+#include <chucho/process.hpp>
 #include <limits>
 #include <sstream>
 #include <mutex>
@@ -442,7 +443,7 @@ pattern_formatter::base_host_piece::base_host_piece(const format_params& params)
 
 std::string pattern_formatter::base_host_piece::get_text_impl(const event& evt) const
 {
-    return evt.get_base_host_name() ? *evt.get_base_host_name() : host::get_base_name();
+    return host::get_base_name();
 }
 
 pattern_formatter::full_host_piece::full_host_piece(const format_params& params)
@@ -452,7 +453,7 @@ pattern_formatter::full_host_piece::full_host_piece(const format_params& params)
 
 std::string pattern_formatter::full_host_piece::get_text_impl(const event& evt) const
 {
-    return evt.get_full_host_name() ? *evt.get_full_host_name() : host::get_full_name();
+    return host::get_full_name();
 }
 
 pattern_formatter::line_number_piece::line_number_piece(const format_params& params)
@@ -518,6 +519,11 @@ std::string pattern_formatter::milliseconds_since_start_piece::get_text_impl(con
 pattern_formatter::pid_piece::pid_piece(const format_params& params)
     : piece(params)
 {
+}
+
+std::string pattern_formatter::pid_piece::get_text_impl(const event& evt) const
+{
+    return std::to_string(process::id());
 }
 
 pattern_formatter::literal_piece::literal_piece(const std::string& text)

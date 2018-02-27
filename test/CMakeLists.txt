@@ -175,6 +175,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                configurator_test.hpp
                diagnostic_context_test.cpp
                duplicate_message_filter_test.cpp
+               event_cache_test.cpp
                file_test.cpp
                file_descriptor_writer_test.cpp
                file_writer_test.cpp

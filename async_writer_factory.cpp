@@ -38,13 +38,13 @@ std::unique_ptr<configurable> async_writer_factory::create_configurable(std::uni
     auto wrt = std::move(awm->get_writer());
     if (!wrt)
         throw exception("async_writer: The async writer's writer must be set");
-    std::size_t queue_cap = awm->get_queue_capacity() ?
-        *awm->get_queue_capacity() : async_writer::DEFAULT_QUEUE_CAPACITY;
-    std::shared_ptr<level> dis = awm->get_discard_threshold() ?
-        awm->get_discard_threshold() : level::INFO_();
+    std::size_t chunk_sz = awm->get_chunk_size() ?
+        *awm->get_chunk_size() : async_writer::DEFAULT_CHUNK_SIZE;
+    std::size_t max_ch = awm->get_max_chunks() ?
+        *awm->get_max_chunks() : async_writer::DEFAULT_MAX_CHUNKS;
     bool flsh = awm->get_flush_on_destruct() ?
         *awm->get_flush_on_destruct() : true;
-    auto aw = std::make_unique<async_writer>(awm->get_name(), std::move(wrt), queue_cap, dis, flsh);
+    auto aw = std::make_unique<async_writer>(awm->get_name(), std::move(wrt), chunk_sz, max_ch, flsh);
     report_info("Created a " + demangle::get_demangled_name(typeid(*aw)));
     return std::move(aw);
 }
