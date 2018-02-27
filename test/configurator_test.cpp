@@ -175,7 +175,7 @@ void configurator::async_writer_with_opts_body()
     ASSERT_EQ(1, lgr->get_writer_names().size());
     auto& awrt = dynamic_cast<chucho::async_writer&>(lgr->get_writer("chucho::async_writer"));
     auto stats = awrt.get_cache_stats();
-    EXPECT_EQ(700, stats.get_chunk_size());
+    EXPECT_EQ(7000, stats.get_chunk_size());
     EXPECT_EQ(10, stats.get_max_size() / stats.get_chunk_size());
     EXPECT_EQ(typeid(chucho::file_writer), typeid(awrt.get_writer()));
     EXPECT_FALSE(awrt.get_flush_on_destruct());

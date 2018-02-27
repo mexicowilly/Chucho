@@ -93,11 +93,12 @@ void event_cache::cull()
         stream << " (file " << oldest << ")";
     report_warning(stream.str());
     stats_.bytes_culled_ += culled;
+    ++stats_.cull_events_;
     if (progress_cb_)
     {
         stats_.average_event_size_ = stats_.events_written_ == 0 ? 0 : total_bytes_written_ / stats_.events_written_;
-        progress_cb_(stats_, event_cache_stats::progress_direction::UP, 1.0, culled);
-        last_fullness_threshold_ = 1.0;
+        last_fullness_threshold_ = static_cast<double>(stats_.current_size_) / static_cast<double>(stats_.max_size_);
+        progress_cb_(stats_, event_cache_stats::progress_direction::DOWN, last_fullness_threshold_, culled);
     }
 }
 

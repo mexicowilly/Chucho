@@ -43,6 +43,7 @@ public:
     std::size_t get_bytes_culled() const;
     std::size_t get_chunk_size() const;
     std::size_t get_current_size() const;
+    std::size_t get_cull_events() const;
     std::size_t get_events_read() const;
     std::size_t get_events_written() const;
     std::size_t get_files_created() const;
@@ -69,6 +70,7 @@ private:
     std::size_t smallest_event_size_{std::numeric_limits<std::size_t>::max()};
     std::size_t largest_event_size_{0};
     std::size_t average_event_size_{0};
+    std::size_t cull_events_{0};
 };
 
 inline event_cache_stats::event_cache_stats(std::size_t chunk_size, std::size_t max_size)
@@ -90,6 +92,11 @@ inline std::size_t event_cache_stats::get_bytes_culled() const
 inline std::size_t event_cache_stats::get_chunk_size() const
 {
     return chunk_size_;
+}
+
+inline std::size_t event_cache_stats::get_cull_events() const
+{
+    return cull_events_;
 }
 
 inline std::size_t event_cache_stats::get_current_size() const

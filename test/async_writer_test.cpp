@@ -130,7 +130,7 @@ TEST_F(async_writer_test, slow)
     // we don't know how many are there
     stats = as->get_cache_stats();
     EXPECT_GT(stats.get_current_size(), 0U);
-    std::this_thread::sleep_for(1s);
+    std::this_thread::sleep_for(2s);
     stats = as->get_cache_stats();
     EXPECT_EQ(0, stats.get_current_size());
     auto& slow = dynamic_cast<slow_writer&>(as->get_writer());
