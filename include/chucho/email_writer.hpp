@@ -20,12 +20,12 @@
 #include <chucho/writer.hpp>
 #include <chucho/email_trigger.hpp>
 #include <chucho/optional.hpp>
-#include <chucho/exception.hpp>
 #include <queue>
-#include <curl/curl.h>
 
 namespace chucho
 {
+
+class curl;
 
 /**
  * @class email_writer email_writer.hpp chucho/email_writer.hpp
@@ -265,12 +265,6 @@ protected:
     virtual void write_impl(const event& evt) override;
 
 private:
-    friend CHUCHO_NO_EXPORT int curl_debug_callback(CURL* curl,
-                                                    curl_infotype info_type,
-                                                    char* text,
-                                                    std::size_t num,
-                                                    void* user_data);
-
     class CHUCHO_NO_EXPORT fixed_size_queue
     {
     public:
@@ -288,20 +282,12 @@ private:
         std::size_t max_;
     };
 
-    class CHUCHO_NO_EXPORT curl_exception : public chucho::exception
-    {
-    public:
-        curl_exception(CURLcode err, const std::string& msg);
-    };
-
     CHUCHO_NO_EXPORT std::string format_date() const;
     CHUCHO_NO_EXPORT std::string format_message(const event& evt);
     CHUCHO_NO_EXPORT void init();
-    template<typename arg_type>
-    CHUCHO_NO_EXPORT void set_curl_option(CURLoption opt, arg_type arg, const char* const err_msg);
 
     fixed_size_queue evts_;
-    CURL* curl_;
+    std::unique_ptr<curl> curl_;
     std::unique_ptr<email_trigger> trigger_;
     std::string from_;
     std::vector<std::string> to_;
@@ -311,8 +297,7 @@ private:
     optional<std::string> user_;
     optional<std::string> password_;
     connection_type connection_type_;
-    bool verbose_;
-    struct curl_slist* rcpts_;
+    void* rcpts_;
 };
 
 inline std::size_t email_writer::get_buffer_capacity() const
@@ -368,19 +353,6 @@ inline email_trigger& email_writer::get_trigger() const
 inline const optional<std::string>& email_writer::get_user() const
 {
     return user_;
-}
-
-inline bool email_writer::get_verbose() const
-{
-    return verbose_;
-}
-
-template<typename arg_type>
-void email_writer::set_curl_option(CURLoption opt, arg_type arg, const char* const err_msg)
-{
-    CURLcode rc = curl_easy_setopt(curl_, opt, arg);
-    if (rc != CURLE_OK)
-        throw curl_exception(rc, std::string("Could not set CURL option ") + err_msg);
 }
 
 inline std::size_t email_writer::fixed_size_queue::capacity() const

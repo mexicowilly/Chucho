@@ -403,13 +403,15 @@ IF(CURL_FOUND)
          include/chucho/level_threshold_email_trigger.hpp)
     LIST(APPEND CHUCHO_EMBEDDED_SOURCES
          "${CMAKE_SOURCE_DIR}/embedded/fnv/hash_64a.c")
-    LIST(APPEND CHUCHO_EMAIL_SOURCES
+    LIST(APPEND CHUCHO_CURL_SOURCES
+         curl.cpp
          email_writer.cpp
          email_writer_factory.cpp
          email_writer_memento.cpp
          level_threshold_email_trigger.cpp
          level_threshold_email_trigger_factory.cpp
          level_threshold_email_trigger_memento.cpp
+         include/chucho/curl.hpp
          include/chucho/email_writer_factory.hpp
          include/chucho/email_writer_memento.hpp
          include/chucho/level_threshold_email_trigger_factory.hpp
@@ -811,7 +813,7 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_C_SOURCES}
     ${CHUCHO_DATABASE_SOURCES}
     ${CHUCHO_EVALUATOR_SOURCES}
-    ${CHUCHO_EMAIL_SOURCES}
+    ${CHUCHO_CURL_SOURCES}
     ${CHUCHO_SERIALIZER_SOURCES}
     ${CHUCHO_MESSAGE_QUEUE_SOURCES}
     ${CHUCHO_DOOR_SOURCES}
