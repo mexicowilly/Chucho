@@ -400,7 +400,8 @@ IF(CURL_FOUND)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
          include/chucho/email_trigger.hpp
          include/chucho/email_writer.hpp
-         include/chucho/level_threshold_email_trigger.hpp)
+         include/chucho/level_threshold_email_trigger.hpp
+         include/chucho/loggly_writer.hpp)
     LIST(APPEND CHUCHO_EMBEDDED_SOURCES
          "${CMAKE_SOURCE_DIR}/embedded/fnv/hash_64a.c")
     LIST(APPEND CHUCHO_CURL_SOURCES
@@ -411,6 +412,7 @@ IF(CURL_FOUND)
          level_threshold_email_trigger.cpp
          level_threshold_email_trigger_factory.cpp
          level_threshold_email_trigger_memento.cpp
+         loggly_writer.cpp
          include/chucho/curl.hpp
          include/chucho/email_writer_factory.hpp
          include/chucho/email_writer_memento.hpp

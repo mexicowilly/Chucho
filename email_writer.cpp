@@ -22,6 +22,7 @@
 #include <sstream>
 #include <iomanip>
 #include <atomic>
+#include <algorithm>
 
 namespace
 {
@@ -76,8 +77,7 @@ email_writer::email_writer(const std::string& name,
       host_(host),
       port_(port),
       subject_(subject),
-      connection_type_(connect),
-      rcpts_(nullptr)
+      connection_type_(connect)
 {
     init();
 }
@@ -105,16 +105,14 @@ email_writer::email_writer(const std::string& name,
       subject_(subject),
       user_(user),
       password_(password),
-      connection_type_(connect),
-      rcpts_(nullptr)
+      connection_type_(connect)
 {
     init();
 }
 
 email_writer::~email_writer()
 {
-    if (rcpts_ != nullptr)
-        curl_slist_free_all(reinterpret_cast<struct curl_slist*>(rcpts_));
+    // Don't delete this destructor.
 }
 
 std::string email_writer::format_date() const
@@ -212,13 +210,9 @@ void email_writer::init()
         stream.str("");
         stream << '<' << from_ << '>';
         curl_->set_option(CURLOPT_MAIL_FROM, stream.str().c_str(), "mail from field");
-        for (auto one : to_)
-        {
-            stream.str("");
-            stream << '<' << one << '>';
-            rcpts_ = curl_slist_append(reinterpret_cast<struct curl_slist*>(rcpts_), stream.str().c_str());
-        }
-        curl_->set_option(CURLOPT_MAIL_RCPT, rcpts_, "mail to");
+        std::vector<std::string> tos;
+        std::transform(to_.begin(), to_.end(), std::back_inserter(tos), [] (const std::string& s) { return '<' + s + '>'; });
+        curl_->set_option(CURLOPT_MAIL_RCPT, curl_->create_slist(std::move(tos)), "mail to");
         curl_->set_option(CURLOPT_UPLOAD, 1, "upload");
         curl_->set_option(CURLOPT_READFUNCTION, curl_read_cb, "read callback");
         if (user_)
@@ -239,15 +233,7 @@ void email_writer::init()
     }
     catch (exception&)
     {
-        if (curl_)
-        {
-            if (rcpts_ != nullptr)
-            {
-                curl_slist_free_all(reinterpret_cast<struct curl_slist*>(rcpts_));
-                rcpts_ = nullptr;
-            }
-            curl_.reset();
-        }
+        curl_.reset();
         throw;
     }
 }

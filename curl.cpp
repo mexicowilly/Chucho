@@ -60,6 +60,21 @@ curl::~curl()
         curl_easy_cleanup(curl_);
 }
 
+curl_slist* curl::create_slist(std::vector<std::string>&& items)
+{
+    curl_slist* result = nullptr;
+    if (!items.empty())
+    {
+        auto sl = curl_slist_append(nullptr, items.front().c_str());
+        items.erase(items.begin());
+        for (const auto& s : items)
+            sl = curl_slist_append(sl, s.c_str());
+        slists_.emplace_back(decltype(slists_)::value_type(sl, curl_slist_free_all));
+        result = sl;
+    }
+    return result;
+}
+
 bool curl::get_ssl_supported()
 {
     std::call_once(global_once, global_setup);

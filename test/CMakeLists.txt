@@ -166,6 +166,10 @@ IF(CHUCHO_HAVE_DOORS)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_DOORS)
 ENDIF()
 
+IF(CURL_FOUND)
+    LIST(APPEND CHUCHO_TEST_CURL_SOURCES loggly_writer_test.cpp)
+ENDIF()
+
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
                c_test.cpp
@@ -209,7 +213,8 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                ${CHUCHO_TEST_EVALUATOR_SOURCES}
                ${CHUCHO_TEST_SERIALIZER_SOURCES}
                ${CHUCHO_TEST_MQ_SOURCES}
-               ${CHUCHO_TEST_DOOR_SOURCES})
+               ${CHUCHO_TEST_DOOR_SOURCES}
+               ${CHUCHO_TEST_CURL_SOURCES})
 TARGET_LINK_LIBRARIES(unit-test chucho gtest)
 
 IF(MSVC)

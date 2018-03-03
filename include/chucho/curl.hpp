@@ -27,6 +27,7 @@
 #include <cstdint>
 #include <string>
 #include <mutex>
+#include <vector>
 
 namespace chucho
 {
@@ -39,6 +40,7 @@ public:
     curl();
     virtual ~curl();
 
+    curl_slist* create_slist(std::vector<std::string>&& items0);
     CURL* get() const;
     std::mutex& get_guard();
     bool get_verbose() const;
@@ -62,6 +64,7 @@ private:
     CURL* curl_;
     bool verbose_;
     mutable std::mutex guard_;
+    std::vector<std::unique_ptr<curl_slist, void(*)(curl_slist*)>> slists_;
 };
 
 inline CURL* curl::get() const
