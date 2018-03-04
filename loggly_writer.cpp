@@ -24,7 +24,7 @@ namespace
 
 std::size_t written_cb(char* data, std::size_t sz, std::size_t num, void* user)
 {
-    std::string* str = reinterpret_cast<std::string*>(user);
+    auto str = reinterpret_cast<std::string*>(user);
     auto total = sz * num;
     str->append(data, total);
     return total;
