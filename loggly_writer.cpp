@@ -16,6 +16,21 @@
 
 #include <chucho/loggly_writer.hpp>
 #include <chucho/curl.hpp>
+#include <cJSON.h>
+#include <cstring>
+
+namespace
+{
+
+std::size_t written_cb(char* data, std::size_t sz, std::size_t num, void* user)
+{
+    std::string* str = reinterpret_cast<std::string*>(user);
+    auto total = sz * num;
+    str->append(data, total);
+    return total;
+}
+
+}
 
 namespace chucho
 {
@@ -29,6 +44,7 @@ loggly_writer::loggly_writer(const std::string& name,
     auto url = "http://logs-01.loggly.com/inputs/" + token + "/tag/http";
     curl_->set_option(CURLOPT_URL, url.c_str(), "url");
     curl_->set_option(CURLOPT_HTTPHEADER, curl_->create_slist({"content-type:text/plain"}), "HTTP header");
+    curl_->set_option(CURLOPT_WRITEFUNCTION, written_cb, "write funtion");
 }
 
 loggly_writer::~loggly_writer()
@@ -51,9 +67,34 @@ void loggly_writer::write_impl(const event& evt)
     auto msg = formatter_->format(evt);
     curl_->set_option(CURLOPT_POSTFIELDS, msg.c_str(), "post fields");
     curl_->set_option(CURLOPT_POSTFIELDSIZE_LARGE, msg.length(), "post field size");
+    std::string written;
+    curl_->set_option(CURLOPT_WRITEDATA, &written, "write data");
     CURLcode rc = curl_easy_perform(curl_->get());
     if (rc != CURLE_OK)
         throw exception(std::string("Could not send event to Loggly: ") + curl_easy_strerror(rc));
+    auto json = cJSON_Parse(written.c_str());
+    if (json != nullptr)
+    {
+        try
+        {
+            auto resp = cJSON_GetObjectItemCaseSensitive(json, "response");
+            if (resp == nullptr)
+                throw exception("Unable to find response key in returned JSON");
+            if (!cJSON_IsString(resp))
+                throw exception("The JSON response is not a string");
+            if (std::strcmp("ok", resp->valuestring) != 0)
+                throw exception("Expected ok response, but got: " + std::string(resp->valuestring));
+        } catch (...)
+        {
+            cJSON_Delete(json);
+            throw;
+        }
+        cJSON_Delete(json);
+    }
+    else
+    {
+        throw exception("Unable to parse JSON from Loggly");
+    }
 }
 
 }

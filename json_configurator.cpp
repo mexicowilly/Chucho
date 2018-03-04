@@ -33,7 +33,7 @@ void json_configurator::configure(std::istream& in)
     } sent(json);
     f.reset();
     auto cl = cJSON_GetObjectItemCaseSensitive(json, "chucho_loggers");
-    if (json == nullptr)
+    if (cl == nullptr)
         throw std::runtime_error("Could not find \"chucho_loggers\" element in the JSON configuration");
     auto lgr_fact = get_factory("chucho::logger");
     auto jlgr = cl->child;

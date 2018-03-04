@@ -418,6 +418,11 @@ IF(CURL_FOUND)
          include/chucho/email_writer_memento.hpp
          include/chucho/level_threshold_email_trigger_factory.hpp
          include/chucho/level_threshold_email_trigger_memento.hpp)
+    IF(NOT JSON_CONFIG)
+        LIST(APPEND CHUCHO_EMBEDDED_SOURCES
+            "${CMAKE_SOURCE_DIR}/embedded/cJSON/cJSON.c"
+            "${CMAKE_SOURCE_DIR}/embedded/include/cJSON.h")
+    ENDIF()
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
