@@ -24,16 +24,55 @@ namespace chucho
 
 class curl;
 
+/**
+ * @class loggly_writer loggly_writer.hpp chucho/loggly_writer.hpp
+ * Writte to Loggly. This writer must make an HTTP connection
+ * and transfer for every event, so it would probably be best to
+ * use it with an @ref async_writer.
+ *
+ * @ingroup writers
+ */
 class CHUCHO_EXPORT loggly_writer : public writer
 {
 public:
+    /**
+     * @name Constructor and Destructor
+     * @{
+     */
+    /**
+     * Construct a Loggly writer.
+     * @param name the writer's name
+     * @param fmt the formatter
+     * @param token the Loggly customer token
+     */
     loggly_writer(const std::string& name,
                   std::unique_ptr<formatter>&& fmt,
                   const std::string& token);
+    /**
+     * Destruct a Loggly writer.
+     */
     virtual ~loggly_writer();
+    /**
+     * @}
+     */
 
+    /**
+     * Return the Loggly customer token.
+     *
+     * @return the customer token
+     */
     const std::string& get_token() const;
+    /**
+     * Return whether the curl output is verbose.
+     *
+     * @return verbose or not
+     */
     bool get_verbose() const;
+    /**
+     * Set whether the curl output should be verbose or not.
+     *
+     * @param state verbose or not
+     */
     void set_verbose(bool state);
 
 protected:

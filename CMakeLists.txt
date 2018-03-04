@@ -432,7 +432,8 @@ ENDIF()
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/email_trigger.hpp
      include/chucho/email_writer.hpp
-     include/chucho/level_threshold_email_trigger.hpp)
+     include/chucho/level_threshold_email_trigger.hpp
+     include/chucho/loggly_writer.hpp)
 
 IF(PROTOBUF_FOUND)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
