@@ -413,11 +413,15 @@ IF(CURL_FOUND)
          level_threshold_email_trigger_factory.cpp
          level_threshold_email_trigger_memento.cpp
          loggly_writer.cpp
+         loggly_writer_factory.cpp
+         loggly_writer_memento.cpp
          include/chucho/curl.hpp
          include/chucho/email_writer_factory.hpp
          include/chucho/email_writer_memento.hpp
          include/chucho/level_threshold_email_trigger_factory.hpp
-         include/chucho/level_threshold_email_trigger_memento.hpp)
+         include/chucho/level_threshold_email_trigger_memento.hpp
+         include/chucho/loggly_writer_factory.hpp
+         include/chucho/loggly_writer_memento.hpp)
     IF(NOT JSON_CONFIG)
         LIST(APPEND CHUCHO_EMBEDDED_SOURCES
             "${CMAKE_SOURCE_DIR}/embedded/cJSON/cJSON.c"
