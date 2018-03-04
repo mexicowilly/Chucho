@@ -79,11 +79,11 @@ void loggly_writer::write_impl(const event& evt)
         {
             auto resp = cJSON_GetObjectItemCaseSensitive(json, "response");
             if (resp == nullptr)
-                throw exception("Unable to find response key in returned JSON");
+                throw exception("Unable to find response key in returned JSON from Loggly");
             if (!cJSON_IsString(resp))
-                throw exception("The JSON response is not a string");
+                throw exception("The Loggly JSON response is not a string");
             if (std::strcmp("ok", resp->valuestring) != 0)
-                throw exception("Expected ok response, but got: " + std::string(resp->valuestring));
+                throw exception("Expected Loggly ok response, but got: " + std::string(resp->valuestring));
         } catch (...)
         {
             cJSON_Delete(json);
