@@ -17,16 +17,15 @@
 #include <chucho/email_writer.hpp>
 #include <chucho/calendar.hpp>
 #include <chucho/pattern_formatter.hpp>
+#include <chucho/curl.hpp>
 #include "fnv.h"
 #include <sstream>
 #include <iomanip>
 #include <atomic>
+#include <algorithm>
 
 namespace
 {
-
-std::atomic_bool ssl_supported(false);
-std::once_flag global_once;
 
 struct read_data
 {
@@ -45,14 +44,6 @@ std::size_t curl_read_cb(char* buf, std::size_t sz, std::size_t nitems, void* da
     return to_copy;
 }
 
-void global_setup()
-{
-    curl_global_init(CURL_GLOBAL_ALL);
-    curl_version_info_data* ver = curl_version_info(CURLVERSION_NOW);
-    if ((ver->features & CURL_VERSION_SSL) != 0)
-        ssl_supported = true;
-}
-
 inline std::ostream& smtpl(std::ostream& stream)
 {
     stream << "\r\n";
@@ -63,16 +54,6 @@ inline std::ostream& smtpl(std::ostream& stream)
 
 namespace chucho
 {
-
-int curl_debug_callback(CURL* curl,
-                        curl_infotype info_type,
-                        char* text,
-                        std::size_t num,
-                        void* user_data)
-{
-    static_cast<email_writer*>(user_data)->report_info(std::string(text, num));
-    return 0;
-}
 
 const std::uint16_t email_writer::DEFAULT_PORT(25);
 const std::size_t email_writer::DEFAULT_BUFFER_CAPACITY(256);
@@ -89,16 +70,14 @@ email_writer::email_writer(const std::string& name,
                            std::size_t buffer_size)
     : writer(name, std::move(fmt)),
       evts_(buffer_size),
-      curl_(nullptr),
+      curl_(std::make_unique<curl>()),
       trigger_(std::move(trigger)),
       from_(from),
       to_(to),
       host_(host),
       port_(port),
       subject_(subject),
-      connection_type_(connect),
-      verbose_(false),
-      rcpts_(nullptr)
+      connection_type_(connect)
 {
     init();
 }
@@ -117,7 +96,7 @@ email_writer::email_writer(const std::string& name,
                            std::size_t buffer_size)
     : writer(name, std::move(fmt)),
       evts_(buffer_size),
-      curl_(nullptr),
+      curl_(std::make_unique<curl>()),
       trigger_(std::move(trigger)),
       from_(from),
       to_(to),
@@ -126,19 +105,14 @@ email_writer::email_writer(const std::string& name,
       subject_(subject),
       user_(user),
       password_(password),
-      connection_type_(connect),
-      verbose_(false),
-      rcpts_(nullptr)
+      connection_type_(connect)
 {
     init();
 }
 
 email_writer::~email_writer()
 {
-    if (rcpts_ != nullptr)
-        curl_slist_free_all(rcpts_);
-    if (curl_ != nullptr)
-        curl_easy_cleanup(curl_);
+    // Don't delete this destructor.
 }
 
 std::string email_writer::format_date() const
@@ -204,8 +178,12 @@ std::string email_writer::format_message(const event& evt)
 
 bool email_writer::get_ssl_supported()
 {
-    std::call_once(global_once, global_setup);
-    return ssl_supported;
+    return curl::get_ssl_supported();
+}
+
+bool email_writer::get_verbose() const
+{
+    return curl_->get_verbose();
 }
 
 void email_writer::init()
@@ -213,17 +191,13 @@ void email_writer::init()
     if (!trigger_)
         throw std::invalid_argument("The trigger cannot be uninitialized");
     set_status_origin("email_writer");
-    std::call_once(global_once, global_setup);
-    if (!ssl_supported && connection_type_ != connection_type::CLEAR)
+    if (!curl::get_ssl_supported() && connection_type_ != connection_type::CLEAR)
     {
         std::string type_text = (connection_type_ == connection_type::SSL) ?
             "SSL" : "STARTTLS";
         report_error("The connection type " + type_text + " is not supported because the CURL library on the system does not support SSL");
         throw exception("[email_writer] Unsupported connection type: " + type_text);
     }
-    curl_ = curl_easy_init();
-    if (curl_ == nullptr)
-        throw exception("Could not initialize the CURL library");
     try
     {
         std::ostringstream stream;
@@ -232,29 +206,25 @@ void email_writer::init()
         else
             stream << "smtp";
         stream << "://" << host_ << ':' << port_;
-        set_curl_option(CURLOPT_URL, stream.str().c_str(), "URL");
+        curl_->set_option(CURLOPT_URL, stream.str().c_str(), "URL");
         stream.str("");
         stream << '<' << from_ << '>';
-        set_curl_option(CURLOPT_MAIL_FROM, stream.str().c_str(), "mail from field");
-        for (auto one : to_)
-        {
-            stream.str("");
-            stream << '<' << one << '>';
-            rcpts_ = curl_slist_append(rcpts_, stream.str().c_str());
-        }
-        set_curl_option(CURLOPT_MAIL_RCPT, rcpts_, "mail to");
-        set_curl_option(CURLOPT_UPLOAD, 1, "upload");
-        set_curl_option(CURLOPT_READFUNCTION, curl_read_cb, "read callback");
+        curl_->set_option(CURLOPT_MAIL_FROM, stream.str().c_str(), "mail from field");
+        std::vector<std::string> tos;
+        std::transform(to_.begin(), to_.end(), std::back_inserter(tos), [] (const std::string& s) { return '<' + s + '>'; });
+        curl_->set_option(CURLOPT_MAIL_RCPT, curl_->create_slist(std::move(tos)), "mail to");
+        curl_->set_option(CURLOPT_UPLOAD, 1, "upload");
+        curl_->set_option(CURLOPT_READFUNCTION, curl_read_cb, "read callback");
         if (user_)
-            set_curl_option(CURLOPT_USERNAME, user_->c_str(), "user name");
+            curl_->set_option(CURLOPT_USERNAME, user_->c_str(), "user name");
         if (password_)
-            set_curl_option(CURLOPT_PASSWORD, password_->c_str(), "password");
+            curl_->set_option(CURLOPT_PASSWORD, password_->c_str(), "password");
         if (connection_type_ == connection_type::STARTTLS)
-            set_curl_option(CURLOPT_USE_SSL, CURLUSESSL_ALL, "use SSL (for STARTTLS connection type");
+            curl_->set_option(CURLOPT_USE_SSL, CURLUSESSL_ALL, "use SSL (for STARTTLS connection type");
         if (connection_type_ == connection_type::STARTTLS || connection_type_ == connection_type::SSL)
         {
-            set_curl_option(CURLOPT_SSL_VERIFYPEER, 0, "not to verify the peer certificate");
-            set_curl_option(CURLOPT_SSL_VERIFYHOST, 0, "not to verify the host");
+            curl_->set_option(CURLOPT_SSL_VERIFYPEER, 0, "not to verify the peer certificate");
+            curl_->set_option(CURLOPT_SSL_VERIFYHOST, 0, "not to verify the host");
         }
 
         #if !defined(NDEBUG)
@@ -263,35 +233,14 @@ void email_writer::init()
     }
     catch (exception&)
     {
-        if (curl_ != nullptr)
-        {
-            if (rcpts_ != nullptr)
-            {
-                curl_slist_free_all(rcpts_);
-                rcpts_ = nullptr;
-            }
-            curl_easy_cleanup(curl_);
-            curl_ = nullptr;
-        }
+        curl_.reset();
         throw;
     }
 }
 
 void email_writer::set_verbose(bool state)
 {
-    if (state && !verbose_)
-    {
-        set_curl_option(CURLOPT_DEBUGFUNCTION, curl_debug_callback, "debug callback");
-        set_curl_option(CURLOPT_DEBUGDATA, this, "debug user data pointer");
-        set_curl_option(CURLOPT_VERBOSE, 1, "verbose output");
-    }
-    else if (!state && verbose_)
-    {
-        set_curl_option(CURLOPT_DEBUGFUNCTION, nullptr, "debug callback");
-        set_curl_option(CURLOPT_DEBUGDATA, nullptr, "debug user data pointer");
-        set_curl_option(CURLOPT_VERBOSE, 0, "verbose output");
-    }
-    verbose_ = state;
+    curl_->set_verbose(state);
 }
 
 void email_writer::write_impl(const event& evt)
@@ -302,10 +251,10 @@ void email_writer::write_impl(const event& evt)
         read_data rd;
         rd.message = format_message(evt);
         rd.pos = 0;
-        set_curl_option(CURLOPT_READDATA, &rd, "read user data");
-        CURLcode rc = curl_easy_perform(curl_);
+        curl_->set_option(CURLOPT_READDATA, &rd, "read user data");
+        CURLcode rc = curl_easy_perform(curl_->get());
         if (rc != CURLE_OK)
-            throw curl_exception(rc, "Could not send email");
+            throw exception(std::string("Could not send email: ") + curl_easy_strerror(rc));
     }
 }
 
@@ -319,11 +268,6 @@ void email_writer::fixed_size_queue::push(const event& evt)
     while (q_.size() >= max_)
         q_.pop();
     q_.push(evt);
-}
-
-email_writer::curl_exception::curl_exception(CURLcode err, const std::string& msg)
-    : chucho::exception(msg + ": " + curl_easy_strerror(err))
-{
 }
 
 }

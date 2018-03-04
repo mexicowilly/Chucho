@@ -400,26 +400,40 @@ IF(CURL_FOUND)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
          include/chucho/email_trigger.hpp
          include/chucho/email_writer.hpp
-         include/chucho/level_threshold_email_trigger.hpp)
+         include/chucho/level_threshold_email_trigger.hpp
+         include/chucho/loggly_writer.hpp)
     LIST(APPEND CHUCHO_EMBEDDED_SOURCES
          "${CMAKE_SOURCE_DIR}/embedded/fnv/hash_64a.c")
-    LIST(APPEND CHUCHO_EMAIL_SOURCES
+    LIST(APPEND CHUCHO_CURL_SOURCES
+         curl.cpp
          email_writer.cpp
          email_writer_factory.cpp
          email_writer_memento.cpp
          level_threshold_email_trigger.cpp
          level_threshold_email_trigger_factory.cpp
          level_threshold_email_trigger_memento.cpp
+         loggly_writer.cpp
+         loggly_writer_factory.cpp
+         loggly_writer_memento.cpp
+         include/chucho/curl.hpp
          include/chucho/email_writer_factory.hpp
          include/chucho/email_writer_memento.hpp
          include/chucho/level_threshold_email_trigger_factory.hpp
-         include/chucho/level_threshold_email_trigger_memento.hpp)
+         include/chucho/level_threshold_email_trigger_memento.hpp
+         include/chucho/loggly_writer_factory.hpp
+         include/chucho/loggly_writer_memento.hpp)
+    IF(NOT JSON_CONFIG)
+        LIST(APPEND CHUCHO_EMBEDDED_SOURCES
+            "${CMAKE_SOURCE_DIR}/embedded/cJSON/cJSON.c"
+            "${CMAKE_SOURCE_DIR}/embedded/include/cJSON.h")
+    ENDIF()
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/email_trigger.hpp
      include/chucho/email_writer.hpp
-     include/chucho/level_threshold_email_trigger.hpp)
+     include/chucho/level_threshold_email_trigger.hpp
+     include/chucho/loggly_writer.hpp)
 
 IF(PROTOBUF_FOUND)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
@@ -583,7 +597,7 @@ IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
         MESSAGE(STATUS "Chucho has log4cplus configuration parsing enabled")
     ENDIF()
     IF(CURL_FOUND)
-        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_EMAIL_WRITER)
+        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_CURL)
     ENDIF()
     SET_SOURCE_FILES_PROPERTIES(config_file_configurator.cpp PROPERTIES
                                 COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATOR_DEFS}")
@@ -811,7 +825,7 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_C_SOURCES}
     ${CHUCHO_DATABASE_SOURCES}
     ${CHUCHO_EVALUATOR_SOURCES}
-    ${CHUCHO_EMAIL_SOURCES}
+    ${CHUCHO_CURL_SOURCES}
     ${CHUCHO_SERIALIZER_SOURCES}
     ${CHUCHO_MESSAGE_QUEUE_SOURCES}
     ${CHUCHO_DOOR_SOURCES}
@@ -859,9 +873,9 @@ IF(RUBY_FOUND)
 ENDIF()
 
 IF(CURL_FOUND)
-    LIST(FIND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_EMAIL_WRITER CHUCHO_HEW_INDEX)
+    LIST(FIND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_CURL CHUCHO_HEW_INDEX)
     IF(CHUCHO_HEW_INDEX EQUAL -1)
-        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_EMAIL_WRITER)
+        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_CURL)
     ENDIF()
 ENDIF()
 
@@ -925,7 +939,7 @@ IF(LOG4CPLUS_CONFIG)
     LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_LOG4CPLUS_CONFIG)
 ENDIF()
 IF(CURL_FOUND)
-    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_EMAIL_WRITER)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_CURL)
 ENDIF()
 IF(CHUCHO_HAVE_DB2)
     LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_DB2_WRITER)

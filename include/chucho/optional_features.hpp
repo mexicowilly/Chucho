@@ -67,6 +67,7 @@ enum feature
     LZMA_COMPRESSION,           /**< LZMA compression */
     LZ4_COMPRESSION,            /**< LZ4 compression */
     FLATBUFFERS_SERIALIZER,     /**< Flatbuffers serialization */
+    LOGGLY_WRITER,              /**< Loggly writer */
     FEATURE_COUNT               /**< Do not use. This is just so I can know how many there are. */
 };
 

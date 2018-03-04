@@ -45,8 +45,9 @@ TEST(optional_features, simple)
 #if defined(CHUCHO_CONFIG_FILE_CONFIG)
     EXPECT_FEATURE(chucho::optional_features::CONFIG_FILE_CONFIGURATION);
 #endif
-#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+#if defined(CHUCHO_HAVE_CURL)
     EXPECT_FEATURE(chucho::optional_features::EMAIL_WRITER);
+    EXPECT_FEATURE(chucho::optional_features::LOGGLY_WRITER);
 #endif
 #if defined(CHUCHO_LOG4CPLUS_CONFIG)
     EXPECT_FEATURE(chucho::optional_features::LOG4CPLUS_CONFIGURATION);

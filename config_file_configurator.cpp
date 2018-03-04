@@ -164,7 +164,7 @@ std::unique_ptr<configurable> config_file_configurator::chucho_properties_proces
     generics.push_back("file_roll_trigger");
     generics.push_back("serializer");
     generics.push_back("compressor");
-    #if defined(CHUCHO_HAVE_EMAIL_WRITER)
+    #if defined(CHUCHO_HAVE_CURL)
     generics.push_back("email_trigger");
     #endif
     for (const auto& cur : cur_props)

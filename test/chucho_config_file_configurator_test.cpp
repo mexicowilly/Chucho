@@ -236,7 +236,7 @@ TEST_F(chucho_config_file_configurator, duplicate_message_filter)
     duplicate_message_filter_body();
 }
 
-#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+#if defined(CHUCHO_HAVE_CURL)
 
 TEST_F(chucho_config_file_configurator, email_writer)
 {
@@ -259,6 +259,18 @@ TEST_F(chucho_config_file_configurator, email_writer)
               "chucho.writer.em.password = lumpy\n"
               "chucho.writer.em.buffer_size = 7000");
     email_writer_body();
+}
+
+TEST_F(chucho_config_file_configurator, loggly_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = lw\n"
+              "chucho.writer.lw = chucho::loggly_writer\n"
+              "chucho.writer.lw.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.lw.token = monkey-balls");
+    loggly_writer_body();
 }
 
 #endif
