@@ -40,7 +40,7 @@ void init_feature_set(chucho::optional_features::feature_set& fs)
 #if defined(CHUCHO_HAVE_DB2_WRITER)
     fs.set(chucho::optional_features::DB2_WRITER);
 #endif
-#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+#if defined(CHUCHO_HAVE_CURL)
     fs.set(chucho::optional_features::EMAIL_WRITER);
 #endif
 #if defined(CHUCHO_HAVE_LOG4CPLUS_CONFIG)
@@ -90,6 +90,9 @@ void init_feature_set(chucho::optional_features::feature_set& fs)
 #endif
 #if defined(CHUCHO_HAVE_FLATBUFFERS)
     fs.set(chucho::optional_features::FLATBUFFERS_SERIALIZER);
+#endif
+#if defined(CHUCHO_HAVE_CURL)
+    fs.set(chucho::optional_features::LOGGLY_WRITER);
 #endif
 }
 

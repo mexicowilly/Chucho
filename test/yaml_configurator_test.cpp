@@ -268,7 +268,7 @@ TEST_F(yaml_configurator, duplicate_message_filter)
     duplicate_message_filter_body();
 }
 
-#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+#if defined(CHUCHO_HAVE_CURL)
 
 TEST_F(yaml_configurator, email_writer)
 {
@@ -289,6 +289,17 @@ TEST_F(yaml_configurator, email_writer)
               "        - password: lumpy\n"
               "        - buffer_size: 7000\n");
     email_writer_body();
+}
+
+TEST_F(yaml_configurator, loggly_writer)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::loggly_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            pattern: '%m'\n"
+              "        - token: monkey-balls\n");
+    loggly_writer_body();
 }
 
 #endif

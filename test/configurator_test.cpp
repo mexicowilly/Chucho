@@ -67,9 +67,10 @@
 #if defined(CHUCHO_HAVE_RUBY)
 #include <chucho/ruby_evaluator_filter.hpp>
 #endif
-#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+#if defined(CHUCHO_HAVE_CURL)
 #include <chucho/email_writer.hpp>
 #include <chucho/level_threshold_email_trigger.hpp>
+#include <chucho/loggly_writer.hpp>
 #endif
 #include <chucho/pipe_writer.hpp>
 #include <chucho/named_pipe_writer.hpp>
@@ -262,7 +263,7 @@ void configurator::duplicate_message_filter_body()
     EXPECT_STREQ("chucho::duplicate_message_filter", flt.get_name().c_str());
 }
 
-#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+#if defined(CHUCHO_HAVE_CURL)
 
 void configurator::email_writer_body()
 {
@@ -285,6 +286,14 @@ void configurator::email_writer_body()
     EXPECT_EQ(*chucho::level::ERROR_(), *ltet.get_level());
     ASSERT_TRUE(ewrt.get_user());
     EXPECT_STREQ("scrumpy", ewrt.get_user()->c_str());
+}
+
+void configurator::loggly_writer_body()
+{
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& lwrt = dynamic_cast<chucho::loggly_writer&>(lgr->get_writer("chucho::loggly_writer"));
+    EXPECT_STREQ("monkey-balls", lwrt.get_token().c_str());
 }
 
 #endif

@@ -50,8 +50,9 @@ protected:
     void door_writer_body();
 #endif
     void duplicate_message_filter_body();
-#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+#if defined(CHUCHO_HAVE_CURL)
     void email_writer_body();
+    void loggly_writer_body();
 #endif
     void file_writer_body();
     void gzip_file_compressor_body();

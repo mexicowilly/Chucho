@@ -32,6 +32,7 @@ public:
                   const std::string& token);
     virtual ~loggly_writer();
 
+    const std::string& get_token() const;
     bool get_verbose() const;
     void set_verbose(bool state);
 
@@ -40,7 +41,13 @@ protected:
 
 private:
     std::unique_ptr<curl> curl_;
+    std::string token_;
 };
+
+inline const std::string& loggly_writer::get_token() const
+{
+    return token_;
+}
 
 }
 

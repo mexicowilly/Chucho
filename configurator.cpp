@@ -66,9 +66,10 @@
 #if defined(CHUCHO_HAVE_RUBY)
 #include <chucho/ruby_evaluator_filter_factory.hpp>
 #endif
-#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+#if defined(CHUCHO_HAVE_CURL)
 #include <chucho/email_writer_factory.hpp>
 #include <chucho/level_threshold_email_trigger_factory.hpp>
+#include <chucho/loggly_writer_factory.hpp>
 #endif
 #if defined(CHUCHO_HAVE_PROTOBUF)
 #include <chucho/protobuf_serializer_factory.hpp>
@@ -219,11 +220,13 @@ void configurator::initialize_impl()
     add_configurable_factory("chucho::ruby_evaluator_filter",
                              std::make_shared<ruby_evaluator_filter_factory>());
 #endif
-#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+#if defined(CHUCHO_HAVE_CURL)
     add_configurable_factory("chucho::email_writer",
                              std::make_shared<email_writer_factory>());
     add_configurable_factory("chucho::level_threshold_email_trigger",
                              std::make_shared<level_threshold_email_trigger_factory>());
+    add_configurable_factory("chucho::loggly_writer",
+                             std::make_shared<loggly_writer_factory>());
 #endif
 #if defined(CHUCHO_HAVE_PROTOBUF)
     add_configurable_factory("chucho::protobuf_serializer",
