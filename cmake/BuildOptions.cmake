@@ -106,7 +106,7 @@ OPTION(JSON_CONFIG "Whether to support reading JSON configuration files" OFF)
 # activemq: activemq_writer
 # bzip2: bzip2_compressor, bzip2_file_compressor
 # capn_proto: capn_proto_serializer
-# curl: email_writer, email_trigger, level_threshold_email_trigger
+# curl: email_writer, email_trigger, level_threshold_email_trigger, loggly_writer
 # db2: db2_writer
 # flatbuffers: flatbuffers_serializer
 # libarchive: zip_file_compressor
