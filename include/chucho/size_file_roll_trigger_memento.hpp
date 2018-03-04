@@ -36,8 +36,6 @@ public:
     const optional<std::uintmax_t>& get_max_size() const;
 
 private:
-    void parse(const std::string& spec);
-
     optional<std::uintmax_t> max_size_;
 };
 

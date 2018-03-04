@@ -85,6 +85,8 @@ async_writer::async_writer(const std::string& name,
       leave_thread_cb_(leave_thread_cb),
       flush_on_destruct_(flush_on_destruct)
 {
+    if (max_chunks < 2)
+        throw std::invalid_argument("max_chunks must be 2 or greater");
     set_status_origin("async_writer");
     if (writer_)
         worker_ = std::make_unique<std::thread>(std::bind(&async_writer::thread_main, this));

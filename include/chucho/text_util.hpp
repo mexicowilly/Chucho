@@ -35,6 +35,7 @@ namespace text_util
 const std::size_t MAX_MESSAGE_SIZE = 500 * 1024;
 
 CHUCHO_PRIV_EXPORT std::string format(const char* const fmt, va_list args);
+CHUCHO_PRIV_EXPORT std::uintmax_t parse_byte_size(const std::string& spec);
 CHUCHO_PRIV_EXPORT std::string to_lower(const std::string& text);
 CHUCHO_PRIV_EXPORT std::vector<std::string> tokenize(const std::string& text, char delim);
 
