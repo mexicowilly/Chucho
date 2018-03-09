@@ -19,6 +19,7 @@
 
 #include <chucho/writer.hpp>
 #include <aws/logs/CloudWatchLogsClient.h>
+#include <aws/logs/model/InputLogEvent.h>
 
 namespace chucho
 {
@@ -26,13 +27,16 @@ namespace chucho
 class CHUCHO_EXPORT cloudwatch_writer : public writer
 {
 public:
+    static constexpr std::size_t DEFAULT_BATCH_SIZE = 50;
+
     cloudwatch_writer(const std::string& name,
                       std::unique_ptr<formatter>&& fmt,
                       const std::string& log_group,
-                      const std::string& log_stream);
-    virtual ~cloudwatch_writer();
+                      const std::string& log_stream,
+                      std::size_t batch_size = DEFAULT_BATCH_SIZE);
 
     virtual void flush() override;
+    std::size_t get_batch_size() const;
     const std::string& get_log_group() const;
     const std::string& get_log_stream() const;
 
@@ -40,23 +44,22 @@ protected:
     virtual void write_impl(const event& evt) override;
 
 private:
-    struct aws_event
-    {
-        aws_event(formatter& fmt, const event& evt);
-
-        std::size_t get_wire_size() const;
-
-        long long millis_since_epoch;
-        Aws::String message;
-    };
+    std::size_t get_wire_size(const Aws::CloudWatchLogs::Model::InputLogEvent& e) const;
+    long long millis_since_epoch(const event& e) const;
 
     Aws::CloudWatchLogs::CloudWatchLogsClient client_;
     std::string log_group_;
     std::string log_stream_;
-    std::vector<aws_event> aws_events_;
+    Aws::Vector<Aws::CloudWatchLogs::Model::InputLogEvent> events_;
     std::size_t wire_size_;
     Aws::String next_token_;
+    std::size_t batch_size_;
 };
+
+inline std::size_t cloudwatch_writer::get_batch_size() const
+{
+    return batch_size_;
+}
 
 inline const std::string& cloudwatch_writer::get_log_group() const
 {
@@ -66,6 +69,16 @@ inline const std::string& cloudwatch_writer::get_log_group() const
 inline const std::string& cloudwatch_writer::get_log_stream() const
 {
     return log_stream_;
+}
+
+inline std::size_t cloudwatch_writer::get_wire_size(const Aws::CloudWatchLogs::Model::InputLogEvent& e) const
+{
+    return e.GetMessage().length() + 26;
+}
+
+inline long long cloudwatch_writer::millis_since_epoch(const event& e) const
+{
+    return std::chrono::duration_cast<std::chrono::milliseconds>(e.get_time().time_since_epoch()).count();
 }
 
 }
