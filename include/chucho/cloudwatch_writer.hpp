@@ -34,11 +34,19 @@ public:
                       const std::string& log_group,
                       const std::string& log_stream,
                       std::size_t batch_size = DEFAULT_BATCH_SIZE);
+    cloudwatch_writer(const std::string& name,
+                      std::unique_ptr<formatter>&& fmt,
+                      const std::string& log_group,
+                      const std::string& log_stream,
+                      const std::string& region,
+                      std::size_t batch_size = DEFAULT_BATCH_SIZE);
 
     virtual void flush() override;
     std::size_t get_batch_size() const;
+    std::size_t get_current_batch_size() const;
     const std::string& get_log_group() const;
     const std::string& get_log_stream() const;
+    const std::string& get_region() const;
 
 protected:
     virtual void write_impl(const event& evt) override;
@@ -47,18 +55,24 @@ private:
     std::size_t get_wire_size(const Aws::CloudWatchLogs::Model::InputLogEvent& e) const;
     long long millis_since_epoch(const event& e) const;
 
-    Aws::CloudWatchLogs::CloudWatchLogsClient client_;
+    std::unique_ptr<Aws::CloudWatchLogs::CloudWatchLogsClient> client_;
     std::string log_group_;
     std::string log_stream_;
     Aws::Vector<Aws::CloudWatchLogs::Model::InputLogEvent> events_;
     std::size_t wire_size_;
     Aws::String next_token_;
     std::size_t batch_size_;
+    std::string region_;
 };
 
 inline std::size_t cloudwatch_writer::get_batch_size() const
 {
     return batch_size_;
+}
+
+inline std::size_t cloudwatch_writer::get_current_batch_size() const
+{
+    return events_.size();
 }
 
 inline const std::string& cloudwatch_writer::get_log_group() const
@@ -69,6 +83,11 @@ inline const std::string& cloudwatch_writer::get_log_group() const
 inline const std::string& cloudwatch_writer::get_log_stream() const
 {
     return log_stream_;
+}
+
+inline const std::string& cloudwatch_writer::get_region() const
+{
+    return region_;
 }
 
 inline std::size_t cloudwatch_writer::get_wire_size(const Aws::CloudWatchLogs::Model::InputLogEvent& e) const

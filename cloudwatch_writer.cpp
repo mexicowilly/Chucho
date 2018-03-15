@@ -16,14 +16,48 @@
 
 #include <chucho/cloudwatch_writer.hpp>
 #include <chucho/exception.hpp>
+#include <chucho/file.hpp>
+#include <chucho/regex.hpp>
 #include <aws/logs/model/PutLogEventsRequest.h>
 #include <aws/logs/model/DescribeLogStreamsRequest.h>
 #include <aws/core/utils/Outcome.h>
+#include <fstream>
 
 namespace
 {
 
-constexpr std::size_t MAX_WIRE_SIZE = 1048576;
+constexpr const std::size_t MAX_WIRE_SIZE = 1048576;
+
+std::string find_aws_region()
+{
+    std::string result;
+    auto conf = chucho::file::get_home_directory() + ".aws" + chucho::file::dir_sep + "config";
+    if (chucho::file::exists(conf))
+    {
+        std::ifstream in(conf);
+        if (in.is_open())
+        {
+            chucho::regex::expression re("^[ \t]*([^ \t]+)[ \t]*=[ \t]*(.*)$");
+            chucho::regex::match mch;
+            std::string line;
+            while (std::getline(in, line))
+            {
+                if (!line.empty() && line.back() == '\r')
+                    line.pop_back();
+                if (chucho::regex::search(line, re, mch) &&
+                    mch.size() == 3 &&
+                    mch[1].begin() != -1 &&
+                    mch[2].begin() != -1 &&
+                    line.substr(mch[1].begin(), mch[1].length()) == "region")
+                {
+                    result = line.substr(mch[2].begin(), mch[2].length());
+                    break;
+                }
+            }
+        }
+    }
+    return result;
+}
 
 }
 
@@ -37,29 +71,68 @@ cloudwatch_writer::cloudwatch_writer(const std::string& name,
                                      const std::string& log_group,
                                      const std::string& log_stream,
                                      std::size_t batch_size)
+    : cloudwatch_writer(name, std::move(fmt), log_group, log_stream, find_aws_region(), batch_size)
+{
+}
+
+cloudwatch_writer::cloudwatch_writer(const std::string& name,
+                                     std::unique_ptr<formatter>&& fmt,
+                                     const std::string& log_group,
+                                     const std::string& log_stream,
+                                     const std::string& region,
+                                     std::size_t batch_size)
     : writer(name, std::move(fmt)),
       log_group_(log_group),
       log_stream_(log_stream),
       wire_size_(0),
-      batch_size_(std::min(batch_size, 10000UL))
+      batch_size_(std::max(1UL, std::min(batch_size, 10000UL))),
+      region_(region)
 {
     set_status_origin("cloudwatch_writer");
+    Aws::Client::ClientConfiguration conf;
+    conf.region = region;
+    client_ = std::make_unique<Aws::CloudWatchLogs::CloudWatchLogsClient>(conf);
+    if (batch_size > 10000)
+        report_warning("The batch size of " + std::to_string(batch_size) + " has been lowered to the maximum of 10000");
+    if (batch_size == 0)
+        report_warning("The batch size of 0 has been changed to 1");
     Aws::CloudWatchLogs::Model::DescribeLogStreamsRequest req;
     req.SetLogGroupName(log_group_.c_str());
     req.SetLogStreamNamePrefix(log_stream_.c_str());
     req.SetOrderBy(Aws::CloudWatchLogs::Model::OrderBy::LogStreamName);
-    req.SetLimit(1);
-    auto oc = client_.DescribeLogStreams(req);
-    if (oc.IsSuccess())
+    req.SetLimit(50);
+    bool finished = false;
+    while (!finished)
     {
-        if (!oc.GetResult().GetLogStreams().empty())
-            next_token_ = oc.GetResult().GetLogStreams()[0].GetUploadSequenceToken();
-    }
-    else
-    {
-        const auto& err = oc.GetError();
-        if (err.GetExceptionName() != "ResourceNotFoundException")
-            throw exception("AWS error describing log streams: (" + err.GetExceptionName() + ") "   + err.GetMessage());
+        auto oc = client_->DescribeLogStreams(req);
+        if (oc.IsSuccess())
+        {
+            if (oc.GetResult().GetLogStreams().empty())
+            {
+                break;
+            }
+            else
+            {
+                for (const auto& s : oc.GetResult().GetLogStreams())
+                {
+                    if (s.GetLogStreamName() == log_stream_)
+                    {
+                        next_token_ = s.GetUploadSequenceToken();
+                        finished = true;
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            const auto &err = oc.GetError();
+            if (err.GetExceptionName() != "ResourceNotFoundException")
+                throw exception("AWS error describing log streams: (" + err.GetExceptionName() + ") " + err.GetMessage());
+        }
+        if (oc.GetResult().GetNextToken().empty())
+            break;
+        req.SetNextToken(oc.GetResult().GetNextToken());
     }
 }
 
@@ -70,17 +143,18 @@ void cloudwatch_writer::flush()
         Aws::CloudWatchLogs::Model::PutLogEventsRequest req;
         req.SetLogGroupName(log_group_.c_str());
         req.SetLogStreamName(log_stream_.c_str());
-        req.SetSequenceToken(next_token_);
+        if (!next_token_.empty())
+            req.SetSequenceToken(next_token_);
         req.SetLogEvents(std::move(events_));
         wire_size_ = 0;
-        auto oc = client_.PutLogEvents(req);
+        auto oc = client_->PutLogEvents(req);
         if (oc.IsSuccess())
         {
             next_token_ = oc.GetResult().GetNextSequenceToken();
         }
         else
         {
-            const auto &err = oc.GetError();
+            const auto& err = oc.GetError();
             throw exception("AWS error putting events: (" + err.GetExceptionName() + ") " + err.GetMessage());
         }
     }
