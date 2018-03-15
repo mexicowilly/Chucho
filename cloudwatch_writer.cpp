@@ -18,6 +18,7 @@
 #include <chucho/exception.hpp>
 #include <chucho/file.hpp>
 #include <chucho/regex.hpp>
+#include <chucho/environment.hpp>
 #include <aws/logs/model/PutLogEventsRequest.h>
 #include <aws/logs/model/DescribeLogStreamsRequest.h>
 #include <aws/core/utils/Outcome.h>
@@ -31,27 +32,35 @@ constexpr const std::size_t MAX_WIRE_SIZE = 1048576;
 std::string find_aws_region()
 {
     std::string result;
-    auto conf = chucho::file::get_home_directory() + ".aws" + chucho::file::dir_sep + "config";
-    if (chucho::file::exists(conf))
+    auto env = chucho::environment::get("AWS_REGION");
+    if (env)
     {
-        std::ifstream in(conf);
-        if (in.is_open())
+        result = *env;
+    }
+    else
+    {
+        auto conf = chucho::file::get_home_directory() + ".aws" + chucho::file::dir_sep + "config";
+        if (chucho::file::exists(conf))
         {
-            chucho::regex::expression re("^[ \t]*([^ \t]+)[ \t]*=[ \t]*(.*)$");
-            chucho::regex::match mch;
-            std::string line;
-            while (std::getline(in, line))
+            std::ifstream in(conf);
+            if (in.is_open())
             {
-                if (!line.empty() && line.back() == '\r')
-                    line.pop_back();
-                if (chucho::regex::search(line, re, mch) &&
-                    mch.size() == 3 &&
-                    mch[1].begin() != -1 &&
-                    mch[2].begin() != -1 &&
-                    line.substr(mch[1].begin(), mch[1].length()) == "region")
+                chucho::regex::expression re("^[ \t]*([^ \t]+)[ \t]*=[ \t]*(.*)$");
+                chucho::regex::match mch;
+                std::string line;
+                while (std::getline(in, line))
                 {
-                    result = line.substr(mch[2].begin(), mch[2].length());
-                    break;
+                    if (!line.empty() && line.back() == '\r')
+                        line.pop_back();
+                    if (chucho::regex::search(line, re, mch) &&
+                        mch.size() == 3 &&
+                        mch[1].begin() != -1 &&
+                        mch[2].begin() != -1 &&
+                        line.substr(mch[1].begin(), mch[1].length()) == "region")
+                    {
+                        result = line.substr(mch[2].begin(), mch[2].length());
+                        break;
+                    }
                 }
             }
         }
