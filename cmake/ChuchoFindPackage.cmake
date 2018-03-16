@@ -20,12 +20,8 @@ FIND_PACKAGE(PkgConfig QUIET)
 
 LIST(APPEND WITH_LIBS $ENV{CHUCHO_WITH_LIBS})
 STRING(TOLOWER "${WITH_LIBS}" LOWER_WITH_LIBS)
-LIST(FIND LOWER_WITH_LIBS awssdk CUCHO_WITH_AWSSDK)
-IF(NOT CHUCHO_WITH_AWSSDK EQUAL -1)
-    LIST(APPEND LOWER_WITH_LIBS curl)
-ENDIF()
 LIST(REMOVE_DUPLICATES LOWER_WITH_LIBS)
-SET(CHUCHO_BUILT_INS curl protobuf ruby zlib bzip2 liblzma libarchive)
+SET(CHUCHO_BUILT_INS curl protobuf ruby zlib bzip2 liblzma libarchive awssdk)
 
 # This cannot be a function, because then FIND_PACKAGE will fail
 # to put its variables in the right scope

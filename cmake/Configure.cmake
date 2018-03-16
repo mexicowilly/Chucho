@@ -485,7 +485,11 @@ CHUCHO_FIND_PACKAGE(RABBITMQ INCLUDE amqp.h LIBS rabbitmq PKG_CONFIG_NAME librab
     amqp_destroy_connection amqp_error_string2 amqp_cstring_bytes amqp_queue_declare
     amqp_basic_consume amqp_consume_message amqp_empty_bytes amqp_empty_table
     amqp_destroy_envelope)
-CHUCHO_FIND_PACKAGE(AWSSDK INCLUDE aws/logs/CloudWatchLogsClient.h LIBS aws-cpp-sdk-logs aws-cpp-sdk-core)
+CHUCHO_FIND_PACKAGE(AWSSDK)
+IF(AWSSDK_FOUND)
+    SET(AWS_SVCS logs)
+    AWSSDK_DETERMINE_LIBS_TO_LINK(AWS_SVCS AWSSDK_LIBS)
+ENDIF()
 
 # This must appear after the above package searches
 CHUCHO_GENERATE_PKG_CONFIG_FILE()
