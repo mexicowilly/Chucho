@@ -21,10 +21,16 @@
 #include <chucho/logger.hpp>
 #include <aws/core/Aws.h>
 
+namespace
+{
+
+std::once_flag once;
+
+}
+
 TEST(cloudwatch_writer, many)
 {
-    Aws::SDKOptions opts;
-    Aws::InitAPI(opts);
+    std::call_once(once, Aws::InitAPI, Aws::SDKOptions());
     auto fmt = std::make_unique<chucho::pattern_formatter>("%m");
     chucho::cloudwatch_writer wrt("cloudwatch", std::move(fmt), "Application", "UnitTest", 10);
     for (int i = 0; i < 11; i++)
@@ -36,21 +42,17 @@ TEST(cloudwatch_writer, many)
     EXPECT_EQ(1, wrt.get_current_batch_size());
     wrt.flush();
     EXPECT_EQ(0, wrt.get_current_batch_size());
-    Aws::ShutdownAPI(opts);
 }
 
 TEST(cloudwatch_writer, one)
 {
-    Aws::SDKOptions opts;
-    Aws::InitAPI(opts);
+    std::call_once(once, Aws::InitAPI, Aws::SDKOptions());
     auto fmt = std::make_unique<chucho::pattern_formatter>("%m");
-    auto wrt = std::make_unique<chucho::cloudwatch_writer>("cloudwatch", std::move(fmt), "Application", "UnitTest");
+    chucho::cloudwatch_writer wrt("cloudwatch", std::move(fmt), "Application", "UnitTest");
     chucho::event e(chucho::logger::get("will"), chucho::level::INFO_(), "Hello, World! (monkies)", __FILE__, __LINE__,
                     CHUCHO_FUNCTION_NAME);
-    wrt->write(e);
-    EXPECT_EQ(1, wrt->get_current_batch_size());
-    wrt->flush();
-    EXPECT_EQ(0, wrt->get_current_batch_size());
-    wrt.reset();
-    Aws::ShutdownAPI(opts);
+    wrt.write(e);
+    EXPECT_EQ(1, wrt.get_current_batch_size());
+    wrt.flush();
+    EXPECT_EQ(0, wrt.get_current_batch_size());
 }

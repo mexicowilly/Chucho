@@ -104,6 +104,9 @@
 #if defined(CHUCHO_HAVE_FLATBUFFERS)
 #include <chucho/flatbuffers_serializer_factory.hpp>
 #endif
+#if defined(CHUCHO_HAVE_AWSSDK)
+#include <chucho/cloudwatch_writer_factory.hpp>
+#endif
 
 #include <cstring>
 #include <mutex>
@@ -271,6 +274,10 @@ void configurator::initialize_impl()
 #if defined(CHUCHO_HAVE_FLATBUFFERS)
     add_configurable_factory("chucho::flatbuffers_serializer",
                              std::make_shared<flatbuffers_serializer_factory>());
+#endif
+#if defined(CHUCHO_HAVE_AWSSDK)
+    add_configurable_factory("chucho::cloudwatch_writer",
+                             std::make_shared<cloudwatch_writer_factory>());
 #endif
 }
 

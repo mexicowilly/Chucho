@@ -20,6 +20,9 @@
 #include <chucho/finalize.hpp>
 #include <iostream>
 #include <fstream>
+#if defined(CHUCHO_HAVE_AWSSDK)
+#include <aws/core/Aws.h>
+#endif
 
 class all_status : public chucho::status_observer
 {
@@ -38,10 +41,16 @@ public:
         chucho::configuration::set_allow_default(false);
         observer_.reset(new all_status());
         chucho::status_manager::get().add(observer_);
+        #if defined(CHUCHO_HAVE_AWSSDK)
+        Aws::InitAPI(Aws::SDKOptions());
+        #endif
     }
 
     virtual void TearDown() override
     {
+        #if defined(CHUCHO_HAVE_AWSSDK)
+        Aws::ShutdownAPI(Aws::SDKOptions());
+        #endif
         // The SunPro compiler has a bug that causes it to segv
         // in the destructor of security_policy.
         #if !defined(__SUNPRO_CC)

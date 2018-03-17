@@ -101,6 +101,9 @@
 #if defined(CHUCHO_HAVE_FLATBUFFERS)
 #include <chucho/flatbuffers_serializer.hpp>
 #endif
+#if defined(CHUCHO_HAVE_AWSSDK)
+#include <chucho/cloudwatch_writer.hpp>
+#endif
 
 namespace chucho
 {
@@ -206,6 +209,23 @@ void configurator::cerr_writer_body()
     auto& wrt = dynamic_cast<chucho::cerr_writer&>(lgr->get_writer("chucho::cerr_writer"));
     EXPECT_STREQ("chucho::cerr_writer", wrt.get_name().c_str());
 }
+
+#if defined(CHUCHO_HAVE_AWSSDK)
+
+void configurator::cloudwatch_writer_body()
+{
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& wrt = dynamic_cast<chucho::cloudwatch_writer&>(lgr->get_writer("chucho::cloudwatch_writer"));
+    EXPECT_STREQ("chucho::cloudwatch_writer", wrt.get_name().c_str());
+    EXPECT_STREQ("monkeyballs", wrt.get_log_group().c_str());
+    EXPECT_STREQ("streamer", wrt.get_log_stream().c_str());
+    EXPECT_STREQ("us-west-1", wrt.get_region().c_str());
+    EXPECT_EQ(chucho::cloudwatch_writer::DEFAULT_BATCH_SIZE, wrt.get_batch_size());
+    EXPECT_EQ(0, wrt.get_current_batch_size());
+}
+
+#endif
 
 void configurator::configure(const char* const cnf)
 {

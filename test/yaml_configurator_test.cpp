@@ -201,6 +201,23 @@ TEST_F(yaml_configurator, cerr_writer_invalid_2)
                          "    - chucho::cerr_writer");
 }
 
+#if defined(CHUCHO_HAVE_AWSSDK)
+
+TEST_F(yaml_configurator, cloudwatch_writer)
+{
+    configure("chucho::logger:\n"
+              "    name: will\n"
+              "    chucho::cloudwatch_writer:\n"
+              "        - chucho::pattern_formatter:\n"
+              "            pattern: '%m'\n"
+              "        - log_group: monkeyballs\n"
+              "        - log_stream: streamer\n"
+              "        - region: us-west-1\n");
+    cloudwatch_writer_body();
+}
+
+#endif
+
 TEST_F(yaml_configurator, cout_writer)
 {
     configure("chucho::logger:\n"

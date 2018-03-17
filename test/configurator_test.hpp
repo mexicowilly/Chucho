@@ -39,7 +39,9 @@ protected:
     void async_writer_with_opts_body();
     void bzip2_file_compressor_body();
     void cerr_writer_body();
-    virtual chucho::configurator& get_configurator() = 0;
+#if defined(CHUCHO_HAVE_AWSSDK)
+    void cloudwatch_writer_body();
+#endif
     void configure(const char* const cnf);
     void configure_with_error(const char* const cnf);
     void cout_writer_body();
@@ -55,6 +57,7 @@ protected:
     void loggly_writer_body();
 #endif
     void file_writer_body();
+    virtual chucho::configurator& get_configurator() = 0;
     void gzip_file_compressor_body();
     void interval_file_roll_trigger_body(const std::string& tmpl);
     void level_filter_body(const std::string& tmpl);
