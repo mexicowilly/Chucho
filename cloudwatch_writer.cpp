@@ -154,7 +154,9 @@ void cloudwatch_writer::flush()
         req.SetLogStreamName(log_stream_.c_str());
         if (!next_token_.empty())
             req.SetSequenceToken(next_token_);
+        guard_.lock();
         req.SetLogEvents(std::move(events_));
+        guard_.unlock();
         wire_size_ = 0;
         auto oc = client_->PutLogEvents(req);
         if (oc.IsSuccess())
@@ -169,6 +171,12 @@ void cloudwatch_writer::flush()
     }
 }
 
+std::size_t cloudwatch_writer::get_current_batch_size()
+{
+    std::lock_guard<std::mutex> lock(guard_);
+    return events_.size();
+}
+
 void cloudwatch_writer::write_impl(const event& evt)
 {
     Aws::CloudWatchLogs::Model::InputLogEvent ile;
@@ -177,6 +185,7 @@ void cloudwatch_writer::write_impl(const event& evt)
     auto esz = get_wire_size(ile);
     if (events_.size() == batch_size_ || wire_size_ + esz > MAX_WIRE_SIZE)
         flush();
+    std::lock_guard<std::mutex> lock(guard_);
     events_.push_back(ile);
     wire_size_ += esz;
 }

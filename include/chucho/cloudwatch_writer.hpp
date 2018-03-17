@@ -43,7 +43,7 @@ public:
 
     virtual void flush() override;
     std::size_t get_batch_size() const;
-    std::size_t get_current_batch_size() const;
+    std::size_t get_current_batch_size();
     const std::string& get_log_group() const;
     const std::string& get_log_stream() const;
     const std::string& get_region() const;
@@ -63,16 +63,12 @@ private:
     Aws::String next_token_;
     std::size_t batch_size_;
     std::string region_;
+    std::mutex guard_;
 };
 
 inline std::size_t cloudwatch_writer::get_batch_size() const
 {
     return batch_size_;
-}
-
-inline std::size_t cloudwatch_writer::get_current_batch_size() const
-{
-    return events_.size();
 }
 
 inline const std::string& cloudwatch_writer::get_log_group() const
