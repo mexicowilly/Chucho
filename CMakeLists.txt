@@ -537,7 +537,9 @@ IF(AWSSDK_FOUND)
          include/chucho/cloudwatch_writer.hpp)
     LIST(APPEND CHUCHO_AWS_SOURCES
          cloudwatch_writer.cpp
+         cloudwatch_writer_factory.cpp
          cloudwatch_writer_memento.cpp
+         include/chucho/cloudwatch_writer_factory.hpp
          include/chucho/cloudwatch_writer_memento.hpp)
 ENDIF()
 
