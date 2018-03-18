@@ -24,6 +24,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <limits.h>
+#include <pwd.h>
 // Needed for realpath, which is not in <cstdlib>
 #include <stdlib.h>
 #include <dirent.h>
@@ -168,6 +169,31 @@ std::string directory_name(const std::string& name)
 bool exists(const std::string& name)
 {
     return access(name.c_str(), F_OK) == 0;
+}
+
+std::string get_home_directory()
+{
+    auto sz = sysconf(_SC_GETPW_R_SIZE_MAX);
+    if (sz == -1)
+        sz = 8 * 1024;
+    struct passwd pw;
+    auto pwp = &pw;
+    std::vector<char> buf;
+    int rc;
+    do
+    {
+        buf.resize(sz);
+        rc = getpwuid_r(geteuid(), &pw, &buf[0], buf.size(), &pwp);
+        sz *= 2;
+    } while (rc == ERANGE);
+    std::string result;
+    if (pwp != nullptr)
+    {
+        result = pw.pw_dir;
+        if (!result.empty() && result.back() != '/')
+            result += '/';
+    }
+    return result;
 }
 
 writeability get_writeability(const std::string& name)

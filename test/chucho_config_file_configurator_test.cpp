@@ -178,6 +178,24 @@ TEST_F(chucho_config_file_configurator, cerr_writer)
     cerr_writer_body();
 }
 
+#if defined(CHUCHO_HAVE_AWSSDK)
+
+TEST_F(chucho_config_file_configurator, cloudwatch_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = ce\n"
+              "chucho.writer.ce = chucho::cloudwatch_writer\n"
+              "chucho.writer.ce.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m%n\n"
+              "chucho.writer.ce.log_group=monkeyballs\n"
+              "chucho.writer.ce.log_stream=streamer\n"
+              "chucho.writer.ce.region=us-west-1");
+    cloudwatch_writer_body();
+}
+
+#endif
+
 TEST_F(chucho_config_file_configurator, cout_writer)
 {
     configure("chucho.logger = will\n"

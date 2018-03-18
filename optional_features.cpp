@@ -28,9 +28,8 @@ void init_feature_set(chucho::optional_features::feature_set& fs)
 #if defined(CHUCHO_HAVE_BZIP2_COMPRESSION)
     fs.set(chucho::optional_features::BZIP2_COMPRESSION);
 #endif
-#if defined(CHUCHO_HAVE_C_API)
+    // We always have C API now
     fs.set(chucho::optional_features::C_API);
-#endif
 #if defined(CHUCHO_HAVE_CAPN_PROTO_SERIALIZER)
     fs.set(chucho::optional_features::CAPN_PROTO_SERIALIZER);
 #endif
@@ -42,6 +41,7 @@ void init_feature_set(chucho::optional_features::feature_set& fs)
 #endif
 #if defined(CHUCHO_HAVE_CURL)
     fs.set(chucho::optional_features::EMAIL_WRITER);
+    fs.set(chucho::optional_features::LOGGLY_WRITER);
 #endif
 #if defined(CHUCHO_HAVE_LOG4CPLUS_CONFIG)
     fs.set(chucho::optional_features::LOG4CPLUS_CONFIGURATION);
@@ -91,8 +91,8 @@ void init_feature_set(chucho::optional_features::feature_set& fs)
 #if defined(CHUCHO_HAVE_FLATBUFFERS)
     fs.set(chucho::optional_features::FLATBUFFERS_SERIALIZER);
 #endif
-#if defined(CHUCHO_HAVE_CURL)
-    fs.set(chucho::optional_features::LOGGLY_WRITER);
+#if defined(CHUCHO_HAVE_AWSSDK)
+    fs.set(chucho::optional_features::CLOUDWATCH_WRITER);
 #endif
 }
 

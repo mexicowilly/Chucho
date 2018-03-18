@@ -68,6 +68,7 @@ enum feature
     LZ4_COMPRESSION,            /**< LZ4 compression */
     FLATBUFFERS_SERIALIZER,     /**< Flatbuffers serialization */
     LOGGLY_WRITER,              /**< Loggly writer */
+    CLOUDWATCH_WRITER,          /**< AWS Cloudwatch writer */
     FEATURE_COUNT               /**< Do not use. This is just so I can know how many there are. */
 };
 

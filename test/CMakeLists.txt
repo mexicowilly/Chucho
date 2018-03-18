@@ -170,6 +170,11 @@ IF(CURL_FOUND)
     LIST(APPEND CHUCHO_TEST_CURL_SOURCES loggly_writer_test.cpp)
 ENDIF()
 
+IF(AWSSDK_FOUND)
+    LIST(APPEND CHUCHO_TEST_AWS_SOURCES cloudwatch_writer_test.cpp)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_AWSSDK)
+ENDIF()
+
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
                c_test.cpp
@@ -214,7 +219,8 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                ${CHUCHO_TEST_SERIALIZER_SOURCES}
                ${CHUCHO_TEST_MQ_SOURCES}
                ${CHUCHO_TEST_DOOR_SOURCES}
-               ${CHUCHO_TEST_CURL_SOURCES})
+               ${CHUCHO_TEST_CURL_SOURCES}
+               ${CHUCHO_TEST_AWS_SOURCES})
 TARGET_LINK_LIBRARIES(unit-test chucho gtest)
 
 IF(MSVC)
