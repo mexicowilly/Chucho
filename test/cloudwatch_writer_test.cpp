@@ -19,18 +19,9 @@
 #include <chucho/pattern_formatter.hpp>
 #include <chucho/function_name.hpp>
 #include <chucho/logger.hpp>
-#include <aws/core/Aws.h>
-
-namespace
-{
-
-std::once_flag once;
-
-}
 
 TEST(cloudwatch_writer, many)
 {
-    std::call_once(once, Aws::InitAPI, Aws::SDKOptions());
     auto fmt = std::make_unique<chucho::pattern_formatter>("%m");
     chucho::cloudwatch_writer wrt("cloudwatch", std::move(fmt), "Application", "UnitTest", 10);
     for (int i = 0; i < 11; i++)
@@ -46,7 +37,6 @@ TEST(cloudwatch_writer, many)
 
 TEST(cloudwatch_writer, one)
 {
-    std::call_once(once, Aws::InitAPI, Aws::SDKOptions());
     auto fmt = std::make_unique<chucho::pattern_formatter>("%m");
     chucho::cloudwatch_writer wrt("cloudwatch", std::move(fmt), "Application", "UnitTest");
     chucho::event e(chucho::logger::get("will"), chucho::level::INFO_(), "Hello, World! (monkies)", __FILE__, __LINE__,

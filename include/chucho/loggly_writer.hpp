@@ -26,7 +26,7 @@ class curl;
 
 /**
  * @class loggly_writer loggly_writer.hpp chucho/loggly_writer.hpp
- * Writte to Loggly. This writer must make an HTTP connection
+ * Write to Loggly. This writer must make an HTTP connection
  * and transfer for every event, so it would probably be best to
  * use it with an @ref async_writer.
  *

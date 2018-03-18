@@ -138,6 +138,7 @@ cloudwatch_writer::cloudwatch_writer(const std::string& name,
             const auto &err = oc.GetError();
             if (err.GetExceptionName() != "ResourceNotFoundException")
                 throw exception("AWS error describing log streams: (" + err.GetExceptionName() + ") " + err.GetMessage());
+            break;
         }
         if (oc.GetResult().GetNextToken().empty())
             break;
