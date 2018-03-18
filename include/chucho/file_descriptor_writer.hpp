@@ -75,7 +75,8 @@ public:
      * Construct a writer.
      * 
      * @note This constructor is only available on Windows.
-     * 
+     *
+     * @param name the name of the writer
      * @param fmt the formatter
      * @param hnd the handle
      * @param flsh whether to flush the buffer after every

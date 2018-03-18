@@ -36,7 +36,18 @@ namespace chucho
 class evaluator_filter : public filter
 {
 protected:
+    /**
+     * @name Constructor
+     * @{
+     */
+    /**
+     * Construct a filter.
+     * @param name the name
+     */
     evaluator_filter(const std::string& name);
+    /**
+     * @}
+     */
 };
 
 inline evaluator_filter::evaluator_filter(const std::string& name)

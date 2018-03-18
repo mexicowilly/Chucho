@@ -30,7 +30,7 @@ namespace chucho
  * in batches of up to 10,000.
  *
  * If you don't provide a region, then one will be supplied by either
- * the environment variable, AWS_REGION, or the <pre>~/.aws/config</pre>
+ * the environment variable, AWS_REGION, or the `~/.aws/config`
  * file. If the region cannot be gleaned from either of those sources,
  * then it will be empty.
  *
@@ -111,7 +111,7 @@ public:
      * Return the name of the region. If no region was passed
      * to the constructor, then this is the region that was
      * determined by evaluating the environment variable,
-     * AWS_REGION, and the file <pre>~/.aws/config</pre>.
+     * AWS_REGION, and the file `~/.aws/config`.
      *
      * @return the region
      */
