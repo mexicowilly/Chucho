@@ -33,9 +33,7 @@ TEST(optional_features, simple)
 #if defined(CHUCHO_HAVE_BZIP2)
     EXPECT_FEATURE(chucho::optional_features::BZIP2_COMPRESSION);
 #endif
-#if defined(CHUCHO_HAVE_C_API)
     EXPECT_FEATURE(chucho::optional_features::C_API);
-#endif
 #if defined(CHUCHO_HAVE_CAPN_PROTO)
     EXPECT_FEATURE(chucho::optional_features::CAPN_PROTO_SERIALIZER);
 #endif
@@ -93,6 +91,9 @@ TEST(optional_features, simple)
 #endif
 #if defined(CHUCHO_HAVE_FLATBUFFERS)
     EXPECT_FEATURE(chucho::optional_features::FLATBUFFERS_SERIALIZER);
+#endif
+#if defined(CHUCHO_HAVE_AWSSDK)
+    EXPECT_FEATURE(chucho::optional_features::CLOUDWATCH_WRITER);
 #endif
     EXPECT_TRUE(fs.none());
 }
