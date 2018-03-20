@@ -145,6 +145,7 @@ ELSEIF(CMAKE_CXX_COMPILER_ID STREQUAL SunPro)
     ELSE()
         MESSAGE(FATAL_ERROR "-erroff=${CHUCHO_SUNPRO_DISABLED_WARNINGS} is required")
     ENDIF()
+    ADD_DEFINITIONS(-D_POSIX_PTHREAD_SEMANTICS)
 ENDIF()
 
 # We are building Chucho
@@ -190,7 +191,7 @@ FIND_PACKAGE(Threads REQUIRED)
 # Now do platform checks
 IF(CHUCHO_POSIX)
     # headers
-    FOREACH(HEAD assert.h fcntl.h limits.h netdb.h pthread.h signal.h
+    FOREACH(HEAD assert.h fcntl.h limits.h netdb.h pthread.h signal.h pwd.h
                  sys/socket.h sys/stat.h sys/utsname.h syslog.h time.h unistd.h)
         STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
         STRING(REPLACE / _ CHUCHO_HEAD_VAR_NAME ${CHUCHO_HEAD_VAR_NAME})
@@ -200,6 +201,9 @@ IF(CHUCHO_POSIX)
             MESSAGE(FATAL_ERROR "The header ${HEAD} is required")
         ENDIF()
     ENDFOREACH()
+
+    # getpwuid_r
+    CHUCHO_REQUIRE_SYMBOLS(pwd.h getpwuid_r)
 
     # host name functions
     CHUCHO_REQUIRE_SYMBOLS(sys/utsname.h uname)
@@ -258,15 +262,6 @@ IF(CHUCHO_POSIX)
 
     # syslog
     CHUCHO_REQUIRE_SYMBOLS(syslog.h syslog)
-
-    # socket/sendto/connect/shutdown/send
-    IF(CHUCHO_SOLARIS)
-        SET(CMAKE_REQUIRED_LIBRARIES socket)
-    ENDIF()
-    CHUCHO_REQUIRE_SYMBOLS(sys/socket.h socket sendto)
-    IF(CHUCHO_SOLARIS)
-        UNSET(CMAKE_REQUIRED_LIBRARIES)
-    ENDIF()
 
     # open/fcntl
     CHUCHO_REQUIRE_SYMBOLS(fcntl.h open fcntl)

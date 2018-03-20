@@ -40,51 +40,19 @@ namespace
 
 void remove_all_impl(const std::string& name)
 {
-    DIR* d = opendir(name.c_str());
-    if (d == nullptr)
-        throw chucho::file_exception("Could not open directory " + name + ": " + std::strerror(errno));
-    struct sentry
+    chucho::file::directory_iterator itor(name);
+    chucho::file::directory_iterator end;
+    struct stat st;
+    while (itor != end)
     {
-        sentry(DIR* d) : d_(d) { }
-        ~sentry() { closedir(d_); }
-        DIR* d_;
-    } s(d);
-#if defined(CHUCHO_DIRENT_NEEDS_NAME)
-    std::vector<std::uint8_t> dirent_bytes(sizeof(struct dirent) +
-        pathconf(name.c_str(), _PC_NAME_MAX));
-    struct dirent* entry = reinterpret_cast<struct dirent*>(&dirent_bytes[0]);
-#else
-    struct dirent dirent_bytes;
-    struct dirent* entry = &dirent_bytes;
-#endif
-    struct dirent* result;
-    struct stat stat_buf;
-    while (true)
-    {
-        if (readdir_r(d, entry, &result) != 0)
+        auto& cur = *itor;
+        if (stat(cur.c_str(), &st) != 0)
         {
-            // error
         }
-        if (result == nullptr)
-            break;
-        if (std::strcmp(entry->d_name, ".") == 0 ||
-            std::strcmp(entry->d_name, "..") == 0)
-        {
-            continue;
-        }
-        std::string child(name + '/' + entry->d_name);
-        if (stat(child.c_str(), &stat_buf) != 0)
-        {
-            // error
-        }
-        if (S_ISDIR(stat_buf.st_mode))
-        {
-            remove_all_impl(child);
-        }
-        else
-        {
-            chucho::file::remove(child);
-        }
+        if (S_ISDIR(st.st_mode))
+            remove_all_impl(cur);
+        chucho::file::remove(cur);
+        ++itor;
     }
     chucho::file::remove(name);
 }
@@ -341,7 +309,7 @@ directory_iterator_impl::directory_iterator_impl(const std::string& dir)
     if (parent_[parent_.length() - 1] != '/')
         parent_ += '/';
 #if defined(CHUCHO_DIRENT_NEEDS_NAME)
-    dirent_bytes_ = std::make_unique<std::uint8_t[]>(sizeof(struct dirent) + pathconf(dir.c_str(), PC_NAME_MAX));
+    dirent_bytes_ = std::make_unique<std::uint8_t[]>(sizeof(struct dirent) + pathconf(dir.c_str(), _PC_NAME_MAX));
 #else
     dirent_bytes_ = std::make_unique<std::uint8_t[]>(sizeof(struct dirent));
 #endif
