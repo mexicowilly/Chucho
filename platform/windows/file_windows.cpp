@@ -20,6 +20,7 @@
 #include <vector>
 #include <iterator>
 #include <io.h>
+#include <shlobj.h>
 
 namespace chucho
 {
@@ -110,6 +111,19 @@ std::string directory_name(const std::string& name)
 bool exists(const std::string& name)
 {
     return _access_s(name.c_str(), 0) == 0;
+}
+
+std::string get_home_directory()
+{
+    std::string result;
+    char* dir;
+    if (SHGetKnownFolderPathA(FOLDERID_Profile, KF_FLAG_DEFAULT, NULL, &dir) == S_OK)
+    {
+        result = dir;
+        CoTaskMemFree(dir);
+        result += '\\';
+    }
+    return result;
 }
 
 writeability get_writeability(const std::string& name)
