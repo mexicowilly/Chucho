@@ -145,6 +145,7 @@ ELSEIF(CMAKE_CXX_COMPILER_ID STREQUAL SunPro)
     ELSE()
         MESSAGE(FATAL_ERROR "-erroff=${CHUCHO_SUNPRO_DISABLED_WARNINGS} is required")
     ENDIF()
+    ADD_DEFINITIONS(-D_POSIX_PTHREAD_SEMANTICS)
 ENDIF()
 
 # We are building Chucho
@@ -190,7 +191,7 @@ FIND_PACKAGE(Threads REQUIRED)
 # Now do platform checks
 IF(CHUCHO_POSIX)
     # headers
-    FOREACH(HEAD assert.h fcntl.h limits.h netdb.h pthread.h signal.h
+    FOREACH(HEAD assert.h fcntl.h limits.h netdb.h pthread.h signal.h pwd.h
                  sys/socket.h sys/stat.h sys/utsname.h syslog.h time.h unistd.h)
         STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
         STRING(REPLACE / _ CHUCHO_HEAD_VAR_NAME ${CHUCHO_HEAD_VAR_NAME})
@@ -200,6 +201,9 @@ IF(CHUCHO_POSIX)
             MESSAGE(FATAL_ERROR "The header ${HEAD} is required")
         ENDIF()
     ENDFOREACH()
+
+    # getpwuid_r
+    CHUCHO_REQUIRE_SYMBOLS(pwd.h getpwuid_r)
 
     # host name functions
     CHUCHO_REQUIRE_SYMBOLS(sys/utsname.h uname)
@@ -259,15 +263,6 @@ IF(CHUCHO_POSIX)
     # syslog
     CHUCHO_REQUIRE_SYMBOLS(syslog.h syslog)
 
-    # socket/sendto/connect/shutdown/send
-    IF(CHUCHO_SOLARIS)
-        SET(CMAKE_REQUIRED_LIBRARIES socket)
-    ENDIF()
-    CHUCHO_REQUIRE_SYMBOLS(sys/socket.h socket sendto)
-    IF(CHUCHO_SOLARIS)
-        UNSET(CMAKE_REQUIRED_LIBRARIES)
-    ENDIF()
-
     # open/fcntl
     CHUCHO_REQUIRE_SYMBOLS(fcntl.h open fcntl)
 
@@ -315,6 +310,65 @@ IF(CHUCHO_POSIX)
             CHUCHO_REQUIRE_SYMBOLS(stropts.h fattach)
             SET(CHUCHO_HAVE_DOORS TRUE CACHE INTERNAL "Whether we have doors")
         ENDIF()
+    ENDIF()
+
+    # On Solaris we don't get the transitive linkage
+    # to the C++ runtime when linking a C program against a Chucho
+    # shared object. So, we need to figure out where the C++
+    # runtime is and add it to the target link libraries of the
+    # C unit test app.
+    IF(CHUCHO_SOLARIS AND NOT DEFINED CHUCHO_STD_CXX_LIBS)
+        CHUCHO_FIND_PROGRAM(CHUCHO_LDD ldd)
+        IF(NOT CHUCHO_LDD)
+            MESSAGE(FATAL_ERROR "Could not find ldd")
+        ENDIF()
+        MESSAGE(STATUS "Looking for standard C++ libraries")
+        FILE(WRITE "${CMAKE_BINARY_DIR}/libstdc++-check.cpp"
+             "#include <string>\nint main() { std::string s; return 0; }")
+        TRY_COMPILE(CHUCHO_CXX_RESULT
+                    "${CMAKE_BINARY_DIR}/libstdc++-check.out"
+                    "${CMAKE_BINARY_DIR}/libstdc++-check.cpp"
+                    COPY_FILE "${CMAKE_BINARY_DIR}/libstdc++-check")
+        IF(NOT CHUCHO_CXX_RESULT)
+            MESSAGE(FATAL_ERROR "Could not compile the program to find libstdc++")
+        ENDIF()
+        EXECUTE_PROCESS(COMMAND "${CHUCHO_LDD}" "${CMAKE_BINARY_DIR}/libstdc++-check"
+                        RESULT_VARIABLE CHUCHO_LDD_RESULT
+                        OUTPUT_VARIABLE CHUCHO_LDD_OUTPUT)
+        IF(NOT CHUCHO_LDD_RESULT EQUAL 0)
+            MESSAGE(FATAL_ERROR "Error running ldd to find libstdc++")
+        ENDIF()
+        FILE(WRITE "${CMAKE_BINARY_DIR}/libstdc++-check-ldd.out"
+             "${CHUCHO_LDD_OUTPUT}")
+        FILE(STRINGS "${CMAKE_BINARY_DIR}/libstdc++-check-ldd.out" CHUCHO_LDD_OUTPUT)
+        FOREACH(LINE ${CHUCHO_LDD_OUTPUT})
+            IF(LINE MATCHES libstdc)
+                STRING(REGEX REPLACE
+                       "^.+=>[ \\\t]*(.+libstdc.+)$"
+                       "\\1"
+                       CHUCHO_LIBSTDCXX
+                       "${LINE}")
+            ENDIF()
+            IF(LINE MATCHES libCrun)
+                STRING(REGEX REPLACE
+                       "^.+=>[ \\\t]*(.+libCrun.+)$"
+                       "\\1"
+                       CHUCHO_LIBCRUN
+                       "${LINE}")
+            ENDIF()
+            IF(LINE MATCHES libgcc_s)
+                STRING(REGEX REPLACE
+                       "^.+=>[ \\\t]*(.+libgcc_s.+)$"
+                       "\\1"
+                       CHUCHO_LIBGCC_S
+                       "${LINE}")
+            ENDIF()
+        ENDFOREACH()
+        SET(CHUCHO_STD_CXX_LIBS ${CHUCHO_LIBSTDCXX} ${CHUCHO_LIBGCC_S} ${CHUCHO_LIBCRUN} CACHE INTERNAL "The location of the stdandard C++ runtime library")
+        IF(NOT CHUCHO_STD_CXX_LIBS)
+            MESSAGE(WARNING "Could not determine the location of stdandard C++ runtime libraries. The C unit tests cannot be built.")
+        ENDIF()
+        MESSAGE(STATUS "Looking for standard C++ libraries - ${CHUCHO_STD_CXX_LIBS}")
     ENDIF()
 
 ELSEIF(CHUCHO_WINDOWS)
