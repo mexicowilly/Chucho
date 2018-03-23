@@ -52,6 +52,7 @@ event_cache::event_cache(std::size_t chunk_size, std::size_t max_size)
       current_sequence_(0),
       mem_chunk_occupied_(0),
       stats_(chunk_size, max_size),
+      total_bytes_written_(0),
       last_fullness_threshold_(0.0)
 {
     if (stats_.chunk_size_ >= stats_.max_size_)
@@ -96,7 +97,7 @@ void event_cache::cull()
     ++stats_.cull_events_;
     if (progress_cb_)
     {
-        stats_.average_event_size_ = stats_.events_written_ == 0 ? 0 : total_bytes_written_ / stats_.events_written_;
+        stats_.average_event_size_ = stats_.events_written_ == 0 ? 0 : (total_bytes_written_ / stats_.events_written_);
         last_fullness_threshold_ = static_cast<double>(stats_.current_size_) / static_cast<double>(stats_.max_size_);
         progress_cb_(stats_, event_cache_stats::progress_direction::DOWN, last_fullness_threshold_, culled);
     }
@@ -126,7 +127,7 @@ std::string event_cache::find_oldest_file()
 event_cache_stats event_cache::get_stats()
 {
     std::lock_guard<std::mutex> lock(guard_);
-    stats_.average_event_size_ = stats_.events_written_ == 0 ? 0 : total_bytes_written_ / stats_.events_written_;
+    stats_.average_event_size_ = stats_.events_written_ == 0 ? 0 : (total_bytes_written_ / stats_.events_written_);
     return stats_;
 }
 
@@ -195,8 +196,6 @@ void event_cache::push(const event& evt)
     }
     stats_.current_size_ += sz;
     ++stats_.events_written_;
-    if (stats_.current_size_ >= stats_.max_size_)
-        cull();
     if (stats_.current_size_ > stats_.largest_size_)
         stats_.largest_size_ = stats_.current_size_;
     if (stats_.largest_event_size_ < sz)

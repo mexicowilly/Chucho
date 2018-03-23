@@ -237,7 +237,7 @@ ADD_DEPENDENCIES(unit-test named-pipe-writer-test-helper)
 
 ADD_EXECUTABLE(c-test-helper EXCLUDE_FROM_ALL
                c_test_helper.c)
-TARGET_LINK_LIBRARIES(c-test-helper chucho)
+TARGET_LINK_LIBRARIES(c-test-helper chucho ${CHUCHO_STD_CXX_LIBS})
 ADD_DEPENDENCIES(unit-test c-test-helper)
 SET_TARGET_PROPERTIES(c-test-helper PROPERTIES LINKER_LANGUAGE C)
 

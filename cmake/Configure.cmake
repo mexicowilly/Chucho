@@ -312,6 +312,65 @@ IF(CHUCHO_POSIX)
         ENDIF()
     ENDIF()
 
+    # On Solaris we don't get the transitive linkage
+    # to the C++ runtime when linking a C program against a Chucho
+    # shared object. So, we need to figure out where the C++
+    # runtime is and add it to the target link libraries of the
+    # C unit test app.
+    IF(CHUCHO_SOLARIS AND NOT DEFINED CHUCHO_STD_CXX_LIBS)
+        CHUCHO_FIND_PROGRAM(CHUCHO_LDD ldd)
+        IF(NOT CHUCHO_LDD)
+            MESSAGE(FATAL_ERROR "Could not find ldd")
+        ENDIF()
+        MESSAGE(STATUS "Looking for standard C++ libraries")
+        FILE(WRITE "${CMAKE_BINARY_DIR}/libstdc++-check.cpp"
+             "#include <string>\nint main() { std::string s; return 0; }")
+        TRY_COMPILE(CHUCHO_CXX_RESULT
+                    "${CMAKE_BINARY_DIR}/libstdc++-check.out"
+                    "${CMAKE_BINARY_DIR}/libstdc++-check.cpp"
+                    COPY_FILE "${CMAKE_BINARY_DIR}/libstdc++-check")
+        IF(NOT CHUCHO_CXX_RESULT)
+            MESSAGE(FATAL_ERROR "Could not compile the program to find libstdc++")
+        ENDIF()
+        EXECUTE_PROCESS(COMMAND "${CHUCHO_LDD}" "${CMAKE_BINARY_DIR}/libstdc++-check"
+                        RESULT_VARIABLE CHUCHO_LDD_RESULT
+                        OUTPUT_VARIABLE CHUCHO_LDD_OUTPUT)
+        IF(NOT CHUCHO_LDD_RESULT EQUAL 0)
+            MESSAGE(FATAL_ERROR "Error running ldd to find libstdc++")
+        ENDIF()
+        FILE(WRITE "${CMAKE_BINARY_DIR}/libstdc++-check-ldd.out"
+             "${CHUCHO_LDD_OUTPUT}")
+        FILE(STRINGS "${CMAKE_BINARY_DIR}/libstdc++-check-ldd.out" CHUCHO_LDD_OUTPUT)
+        FOREACH(LINE ${CHUCHO_LDD_OUTPUT})
+            IF(LINE MATCHES libstdc)
+                STRING(REGEX REPLACE
+                       "^.+=>[ \\\t]*(.+libstdc.+)$"
+                       "\\1"
+                       CHUCHO_LIBSTDCXX
+                       "${LINE}")
+            ENDIF()
+            IF(LINE MATCHES libCrun)
+                STRING(REGEX REPLACE
+                       "^.+=>[ \\\t]*(.+libCrun.+)$"
+                       "\\1"
+                       CHUCHO_LIBCRUN
+                       "${LINE}")
+            ENDIF()
+            IF(LINE MATCHES libgcc_s)
+                STRING(REGEX REPLACE
+                       "^.+=>[ \\\t]*(.+libgcc_s.+)$"
+                       "\\1"
+                       CHUCHO_LIBGCC_S
+                       "${LINE}")
+            ENDIF()
+        ENDFOREACH()
+        SET(CHUCHO_STD_CXX_LIBS ${CHUCHO_LIBSTDCXX} ${CHUCHO_LIBGCC_S} ${CHUCHO_LIBCRUN} CACHE INTERNAL "The location of the stdandard C++ runtime library")
+        IF(NOT CHUCHO_STD_CXX_LIBS)
+            MESSAGE(WARNING "Could not determine the location of stdandard C++ runtime libraries. The C unit tests cannot be built.")
+        ENDIF()
+        MESSAGE(STATUS "Looking for standard C++ libraries - ${CHUCHO_STD_CXX_LIBS}")
+    ENDIF()
+
 ELSEIF(CHUCHO_WINDOWS)
     FOREACH(HEAD windows.h winsock2.h io.h process.h ws2tcpip.h time.h assert.h)
         STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})

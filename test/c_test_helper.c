@@ -48,7 +48,9 @@ int main(int argc, char* argv[])
     CHUCHO_C_ERROR_M("c", " mark", "%i", 10);
     CHUCHO_C_FATAL("c", "%i", 11);
     CHUCHO_C_FATAL_M("c", " mark", "%i", 12);
+#if !defined(__SUNPRO_C)
     chucho_finalize();
+#endif
     return EXIT_SUCCESS;
 }
 
