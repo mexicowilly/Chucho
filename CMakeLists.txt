@@ -177,6 +177,7 @@ ELSEIF(CHUCHO_WINDOWS)
         platform/windows/line_ending_windows.cpp
         platform/windows/named_pipe_writer_windows.cpp
         platform/windows/pipe_writer_windows.cpp
+        platform/windows/process_windows.cpp
         platform/windows/syslog_writer_windows.cpp
         platform/windows/text_util_windows.cpp
         platform/windows/windows_event_log_writer.cpp

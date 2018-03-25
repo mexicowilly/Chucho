@@ -104,6 +104,12 @@ TEST(file_test, directory_name)
 #endif
 }
 
+TEST(file_test, home)
+{
+    auto h = chucho::file::home_directory();
+    std::cout << "HOME: " << h << std::endl;
+}
+
 TEST(file_test, is_fully_qualified)
 {
 #if defined(CHUCHO_POSIX)
@@ -166,3 +172,10 @@ TEST(file_test, size)
     EXPECT_EQ(5, chucho::file::size("file_test_size.txt"));
     ASSERT_NO_THROW(chucho::file::remove("file_test_size.txt"));
 }
+
+TEST(file_test, temp)
+{
+    auto t = chucho::file::temporary_directory();
+    std::cout << "TEMP: " << t << std::endl;
+}
+

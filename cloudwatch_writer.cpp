@@ -39,7 +39,7 @@ std::string find_aws_region()
     }
     else
     {
-        auto conf = chucho::file::get_home_directory() + ".aws" + chucho::file::dir_sep + "config";
+        auto conf = chucho::file::home_directory() + ".aws" + chucho::file::dir_sep + "config";
         if (chucho::file::exists(conf))
         {
             std::ifstream in(conf);

@@ -278,7 +278,7 @@ directory_iterator& directory_iterator::operator++ ()
     {
         while (true)
         {
-            struct dirent *result;
+            struct dirent* result;
             if (readdir_r(pimpl_->dir_, pimpl_->entry_, &result) != 0)
                 throw chucho::file_exception("Could not read directory " + pimpl_->parent_ + ": " + std::strerror(errno));
             if (result == nullptr)

@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <iterator>
 #include <sstream>
+#include <cctype>
 
 namespace chucho
 {
