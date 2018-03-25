@@ -139,7 +139,18 @@ bool exists(const std::string& name)
     return access(name.c_str(), F_OK) == 0;
 }
 
-std::string get_home_directory()
+writeability get_writeability(const std::string& name)
+{
+    writeability result = writeability::NON_WRITEABLE;
+    int rc = access(name.c_str(), W_OK);
+    if (rc == 0)
+        result = writeability::WRITEABLE;
+    else if (errno == ENOENT) 
+        result = writeability::NON_EXISTENT;
+    return result;
+}
+
+std::string home_directory()
 {
     auto sz = sysconf(_SC_GETPW_R_SIZE_MAX);
     if (sz == -1)
@@ -161,17 +172,6 @@ std::string get_home_directory()
         if (!result.empty() && result.back() != '/')
             result += '/';
     }
-    return result;
-}
-
-writeability get_writeability(const std::string& name)
-{
-    writeability result = writeability::NON_WRITEABLE;
-    int rc = access(name.c_str(), W_OK);
-    if (rc == 0)
-        result = writeability::WRITEABLE;
-    else if (errno == ENOENT) 
-        result = writeability::NON_EXISTENT;
     return result;
 }
 
