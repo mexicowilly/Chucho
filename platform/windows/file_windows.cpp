@@ -268,6 +268,7 @@ directory_iterator& directory_iterator::operator++ ()
             if (!FindNextFileA(pimpl_->handle_, &pimpl_->fdata_))
             {
                 pimpl_.reset();
+                cur_.clear();
                 break;
             }
         } while (std::strcmp(pimpl_->fdata_.cFileName, ".") == 0 ||
