@@ -94,6 +94,11 @@
  */
 #define CHUCHO_TRACE_LGBL(msg) CHUCHO_INTERNAL_LOG(TRACE_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
+ * @def CHUCHO_TRACE_L(msg)
+ * @copydoc CHUCHO_TRACE_LGBL(msg)
+ */
+#define CHUCHO_TRACE_L(msg) CHUCHO_TRACE_LGBL(msg)
+/**
  * @def CHUCHO_TRACE_STR(lg, msg)
  * Log a trace-level message that is text only.
  * @param lg the logger, which must be a std::shared_ptr<logger> 
@@ -110,6 +115,11 @@
  *            char* or a std::string
  */
 #define CHUCHO_TRACE_LGBL_STR(msg) CHUCHO_INTERNAL_LOG_STR(TRACE_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+/**
+ * @def CHUCHO_TRACE_L_STR(msg)
+ * @copydoc CHUCHO_TRACE_LGBL_STR(msg)
+ */
+#define CHUCHO_TRACE_L_STR(msg) CHUCHO_TRACE_LGBL_STR(msg)
 /**
  * @def CHUCHO_TRACE_M(mrk, lg, msg)
  * Log a trace-level message with a marker.
@@ -138,6 +148,11 @@
  */
 #define CHUCHO_TRACE_LGBL_M(mrk, msg) CHUCHO_INTERNAL_LOG_M(mrk, TRACE_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
+ * @def CHUCHO_TRACE_L_M(mrk, msg)
+ * @copydoc CHUCHO_TRACE_LGBL_M(mrk, msg)
+ */
+#define CHUCHO_TRACE_L_M(mrk, msg) CHUCHO_TRACE_LGBL_M(mrk, msg)
+/**
  * @def CHUCHO_TRACE_STR_M(mrk, lg, msg)
  * Log a trace-level message that is text only with a marker.
  * @param mrk the marker, which may either be a marker reference 
@@ -163,6 +178,11 @@
  */
 #define CHUCHO_TRACE_LGBL_STR_M(mrk, msg) CHUCHO_INTERNAL_LOG_STR_M(mrk, TRACE_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
+ * @def CHUCHO_TRACE_L_STR_M(mrk, msg)
+ * @copydoc CHUCHO_TRACE_LGBL_STR_M(mrk, msg)
+ */
+#define CHUCHO_TRACE_L_STR_M(mrk, msg) CHUCHO_TRACE_LGBL_STR_M(mrk, msg)
+/**
  * @def CHUCHO_DEBUG(lg, msg)
  * Log a debug-level message.
  * @param lg the logger, which must be a std::shared_ptr<logger> 
@@ -182,6 +202,11 @@
  */
 #define CHUCHO_DEBUG_LGBL(msg) CHUCHO_INTERNAL_LOG(DEBUG_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
+ * @def CHUCHO_DEBUG_L(msg)
+ * @copydoc CHUCHO_DEBUG_LGBL(msg)
+ */
+#define CHUCHO_DEBUG_L(msg) CHUCHO_DEBUG_LGBL(msg)
+/**
  * @def CHUCHO_DEBUG_STR(lg, msg)
  * Log a debug-level message that is text only.
  * @param lg the logger, which must be a std::shared_ptr<logger> 
@@ -198,6 +223,11 @@
  *            char* or a std::string
  */
 #define CHUCHO_DEBUG_LGBL_STR(msg) CHUCHO_INTERNAL_LOG_STR(DEBUG_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+/**
+ * @def CHUCHO_DEBUG_L_STR(msg)
+ * @copydoc CHUCHO_DEBUG_LGBL_STR(msg)
+ */
+#define CHUCHO_DEBUG_L_STR(msg) CHUCHO_DEBUG_LGBL_STR(msg)
 /**
  * @def CHUCHO_DEBUG_M(mrk, lg, msg)
  * Log a debug-level message with a marker.
@@ -226,6 +256,11 @@
  */
 #define CHUCHO_DEBUG_LGBL_M(mrk, msg) CHUCHO_INTERNAL_LOG_M(mrk, DEBUG_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
+ * @def CHUCHO_DEBUG_L_M(mrk, msg)
+ * @copydoc CHUCHO_DEBUG_LGBL_M(mrk, msg)
+ */
+#define CHUCHO_DEBUG_L_M(mrk, msg) CHUCHO_DEBUG_LGBL_M(mrk, msg)
+/**
  * @def CHUCHO_DEBUG_STR_M(lg, msg)
  * Log a debug-level message that is text only with a marker.
  * @param mrk the marker, which may either be a marker reference 
@@ -251,6 +286,11 @@
  */
 #define CHUCHO_DEBUG_LGBL_STR_M(mrk, msg) CHUCHO_INTERNAL_LOG_STR_M(mrk, DEBUG_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
+ * @def CHUCHO_DEBUG_L_STR_M(mrk, msg)
+ * @copydoc CHUCHO_DEBUG_LGBL_STR_M(mrk, msg)
+ */
+#define CHUCHO_DEBUG_L_STR_M(mrk, msg) CHUCHO_DEBUG_LGBL_STR_M(mrk, msg)
+/**
  * @def CHUCHO_INFO(lg, msg)
  * Log a info-level message.
  * @param lg the logger, which must be a std::shared_ptr<logger> 
@@ -270,6 +310,11 @@
  */
 #define CHUCHO_INFO_LGBL(msg) CHUCHO_INTERNAL_LOG(INFO_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
+ * @def CHUCHO_INFO_L(msg)
+ * @copydoc CHUCHO_INFO_LGBL(msg)
+ */
+#define CHUCHO_INFO_L(msg) CHUCHO_INFO_LGBL(msg)
+/**
  * @def CHUCHO_INFO_STR(lg, msg)
  * Log a info-level message that is text only.
  * @param lg the logger, which must be a std::shared_ptr<logger> 
@@ -286,6 +331,11 @@
  *            char* or a std::string
  */
 #define CHUCHO_INFO_LGBL_STR(msg) CHUCHO_INTERNAL_LOG_STR(INFO_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+/**
+ * @def CHUCHO_INFO_L_STR(msg)
+ * @copydoc CHUCHO_INFO_LGBL_STR(msg)
+ */
+#define CHUCHO_INFO_L_STR(msg) CHUCHO_INFO_LGBL_STR(msg)
 /**
  * @def CHUCHO_INFO_M(mrk, lg, msg)
  * Log a info-level message with a marker.
@@ -314,6 +364,11 @@
  */
 #define CHUCHO_INFO_LGBL_M(mrk, msg) CHUCHO_INTERNAL_LOG_M(mrk, INFO_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
+ * @def CHUCHO_INFO_L_M(mrk, msg)
+ * @copydoc CHUCHO_INFO_LGBL_M(mrk, msg)
+ */
+#define CHUCHO_INFO_L_M(mrk, msg) CHUCHO_INFO_LGBL_M(mrk, msg)
+/**
  * @def CHUCHO_INFO_STR_M(lg, msg)
  * Log a info-level message that is text only with a marker.
  * @param mrk the marker, which may either be a marker reference 
@@ -339,6 +394,11 @@
  */
 #define CHUCHO_INFO_LGBL_STR_M(mrk, msg) CHUCHO_INTERNAL_LOG_STR_M(mrk, INFO_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
+ * @def CHUCHO_INFO_L_STR_M(mrk, msg)
+ * @copydoc CHUCHO_INFO_LGBL_STR_M(mrk, msg)
+ */
+#define CHUCHO_INFO_L_STR_M(mrk, msg) CHUCHO_INFO_LGBL_STR_M(mrk, msg)
+/**
  * @def CHUCHO_WARN(lg, msg)
  * Log a warn-level message.
  * @param lg the logger, which must be a std::shared_ptr<logger> 
@@ -358,6 +418,11 @@
  */
 #define CHUCHO_WARN_LGBL(msg) CHUCHO_INTERNAL_LOG(WARN_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
+ * @def CHUCHO_WARN_L(msg)
+ * @copydoc CHUCHO_WARN_LGBL(msg)
+ */
+#define CHUCHO_WARN_L(msg) CHUCHO_WARN_LGBL(msg)
+/**
  * @def CHUCHO_WARN_STR(lg, msg)
  * Log a warn-level message that is text only.
  * @param lg the logger, which must be a std::shared_ptr<logger> 
@@ -374,6 +439,11 @@
  *            char* or a std::string
  */
 #define CHUCHO_WARN_LGBL_STR(msg) CHUCHO_INTERNAL_LOG_STR(WARN_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+/**
+ * @def CHUCHO_WARN_L_STR(msg)
+ * @copydoc CHUCHO_WARN_LGBL_STR(msg)
+ */
+#define CHUCHO_WARN_L_STR(msg) CHUCHO_WARN_LGBL_STR(msg)
 /**
  * @def CHUCHO_WARN_M(mrk, lg, msg)
  * Log a warn-level message with a marker.
@@ -402,6 +472,11 @@
  */
 #define CHUCHO_WARN_LGBL_M(mrk, msg) CHUCHO_INTERNAL_LOG_M(mrk, WARN_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
+ * @def CHUCHO_WARN_L_M(mrk, msg)
+ * @copydoc CHUCHO_WARN_LGBL_M(mrk, msg)
+ */
+#define CHUCHO_WARN_L_M(mrk, msg) CHUCHO_WARN_LGBL_M(mrk, msg)
+/**
  * @def CHUCHO_WARN_STR_M(lg, msg)
  * Log a warn-level message that is text only with a marker.
  * @param mrk the marker, which may either be a marker reference 
@@ -427,6 +502,11 @@
  */
 #define CHUCHO_WARN_LGBL_STR_M(mrk, msg) CHUCHO_INTERNAL_LOG_STR_M(mrk, WARN_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
+ * @def CHUCHO_WARN_L_STR_M(mrk, msg)
+ * @copydoc CHUCHO_WARN_LGBL_STR_M(mrk, msg)
+ */
+#define CHUCHO_WARN_L_STR_M(mrk, msg) CHUCHO_WARN_LGBL_STR_M(mrk, msg)
+/**
  * @def CHUCHO_ERROR(lg, msg)
  * Log a error-level message.
  * @param lg the logger, which must be a std::shared_ptr<logger> 
@@ -446,6 +526,11 @@
  */
 #define CHUCHO_ERROR_LGBL(msg) CHUCHO_INTERNAL_LOG(ERROR_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
+ * @def CHUCHO_ERROR_L(msg)
+ * @copydoc CHUCHO_ERROR_LGBL(msg)
+ */
+#define CHUCHO_ERROR_L(msg) CHUCHO_ERROR_LGBL(msg)
+/**
  * @def CHUCHO_ERROR_STR(lg, msg)
  * Log a error-level message that is text only.
  * @param lg the logger, which must be a std::shared_ptr<logger> 
@@ -462,6 +547,11 @@
  *            char* or a std::string
  */
 #define CHUCHO_ERROR_LGBL_STR(msg) CHUCHO_INTERNAL_LOG_STR(ERROR_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+/**
+ * @def CHUCHO_ERROR_L_STR(msg)
+ * @copydoc CHUCHO_ERROR_LGBL_STR(msg)
+ */
+#define CHUCHO_ERROR_L_STR(msg) CHUCHO_ERROR_LGBL_STR(msg)
 /**
  * @def CHUCHO_ERROR_M(mrk, lg, msg)
  * Log a error-level message with a marker.
@@ -490,6 +580,11 @@
  */
 #define CHUCHO_ERROR_LGBL_M(mrk, msg) CHUCHO_INTERNAL_LOG_M(mrk, ERROR_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
+ * @def CHUCHO_ERROR_L_M(mrk, msg)
+ * @copydoc CHUCHO_ERROR_LGBL_M(mrk, msg)
+ */
+#define CHUCHO_ERROR_L_M(mrk, msg) CHUCHO_ERROR_LGBL_M(mrk, msg)
+/**
  * @def CHUCHO_ERROR_STR_M(lg, msg)
  * Log a error-level message that is text only with a marker.
  * @param mrk the marker, which may either be a marker reference 
@@ -515,6 +610,11 @@
  */
 #define CHUCHO_ERROR_LGBL_STR_M(mrk, msg) CHUCHO_INTERNAL_LOG_STR_M(mrk, ERROR_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
+ * @def CHUCHO_ERROR_L_STR_M(mrk, msg)
+ * @copydoc CHUCHO_ERROR_LGBL_STR_M(mrk, msg)
+ */
+#define CHUCHO_ERROR_L_STR_M(mrk, msg) CHUCHO_ERROR_LGBL_STR_M(mrk, msg)
+/**
  * @def CHUCHO_FATAL(lg, msg)
  * Log a fatal-level message.
  * @param lg the logger, which must be a std::shared_ptr<logger> 
@@ -534,6 +634,11 @@
  */
 #define CHUCHO_FATAL_LGBL(msg) CHUCHO_INTERNAL_LOG(FATAL_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
+ * @def CHUCHO_FATAL_L(msg)
+ * @copydoc CHUCHO_FATAL_LGBL(msg)
+ */
+#define CHUCHO_FATAL_L(msg) CHUCHO_FATAL_LGBL(msg)
+/**
  * @def CHUCHO_FATAL_STR(lg, msg)
  * Log a fatal-level message that is text only.
  * @param lg the logger, which must be a std::shared_ptr<logger> 
@@ -550,6 +655,11 @@
  *            char* or a std::string
  */
 #define CHUCHO_FATAL_LGBL_STR(msg) CHUCHO_INTERNAL_LOG_STR(FATAL_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+/**
+ * @def CHUCHO_FATAL_L_STR(msg)
+ * @copydoc CHUCHO_FATAL_LGBL_STR(msg)
+ */
+#define CHUCHO_FATAL_L_STR(msg) CHUCHO_FATAL_LGBL_STR(msg)
 /**
  * @def CHUCHO_FATAL_M(mrk, lg, msg)
  * Log a fatal-level message with a marker.
@@ -578,6 +688,11 @@
  */
 #define CHUCHO_FATAL_LGBL_M(mrk, msg) CHUCHO_INTERNAL_LOG_M(mrk, FATAL_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
+ * @def CHUCHO_FATAL_L_M(mrk, msg)
+ * @copydoc CHUCHO_FATAL_LGBL_M(mrk, msg)
+ */
+#define CHUCHO_FATAL_L_M(mrk, msg) CHUCHO_FATAL_LGBL_M(mrk, msg)
+/**
  * @def CHUCHO_FATAL_STR_M(lg, msg)
  * Log a fatal-level message that is text only with a marker.
  * @param mrk the marker, which may either be a marker reference 
@@ -602,5 +717,10 @@
  *            char* or a std::string
  */
 #define CHUCHO_FATAL_LGBL_STR_M(mrk, msg) CHUCHO_INTERNAL_LOG_STR_M(mrk, FATAL_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+/**
+ * @def CHUCHO_FATAL_L_STR_M(mrk, msg)
+ * @copydoc CHUCHO_FATAL_LGBL_STR_M(mrk, msg)
+ */
+#define CHUCHO_FATAL_L_STR_M(mrk, msg) CHUCHO_FATAL_LGBL_STR_M(mrk, msg)
 
 #endif
