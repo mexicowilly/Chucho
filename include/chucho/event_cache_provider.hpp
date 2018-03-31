@@ -33,7 +33,7 @@ class event_cache;
  * deleted.
  *
  * Cache data can be monitored by polling with @ref get_cache_stats, or via a callback
- * function. The callback is invoked when the  cache is 80%, 90% and 95% full. Additionally,
+ * function. The callback is invoked when the cache is 80%, 90% and 95% full. Additionally,
  * it is called immediately after the cache has become full and the oldest chunk is
  * deleted.
  *

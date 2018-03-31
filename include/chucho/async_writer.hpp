@@ -36,22 +36,12 @@ namespace chucho
  * another writer that might be going too slowly and forwards 
  * events to it in a second thread. This can allow applications 
  * not to be slowed by slow writers. 
- *  
- * An asynchronous writer holds its events in a queue, the 
- * capacity of which can be set. This is a blocking queue, 
- * meaning that once the queue is full, then the asynchronous 
- * writer pushes back on the application and becomes synchronous 
- * again. 
- *  
- * The push-back is mitigated by the fact that the asynchronous 
- * writer can drop events of an indicated level. Once the queue 
- * is 80% full, then events at the discard threshold are 
- * dropped. By default the discard threshold is level INFO_. 
- * This means that any event with INFO_ level or less gets 
- * dropped. With the default set of levels, only WARN_, ERROR_ 
- * and FATAL_ events will get written to the underlying slow 
- * writer. 
- * 
+ *
+ * The writer holds events in a disk-backed cache. One chunk of
+ * data is held in memory and others are stored to disk. Please
+ * refer to @ref event_cache_provider for details.
+ *
+ * @sa event_cache_provider
  * @ingroup writers
  */
 class CHUCHO_EXPORT async_writer : public writer, public event_cache_provider
@@ -112,23 +102,11 @@ protected:
     virtual void write_impl(const event& evt) override;
 
 private:
-    friend class mysql_writer;
-
-    CHUCHO_NO_EXPORT async_writer(const std::string& name,
-                                  std::unique_ptr<writer>&& wrt,
-                                  std::size_t chunk_size,
-                                  std::size_t max_chunks,
-                                  bool flush_on_destruct,
-                                  std::function<void()> enter_thread_cb,
-                                  std::function<void()> leave_thread_cb);
-
     CHUCHO_NO_EXPORT void thread_main();
 
     std::unique_ptr<writer> writer_;
     std::atomic<bool> stop_;
     std::unique_ptr<std::thread> worker_;
-    std::function<void()> enter_thread_cb_;
-    std::function<void()> leave_thread_cb_;
     bool flush_on_destruct_;
 };
 
