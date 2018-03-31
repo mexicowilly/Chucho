@@ -69,6 +69,7 @@ enum feature
     FLATBUFFERS_SERIALIZER,     /**< Flatbuffers serialization */
     LOGGLY_WRITER,              /**< Loggly writer */
     CLOUDWATCH_WRITER,          /**< AWS Cloudwatch writer */
+    DATABASE_WRITER,            /**< Database writer */
     FEATURE_COUNT               /**< Do not use. This is just so I can know how many there are. */
 };
 

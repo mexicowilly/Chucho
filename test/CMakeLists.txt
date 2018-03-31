@@ -108,24 +108,9 @@ IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
     ENDIF()
 ENDIF()
 
-IF(CHUCHO_HAVE_MYSQL)
-    ADD_DEFINITIONS(-DCHUCHO_HAVE_MYSQL)
-ENDIF()
-
-IF(CHUCHO_HAVE_ORACLE)
-    ADD_DEFINITIONS(-DCHUCHO_HAVE_ORACLE)
-ENDIF()
-
-IF(CHUCHO_HAVE_SQLITE)
-    ADD_DEFINITIONS(-DCHUCHO_HAVE_SQLITE)
-ENDIF()
-
-IF(CHUCHO_HAVE_POSTGRES)
-    ADD_DEFINITIONS(-DCHUCHO_HAVE_POSTGRES)
-ENDIF()
-
-IF(CHUCHO_HAVE_DB2)
-    ADD_DEFINITIONS(-DCHUCHO_HAVE_DB2)
+IF(CHUCHO_HAVE_SOCI)
+    LIST(APPEND CHUCHO_TEST_DB_SOURCES database_writer_test.cpp)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_SOCI)
 ENDIF()
 
 IF(RUBY_FOUND)
@@ -220,7 +205,8 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                ${CHUCHO_TEST_MQ_SOURCES}
                ${CHUCHO_TEST_DOOR_SOURCES}
                ${CHUCHO_TEST_CURL_SOURCES}
-               ${CHUCHO_TEST_AWS_SOURCES})
+               ${CHUCHO_TEST_AWS_SOURCES}
+               ${CHUCHO_TEST_DB_SOURCES})
 TARGET_LINK_LIBRARIES(unit-test chucho gtest)
 
 IF(MSVC)
@@ -296,41 +282,6 @@ IF(CHUCHO_WINDOWS)
     SET_SOURCE_FILES_PROPERTIES(windows_event_log_writer_test.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_EVENT_LOG_DLL="${CHUCHO_EVENT_LOG_DLL}")
     TARGET_LINK_LIBRARIES(windows-event-log-writer-test chucho gtest)
-ENDIF()
-
-IF(CHUCHO_HAVE_ORACLE)
-    ADD_EXECUTABLE(oracle-writer-test EXCLUDE_FROM_ALL
-                   harness.cpp
-                   oracle_writer_test.cpp)
-    TARGET_LINK_LIBRARIES(oracle-writer-test chucho gtest)
-ENDIF()
-
-IF(CHUCHO_HAVE_MYSQL)
-    ADD_EXECUTABLE(mysql-writer-test EXCLUDE_FROM_ALL
-                   harness.cpp
-                   mysql_writer_test.cpp)
-    TARGET_LINK_LIBRARIES(mysql-writer-test chucho gtest)
-ENDIF()
-
-IF(CHUCHO_HAVE_SQLITE)
-    ADD_EXECUTABLE(sqlite-writer-test EXCLUDE_FROM_ALL
-                   harness.cpp
-                   sqlite_writer_test.cpp)
-    TARGET_LINK_LIBRARIES(sqlite-writer-test chucho gtest)
-ENDIF()
-
-IF(CHUCHO_HAVE_POSTGRES)
-    ADD_EXECUTABLE(postgres-writer-test EXCLUDE_FROM_ALL
-                   harness.cpp
-                   postgres_writer_test.cpp)
-    TARGET_LINK_LIBRARIES(postgres-writer-test chucho gtest)
-ENDIF()
-
-IF(CHUCHO_HAVE_DB2)
-    ADD_EXECUTABLE(db2-writer-test EXCLUDE_FROM_ALL
-                   harness.cpp
-                   db2_writer_test.cpp)
-    TARGET_LINK_LIBRARIES(db2-writer-test chucho gtest)
 ENDIF()
 
 IF(CURL_FOUND)

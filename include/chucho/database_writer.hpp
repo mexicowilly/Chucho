@@ -18,6 +18,7 @@
 #define CHUCHO_DATABASE_WRITER_HPP__
 
 #include <chucho/writer.hpp>
+#include <soci/soci.h>
 
 namespace chucho
 {
@@ -30,21 +31,28 @@ namespace chucho
  */
 class CHUCHO_EXPORT database_writer : public writer
 {
+public:
+    database_writer(const std::string& name,
+                    std::unique_ptr<formatter>&& fmt,
+                    const std::string& connection);
+
 protected:
-    /**
-     * @name Constructor
-     */
-    //@{
-    /**
-     * Construct a database writer.
-     *
-     * @param name the name of the writer
-     * @param fmt the formatter
-     * @throw std::invalid_argument if fmt is an uninitialized 
-     *        std::unique_ptr
-     */
-    database_writer(const std::string& name, std::unique_ptr<formatter>&& fmt);
-    //@}
+    virtual void write_impl(const event& evt) override;
+
+private:
+    soci::session sql_;
+    soci::statement stmt_;
+    std::string formatted_message_;
+    std::tm timestamp_;
+    std::string file_name_;
+    int line_number_;
+    std::string function_name_;
+    std::string logger_name_;
+    std::string level_name_;
+    std::string marker_;
+    soci::indicator marker_ind_;
+    std::string thread_;
+    std::string host_name_;
 };
 
 }

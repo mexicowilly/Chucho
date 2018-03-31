@@ -46,18 +46,6 @@ INCLUDE_DIRECTORIES(include
 # Don't just add these even they are empty, because
 # if you put the directory in quotes, CMake gets mad
 # if the value is empty.
-IF(CHUCHO_HAVE_ORACLE)
-    INCLUDE_DIRECTORIES("${ORACLE_INCLUDE_DIR}")
-ENDIF()
-IF(CHUCHO_HAVE_MYSQL)
-    INCLUDE_DIRECTORIES("${MYSQL_INCLUDE_DIR}")
-ENDIF()
-IF(CHUCHO_HAVE_SQLITE)
-    INCLUDE_DIRECTORIES("${SQLITE_INCLUDE_DIR}")
-ENDIF()
-IF(CHUCHO_HAVE_POSTGRES)
-    INCLUDE_DIRECTORIES("${POSTGRES_INCLUDE_DIR}")
-ENDIF()
 IF(CURL_FOUND)
     INCLUDE_DIRECTORIES(${CURL_INCLUDE_DIRS})
 ENDIF()
@@ -75,9 +63,6 @@ IF(CHUCHO_HAVE_ZEROMQ)
 ENDIF()
 IF(CHUCHO_HAVE_ACTIVEMQ)
     INCLUDE_DIRECTORIES("${ACTIVEMQ_INCLUDE_DIR}")
-ENDIF()
-IF(CHUCHO_HAVE_DB2)
-    INCLUDE_DIRECTORIES("${DB2_INCLUDE_DIR}")
 ENDIF()
 IF(CHUCHO_HAVE_RABBITMQ)
     INCLUDE_DIRECTORIES("${RABBITMQ_INCLUDE_DIR}")
@@ -102,6 +87,9 @@ IF(CHUCHO_HAVE_LZ4)
 ENDIF()
 IF(AWSSDK_FOUND)
     INCLUDE_DIRECTORIES("${AWSSDK_INCLUDE_DIR}")
+ENDIF()
+IF(CHUCHO_HAVE_SOCI)
+    INCLUDE_DIRECTORIES("${SOCI_INCLUDE_DIR}")
 ENDIF()
 
 IF(CHUCHO_POSIX)
@@ -201,7 +189,6 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/configuration.h
     include/chucho/configurator.hpp
     include/chucho/cout_writer.hpp
-    include/chucho/database_writer.hpp
     include/chucho/diagnostic_context.hpp
     include/chucho/duplicate_message_filter.hpp
     include/chucho/evaluator_filter.hpp
@@ -321,71 +308,6 @@ ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/lz4_compressor.hpp)
-
-IF(CHUCHO_HAVE_ORACLE)
-    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/oracle_writer.hpp)
-    LIST(APPEND CHUCHO_DATABASE_SOURCES
-         oracle_writer.cpp
-         oracle_writer_factory.cpp
-         oracle_writer_memento.cpp
-         include/chucho/oracle_writer_factory.hpp
-         include/chucho/oracle_writer_memento.hpp)
-ENDIF()
-
-LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
-     include/chucho/oracle_writer.hpp)
-
-IF(CHUCHO_HAVE_MYSQL)
-    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/mysql_writer.hpp)
-    LIST(APPEND CHUCHO_DATABASE_SOURCES
-         mysql_writer.cpp
-         mysql_writer_factory.cpp
-         mysql_writer_memento.cpp
-         include/chucho/mysql_writer_factory.hpp
-         include/chucho/mysql_writer_memento.hpp)
-ENDIF()
-
-LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
-     include/chucho/mysql_writer.hpp)
-
-IF(CHUCHO_HAVE_SQLITE)
-    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/sqlite_writer.hpp)
-    LIST(APPEND CHUCHO_DATABASE_SOURCES
-         sqlite_writer.cpp
-         sqlite_writer_factory.cpp
-         sqlite_writer_memento.cpp
-         include/chucho/sqlite_writer_factory.hpp
-         include/chucho/sqlite_writer_memento.hpp)
-ENDIF()
-
-LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
-     include/chucho/sqlite_writer.hpp)
-
-IF(CHUCHO_HAVE_POSTGRES)
-    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/postgres_writer.hpp)
-    LIST(APPEND CHUCHO_DATABASE_SOURCES
-         postgres_writer.cpp
-         postgres_writer_factory.cpp
-         postgres_writer_memento.cpp
-         include/chucho/postgres_writer_factory.hpp
-         include/chucho/postgres_writer_memento.hpp)
-ENDIF()
-
-LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
-     include/chucho/postgres_writer.hpp)
-
-IF(CHUCHO_HAVE_DB2)
-    LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/db2_writer.hpp)
-    LIST(APPEND CHUCHO_DATABASE_SOURCES
-         db2_writer.cpp
-         db2_writer_factory.cpp
-         db2_writer_memento.cpp
-         include/chucho/db2_writer_factory.hpp
-         include/chucho/db2_writer_memento.hpp)
-ENDIF()
-
-LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
-     include/chucho/db2_writer.hpp)
 
 IF(RUBY_FOUND)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS include/chucho/ruby_evaluator_filter.hpp)
@@ -547,6 +469,13 @@ ENDIF()
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/cloudwatch_writer.hpp)
 
+IF(CHUCHO_HAVE_SOCI)
+    LIST(APPEND CHUCHO_PUBLIC_HEADERS
+         include/chucho/database_writer.hpp)
+    LIST(APPEND CHUCHO_DATABASE_SOURCES
+         database_writer.cpp)
+ENDIF()
+
 # The libyaml sources are required by chuchod
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
     # Update this when you rev libyaml
@@ -682,7 +611,6 @@ SET(CHUCHO_SOURCES
     configurator.cpp
     cout_writer_factory.cpp
     demangle.cpp
-    database_writer.cpp
     diagnostic_context.cpp
     duplicate_message_filter.cpp
     duplicate_message_filter_factory.cpp
@@ -867,24 +795,8 @@ IF(CHUCHO_WINDOWS)
                                 COMPILE_DEFINITIONS NOMINMAX)
 ENDIF()
 
-IF(CHUCHO_HAVE_MYSQL)
-    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_MYSQL)
-ENDIF()
-
-IF(CHUCHO_HAVE_ORACLE)
-    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_ORACLE)
-ENDIF()
-
-IF(CHUCHO_HAVE_SQLITE)
-    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_SQLITE)
-ENDIF()
-
-IF(CHUCHO_HAVE_POSTGRES)
-    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_POSTGRES)
-ENDIF()
-
-IF(CHUCHO_HAVE_DB2)
-    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_DB2)
+IF(CHUCHO_HAVE_SOCI)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_SOCI)
 ENDIF()
 
 IF(RUBY_FOUND)
@@ -964,20 +876,8 @@ ENDIF()
 IF(CURL_FOUND)
     LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_CURL)
 ENDIF()
-IF(CHUCHO_HAVE_DB2)
-    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_DB2_WRITER)
-ENDIF()
-IF(CHUCHO_HAVE_MYSQL)
-    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_MYSQL_WRITER)
-ENDIF()
-IF(CHUCHO_HAVE_ORACLE)
-    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_ORACLE_WRITER)
-ENDIF()
-IF(CHUCHO_HAVE_POSTGRES)
-    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_POSTGRESQL_WRITER)
-ENDIF()
-IF(CHUCHO_HAVE_SQLITE)
-    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_SQLITE_WRITER)
+IF(CHUCHO_HAVE_SOCI)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_SOCI)
 ENDIF()
 IF(RUBY_FOUND)
     LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_RUBY_EVALUATOR_FILTER)
@@ -1121,26 +1021,6 @@ ELSE()
             PUBLIC_HEADER DESTINATION include/chucho)
 ENDIF()
 
-IF(CHUCHO_HAVE_MYSQL)
-    TARGET_LINK_LIBRARIES(chucho ${MYSQL_LIBS})
-ENDIF()
-
-IF(CHUCHO_HAVE_ORACLE)
-    TARGET_LINK_LIBRARIES(chucho ${ORACLE_LIBS})
-ENDIF()
-
-IF(CHUCHO_HAVE_SQLITE)
-    TARGET_LINK_LIBRARIES(chucho ${SQLITE_LIBS})
-ENDIF()
-
-IF(CHUCHO_HAVE_POSTGRES)
-    TARGET_LINK_LIBRARIES(chucho ${POSTGRES_LIBS})
-ENDIF()
-
-IF(CHUCHO_HAVE_DB2)
-    TARGET_LINK_LIBRARIES(chucho ${DB2_LIBS})
-ENDIF()
-
 IF(RUBY_FOUND)
     TARGET_LINK_LIBRARIES(chucho ${RUBY_LIBRARY})
 ENDIF()
@@ -1200,6 +1080,10 @@ ENDIF()
 
 IF(AWSSDK_FOUND)
     TARGET_LINK_LIBRARIES(chucho ${AWSSDK_LIBS})
+ENDIF()
+
+IF(CHUCHO_HAVE_SOCI)
+    TARGET_LINK_LIBRARIES(chucho ${SOCI_LIBS})
 ENDIF()
 
 TARGET_LINK_LIBRARIES(chucho ${CMAKE_THREAD_LIBS_INIT})
