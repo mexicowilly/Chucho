@@ -48,22 +48,6 @@
 #endif
 #include <chucho/exception.hpp>
 #include <chucho/configuration.hpp>
-#if defined(CHUCHO_HAVE_MYSQL)
-#include <chucho/mysql_writer.hpp>
-#endif
-#if defined(CHUCHO_HAVE_ORACLE)
-#include <chucho/oracle_writer.hpp>
-#endif
-#if defined(CHUCHO_HAVE_SQLITE)
-#include <chucho/sqlite_writer.hpp>
-#include <chucho/file.hpp>
-#endif
-#if defined(CHUCHO_HAVE_POSTGRES)
-#include <chucho/postgres_writer.hpp>
-#endif
-#if defined(CHUCHO_HAVE_DB2)
-#include <chucho/db2_writer.hpp>
-#endif
 #if defined(CHUCHO_HAVE_RUBY)
 #include <chucho/ruby_evaluator_filter.hpp>
 #endif
@@ -247,20 +231,6 @@ void configurator::cout_writer_body()
     auto& wrt = dynamic_cast<chucho::cout_writer&>(lgr->get_writer("chucho::cout_writer"));
     EXPECT_STREQ("chucho::cout_writer", wrt.get_name().c_str());
 }
-
-#if defined(CHUCHO_HAVE_DB2)
-
-void configurator::db2_writer_body()
-{
-    auto lgr = chucho::logger::get("will");
-    ASSERT_EQ(1, lgr->get_writer_names().size());
-    auto& owrt = dynamic_cast<chucho::db2_writer&>(lgr->get_writer("chucho::db2_writer"));
-    EXPECT_EQ(std::string("chucho"), owrt.get_database());
-    EXPECT_EQ(std::string("db2inst1"), owrt.get_user());
-    EXPECT_EQ(std::string("db2inst1"), owrt.get_password());
-}
-
-#endif
 
 #if defined(CHUCHO_HAVE_DOORS)
 
@@ -487,36 +457,6 @@ void configurator::multiple_writer_body()
     EXPECT_EQ(std::string("two.log"), wrt2.get_file_name());
 }
 
-#if defined(CHUCHO_HAVE_MYSQL)
-
-void configurator::mysql_writer_full_body()
-{
-    auto lgr = chucho::logger::get("will");
-    ASSERT_EQ(1, lgr->get_writer_names().size());
-    auto& mwrt = dynamic_cast<chucho::mysql_writer&>(lgr->get_writer("chucho::mysql_writer"));
-    EXPECT_EQ(std::string("test"), mwrt.get_database());
-    EXPECT_EQ(std::string("192.168.56.101"), mwrt.get_host());
-    EXPECT_EQ(std::string("test_user"), mwrt.get_user());
-    EXPECT_EQ(std::string("password"), mwrt.get_password());
-    auto& aw = mwrt.get_async_writer();
-    EXPECT_EQ(*chucho::level::INFO_(), *aw.get_discard_threshold());
-    EXPECT_EQ(912, aw.get_queue_capacity());
-    EXPECT_EQ(false, aw.get_flush_on_destruct());
-}
-
-void configurator::mysql_writer_minimal_body()
-{
-    auto lgr = chucho::logger::get("will");
-    ASSERT_EQ(1, lgr->get_writer_names().size());
-    auto& mwrt = dynamic_cast<chucho::mysql_writer&>(lgr->get_writer("chucho::mysql_writer"));
-    EXPECT_EQ(std::string("test"), mwrt.get_database());
-    EXPECT_EQ(std::string("192.168.56.101"), mwrt.get_host());
-    EXPECT_EQ(std::string("test_user"), mwrt.get_user());
-    EXPECT_EQ(std::string("password"), mwrt.get_password());
-}
-
-#endif
-
 void configurator::named_pipe_writer_body()
 {
     auto lgr = chucho::logger::get("will");
@@ -542,20 +482,6 @@ void configurator::numbered_file_roller_body()
     EXPECT_EQ(-3, nrlr.get_min_index());
 }
 
-#if defined(CHUCHO_HAVE_ORACLE)
-
-void configurator::oracle_writer_body()
-{
-    auto lgr = chucho::logger::get("will");
-    ASSERT_EQ(1, lgr->get_writer_names().size());
-    auto& owrt = dynamic_cast<chucho::oracle_writer&>(lgr->get_writer("chucho::oracle_writer"));
-    EXPECT_EQ(std::string("192.168.56.102/pdb1"), owrt.get_database());
-    EXPECT_EQ(std::string("test_user"), owrt.get_user());
-    EXPECT_EQ(std::string("password"), owrt.get_password());
-}
-
-#endif
-
 void configurator::pipe_writer_body()
 {
     auto lgr = chucho::logger::get("will");
@@ -563,18 +489,6 @@ void configurator::pipe_writer_body()
     auto& pwrt = dynamic_cast<chucho::pipe_writer&>(lgr->get_writer("chucho::pipe_writer"));
     EXPECT_FALSE(pwrt.get_flush());
 }
-
-#if defined(CHUCHO_HAVE_POSTGRES)
-
-void configurator::postgres_writer_body()
-{
-    auto lgr = chucho::logger::get("will");
-    ASSERT_EQ(1, lgr->get_writer_names().size());
-    auto& pwrt = dynamic_cast<chucho::postgres_writer&>(lgr->get_writer("chucho::postgres_writer"));
-    EXPECT_EQ(std::string("postgres://test_user:password@192.168.56.101/postgres"), pwrt.get_uri());
-}
-
-#endif
 
 #if defined(CHUCHO_HAVE_RABBITMQ)
 
@@ -712,21 +626,6 @@ void configurator::sliding_numbered_file_roller_body()
     EXPECT_EQ(5, srlr.get_max_count());
     EXPECT_EQ(-3, srlr.get_min_index());
 }
-
-#if defined(CHUCHO_HAVE_SQLITE)
-
-void configurator::sqlite_writer_body()
-{
-    auto lgr = chucho::logger::get("will");
-    ASSERT_EQ(1, lgr->get_writer_names().size());
-    auto& wrt = dynamic_cast<chucho::sqlite_writer&>(lgr->get_writer("chucho::sqlite_writer"));
-    EXPECT_EQ(std::string("database.sqlite"), wrt.get_file_name());
-    lgr->remove_writer("chucho::sqlite_writer");
-    lgr.reset();
-    chucho::file::remove("database.sqlite");
-}
-
-#endif
 
 void configurator::syslog_writer_body()
 {

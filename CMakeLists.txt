@@ -473,7 +473,11 @@ IF(CHUCHO_HAVE_SOCI)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
          include/chucho/database_writer.hpp)
     LIST(APPEND CHUCHO_DATABASE_SOURCES
-         database_writer.cpp)
+         database_writer.cpp
+         database_writer_factory.cpp
+         database_writer_memento.cpp
+         include/chucho/database_writer_factory.hpp
+         include/chucho/database_writer_memento.hpp)
 ENDIF()
 
 # The libyaml sources are required by chuchod

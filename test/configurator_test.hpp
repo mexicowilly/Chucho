@@ -45,9 +45,6 @@ protected:
     void configure(const char* const cnf);
     void configure_with_error(const char* const cnf);
     void cout_writer_body();
-#if defined(CHUCHO_HAVE_DB2)
-    void db2_writer_body();
-#endif
 #if defined(CHUCHO_HAVE_DOORS)
     void door_writer_body();
 #endif
@@ -65,19 +62,9 @@ protected:
     void logger_body();
     void lzma_file_compressor_body();
     void multiple_writer_body();
-#if defined(CHUCHO_HAVE_MYSQL)
-    void mysql_writer_full_body();
-    void mysql_writer_minimal_body();
-#endif
     void named_pipe_writer_body();
     void numbered_file_roller_body();
-#if defined(CHUCHO_HAVE_ORACLE)
-    void oracle_writer_body();
-#endif
     void pipe_writer_body();
-#if defined(CHUCHO_HAVE_POSTGRES)
-    void postgres_writer_body();
-#endif
 #if defined(CHUCHO_HAVE_RABBITMQ)
     void rabbitmq_writer_body();
     void rabbitmq_writer_coalesce_body();
@@ -92,9 +79,6 @@ protected:
     void root_alias_body();
     void size_file_roll_trigger_body(const std::string& tmpl);
     void sliding_numbered_file_roller_body();
-#if defined(CHUCHO_HAVE_SQLITE)
-    void sqlite_writer_body();
-#endif
     void syslog_writer_body();
     void syslog_writer_facility_body(const std::string& tmpl);
     void syslog_writer_port_body();

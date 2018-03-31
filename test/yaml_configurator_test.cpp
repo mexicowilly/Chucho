@@ -242,23 +242,6 @@ TEST_F(yaml_configurator, cout_writer_invalid_2)
                          "    - chucho::cout_writer");
 }
 
-#if defined(CHUCHO_HAVE_DB2)
-
-TEST_F(yaml_configurator, db2_writer)
-{
-    configure("chucho::logger:\n"
-              "    name: will\n"
-              "    chucho::db2_writer:\n"
-              "        chucho::pattern_formatter:\n"
-              "            pattern: '%m'\n"
-              "        user: db2inst1\n"
-              "        password: db2inst1\n"
-              "        database: chucho");
-    db2_writer_body();
-}
-
-#endif
-
 #if defined(CHUCHO_HAVE_DOORS)
 
 TEST_F(yaml_configurator, door_writer)
@@ -464,42 +447,6 @@ TEST_F(yaml_configurator, multiple_writer)
     multiple_writer_body();
 }
 
-#if defined(CHUCHO_HAVE_MYSQL)
-
-TEST_F(yaml_configurator, mysql_writer_full)
-{
-    configure("chucho::logger:\n"
-              "    name: will\n"
-              "    chucho::mysql_writer:\n"
-              "        chucho::pattern_formatter:\n"
-              "            pattern: '%m'\n"
-              "        host: 192.168.56.101\n"
-              "        user: test_user\n"
-              "        password: password\n"
-              "        database: test\n"
-              "        port: 3306\n"
-              "        queue_capacity: 912\n"
-              "        discard_threshold: info\n"
-              "        flush_on_destruct: false");
-    mysql_writer_full_body();
-}
-
-TEST_F(yaml_configurator, mysql_writer_minimal)
-{
-    configure("chucho::logger:\n"
-              "    name: will\n"
-              "    chucho::mysql_writer:\n"
-              "        chucho::pattern_formatter:\n"
-              "            pattern: '%m'\n"
-              "        host: 192.168.56.101\n"
-              "        user: test_user\n"
-              "        password: password\n"
-              "        database: test");
-    mysql_writer_minimal_body();
-}
-
-#endif
-
 TEST_F(yaml_configurator, named_pipe_writer)
 {
     configure("chucho::logger:\n"
@@ -528,23 +475,6 @@ TEST_F(yaml_configurator, numbered_file_roller)
     numbered_file_roller_body();
 }
 
-#if defined(CHUCHO_HAVE_ORACLE)
-
-TEST_F(yaml_configurator, oracle_writer)
-{
-    configure("chucho::logger:\n"
-              "    name: will\n"
-              "    chucho::oracle_writer:\n"
-              "        chucho::pattern_formatter:\n"
-              "            pattern: '%m'\n"
-              "        user: test_user\n"
-              "        password: password\n"
-              "        database: 192.168.56.102/pdb1");
-    oracle_writer_body();
-}
-
-#endif
-
 TEST_F(yaml_configurator, pipe_writer)
 {
     configure("chucho::logger:\n"
@@ -555,21 +485,6 @@ TEST_F(yaml_configurator, pipe_writer)
               "        flush: false");
     pipe_writer_body();
 }
-
-#if defined(CHUCHO_HAVE_POSTGRES)
-
-TEST_F(yaml_configurator, postgres_writer)
-{
-    configure("chucho::logger:\n"
-              "    name: will\n"
-              "    chucho::postgres_writer:\n"
-              "        chucho::pattern_formatter:\n"
-              "            pattern: '%m'\n"
-              "        uri: 'postgres://test_user:password@192.168.56.101/postgres'");
-    postgres_writer_body();
-}
-
-#endif
 
 #if defined(CHUCHO_HAVE_RABBITMQ)
 
@@ -694,21 +609,6 @@ TEST_F(yaml_configurator, sliding_numbered_file_roller)
               "        file_name: hello");
     sliding_numbered_file_roller_body();
 }
-
-#if defined(CHUCHO_HAVE_SQLITE)
-
-TEST_F(yaml_configurator, sqlite_writer)
-{
-    configure("chucho::logger:\n"
-              "    - name: will\n"
-              "    - chucho::sqlite_writer:\n"
-              "        - chucho::pattern_formatter:\n"
-              "            - pattern: '%m%n'\n"
-              "        - file_name: database.sqlite");
-    sqlite_writer_body();
-}
-
-#endif
 
 TEST_F(yaml_configurator, syslog_writer)
 {
