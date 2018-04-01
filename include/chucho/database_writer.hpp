@@ -25,16 +25,70 @@ namespace chucho
 
 /**
  * @class database_writer database_writer.hpp chucho/database_writer.hpp
- * A writer that writes to a database.
- * 
+ * A writer that writes to a database. Supported databases include any
+ * that the <a href="http://soci.sourceforge.net">SOCI</a> library
+ * supports. As of this writing these are Oracle, MySQL, DB2, PostgreSQL,
+ * sqlite3, ODBC and Firebird. You must have the back-end client libraries
+ * installed, as well as a SOCI library in order to use this writer.
+ *
+ * No compile-time linkage is necessary with the back-end SOCI library or
+ * the database client libraries, but at run-time, these libraries must
+ * be available.
+ *
+ * The text of the connection parameter depends on which back-end is being
+ * requested. But, generally, it takes the form:
+ * @code
+ * <back-end type>://<space-separated parameters>
+ * @endcode
+ * For PostgreSQL, this might look like:
+ * @code
+ * postgresql://host=lotsofdoggies.com port=5432 dbname=chucho user=scrumpy password=dumpy
+ * @endcode
+ * And, for Oracle, it might be something like:
+ * @code
+ * oracle://service=//host.stuff.com:1521/CHUCHO user=scrumpy password=dumpy
+ * @endcode
+ * Please consult the SOCI documentation for the details of the desired
+ * back-end.
+ *
  * @ingroup writers database
  */
 class CHUCHO_EXPORT database_writer : public writer
 {
 public:
+    /**
+     * @name Constructor
+     * @{
+     */
+    /**
+     * Construct a writer.
+     *
+     * The text of the connection parameter depends on which back-end is being
+     * requested. But, generally, it takes the form:
+     * @code
+     * <back-end type>://<space-separated parameters>
+     * @endcode
+     * For PostgreSQL, this might look like:
+     * @code
+     * postgresql://host=lotsofdoggies.com port=5432 dbname=chucho user=scrumpy password=dumpy
+     * @endcode
+     * And, for Oracle, it might be something like:
+     * @code
+     * oracle://service=//host.stuff.com:1521/CHUCHO user=scrumpy password=dumpy
+     * @endcode
+     * Please consult the SOCI documentation for the details of the desired
+     * back-end.
+     *
+     * @param name the name
+     * @param fmt the formatter
+     * @param connection the connection information
+     */
     database_writer(const std::string& name,
                     std::unique_ptr<formatter>&& fmt,
                     const std::string& connection);
+    /**
+     * @}
+     */
 
 protected:
     virtual void write_impl(const event& evt) override;

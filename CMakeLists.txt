@@ -480,6 +480,9 @@ IF(CHUCHO_HAVE_SOCI)
          include/chucho/database_writer_memento.hpp)
 ENDIF()
 
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/database_writer.hpp)
+
 # The libyaml sources are required by chuchod
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
     # Update this when you rev libyaml
