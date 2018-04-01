@@ -38,7 +38,8 @@ database_writer::database_writer(const std::string& name,
       sql_(connection),
       stmt_(sql_),
       marker_ind_(soci::i_null),
-      host_name_(host::get_full_name())
+      host_name_(host::get_full_name()),
+      process_id_(process::id())
 {
     stmt_ = (sql_.prepare << INSERT,
              soci::use(formatted_message_),
@@ -50,7 +51,8 @@ database_writer::database_writer(const std::string& name,
              soci::use(level_name_),
              soci::use(marker_, marker_ind_),
              soci::use(thread_),
-             soci::use(host_name_));
+             soci::use(host_name_),
+             soci::use(process_id_));
 }
 
 void database_writer::write_impl(const event& evt)
