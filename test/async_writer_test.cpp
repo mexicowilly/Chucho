@@ -115,7 +115,7 @@ TEST_F(async_writer_test, flush_on_destruct)
     as.reset();
     then = std::chrono::steady_clock::now();
     elap = std::chrono::duration_cast<std::chrono::milliseconds>(then - now);
-    EXPECT_LT(elap.count(), 10);
+    EXPECT_LT(elap.count(), 50);
 }
 
 TEST_F(async_writer_test, slow)

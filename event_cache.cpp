@@ -33,7 +33,7 @@ int get_random_number()
     static std::once_flag once;
 
     std::lock_guard<std::mutex> lock(guard);
-    std::call_once(once, [] () { std::srand(std::time(nullptr)); });
+    std::call_once(once, [] () { std::srand(static_cast<unsigned>(std::time(nullptr))); });
     return std::rand();
 }
 
@@ -84,8 +84,9 @@ void event_cache::cull()
     else
     {
         oldest = find_oldest_file();
-        culled = file::size(oldest);
+        culled = static_cast<std::size_t>(file::size(oldest));
         file::remove(oldest);
+        report_info("Removed oldest file: " + oldest);
         ++stats_.files_destroyed_;
     }
     stats_.current_size_ -= culled;
@@ -147,7 +148,7 @@ optional<event> event_cache::pop(std::chrono::milliseconds to_wait)
             stream.read(reinterpret_cast<char*>(mem_chunk_.get()), sz);
             stream.close();
             read_pos_ = mem_chunk_.get();
-            mem_chunk_occupied_ = sz;
+            mem_chunk_occupied_ = static_cast<std::size_t>(sz);
             if (write_file_ && std::stoul(file::base_name(oldest)) == current_sequence_)
             {
                 write_pos_ = mem_chunk_.get() + static_cast<std::size_t>(write_file_->tellp());
@@ -155,7 +156,7 @@ optional<event> event_cache::pop(std::chrono::milliseconds to_wait)
             }
             file::remove(oldest);
             ++stats_.files_destroyed_;
-            report_info("Loaded file " + oldest);
+            report_info("Loaded and removed file " + oldest);
         }
         std::size_t sz;
         result = unserialize(sz);
@@ -255,12 +256,12 @@ std::size_t event_cache::serialize(const event& evt)
     set_ser_buf<std::uint32_t>(pos, sz);
     pos += 4;
     std::size_t len = evt.get_logger()->get_name().length();
-    set_ser_buf<std::uint16_t>(pos, len);
+    set_ser_buf<std::uint16_t>(pos, static_cast<std::uint16_t>(len));
     pos += 2;
     std::memcpy(&ser_buf_[pos], evt.get_logger()->get_name().data(), len);
     pos += len;
     len = std::strlen(evt.get_level()->get_name());
-    set_ser_buf<std::uint16_t>(pos, len);
+    set_ser_buf<std::uint16_t>(pos, static_cast<std::uint16_t>(len));
     pos += 2;
     std::memcpy(&ser_buf_[pos], evt.get_level()->get_name(), len);
     pos += len;
@@ -272,24 +273,24 @@ std::size_t event_cache::serialize(const event& evt)
     set_ser_buf<std::uint64_t>(pos, std::chrono::duration_cast<std::chrono::microseconds>(evt.get_time().time_since_epoch()).count());
     pos += 8;
     len = std::strlen(evt.get_file_name());
-    set_ser_buf<std::uint16_t>(pos, len);
+    set_ser_buf<std::uint16_t>(pos, static_cast<std::uint16_t>(len));
     pos += 2;
     std::memcpy(&ser_buf_[pos], evt.get_file_name(), len);
     pos += len;
     set_ser_buf<std::uint32_t>(pos, evt.get_line_number());
     pos += 4;
     len = std::strlen(evt.get_function_name());
-    set_ser_buf<std::uint16_t>(pos, len);
+    set_ser_buf<std::uint16_t>(pos, static_cast<std::uint16_t>(len));
     pos += 2;
     std::memcpy(&ser_buf_[pos], evt.get_function_name(), len);
     pos += len;
     len = mrk_text.length();
-    set_ser_buf<std::uint16_t>(pos, len);
+    set_ser_buf<std::uint16_t>(pos, static_cast<std::uint16_t>(len));
     pos += 2;
     std::memcpy(&ser_buf_[pos], mrk_text.data(), len);
     pos += len;
     len = thr_text.length();
-    set_ser_buf<std::uint16_t>(pos, len);
+    set_ser_buf<std::uint16_t>(pos, static_cast<std::uint16_t>(len));
     pos += 2;
     std::memcpy(&ser_buf_[pos], thr_text.data(), len);
     return sz;

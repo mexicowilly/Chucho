@@ -32,8 +32,8 @@ async_writer_memento::async_writer_memento(configurator& cfg)
     cfg.get_security_policy().set_text("async_writer::max_chunks(text)", 7);
     cfg.get_security_policy().set_text("async_writer::flush_on_destruct", 5);
     cfg.get_security_policy().set_text("async_writer::name", 256);
-    set_handler("chunk_size", [this] (const std::string& s) { chunk_size_ = validate("async_writer::chunk_size",
-         text_util::parse_byte_size(validate("async_writer::chunk_size(text)", s))); });
+    set_handler("chunk_size", [this] (const std::string& s) { chunk_size_ = static_cast<std::size_t>(validate("async_writer::chunk_size",
+         text_util::parse_byte_size(validate("async_writer::chunk_size(text)", s)))); });
     set_handler("max_chunks", [this] (const std::string& cap) { max_chunks_ = validate("async_writer::max_chunks", std::stoul(validate("async_writer::max_chunks(text)", cap))); });
     set_handler("flush_on_destruct", [this] (const std::string& val) { flush_on_destruct_ = boolean_value(validate("async_writer::flush_on_destruct", val)); });
     set_handler("name", [this] (const std::string& name) { name_ = validate("async_writer::name", name); });

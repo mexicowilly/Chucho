@@ -1112,12 +1112,12 @@ IF(CHUCHO_WINDOWS)
                               "${CMAKE_BINARY_DIR}/event_log.hpp"
                        COMMAND mc -e hpp -h "${CMAKE_BINARY_DIR}" -r "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}/platform/windows/event_log.mc"
                        DEPENDS platform/windows/event_log.mc)
-    ADD_LIBRARY(event_log SHARED "${CMAKE_BINARY_DIR}/event_log.rc")
-    SET_TARGET_PROPERTIES(event_log PROPERTIES
+    ADD_LIBRARY(chucho_event_log SHARED "${CMAKE_BINARY_DIR}/event_log.rc")
+    SET_TARGET_PROPERTIES(chucho_event_log PROPERTIES
                           LINKER_LANGUAGE CXX
                           LINK_FLAGS /NOENTRY)
-    ADD_DEPENDENCIES(chucho event_log)
-    INSTALL(TARGETS event_log
+    ADD_DEPENDENCIES(chucho chucho_event_log)
+    INSTALL(TARGETS chucho_event_log
             RUNTIME DESTINATION bin)
 ENDIF()
 
