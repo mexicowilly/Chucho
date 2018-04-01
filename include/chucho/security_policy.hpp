@@ -62,14 +62,32 @@ namespace chucho
  * The following is the default security policy. 
  * <table> 
  *     <tr><th>Key</th><th>Value</th></tr>
- *     <tr><td>async_writer::queue_capacity</td>
- *         <td>[10, 32768]</td></tr>
- *     <tr><td>async_writer::queue_capacity(text)</td>
- *         <td>5</td></tr>
- *     <tr><td>async_writer::discard_threshold</td>
+ *     <tr><td>activemq_writer::broker</td>
  *         <td><i>default</i></td></tr>
+ *     <tr><td>activemq_writer::topic_or_queue</td>
+ *         <td><i>default</i></td></tr>
+ *     <tr><td>%activemq_writer::consumer_type</td>
+ *         <td>5</td></tr>
+ *     <tr><td>async_writer::chunk_size</td>
+ *         <td>[1024, 104857600]</td></tr>
+ *     <tr><td>async_writer::chunk_size(text)</td>
+ *         <td>9</td></tr>
  *     <tr><td>async_writer::flush_on_destruct</td>
  *         <td>5</td></tr>
+ *     <tr><td>async_writer::max_chunks</td>
+ *         <td>[2, 1000000]</td></tr>
+ *     <tr><td>async_writer::max_chunks(text)</td>
+ *         <td>7</td></tr>
+ *     <tr><td>cloudwatch_writer::batch_size</td>
+ *         <td>[1, 10000]</td></tr>
+ *     <tr><td>cloudwatch_writer::batch_size(text)</td>
+ *         <td>5</td></tr>
+ *     <tr><td>cloudwatch_writer::log_group</td>
+ *         <td>512</td></tr>
+ *     <tr><td>cloudwatch_writer::log_stream</td>
+ *         <td>512</td></tr>
+ *     <tr><td>database_writer::connection</td>
+ *         <td><i>default</i></td></tr>
  *     <tr><td>email_writer::buffer_size</td>
  *         <td>[1, 65536]</td></tr>
  *     <tr><td>email_writer::buffer_size(text)</td>
@@ -126,30 +144,14 @@ namespace chucho
  *         <td><i>default</i></td></tr>
  *     <tr><td>%logger::writes_to_ancestors</td>
  *         <td>5</td></tr>
+ *     <tr><td>loggly_writer::token</td>
+ *         <td><i>default</i></td></tr>
  *     <tr><td>message_queue_writer::coalesce_max</td>
  *         <td>[0, 10000]</td></tr>
  *     <tr><td>message_queue_writer::coalesce_max(text)</td>
  *         <td>5</td></tr>
- *     <tr><td>mysql_writer::host</td>
- *         <td>253</td></tr>
- *     <tr><td>mysql_writer::user</td>
- *         <td>16</td></tr>
- *     <tr><td>mysql_writer::password</td>
- *         <td><i>default</i></td></tr>
- *     <tr><td>mysql_writer::database</td>
- *         <td>64</td></tr>
- *     <tr><td>mysql_writer::port</td>
- *         <td>[1, 65535]</td></tr>
- *     <tr><td>mysql_writer::port(text)</td>
- *         <td>5</td></tr>
- *     <tr><td>mysql_writer::queue_capacity</td>
- *         <td>[10, 32768]</td></tr>
- *     <tr><td>mysql_writer::queue_capacity(text)</td>
- *         <td>5</td></tr>
- *     <tr><td>mysql_writer::discard_threshold</td>
- *         <td><i>default</i></td></tr>
- *     <tr><td>mysql_writer::flush_on_destruct</td>
- *         <td>5</td></tr>
+ *     <tr><td>nameable::name</td>
+ *         <td>256</td></tr>
  *     <tr><td>%named_pipe_writer::flush</td>
  *         <td>5</td></tr>
  *     <tr><td>named_pipe_writer::name</td>
@@ -162,22 +164,16 @@ namespace chucho
  *         <td>[-1000, 1000]</td></tr>
  *     <tr><td>numbered_file_roller::max_index(text)</td>
  *         <td>5</td></tr>
- *     <tr><td>oracle_writer::user</td>
- *         <td>30</td></tr>
- *     <tr><td>oracle_writer::password</td>
- *         <td>30</td></tr>
- *     <tr><td>oracle_writer::database</td>
- *         <td>512</td></tr>
  *     <tr><td>pattern_formatter::pattern</td>
  *         <td><i>default</i></td></tr>
  *     <tr><td>%pipe_writer::flush</td>
  *         <td>5</td></tr>
- *     <tr><td>postgres_writer::uri</td>
- *         <td>8000</td></tr>
- *     <tr><td>remote_writer::port</td>
- *         <td>[1, 65535]</td></tr>
- *     <tr><td>remote_writer::port(text)</td>
- *         <td>5</td></tr>
+ *     <tr><td>rabbitmq_writer::exchange</td>
+ *         <td><i>default</i></td></tr>
+ *     <tr><td>rabbitmq_writer::routing_key</td>
+ *         <td><i>default</i></td></tr>
+ *     <tr><td>rabbitmq_writer::url</td>
+ *         <td><i>default</i></td></tr>
  *     <tr><td>ruby_evaluator_filter::expression</td>
  *         <td><i>default</i></td></tr>
  *     <tr><td>size_file_roll_trigger::max_size</td>
@@ -192,10 +188,6 @@ namespace chucho
  *         <td>[1, 1000]</td></tr>
  *     <tr><td>sliding_numbered_file_roller::max_count(text)</td>
  *         <td>4</td></tr>
- *     <tr><td>sqlite_writer::file_name</td>
- *         <td><i>default</i></td></tr>
- *     <tr><td>syslog_writer::facility</td>
- *         <td>8</td></tr>
  *     <tr><td>syslog_writer::host_name</td>
  *         <td>253</td></tr>
  *     <tr><td>syslog_writer::port</td>
@@ -212,6 +204,10 @@ namespace chucho
  *         <td><i>default</i></td></tr>
  *     <tr><td>zeromq_writer::prefix</td>
  *         <td><i>default</i></td></tr>
+ *     <tr><td>zlib_compressor::compression_level</td>
+ *         <td>[0, 9]</td></tr>
+ *     <tr><td>zlib_compressor::compression_level(text)</td>
+ *         <td>1</td></tr>
  * </table>
  * 
  * @ingroup miscellaneous
