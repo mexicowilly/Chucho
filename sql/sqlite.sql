@@ -23,7 +23,7 @@ CREATE TABLE chucho_event
 (
    event_id INTEGER PRIMARY KEY AUTOINCREMENT,
    formatted_message TEXT NOT NULL,
-   timestamp INTEGER NOT NULL,
+   timestmp INTEGER NOT NULL,
    file_name TEXT NOT NULL,
    line_number INTEGER NOT NULL,
    function_name TEXT NOT NULL,

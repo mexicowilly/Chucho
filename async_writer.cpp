@@ -49,9 +49,7 @@ async_writer::async_writer(const std::string& name,
                    std::move(wrt),
                    DEFAULT_CHUNK_SIZE,
                    DEFAULT_MAX_CHUNKS,
-                   flush_on_destruct,
-                   std::function<void()>(),
-                   std::function<void()>())
+                   flush_on_destruct)
 {
 }
 
@@ -60,29 +58,10 @@ async_writer::async_writer(const std::string& name,
                            std::size_t chunk_size,
                            std::size_t max_chunks,
                            bool flush_on_destruct)
-    : async_writer(name,
-                   std::move(wrt),
-                   chunk_size,
-                   max_chunks,
-                   flush_on_destruct,
-                   std::function<void()>(),
-                   std::function<void()>())
-{
-}
-
-async_writer::async_writer(const std::string& name,
-                           std::unique_ptr<writer>&& wrt,
-                           std::size_t chunk_size,
-                           std::size_t max_chunks,
-                           bool flush_on_destruct,
-                           std::function<void()> enter_thread_cb,
-                           std::function<void()> leave_thread_cb)
     : writer(name, std::move(std::make_unique<noop_formatter>())),
       event_cache_provider(chunk_size, max_chunks * chunk_size),
       writer_(std::move(wrt)),
       stop_(false),
-      enter_thread_cb_(enter_thread_cb),
-      leave_thread_cb_(leave_thread_cb),
       flush_on_destruct_(flush_on_destruct)
 {
     if (max_chunks < 2)
@@ -103,8 +82,6 @@ async_writer::~async_writer()
 
 void async_writer::thread_main()
 {
-    if (enter_thread_cb_) 
-        enter_thread_cb_();
     while (true)
     {
         auto evt = cache_->pop(250ms);
@@ -119,8 +96,6 @@ void async_writer::thread_main()
             break;
         }
     }
-    if (leave_thread_cb_) 
-        leave_thread_cb_();
     report_info("The writer thread is exiting");
 }
 

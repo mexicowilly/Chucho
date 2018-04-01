@@ -514,22 +514,7 @@ CHUCHO_FIND_PACKAGE(LibLZMA)
 CHUCHO_FIND_PACKAGE(LibArchive)
 CHUCHO_FIND_PACKAGE(LZ4 INCLUDE lz4.h LIBS lz4 PKG_CONFIG_NAME liblz4 SYMBOLS
     LZ4_compressBound LZ4_compress_default LZ4_decompress_safe)
-CHUCHO_FIND_PACKAGE(SQLITE INCLUDE sqlite3.h LIBS sqlite3 PKG_CONFIG_NAME sqlite3 SYMBOLS
-    sqlite3_threadsafe sqlite3_open sqlite3_prepare_v2 sqlite3_reset sqlite3_bind_text
-    sqlite3_bind_int64 sqlite3_bind_int sqlite3_step sqlite3_finalize sqlite3_close
-    sqlite3_extended_result_codes sqlite3_extended_errcode sqlite3_errmsg)
-CHUCHO_FIND_PACKAGE(ORACLE INCLUDE oci.h LIBS occi clntsh SYMBOLS
-    OCIEnvCreate OCIHandleAlloc OCILogon2 OCIStmtPrepare OCIBindByName
-    OCIStmtExecute OCIHandleFree OCIErrorGet OCIDescriptorAlloc OCIDescriptorFree)
-CHUCHO_FIND_PACKAGE(MYSQL INCLUDE mysql.h LIBS mysqlclient PKG_CONFIG_NAME mysqlclient SYMBOLS
-    mysql_init mysql_real_connect mysql_stmt_init mysql_stmt_prepare mysql_autocommit
-    mysql_stmt_close mysql_close mysql_stmt_bind_param mysql_stmt_execute)
-CHUCHO_FIND_PACKAGE(POSTGRES INCLUDE libpq-fe.h LIBS pq PKG_CONFIG_NAME libpq SYMBOLS
-    PQconnectdb PQprepare PQexecPrepared PQresultStatus PQresultErrorMessage
-    PQclear PQfinish PQstatus PQerrorMessage)
-CHUCHO_FIND_PACKAGE(DB2 INCLUDE sqlcli1.h LIBS db2 SYMBOLS
-    SQLAllocHandle SQLFreeHandle SQLSetEnvAttr SQLConnect SQLBindParameter
-    SQLPrepare SQLExecute SQLDisconnect SQLGetDiagRec)
+CHUCHO_FIND_PACKAGE(SOCI INCLUDE soci/soci.h LIBS soci_core)
 CHUCHO_FIND_PACKAGE(ZEROMQ INCLUDE zmq.h LIBS zmq PKG_CONFIG_NAME libzmq SYMBOLS
     zmq_ctx_new zmq_ctx_destroy zmq_socket zmq_close zmq_connect zmq_msg_send
     zmq_msg_init_size zmq_msg_data zmq_strerror zmq_msg_close zmq_bind)

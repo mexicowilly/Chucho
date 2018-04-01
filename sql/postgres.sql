@@ -23,7 +23,7 @@ CREATE TABLE chucho_event
 (
     event_id BIGINT DEFAULT NEXTVAL('chucho_id_seq') PRIMARY KEY,
     formatted_message TEXT NOT NULL,
-    timestamp TIMESTAMPTZ NOT NULL,
+    timestmp TIMESTAMPTZ NOT NULL,
     file_name TEXT NOT NULL,
     line_number INTEGER NOT NULL,
     function_name TEXT NOT NULL,

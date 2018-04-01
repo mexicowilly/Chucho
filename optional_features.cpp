@@ -36,9 +36,6 @@ void init_feature_set(chucho::optional_features::feature_set& fs)
 #if defined(CHUCHO_HAVE_CONFIG_FILE_CONFIG)
     fs.set(chucho::optional_features::CONFIG_FILE_CONFIGURATION);
 #endif
-#if defined(CHUCHO_HAVE_DB2_WRITER)
-    fs.set(chucho::optional_features::DB2_WRITER);
-#endif
 #if defined(CHUCHO_HAVE_CURL)
     fs.set(chucho::optional_features::EMAIL_WRITER);
     fs.set(chucho::optional_features::LOGGLY_WRITER);
@@ -49,15 +46,6 @@ void init_feature_set(chucho::optional_features::feature_set& fs)
 #if defined(CHUCHO_HAVE_MINIZIP_COMPRESSION)
     fs.set(chucho::optional_features::MINIZIP_COMPRESSION);
 #endif
-#if defined(CHUCHO_HAVE_MYSQL_WRITER)
-    fs.set(chucho::optional_features::MYSQL_WRITER);
-#endif
-#if defined(CHUCHO_HAVE_ORACLE_WRITER)
-    fs.set(chucho::optional_features::ORACLE_WRITER);
-#endif
-#if defined(CHUCHO_HAVE_POSTGRESQL_WRITER)
-    fs.set(chucho::optional_features::POSTGRESQL_WRITER);
-#endif
 #if defined(CHUCHO_HAVE_PROTOBUF_SERIALIZER)
     fs.set(chucho::optional_features::PROTOBUF_SERIALIZER);
 #endif
@@ -66,9 +54,6 @@ void init_feature_set(chucho::optional_features::feature_set& fs)
 #endif
 #if defined(CHUCHO_HAVE_RUBY_EVALUATOR_FILTER)
     fs.set(chucho::optional_features::RUBY_EVALUATOR_FILTER);
-#endif
-#if defined(CHUCHO_HAVE_SQLITE_WRITER)
-    fs.set(chucho::optional_features::SQLITE_WRITER);
 #endif
 #if defined(CHUCHO_HAVE_YAML_CONFIG)
     fs.set(chucho::optional_features::YAML_CONFIGURATION);
@@ -93,6 +78,9 @@ void init_feature_set(chucho::optional_features::feature_set& fs)
 #endif
 #if defined(CHUCHO_HAVE_AWSSDK)
     fs.set(chucho::optional_features::CLOUDWATCH_WRITER);
+#endif
+#if defined(CHUCHO_HAVE_SOCI)
+    fs.set(chucho::optional_features::DATABASE_WRITER);
 #endif
 }
 

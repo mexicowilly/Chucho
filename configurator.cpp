@@ -48,21 +48,6 @@
 #if defined(CHUCHO_WINDOWS)
 #include <chucho/windows_event_log_writer_factory.hpp>
 #endif
-#if defined(CHUCHO_HAVE_MYSQL)
-#include <chucho/mysql_writer_factory.hpp>
-#endif
-#if defined(CHUCHO_HAVE_ORACLE)
-#include <chucho/oracle_writer_factory.hpp>
-#endif
-#if defined(CHUCHO_HAVE_SQLITE)
-#include <chucho/sqlite_writer_factory.hpp>
-#endif
-#if defined(CHUCHO_HAVE_POSTGRES)
-#include <chucho/postgres_writer_factory.hpp>
-#endif
-#if defined(CHUCHO_HAVE_DB2)
-#include <chucho/db2_writer_factory.hpp>
-#endif
 #if defined(CHUCHO_HAVE_RUBY)
 #include <chucho/ruby_evaluator_filter_factory.hpp>
 #endif
@@ -106,6 +91,9 @@
 #endif
 #if defined(CHUCHO_HAVE_AWSSDK)
 #include <chucho/cloudwatch_writer_factory.hpp>
+#endif
+#if defined(CHUCHO_HAVE_SOCI)
+#include <chucho/database_writer_factory.hpp>
 #endif
 
 #include <cstring>
@@ -199,26 +187,6 @@ void configurator::initialize_impl()
     add_configurable_factory("chucho::windows_event_log_writer",
                              std::make_shared<windows_event_log_writer_factory>());
 #endif
-#if defined(CHUCHO_HAVE_MYSQL)
-    add_configurable_factory("chucho::mysql_writer",
-                             std::make_shared<mysql_writer_factory>());
-#endif
-#if defined(CHUCHO_HAVE_ORACLE)
-    add_configurable_factory("chucho::oracle_writer",
-                             std::make_shared<oracle_writer_factory>());
-#endif
-#if defined(CHUCHO_HAVE_SQLITE)
-    add_configurable_factory("chucho::sqlite_writer",
-                             std::make_shared<sqlite_writer_factory>());
-#endif
-#if defined(CHUCHO_HAVE_POSTGRES)
-    add_configurable_factory("chucho::postgres_writer",
-                             std::make_shared<postgres_writer_factory>());
-#endif
-#if defined(CHUCHO_HAVE_DB2)
-    add_configurable_factory("chucho::db2_writer",
-                             std::make_shared<db2_writer_factory>());
-#endif
 #if defined(CHUCHO_HAVE_RUBY)
     add_configurable_factory("chucho::ruby_evaluator_filter",
                              std::make_shared<ruby_evaluator_filter_factory>());
@@ -278,6 +246,10 @@ void configurator::initialize_impl()
 #if defined(CHUCHO_HAVE_AWSSDK)
     add_configurable_factory("chucho::cloudwatch_writer",
                              std::make_shared<cloudwatch_writer_factory>());
+#endif
+#if defined(CHUCHO_HAVE_SOCI)
+    add_configurable_factory("chucho::database_writer",
+                             std::make_shared<database_writer_factory>());
 #endif
 }
 
