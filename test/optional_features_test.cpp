@@ -95,5 +95,8 @@ TEST(optional_features, simple)
 #if defined(CHUCHO_HAVE_AWSSDK)
     EXPECT_FEATURE(chucho::optional_features::CLOUDWATCH_WRITER);
 #endif
+#if defined(CHUCHO_HAVE_SOCI)
+    EXPECT_FEATURE(chucho::optional_features::DATABASE_WRITER);
+#endif
     EXPECT_TRUE(fs.none());
 }
