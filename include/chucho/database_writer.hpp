@@ -107,6 +107,7 @@ private:
     soci::indicator marker_ind_;
     std::string thread_;
     std::string host_name_;
+    int process_id_;
 };
 
 }

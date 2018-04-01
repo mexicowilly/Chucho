@@ -18,12 +18,13 @@
 #include <chucho/host.hpp>
 #include <chucho/calendar.hpp>
 #include <chucho/logger.hpp>
+#include <chucho/process.hpp>
 #include <thread>
 
 namespace
 {
 
-constexpr const char* INSERT = "INSERT INTO chucho_event ( formatted_message, timestmp, file_name, line_number, function_name, logger, level_name, marker, thread, host_name ) VALUES ( :formatted_message, :timestmp, :file_name, :line_number, :function_name, :logger, :level_name, :marker, :thread, :host_name )";
+constexpr const char* INSERT = "INSERT INTO chucho_event ( formatted_message, timestmp, file_name, line_number, function_name, logger, level_name, marker, thread, host_name, process_id ) VALUES ( :formatted_message, :timestmp, :file_name, :line_number, :function_name, :logger, :level_name, :marker, :thread, :host_name, :process_id )";
 
 }
 
