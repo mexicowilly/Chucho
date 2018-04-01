@@ -26,5 +26,6 @@ CREATE TABLE chucho_event
     level_name VARCHAR(256) NOT NULL,
     marker VARCHAR(1024),
     thread VARCHAR(256) NOT NULL,
-    host_name VARCHAR(256) NOT NULL
+    host_name VARCHAR(256) NOT NULL,
+    process_id INTEGER NOT NULL
 );

@@ -26,7 +26,8 @@ CREATE TABLE chucho_event
     level_name VARCHAR2(256) NOT NULL,
     marker VARCHAR2(1024),
     thread VARCHAR2(256) NOT NULL,
-    host_name VARCHAR2(256) NOT NULL
+    host_name VARCHAR2(256) NOT NULL,
+    process_id INTEGER NOT NULL
 );
 
 CREATE SEQUENCE chucho_event_id_seq MINVALUE 1 START WITH 1;

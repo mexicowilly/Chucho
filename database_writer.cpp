@@ -18,12 +18,13 @@
 #include <chucho/host.hpp>
 #include <chucho/calendar.hpp>
 #include <chucho/logger.hpp>
+#include <chucho/process.hpp>
 #include <thread>
 
 namespace
 {
 
-constexpr const char* INSERT = "INSERT INTO chucho_event ( formatted_message, timestmp, file_name, line_number, function_name, logger, level_name, marker, thread, host_name ) VALUES ( :formatted_message, :timestmp, :file_name, :line_number, :function_name, :logger, :level_name, :marker, :thread, :host_name )";
+constexpr const char* INSERT = "INSERT INTO chucho_event ( formatted_message, timestmp, file_name, line_number, function_name, logger, level_name, marker, thread, host_name, process_id ) VALUES ( :formatted_message, :timestmp, :file_name, :line_number, :function_name, :logger, :level_name, :marker, :thread, :host_name, :process_id )";
 
 }
 
@@ -37,7 +38,8 @@ database_writer::database_writer(const std::string& name,
       sql_(connection),
       stmt_(sql_),
       marker_ind_(soci::i_null),
-      host_name_(host::get_full_name())
+      host_name_(host::get_full_name()),
+      process_id_(process::id())
 {
     stmt_ = (sql_.prepare << INSERT,
              soci::use(formatted_message_),
@@ -49,7 +51,8 @@ database_writer::database_writer(const std::string& name,
              soci::use(level_name_),
              soci::use(marker_, marker_ind_),
              soci::use(thread_),
-             soci::use(host_name_));
+             soci::use(host_name_),
+             soci::use(process_id_));
 }
 
 void database_writer::write_impl(const event& evt)
