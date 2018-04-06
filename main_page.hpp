@@ -38,7 +38,14 @@
  * This is the documentation of the Chucho API. For access to 
  * releases, documentation, tickets and source code, please 
  * visit the <a href="https://github.com/mexicowilly/Chucho"
- * target="_blank">project * site</a>.
+ * target="_blank">project site</a>.
+ *
+ * For documentation of how to create a configuration file for
+ * Chucho that will establish the run-time settings, please see
+ * <a href="https://github.com/mexicowilly/Chucho/wiki/Configuration"
+ * target="_blank">configuration documentation</a> and
+ * <a href="https://github.com/mexicowilly/Chucho/wiki/Configuration-Reference"
+ * target="_blank">configuration reference</a>.
  *  
  * Chucho uses the same architecture as <a 
  * href="http://logback.qos.ch/" 
@@ -49,10 +56,10 @@
  * target="_blank">user manual</a>, which is under construction.
  *  
  * @subsection c C API
- * Though the core of Chucho is written in C++11, a wrapping C 
+ * Though the core of Chucho is written in C++14, a wrapping C
  * API is also exposed. This allows Chucho to be used in C 
  * programs and in C++ programs that may be built with a 
- * compiler that cannot build Chucho, such as a non-C++11 
+ * compiler that cannot build Chucho, such as a non-C++14
  * compiler. 
  *  
  * The C API is expressed in header files with the extension @c 
