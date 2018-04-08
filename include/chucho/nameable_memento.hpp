@@ -23,6 +23,13 @@
 namespace chucho
 {
 
+/**
+ * @class nameable_memento nameable_memento.hpp chucho/nameable_memento.hpp
+ * A @ref memento that has common functionality for things that
+ * get named. These include writers and filters.
+ *  
+ * @ingroup configuration 
+ */
 class nameable_memento : public memento
 {
 public:
@@ -31,7 +38,7 @@ public:
      */
     //@{
     /**
-     * Construct a filter_memento.
+     * Construct a memento.
      *
      * @param cfg the configurator that is perform configuration
      */
