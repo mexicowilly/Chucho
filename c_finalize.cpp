@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 
+#include <chucho/finalize.h>
 #include <chucho/finalize.hpp>
 
 extern "C"
