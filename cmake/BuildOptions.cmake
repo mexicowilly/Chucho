@@ -63,7 +63,6 @@ OPTION(ENABLE_SHARED "Whether to build a shared object" OFF)
 
 OPTION(ENABLE_FRAMEWORK "Whether to build as a framework on Macintosh" ON)
 
-
 # Whether to use libstdc++ when compiling with Clang.
 OPTION(CLANG_LIBSTDCXX "Whether to use libstdc++ with the Clang compiler" OFF)
 
