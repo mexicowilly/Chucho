@@ -21,6 +21,11 @@
 #error "This header is private"
 #endif
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/export.h>
 #include <string>
 #include <cstdint>
@@ -88,5 +93,9 @@ inline directory_iterator::reference directory_iterator::operator* ()
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

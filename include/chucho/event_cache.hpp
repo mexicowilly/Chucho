@@ -21,6 +21,11 @@
 #error "This header is private"
 #endif
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/export.h>
 #include <chucho/non_copyable.hpp>
 #include <chucho/status_reporter.hpp>
@@ -117,5 +122,9 @@ inline std::string event_cache::get_mem_buf_str(std::size_t idx, std::size_t len
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif
