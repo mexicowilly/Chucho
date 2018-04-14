@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -131,11 +131,13 @@ configure(R"cnf(
             "writers" : [
                 { "chucho::file_writer" : {
                     "chucho::pattern_formatter" : { "pattern" : "%m%n" },
-                    "file_name" : "one.log"
+                    "file_name" : "one.log",
+                    "name" : "one"
                 } },
                 { "chucho::file_writer" : {
                     "chucho::pattern_formatter" : { "pattern" : "%m%n" },
-                    "file_name" : "two.log"
+                    "file_name" : "two.log",
+                    "name" : "two"
                 } }
             ]
         }
@@ -173,7 +175,7 @@ TEST_F(json_configurator, rolling_file_writer)
 
 TEST_F(json_configurator, root_alias)
 {
-    chucho::logger::get("")->remove_all_writers();
+    chucho::logger::get("")->clear_writers();
     configure(R"cnf(
 {
     "chucho_loggers" : {

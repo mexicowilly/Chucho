@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -42,7 +42,8 @@ private:
 
 TEST_F(duplicate_message_filter_test, evaluate)
 {
-    chucho::duplicate_message_filter f;
+    chucho::duplicate_message_filter f("dup");
+    EXPECT_STREQ("dup", f.get_name().c_str());
     EXPECT_EQ(chucho::filter::result::NEUTRAL, f.evaluate(get_event("one")));
     EXPECT_EQ(chucho::filter::result::NEUTRAL, f.evaluate(get_event("two")));
     EXPECT_EQ(chucho::filter::result::DENY, f.evaluate(get_event("two")));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -39,21 +39,22 @@ protected:
     void async_writer_with_opts_body();
     void bzip2_file_compressor_body();
     void cerr_writer_body();
-    virtual chucho::configurator& get_configurator() = 0;
+#if defined(CHUCHO_HAVE_AWSSDK)
+    void cloudwatch_writer_body();
+#endif
     void configure(const char* const cnf);
     void configure_with_error(const char* const cnf);
     void cout_writer_body();
-#if defined(CHUCHO_HAVE_DB2)
-    void db2_writer_body();
-#endif
 #if defined(CHUCHO_HAVE_DOORS)
     void door_writer_body();
 #endif
     void duplicate_message_filter_body();
-#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+#if defined(CHUCHO_HAVE_CURL)
     void email_writer_body();
+    void loggly_writer_body();
 #endif
     void file_writer_body();
+    virtual chucho::configurator& get_configurator() = 0;
     void gzip_file_compressor_body();
     void interval_file_roll_trigger_body(const std::string& tmpl);
     void level_filter_body(const std::string& tmpl);
@@ -61,19 +62,9 @@ protected:
     void logger_body();
     void lzma_file_compressor_body();
     void multiple_writer_body();
-#if defined(CHUCHO_HAVE_MYSQL)
-    void mysql_writer_full_body();
-    void mysql_writer_minimal_body();
-#endif
     void named_pipe_writer_body();
     void numbered_file_roller_body();
-#if defined(CHUCHO_HAVE_ORACLE)
-    void oracle_writer_body();
-#endif
     void pipe_writer_body();
-#if defined(CHUCHO_HAVE_POSTGRES)
-    void postgres_writer_body();
-#endif
 #if defined(CHUCHO_HAVE_RABBITMQ)
     void rabbitmq_writer_body();
     void rabbitmq_writer_coalesce_body();
@@ -81,7 +72,6 @@ protected:
     void rabbitmq_writer_capn_proto_body();
 #endif
 #endif
-    void remote_writer_body();
 #if defined(CHUCHO_HAVE_RUBY)
     void ruby_evaluator_filter_body();
 #endif
@@ -89,9 +79,6 @@ protected:
     void root_alias_body();
     void size_file_roll_trigger_body(const std::string& tmpl);
     void sliding_numbered_file_roller_body();
-#if defined(CHUCHO_HAVE_SQLITE)
-    void sqlite_writer_body();
-#endif
     void syslog_writer_body();
     void syslog_writer_facility_body(const std::string& tmpl);
     void syslog_writer_port_body();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ namespace
 class string_writer : public chucho::writer
 {
 public:
-    string_writer(std::shared_ptr<chucho::formatter> fmt)
-        : writer(fmt) { }
+    string_writer()
+        : writer("string", std::move(std::make_unique<chucho::pattern_formatter>("%m"))) { }
 
     void clear()
     {
@@ -79,17 +79,19 @@ class streamable_test : public ::testing::Test, public chucho::streamable<stream
 {
 protected:
     streamable_test()
-        : wrt_(std::make_shared<string_writer>(std::make_shared<chucho::pattern_formatter>("%m")))
     {
-        get_logger()->add_writer(wrt_);
+        get_logger()->add_writer(std::move(std::make_unique<string_writer>()));
     }
 
     ~streamable_test()
     {
-        get_logger()->remove_writer(wrt_);
+        get_logger()->remove_writer("string");
     }
 
-    std::shared_ptr<string_writer> wrt_;
+    std::string get_text()
+    {
+        return dynamic_cast<string_writer&>(get_logger()->get_writer("string")).get_text();
+    }
 };
 
 TEST_F(streamable_test, copy)
@@ -114,7 +116,7 @@ TEST_F(streamable_test, info)
     get_logger()->set_level(chucho::level::INFO_());
     CHUCHO_MS << chucho::info << "hello" << chucho::endm;
     CHUCHO_MS << chucho::debug << "goodbye" << chucho::endm;
-    EXPECT_EQ(std::string("hello"), wrt_->get_text());
+    EXPECT_EQ(std::string("hello"), get_text());
 }
 
 TEST_F(streamable_test, info_lgbl)
@@ -122,7 +124,7 @@ TEST_F(streamable_test, info_lgbl)
     get_logger()->set_level(chucho::level::INFO_());
     CHUCHO_INFO_LGBL("hello");
     CHUCHO_DEBUG_LGBL("goodbye");
-    EXPECT_EQ(std::string("hello"), wrt_->get_text());
+    EXPECT_EQ(std::string("hello"), get_text());
 }
 
 TEST_F(streamable_test, level)

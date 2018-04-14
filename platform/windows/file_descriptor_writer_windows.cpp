@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -44,9 +44,10 @@ HANDLE get_handle_from_fd(int fd)
 namespace chucho
 {
 
-file_descriptor_writer::file_descriptor_writer(std::shared_ptr<formatter> fmt,
+file_descriptor_writer::file_descriptor_writer(const std::string& name,
+                                               std::unique_ptr<formatter>&& fmt,
                                                bool flsh)
-    : writer(fmt),
+    : writer(name, std::move(fmt)),
       num_(0),
       handle_(INVALID_HANDLE_VALUE),
       fd_(-1),
@@ -56,10 +57,11 @@ file_descriptor_writer::file_descriptor_writer(std::shared_ptr<formatter> fmt,
     set_status_origin("file_descriptor_writer");
 }
 
-file_descriptor_writer::file_descriptor_writer(std::shared_ptr<formatter> fmt,
+file_descriptor_writer::file_descriptor_writer(const std::string& name,
+                                               std::unique_ptr<formatter>&& fmt,
                                                int fd,
                                                bool flsh)
-    : writer(fmt),
+    : writer(name, std::move(fmt)),
       num_(0),
       handle_(get_handle_from_fd(fd)),
       fd_(fd),
@@ -69,10 +71,11 @@ file_descriptor_writer::file_descriptor_writer(std::shared_ptr<formatter> fmt,
     set_status_origin("file_descriptor_writer");
 }
 
-file_descriptor_writer::file_descriptor_writer(std::shared_ptr<formatter> fmt,
+file_descriptor_writer::file_descriptor_writer(const std::string& name,
+                                               std::unique_ptr<formatter>&& fmt,
                                                HANDLE hnd,
                                                bool flsh)
-    : writer(fmt),
+    : writer(name, std::move(fmt)),
       num_(0),
       handle_(hnd),
       fd_(-1),
@@ -119,7 +122,7 @@ void file_descriptor_writer::flush()
         DWORD written;
         if (!WriteFile(handle_,
                        buf_.data(),
-                       num_,
+                       static_cast<DWORD>(num_),
                        &written,
                        NULL))
         {

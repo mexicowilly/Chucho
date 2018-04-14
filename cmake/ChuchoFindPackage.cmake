@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2017 Will Mason
+# Copyright 2013-2018 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -20,7 +20,8 @@ FIND_PACKAGE(PkgConfig QUIET)
 
 LIST(APPEND WITH_LIBS $ENV{CHUCHO_WITH_LIBS})
 STRING(TOLOWER "${WITH_LIBS}" LOWER_WITH_LIBS)
-SET(CHUCHO_BUILT_INS curl protobuf ruby zlib bzip2 liblzma libarchive)
+LIST(REMOVE_DUPLICATES LOWER_WITH_LIBS)
+SET(CHUCHO_BUILT_INS curl protobuf ruby zlib bzip2 liblzma libarchive awssdk)
 
 # This cannot be a function, because then FIND_PACKAGE will fail
 # to put its variables in the right scope

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,6 +20,9 @@
 #include <chucho/finalize.hpp>
 #include <iostream>
 #include <fstream>
+#if defined(CHUCHO_HAVE_AWSSDK)
+#include <aws/core/Aws.h>
+#endif
 
 class all_status : public chucho::status_observer
 {
@@ -37,12 +40,22 @@ public:
     {
         chucho::configuration::set_allow_default(false);
         observer_.reset(new all_status());
-        chucho::status_manager::get()->add(observer_);
+        chucho::status_manager::get().add(observer_);
+        #if defined(CHUCHO_HAVE_AWSSDK)
+        Aws::InitAPI(Aws::SDKOptions());
+        #endif
     }
 
     virtual void TearDown() override
     {
+        #if defined(CHUCHO_HAVE_AWSSDK)
+        Aws::ShutdownAPI(Aws::SDKOptions());
+        #endif
+        // The SunPro compiler has a bug that causes it to segv
+        // in the destructor of security_policy.
+        #if !defined(__SUNPRO_CC)
         chucho::finalize();
+        #endif
     }
 
 private:

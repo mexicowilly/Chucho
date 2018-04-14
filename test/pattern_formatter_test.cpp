@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -114,8 +114,8 @@ TEST_F(pattern_formatter_test, local_date_time)
     chucho::calendar::pieces cal = *std::localtime(&secs);
     cal.is_utc = false;
     EXPECT_EQ(chucho::calendar::format(cal, "%Y-%m-%d %H:%M:%S"), f.format(evt_));
-    f = chucho::pattern_formatter("%D{%Y}");
-    EXPECT_EQ(chucho::calendar::format(cal, "%Y"), f.format(evt_));
+    chucho::pattern_formatter f2("%D{%Y}");
+    EXPECT_EQ(chucho::calendar::format(cal, "%Y"), f2.format(evt_));
 }
 
 TEST_F(pattern_formatter_test, logger)
@@ -138,8 +138,8 @@ TEST_F(pattern_formatter_test, microseconds)
     std::ostringstream stream;
     stream << std::setfill('0') << std::setw(6) << micros;
     EXPECT_EQ(stream.str(), fmt);
-    f = chucho::pattern_formatter("%d{-%Q%%Qdoggy%%Q%%%Q}");
-    fmt = f.format(evt_);
+    chucho::pattern_formatter f2("%d{-%Q%%Qdoggy%%Q%%%Q}");
+    fmt = f2.format(evt_);
     stream.str("");
     stream << std::setfill('0') << '-' << std::setw(6) << micros << "%Qdoggy%Q%" << std::setw(6) << micros;
     EXPECT_EQ(stream.str(), fmt);
@@ -181,68 +181,68 @@ TEST_F(pattern_formatter_test, utc_date_time)
     chucho::calendar::pieces cal = *std::gmtime(&secs);
     cal.is_utc = true;
     EXPECT_EQ(chucho::calendar::format(cal, "%Y-%m-%d %H:%M:%S"), f.format(evt_));
-    f = chucho::pattern_formatter("%d{%Y}");
-    EXPECT_EQ(chucho::calendar::format(cal, "%Y"), f.format(evt_));
+    chucho::pattern_formatter f2("%d{%Y}");
+    EXPECT_EQ(chucho::calendar::format(cal, "%Y"), f2.format(evt_));
 }
 
 TEST_F(pattern_formatter_test, with_literal)
 {
-    chucho::pattern_formatter f(" %m");
-    EXPECT_STREQ(" hi", f.format(evt_).c_str());
-    f = chucho::pattern_formatter("%m ");
-    EXPECT_STREQ("hi ", f.format(evt_).c_str());
-    f = chucho::pattern_formatter(" %m ");
-    EXPECT_STREQ(" hi ", f.format(evt_).c_str());
-    f = chucho::pattern_formatter("%m %L");
-    EXPECT_STREQ("hi 10", f.format(evt_).c_str());
-    f = chucho::pattern_formatter(" %m %L");
-    EXPECT_STREQ(" hi 10", f.format(evt_).c_str());
-    f = chucho::pattern_formatter("%m %L ");
-    EXPECT_STREQ("hi 10 ", f.format(evt_).c_str());
-    f = chucho::pattern_formatter(" %m %L ");
-    EXPECT_STREQ(" hi 10 ", f.format(evt_).c_str());
+    auto f = std::make_unique<chucho::pattern_formatter>(" %m");
+    EXPECT_STREQ(" hi", f->format(evt_).c_str());
+    f = std::make_unique<chucho::pattern_formatter>("%m ");
+    EXPECT_STREQ("hi ", f->format(evt_).c_str());
+    f = std::make_unique<chucho::pattern_formatter>(" %m ");
+    EXPECT_STREQ(" hi ", f->format(evt_).c_str());
+    f = std::make_unique<chucho::pattern_formatter>("%m %L");
+    EXPECT_STREQ("hi 10", f->format(evt_).c_str());
+    f = std::make_unique<chucho::pattern_formatter>(" %m %L");
+    EXPECT_STREQ(" hi 10", f->format(evt_).c_str());
+    f = std::make_unique<chucho::pattern_formatter>("%m %L ");
+    EXPECT_STREQ("hi 10 ", f->format(evt_).c_str());
+    f = std::make_unique<chucho::pattern_formatter>(" %m %L ");
+    EXPECT_STREQ(" hi 10 ", f->format(evt_).c_str());
 }
 
 TEST_F(pattern_formatter_test, format_params)
 {
-    chucho::pattern_formatter f("%5m");
-    EXPECT_STREQ("   hi", f.format(evt_).c_str());
-    f = chucho::pattern_formatter("%-17m");
-    EXPECT_STREQ("hi               ", f.format(evt_).c_str());
-    f = chucho::pattern_formatter("%.1m");
-    EXPECT_STREQ("i", f.format(evt_).c_str());
-    f = chucho::pattern_formatter("%5.1m");
-    EXPECT_STREQ("i", f.format(evt_).c_str());
-    f = chucho::pattern_formatter("%1.1m");
-    EXPECT_STREQ("i", f.format(evt_).c_str());
-    f = chucho::pattern_formatter("%1.10m");
-    EXPECT_STREQ("hi", f.format(evt_).c_str());
-    f = chucho::pattern_formatter("%-5.10m");
-    EXPECT_STREQ("hi   ", f.format(evt_).c_str());
+    auto f = std::make_unique<chucho::pattern_formatter>("%5m");
+    EXPECT_STREQ("   hi", f->format(evt_).c_str());
+    f = std::make_unique<chucho::pattern_formatter>("%-17m");
+    EXPECT_STREQ("hi               ", f->format(evt_).c_str());
+    f = std::make_unique<chucho::pattern_formatter>("%.1m");
+    EXPECT_STREQ("i", f->format(evt_).c_str());
+    f = std::make_unique<chucho::pattern_formatter>("%5.1m");
+    EXPECT_STREQ("i", f->format(evt_).c_str());
+    f = std::make_unique<chucho::pattern_formatter>("%1.1m");
+    EXPECT_STREQ("i", f->format(evt_).c_str());
+    f = std::make_unique<chucho::pattern_formatter>("%1.10m");
+    EXPECT_STREQ("hi", f->format(evt_).c_str());
+    f = std::make_unique<chucho::pattern_formatter>("%-5.10m");
+    EXPECT_STREQ("hi   ", f->format(evt_).c_str());
 }
 
 TEST_F(pattern_formatter_test, invalid)
 {
-    std::shared_ptr<chucho::status_manager> smgr = chucho::status_manager::get();
-    smgr->clear();
-    chucho::pattern_formatter f("%z");
-    EXPECT_EQ(1, smgr->get_count());
-    EXPECT_EQ(chucho::status::level::ERROR_, smgr->get_level());
-    EXPECT_STREQ("%z", f.format(evt_).c_str());
-    f = chucho::pattern_formatter("%1.m");
-    EXPECT_EQ(2, smgr->get_count());
-    EXPECT_EQ(chucho::status::level::ERROR_, smgr->get_level());
-    EXPECT_STREQ("%1.m", f.format(evt_).c_str());
-    f = chucho::pattern_formatter("");
-    EXPECT_EQ(3, smgr->get_count());
-    EXPECT_EQ(chucho::status::level::ERROR_, smgr->get_level());
-    EXPECT_STREQ("", f.format(evt_).c_str());
-    f = chucho::pattern_formatter("%d{%Ym");
-    EXPECT_EQ(5, smgr->get_count());
-    EXPECT_EQ(chucho::status::level::ERROR_, smgr->get_level());
-    f = chucho::pattern_formatter("%C");
-    EXPECT_EQ(6, smgr->get_count());
-    EXPECT_EQ(chucho::status::level::ERROR_, smgr->get_level());
+    auto& smgr = chucho::status_manager::get();
+    smgr.clear();
+    auto f = std::make_unique<chucho::pattern_formatter>("%z");
+    EXPECT_EQ(1, smgr.get_count());
+    EXPECT_EQ(chucho::status::level::ERROR_, smgr.get_level());
+    EXPECT_STREQ("%z", f->format(evt_).c_str());
+    f = std::make_unique<chucho::pattern_formatter>("%1.m");
+    EXPECT_EQ(2, smgr.get_count());
+    EXPECT_EQ(chucho::status::level::ERROR_, smgr.get_level());
+    EXPECT_STREQ("%1.m", f->format(evt_).c_str());
+    f = std::make_unique<chucho::pattern_formatter>("");
+    EXPECT_EQ(3, smgr.get_count());
+    EXPECT_EQ(chucho::status::level::ERROR_, smgr.get_level());
+    EXPECT_STREQ("", f->format(evt_).c_str());
+    f = std::make_unique<chucho::pattern_formatter>("%d{%Ym");
+    EXPECT_EQ(5, smgr.get_count());
+    EXPECT_EQ(chucho::status::level::ERROR_, smgr.get_level());
+    f = std::make_unique<chucho::pattern_formatter>("%C");
+    EXPECT_EQ(6, smgr.get_count());
+    EXPECT_EQ(chucho::status::level::ERROR_, smgr.get_level());
 }
 
 TEST_F(pattern_formatter_test, marker)
@@ -253,9 +253,9 @@ TEST_F(pattern_formatter_test, marker)
 
 TEST_F(pattern_formatter_test, diagnostic_context)
 {
-    chucho::pattern_formatter f("%C{name}");
-    EXPECT_STREQ("", f.format(evt_).c_str());
-    f = chucho::pattern_formatter("%C{name}");
+    auto f = std::make_unique<chucho::pattern_formatter>("%C{name}");
+    EXPECT_STREQ("", f->format(evt_).c_str());
+    f = std::make_unique<chucho::pattern_formatter>("%C{name}");
     chucho::diagnostic_context::at("name") = "funky";
-    EXPECT_STREQ("funky", f.format(evt_).c_str());
+    EXPECT_STREQ("funky", f->format(evt_).c_str());
 }

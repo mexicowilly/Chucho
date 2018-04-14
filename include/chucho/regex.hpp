@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
 #pragma warning(disable:4251)
 #endif
 
-#include <chucho/export.hpp>
+#include <chucho/export.h>
 #include <chucho/non_copyable.hpp>
 #include <memory>
 #include <string>

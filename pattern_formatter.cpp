@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <chucho/line_ending.hpp>
 #include <chucho/host.hpp>
 #include <chucho/time_util.hpp>
+#include <chucho/process.hpp>
 #include <limits>
 #include <sstream>
 #include <mutex>
@@ -67,11 +68,11 @@ pattern_formatter::pattern_formatter(const std::string& pattern)
     parse(pattern);
 }
 
-std::shared_ptr<pattern_formatter::piece> pattern_formatter::create_piece(std::string::const_iterator& pos,
+std::unique_ptr<pattern_formatter::piece> pattern_formatter::create_piece(std::string::const_iterator& pos,
                                                                           std::string::const_iterator end,
                                                                           const format_params& params)
 {
-    std::shared_ptr<piece> result;
+    std::unique_ptr<piece> result;
     std::string arg;
     char c = *pos;
     switch (c)
@@ -139,13 +140,13 @@ std::shared_ptr<pattern_formatter::piece> pattern_formatter::create_piece(std::s
         report_error(std::string("Unexpected character '") + c + "' in pattern");
         throw exception("Invalid parameter");
     }
-    return result;
+    return std::move(result);
 }
 
 std::string pattern_formatter::format(const event& evt)
 {
     std::string result;
-    for (std::shared_ptr<piece>& p : pieces_)
+    for (auto& p : pieces_)
         result += p->get_text(evt);
     return result;
 }
@@ -204,10 +205,7 @@ void pattern_formatter::parse(const std::string& pattern)
                     else
                     {
                         if (!text.empty())
-                        {
-                            std::shared_ptr<piece> p(new literal_piece(text));
-                            pieces_.push_back(p);
-                        }
+                            pieces_.emplace_back(std::make_unique<literal_piece>(text));
                         state = parser_state::BEGIN;
                         begin_pos = i;
                     }
@@ -237,7 +235,7 @@ void pattern_formatter::parse(const std::string& pattern)
                     }
                     else
                     {
-                        pieces_.push_back(create_piece(i, pattern.end(), params));
+                        pieces_.push_back(std::move(create_piece(i, pattern.end(), params)));
                         state = parser_state::LITERAL;
                         text.clear();
                         params.reset();
@@ -258,7 +256,7 @@ void pattern_formatter::parse(const std::string& pattern)
                     }
                     else
                     {
-                        pieces_.push_back(create_piece(i, pattern.end(), params));
+                        pieces_.push_back(std::move(create_piece(i, pattern.end(), params)));
                         state = parser_state::LITERAL;
                         text.clear();
                         params.reset();
@@ -290,7 +288,7 @@ void pattern_formatter::parse(const std::string& pattern)
                 else
                 {
                     params.max_width_ = std::stoi(text);
-                    pieces_.push_back(create_piece(i, pattern.end(), params));
+                    pieces_.push_back(std::move(create_piece(i, pattern.end(), params)));
                     state = parser_state::LITERAL;
                     text.clear();
                     params.reset();
@@ -300,8 +298,7 @@ void pattern_formatter::parse(const std::string& pattern)
         }
         catch (...)
         {
-            std::shared_ptr<piece> p(new literal_piece(std::string(begin_pos, i + 1)));
-            pieces_.push_back(p);
+            pieces_.emplace_back(std::make_unique<literal_piece>(std::string(begin_pos, i + 1)));
             state = parser_state::LITERAL;
             text.clear();
             params.reset();
@@ -309,8 +306,7 @@ void pattern_formatter::parse(const std::string& pattern)
     }
     if (!text.empty())
     {
-        std::shared_ptr<piece> p(new literal_piece(text));
-        pieces_.push_back(p);
+        pieces_.emplace_back(std::make_unique<literal_piece>(text));
     }
 }
 
@@ -447,7 +443,7 @@ pattern_formatter::base_host_piece::base_host_piece(const format_params& params)
 
 std::string pattern_formatter::base_host_piece::get_text_impl(const event& evt) const
 {
-    return evt.get_base_host_name() ? *evt.get_base_host_name() : host::get_base_name();
+    return host::get_base_name();
 }
 
 pattern_formatter::full_host_piece::full_host_piece(const format_params& params)
@@ -457,7 +453,7 @@ pattern_formatter::full_host_piece::full_host_piece(const format_params& params)
 
 std::string pattern_formatter::full_host_piece::get_text_impl(const event& evt) const
 {
-    return evt.get_full_host_name() ? *evt.get_full_host_name() : host::get_full_name();
+    return host::get_full_name();
 }
 
 pattern_formatter::line_number_piece::line_number_piece(const format_params& params)
@@ -523,6 +519,11 @@ std::string pattern_formatter::milliseconds_since_start_piece::get_text_impl(con
 pattern_formatter::pid_piece::pid_piece(const format_params& params)
     : piece(params)
 {
+}
+
+std::string pattern_formatter::pid_piece::get_text_impl(const event& evt) const
+{
+    return std::to_string(process::id());
 }
 
 pattern_formatter::literal_piece::literal_piece(const std::string& text)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,17 +26,17 @@ lz4_compressor_factory::lz4_compressor_factory()
     set_status_origin("lz4_compressor_factory");
 }
 
-std::shared_ptr<configurable> lz4_compressor_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> lz4_compressor_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    std::shared_ptr<configurable> cnf = std::make_shared<lz4_compressor>();
+    auto cnf = std::make_unique<lz4_compressor>();
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
-    return cnf;
+    return std::move(cnf);
 }
 
-std::shared_ptr<memento> lz4_compressor_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> lz4_compressor_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto(new memento(cfg));
-    return mnto;
+    auto mnto = std::make_unique<memento>(cfg);
+    return std::move(mnto);
 }
 
 }

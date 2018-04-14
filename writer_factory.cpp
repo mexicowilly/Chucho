@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,18 +17,16 @@
 #include <chucho/writer_factory.hpp>
 #include <chucho/writer.hpp>
 #include <assert.h>
-#include <algorithm>
 
 namespace chucho
 {
 
-void writer_factory::set_filters(std::shared_ptr<configurable> cnf, std::shared_ptr<writer_memento> mnto)
+void writer_factory::set_filters(configurable& cnf, writer_memento& mnto)
 {
-    auto wrt = std::dynamic_pointer_cast<writer>(cnf);
-    assert(wrt);
-    std::for_each(mnto->get_filters().begin(),
-                  mnto->get_filters().end(),
-                  [&] (std::shared_ptr<filter> f) { wrt->add_filter(f); });
+    auto wrt = dynamic_cast<writer*>(&cnf);
+    assert(wrt != nullptr);
+    for (auto& f : mnto.get_filters())
+        wrt->add_filter(std::move(f));
 }
 
 }

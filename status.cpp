@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ std::ostream& operator<< (std::ostream& stream, const status& st)
     auto since = st.time_.time_since_epoch();
     auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(since);
     std::ostringstream fmt_stream;
-    fmt_stream << "%H.%M.%S." << (millis.count() % 1000);
+    fmt_stream << "%H.%M.%S." << std::setfill('0') << std::setw(3) << (millis.count() % 1000);
     calendar::pieces cal = calendar::get_utc(millis.count() / 1000);
     stream << calendar::format(cal, fmt_stream.str());
     stream << ' ';

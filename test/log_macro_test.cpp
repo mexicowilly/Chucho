@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -33,8 +33,8 @@ const chucho::optional<chucho::marker> MARK(chucho::marker("marky mark"));
 class string_writer : public chucho::writer
 {
 public:
-    string_writer(std::shared_ptr<chucho::formatter> fmt)
-        : writer(fmt) { }
+    string_writer(std::unique_ptr<chucho::formatter>&& fmt)
+        : writer("string", std::move(fmt)) { }
 
     std::vector<std::string> get_lines()
     {
@@ -62,18 +62,25 @@ private:
 class log_macro : protected chucho::loggable<log_macro>, public ::testing::Test
 {
 public:
-    log_macro()
-        : lgr_(chucho::logger::get("log_macro")),
-          wrt_(std::make_shared<string_writer>(std::make_shared<chucho::pattern_formatter>("%p %m %k%n"))),
-          lgbl_wrt_(std::make_shared<string_writer>(std::make_shared<chucho::pattern_formatter>("%p %m %k%n")))
+    enum class expected_logger
     {
-        lgr_->add_writer(wrt_);
-        get_logger()->add_writer(lgbl_wrt_);
+        INTRINSIC,
+        EXPLICIT
+    };
+
+    log_macro()
+        : lgr_(chucho::logger::get("log_macro"))
+    {
+        auto wrt = std::make_unique<string_writer>(std::move(std::make_unique<chucho::pattern_formatter>("%p %m %k%n")));
+        lgr_->add_writer(std::move(wrt));
+        wrt = std::make_unique<string_writer>(std::move(std::make_unique<chucho::pattern_formatter>("%p %m %k%n")));
+        get_logger()->add_writer(std::move(wrt));
     }
 
     ~log_macro()
     {
         lgr_.reset();
+        get_logger()->clear_writers();
         chucho::logger::remove_unused_loggers();
     }
 
@@ -86,6 +93,16 @@ protected:
         CHUCHO_WARN(lgr_, "my dog " << "has fleas");
         CHUCHO_ERROR(lgr_, "my dog " << "has fleas");
         CHUCHO_FATAL(lgr_, "my dog " << "has fleas");
+    }
+
+    void log_l()
+    {
+        CHUCHO_TRACE_L("my dog " << "has fleas");
+        CHUCHO_DEBUG_L("my dog " << "has fleas");
+        CHUCHO_INFO_L("my dog " << "has fleas");
+        CHUCHO_WARN_L("my dog " << "has fleas");
+        CHUCHO_ERROR_L("my dog " << "has fleas");
+        CHUCHO_FATAL_L("my dog " << "has fleas");
     }
 
     void log_lgbl()
@@ -108,6 +125,16 @@ protected:
         CHUCHO_FATAL_M(MARK, lgr_, "my dog " << "has fleas");
     }
 
+    void log_l_marker()
+    {
+        CHUCHO_TRACE_L_M(MARK, "my dog " << "has fleas");
+        CHUCHO_DEBUG_L_M(MARK, "my dog " << "has fleas");
+        CHUCHO_INFO_L_M(MARK, "my dog " << "has fleas");
+        CHUCHO_WARN_L_M(MARK, "my dog " << "has fleas");
+        CHUCHO_ERROR_L_M(MARK, "my dog " << "has fleas");
+        CHUCHO_FATAL_L_M(MARK, "my dog " << "has fleas");
+    }
+
     void log_lgbl_marker()
     {
         CHUCHO_TRACE_LGBL_M(MARK, "my dog " << "has fleas");
@@ -126,6 +153,16 @@ protected:
         CHUCHO_WARN_STR_M(MARK->get_name(), lgr_, "my dog has fleas");
         CHUCHO_ERROR_STR_M(MARK->get_name(), lgr_, "my dog has fleas");
         CHUCHO_FATAL_STR_M(MARK->get_name(), lgr_, "my dog has fleas");
+    }
+
+    void log_l_marker_str()
+    {
+        CHUCHO_TRACE_L_STR_M(MARK->get_name(), "my dog has fleas");
+        CHUCHO_DEBUG_L_STR_M(MARK->get_name(), "my dog has fleas");
+        CHUCHO_INFO_L_STR_M(MARK->get_name(), "my dog has fleas");
+        CHUCHO_WARN_L_STR_M(MARK->get_name(), "my dog has fleas");
+        CHUCHO_ERROR_L_STR_M(MARK->get_name(), "my dog has fleas");
+        CHUCHO_FATAL_L_STR_M(MARK->get_name(), "my dog has fleas");
     }
 
     void log_lgbl_marker_str()
@@ -148,6 +185,16 @@ protected:
         CHUCHO_FATAL_STR(lgr_, "my dog has fleas");
     }
 
+    void log_l_str()
+    {
+        CHUCHO_TRACE_L_STR("my dog has fleas");
+        CHUCHO_DEBUG_L_STR("my dog has fleas");
+        CHUCHO_INFO_L_STR("my dog has fleas");
+        CHUCHO_WARN_L_STR("my dog has fleas");
+        CHUCHO_ERROR_L_STR("my dog has fleas");
+        CHUCHO_FATAL_L_STR("my dog has fleas");
+    }
+
     void log_lgbl_str()
     {
         CHUCHO_TRACE_LGBL_STR("my dog has fleas");
@@ -159,7 +206,7 @@ protected:
     }
 
     void expect(std::shared_ptr<chucho::level> lvl,
-                std::shared_ptr<string_writer> wrt,
+                expected_logger exp,
                 const chucho::optional<chucho::marker>& mark = chucho::optional<chucho::marker>())
     {
         std::array<std::shared_ptr<chucho::level>, 6> lvls =
@@ -171,7 +218,9 @@ protected:
             chucho::level::ERROR_(),
             chucho::level::FATAL_()
         };
-        std::vector<std::string> lines(wrt->get_lines());
+        chucho::writer& wrt = exp == expected_logger::EXPLICIT ?
+            lgr_->get_writer("string") : get_logger()->get_writer("string");
+        std::vector<std::string> lines(dynamic_cast<string_writer&>(wrt).get_lines());
         std::size_t i = std::distance(lvls.begin(), std::find(lvls.begin(), lvls.end(), lvl));
         ASSERT_EQ(lvls.size() - i, lines.size());
         for (std::size_t num = 0; i < lvls.size(); i++, num++)
@@ -183,8 +232,6 @@ protected:
     }
 
     std::shared_ptr<chucho::logger> lgr_;
-    std::shared_ptr<string_writer> wrt_;
-    std::shared_ptr<string_writer> lgbl_wrt_;
 };
 
 }
@@ -194,7 +241,15 @@ TEST_F(log_macro, debug)
     SCOPED_TRACE("debug");
     lgr_->set_level(chucho::level::DEBUG_());
     log();
-    expect(chucho::level::DEBUG_(), wrt_);
+    expect(chucho::level::DEBUG_(), expected_logger::EXPLICIT);
+}
+
+TEST_F(log_macro, debug_l)
+{
+    SCOPED_TRACE("debug_l");
+    get_logger()->set_level(chucho::level::DEBUG_());
+    log_l();
+    expect(chucho::level::DEBUG_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, debug_lgbl)
@@ -202,7 +257,7 @@ TEST_F(log_macro, debug_lgbl)
     SCOPED_TRACE("debug_lgbl");
     get_logger()->set_level(chucho::level::DEBUG_());
     log_lgbl();
-    expect(chucho::level::DEBUG_(), lgbl_wrt_);
+    expect(chucho::level::DEBUG_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, debug_marker)
@@ -210,7 +265,15 @@ TEST_F(log_macro, debug_marker)
     SCOPED_TRACE("debug_marker");
     lgr_->set_level(chucho::level::DEBUG_());
     log_marker();
-    expect(chucho::level::DEBUG_(), wrt_, MARK);
+    expect(chucho::level::DEBUG_(), expected_logger::EXPLICIT, MARK);
+}
+
+TEST_F(log_macro, debug_l_marker)
+{
+    SCOPED_TRACE("debug_l_marker");
+    get_logger()->set_level(chucho::level::DEBUG_());
+    log_l_marker();
+    expect(chucho::level::DEBUG_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, debug_lgbl_marker)
@@ -218,7 +281,7 @@ TEST_F(log_macro, debug_lgbl_marker)
     SCOPED_TRACE("debug_lgbl_marker");
     get_logger()->set_level(chucho::level::DEBUG_());
     log_lgbl_marker();
-    expect(chucho::level::DEBUG_(), lgbl_wrt_, MARK);
+    expect(chucho::level::DEBUG_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, debug_marker_str)
@@ -226,7 +289,15 @@ TEST_F(log_macro, debug_marker_str)
     SCOPED_TRACE("debug_marker_str");
     lgr_->set_level(chucho::level::DEBUG_());
     log_marker_str();
-    expect(chucho::level::DEBUG_(), wrt_, MARK);
+    expect(chucho::level::DEBUG_(), expected_logger::EXPLICIT, MARK);
+}
+
+TEST_F(log_macro, debug_l_marker_str)
+{
+    SCOPED_TRACE("debug_l_marker_str");
+    get_logger()->set_level(chucho::level::DEBUG_());
+    log_l_marker_str();
+    expect(chucho::level::DEBUG_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, debug_lgbl_marker_str)
@@ -234,7 +305,7 @@ TEST_F(log_macro, debug_lgbl_marker_str)
     SCOPED_TRACE("debug_lgbl_marker_str");
     get_logger()->set_level(chucho::level::DEBUG_());
     log_lgbl_marker_str();
-    expect(chucho::level::DEBUG_(), lgbl_wrt_, MARK);
+    expect(chucho::level::DEBUG_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, debug_str)
@@ -242,7 +313,15 @@ TEST_F(log_macro, debug_str)
     SCOPED_TRACE("debug_str");
     lgr_->set_level(chucho::level::DEBUG_());
     log_str();
-    expect(chucho::level::DEBUG_(), wrt_);
+    expect(chucho::level::DEBUG_(), expected_logger::EXPLICIT);
+}
+
+TEST_F(log_macro, debug_l_str)
+{
+    SCOPED_TRACE("debug_l_str");
+    get_logger()->set_level(chucho::level::DEBUG_());
+    log_l_str();
+    expect(chucho::level::DEBUG_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, debug_lgbl_str)
@@ -250,7 +329,7 @@ TEST_F(log_macro, debug_lgbl_str)
     SCOPED_TRACE("debug_lgbl_str");
     get_logger()->set_level(chucho::level::DEBUG_());
     log_lgbl_str();
-    expect(chucho::level::DEBUG_(), lgbl_wrt_);
+    expect(chucho::level::DEBUG_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, error)
@@ -258,7 +337,15 @@ TEST_F(log_macro, error)
     SCOPED_TRACE("error");
     lgr_->set_level(chucho::level::ERROR_());
     log();
-    expect(chucho::level::ERROR_(), wrt_);
+    expect(chucho::level::ERROR_(), expected_logger::EXPLICIT);
+}
+
+TEST_F(log_macro, error_l)
+{
+    SCOPED_TRACE("error_l");
+    get_logger()->set_level(chucho::level::ERROR_());
+    log_l();
+    expect(chucho::level::ERROR_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, error_lgbl)
@@ -266,7 +353,7 @@ TEST_F(log_macro, error_lgbl)
     SCOPED_TRACE("error_lgbl");
     get_logger()->set_level(chucho::level::ERROR_());
     log_lgbl();
-    expect(chucho::level::ERROR_(), lgbl_wrt_);
+    expect(chucho::level::ERROR_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, error_marker)
@@ -274,7 +361,15 @@ TEST_F(log_macro, error_marker)
     SCOPED_TRACE("error_marker");
     lgr_->set_level(chucho::level::ERROR_());
     log_marker();
-    expect(chucho::level::ERROR_(), wrt_, MARK);
+    expect(chucho::level::ERROR_(), expected_logger::EXPLICIT, MARK);
+}
+
+TEST_F(log_macro, error_l_marker)
+{
+    SCOPED_TRACE("error_l_marker");
+    get_logger()->set_level(chucho::level::ERROR_());
+    log_l_marker();
+    expect(chucho::level::ERROR_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, error_lgbl_marker)
@@ -282,7 +377,7 @@ TEST_F(log_macro, error_lgbl_marker)
     SCOPED_TRACE("error_lgbl_marker");
     get_logger()->set_level(chucho::level::ERROR_());
     log_lgbl_marker();
-    expect(chucho::level::ERROR_(), lgbl_wrt_, MARK);
+    expect(chucho::level::ERROR_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, error_marker_str)
@@ -290,7 +385,15 @@ TEST_F(log_macro, error_marker_str)
     SCOPED_TRACE("error_marker_str");
     lgr_->set_level(chucho::level::ERROR_());
     log_marker_str();
-    expect(chucho::level::ERROR_(), wrt_, MARK);
+    expect(chucho::level::ERROR_(), expected_logger::EXPLICIT, MARK);
+}
+
+TEST_F(log_macro, error_l_marker_str)
+{
+    SCOPED_TRACE("error_l_marker_str");
+    get_logger()->set_level(chucho::level::ERROR_());
+    log_l_marker_str();
+    expect(chucho::level::ERROR_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, error_lgbl_marker_str)
@@ -298,7 +401,7 @@ TEST_F(log_macro, error_lgbl_marker_str)
     SCOPED_TRACE("error_lgbl_marker_str");
     get_logger()->set_level(chucho::level::ERROR_());
     log_lgbl_marker_str();
-    expect(chucho::level::ERROR_(), lgbl_wrt_, MARK);
+    expect(chucho::level::ERROR_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, error_str)
@@ -306,7 +409,15 @@ TEST_F(log_macro, error_str)
     SCOPED_TRACE("error_str");
     lgr_->set_level(chucho::level::ERROR_());
     log_str();
-    expect(chucho::level::ERROR_(), wrt_);
+    expect(chucho::level::ERROR_(), expected_logger::EXPLICIT);
+}
+
+TEST_F(log_macro, error_l_str)
+{
+    SCOPED_TRACE("error_l_str");
+    get_logger()->set_level(chucho::level::ERROR_());
+    log_l_str();
+    expect(chucho::level::ERROR_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, error_lgbl_str)
@@ -314,7 +425,7 @@ TEST_F(log_macro, error_lgbl_str)
     SCOPED_TRACE("error_lgbl_str");
     get_logger()->set_level(chucho::level::ERROR_());
     log_lgbl_str();
-    expect(chucho::level::ERROR_(), lgbl_wrt_);
+    expect(chucho::level::ERROR_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, fatal)
@@ -322,7 +433,15 @@ TEST_F(log_macro, fatal)
     SCOPED_TRACE("fatal");
     lgr_->set_level(chucho::level::FATAL_());
     log();
-    expect(chucho::level::FATAL_(), wrt_);
+    expect(chucho::level::FATAL_(), expected_logger::EXPLICIT);
+}
+
+TEST_F(log_macro, fatal_l)
+{
+    SCOPED_TRACE("fatal_l");
+    get_logger()->set_level(chucho::level::FATAL_());
+    log_l();
+    expect(chucho::level::FATAL_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, fatal_lgbl)
@@ -330,7 +449,7 @@ TEST_F(log_macro, fatal_lgbl)
     SCOPED_TRACE("fatal_lgbl");
     get_logger()->set_level(chucho::level::FATAL_());
     log_lgbl();
-    expect(chucho::level::FATAL_(), lgbl_wrt_);
+    expect(chucho::level::FATAL_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, fatal_marker)
@@ -338,7 +457,15 @@ TEST_F(log_macro, fatal_marker)
     SCOPED_TRACE("fatal_marker");
     lgr_->set_level(chucho::level::FATAL_());
     log_marker();
-    expect(chucho::level::FATAL_(), wrt_, MARK);
+    expect(chucho::level::FATAL_(), expected_logger::EXPLICIT, MARK);
+}
+
+TEST_F(log_macro, fatal_l_marker)
+{
+    SCOPED_TRACE("fatal_l_marker");
+    get_logger()->set_level(chucho::level::FATAL_());
+    log_l_marker();
+    expect(chucho::level::FATAL_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, fatal_lgbl_marker)
@@ -346,7 +473,7 @@ TEST_F(log_macro, fatal_lgbl_marker)
     SCOPED_TRACE("fatal_lgbl_marker");
     get_logger()->set_level(chucho::level::FATAL_());
     log_lgbl_marker();
-    expect(chucho::level::FATAL_(), lgbl_wrt_, MARK);
+    expect(chucho::level::FATAL_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, fatal_marker_str)
@@ -354,7 +481,15 @@ TEST_F(log_macro, fatal_marker_str)
     SCOPED_TRACE("fatal_marker_str");
     lgr_->set_level(chucho::level::FATAL_());
     log_marker_str();
-    expect(chucho::level::FATAL_(), wrt_, MARK);
+    expect(chucho::level::FATAL_(), expected_logger::EXPLICIT, MARK);
+}
+
+TEST_F(log_macro, fatal_l_marker_str)
+{
+    SCOPED_TRACE("fatal_l_marker_str");
+    get_logger()->set_level(chucho::level::FATAL_());
+    log_l_marker_str();
+    expect(chucho::level::FATAL_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, fatal_lgbl_marker_str)
@@ -362,7 +497,7 @@ TEST_F(log_macro, fatal_lgbl_marker_str)
     SCOPED_TRACE("fatal_lgbl_marker_str");
     get_logger()->set_level(chucho::level::FATAL_());
     log_lgbl_marker_str();
-    expect(chucho::level::FATAL_(), lgbl_wrt_, MARK);
+    expect(chucho::level::FATAL_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, fatal_str)
@@ -370,7 +505,15 @@ TEST_F(log_macro, fatal_str)
     SCOPED_TRACE("fatal_str");
     lgr_->set_level(chucho::level::FATAL_());
     log_str();
-    expect(chucho::level::FATAL_(), wrt_);
+    expect(chucho::level::FATAL_(), expected_logger::EXPLICIT);
+}
+
+TEST_F(log_macro, fatal_l_str)
+{
+    SCOPED_TRACE("fatal_l_str");
+    get_logger()->set_level(chucho::level::FATAL_());
+    log_l_str();
+    expect(chucho::level::FATAL_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, fatal_lgbl_str)
@@ -378,7 +521,7 @@ TEST_F(log_macro, fatal_lgbl_str)
     SCOPED_TRACE("fatal_lgbl_str");
     get_logger()->set_level(chucho::level::FATAL_());
     log_lgbl_str();
-    expect(chucho::level::FATAL_(), lgbl_wrt_);
+    expect(chucho::level::FATAL_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, info)
@@ -386,7 +529,15 @@ TEST_F(log_macro, info)
     SCOPED_TRACE("info");
     lgr_->set_level(chucho::level::INFO_());
     log();
-    expect(chucho::level::INFO_(), wrt_);
+    expect(chucho::level::INFO_(), expected_logger::EXPLICIT);
+}
+
+TEST_F(log_macro, info_l)
+{
+    SCOPED_TRACE("info_l");
+    get_logger()->set_level(chucho::level::INFO_());
+    log_l();
+    expect(chucho::level::INFO_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, info_lgbl)
@@ -394,7 +545,7 @@ TEST_F(log_macro, info_lgbl)
     SCOPED_TRACE("info_lgbl");
     get_logger()->set_level(chucho::level::INFO_());
     log_lgbl();
-    expect(chucho::level::INFO_(), lgbl_wrt_);
+    expect(chucho::level::INFO_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, info_marker)
@@ -402,7 +553,15 @@ TEST_F(log_macro, info_marker)
     SCOPED_TRACE("info_marker");
     lgr_->set_level(chucho::level::INFO_());
     log_marker();
-    expect(chucho::level::INFO_(), wrt_, MARK);
+    expect(chucho::level::INFO_(), expected_logger::EXPLICIT, MARK);
+}
+
+TEST_F(log_macro, info_l_marker)
+{
+    SCOPED_TRACE("info_l_marker");
+    get_logger()->set_level(chucho::level::INFO_());
+    log_l_marker();
+    expect(chucho::level::INFO_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, info_lgbl_marker)
@@ -410,7 +569,7 @@ TEST_F(log_macro, info_lgbl_marker)
     SCOPED_TRACE("info_lgbl_marker");
     get_logger()->set_level(chucho::level::INFO_());
     log_lgbl_marker();
-    expect(chucho::level::INFO_(), lgbl_wrt_, MARK);
+    expect(chucho::level::INFO_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, info_marker_str)
@@ -418,7 +577,15 @@ TEST_F(log_macro, info_marker_str)
     SCOPED_TRACE("info_marker_str");
     lgr_->set_level(chucho::level::INFO_());
     log_marker_str();
-    expect(chucho::level::INFO_(), wrt_, MARK);
+    expect(chucho::level::INFO_(), expected_logger::EXPLICIT, MARK);
+}
+
+TEST_F(log_macro, info_l_marker_str)
+{
+    SCOPED_TRACE("info_l_marker_str");
+    get_logger()->set_level(chucho::level::INFO_());
+    log_l_marker_str();
+    expect(chucho::level::INFO_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, info_lgbl_marker_str)
@@ -426,7 +593,7 @@ TEST_F(log_macro, info_lgbl_marker_str)
     SCOPED_TRACE("info_lgbl_marker_str");
     get_logger()->set_level(chucho::level::INFO_());
     log_lgbl_marker_str();
-    expect(chucho::level::INFO_(), lgbl_wrt_, MARK);
+    expect(chucho::level::INFO_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, info_str)
@@ -434,7 +601,15 @@ TEST_F(log_macro, info_str)
     SCOPED_TRACE("info_str");
     lgr_->set_level(chucho::level::INFO_());
     log_str();
-    expect(chucho::level::INFO_(), wrt_);
+    expect(chucho::level::INFO_(), expected_logger::EXPLICIT);
+}
+
+TEST_F(log_macro, info_l_str)
+{
+    SCOPED_TRACE("info_l_str");
+    get_logger()->set_level(chucho::level::INFO_());
+    log_l_str();
+    expect(chucho::level::INFO_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, info_lgbl_str)
@@ -442,7 +617,7 @@ TEST_F(log_macro, info_lgbl_str)
     SCOPED_TRACE("info_lgbl_str");
     get_logger()->set_level(chucho::level::INFO_());
     log_lgbl_str();
-    expect(chucho::level::INFO_(), lgbl_wrt_);
+    expect(chucho::level::INFO_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, trace)
@@ -450,7 +625,15 @@ TEST_F(log_macro, trace)
     SCOPED_TRACE("trace");
     lgr_->set_level(chucho::level::TRACE_());
     log();
-    expect(chucho::level::TRACE_(), wrt_);
+    expect(chucho::level::TRACE_(), expected_logger::EXPLICIT);
+}
+
+TEST_F(log_macro, trace_l)
+{
+    SCOPED_TRACE("trace_l");
+    get_logger()->set_level(chucho::level::TRACE_());
+    log_l();
+    expect(chucho::level::TRACE_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, trace_lgbl)
@@ -458,7 +641,7 @@ TEST_F(log_macro, trace_lgbl)
     SCOPED_TRACE("trace_lgbl");
     get_logger()->set_level(chucho::level::TRACE_());
     log_lgbl();
-    expect(chucho::level::TRACE_(), lgbl_wrt_);
+    expect(chucho::level::TRACE_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, trace_marker)
@@ -466,7 +649,15 @@ TEST_F(log_macro, trace_marker)
     SCOPED_TRACE("trace_marker");
     lgr_->set_level(chucho::level::TRACE_());
     log_marker();
-    expect(chucho::level::TRACE_(), wrt_, MARK);
+    expect(chucho::level::TRACE_(), expected_logger::EXPLICIT, MARK);
+}
+
+TEST_F(log_macro, trace_l_marker)
+{
+    SCOPED_TRACE("trace_l_marker");
+    get_logger()->set_level(chucho::level::TRACE_());
+    log_l_marker();
+    expect(chucho::level::TRACE_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, trace_lgbl_marker)
@@ -474,7 +665,7 @@ TEST_F(log_macro, trace_lgbl_marker)
     SCOPED_TRACE("trace_lgbl_marker");
     get_logger()->set_level(chucho::level::TRACE_());
     log_lgbl_marker();
-    expect(chucho::level::TRACE_(), lgbl_wrt_, MARK);
+    expect(chucho::level::TRACE_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, trace_marker_str)
@@ -482,7 +673,15 @@ TEST_F(log_macro, trace_marker_str)
     SCOPED_TRACE("trace_marker_str");
     lgr_->set_level(chucho::level::TRACE_());
     log_marker_str();
-    expect(chucho::level::TRACE_(), wrt_, MARK);
+    expect(chucho::level::TRACE_(), expected_logger::EXPLICIT, MARK);
+}
+
+TEST_F(log_macro, trace_l_marker_str)
+{
+    SCOPED_TRACE("trace_l_marker_str");
+    get_logger()->set_level(chucho::level::TRACE_());
+    log_l_marker_str();
+    expect(chucho::level::TRACE_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, trace_lgbl_marker_str)
@@ -490,7 +689,7 @@ TEST_F(log_macro, trace_lgbl_marker_str)
     SCOPED_TRACE("trace_lgbl_marker_str");
     get_logger()->set_level(chucho::level::TRACE_());
     log_lgbl_marker_str();
-    expect(chucho::level::TRACE_(), lgbl_wrt_, MARK);
+    expect(chucho::level::TRACE_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, trace_str)
@@ -498,7 +697,15 @@ TEST_F(log_macro, trace_str)
     SCOPED_TRACE("trace_str");
     lgr_->set_level(chucho::level::TRACE_());
     log_str();
-    expect(chucho::level::TRACE_(), wrt_);
+    expect(chucho::level::TRACE_(), expected_logger::EXPLICIT);
+}
+
+TEST_F(log_macro, trace_l_str)
+{
+    SCOPED_TRACE("trace_l_str");
+    get_logger()->set_level(chucho::level::TRACE_());
+    log_l_str();
+    expect(chucho::level::TRACE_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, trace_lgbl_str)
@@ -506,7 +713,7 @@ TEST_F(log_macro, trace_lgbl_str)
     SCOPED_TRACE("trace_lgbl_str");
     get_logger()->set_level(chucho::level::TRACE_());
     log_lgbl_str();
-    expect(chucho::level::TRACE_(), lgbl_wrt_);
+    expect(chucho::level::TRACE_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, warn)
@@ -514,7 +721,15 @@ TEST_F(log_macro, warn)
     SCOPED_TRACE("warn");
     lgr_->set_level(chucho::level::WARN_());
     log();
-    expect(chucho::level::WARN_(), wrt_);
+    expect(chucho::level::WARN_(), expected_logger::EXPLICIT);
+}
+
+TEST_F(log_macro, warn_l)
+{
+    SCOPED_TRACE("warn_l");
+    get_logger()->set_level(chucho::level::WARN_());
+    log_l();
+    expect(chucho::level::WARN_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, warn_lgbl)
@@ -522,7 +737,7 @@ TEST_F(log_macro, warn_lgbl)
     SCOPED_TRACE("warn_lgbl");
     get_logger()->set_level(chucho::level::WARN_());
     log_lgbl();
-    expect(chucho::level::WARN_(), lgbl_wrt_);
+    expect(chucho::level::WARN_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, warn_marker)
@@ -530,7 +745,15 @@ TEST_F(log_macro, warn_marker)
     SCOPED_TRACE("warn_marker");
     lgr_->set_level(chucho::level::WARN_());
     log_marker();
-    expect(chucho::level::WARN_(), wrt_, MARK);
+    expect(chucho::level::WARN_(), expected_logger::EXPLICIT, MARK);
+}
+
+TEST_F(log_macro, warn_l_marker)
+{
+    SCOPED_TRACE("warn_l_marker");
+    get_logger()->set_level(chucho::level::WARN_());
+    log_l_marker();
+    expect(chucho::level::WARN_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, warn_lgbl_marker)
@@ -538,7 +761,7 @@ TEST_F(log_macro, warn_lgbl_marker)
     SCOPED_TRACE("warn_lgbl_marker");
     get_logger()->set_level(chucho::level::WARN_());
     log_lgbl_marker();
-    expect(chucho::level::WARN_(), lgbl_wrt_, MARK);
+    expect(chucho::level::WARN_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, warn_marker_str)
@@ -546,7 +769,15 @@ TEST_F(log_macro, warn_marker_str)
     SCOPED_TRACE("warn_marker_str");
     lgr_->set_level(chucho::level::WARN_());
     log_marker_str();
-    expect(chucho::level::WARN_(), wrt_, MARK);
+    expect(chucho::level::WARN_(), expected_logger::EXPLICIT, MARK);
+}
+
+TEST_F(log_macro, warn_l_marker_str)
+{
+    SCOPED_TRACE("warn_l_marker_str");
+    get_logger()->set_level(chucho::level::WARN_());
+    log_l_marker_str();
+    expect(chucho::level::WARN_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, warn_lgbl_marker_str)
@@ -554,7 +785,7 @@ TEST_F(log_macro, warn_lgbl_marker_str)
     SCOPED_TRACE("warn_lgbl_marker_str");
     get_logger()->set_level(chucho::level::WARN_());
     log_lgbl_marker_str();
-    expect(chucho::level::WARN_(), lgbl_wrt_, MARK);
+    expect(chucho::level::WARN_(), expected_logger::INTRINSIC, MARK);
 }
 
 TEST_F(log_macro, warn_str)
@@ -562,7 +793,15 @@ TEST_F(log_macro, warn_str)
     SCOPED_TRACE("warn_str");
     lgr_->set_level(chucho::level::WARN_());
     log_str();
-    expect(chucho::level::WARN_(), wrt_);
+    expect(chucho::level::WARN_(), expected_logger::EXPLICIT);
+}
+
+TEST_F(log_macro, warn_l_str)
+{
+    SCOPED_TRACE("warn_l_str");
+    get_logger()->set_level(chucho::level::WARN_());
+    log_l_str();
+    expect(chucho::level::WARN_(), expected_logger::INTRINSIC);
 }
 
 TEST_F(log_macro, warn_lgbl_str)
@@ -570,5 +809,5 @@ TEST_F(log_macro, warn_lgbl_str)
     SCOPED_TRACE("warn_lgbl_str");
     get_logger()->set_level(chucho::level::WARN_());
     log_lgbl_str();
-    expect(chucho::level::WARN_(), lgbl_wrt_);
+    expect(chucho::level::WARN_(), expected_logger::INTRINSIC);
 }

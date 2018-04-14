@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -64,8 +64,10 @@ VALUE report_exception(VALUE rprt, VALUE except)
 namespace chucho
 {
 
-ruby_evaluator_filter::ruby_evaluator_filter(const std::string& expression)
-    : expression_(expression)
+ruby_evaluator_filter::ruby_evaluator_filter(const std::string& name,
+                                             const std::string& expression)
+    : evaluator_filter(name),
+      expression_(expression)
 {
 }
 

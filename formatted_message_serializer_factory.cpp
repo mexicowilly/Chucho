@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,17 +26,17 @@ formatted_message_serializer_factory::formatted_message_serializer_factory()
     set_status_origin("formatted_message_serializer_factory");
 }
 
-std::shared_ptr<configurable> formatted_message_serializer_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> formatted_message_serializer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    std::shared_ptr<configurable> cnf(new formatted_message_serializer());
+    auto cnf = std::make_unique<formatted_message_serializer>();
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
-    return cnf;
+    return std::move(cnf);
 }
 
-std::shared_ptr<memento> formatted_message_serializer_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> formatted_message_serializer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto(new memento(cfg));
-    return mnto;
+    auto mnto = std::make_unique<memento>(cfg);
+    return std::move(mnto);
 }
 
 }

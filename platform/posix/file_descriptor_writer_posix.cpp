@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,21 +24,18 @@
 namespace chucho
 {
 
-file_descriptor_writer::file_descriptor_writer(std::shared_ptr<formatter> fmt,
+file_descriptor_writer::file_descriptor_writer(const std::string& name,
+                                               std::unique_ptr<formatter>&& fmt,
                                                bool flsh)
-    : writer(fmt),
-      num_(0),
-      fd_(-1),
-      flush_(flsh),
-      allow_close_(true)
+    : file_descriptor_writer(name, std::move(fmt), -1, flsh)
 {
-    set_status_origin("file_descriptor_writer");
 }
 
-file_descriptor_writer::file_descriptor_writer(std::shared_ptr<formatter> fmt,
+file_descriptor_writer::file_descriptor_writer(const std::string& name,
+                                               std::unique_ptr<formatter>&& fmt,
                                                int fd,
                                                bool flsh)
-    : writer(fmt),
+    : writer(name, std::move(fmt)),
       num_(0),
       fd_(fd),
       flush_(flsh),

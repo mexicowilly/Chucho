@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,14 +21,18 @@ namespace chucho
 
 garbage_cleaner::~garbage_cleaner()
 {
-    for (auto cln : cleaners_)
-        cln();
+    std::lock_guard<std::mutex> lg(guard_);
+    while (!cleaners_.empty())
+    {
+        cleaners_.top()();
+        cleaners_.pop();
+    }
 }
 
 void garbage_cleaner::add(cleaner_type cln)
 {
     std::lock_guard<std::mutex> lg(guard_);
-    cleaners_.push_back(cln);
+    cleaners_.push(cln);
 }
 
 garbage_cleaner& garbage_cleaner::get()

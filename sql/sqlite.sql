@@ -1,5 +1,5 @@
 -- 
---  Copyright 2013-2017 Will Mason
+--  Copyright 2013-2018 Will Mason
 --  
 --     Licensed under the Apache License, Version 2.0 (the "License");
 --     you may not use this file except in compliance with the License.
@@ -23,13 +23,15 @@ CREATE TABLE chucho_event
 (
    event_id INTEGER PRIMARY KEY AUTOINCREMENT,
    formatted_message TEXT NOT NULL,
-   timestamp INTEGER NOT NULL,
+   timestmp INTEGER NOT NULL,
    file_name TEXT NOT NULL,
    line_number INTEGER NOT NULL,
    function_name TEXT NOT NULL,
    logger TEXT NOT NULL,
    level_name TEXT NOT NULL,
    marker TEXT,
-   thread TEXT NOT NULL
+   thread TEXT NOT NULL,
+   host_name TEXT NOT NULL,
+   process_id INTEGER NOT NULL
 );
 COMMIT;

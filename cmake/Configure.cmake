@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2017 Will Mason
+# Copyright 2013-2018 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -64,8 +64,10 @@ ENDIF()
 MESSAGE(STATUS "Build type -- ${CMAKE_BUILD_TYPE}")
 
 # Standards
-SET(CMAKE_CXX_STANDARD 11)
-SET(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+IF(NOT CMAKE_CXX_COMPILER_ID STREQUAL SunPro)
+    SET(CMAKE_CXX_STANDARD 14)
+    SET(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+ENDIF()
 SET(CMAKE_C_STANDARD 99)
 SET(CMAKE_C_STANDARD_REQUIRED TRUE)
 
@@ -114,17 +116,14 @@ ELSEIF(MSVC)
     IF(ENABLE_SHARED)
         SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4275 /EHsc")
     ENDIF()
+    ADD_DEFINITIONS(-DNOMINMAX)
 ELSEIF(CMAKE_CXX_COMPILER_ID STREQUAL SunPro)
-    IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.14.0)
-        MESSAGE(FATAL_ERROR "CC version 5.14.0 or later is required (the compiler that ships with Solaris Studio 12.5)")
+    IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.15.0)
+        MESSAGE(FATAL_ERROR "CC version 5.15.0 or later is required")
     ENDIF()
-    # CMake is supposed to do this with the standards flags. Jul 15 2017
-    CHECK_CXX_COMPILER_FLAG(-std=c++11 CHUCHO_HAVE_CXX11)
-    IF(CHUCHO_HAVE_CXX11)
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-    ELSE()
-        MESSAGE(FATAL_ERROR "-std=c++11 is required")
-    ENDIF()
+    # Set the flag unconditionally because of weirdness with setting
+    # the CXX standard to 14.
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
     CHECK_CXX_COMPILER_FLAG(-errtags=yes CHUCHO_HAVE_ERRTAGS)
     IF(CHUCHO_HAVE_ERRTAGS)
         SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -errtags=yes")
@@ -147,6 +146,7 @@ ELSEIF(CMAKE_CXX_COMPILER_ID STREQUAL SunPro)
     ELSE()
         MESSAGE(FATAL_ERROR "-erroff=${CHUCHO_SUNPRO_DISABLED_WARNINGS} is required")
     ENDIF()
+    ADD_DEFINITIONS(-D_POSIX_PTHREAD_SEMANTICS)
 ENDIF()
 
 # We are building Chucho
@@ -167,10 +167,7 @@ ELSE()
     SET(CHUCHO_STATIC TRUE)
 ENDIF()
 MAKE_DIRECTORY("${CMAKE_BINARY_DIR}/chucho")
-CONFIGURE_FILE(include/chucho/export.hpp.in "${CMAKE_BINARY_DIR}/chucho/export.hpp")
-IF(C_API)
-    CONFIGURE_FILE(include/chucho/export.hpp.in "${CMAKE_BINARY_DIR}/chucho/export.h")
-ENDIF()
+CONFIGURE_FILE(include/chucho/export.h.in "${CMAKE_BINARY_DIR}/chucho/export.h")
 
 # Configure our version header
 STRING(REGEX REPLACE "^([0-9]+)\\..+$" "\\1" CHUCHO_VERSION_MAJOR ${CHUCHO_VERSION})
@@ -195,7 +192,7 @@ FIND_PACKAGE(Threads REQUIRED)
 # Now do platform checks
 IF(CHUCHO_POSIX)
     # headers
-    FOREACH(HEAD arpa/inet.h assert.h fcntl.h limits.h netdb.h poll.h pthread.h signal.h
+    FOREACH(HEAD assert.h fcntl.h limits.h netdb.h pthread.h signal.h pwd.h
                  sys/socket.h sys/stat.h sys/utsname.h syslog.h time.h unistd.h)
         STRING(REPLACE . _ CHUCHO_HEAD_VAR_NAME CHUCHO_HAVE_${HEAD})
         STRING(REPLACE / _ CHUCHO_HEAD_VAR_NAME ${CHUCHO_HEAD_VAR_NAME})
@@ -205,6 +202,9 @@ IF(CHUCHO_POSIX)
             MESSAGE(FATAL_ERROR "The header ${HEAD} is required")
         ENDIF()
     ENDFOREACH()
+
+    # getpwuid_r
+    CHUCHO_REQUIRE_SYMBOLS(pwd.h getpwuid_r)
 
     # host name functions
     CHUCHO_REQUIRE_SYMBOLS(sys/utsname.h uname)
@@ -252,11 +252,11 @@ IF(CHUCHO_POSIX)
     # realpath
     CHUCHO_REQUIRE_SYMBOLS(stdlib.h realpath)
 
-    # getaddrinfo/freeaddrinfo/gai_strerror/getnameinfo
+    # getaddrinfo/freeaddrinfo/gai_strerror
     IF(CHUCHO_SOLARIS)
         SET(CMAKE_REQUIRED_LIBRARIES socket nsl)
     ENDIF()
-    CHUCHO_REQUIRE_SYMBOLS(netdb.h getaddrinfo freeaddrinfo gai_strerror getnameinfo)
+    CHUCHO_REQUIRE_SYMBOLS(netdb.h getaddrinfo freeaddrinfo gai_strerror)
     IF(CHUCHO_SOLARIS)
         UNSET(CMAKE_REQUIRED_LIBRARIES)
     ENDIF()
@@ -264,28 +264,8 @@ IF(CHUCHO_POSIX)
     # syslog
     CHUCHO_REQUIRE_SYMBOLS(syslog.h syslog)
 
-    # socket/sendto/connect/shutdown/send
-    IF(CHUCHO_SOLARIS)
-        SET(CMAKE_REQUIRED_LIBRARIES socket)
-    ENDIF()
-    CHUCHO_REQUIRE_SYMBOLS(sys/socket.h socket sendto connect shutdown send)
-    IF(CHUCHO_SOLARIS)
-        UNSET(CMAKE_REQUIRED_LIBRARIES)
-    ENDIF()
-
-    # poll
-    CHUCHO_REQUIRE_SYMBOLS(poll.h poll)
-
-    # signal stuff
-    SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
-    CHUCHO_REQUIRE_SYMBOLS(signal.h sigemptyset sigwait sigpending sigismember pthread_sigmask)
-    UNSET(CMAKE_REQUIRED_LIBRARIES)
-
     # open/fcntl
     CHUCHO_REQUIRE_SYMBOLS(fcntl.h open fcntl)
-
-    # htonl
-    CHUCHO_REQUIRE_SYMBOLS(arpa/inet.h htonl)
 
     # timegm
     CHECK_CXX_SYMBOL_EXISTS(timegm time.h CHUCHO_HAVE_TIMEGM)
@@ -323,25 +303,6 @@ IF(CHUCHO_POSIX)
     ENDIF()
     CHECK_CXX_SYMBOL_EXISTS(O_LARGEFILE fcntl.h CHUCHO_HAVE_O_LARGEFILE)
 
-    IF(CHUCHOD)
-        CHECK_INCLUDE_FILE_CXX(pwd.h CHUCHO_HAVE_PWD_H)
-        IF(NOT ${CHUCHO_HAVE_PWD_H})
-            MESSAGE(FATAL_ERROR "The header pwd.h is required")
-        ENDIF()
-        CHUCHO_REQUIRE_SYMBOLS(unistd.h getuid fork setsid dup2 chdir _exit)
-        IF(CHUCHO_SOLARIS)
-            SET(CMAKE_REQUIRED_LIBRARIES socket)
-        ENDIF()
-        CHUCHO_REQUIRE_SYMBOLS(sys/socket.h recv bind listen accept)
-        IF(CHUCHO_SOLARIS)
-            UNSET(CMAKE_REQUIRED_LIBRARIES)
-        ENDIF()
-        CHUCHO_REQUIRE_SYMBOLS(pwd.h getpwuid)
-        SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
-        CHUCHO_REQUIRE_SYMBOLS(signal.h raise sigaddset sigaction kill)
-        UNSET(CMAKE_REQUIRED_LIBRARIES)
-    ENDIF()
-
     # Doors
     IF(CHUCHO_SOLARIS)
         CHECK_INCLUDE_FILE_CXX(door.h CHUCHO_HAVE_DOOR_H)
@@ -350,6 +311,65 @@ IF(CHUCHO_POSIX)
             CHUCHO_REQUIRE_SYMBOLS(stropts.h fattach)
             SET(CHUCHO_HAVE_DOORS TRUE CACHE INTERNAL "Whether we have doors")
         ENDIF()
+    ENDIF()
+
+    # On Solaris we don't get the transitive linkage
+    # to the C++ runtime when linking a C program against a Chucho
+    # shared object. So, we need to figure out where the C++
+    # runtime is and add it to the target link libraries of the
+    # C unit test app.
+    IF(CHUCHO_SOLARIS AND NOT DEFINED CHUCHO_STD_CXX_LIBS)
+        CHUCHO_FIND_PROGRAM(CHUCHO_LDD ldd)
+        IF(NOT CHUCHO_LDD)
+            MESSAGE(FATAL_ERROR "Could not find ldd")
+        ENDIF()
+        MESSAGE(STATUS "Looking for standard C++ libraries")
+        FILE(WRITE "${CMAKE_BINARY_DIR}/libstdc++-check.cpp"
+             "#include <string>\nint main() { std::string s; return 0; }")
+        TRY_COMPILE(CHUCHO_CXX_RESULT
+                    "${CMAKE_BINARY_DIR}/libstdc++-check.out"
+                    "${CMAKE_BINARY_DIR}/libstdc++-check.cpp"
+                    COPY_FILE "${CMAKE_BINARY_DIR}/libstdc++-check")
+        IF(NOT CHUCHO_CXX_RESULT)
+            MESSAGE(FATAL_ERROR "Could not compile the program to find libstdc++")
+        ENDIF()
+        EXECUTE_PROCESS(COMMAND "${CHUCHO_LDD}" "${CMAKE_BINARY_DIR}/libstdc++-check"
+                        RESULT_VARIABLE CHUCHO_LDD_RESULT
+                        OUTPUT_VARIABLE CHUCHO_LDD_OUTPUT)
+        IF(NOT CHUCHO_LDD_RESULT EQUAL 0)
+            MESSAGE(FATAL_ERROR "Error running ldd to find libstdc++")
+        ENDIF()
+        FILE(WRITE "${CMAKE_BINARY_DIR}/libstdc++-check-ldd.out"
+             "${CHUCHO_LDD_OUTPUT}")
+        FILE(STRINGS "${CMAKE_BINARY_DIR}/libstdc++-check-ldd.out" CHUCHO_LDD_OUTPUT)
+        FOREACH(LINE ${CHUCHO_LDD_OUTPUT})
+            IF(LINE MATCHES libstdc)
+                STRING(REGEX REPLACE
+                       "^.+=>[ \\\t]*(.+libstdc.+)$"
+                       "\\1"
+                       CHUCHO_LIBSTDCXX
+                       "${LINE}")
+            ENDIF()
+            IF(LINE MATCHES libCrun)
+                STRING(REGEX REPLACE
+                       "^.+=>[ \\\t]*(.+libCrun.+)$"
+                       "\\1"
+                       CHUCHO_LIBCRUN
+                       "${LINE}")
+            ENDIF()
+            IF(LINE MATCHES libgcc_s)
+                STRING(REGEX REPLACE
+                       "^.+=>[ \\\t]*(.+libgcc_s.+)$"
+                       "\\1"
+                       CHUCHO_LIBGCC_S
+                       "${LINE}")
+            ENDIF()
+        ENDFOREACH()
+        SET(CHUCHO_STD_CXX_LIBS ${CHUCHO_LIBSTDCXX} ${CHUCHO_LIBGCC_S} ${CHUCHO_LIBCRUN} CACHE INTERNAL "The location of the stdandard C++ runtime library")
+        IF(NOT CHUCHO_STD_CXX_LIBS)
+            MESSAGE(WARNING "Could not determine the location of stdandard C++ runtime libraries. The C unit tests cannot be built.")
+        ENDIF()
+        MESSAGE(STATUS "Looking for standard C++ libraries - ${CHUCHO_STD_CXX_LIBS}")
     ENDIF()
 
 ELSEIF(CHUCHO_WINDOWS)
@@ -480,91 +500,6 @@ ENDIF()
 # assert
 CHUCHO_REQUIRE_SYMBOLS(assert.h assert)
 
-# C API required stuff
-IF(C_API)
-    CHECK_C_SOURCE_COMPILES("
-#include <stdio.h>
-#define VA_CHK(...) printf(__VA_ARGS__)
-int main()
-{
-    VA_CHK(\"%s\", \"hello\");
-    return 0;
-}" CHUCHO_HAVE_VA_MACRO)
-    IF(NOT CHUCHO_HAVE_VA_MACRO)
-        MESSAGE(FATAL_ERROR "C macros with variadic arguments are required (standard C99)")
-    ENDIF()
-
-    # C headers
-    # (we already checked for stdlib.h)
-    FOREACH(HEAD stdio.h string.h)
-        CHECK_INCLUDE_FILE(${HEAD} HAVE_${HEAD})
-        IF (NOT HAVE_${HEAD})
-            MESSAGE(FATAL_ERROR "${HEAD} is required")
-        ENDIF()
-    ENDFOREACH()
-
-    # fopen/fgets/fclose/remove
-    CHUCHO_REQUIRE_C_SYMBOLS(stdio.h fopen fgets fclose remove fwrite)
-
-    # strdup/strstr/strcmp
-    CHUCHO_REQUIRE_C_SYMBOLS(string.h strstr strcmp strlen strcpy strcat)
-
-    # calloc/free/malloc
-    CHUCHO_REQUIRE_C_SYMBOLS(stdlib.h calloc free malloc)
-
-    # On Solaris we don't get the transitive linkage
-    # to the C++ runtime when linking a C program against a Chucho
-    # shared object. So, we need to figure out where the C++
-    # runtime is and add it to the target link libraries of the
-    # C unit test app.
-    IF(C_API AND ENABLE_SHARED AND CHUCHO_SOLARIS AND NOT DEFINED CHUCHO_STD_CXX_LIBS)
-        CHUCHO_FIND_PROGRAM(CHUCHO_LDD ldd)
-        IF(NOT CHUCHO_LDD)
-            MESSAGE(FATAL_ERROR "Could not find ldd")
-        ENDIF()
-        MESSAGE(STATUS "Looking for standard C++ libraries")
-        FILE(WRITE "${CMAKE_BINARY_DIR}/libstdc++-check.cpp"
-             "#include <string>\nint main() { std::string s; return 0; }")
-        TRY_COMPILE(CHUCHO_CXX_RESULT
-                    "${CMAKE_BINARY_DIR}/libstdc++-check.out"
-                    "${CMAKE_BINARY_DIR}/libstdc++-check.cpp"
-                    COPY_FILE "${CMAKE_BINARY_DIR}/libstdc++-check")
-        IF(NOT CHUCHO_CXX_RESULT)
-            MESSAGE(FATAL_ERROR "Could not compile the program to find libstdc++")
-        ENDIF()
-        EXECUTE_PROCESS(COMMAND "${CHUCHO_LDD}" "${CMAKE_BINARY_DIR}/libstdc++-check"
-                        RESULT_VARIABLE CHUCHO_LDD_RESULT
-                        OUTPUT_VARIABLE CHUCHO_LDD_OUTPUT)
-        IF(NOT CHUCHO_LDD_RESULT EQUAL 0)
-            MESSAGE(FATAL_ERROR "Error running ldd to find libstdc++")
-        ENDIF()
-        FILE(WRITE "${CMAKE_BINARY_DIR}/libstdc++-check-ldd.out"
-             "${CHUCHO_LDD_OUTPUT}")
-        FILE(STRINGS "${CMAKE_BINARY_DIR}/libstdc++-check-ldd.out" CHUCHO_LDD_OUTPUT)
-        FOREACH(LINE ${CHUCHO_LDD_OUTPUT})
-            IF(LINE MATCHES libstdc)
-                STRING(REGEX REPLACE
-                       "^.+=>[ \\\t]*(.+libstdc.+)$"
-                       "\\1"
-                       CHUCHO_LIBSTDCXX
-                       "${LINE}")
-            ENDIF()
-            IF(LINE MATCHES libCrun)
-                STRING(REGEX REPLACE
-                       "^.+=>[ \\\t]*(.+libCrun.+)$"
-                       "\\1"
-                       CHUCHO_LIBCRUN
-                       "${LINE}")
-            ENDIF()
-        ENDFOREACH()
-        SET(CHUCHO_STD_CXX_LIBS ${CHUCHO_LIBSTDCXX} ${CHUCHO_LIBCRUN} CACHE INTERNAL "The location of the stdandard C++ runtime library")
-        IF(NOT CHUCHO_STD_CXX_LIBS)
-            MESSAGE(WARNING "Could not determine the location of stdandard C++ runtime libraries. The C unit tests cannot be built.")
-        ENDIF()
-        MESSAGE(STATUS "Looking for standard C++ libraries - ${CHUCHO_STD_CXX_LIBS}")
-    ENDIF()
-ENDIF()
-
 # Things Chucho may or may not depend on
 CHUCHO_FIND_PACKAGE(CURL)
 CHUCHO_FIND_PACKAGE(Ruby)
@@ -579,22 +514,7 @@ CHUCHO_FIND_PACKAGE(LibLZMA)
 CHUCHO_FIND_PACKAGE(LibArchive)
 CHUCHO_FIND_PACKAGE(LZ4 INCLUDE lz4.h LIBS lz4 PKG_CONFIG_NAME liblz4 SYMBOLS
     LZ4_compressBound LZ4_compress_default LZ4_decompress_safe)
-CHUCHO_FIND_PACKAGE(SQLITE INCLUDE sqlite3.h LIBS sqlite3 PKG_CONFIG_NAME sqlite3 SYMBOLS
-    sqlite3_threadsafe sqlite3_open sqlite3_prepare_v2 sqlite3_reset sqlite3_bind_text
-    sqlite3_bind_int64 sqlite3_bind_int sqlite3_step sqlite3_finalize sqlite3_close
-    sqlite3_extended_result_codes sqlite3_extended_errcode sqlite3_errmsg)
-CHUCHO_FIND_PACKAGE(ORACLE INCLUDE oci.h LIBS occi clntsh SYMBOLS
-    OCIEnvCreate OCIHandleAlloc OCILogon2 OCIStmtPrepare OCIBindByName
-    OCIStmtExecute OCIHandleFree OCIErrorGet OCIDescriptorAlloc OCIDescriptorFree)
-CHUCHO_FIND_PACKAGE(MYSQL INCLUDE mysql.h LIBS mysqlclient PKG_CONFIG_NAME mysqlclient SYMBOLS
-    mysql_init mysql_real_connect mysql_stmt_init mysql_stmt_prepare mysql_autocommit
-    mysql_stmt_close mysql_close mysql_stmt_bind_param mysql_stmt_execute)
-CHUCHO_FIND_PACKAGE(POSTGRES INCLUDE libpq-fe.h LIBS pq PKG_CONFIG_NAME libpq SYMBOLS
-    PQconnectdb PQprepare PQexecPrepared PQresultStatus PQresultErrorMessage
-    PQclear PQfinish PQstatus PQerrorMessage)
-CHUCHO_FIND_PACKAGE(DB2 INCLUDE sqlcli1.h LIBS db2 SYMBOLS
-    SQLAllocHandle SQLFreeHandle SQLSetEnvAttr SQLConnect SQLBindParameter
-    SQLPrepare SQLExecute SQLDisconnect SQLGetDiagRec)
+CHUCHO_FIND_PACKAGE(SOCI INCLUDE soci/soci.h LIBS soci_core)
 CHUCHO_FIND_PACKAGE(ZEROMQ INCLUDE zmq.h LIBS zmq PKG_CONFIG_NAME libzmq SYMBOLS
     zmq_ctx_new zmq_ctx_destroy zmq_socket zmq_close zmq_connect zmq_msg_send
     zmq_msg_init_size zmq_msg_data zmq_strerror zmq_msg_close zmq_bind)
@@ -605,6 +525,16 @@ CHUCHO_FIND_PACKAGE(RABBITMQ INCLUDE amqp.h LIBS rabbitmq PKG_CONFIG_NAME librab
     amqp_destroy_connection amqp_error_string2 amqp_cstring_bytes amqp_queue_declare
     amqp_basic_consume amqp_consume_message amqp_empty_bytes amqp_empty_table
     amqp_destroy_envelope)
+CHUCHO_FIND_PACKAGE(AWSSDK)
+IF(AWSSDK_FOUND)
+    FIND_LIBRARY(CHUCHO_CRYPTO_LIB crypto)
+    IF(NOT CHUCHO_CRYPTO_LIB)
+        MESSAGE(FATAL_ERROR "AWS SDK requires the crypto library")
+    ENDIF()
+    LIST(APPEND AWSSDK_PLATFORM_DEPS ${CHUCHO_CRYPTO_LIB})
+    SET(AWS_SVCS logs)
+    AWSSDK_DETERMINE_LIBS_TO_LINK(AWS_SVCS AWSSDK_LIBS)
+ENDIF()
 
 # This must appear after the above package searches
 CHUCHO_GENERATE_PKG_CONFIG_FILE()
@@ -614,83 +544,6 @@ FIND_PACKAGE(Doxygen)
 
 # cppcheck
 CHUCHO_FIND_PROGRAM(CHUCHO_CPPCHECK cppcheck)
-
-# Solaris service stuff
-IF(CHUCHO_SOLARIS)
-    CHUCHO_FIND_PROGRAM(CHUCHO_SVCCFG svccfg)
-    IF(NOT CHUCHO_SVCCFG)
-        MESSAGE(FATAL_ERROR "svccfg is required")
-    ENDIF()
-    CHUCHO_FIND_PROGRAM(CHUCHO_SVCADM svcadm)
-    IF(NOT CHUCHO_SVCADM)
-        MESSAGE(FATAL_ERROR "svcadm is required")
-    ENDIF()
-ENDIF()
-
-# Macintosh launchd stuff
-IF(CHUCHO_MACINTOSH)
-    CHUCHO_FIND_PROGRAM(CHUCHO_LAUNCHCTL launchctl)
-    IF(NOT CHUCHO_LAUNCHCTL)
-        MESSAGE(FATAL_ERROR "launchctl is required")
-    ENDIF()
-    IF(INSTALL_SERVICE)
-        CHUCHO_REQUIRE_SYMBOLS(sys/event.h kqueue kevent EV_SET EVFILT_READ EV_ADD)
-        CHUCHO_REQUIRE_SYMBOLS(launch.h launch_data_new_string LAUNCH_KEY_CHECKIN
-                               launch_msg launch_data_free launch_data_get_type launch_data_get_errno
-                               launch_data_dict_lookup LAUNCH_JOBKEY_SOCKETS launch_data_array_get_count
-                               launch_data_array_get_index launch_data_get_fd)
-        SET(CMAKE_EXTRA_INCLUDE_FILES launch.h)
-        CHECK_TYPE_SIZE(launch_data_t CHUCHO_LAUNCH_DATA_T_SIZE)
-        IF(CHUCHO_LAUNCH_DATA_T_SIZE STREQUAL "")
-            MESSAGE(FATAL_ERROR "The launch_data_t type could not be found")
-        ENDIF()
-        UNSET(CMAKE_EXTRA_INCLUDE_FILES)
-    ENDIF()
-ENDIF()
-
-# Linux service stuff
-IF(CHUCHO_LINUX)
-    CHUCHO_FIND_PROGRAM(CHUCHO_INIT init)
-    IF(CHUCHO_INIT)
-        EXECUTE_PROCESS(COMMAND "${CHUCHO_INIT}" --version
-                        OUTPUT_VARIABLE CHUCHO_INIT_OUT
-                        ERROR_QUIET)
-    ENDIF()
-    IF(CHUCHO_INIT_OUT AND CHUCHO_INIT_OUT MATCHES upstart)
-        CHUCHO_FIND_PROGRAM(CHUCHO_INITCTL initctl)
-        IF(CHUCHO_INITCTL)
-            MESSAGE(STATUS "This Linux is using the Upstart init system")
-            SET(CHUCHO_UPSTART_INIT TRUE)
-        ELSE()
-            MESSAGE(WARNING "initctl is required when using the Upstart init system. The chuchod service will not be installed.")
-        ENDIF()
-    ELSE()
-        CHUCHO_FIND_PROGRAM(CHUCHO_SYSTEMCTL systemctl)
-        IF(CHUCHO_SYSTEMCTL)
-            EXECUTE_PROCESS(COMMAND "${CHUCHO_SYSTEMCTL}"
-                            OUTPUT_VARIABLE CHUCHO_SYSTEMCTL_OUT
-                            ERROR_QUIET)
-            IF(CHUCHO_SYSTEMCTL_OUT AND CHUCHO_SYSTEMCTL_OUT MATCHES "-\\.mount")
-                MESSAGE(STATUS "This Linux is using the systemd init system")
-                SET(CHUCHO_SYSTEMD_INIT TRUE)
-            ELSE()
-                MESSAGE(WARNING "systemctl is required when using the systemd init system. The chuchod service will not be installed.")
-            ENDIF()
-        ELSE()
-            MESSAGE(STATUS "Chucho only supports the Upstart and systemd init systems on Linux.")
-        ENDIF()
-    ENDIF()
-ENDIF()
-
-# BSD service stuff
-IF(CHUCHO_BSD AND EXISTS /etc/rc AND EXISTS /etc/rc.conf AND EXISTS /etc/rc.subr AND IS_DIRECTORY /etc/rc.d)
-    CHUCHO_FIND_PROGRAM(CHUCHO_SED sed)
-    IF(NOT CHUCHO_SED)
-        MESSAGE(FATAL_ERROR "sed is required when using the rc.d init system")
-    ENDIF()
-    MESSAGE(STATUS "This ${CMAKE_SYSTEM_NAME} is using the rc.d init system")
-    SET(CHUCHO_RC_INIT TRUE)
-ENDIF()
 
 #
 # External projects
@@ -733,6 +586,11 @@ ExternalProject_Add(gtest-external
                     ${CHUCHO_GTEST_PACKAGE_ARGS}
                     CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} ${CHUCHO_ADDL_GTEST_CXX_FLAGS}" -DBUILD_GTEST=ON -DBUILD_GMOCK=OFF "-DCMAKE_INSTALL_PREFIX=${CHUCHO_EXTERNAL_PREFIX}" ${CHUCHO_GTEST_CMAKE_FLAGS}
                     CMAKE_GENERATOR "${CHUCHO_GTEST_GENERATOR}")
+IF(MSVC)
+    ExternalProject_Add_Step(gtest-external patch-for-msvc
+                             DEPENDEES download DEPENDERS configure
+                             COMMAND "${CMAKE_COMMAND}" -DFILE_NAME=<SOURCE_DIR>/googletest/cmake/internal_utils.cmake -P "${CMAKE_SOURCE_DIR}/cmake/UpdateGtestForMsvc.cmake")
+ENDIF()
 ADD_LIBRARY(gtest STATIC IMPORTED)
 IF(CHUCHO_WINDOWS)
     SET_TARGET_PROPERTIES(gtest PROPERTIES

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,15 +15,54 @@
  */
 
 #include <chucho/text_util.hpp>
-#include <cctype>
+#include <chucho/exception.hpp>
 #include <algorithm>
 #include <iterator>
+#include <sstream>
+#include <cctype>
 
 namespace chucho
 {
 
 namespace text_util
 {
+
+std::uintmax_t parse_byte_size(const std::string& spec)
+{
+    if (spec.empty() || !std::isdigit(spec[0]))
+        throw exception("The size specification must start with a digit");
+    std::istringstream stream(spec);
+    std::uintmax_t tmp;
+    stream >> tmp;
+    std::string suffix;
+    stream >> suffix;
+    if (!suffix.empty())
+    {
+        std::string lower = to_lower(suffix);
+        if (lower.length() > 2 ||
+            (lower.length() == 2 && lower[1] != 'b') ||
+            (lower.length() == 2 && lower[0] == 'b') ||
+            (std::string("bkmg").find(lower[0]) == std::string::npos))
+        {
+            throw exception("The suffix '" + suffix + "' is invalid (case-insensitive b, k[b], m[b], g[b])");
+        }
+        switch (lower[0])
+        {
+            case 'b':
+                break;
+            case 'k':
+                tmp *= 1024;
+                break;
+            case 'm':
+                tmp *= 1024 * 1024;
+                break;
+            case 'g':
+                tmp *= 1024 * 1024 * 1024;
+                break;
+        }
+    }
+    return tmp;
+}
 
 std::string to_lower(const std::string& text)
 {

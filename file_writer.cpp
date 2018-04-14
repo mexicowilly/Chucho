@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -31,10 +31,11 @@ inline int to_int(chucho::file::writeability val)
 namespace chucho
 {
 
-file_writer::file_writer(std::shared_ptr<formatter> fmt,
+file_writer::file_writer(const std::string& name,
+                         std::unique_ptr<formatter>&& fmt,
                          on_start start,
                          bool flsh)
-    : file_descriptor_writer(fmt, flsh),
+    : file_descriptor_writer(name, std::move(fmt), flsh),
       start_(start),
       next_access_check_(std::chrono::steady_clock::now()),
       is_open_(false),
@@ -44,11 +45,12 @@ file_writer::file_writer(std::shared_ptr<formatter> fmt,
     set_status_origin("file_writer");
 }
 
-file_writer::file_writer(std::shared_ptr<formatter> fmt,
+file_writer::file_writer(const std::string& name,
+                         std::unique_ptr<formatter>&& fmt,
                          const std::string& file_name,
                          on_start start,
                          bool flsh)
-    : file_descriptor_writer(fmt, flsh),
+    : file_descriptor_writer(name, std::move(fmt), flsh),
       initial_file_name_(file_name),
       start_(start),
       next_access_check_(std::chrono::steady_clock::now()),

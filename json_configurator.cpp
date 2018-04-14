@@ -1,11 +1,28 @@
+/*
+ * Copyright 2013-2018 Will Mason
+ * 
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 #include <chucho/json_configurator.hpp>
 #include <cstring>
 #include <algorithm>
+#include <sstream>
 
 namespace chucho
 {
 
-json_configurator::json_configurator(const security_policy& sec_pol)
+json_configurator::json_configurator(security_policy& sec_pol)
     : configurator(sec_pol)
 {
     set_status_origin("json_configurator");
@@ -32,7 +49,7 @@ void json_configurator::configure(std::istream& in)
     } sent(json);
     f.reset();
     auto cl = cJSON_GetObjectItemCaseSensitive(json, "chucho_loggers");
-    if (json == nullptr)
+    if (cl == nullptr)
         throw std::runtime_error("Could not find \"chucho_loggers\" element in the JSON configuration");
     auto lgr_fact = get_factory("chucho::logger");
     auto jlgr = cl->child;
@@ -65,21 +82,21 @@ void json_configurator::configure(std::istream& in)
     }
 }
 
-std::shared_ptr<configurable> json_configurator::create_subobject(const cJSON* json,
+std::unique_ptr<configurable> json_configurator::create_subobject(const cJSON* json,
                                                                   std::shared_ptr<configurable_factory> fact)
 {
     auto facts = get_factories();
-    auto mnto = fact->create_memento(*this);
+    auto mnto = std::move(fact->create_memento(*this));
     while (json != nullptr)
     {
         auto found = facts.find(json->string);
         if (found == facts.end())
             mnto->handle(json->string, value_to_text(json));
         else
-            mnto->handle(create_subobject(json->child, found->second));
+            mnto->handle(std::move(create_subobject(json->child, found->second)));
         json = json->next;
     }
-    return fact->create_configurable(mnto);
+    return std::move(fact->create_configurable(mnto));
 }
 
 std::shared_ptr<configurable_factory> json_configurator::get_factory(const char* const str)

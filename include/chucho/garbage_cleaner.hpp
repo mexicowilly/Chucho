@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #endif
 
 #include <functional>
-#include <vector>
+#include <stack>
 #include <mutex>
 
 namespace chucho
@@ -40,7 +40,7 @@ public:
     void add(cleaner_type cln);
 
 private:
-    std::vector<cleaner_type> cleaners_;
+    std::stack<cleaner_type> cleaners_;
     std::mutex guard_;
 };
 

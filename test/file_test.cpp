@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -38,6 +38,38 @@ TEST(file_test, base_name)
 #endif
 }
 
+TEST(file_test, directory_iterator)
+{
+    std::string dir_name("directory_iterator_test");
+    ASSERT_NO_THROW(chucho::file::remove_all(dir_name));
+    ASSERT_NO_THROW(chucho::file::create_directory(dir_name));
+    std::ofstream s1(dir_name + chucho::file::dir_sep + "one");
+    ASSERT_TRUE(s1.is_open());
+    s1 << "hi";
+    s1.close();
+    std::ofstream s2(dir_name + chucho::file::dir_sep + "two");
+    ASSERT_TRUE(s2.is_open());
+    s2 << "hi";
+    s2.close();
+    std::ofstream s3(dir_name + chucho::file::dir_sep + "three");
+    ASSERT_TRUE(s3.is_open());
+    s3 << "hi";
+    s3.close();
+    chucho::file::directory_iterator itor(dir_name);
+    chucho::file::directory_iterator end;
+    std::set<std::string> names;
+    while (itor != end)
+    {
+        names.insert(chucho::file::base_name(*itor));
+        ++itor;
+    }
+    EXPECT_EQ(3, names.size());
+    EXPECT_EQ(1, names.count("one"));
+    EXPECT_EQ(1, names.count("two"));
+    EXPECT_EQ(1, names.count("three"));
+    ASSERT_NO_THROW(chucho::file::remove_all(dir_name));
+}
+
 TEST(file_test, directory_name)
 {
     EXPECT_STREQ("/one/two", chucho::file::directory_name("/one/two/three").c_str());
@@ -70,6 +102,12 @@ TEST(file_test, directory_name)
     EXPECT_STREQ("\\", chucho::file::directory_name("\\").c_str());
     EXPECT_STREQ("\\", chucho::file::directory_name("\\\\\\\\\\\\").c_str());
 #endif
+}
+
+TEST(file_test, home)
+{
+    auto h = chucho::file::home_directory();
+    std::cout << "HOME: " << h << std::endl;
 }
 
 TEST(file_test, is_fully_qualified)
@@ -134,3 +172,10 @@ TEST(file_test, size)
     EXPECT_EQ(5, chucho::file::size("file_test_size.txt"));
     ASSERT_NO_THROW(chucho::file::remove("file_test_size.txt"));
 }
+
+TEST(file_test, temp)
+{
+    auto t = chucho::file::temporary_directory();
+    std::cout << "TEMP: " << t << std::endl;
+}
+

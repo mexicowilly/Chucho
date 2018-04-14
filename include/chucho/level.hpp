@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 #if !defined(CHUCHO_LEVEL_HPP__)
 #define CHUCHO_LEVEL_HPP__
 
-#include <chucho/export.hpp>
+#include <chucho/export.h>
 #include <chucho/syslog_constants.hpp>
 #include <ostream>
 #include <memory>

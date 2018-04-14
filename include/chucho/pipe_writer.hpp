@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -54,12 +54,14 @@ public:
     /**
      * Construct a pipe writer. The constructor creates the
      * pipe and attaches itself to the output end.
-     * 
+     *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param flsh whether to flush the buffer after writing
      * each event
      */
-    pipe_writer(std::shared_ptr<formatter> fmt,
+    pipe_writer(const std::string& name,
+                std::unique_ptr<formatter>&& fmt,
                 bool flsh = true);
     /**
      * Destroy the pipe, closing both the input and output

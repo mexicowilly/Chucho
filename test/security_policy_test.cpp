@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ TEST(security_policy, override_integer)
     pol.set_integer("int", 699, 701);
     EXPECT_THROW(pol.validate("int", 700), chucho::exception);
     pol.override_integer("int", 699, 701);
-    int val;
+    std::intmax_t val;
     EXPECT_NO_THROW(val = pol.validate("int", 700));
     EXPECT_EQ(700, val);
 }
@@ -97,7 +97,7 @@ TEST(security_policy, set_integer)
 {
     chucho::security_policy pol;
     pol.set_integer("int", -1, 1);
-    int val;
+    std::intmax_t val;
     EXPECT_NO_THROW(val = pol.validate("int", 0));
     EXPECT_EQ(0, val);
     EXPECT_THROW(pol.validate("int", 700), chucho::exception);
@@ -117,7 +117,7 @@ TEST(security_policy, set_unsigned)
 {
     chucho::security_policy pol;
     pol.set_integer("unsigned", 1U, 3U);
-    unsigned val;
+    std::intmax_t val;
     EXPECT_NO_THROW(val = pol.validate("unsigned", 2));
     EXPECT_EQ(2, val);
     EXPECT_THROW(pol.validate("unsigned", 700), chucho::exception);

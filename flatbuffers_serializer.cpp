@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -53,12 +53,12 @@ std::vector<std::uint8_t> flatbuffers_serializer::finish_blob()
     return result;
 }
 
-void flatbuffers_serializer::serialize(const event& evt, std::shared_ptr<formatter> fmt)
+void flatbuffers_serializer::serialize(const event& evt, formatter& fmt)
 {
     // Strings cannot be created during the time that the builder is active.
     // So, create them before and then start the builder. Flatbuffers gets very
     // angry if you try to nest them.
-    auto msg = handle_->builder.CreateString(utf8::escape_invalid(fmt->format(evt)));
+    auto msg = handle_->builder.CreateString(utf8::escape_invalid(fmt.format(evt)));
     auto fn = handle_->builder.CreateString(utf8::escape_invalid(evt.get_file_name()));
     auto func = handle_->builder.CreateString(utf8::escape_invalid(evt.get_function_name()));
     auto lgr = handle_->builder.CreateString(utf8::escape_invalid(evt.get_logger()->get_name()));

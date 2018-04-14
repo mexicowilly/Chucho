@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ namespace chucho
 {
 
 // TODO: Forward this constructor when Microsoft decides to support that
-numbered_file_roller::numbered_file_roller(int max_index, std::shared_ptr<file_compressor> cmp)
-    : file_roller(cmp),
+numbered_file_roller::numbered_file_roller(int max_index, std::unique_ptr<file_compressor>&& cmp)
+    : file_roller(std::move(cmp)),
       min_index_(1),
       max_index_(max_index)
 {
@@ -35,8 +35,8 @@ numbered_file_roller::numbered_file_roller(int max_index, std::shared_ptr<file_c
         throw std::invalid_argument("numbered_file_roller: min_index must be less than or equal to max_index");
 }
 
-numbered_file_roller::numbered_file_roller(int min_index, int max_index, std::shared_ptr<file_compressor> cmp)
-    : file_roller(cmp),
+numbered_file_roller::numbered_file_roller(int min_index, int max_index, std::unique_ptr<file_compressor>&& cmp)
+    : file_roller(std::move(cmp)),
       min_index_(min_index),
       max_index_(max_index)
 {

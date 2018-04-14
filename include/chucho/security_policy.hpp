@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,10 +24,9 @@
 
 #include <chucho/exception.hpp>
 #include <chucho/optional.hpp>
+#include <chucho/non_copyable.hpp>
 #include <map>
 #include <string>
-#include <sstream>
-#include <memory>
 #include <cstdint>
 
 namespace chucho
@@ -63,14 +62,32 @@ namespace chucho
  * The following is the default security policy. 
  * <table> 
  *     <tr><th>Key</th><th>Value</th></tr>
- *     <tr><td>async_writer::queue_capacity</td>
- *         <td>[10, 32768]</td></tr>
- *     <tr><td>async_writer::queue_capacity(text)</td>
- *         <td>5</td></tr>
- *     <tr><td>async_writer::discard_threshold</td>
+ *     <tr><td>activemq_writer::broker</td>
  *         <td><i>default</i></td></tr>
+ *     <tr><td>activemq_writer::topic_or_queue</td>
+ *         <td><i>default</i></td></tr>
+ *     <tr><td>%activemq_writer::consumer_type</td>
+ *         <td>5</td></tr>
+ *     <tr><td>async_writer::chunk_size</td>
+ *         <td>[1024, 104857600]</td></tr>
+ *     <tr><td>async_writer::chunk_size(text)</td>
+ *         <td>9</td></tr>
  *     <tr><td>async_writer::flush_on_destruct</td>
  *         <td>5</td></tr>
+ *     <tr><td>async_writer::max_chunks</td>
+ *         <td>[2, 1000000]</td></tr>
+ *     <tr><td>async_writer::max_chunks(text)</td>
+ *         <td>7</td></tr>
+ *     <tr><td>cloudwatch_writer::batch_size</td>
+ *         <td>[1, 10000]</td></tr>
+ *     <tr><td>cloudwatch_writer::batch_size(text)</td>
+ *         <td>5</td></tr>
+ *     <tr><td>cloudwatch_writer::log_group</td>
+ *         <td>512</td></tr>
+ *     <tr><td>cloudwatch_writer::log_stream</td>
+ *         <td>512</td></tr>
+ *     <tr><td>database_writer::connection</td>
+ *         <td><i>default</i></td></tr>
  *     <tr><td>email_writer::buffer_size</td>
  *         <td>[1, 65536]</td></tr>
  *     <tr><td>email_writer::buffer_size(text)</td>
@@ -127,30 +144,14 @@ namespace chucho
  *         <td><i>default</i></td></tr>
  *     <tr><td>%logger::writes_to_ancestors</td>
  *         <td>5</td></tr>
+ *     <tr><td>loggly_writer::token</td>
+ *         <td><i>default</i></td></tr>
  *     <tr><td>message_queue_writer::coalesce_max</td>
  *         <td>[0, 10000]</td></tr>
  *     <tr><td>message_queue_writer::coalesce_max(text)</td>
  *         <td>5</td></tr>
- *     <tr><td>mysql_writer::host</td>
- *         <td>253</td></tr>
- *     <tr><td>mysql_writer::user</td>
- *         <td>16</td></tr>
- *     <tr><td>mysql_writer::password</td>
- *         <td><i>default</i></td></tr>
- *     <tr><td>mysql_writer::database</td>
- *         <td>64</td></tr>
- *     <tr><td>mysql_writer::port</td>
- *         <td>[1, 65535]</td></tr>
- *     <tr><td>mysql_writer::port(text)</td>
- *         <td>5</td></tr>
- *     <tr><td>mysql_writer::queue_capacity</td>
- *         <td>[10, 32768]</td></tr>
- *     <tr><td>mysql_writer::queue_capacity(text)</td>
- *         <td>5</td></tr>
- *     <tr><td>mysql_writer::discard_threshold</td>
- *         <td><i>default</i></td></tr>
- *     <tr><td>mysql_writer::flush_on_destruct</td>
- *         <td>5</td></tr>
+ *     <tr><td>nameable::name</td>
+ *         <td>256</td></tr>
  *     <tr><td>%named_pipe_writer::flush</td>
  *         <td>5</td></tr>
  *     <tr><td>named_pipe_writer::name</td>
@@ -163,22 +164,16 @@ namespace chucho
  *         <td>[-1000, 1000]</td></tr>
  *     <tr><td>numbered_file_roller::max_index(text)</td>
  *         <td>5</td></tr>
- *     <tr><td>oracle_writer::user</td>
- *         <td>30</td></tr>
- *     <tr><td>oracle_writer::password</td>
- *         <td>30</td></tr>
- *     <tr><td>oracle_writer::database</td>
- *         <td>512</td></tr>
  *     <tr><td>pattern_formatter::pattern</td>
  *         <td><i>default</i></td></tr>
  *     <tr><td>%pipe_writer::flush</td>
  *         <td>5</td></tr>
- *     <tr><td>postgres_writer::uri</td>
- *         <td>8000</td></tr>
- *     <tr><td>remote_writer::port</td>
- *         <td>[1, 65535]</td></tr>
- *     <tr><td>remote_writer::port(text)</td>
- *         <td>5</td></tr>
+ *     <tr><td>rabbitmq_writer::exchange</td>
+ *         <td><i>default</i></td></tr>
+ *     <tr><td>rabbitmq_writer::routing_key</td>
+ *         <td><i>default</i></td></tr>
+ *     <tr><td>rabbitmq_writer::url</td>
+ *         <td><i>default</i></td></tr>
  *     <tr><td>ruby_evaluator_filter::expression</td>
  *         <td><i>default</i></td></tr>
  *     <tr><td>size_file_roll_trigger::max_size</td>
@@ -193,10 +188,6 @@ namespace chucho
  *         <td>[1, 1000]</td></tr>
  *     <tr><td>sliding_numbered_file_roller::max_count(text)</td>
  *         <td>4</td></tr>
- *     <tr><td>sqlite_writer::file_name</td>
- *         <td><i>default</i></td></tr>
- *     <tr><td>syslog_writer::facility</td>
- *         <td>8</td></tr>
  *     <tr><td>syslog_writer::host_name</td>
  *         <td>253</td></tr>
  *     <tr><td>syslog_writer::port</td>
@@ -213,15 +204,19 @@ namespace chucho
  *         <td><i>default</i></td></tr>
  *     <tr><td>zeromq_writer::prefix</td>
  *         <td><i>default</i></td></tr>
+ *     <tr><td>zlib_compressor::compression_level</td>
+ *         <td>[0, 9]</td></tr>
+ *     <tr><td>zlib_compressor::compression_level(text)</td>
+ *         <td>1</td></tr>
  * </table>
  * 
  * @ingroup miscellaneous
  */
-class CHUCHO_EXPORT security_policy
+class CHUCHO_EXPORT security_policy : non_copyable
 {
 public:
     /**
-     * @name Constructor 
+     * @name Constructor
      * @{ 
      */
     /**
@@ -266,8 +261,7 @@ public:
      * @param low the minimum value of the range
      * @param high the maximum value of the range
      */
-    template <typename val_type>
-    void override_integer(const std::string& key, val_type low, val_type high);
+    void override_integer(const std::string& key, std::intmax_t  low, std::intmax_t high);
     /**
      * Set a text maximum length. This method clobbers any existing 
      * text value for the key. The method @ref set_text will not set
@@ -295,8 +289,7 @@ public:
      * @param low the minimum value of the range
      * @param high the maximum value of the range
      */
-    template <typename val_type>
-    void set_integer(const std::string& key, val_type low, val_type high);
+    void set_integer(const std::string& key, std::intmax_t low, std::intmax_t high);
     /**
      * Set a text maximum length. This method will not replace an 
      * existing maximum length for the key. If you wish to 
@@ -328,37 +321,26 @@ public:
      * @throw exception if the value does not conform to the 
      *        security policy
      */
-    template <typename val_type>
-    val_type validate(const std::string& key, const val_type& val) const;
+    std::intmax_t validate(const std::string& key, const std::intmax_t& val) const;
 
 private:
-    class CHUCHO_NO_EXPORT basic_range
+    class CHUCHO_NO_EXPORT range
     {
     public:
-    	virtual ~basic_range() { };
+        range() = default;
+        range(std::intmax_t low, std::intmax_t high);
 
-        virtual std::pair<std::intmax_t, std::intmax_t> get_range() const = 0;
-        virtual bool in_range(std::uintmax_t val) const = 0;
-        virtual std::string to_text() const = 0;
-    };
-
-    template <typename int_type>
-    class CHUCHO_NO_EXPORT range : public basic_range
-    {
-    public:
-        range(int_type low, int_type high);
-
-        virtual std::pair<std::intmax_t, std::intmax_t> get_range() const override;
-        virtual bool in_range(std::uintmax_t val) const override;
-        virtual std::string to_text() const override;
+        std::pair<std::intmax_t, std::intmax_t> get_range() const;
+        bool in_range(std::intmax_t val) const;
+        std::string to_text() const;
 
     private:
-        int_type low_;
-        int_type high_;
+        std::intmax_t low_{0};
+        std::intmax_t high_{0};
     };
 
+    std::map<std::string, range> int_ranges_;
     std::map<std::string, std::size_t> text_maxes_;
-    std::map<std::string, std::shared_ptr<basic_range>> int_ranges_;
     std::size_t default_text_max_;
 };
 
@@ -367,10 +349,9 @@ inline std::size_t security_policy::get_default_text_max() const
     return default_text_max_;
 }
 
-template <typename val_type>
-void security_policy::override_integer(const std::string& key, val_type low, val_type high)
+inline void security_policy::override_integer(const std::string& key, std::intmax_t low, std::intmax_t high)
 {
-    int_ranges_[key] = std::make_shared<range<val_type>>(low, high);
+    int_ranges_[key] = range(low, high);
 }
 
 inline void security_policy::override_text(const std::string& key, std::size_t max_len)
@@ -383,55 +364,26 @@ inline void security_policy::set_default_text_max(std::size_t dflt)
     default_text_max_ = dflt;
 }
 
-template <typename val_type>
-void security_policy::set_integer(const std::string& key, val_type low, val_type high)
+inline void security_policy::set_integer(const std::string& key, std::intmax_t low, std::intmax_t high)
 {
     if (int_ranges_.count(key) == 0)
         override_integer(key, low, high);
 }
 
-template <typename val_type>
-val_type security_policy::validate(const std::string& key, const val_type& val) const
-{
-    auto found = int_ranges_.find(key);
-    if (found == int_ranges_.end())
-        throw exception("The key " + key + " could not be found in the security policy, so its value cannot be tested");
-    if (!found->second->in_range(val))
-    {
-        std::ostringstream stream;
-        stream << "The value," << val << ", of key, " << key << ", lies outside the range," <<
-            found->second->to_text() << ", permitted by the security policy";
-        throw exception(stream.str());
-    }
-    return val;
-}
-
-template <typename int_type>
-security_policy::range<int_type>::range(int_type low, int_type high)
+inline security_policy::range::range(std::intmax_t low, std::intmax_t high)
     : low_(low),
       high_(high)
 {
 }
 
-template <typename int_type>
-std::pair<std::intmax_t, std::intmax_t> security_policy::range<int_type>::get_range() const
+inline std::pair<std::intmax_t, std::intmax_t> security_policy::range::get_range() const
 {
-    return std::make_pair(static_cast<std::intmax_t>(low_), static_cast<std::intmax_t>(high_));
+    return std::make_pair(low_, high_);
 }
 
-template <typename int_type>
-bool security_policy::range<int_type>::in_range(std::uintmax_t val) const
+inline bool security_policy::range::in_range(std::intmax_t val) const
 {
-    int_type cval = static_cast<int_type>(val);
-    return cval >= low_ && cval <= high_;
-}
-
-template <typename int_type>
-std::string security_policy::range<int_type>::to_text() const
-{
-    std::ostringstream stream;
-    stream << '(' << low_ << ", " << high_ << ')';
-    return stream.str();
+    return val >= low_ && val <= high_;
 }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
  * @ingroup miscellaneous
  */
 
-#include <chucho/export.hpp>
+#include <chucho/export.h>
 #include <bitset>
 
 namespace chucho
@@ -67,6 +67,9 @@ enum feature
     LZMA_COMPRESSION,           /**< LZMA compression */
     LZ4_COMPRESSION,            /**< LZ4 compression */
     FLATBUFFERS_SERIALIZER,     /**< Flatbuffers serialization */
+    LOGGLY_WRITER,              /**< Loggly writer */
+    CLOUDWATCH_WRITER,          /**< AWS Cloudwatch writer */
+    DATABASE_WRITER,            /**< Database writer */
     FEATURE_COUNT               /**< Do not use. This is just so I can know how many there are. */
 };
 

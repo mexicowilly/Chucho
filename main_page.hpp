@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -38,7 +38,14 @@
  * This is the documentation of the Chucho API. For access to 
  * releases, documentation, tickets and source code, please 
  * visit the <a href="https://github.com/mexicowilly/Chucho"
- * target="_blank">project * site</a>.
+ * target="_blank">project site</a>.
+ *
+ * For documentation of how to create a configuration file for
+ * Chucho that will establish the run-time settings, please see
+ * <a href="https://github.com/mexicowilly/Chucho/wiki/Configuration"
+ * target="_blank">configuration documentation</a> and
+ * <a href="https://github.com/mexicowilly/Chucho/wiki/Configuration-Reference"
+ * target="_blank">configuration reference</a>.
  *  
  * Chucho uses the same architecture as <a 
  * href="http://logback.qos.ch/" 
@@ -49,10 +56,10 @@
  * target="_blank">user manual</a>, which is under construction.
  *  
  * @subsection c C API
- * Though the core of Chucho is written in C++11, a wrapping C 
+ * Though the core of Chucho is written in C++14, a wrapping C
  * API is also exposed. This allows Chucho to be used in C 
  * programs and in C++ programs that may be built with a 
- * compiler that cannot build Chucho, such as a non-C++11 
+ * compiler that cannot build Chucho, such as a non-C++14
  * compiler. 
  *  
  * The C API is expressed in header files with the extension @c 
@@ -71,7 +78,7 @@
  * href="https://groups.google.com/forum/?fromgroups#!forum/chucho-logging" 
  * target="_blank">Google group</a>. 
  *  
- * @copyright &copy; 2013-2017 Will Mason
+ * @copyright &copy; 2013-2018 Will Mason
  */
 
 /**
@@ -165,58 +172,8 @@
  */
 
 /**
- * @defgroup c_compressors Compressors 
- * Functions for compressing, used optionally with message queues.
- *  
- * @ingroup c 
- */
-
-/**
  * @defgroup c_configuration Configuration 
  * Functions that help manage the configuration of Chucho.
- *  
- * @ingroup c 
- */
-
-/**
- * @defgroup c_database Database
- * Functions that help manage database writers.
- *  
- * @ingroup c 
- */
-
-/**
- * @defgroup c_email Email
- * Functions that manage email writers.
- * 
- * @ingroup c
- */
-
-/**
- * @defgroup c_fcompressors File Compressors 
- * Functions for compressing rolling files.
- *  
- * @ingroup c 
- */
-
-/**
- * @defgroup c_filters Filters
- * Filters are attached to @ref chucho_writer, and they can be 
- * used to refine log filtering beyond the basic level check. 
- *
- * @ingroup c 
- */
-
-/**
- * @defgroup c_formatters Formatters 
- * @copydoc formatters 
- *  
- * @ingroup c 
- */
-
-/**
- * @defgroup c_levels Levels 
- * @copydoc levels 
  *  
  * @ingroup c 
  */
@@ -229,44 +186,9 @@
  */
 
 /**
- * @defgroup c_mq Message Queues
- * Functions for writing to message queues.
- * 
- * @ingroup c
- */
-
-/**
  * @defgroup c_miscellaneous Miscellaneous 
  * @copydoc miscellaneous 
  *  
  * @ingroup c 
  */
 
-/**
- * @defgroup c_rolling Rolling Files 
- * Types and functions that help with rolling files, writing 
- * rolling files and determining when files should roll. 
- *  
- * @ingroup c 
- */
-
-/**
- * @defgroup c_status Status 
- * @copydoc status 
- *  
- * @ingroup c 
- */
-
-/**
- * @defgroup c_syslog Syslog 
- * Functions and enumerations for writing to syslog. 
- *  
- * @ingroup c 
- */
-
-/**
- * @defgroup c_writers Writers 
- * @copydoc writers 
- *  
- * @ingroup c 
- */

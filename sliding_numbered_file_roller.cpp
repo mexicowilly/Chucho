@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ namespace chucho
 {
 
 sliding_numbered_file_roller::sliding_numbered_file_roller(std::size_t max_count,
-                                                           std::shared_ptr<file_compressor> cmp)
-    : file_roller(cmp),
+                                                           std::unique_ptr<file_compressor>&& cmp)
+    : file_roller(std::move(cmp)),
       max_count_(max_count),
       cur_index_(0),
       min_index_(1)
@@ -34,8 +34,8 @@ sliding_numbered_file_roller::sliding_numbered_file_roller(std::size_t max_count
 
 sliding_numbered_file_roller::sliding_numbered_file_roller(int min_index,
                                                            std::size_t max_count,
-                                                           std::shared_ptr<file_compressor> cmp)
-    : file_roller(cmp),
+                                                           std::unique_ptr<file_compressor>&& cmp)
+    : file_roller(std::move(cmp)),
       max_count_(max_count),
       cur_index_(min_index - 1),
       min_index_(min_index)
@@ -66,7 +66,7 @@ void sliding_numbered_file_roller::roll()
     std::string fn;
     try
     {
-        int cut = ++cur_index_ - max_count_;
+        int cut = static_cast<int>(++cur_index_ - max_count_);
         if (cut >= min_index_ - 1)
         {
             fn = get_file_name(cut, true);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,9 +21,15 @@
 #error "This header is private"
 #endif
 
-#include <chucho/export.hpp>
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
+#include <chucho/export.h>
 #include <string>
 #include <cstdint>
+#include <memory>
 
 namespace chucho
 {
@@ -40,19 +46,56 @@ enum class writeability
     NON_EXISTENT
 };
 
+struct directory_iterator_impl;
+
+class CHUCHO_PRIV_EXPORT directory_iterator : public std::iterator<std::forward_iterator_tag, std::string>
+{
+public:
+    directory_iterator();
+    directory_iterator(const std::string& directory);
+    directory_iterator(const directory_iterator& it) = delete;
+    ~directory_iterator();
+
+    directory_iterator& operator= (const directory_iterator& it) = delete;
+    bool operator== (const directory_iterator& it) const;
+    bool operator!= (const directory_iterator& it) const;
+    directory_iterator& operator++ ();
+    reference operator* ();
+
+private:
+    std::unique_ptr<directory_iterator_impl> pimpl_;
+    std::string cur_;
+};
+
 CHUCHO_PRIV_EXPORT std::string base_name(const std::string& name);
 CHUCHO_PRIV_EXPORT void create_directories(const std::string& name);
 CHUCHO_PRIV_EXPORT void create_directory(const std::string& name);
 CHUCHO_PRIV_EXPORT std::string directory_name(const std::string& name);
 CHUCHO_PRIV_EXPORT bool exists(const std::string& name);
 CHUCHO_PRIV_EXPORT writeability get_writeability(const std::string& name);
+CHUCHO_PRIV_EXPORT std::string home_directory();
 CHUCHO_PRIV_EXPORT bool is_fully_qualified(const std::string& name);
 CHUCHO_PRIV_EXPORT void remove(const std::string& name);
 CHUCHO_PRIV_EXPORT void remove_all(const std::string& name);
 CHUCHO_PRIV_EXPORT std::uintmax_t size(const std::string& name);
+CHUCHO_PRIV_EXPORT std::string temporary_directory();
 
+inline bool directory_iterator::operator!= (const directory_iterator& it) const
+{
+    return !operator==(it);
+}
+
+inline directory_iterator::reference directory_iterator::operator* ()
+{
+    return cur_;
 }
 
 }
+
+}
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

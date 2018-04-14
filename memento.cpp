@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ void memento::handle(const std::string& key, const std::string& value)
         found->second(value);
 }
 
-void memento::handle(std::shared_ptr<configurable> cnf)
+void memento::handle(std::unique_ptr<configurable>&& cnf)
 {
     report_error(demangle::get_demangled_name(typeid(*this)) + " cannot handle a type of " +
         demangle::get_demangled_name(typeid(*cnf)));

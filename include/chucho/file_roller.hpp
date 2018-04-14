@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ public:
     /**
      * Construct a file roller.
      */
-    file_roller(std::shared_ptr<file_compressor> cmp = std::shared_ptr<file_compressor>());
+    file_roller(std::unique_ptr<file_compressor>&& cmp = std::move(std::unique_ptr<file_compressor>()));
     /**
      * Destroy the file roller.
      */
@@ -69,12 +69,13 @@ public:
      */
     virtual std::string get_active_file_name() = 0;
     /**
-     * Return the @ref file_compressor associated with this roller, 
-     * if there is one. 
-     * 
-     * @return the @ref file_compressor
+     * Return the file compressor.
+     *
+     * @post You do not own this pointer.
+     *
+     * @return the file compressor or nullptr
      */
-    std::shared_ptr<file_compressor> get_file_compressor() const;
+    file_compressor* get_file_compressor() const;
     /**
      * Roll the files.
      */
@@ -107,12 +108,12 @@ protected:
      * The @ref file_compressor used by this roller, if there is 
      * one. 
      */
-    std::shared_ptr<file_compressor> compressor_;
+    std::unique_ptr<file_compressor> compressor_;
 };
 
-inline std::shared_ptr<file_compressor> file_roller::get_file_compressor() const
+inline file_compressor* file_roller::get_file_compressor() const
 {
-    return compressor_;
+    return compressor_.get();
 }
 
 }

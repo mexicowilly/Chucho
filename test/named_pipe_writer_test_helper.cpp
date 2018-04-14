@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ int main(int argc, char* argv[])
     {
         if (argc != 3)
             return EXIT_FAILURE;
-        auto fmt = std::make_shared<chucho::pattern_formatter>("%m");
-        auto wrt = std::make_shared<chucho::named_pipe_writer>(fmt, argv[1]);
+        auto fmt = std::make_unique<chucho::pattern_formatter>("%m");
+        auto wrt = std::make_unique<chucho::named_pipe_writer>("named", std::move(fmt), argv[1]);
         std::shared_ptr<chucho::logger> log = chucho::logger::get("named_pipe_writer_test");
         chucho::event evt(log, chucho::level::INFO_(), argv[2], __FILE__, __LINE__, __FUNCTION__);
         wrt->write(evt);

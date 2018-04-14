@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -42,15 +42,19 @@ void warn_error_status_observer::status_reported(const chucho::status& st)
         std::cout << st << std::endl;
 }
 
+}
+
+namespace chucho
+{
+
 struct smgr_wrapper
 {
     smgr_wrapper();
 
-    std::shared_ptr<chucho::status_manager> smgr;
+    chucho::status_manager smgr;
 };
 
 smgr_wrapper::smgr_wrapper()
-    : smgr(new chucho::status_manager())
 {
     chucho::garbage_cleaner::get().add([this] () { delete this; });
 }
@@ -64,11 +68,6 @@ smgr_wrapper& wrap()
     std::call_once(once, [&] () { wrp = new smgr_wrapper(); });
     return *wrp;
 }
-
-}
-
-namespace chucho
-{
 
 status_manager::status_manager()
     : count_(0),
@@ -133,7 +132,7 @@ void status_manager::clear()
     level_ = status::level::INFO_;
 }
 
-std::shared_ptr<status_manager> status_manager::get()
+status_manager& status_manager::get()
 {
     return wrap().smgr;
 }

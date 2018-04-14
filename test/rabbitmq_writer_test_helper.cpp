@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -31,11 +31,15 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     chucho::configuration::set_style(chucho::configuration::style::OFF);
-    auto fmt = std::make_shared<chucho::pattern_formatter>("%m");
-    auto ser = std::make_shared<chucho::formatted_message_serializer>();
+    auto fmt = std::make_unique<chucho::pattern_formatter>("%m");
+    auto ser = std::make_unique<chucho::formatted_message_serializer>();
     try
     {
-        std::unique_ptr<chucho::rabbitmq_writer> wrt(new chucho::rabbitmq_writer(fmt, ser, argv[1], argv[2]));
+        auto wrt = std::make_unique<chucho::rabbitmq_writer>("rabbit",
+                                                             std::move(fmt),
+                                                             std::move(ser),
+                                                             argv[1],
+                                                             argv[2]);
         chucho::event evt(chucho::logger::get("rabbitmq_writer_test"),
                           chucho::level::INFO_(),
                           argv[3],

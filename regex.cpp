@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ iterator::iterator(const std::string& text, expression& re)
           for (unsigned i = 0; i < mch.size(); i++)
           {
               if (mch[i].matched)
-                  match_.subs_.push_back(sub_match(mch.position(i), mch.length(i)));
+                  match_.subs_.push_back(sub_match(static_cast<int>(mch.position(i)), mch.length(i)));
               else
                   match_.subs_.push_back(sub_match(-1, 0));
           }
@@ -159,7 +159,7 @@ iterator& iterator::operator++ ()
         for (unsigned i = 0; i < mch.size(); i++)
         {
             if (mch[i].matched)
-                match_.subs_.push_back(sub_match(mch.position(i), mch.length(i)));
+                match_.subs_.push_back(sub_match(static_cast<int>(mch.position(i)), mch.length(i)));
             else
                 match_.subs_.push_back(sub_match(-1, 0));
         }
@@ -241,7 +241,7 @@ bool search(const std::string& text, expression& re, match& mch)
         for (unsigned i = 0; i < res.size(); i++)
         {
             if (res[i].matched)
-                mch.subs_.push_back(sub_match(res.position(i), res.length(i)));
+                mch.subs_.push_back(sub_match(static_cast<int>(res.position(i)), res.length(i)));
             else
                 mch.subs_.push_back(sub_match(-1, 0));
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,9 +27,9 @@ std::vector<std::uint8_t> formatted_message_serializer::finish_blob()
     return result;
 }
 
-void formatted_message_serializer::serialize(const event& evt, std::shared_ptr<formatter> fmt)
+void formatted_message_serializer::serialize(const event& evt, formatter& fmt)
 {
-    events_ += fmt->format(evt) + line_ending::EOL;
+    events_ += fmt.format(evt) + line_ending::EOL;
 }
 
 }

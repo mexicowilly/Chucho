@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -29,27 +29,30 @@ async_writer_factory::async_writer_factory()
     set_status_origin("async_writer_factory");
 }
 
-std::shared_ptr<configurable> async_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> async_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    auto awm = std::dynamic_pointer_cast<async_writer_memento>(mnto);
-    assert(awm);
-    if (!awm->get_writer())
+    auto awm = dynamic_cast<async_writer_memento*>(mnto.get());
+    assert(awm != nullptr);
+    if (awm->get_name().empty())
+        throw exception("async_writer_factory: The name is not set");
+    auto wrt = std::move(awm->get_writer());
+    if (!wrt)
         throw exception("async_writer: The async writer's writer must be set");
-    std::size_t queue_cap = awm->get_queue_capacity() ?
-        *awm->get_queue_capacity() : async_writer::DEFAULT_QUEUE_CAPACITY;
-    std::shared_ptr<level> dis = awm->get_discard_threshold() ?
-        awm->get_discard_threshold() : level::INFO_();
+    std::size_t chunk_sz = awm->get_chunk_size() ?
+        *awm->get_chunk_size() : async_writer::DEFAULT_CHUNK_SIZE;
+    std::size_t max_ch = awm->get_max_chunks() ?
+        *awm->get_max_chunks() : async_writer::DEFAULT_MAX_CHUNKS;
     bool flsh = awm->get_flush_on_destruct() ?
         *awm->get_flush_on_destruct() : true;
-    auto aw = std::make_shared<async_writer>(awm->get_writer(), queue_cap, dis, flsh);
+    auto aw = std::make_unique<async_writer>(awm->get_name(), std::move(wrt), chunk_sz, max_ch, flsh);
     report_info("Created a " + demangle::get_demangled_name(typeid(*aw)));
-    return aw;
+    return std::move(aw);
 }
 
-std::shared_ptr<memento> async_writer_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> async_writer_factory::create_memento(configurator& cfg)
 {
-    auto mnto = std::make_shared<async_writer_memento>(cfg);
-    return mnto;
+    auto mnto = std::make_unique<async_writer_memento>(cfg);
+    return std::move(mnto);
 }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -65,9 +65,8 @@ public:
      * 
      * @return the instance
      */
-    static std::shared_ptr<status_manager> get();
+    static status_manager& get();
 
-    status_manager();
     /**
      * Add a status entry.
      * 
@@ -120,7 +119,7 @@ public:
      * For example, to print only errors and warnings to stdout, the
      * following code could be used. 
      * @code 
-     * chucho::status_manager::get()->print(std::cout, chucho::status::level::WARNING_); 
+     * chucho::status_manager::get().print(std::cout, chucho::status::level::WARNING_);
      * @endcode 
      * 
      * @param stream the stream to which to print the entries
@@ -135,6 +134,9 @@ public:
     void remove(std::shared_ptr<status_observer> obs);
 
 private:
+    friend struct smgr_wrapper;
+
+    status_manager();
     /**
      * @pre guard_ must be locked
      */

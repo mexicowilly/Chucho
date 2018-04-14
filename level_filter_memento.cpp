@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 
 #include <chucho/level_filter_memento.hpp>
+#include <chucho/level_filter.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/text_util.hpp>
 #include <algorithm>
@@ -23,9 +24,10 @@ namespace chucho
 {
 
 level_filter_memento::level_filter_memento(configurator& cfg, memento_key_set ks)
-    : memento(cfg)
+    : filter_memento(cfg)
 {
     set_status_origin("level_filter_memento");
+    set_default_name(typeid(level_filter));
     cfg.get_security_policy().set_text("level_filter::on_match", 7);
     cfg.get_security_policy().set_text("level_filter::on_mismatch", 7);
     handler lvl_hnd = [this] (const std::string& name) { level_ = level::from_text(validate("level_filter::level", name)); };

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -37,12 +37,13 @@ public:
     //@{
     /**
      * Construct a cout_writer.
-     * 
+     *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @throw std::invalid_argument if fmt is an uninitialized 
-     *        std::shared_ptr
+     *        std::unique_ptr
      */
-    cout_writer(std::shared_ptr<formatter> fmt);
+    cout_writer(const std::string& name, std::unique_ptr<formatter>&& fmt);
     //@}
 };
 

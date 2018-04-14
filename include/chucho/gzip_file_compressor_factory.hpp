@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ class gzip_file_compressor_factory : public file_compressor_factory
 public:
     gzip_file_compressor_factory();
 
-    virtual std::shared_ptr<configurable> create_configurable(std::shared_ptr<memento> mnto) override;
+    virtual std::unique_ptr<configurable> create_configurable(std::unique_ptr<memento>& mnto) override;
 };
 
 }

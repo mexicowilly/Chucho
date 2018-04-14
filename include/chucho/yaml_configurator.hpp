@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ class memento;
 class CHUCHO_PRIV_EXPORT yaml_configurator : public configurator
 {
 public:
-    yaml_configurator(const security_policy& sec_pol);
+    yaml_configurator(security_policy& sec_pol);
 
     virtual void configure(std::istream& in) override;
 
@@ -42,7 +42,7 @@ private:
                 const yaml_node_t& node,
                 int level,
                 const std::string& key,
-                std::shared_ptr<memento> mnto);
+                std::unique_ptr<memento>& mnto);
 };
 
 }

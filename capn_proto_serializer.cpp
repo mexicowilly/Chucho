@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -58,12 +58,12 @@ std::vector<std::uint8_t> capn_proto_serializer::finish_blob()
     return std::vector<std::uint8_t>(bytes.begin(), bytes.end());
 }
 
-void capn_proto_serializer::serialize(const event& evt, std::shared_ptr<formatter> fmt)
+void capn_proto_serializer::serialize(const event& evt, formatter& fmt)
 {
     std::ostringstream tstream;
     tstream << std::this_thread::get_id();
     events_.emplace_back(evt,
-                         utf8::escape_invalid(fmt->format(evt)),
+                         utf8::escape_invalid(fmt.format(evt)),
                          utf8::escape_invalid(tstream.str()));
 }
 

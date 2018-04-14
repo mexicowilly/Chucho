@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ public:
      */
     time_file_roller(const std::string& file_name_pattern,
                      std::size_t max_history,
-                     std::shared_ptr<file_compressor> cmp = std::shared_ptr<file_compressor>());
+                     std::unique_ptr<file_compressor>&& cmp = std::move(std::unique_ptr<file_compressor>()));
     //@}
 
     virtual std::string get_active_file_name() override;

@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2017 Will Mason
+# Copyright 2013-2018 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -16,17 +16,7 @@
 
 IF(MSVC)
     ADD_DEFINITIONS(-D_VARIADIC_MAX=10)
-ENDIF()
-
-IF(C_API)
-    IF(CMAKE_COMPILER_IS_GNUC OR CMAKE_C_COMPILER_ID STREQUAL Clang)
-        INCLUDE(CheckCCompilerFlag)
-        CHECK_C_COMPILER_FLAG(-std=c99 CHUCHO_HAVE_STDC99)
-        IF(NOT CHUCHO_HAVE_STDC99)
-            MESSAGE(FATAL_ERROR "-std=c99 is required")
-        ENDIF()
-        SET(CMAKE_C_FLAGS -std=c99)
-    ENDIF()
+    SET_DIRECTORY_PROPERTIES(PROPERTIES COMPILE_OPTIONS "/wd4996")
 ENDIF()
 
 IF(CHUCHO_POSIX)
@@ -118,24 +108,9 @@ IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
     ENDIF()
 ENDIF()
 
-IF(CHUCHO_HAVE_MYSQL)
-    ADD_DEFINITIONS(-DCHUCHO_HAVE_MYSQL)
-ENDIF()
-
-IF(CHUCHO_HAVE_ORACLE)
-    ADD_DEFINITIONS(-DCHUCHO_HAVE_ORACLE)
-ENDIF()
-
-IF(CHUCHO_HAVE_SQLITE)
-    ADD_DEFINITIONS(-DCHUCHO_HAVE_SQLITE)
-ENDIF()
-
-IF(CHUCHO_HAVE_POSTGRES)
-    ADD_DEFINITIONS(-DCHUCHO_HAVE_POSTGRES)
-ENDIF()
-
-IF(CHUCHO_HAVE_DB2)
-    ADD_DEFINITIONS(-DCHUCHO_HAVE_DB2)
+IF(CHUCHO_HAVE_SOCI)
+    LIST(APPEND CHUCHO_TEST_DB_SOURCES database_writer_test.cpp)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_SOCI)
 ENDIF()
 
 IF(RUBY_FOUND)
@@ -144,7 +119,7 @@ IF(RUBY_FOUND)
 ENDIF()
 
 IF(CURL_FOUND)
-    ADD_DEFINITIONS(-DCHUCHO_HAVE_EMAIL_WRITER)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_CURL)
 ENDIF()
 
 IF(CHUCHO_HAVE_ZEROMQ)
@@ -176,14 +151,25 @@ IF(CHUCHO_HAVE_DOORS)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_DOORS)
 ENDIF()
 
+IF(CURL_FOUND)
+    LIST(APPEND CHUCHO_TEST_CURL_SOURCES loggly_writer_test.cpp)
+ENDIF()
+
+IF(AWSSDK_FOUND)
+    LIST(APPEND CHUCHO_TEST_AWS_SOURCES cloudwatch_writer_test.cpp)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_AWSSDK)
+ENDIF()
+
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
+               c_test.cpp
                calendar_test.cpp
                configuration_test.cpp
                configurator_test.cpp
                configurator_test.hpp
                diagnostic_context_test.cpp
                duplicate_message_filter_test.cpp
+               event_cache_test.cpp
                file_test.cpp
                file_descriptor_writer_test.cpp
                file_writer_test.cpp
@@ -217,7 +203,10 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                ${CHUCHO_TEST_EVALUATOR_SOURCES}
                ${CHUCHO_TEST_SERIALIZER_SOURCES}
                ${CHUCHO_TEST_MQ_SOURCES}
-               ${CHUCHO_TEST_DOOR_SOURCES})
+               ${CHUCHO_TEST_DOOR_SOURCES}
+               ${CHUCHO_TEST_CURL_SOURCES}
+               ${CHUCHO_TEST_AWS_SOURCES}
+               ${CHUCHO_TEST_DB_SOURCES})
 TARGET_LINK_LIBRARIES(unit-test chucho gtest)
 
 IF(MSVC)
@@ -231,6 +220,12 @@ ADD_EXECUTABLE(named-pipe-writer-test-helper EXCLUDE_FROM_ALL
                named_pipe_writer_test_helper.cpp)
 TARGET_LINK_LIBRARIES(named-pipe-writer-test-helper chucho)
 ADD_DEPENDENCIES(unit-test named-pipe-writer-test-helper)
+
+ADD_EXECUTABLE(c-test-helper EXCLUDE_FROM_ALL
+               c_test_helper.c)
+TARGET_LINK_LIBRARIES(c-test-helper chucho ${CHUCHO_STD_CXX_LIBS})
+ADD_DEPENDENCIES(unit-test c-test-helper)
+SET_TARGET_PROPERTIES(c-test-helper PROPERTIES LINKER_LANGUAGE C)
 
 IF(CHUCHO_HAVE_ZEROMQ)
     ADD_EXECUTABLE(zeromq-writer-test-helper EXCLUDE_FROM_ALL
@@ -270,169 +265,6 @@ IF(CHUCHO_WINDOWS)
     STRING(REPLACE "\\" "\\\\" CHUCHO_EVENT_LOG_DLL "${CHUCHO_EVENT_LOG_DLL}")
 ENDIF()
 
-IF(C_API)
-    ADD_DEFINITIONS(-DCHUCHO_HAVE_C_API)
-
-    IF(ZLIB_FOUND OR BZIP2_FOUND OR LibArchive_FOUND OR LIBLZMA_FOUND)
-        SET(CHUCHO_TEST_COMPRESSION_C_SOURCES
-            file_compressor_test.c
-            file_compressor_test.h)
-    ENDIF()
-
-    IF(CHUCHO_HAVE_ORACLE)
-        LIST(APPEND CHUCHO_DB_C_SOURCES
-             oracle_writer_test.c
-             oracle_writer_test.h)
-    ENDIF()
-
-    IF(CHUCHO_HAVE_MYSQL)
-        LIST(APPEND CHUCHO_DB_C_SOURCES
-             mysql_writer_test.c
-             mysql_writer_test.h)
-    ENDIF()
-
-    IF(CHUCHO_HAVE_SQLITE)
-        LIST(APPEND CHUCHO_DB_C_SOURCES
-             sqlite_writer_test.c
-             sqlite_writer_test.h)
-    ENDIF()
-
-    IF(CHUCHO_HAVE_POSTGRES)
-        LIST(APPEND CHUCHO_DB_C_SOURCES
-             postgres_writer_test.c
-             postgres_writer_test.h)
-    ENDIF()
-
-    IF(CHUCHO_HAVE_DB2)
-        LIST(APPEND CHUCHO_DB_C_SOURCES
-             db2_writer_test.c
-             db2_writer_test.h)
-    ENDIF()
-
-    IF(RUBY_FOUND)
-        LIST(APPEND CHUCHO_EVALUATOR_C_SOURCES
-             ruby_evaluator_filter_test.c
-             ruby_evaluator_filter_test.h)
-    ENDIF()
-
-    IF(CURL_FOUND)
-        LIST(APPEND CHUCHO_EMAIL_WRITER_C_SOURCES
-             email_writer_test.c
-             email_writer_test.h)
-    ENDIF()
-
-    IF(CHUCHO_HAVE_ZEROMQ)
-        LIST(APPEND CHUCHO_MQ_C_SOURCES
-             zeromq_writer_test.c
-             zeromq_writer_test.h)
-    ENDIF()
-
-    IF(CHUCHO_HAVE_ACTIVEMQ)
-        LIST(APPEND CHUCHO_MQ_C_SOURCES
-             activemq_writer_test.c
-             activemq_writer_test.h)
-    ENDIF()
-
-    IF(CHUCHO_HAVE_RABBITMQ)
-        LIST(APPEND CHUCHO_MQ_C_SOURCES
-             rabbitmq_writer_test.c
-             rabbitmq_writer_test.h)
-    ENDIF()
-
-    IF(CHUCHO_HAVE_DOORS)
-        LIST(APPEND CHUCHO_DOOR_C_SOURCES
-             door_writer_test.c
-             door_writer_test.h)
-    ENDIF()
-
-    IF(CHUCHO_WINDOWS)
-        SET_SOURCE_FILES_PROPERTIES(windows_event_log_writer_test.c PROPERTIES
-                                    COMPILE_DEFINITIONS CHUCHO_EVENT_LOG_DLL="${CHUCHO_EVENT_LOG_DLL}")
-        IF(MSVC)
-            SET_SOURCE_FILES_PROPERTIES(log_macro_test.c PROPERTIES
-                                        COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
-            SET_SOURCE_FILES_PROPERTIES(test_util.c PROPERTIES
-                                        COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
-        ENDIF()
-        SET(CHUCHO_PLATFORM_C_SOURCES
-            windows_event_log_writer_test.c
-            windows_event_log_writer_test.h)
-    ENDIF()
-
-    ADD_EXECUTABLE(c-unit-test EXCLUDE_FROM_ALL
-                   async_writer_test.c
-                   async_writer_test.h
-                   cerr_writer_test.c
-                   cerr_writer_test.h
-                   cout_writer_test.c
-                   cout_writer_test.h
-                   configuration_test.c
-                   configuration_test.h
-                   diagnostic_context_test.c
-                   diagnostic_context_test.h
-                   duplicate_message_filter_test.c
-                   duplicate_message_filter_test.h
-                   file_descriptor_writer_test.c
-                   file_descriptor_writer_test.h
-                   file_roller_test.c
-                   file_roller_test.h
-                   file_writer_test.c
-                   file_writer_test.h
-                   harness.c
-                   level_filter_test.c
-                   level_filter_test.h
-                   level_test.c
-                   level_test.h
-                   level_threshold_filter_test.c
-                   level_threshold_filter_test.h
-                   log_macro_test.c
-                   log_macro_test.h
-                   logger_test.c
-                   logger_test.h
-                   named_pipe_writer_test.c
-                   named_pipe_writer_test.h
-                   numbered_file_roller_test.c
-                   numbered_file_roller_test.h
-                   pattern_formatter_test.c
-                   pattern_formatter_test.h
-                   pipe_writer_test.c
-                   pipe_writer_test.h
-                   remote_writer_test.c
-                   remote_writer_test.h
-                   rolling_file_writer_test.c
-                   rolling_file_writer_test.h
-                   security_policy_test.c
-                   security_policy_test.h
-                   size_file_roll_trigger_test.c
-                   size_file_roll_trigger_test.h
-                   sliding_numbered_file_roller_test.c
-                   sliding_numbered_file_roller_test.h
-                   syslog_writer_test.c
-                   syslog_writer_test.h
-                   test_util.c
-                   test_util.h
-                   time_file_roller_test.c
-                   time_file_roller_test.h
-                   writer_test.c
-                   writer_test.h
-                   ${CHUCHO_TEST_COMPRESSION_C_SOURCES}
-                   ${CHUCHO_DB_C_SOURCES}
-                   ${CHUCHO_EVALUATOR_C_SOURCES}
-                   ${CHUCHO_PLATFORM_C_SOURCES}
-                   ${CHUCHO_EMAIL_WRITER_C_SOURCES}
-                   ${CHUCHO_MQ_C_SOURCES}
-                   ${CHUCHO_DOOR_C_SOURCES})
-    TARGET_LINK_LIBRARIES(c-unit-test chucho)
-
-    IF(CHUCHO_SOLARIS AND ENABLE_SHARED AND CHUCHO_STD_CXX_LIBS)
-        TARGET_LINK_LIBRARIES(c-unit-test ${CHUCHO_STD_CXX_LIBS})
-    ENDIF()
-
-    ADD_CUSTOM_TARGET(c-check
-                      COMMAND c-unit-test
-                      WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
-ENDIF()
-
 ADD_EXECUTABLE(time-rolling-file-test EXCLUDE_FROM_ALL
                harness.cpp
                time_rolling_file_test.cpp)
@@ -443,10 +275,6 @@ ADD_EXECUTABLE(syslog-writer-test EXCLUDE_FROM_ALL
                syslog_writer_test.cpp)
 TARGET_LINK_LIBRARIES(syslog-writer-test chucho gtest)
 
-ADD_EXECUTABLE(remote-writer-test EXCLUDE_FROM_ALL
-               remote_writer_test.cpp)
-TARGET_LINK_LIBRARIES(remote-writer-test chucho)
-
 IF(CHUCHO_WINDOWS)
     ADD_EXECUTABLE(windows-event-log-writer-test EXCLUDE_FROM_ALL
                    harness.cpp
@@ -454,41 +282,6 @@ IF(CHUCHO_WINDOWS)
     SET_SOURCE_FILES_PROPERTIES(windows_event_log_writer_test.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_EVENT_LOG_DLL="${CHUCHO_EVENT_LOG_DLL}")
     TARGET_LINK_LIBRARIES(windows-event-log-writer-test chucho gtest)
-ENDIF()
-
-IF(CHUCHO_HAVE_ORACLE)
-    ADD_EXECUTABLE(oracle-writer-test EXCLUDE_FROM_ALL
-                   harness.cpp
-                   oracle_writer_test.cpp)
-    TARGET_LINK_LIBRARIES(oracle-writer-test chucho gtest)
-ENDIF()
-
-IF(CHUCHO_HAVE_MYSQL)
-    ADD_EXECUTABLE(mysql-writer-test EXCLUDE_FROM_ALL
-                   harness.cpp
-                   mysql_writer_test.cpp)
-    TARGET_LINK_LIBRARIES(mysql-writer-test chucho gtest)
-ENDIF()
-
-IF(CHUCHO_HAVE_SQLITE)
-    ADD_EXECUTABLE(sqlite-writer-test EXCLUDE_FROM_ALL
-                   harness.cpp
-                   sqlite_writer_test.cpp)
-    TARGET_LINK_LIBRARIES(sqlite-writer-test chucho gtest)
-ENDIF()
-
-IF(CHUCHO_HAVE_POSTGRES)
-    ADD_EXECUTABLE(postgres-writer-test EXCLUDE_FROM_ALL
-                   harness.cpp
-                   postgres_writer_test.cpp)
-    TARGET_LINK_LIBRARIES(postgres-writer-test chucho gtest)
-ENDIF()
-
-IF(CHUCHO_HAVE_DB2)
-    ADD_EXECUTABLE(db2-writer-test EXCLUDE_FROM_ALL
-                   harness.cpp
-                   db2_writer_test.cpp)
-    TARGET_LINK_LIBRARIES(db2-writer-test chucho gtest)
 ENDIF()
 
 IF(CURL_FOUND)
@@ -506,4 +299,4 @@ ADD_CUSTOM_TARGET(check-config
                   COMMAND "${CMAKE_COMMAND}" "-DCHUCHO_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -DCLANG_LIBSTDCXX=${CLANG_LIBSTDCXX} -P "${CMAKE_CURRENT_SOURCE_DIR}/CheckAllConfigs.cmake")
 
 ADD_CUSTOM_TARGET(all-test
-                  DEPENDS unit-test rolling-file-test syslog-writer-test remote-writer-test windows-event-log-writer-test)
+                  DEPENDS unit-test time-rolling-file-test syslog-writer-test windows-event-log-writer-test)

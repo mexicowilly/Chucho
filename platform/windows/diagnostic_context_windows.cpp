@@ -71,7 +71,7 @@ void thread_exit_manager::main()
         for (auto d : diags_)
             thrs.push_back(d.first);
         ul.unlock();
-        DWORD rc = WaitForMultipleObjects(thrs.size(), &thrs[0], FALSE, 500);
+        DWORD rc = WaitForMultipleObjects(static_cast<DWORD>(thrs.size()), &thrs[0], FALSE, 500);
         if (rc != WAIT_FAILED && rc != WAIT_TIMEOUT)
         {
             HANDLE hnd = thrs[rc - WAIT_OBJECT_0];

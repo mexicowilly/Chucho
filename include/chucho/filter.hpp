@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,6 +20,11 @@
 #include <chucho/event.hpp>
 #include <chucho/status_reporter.hpp>
 #include <chucho/configurable.hpp>
+
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
 
 namespace chucho
 {
@@ -63,9 +68,15 @@ public:
     };
 
     /**
-     * @name Destructor
+     * @name Constructor and Destructor
      * @{
      */
+    /**
+     * Construct a filter.
+     *
+     * @param name the name of this filter
+     */
+    filter(const std::string& name);
     /**
      * Destory the filter.
      */
@@ -79,8 +90,31 @@ public:
      * @return result the level of acceptance
      */
     virtual result evaluate(const event& evt) = 0;
+    /*
+     * Return the name of this filter.
+     *
+     * @return the name
+     */
+    const std::string& get_name() const;
+
+private:
+    std::string name_;
 };
 
+inline filter::filter(const std::string& name)
+    : name_(name)
+{
 }
+
+inline const std::string& filter::get_name() const
+{
+    return name_;
+}
+
+}
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

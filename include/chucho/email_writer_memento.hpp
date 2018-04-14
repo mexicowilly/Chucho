@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ public:
 
     const optional<std::size_t>& get_buffer_size() const;
     const optional<email_writer::connection_type>& get_connection_type() const;
-    std::shared_ptr<email_trigger> get_email_trigger() const;
+    std::unique_ptr<email_trigger> get_email_trigger();
     const std::string& get_from() const;
     const std::string& get_host() const;
     const std::string& get_password() const;
@@ -43,13 +43,13 @@ public:
     const std::vector<std::string>& get_to() const;
     const std::string& get_user() const;
     const optional<bool>& get_verbose() const;
-    virtual void handle(std::shared_ptr<configurable> cnf) override;
+    virtual void handle(std::unique_ptr<configurable>&& cnf) override;
 
 private:
     void set_connection_type(const std::string& connect);
     void set_to(const std::string& to);
 
-    std::shared_ptr<email_trigger> trigger_;
+    std::unique_ptr<email_trigger> trigger_;
     std::string from_;
     std::vector<std::string> to_;
     std::string host_;
@@ -72,9 +72,9 @@ inline const optional<email_writer::connection_type>& email_writer_memento::get_
     return connection_type_;
 }
 
-inline std::shared_ptr<email_trigger> email_writer_memento::get_email_trigger() const
+inline std::unique_ptr<email_trigger> email_writer_memento::get_email_trigger()
 {
-    return trigger_;
+    return std::move(trigger_);
 }
 
 inline const std::string& email_writer_memento::get_from() const

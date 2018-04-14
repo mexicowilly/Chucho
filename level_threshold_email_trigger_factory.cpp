@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 #include <chucho/level_threshold_email_trigger.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
-#include <assert.h>
 
 namespace chucho
 {
@@ -29,22 +28,20 @@ level_threshold_email_trigger_factory::level_threshold_email_trigger_factory()
     set_status_origin("level_threshold_email_trigger_factory");
 }
 
-std::shared_ptr<configurable> level_threshold_email_trigger_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> level_threshold_email_trigger_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    assert(dynamic_cast<level_threshold_email_trigger_memento*>(mnto.get()));
-    auto ltetm = std::dynamic_pointer_cast<level_threshold_email_trigger_memento>(mnto);
-    assert(ltetm);
+    auto ltetm = dynamic_cast<level_threshold_email_trigger_memento*>(mnto.get());
     if (!ltetm->get_level())
         throw exception("level_threshold_email_trigger_factory: The level must be set");
-    std::shared_ptr<configurable> cnf(new level_threshold_email_trigger(ltetm->get_level()));
+    auto cnf = std::make_unique<level_threshold_email_trigger>(ltetm->get_level());
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
-    return cnf;
+    return std::move(cnf);
 }
 
-std::shared_ptr<memento> level_threshold_email_trigger_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> level_threshold_email_trigger_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto = std::make_shared<level_threshold_email_trigger_memento>(cfg);
-    return mnto;
+    auto mnto = std::make_unique<level_threshold_email_trigger_memento>(cfg);
+    return std::move(mnto);
 }
 
 }

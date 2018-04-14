@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -29,22 +29,23 @@ ruby_evaluator_filter_factory::ruby_evaluator_filter_factory()
     set_status_origin("ruby_evaluator_filter_factory");
 }
 
-std::shared_ptr<configurable> ruby_evaluator_filter_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> ruby_evaluator_filter_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    assert(dynamic_cast<ruby_evaluator_filter_memento*>(mnto.get()));
-    auto refm = std::dynamic_pointer_cast<ruby_evaluator_filter_memento>(mnto);
-    assert(refm);
+    auto refm = dynamic_cast<ruby_evaluator_filter_memento*>(mnto.get());
+    assert(refm != nullptr);
+    if (refm->get_name().empty())
+        throw exception("ruby_evaluator_filter_factory: The name must be set");
     if (refm->get_expression().empty())
         throw exception("ruby_evaluator_filter_factory: The expression must be set");
-    std::shared_ptr<configurable> cnf = std::make_shared<ruby_evaluator_filter>(refm->get_expression());
+    auto cnf = std::make_unique<ruby_evaluator_filter>(refm->get_name(), refm->get_expression());
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
-    return cnf;
+    return std::move(cnf);
 }
 
-std::shared_ptr<memento> ruby_evaluator_filter_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> ruby_evaluator_filter_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto = std::make_shared<ruby_evaluator_filter_memento>(cfg);
-    return mnto;
+    auto mnto = std::make_unique<ruby_evaluator_filter_memento>(cfg);
+    return std::move(mnto);
 }
 
 }

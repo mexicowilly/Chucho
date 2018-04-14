@@ -1,7 +1,8 @@
 #include "winsock_startup.hpp"
-#include <chucho/socket_exception.hpp>
-#include <chucho/garbage_cleaner.hpp>
 #include <winsock2.h>
+#include "error_util.hpp"
+#include <chucho/garbage_cleaner.hpp>
+#include <chucho/exception.hpp>
 
 namespace
 {
@@ -14,7 +15,7 @@ public:
         WSADATA data;
         int rc = WSAStartup(MAKEWORD(2, 0), &data);
         if (rc != 0)
-            throw chucho::socket_exception("Could not start socket subsystem", rc);
+            throw chucho::exception("Could not start socket subsystem: " + chucho::error_util::message(WSAGetLastError()));
     }
 
     ~worker()

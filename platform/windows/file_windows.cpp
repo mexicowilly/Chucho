@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <vector>
 #include <iterator>
 #include <io.h>
+#include <shlobj.h>
 
 namespace chucho
 {
@@ -28,6 +29,16 @@ namespace file
 {
 
 const char dir_sep = '\\';
+
+struct directory_iterator_impl
+{
+    directory_iterator_impl(const std::string& dir);
+    ~directory_iterator_impl();
+
+    HANDLE handle_;
+    std::string parent_;
+    WIN32_FIND_DATAA fdata_;
+};
 
 std::string base_name(const std::string& name)
 {
@@ -123,6 +134,36 @@ writeability get_writeability(const std::string& name)
     return result;
 }
 
+std::string home_directory()
+{
+    std::string result;
+    wchar_t* dir;
+    if (SHGetKnownFolderPath(FOLDERID_Profile, KF_FLAG_DEFAULT, NULL, &dir) == S_OK)
+    {
+        auto dir_len = std::wcslen(dir);
+        int rc = WideCharToMultiByte(CP_ACP,
+                                     0,
+                                     dir,
+                                     dir_len,
+                                     NULL,
+                                     0,
+                                     NULL,
+                                     NULL);
+        result.resize(rc);
+        WideCharToMultiByte(CP_ACP,
+                            0,
+                            dir,
+                            dir_len,
+                            &result[0],
+                            result.length(),
+                            NULL,
+                            NULL);
+        CoTaskMemFree(dir);
+        result += '\\';
+    }
+    return result;
+}
+
 bool is_fully_qualified(const std::string& name)
 {
     return !name.empty() &&
@@ -174,6 +215,83 @@ std::uintmax_t size(const std::string& name)
     biggy.LowPart = attrs.nFileSizeLow;
     biggy.HighPart = attrs.nFileSizeHigh;
     return biggy.QuadPart;
+}
+
+std::string temporary_directory()
+{
+    char buf[MAX_PATH + 1];
+    auto rc = GetTempPathA(sizeof(buf), buf);
+    return std::string(buf);
+}
+
+directory_iterator::directory_iterator()
+{
+}
+
+directory_iterator::~directory_iterator()
+{
+}
+
+directory_iterator::directory_iterator(const std::string& directory)
+    : pimpl_(std::make_unique<directory_iterator_impl>(directory))
+{
+    if (pimpl_->handle_ == INVALID_HANDLE_VALUE)
+    {
+        pimpl_.reset();
+    }
+    else
+    {
+        while (std::strcmp(pimpl_->fdata_.cFileName, ".") == 0 ||
+               std::strcmp(pimpl_->fdata_.cFileName, "..") == 0)
+        {
+            if (!FindNextFileA(pimpl_->handle_, &pimpl_->fdata_)) {
+                pimpl_.reset();
+                break;
+            }
+        }
+        if (pimpl_)
+            cur_ = pimpl_->parent_ + pimpl_->fdata_.cFileName;
+    }
+}
+
+bool directory_iterator::operator== (const directory_iterator& it) const
+{
+    return (!pimpl_ && !it.pimpl_) || (pimpl_ && it.pimpl_ && pimpl_->parent_ == it.pimpl_->parent_ && cur_ == it.cur_);
+}
+
+directory_iterator& directory_iterator::operator++ ()
+{
+    if (pimpl_)
+    {
+        do
+        {
+            if (!FindNextFileA(pimpl_->handle_, &pimpl_->fdata_))
+            {
+                pimpl_.reset();
+                cur_.clear();
+                break;
+            }
+        } while (std::strcmp(pimpl_->fdata_.cFileName, ".") == 0 ||
+                 std::strcmp(pimpl_->fdata_.cFileName, "..") == 0);
+        if (pimpl_)
+            cur_ = pimpl_->parent_ + pimpl_->fdata_.cFileName;
+    }
+    return *this;
+}
+
+directory_iterator_impl::directory_iterator_impl(const std::string& dir)
+    : handle_(INVALID_HANDLE_VALUE),
+      parent_(dir)
+{
+    if (!parent_.empty() && parent_.back() != '\\')
+        parent_ += '\\';
+    auto search = parent_ + '*';
+    handle_ = FindFirstFileA(search.c_str(), &fdata_);
+}
+
+directory_iterator_impl::~directory_iterator_impl()
+{
+    FindClose(handle_);
 }
 
 }

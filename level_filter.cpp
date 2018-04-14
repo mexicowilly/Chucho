@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,10 +19,12 @@
 namespace chucho
 {
 
-level_filter::level_filter(std::shared_ptr<level>lvl,
+level_filter::level_filter(const std::string& name,
+                           std::shared_ptr<level>lvl,
                            result on_match,
                            result on_mismatch)
-    : level_(lvl),
+    : filter(name),
+      level_(lvl),
       on_match_(on_match),
       on_mismatch_(on_mismatch)
 {

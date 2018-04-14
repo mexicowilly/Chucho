@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -32,11 +32,11 @@ zip_file_compressor_factory::zip_file_compressor_factory()
     set_status_origin("zip_file_compressor_factory");
 }
 
-std::shared_ptr<configurable> zip_file_compressor_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> zip_file_compressor_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
 #if defined(CHUCHO_HAVE_LIBARCHIVE)
-    auto fcm = std::dynamic_pointer_cast<file_compressor_memento>(mnto);
-    assert(fcm);
+    auto fcm = dynamic_cast<file_compressor_memento*>(mnto.get());
+    assert(fcm != nullptr);
     if (!fcm->get_min_index())
         throw exception("zip_file_compressor_factory: The min_index field must be set");
     unsigned mi = *fcm->get_min_index();
@@ -45,13 +45,13 @@ std::shared_ptr<configurable> zip_file_compressor_factory::create_configurable(s
         report_warning("A min_index of 0 was given, which will be reset to the minimum value of 1");
         mi = 1;
     }
-    auto zfc = std::make_shared<zip_file_compressor>(mi);
+    auto zfc = std::make_unique<zip_file_compressor>(mi);
 #else
     report_warning("A zip_file_compressor was requested in the configuration, but this Chucho library was built without zip archive support.");
-    auto zfc = std::make_shared<noop_file_compressor>();
+    auto zfc = std::make_unique<noop_file_compressor>();
 #endif
     report_info("Created a " + demangle::get_demangled_name(typeid(*zfc)));
-    return zfc;
+    return std::move(zfc);
 }
 
 }

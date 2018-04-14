@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -29,15 +29,19 @@ email_writer_factory::email_writer_factory()
     set_status_origin("email_writer_factory");
 }
 
-std::shared_ptr<configurable> email_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> email_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    auto ewm = std::dynamic_pointer_cast<email_writer_memento>(mnto);
-    assert(ewm);
-    if (!ewm->get_formatter())
+    auto ewm = dynamic_cast<email_writer_memento*>(mnto.get());
+    assert(ewm != nullptr);
+    if (ewm->get_name().empty())
+        throw exception("email_writer_factory: The name is not set");
+    auto fmt = std::move(ewm->get_formatter());
+    if (!fmt)
         throw exception("email_writer_factory: The writer's formatter is not set");
     if (!ewm->get_connection_type()) 
         throw exception("email_writer_factory: The connection type must be set");
-    if (!ewm->get_email_trigger()) 
+    auto trg = std::move(ewm->get_email_trigger());
+    if (!trg)
         throw exception("email_writer_factory: The email trigger must be set");
     if (ewm->get_from().empty()) 
         throw exception("email_writer_factory: The from field must be set");
@@ -49,46 +53,47 @@ std::shared_ptr<configurable> email_writer_factory::create_configurable(std::sha
         throw exception("email_writer_factory: At least one recipient in the to field must be set");
     std::uint16_t port = ewm->get_port() ? *ewm->get_port() : email_writer::DEFAULT_PORT;
     std::size_t buf_size = ewm->get_buffer_size() ? *ewm->get_buffer_size() : email_writer::DEFAULT_BUFFER_CAPACITY;
-    std::shared_ptr<email_writer> wrt;
+    std::unique_ptr<email_writer> wrt;
     if (ewm->get_user().empty() && ewm->get_password().empty())
     {
-        wrt = std::make_shared<email_writer>(ewm->get_formatter(),
+        wrt = std::make_unique<email_writer>(ewm->get_name(),
+                                             std::move(fmt),
                                              ewm->get_host(),
                                              *ewm->get_connection_type(),
                                              ewm->get_to(),
                                              ewm->get_from(),
                                              ewm->get_subject(),
-                                             ewm->get_email_trigger(),
+                                             std::move(trg),
                                              port,
                                              buf_size);
-
     }
     else
     {
-        wrt = std::make_shared<email_writer>(ewm->get_formatter(),
+        wrt = std::make_unique<email_writer>(ewm->get_name(),
+                                             std::move(fmt),
                                              ewm->get_host(),
                                              *ewm->get_connection_type(),
                                              ewm->get_to(),
                                              ewm->get_from(),
                                              ewm->get_subject(),
-                                             ewm->get_email_trigger(),
+                                             std::move(trg),
                                              ewm->get_user(),
                                              ewm->get_password(),
                                              port,
                                              buf_size);
 
     }
-    set_filters(wrt, ewm);
+    set_filters(*wrt, *ewm);
     if (ewm->get_verbose())
         wrt->set_verbose(*ewm->get_verbose());
     report_info("Created a " + demangle::get_demangled_name(typeid(*wrt)));
-    return wrt;
+    return std::move(wrt);
 }
 
-std::shared_ptr<memento> email_writer_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> email_writer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto = std::make_shared<email_writer_memento>(cfg);
-    return mnto;
+    auto mnto = std::make_unique<email_writer_memento>(cfg);
+    return std::move(mnto);
 }
 
 }

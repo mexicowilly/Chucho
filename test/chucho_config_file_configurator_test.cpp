@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -134,8 +134,8 @@ TEST_F(chucho_config_file_configurator, async_writer_with_opts)
               "chucho.logger.will.writer = as\n"
               "chucho.writer.as = chucho::async_writer\n"
               "chucho.writer.as.writer = fw\n"
-              "chucho.writer.as.discard_threshold = error\n"
-              "chucho.writer.as.queue_capacity = 700\n"
+              "chucho.writer.as.chunk_size = 7000\n"
+              "chucho.writer.as.max_chunks = 10\n"
               "chucho.writer.as.flush_on_destruct = false\n"
               "chucho.writer.fw = chucho::file_writer\n"
               "chucho.writer.fw.file_name = hello.log\n"
@@ -178,6 +178,24 @@ TEST_F(chucho_config_file_configurator, cerr_writer)
     cerr_writer_body();
 }
 
+#if defined(CHUCHO_HAVE_AWSSDK)
+
+TEST_F(chucho_config_file_configurator, cloudwatch_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = ce\n"
+              "chucho.writer.ce = chucho::cloudwatch_writer\n"
+              "chucho.writer.ce.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m%n\n"
+              "chucho.writer.ce.log_group=monkeyballs\n"
+              "chucho.writer.ce.log_stream=streamer\n"
+              "chucho.writer.ce.region=us-west-1");
+    cloudwatch_writer_body();
+}
+
+#endif
+
 TEST_F(chucho_config_file_configurator, cout_writer)
 {
     configure("chucho.logger = will\n"
@@ -188,24 +206,6 @@ TEST_F(chucho_config_file_configurator, cout_writer)
               "chucho.formatter.pf.pattern = %m%n");
     cout_writer_body();
 }
-
-#if defined(CHUCHO_HAVE_DB2)
-
-TEST_F(chucho_config_file_configurator, db2_writer)
-{
-    configure("chucho.logger = will\n"
-              "chucho.logger.will.writer = or\n"
-              "chucho.writer.or = chucho::db2_writer\n"
-              "chucho.writer.or.formatter = pf\n"
-              "chucho.formatter.pf = chucho::pattern_formatter\n"
-              "chucho.formatter.pf.pattern = %m\n"
-              "chucho.writer.or.user = db2inst1\n"
-              "chucho.writer.or.password = db2inst1\n"
-              "chucho.writer.or.database = chucho");
-    db2_writer_body();
-}
-
-#endif
 
 #if defined(CHUCHO_HAVE_DOORS)
 
@@ -236,7 +236,7 @@ TEST_F(chucho_config_file_configurator, duplicate_message_filter)
     duplicate_message_filter_body();
 }
 
-#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+#if defined(CHUCHO_HAVE_CURL)
 
 TEST_F(chucho_config_file_configurator, email_writer)
 {
@@ -259,6 +259,18 @@ TEST_F(chucho_config_file_configurator, email_writer)
               "chucho.writer.em.password = lumpy\n"
               "chucho.writer.em.buffer_size = 7000");
     email_writer_body();
+}
+
+TEST_F(chucho_config_file_configurator, loggly_writer)
+{
+    configure("chucho.logger = will\n"
+              "chucho.logger.will.writer = lw\n"
+              "chucho.writer.lw = chucho::loggly_writer\n"
+              "chucho.writer.lw.formatter = pf\n"
+              "chucho.formatter.pf = chucho::pattern_formatter\n"
+              "chucho.formatter.pf.pattern = %m\n"
+              "chucho.writer.lw.token = monkey-balls");
+    loggly_writer_body();
 }
 
 #endif
@@ -355,25 +367,27 @@ TEST_F(chucho_config_file_configurator, filter_order)
               "chucho.writer.co.filter = z\n"
               "chucho.filter.z = chucho::level_threshold_filter\n"
               "chucho.filter.z.level = fatal\n"
+              "chucho.filter.z.name = one\n"
               "chucho.writer.co.filter = a\n"
               "chucho.filter.a = chucho::level_threshold_filter\n"
               "chucho.filter.a.level = debug\n"
+              "chucho.filter.a.name = two\n"
               "chucho.writer.co.filter = m\n"
               "chucho.filter.m = chucho::level_threshold_filter\n"
-              "chucho.filter.m.level = warn");
-    auto wrts = chucho::logger::get("will")->get_writers();
+              "chucho.filter.m.level = warn\n"
+              "chucho.filter.m.name = three");
+    auto lgr = chucho::logger::get("will");
+    auto wrts = lgr->get_writer_names();
     ASSERT_EQ(1, wrts.size());
-    auto flts = wrts[0]->get_filters();
+    auto& wrt = lgr->get_writer(wrts[0]);
+    auto flts = wrt.get_filter_names();
     ASSERT_EQ(3, flts.size());
-    ASSERT_EQ(typeid(chucho::level_threshold_filter), typeid(*flts[0]));
-    auto thresh = std::static_pointer_cast<chucho::level_threshold_filter>(flts[0]);
-    EXPECT_EQ(*chucho::level::FATAL_(), *thresh->get_level());
-    ASSERT_EQ(typeid(chucho::level_threshold_filter), typeid(*flts[1]));
-    thresh = std::static_pointer_cast<chucho::level_threshold_filter>(flts[1]);
-    EXPECT_EQ(*chucho::level::DEBUG_(), *thresh->get_level());
-    ASSERT_EQ(typeid(chucho::level_threshold_filter), typeid(*flts[2]));
-    thresh = std::static_pointer_cast<chucho::level_threshold_filter>(flts[2]);
-    EXPECT_EQ(*chucho::level::WARN_(), *thresh->get_level());
+    EXPECT_EQ(*chucho::level::FATAL_(),
+              *dynamic_cast<chucho::level_threshold_filter&>(wrt.get_filter("one")).get_level());
+    EXPECT_EQ(*chucho::level::DEBUG_(),
+              *dynamic_cast<chucho::level_threshold_filter&>(wrt.get_filter("two")).get_level());
+    EXPECT_EQ(*chucho::level::WARN_(),
+              *dynamic_cast<chucho::level_threshold_filter&>(wrt.get_filter("three")).get_level());
 }
 
 TEST_F(chucho_config_file_configurator, gzip_file_compressor)
@@ -472,55 +486,19 @@ TEST_F(chucho_config_file_configurator, lzma_file_compressor)
     lzma_file_compressor_body();
 }
 
-#if defined(CHUCHO_HAVE_MYSQL)
-
-TEST_F(chucho_config_file_configurator, mysql_writer_full)
-{
-    configure("chucho.logger = will\n"
-              "chucho.logger.will.writer = my\n"
-              "chucho.writer.my = chucho::mysql_writer\n"
-              "chucho.writer.my.formatter = pf\n"
-              "chucho.formatter.pf = chucho::pattern_formatter\n"
-              "chucho.formatter.pf.pattern = %m\n"
-              "chucho.writer.my.host = 192.168.56.101\n"
-              "chucho.writer.my.user = test_user\n"
-              "chucho.writer.my.password = password\n"
-              "chucho.writer.my.database = test\n"
-              "chucho.writer.my.port = 3306\n"
-              "chucho.writer.my.queue_capacity = 912\n"
-              "chucho.writer.my.discard_threshold = info\n"
-              "chucho.writer.my.flush_on_destruct = false");
-    mysql_writer_full_body();
-}
-
-TEST_F(chucho_config_file_configurator, mysql_writer_minimal)
-{
-    configure("chucho.logger = will\n"
-              "chucho.logger.will.writer = my\n"
-              "chucho.writer.my = chucho::mysql_writer\n"
-              "chucho.writer.my.formatter = pf\n"
-              "chucho.formatter.pf = chucho::pattern_formatter\n"
-              "chucho.formatter.pf.pattern = %m\n"
-              "chucho.writer.my.host = 192.168.56.101\n"
-              "chucho.writer.my.user = test_user\n"
-              "chucho.writer.my.password = password\n"
-              "chucho.writer.my.database = test");
-    mysql_writer_minimal_body();
-}
-
-#endif
-
 TEST_F(chucho_config_file_configurator, multiple_writer)
 {
     configure("chucho.logger = will\n"
               "chucho.logger.will.writer = fw1\n"
               "chucho.writer.fw1 = chucho::file_writer\n"
+              "chucho.writer.fw1.name = one\n"
               "chucho.writer.fw1.formatter = pf\n"
               "chucho.formatter.pf = chucho::pattern_formatter\n"
               "chucho.formatter.pf.pattern = %m%n\n"
               "chucho.writer.fw1.file_name = one.log\n"
               "chucho.logger.will.writer = fw2\n"
               "chucho.writer.fw2 = chucho::file_writer\n"
+              "chucho.writer.fw2.name = two\n"
               "chucho.writer.fw2.formatter = pf\n"
               "chucho.writer.fw2.file_name = two.log");
     multiple_writer_body();
@@ -534,7 +512,7 @@ TEST_F(chucho_config_file_configurator, named_pipe_writer)
               "chucho.writer.npw.formatter = pf\n"
               "chucho.formatter.pf = chucho::pattern_formatter\n"
               "chucho.formatter.pf.pattern = %m%n\n"
-              "chucho.writer.npw.name = monkeyballs\n"
+              "chucho.writer.npw.pipe_name = monkeyballs\n"
               "chucho.writer.npw.flush = false");
     named_pipe_writer_body();
 }
@@ -558,24 +536,6 @@ TEST_F(chucho_config_file_configurator, numbered_file_roller)
     numbered_file_roller_body();
 }
 
-#if defined(CHUCHO_HAVE_ORACLE)
-
-TEST_F(chucho_config_file_configurator, oracle_writer)
-{
-    configure("chucho.logger = will\n"
-              "chucho.logger.will.writer = or\n"
-              "chucho.writer.or = chucho::oracle_writer\n"
-              "chucho.writer.or.formatter = pf\n"
-              "chucho.formatter.pf = chucho::pattern_formatter\n"
-              "chucho.formatter.pf.pattern = %m\n"
-              "chucho.writer.or.user = test_user\n"
-              "chucho.writer.or.password = password\n"
-              "chucho.writer.or.database = 192.168.56.102/pdb1");
-    oracle_writer_body();
-}
-
-#endif
-
 TEST_F(chucho_config_file_configurator, pipe_writer)
 {
     configure("chucho.logger = will\n"
@@ -587,22 +547,6 @@ TEST_F(chucho_config_file_configurator, pipe_writer)
               "chucho.writer.pw.flush = false");
     pipe_writer_body();
 }
-
-#if defined(CHUCHO_HAVE_POSTGRES)
-
-TEST_F(chucho_config_file_configurator, postgres_writer)
-{
-    configure("chucho.logger = will\n"
-              "chucho.logger.will.writer = pg\n"
-              "chucho.writer.pg = chucho::postgres_writer\n"
-              "chucho.writer.pg.formatter = pf\n"
-              "chucho.formatter.pf = chucho::pattern_formatter\n"
-              "chucho.formatter.pf.pattern = %m\n"
-              "chucho.writer.pg.uri = postgres://test_user:password@192.168.56.101/postgres");
-    postgres_writer_body();
-}
-
-#endif
 
 #if defined(CHUCHO_HAVE_RABBITMQ)
 
@@ -658,25 +602,6 @@ TEST_F(chucho_config_file_configurator, rabbitmq_writer_capn_proto)
 
 #endif
 
-TEST_F(chucho_config_file_configurator, remote_writer)
-{
-    configure("chucho.logger = will\n"
-              "chucho.logger.will.writer = rw1\n"
-              "chucho.writer.rw1 = chucho::remote_writer\n"
-              "chucho.writer.rw1.host = motherboy\n"
-              "chucho.logger = will2\n"
-              "chucho.logger.will2.writer = rw2\n"
-              "chucho.writer.rw2 = chucho::remote_writer\n"
-              "chucho.writer.rw2.host = motherboy\n"
-              "chucho.writer.rw2.port = 19567\n"
-              "chucho.logger = will3\n"
-              "chucho.logger.will3.writer = rw3\n"
-              "chucho.writer.rw3 = chucho::remote_writer\n"
-              "chucho.writer.rw3.host = motherboy\n"
-              "chucho.writer.rw3.unsent_cache_max = 750");
-    remote_writer_body();
-}
-
 TEST_F(chucho_config_file_configurator, rolling_file_writer)
 {
     configure("chucho.logger = will\n"
@@ -700,7 +625,7 @@ TEST_F(chucho_config_file_configurator, rolling_file_writer)
 
 TEST_F(chucho_config_file_configurator, root_alias)
 {
-    chucho::logger::get("")->remove_all_writers();
+    chucho::logger::get("")->clear_writers();
     configure("chucho.logger = <root>\n"
               "chucho.logger.<root>.writer = ce\n"
               "chucho.writer.ce = chucho::cout_writer\n"
@@ -764,22 +689,6 @@ TEST_F(chucho_config_file_configurator, sliding_numbered_file_roller)
               "chucho.writer.rfw.file_name = hello");
     sliding_numbered_file_roller_body();
 }
-
-#if defined(CHUCHO_HAVE_SQLITE)
-
-TEST_F(chucho_config_file_configurator, sqlite_writer)
-{
-    configure("chucho.logger = will\n"
-              "chucho.logger.will.writer = sw\n"
-              "chucho.writer.sw = chucho::sqlite_writer\n"
-              "chucho.writer.sw.formatter = pf\n"
-              "chucho.formatter.pf = chucho::pattern_formatter\n"
-              "chucho.formatter.pf.pattern = %m%n\n"
-              "chucho.writer.sw.file_name = database.sqlite");
-    sqlite_writer_body();
-}
-
-#endif
 
 TEST_F(chucho_config_file_configurator, syslog_writer)
 {

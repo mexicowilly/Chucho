@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -199,8 +199,8 @@ public:
      * servers, which re-read their configuration files upon 
      * receiving SIGHUP.
      *  
-     * If the reconfiguration fails for any reason, then the current 
-     * running configuration of Chucho is not affected. 
+     * If the reconfiguration fails for any reason, then the
+     * resulting configuration may be invalid.
      *  
      * @pre Chucho must have already undergone its initial 
      *      configuration, which is initiated by requesting the
@@ -229,10 +229,7 @@ public:
      * Chucho build will be detected and properly handled. By 
      * default, only the YAML format is supported. 
      *  
-     * If the configuration is not loadable, then the existing 
-     * configuration will be preserved. 
-     *  
-     * @note An invalid configuration is usually one where the text 
+     * @note An invalid configuration is usually one where the text
      *       simply cannot be parsed. Erros in the configuration
      *       parameters, like the absence of a @ref formatter for a
      *       @ref writer, are not unrecoverable errors, and thus,

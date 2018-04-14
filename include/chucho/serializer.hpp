@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ public:
      * @param evt the event to blobify
      * @param fmt the formatter used to create the formatted message
      */
-    virtual void serialize(const event& evt, std::shared_ptr<formatter> fmt) = 0;
+    virtual void serialize(const event& evt, formatter& fmt) = 0;
 };
 
 }

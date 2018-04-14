@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 #include <chucho/level_filter.hpp>
 #include <chucho/rolling_file_writer.hpp>
 #include <chucho/numbered_file_roller.hpp>
-#include <chucho/remote_writer.hpp>
 #include <chucho/status_manager.hpp>
 #include <chucho/pattern_formatter.hpp>
 #include <chucho/event.hpp>
@@ -110,26 +109,20 @@ TEST_F(log4cplus_config_file_configurator, daily_rolling_file_appender)
     while (exp[i].first != nullptr)
     {
         chucho::logger::remove_unused_loggers();
-        chucho::status_manager::get()->clear();
+        chucho::status_manager::get().clear();
         std::string rep = tmpl;
         rep.replace(rep_loc, 8, exp[i].first);
         struct std::tm now = chucho::calendar::get_utc(time(nullptr));
         configure(rep.c_str());
-        auto wrts = chucho::logger::get("will")->get_writers();
-        ASSERT_EQ(1, wrts.size());
-        ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
-        auto rfw = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
-        ASSERT_TRUE(static_cast<bool>(rfw));
-        auto rlr = rfw->get_file_roller();
-        ASSERT_EQ(typeid(chucho::time_file_roller), typeid(*rlr));
-        auto tfr = std::static_pointer_cast<chucho::time_file_roller>(rlr);
-        ASSERT_TRUE(static_cast<bool>(tfr));
-        std::string fn = tfr->get_active_file_name();
+        auto& rfw = dynamic_cast<chucho::rolling_file_writer&>(
+            chucho::logger::get("will")->get_writer("chucho::rolling_file_writer"));
+        auto& tfr = dynamic_cast<chucho::time_file_roller&>(rfw.get_file_roller());
+        std::string fn = tfr.get_active_file_name();
         EXPECT_EQ("." + chucho::calendar::format(now, exp[i].second), fn);
         i++;
     }
     // clear the status because we generated some warnings
-    chucho::status_manager::get()->clear();
+    chucho::status_manager::get().clear();
 }
 
 TEST_F(log4cplus_config_file_configurator, file_writer)
@@ -153,15 +146,16 @@ TEST_F(log4cplus_config_file_configurator, level_filter_accept)
               "log4cplus.appender.fl.filters.1.LogLevelToMatch = error\n"
               "log4cplus.appender.fl.filters.1.AcceptOnMatch = true\n"
               "log4cplus.appender.fl.File = hello.log");
-    auto wrts = chucho::logger::get("will")->get_writers();
+    auto lgr = chucho::logger::get("will");
+    auto wrts = lgr->get_writer_names();
     ASSERT_EQ(1, wrts.size());
-    auto flts = wrts[0]->get_filters();
+    auto& wrt = lgr->get_writer(wrts[0]);
+    auto flts = wrt.get_filter_names();
     ASSERT_EQ(1, flts.size());
-    ASSERT_EQ(typeid(chucho::level_filter), typeid(*flts[0]));
-    auto lf = std::static_pointer_cast<chucho::level_filter>(flts[0]);
-    EXPECT_EQ(*chucho::level::ERROR_(), *lf->get_level());
-    EXPECT_EQ(chucho::filter::result::ACCEPT, lf->get_on_match());
-    EXPECT_EQ(chucho::filter::result::NEUTRAL, lf->get_on_mismatch());
+    auto& lf = dynamic_cast<chucho::level_filter&>(wrt.get_filter(flts[0]));
+    EXPECT_EQ(*chucho::level::ERROR_(), *lf.get_level());
+    EXPECT_EQ(chucho::filter::result::ACCEPT, lf.get_on_match());
+    EXPECT_EQ(chucho::filter::result::NEUTRAL, lf.get_on_mismatch());
 }
 
 TEST_F(log4cplus_config_file_configurator, level_filter_deny)
@@ -172,15 +166,16 @@ TEST_F(log4cplus_config_file_configurator, level_filter_deny)
               "log4cplus.appender.cout.layout.ConversionPattern = %m%n\n"
               "log4cplus.appender.cout.filters.1 = log4cplus::spi::LogLevelMatchFilter\n"
               "log4cplus.appender.cout.filters.1.LogLevelToMatch = error");
-    auto wrts = chucho::logger::get("will")->get_writers();
+    auto lgr = chucho::logger::get("will");
+    auto wrts = lgr->get_writer_names();
     ASSERT_EQ(1, wrts.size());
-    auto flts = wrts[0]->get_filters();
+    auto& wrt = lgr->get_writer(wrts[0]);
+    auto flts = wrt.get_filter_names();
     ASSERT_EQ(1, flts.size());
-    ASSERT_EQ(typeid(chucho::level_filter), typeid(*flts[0]));
-    auto lf = std::static_pointer_cast<chucho::level_filter>(flts[0]);
-    EXPECT_EQ(*chucho::level::ERROR_(), *lf->get_level());
-    EXPECT_EQ(chucho::filter::result::DENY, lf->get_on_match());
-    EXPECT_EQ(chucho::filter::result::NEUTRAL, lf->get_on_mismatch());
+    auto& lf = dynamic_cast<chucho::level_filter&>(wrt.get_filter(flts[0]));
+    EXPECT_EQ(*chucho::level::ERROR_(), *lf.get_level());
+    EXPECT_EQ(chucho::filter::result::DENY, lf.get_on_match());
+    EXPECT_EQ(chucho::filter::result::NEUTRAL, lf.get_on_mismatch());
 }
 
 TEST_F(log4cplus_config_file_configurator, level_threshold_filter)
@@ -203,6 +198,7 @@ TEST_F(log4cplus_config_file_configurator, logger)
     EXPECT_EQ(*chucho::level::FATAL_(), *lgr->get_level());
 }
 
+/*
 TEST_F(log4cplus_config_file_configurator, multiple_writer)
 {
     configure("log4cplus.logger.will = info, fw1, fw2\n"
@@ -210,18 +206,18 @@ TEST_F(log4cplus_config_file_configurator, multiple_writer)
               "log4cplus.appender.fw1.layout = log4cplus::PatternLayout\n"
               "log4cplus.appender.fw1.layout.ConversionPattern = %m%n\n"
               "log4cplus.appender.fw1.File = one.log\n"
-              "log4cplus.appender.fw2 = log4cplus::FileAppender\n"
+              "log4cplus.appender.fw2 = log4cplus::ConsoleAppender\n"
               "log4cplus.appender.fw2.layout = log4cplus::PatternLayout\n"
-              "log4cplus.appender.fw2.layout.ConversionPattern = %m%n\n"
-              "log4cplus.appender.fw2.File = two.log");
+              "log4cplus.appender.fw2.layout.ConversionPattern = %m%n\");
     multiple_writer_body();
 }
+*/
 
 TEST_F(log4cplus_config_file_configurator, null_appender)
 {
     configure("log4cplus.logger.will = info, na\n"
               "log4cplus.appender.na = log4cplus::NullAppender");
-    auto wrts = chucho::logger::get("will")->get_writers();
+    auto wrts = chucho::logger::get("will")->get_writer_names();
     ASSERT_EQ(0, wrts.size());
 }
 
@@ -232,17 +228,11 @@ TEST_F(log4cplus_config_file_configurator, numbered_file_roller)
               "log4cplus.appender.nfr.layout = log4cplus::PatternLayout\n"
               "log4cplus.appender.nfr.layout.ConversionPattern = %m%n\n"
               "log4cplus.appender.nfr.File = hello.log");
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
-    auto fwrt = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(fwrt));
-    auto rlr = fwrt->get_file_roller();
-    ASSERT_EQ(typeid(chucho::numbered_file_roller), typeid(*rlr));
-    auto nrlr = std::static_pointer_cast<chucho::numbered_file_roller>(rlr);
-    ASSERT_TRUE(static_cast<bool>(nrlr));
-    EXPECT_EQ(1, nrlr->get_max_index());
-    EXPECT_EQ(1, nrlr->get_min_index());
+    auto& rfw = dynamic_cast<chucho::rolling_file_writer&>(
+        chucho::logger::get("will")->get_writer("chucho::rolling_file_writer"));
+    auto& nrlr = dynamic_cast<chucho::numbered_file_roller&>(rfw.get_file_roller());
+    EXPECT_EQ(1, nrlr.get_max_index());
+    EXPECT_EQ(1, nrlr.get_min_index());
 }
 
 TEST_F(log4cplus_config_file_configurator, numbered_file_roller_with_opts)
@@ -253,46 +243,11 @@ TEST_F(log4cplus_config_file_configurator, numbered_file_roller_with_opts)
               "log4cplus.appender.nfr.layout.ConversionPattern = %m%n\n"
               "log4cplus.appender.nfr.File = hello.log\n"
               "log4cplus.appender.nfr.MaxBackupIndex = 72");
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
-    auto fwrt = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(fwrt));
-    auto rlr = fwrt->get_file_roller();
-    ASSERT_EQ(typeid(chucho::numbered_file_roller), typeid(*rlr));
-    auto nrlr = std::static_pointer_cast<chucho::numbered_file_roller>(rlr);
-    ASSERT_TRUE(static_cast<bool>(nrlr));
-    EXPECT_EQ(72, nrlr->get_max_index());
-    EXPECT_EQ(1, nrlr->get_min_index());
-}
-
-TEST_F(log4cplus_config_file_configurator, remote_writer)
-{
-    configure("log4cplus.logger.will = info, rw1\n"
-              "log4cplus.appender.rw1 = log4cplus::SocketAppender\n"
-              "log4cplus.appender.rw1.host = motherboy\n"
-              "log4cplus.logger.will2 = info, rw2\n"
-              "log4cplus.appender.rw2 = log4cplus::SocketAppender\n"
-              "log4cplus.appender.rw2.host = motherboy\n"
-              "log4cplus.appender.rw2.port = 19567");
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::remote_writer), typeid(*wrts[0]));
-    auto rw = std::static_pointer_cast<chucho::remote_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(rw));
-    EXPECT_EQ(std::string("motherboy"), rw->get_host());
-    EXPECT_EQ(chucho::remote_writer::DEFAULT_PORT, rw->get_port());
-    EXPECT_EQ(chucho::remote_writer::DEFAULT_UNSENT_CACHE_MAX, rw->get_unsent_cache_max());
-    wrts = chucho::logger::get("will2")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::remote_writer), typeid(*wrts[0]));
-    rw = std::static_pointer_cast<chucho::remote_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(rw));
-    EXPECT_EQ(std::string("motherboy"), rw->get_host());
-    EXPECT_EQ(19567, rw->get_port());
-    EXPECT_EQ(chucho::remote_writer::DEFAULT_UNSENT_CACHE_MAX, rw->get_unsent_cache_max());
-    // clear the status because we generated some warnings
-    chucho::status_manager::get()->clear();
+    auto& rfw = dynamic_cast<chucho::rolling_file_writer&>(
+        chucho::logger::get("will")->get_writer("chucho::rolling_file_writer"));
+    auto& nrlr = dynamic_cast<chucho::numbered_file_roller&>(rfw.get_file_roller());
+    EXPECT_EQ(72, nrlr.get_max_index());
+    EXPECT_EQ(1, nrlr.get_min_index());
 }
 
 TEST_F(log4cplus_config_file_configurator, rolling_file_writer)
@@ -304,14 +259,11 @@ TEST_F(log4cplus_config_file_configurator, rolling_file_writer)
               "log4cplus.appender.rfr.File = hello.log\n"
               "log4cplus.appender.rfr.Append = false\n"
               "log4cplus.appender.rfr.ImmediateFlush = false");
-    auto wrts = chucho::logger::get("will")->get_writers();
-    ASSERT_EQ(1, wrts.size());
-    ASSERT_EQ(typeid(chucho::rolling_file_writer), typeid(*wrts[0]));
-    auto fwrt = std::static_pointer_cast<chucho::rolling_file_writer>(wrts[0]);
-    ASSERT_TRUE(static_cast<bool>(fwrt));
-    EXPECT_EQ(std::string("hello.log"), fwrt->get_file_name());
-    EXPECT_EQ(chucho::file_writer::on_start::TRUNCATE, fwrt->get_on_start());
-    EXPECT_FALSE(fwrt->get_flush());
+    auto& fwrt = dynamic_cast<chucho::rolling_file_writer&>(
+        chucho::logger::get("will")->get_writer("chucho::rolling_file_writer"));
+    EXPECT_EQ(std::string("hello.log"), fwrt.get_file_name());
+    EXPECT_EQ(chucho::file_writer::on_start::TRUNCATE, fwrt.get_on_start());
+    EXPECT_FALSE(fwrt.get_flush());
 }
 
 TEST_F(log4cplus_config_file_configurator, rolling_file_writer_invalid_1)
@@ -366,13 +318,10 @@ TEST_F(log4cplus_config_file_configurator, simple_layout)
     configure("log4cplus.logger.will = info, sl\n"
               "log4cplus.appender.sl = log4cplus::ConsoleAppender\n"
               "log4cplus.appender.sl.layout = log4cplus::SimpleLayout");
-    auto wrts = chucho::logger::get("will")->get_writers();
+    auto lgr = chucho::logger::get("will");
+    auto wrts = lgr->get_writer_names();
     ASSERT_EQ(1, wrts.size());
-    auto fmt = wrts[0]->get_formatter();
-    ASSERT_TRUE(static_cast<bool>(fmt));
-    ASSERT_EQ(typeid(chucho::pattern_formatter), typeid(*fmt));
-    auto pf = std::static_pointer_cast<chucho::pattern_formatter>(fmt);
-    ASSERT_TRUE(static_cast<bool>(pf));
+    auto& pf = dynamic_cast<chucho::pattern_formatter&>(lgr->get_writer(wrts[0]).get_formatter());
     chucho::event evt(chucho::logger::get("pattern logger"),
                       chucho::level::INFO_(),
                       "hi",
@@ -380,7 +329,7 @@ TEST_F(log4cplus_config_file_configurator, simple_layout)
                       __LINE__,
                       "dowdy",
                       "chucho");
-    std::string f = pf->format(evt);
+    std::string f = pf.format(evt);
     std::string exp(chucho::level::INFO_()->get_name());
     exp += " - hi";
     exp += chucho::line_ending::EOL;
@@ -438,13 +387,10 @@ TEST_F(log4cplus_config_file_configurator, ttcc_layout)
     configure("log4cplus.logger.will = info, sl\n"
               "log4cplus.appender.sl = log4cplus::ConsoleAppender\n"
               "log4cplus.appender.sl.layout = log4cplus::TTCCLayout");
-    auto wrts = chucho::logger::get("will")->get_writers();
+    auto lgr = chucho::logger::get("will");
+    auto wrts = lgr->get_writer_names();
     ASSERT_EQ(1, wrts.size());
-    auto fmt = wrts[0]->get_formatter();
-    ASSERT_TRUE(static_cast<bool>(fmt));
-    ASSERT_EQ(typeid(chucho::pattern_formatter), typeid(*fmt));
-    auto pf = std::static_pointer_cast<chucho::pattern_formatter>(fmt);
-    ASSERT_TRUE(static_cast<bool>(pf));
+    auto& pf = dynamic_cast<chucho::pattern_formatter&>(lgr->get_writer(wrts[0]).get_formatter());
     chucho::event evt(chucho::logger::get("will"),
                       chucho::level::INFO_(),
                       "hi",
@@ -452,7 +398,7 @@ TEST_F(log4cplus_config_file_configurator, ttcc_layout)
                       __LINE__,
                       "dowdy",
                       "chucho");
-    std::string f = pf->format(evt);
+    std::string f = pf.format(evt);
     // Erase the milliseconds, since we can't guess it
     f.erase(0, f.find(' ') + 1);
     std::ostringstream stream;

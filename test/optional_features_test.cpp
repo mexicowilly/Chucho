@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -33,9 +33,7 @@ TEST(optional_features, simple)
 #if defined(CHUCHO_HAVE_BZIP2)
     EXPECT_FEATURE(chucho::optional_features::BZIP2_COMPRESSION);
 #endif
-#if defined(CHUCHO_HAVE_C_API)
     EXPECT_FEATURE(chucho::optional_features::C_API);
-#endif
 #if defined(CHUCHO_HAVE_CAPN_PROTO)
     EXPECT_FEATURE(chucho::optional_features::CAPN_PROTO_SERIALIZER);
 #endif
@@ -45,8 +43,9 @@ TEST(optional_features, simple)
 #if defined(CHUCHO_CONFIG_FILE_CONFIG)
     EXPECT_FEATURE(chucho::optional_features::CONFIG_FILE_CONFIGURATION);
 #endif
-#if defined(CHUCHO_HAVE_EMAIL_WRITER)
+#if defined(CHUCHO_HAVE_CURL)
     EXPECT_FEATURE(chucho::optional_features::EMAIL_WRITER);
+    EXPECT_FEATURE(chucho::optional_features::LOGGLY_WRITER);
 #endif
 #if defined(CHUCHO_LOG4CPLUS_CONFIG)
     EXPECT_FEATURE(chucho::optional_features::LOG4CPLUS_CONFIGURATION);
@@ -92,6 +91,12 @@ TEST(optional_features, simple)
 #endif
 #if defined(CHUCHO_HAVE_FLATBUFFERS)
     EXPECT_FEATURE(chucho::optional_features::FLATBUFFERS_SERIALIZER);
+#endif
+#if defined(CHUCHO_HAVE_AWSSDK)
+    EXPECT_FEATURE(chucho::optional_features::CLOUDWATCH_WRITER);
+#endif
+#if defined(CHUCHO_HAVE_SOCI)
+    EXPECT_FEATURE(chucho::optional_features::DATABASE_WRITER);
 #endif
     EXPECT_TRUE(fs.none());
 }

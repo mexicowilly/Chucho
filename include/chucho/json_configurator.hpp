@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -33,12 +33,12 @@ namespace chucho
 class CHUCHO_PRIV_EXPORT json_configurator : public configurator
 {
 public:
-    json_configurator(const security_policy& sec_pol);
+    json_configurator(security_policy& sec_pol);
 
     virtual void configure(std::istream &in) override;
 
 private:
-    std::shared_ptr<configurable> create_subobject(const cJSON* json,
+    std::unique_ptr<configurable> create_subobject(const cJSON* json,
                                                    std::shared_ptr<configurable_factory> fact);
     std::shared_ptr<configurable_factory> get_factory(const char* const str);
     std::string value_to_text(const cJSON* json);

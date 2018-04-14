@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ class formatter;
 class CHUCHO_PRIV_EXPORT config_file_configurator : public configurator
 {
 public:
-    config_file_configurator(const security_policy& sec_pol);
+    config_file_configurator(security_policy& sec_pol);
 
     virtual void configure(std::istream& in) override;
     memento_key_set get_memento_key_set() const;
@@ -66,13 +66,13 @@ private:
         virtual void process(const properties& props) override;
 
     private:
-        std::shared_ptr<configurable> create_configurable(const std::string& type,
+        std::unique_ptr<configurable> create_configurable(const std::string& type,
                                                           const std::string& name,
                                                           const properties& props);
 
-        std::shared_ptr<configurable> create_file_roller(const std::string& name,
+        std::unique_ptr<configurable> create_file_roller(const std::string& name,
                                                          const properties& props);
-        std::shared_ptr<configurable> create_writer(const std::string& name,
+        std::unique_ptr<configurable> create_writer(const std::string& name,
                                                     const properties& props);
         std::shared_ptr<configurable_factory> get_factory(const std::string& type,
                                                           const std::string& name,
@@ -91,25 +91,25 @@ private:
         virtual void process(const properties& props) override;
 
     private:
-        void add_filters(std::shared_ptr<writer> wrt, const properties& props);
+        void add_filters(writer& wrt, const properties& props);
         bool boolean_value(const std::string& text) const;
-        std::shared_ptr<configurable> create_async_writer(const properties& top_props,
+        std::unique_ptr<configurable> create_async_writer(const properties& top_props,
                                                           const properties& wrt_props);
-        std::shared_ptr<configurable> create_console_writer(std::shared_ptr<formatter> fmt,
+        std::unique_ptr<configurable> create_console_writer(std::unique_ptr<formatter>&& fmt,
                                                             const properties& props);
-        std::shared_ptr<formatter> create_formatter(const std::string& type,
+        std::unique_ptr<formatter> create_formatter(const std::string& type,
                                                     const properties& props);
-        std::shared_ptr<configurable> create_logger(const std::string& name,
-                                                    const std::string& desc,
-                                                    const properties& props);
-        std::shared_ptr<configurable> create_size_rolling_writer(std::shared_ptr<formatter> fmt,
+        void create_logger(const std::string& name,
+                           const std::string& desc,
+                           const properties& props);
+        std::unique_ptr<configurable> create_size_rolling_writer(std::unique_ptr<formatter>&& fmt,
                                                                  const properties& props);
-        std::shared_ptr<configurable> create_time_rolling_writer(std::shared_ptr<formatter> fmt,
+        std::unique_ptr<configurable> create_time_rolling_writer(std::unique_ptr<formatter>&& fmt,
                                                                  const properties& props);
-        std::shared_ptr<configurable> create_writer(const std::string& name,
+        std::unique_ptr<configurable> create_writer(const std::string& name,
                                                     const properties& props);
-        void fill_file_writer_memento(std::shared_ptr<memento> mnto,
-                                      std::shared_ptr<formatter> fmt,
+        void fill_file_writer_memento(std::unique_ptr<memento>& mnto,
+                                      std::unique_ptr<formatter>&& fmt,
                                       const properties& props);
         std::vector<std::string> split_logger_descriptor(const std::string& desc);
         std::string time_pattern_from_log4cplus_schedule(const optional<std::string>& sched,

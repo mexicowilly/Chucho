@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,13 +17,16 @@
 #include <chucho/writer.hpp>
 #include <chucho/exception.hpp>
 #include <stdexcept>
+#include <algorithm>
 
 namespace chucho
 {
 
-writer::writer(std::shared_ptr<formatter> fmt)
-    : formatter_(fmt),
-      i_am_writing_(false)
+writer::writer(const std::string& name, std::unique_ptr<formatter>&& fmt)
+    : formatter_(std::move(fmt)),
+      guard_(std::make_unique<std::recursive_mutex>()),
+      i_am_writing_(false),
+      name_(name)
 {
     if (!formatter_)
         throw std::invalid_argument("The formatter cannot be a nullptr");
@@ -33,15 +36,15 @@ writer::~writer()
 {
 }
 
-void writer::add_filter(std::shared_ptr<filter> flt)
+void writer::add_filter(std::unique_ptr<filter>&& flt)
 {
-    std::lock_guard<std::recursive_mutex> lg(guard_);
-    filters_.push_back(flt);
+    std::lock_guard<std::recursive_mutex> lg(*guard_);
+    filters_.push_back(std::move(flt));
 }
 
 void writer::clear_filters()
 {
-    std::lock_guard<std::recursive_mutex> lg(guard_);
+    std::lock_guard<std::recursive_mutex> lg(*guard_);
     filters_.clear();
 }
 
@@ -49,15 +52,29 @@ void writer::flush()
 {
 }
 
-std::vector<std::shared_ptr<filter>> writer::get_filters()
+filter& writer::get_filter(const std::string& name)
 {
-    std::lock_guard<std::recursive_mutex> lg(guard_);
-    return filters_;
+    std::lock_guard<std::recursive_mutex> lg(*guard_);
+    auto found = std::find_if(filters_.begin(),
+                              filters_.end(),
+                              [&name] (const std::unique_ptr<filter>& f) { return f->get_name() == name; });
+    if (found == filters_.end())
+        throw std::invalid_argument("The filter " + name + " could not be found");
+    return **found;
+}
+
+std::vector<std::string> writer::get_filter_names()
+{
+    std::vector<std::string> result;
+    std::lock_guard<std::recursive_mutex> lg(*guard_);
+    for (const auto& f : filters_)
+        result.push_back(f->get_name());
+    return result;
 }
 
 bool writer::permits(const event& evt)
 {
-    for (std::shared_ptr<filter> f : filters_)
+    for (const auto& f : filters_)
     {
         filter::result res = f->evaluate(evt);
         if (res == filter::result::DENY)
@@ -68,9 +85,15 @@ bool writer::permits(const event& evt)
     return true;
 }
 
+void writer::remove_filter(const std::string& name)
+{
+    std::lock_guard<std::recursive_mutex> lg(*guard_);
+    filters_.remove_if([&name] (const std::unique_ptr<filter>& f) { return f->get_name() == name; });
+}
+
 void writer::write(const event& evt)
 {
-    std::lock_guard<std::recursive_mutex> lg(guard_);
+    std::lock_guard<std::recursive_mutex> lg(*guard_);
     // Prevent writing more than once in same thread
     if (!i_am_writing_)
     {
@@ -83,7 +106,7 @@ void writer::write(const event& evt)
         } s(i_am_writing_);
         try
         {
-            if (formatter_ && permits(evt))
+            if (permits(evt))
                 write_impl(evt);
         }
         catch (std::exception& e)

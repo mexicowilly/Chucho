@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 namespace chucho
 {
 
-cout_writer::cout_writer(std::shared_ptr<formatter> fmt)
-    : file_descriptor_writer(fmt, STDOUT_FILENO, true)
+cout_writer::cout_writer(const std::string& name, std::unique_ptr<formatter>&& fmt)
+    : file_descriptor_writer(name, std::move(fmt), STDOUT_FILENO, true)
 {
     set_allow_close(false);
 }

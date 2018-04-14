@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ class CHUCHO_EXPORT capn_proto_serializer : public serializer
 {
 public:
     virtual std::vector<std::uint8_t> finish_blob() override;
-    virtual void serialize(const event& evt, std::shared_ptr<formatter> fmt) override;
+    virtual void serialize(const event& evt, formatter& fmt) override;
 
 private:
     struct event_store

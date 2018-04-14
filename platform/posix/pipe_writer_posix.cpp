@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,9 +23,10 @@
 namespace chucho
 {
 
-pipe_writer::pipe_writer(std::shared_ptr<formatter> fmt,
+pipe_writer::pipe_writer(const std::string& name,
+                         std::unique_ptr<formatter>&& fmt,
                          bool flsh)
-    : file_descriptor_writer(fmt, flsh),
+    : file_descriptor_writer(name, std::move(fmt), flsh),
       input_(-1),
       output_(-1)
 {

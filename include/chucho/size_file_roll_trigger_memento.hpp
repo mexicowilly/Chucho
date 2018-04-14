@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -36,8 +36,6 @@ public:
     const optional<std::uintmax_t>& get_max_size() const;
 
 private:
-    void parse(const std::string& spec);
-
     optional<std::uintmax_t> max_size_;
 };
 

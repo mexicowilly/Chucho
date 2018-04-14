@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -61,11 +61,13 @@ public:
      */
     /**
      * Construct an evaluator.
-     * 
+     *
+     * @param name the name of this filter
      * @param expression the Ruby code that should be run to 
      *                   evaulate the filtration disposition
      */
-    ruby_evaluator_filter(const std::string& expression);
+    ruby_evaluator_filter(const std::string& name,
+                          const std::string& expression);
     /** @}  */
 
     virtual result evaluate(const event& evt) override;

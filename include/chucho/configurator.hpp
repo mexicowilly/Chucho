@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ public:
     /**
      * Make a configurator.
      */
-    configurator(const security_policy& sec_pol);
+    configurator(security_policy& sec_pol);
 	/**
 	 * Destroy a configurator.
 	 */
@@ -135,7 +135,7 @@ private:
     CHUCHO_NO_EXPORT static void initialize_impl();
 
     std::map<std::string, std::string> variables_;
-    security_policy security_policy_;
+    security_policy& security_policy_;
 };
 
 inline void configurator::add_configurable_factory(const std::string& name,

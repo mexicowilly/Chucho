@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,10 @@
 
 #include <chucho/duplicate_message_filter_factory.hpp>
 #include <chucho/duplicate_message_filter.hpp>
+#include <chucho/filter_memento.hpp>
 #include <chucho/demangle.hpp>
+#include <chucho/exception.hpp>
+#include <assert.h>
 
 namespace chucho
 {
@@ -26,17 +29,22 @@ duplicate_message_filter_factory::duplicate_message_filter_factory()
     set_status_origin("duplicate_message_filter_factory");
 }
 
-std::shared_ptr<configurable> duplicate_message_filter_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> duplicate_message_filter_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    std::shared_ptr<configurable> cnf(new duplicate_message_filter());
+    auto m = dynamic_cast<filter_memento*>(mnto.get());
+    assert(m != nullptr);
+    if (m->get_name().empty())
+        throw exception("duplicate_message_filter_factory: The filter's name is not set");
+    auto cnf = std::make_unique<duplicate_message_filter>(m->get_name());
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
-    return cnf;
+    return std::move(cnf);
 }
 
-std::shared_ptr<memento> duplicate_message_filter_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> duplicate_message_filter_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto(new memento(cfg));
-    return mnto;
+    auto mnto = std::make_unique<filter_memento>(cfg);
+    mnto->set_default_name(typeid(duplicate_message_filter));
+    return std::move(mnto);
 }
 
 }

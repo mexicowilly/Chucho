@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,79 +16,86 @@
 
 #include <chucho/log.h>
 #include <chucho/event.hpp>
-#include <chucho/c_logger.hpp>
-#include <chucho/c_level.hpp>
-#include <chucho/optional.hpp>
 #include <chucho/text_util.hpp>
+#include <chucho/logger.hpp>
 #include <cstdarg>
+
+namespace
+{
+
+std::shared_ptr<chucho::level> c_to_level(chucho_level_t lvl)
+{
+    switch (lvl)
+    {
+    case CHUCHO_TRACE:
+        return chucho::level::TRACE_();
+    case CHUCHO_DEBUG:
+        return chucho::level::DEBUG_();
+    case CHUCHO_INFO:
+        return chucho::level::INFO_();
+    case CHUCHO_WARN:
+        return chucho::level::WARN_();
+    case CHUCHO_ERROR:
+        return chucho::level::ERROR_();
+    case CHUCHO_FATAL:
+        return chucho::level::FATAL_();
+    }
+    return chucho::level::INFO_();
+}
+
+}
 
 extern "C"
 {
 
-chucho_rc chucho_log(const chucho_level* lvl,
-                     chucho_logger* lgr,
+void chucho_log(chucho_level_t lvl,
+                const char* const lgr,
+                const char* const file,
+                int line,
+                const char* const func,
+                const char* const format, ...)
+{
+    auto l = chucho::logger::get(lgr);
+    auto lv = c_to_level(lvl);
+    if (l->permits(lv))
+    {
+        va_list args;
+        va_start(args, format);
+        auto msg = chucho::text_util::format(format, args);
+        va_end(args);
+        l->write(chucho::event(l,
+                               lv,
+                               msg,
+                               file,
+                               line,
+                               func));
+    }
+}
+
+void chucho_log_mark(chucho_level_t lvl,
+                     const char* const lgr,
                      const char* const file,
                      int line,
                      const char* const func,
+                     const char* const mark,
                      const char* const format, ...)
 {
-    try
+    auto l = chucho::logger::get(lgr);
+    auto lv = c_to_level(lvl);
+    if (l->permits(lv))
     {
-        if (lvl == nullptr || lgr == nullptr)
-            return CHUCHO_NULL_POINTER; 
-        if (lgr->logger_->permits(lvl->level_))
-        {
-            va_list args;
-            va_start(args, format);
-            auto msg = chucho::text_util::format(format, args);
-            va_end(args);
-            lgr->logger_->write(chucho::event(lgr->logger_,
-                                              lvl->level_,
-                                              msg,
-                                              file,
-                                              line,
-                                              func));
-        }
+        va_list args;
+        va_start(args, format);
+        auto msg = chucho::text_util::format(format, args);
+        va_end(args);
+        l->write(chucho::event(l,
+                               lv,
+                               msg,
+                               file,
+                               line,
+                               func,
+                               mark));
     }
-    catch (...)
-    {
-        return CHUCHO_OUT_OF_MEMORY;
-    }
-    return CHUCHO_NO_ERROR;
-}
-
-chucho_rc chucho_log_mark(const chucho_level* lvl,
-                          chucho_logger* lgr,
-                          const char* const file,
-                          int line,
-                          const char* const func,
-                          const char* const mark,
-                          const char* const format, ...)
-{
-    try
-    {
-        if (lvl == nullptr || lgr == nullptr || mark == nullptr)
-            return CHUCHO_NULL_POINTER; 
-        if (lgr->logger_->permits(lvl->level_))
-        {
-            va_list args;
-            va_start(args, format);
-            auto msg = chucho::text_util::format(format, args);
-            va_end(args);
-            lgr->logger_->write(chucho::event(lgr->logger_,
-                                              lvl->level_,
-                                              msg,
-                                              file,
-                                              line,
-                                              func,
-                                              mark));
-        }
-    }
-    catch (...)
-    {
-        return CHUCHO_OUT_OF_MEMORY;
-    }
-    return CHUCHO_NO_ERROR;
 }
 
 }

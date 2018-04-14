@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ namespace
 class string_writer : public chucho::writer
 {
 public:
-    string_writer(std::shared_ptr<chucho::formatter> fmt)
-        : writer(fmt) { }
+    string_writer(std::unique_ptr<chucho::formatter>&& fmt)
+        : writer("string", std::move(fmt)) { }
     
     void clear()
     {
@@ -53,10 +53,10 @@ class stream_test : public ::testing::Test
 {
 public:
     stream_test()
-        : lgr_(chucho::logger::get("stream_test")),
-          wrt_(std::make_shared<string_writer>(std::make_shared<chucho::pattern_formatter>("%m%k")))
+        : lgr_(chucho::logger::get("stream_test"))
     {
-        lgr_->add_writer(wrt_);
+        auto wrt = std::make_unique<string_writer>(std::move(std::make_unique<chucho::pattern_formatter>("%m%k")));
+        lgr_->add_writer(std::move(wrt));
     }
     
     ~stream_test()
@@ -64,15 +64,19 @@ public:
         lgr_.reset();
         chucho::logger::remove_unused_loggers();
     }
+
+    void clear_text()
+    {
+        dynamic_cast<string_writer&>(lgr_->get_writer("string")).clear();
+    }
     
     std::string get_text()
     {
-        return std::dynamic_pointer_cast<string_writer>(wrt_)->get_text();
+        return dynamic_cast<string_writer&>(lgr_->get_writer("string")).get_text();
     }
     
 protected:
     std::shared_ptr<chucho::logger> lgr_;
-    std::shared_ptr<chucho::writer> wrt_;
 };
 
 }
@@ -141,7 +145,7 @@ TEST_F(stream_test, set_marker)
     lgr_->set_level(chucho::level::INFO_());
     CHUCHO_M(ls) << chucho::info << chucho::set_marker(chucho::marker("marky")) << chucho::endm;
     EXPECT_EQ(std::string("marky"), get_text());
-    std::dynamic_pointer_cast<string_writer>(wrt_)->clear();
+    clear_text();
     CHUCHO_M(ls) << chucho::set_marker("marky 2") << chucho::endm;
     EXPECT_EQ(std::string("marky 2"), get_text());
 }

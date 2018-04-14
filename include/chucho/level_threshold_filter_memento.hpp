@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,14 +21,14 @@
 #error "This header is private"
 #endif
 
-#include <chucho/memento.hpp>
+#include <chucho/filter_memento.hpp>
 #include <chucho/level.hpp>
 #include <chucho/memento_key_set.hpp>
 
 namespace chucho
 {
 
-class level_threshold_filter_memento : public memento
+class level_threshold_filter_memento : public filter_memento
 {
 public:
     level_threshold_filter_memento(configurator& cfg, memento_key_set ks);

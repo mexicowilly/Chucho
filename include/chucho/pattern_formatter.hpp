@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -173,6 +173,8 @@ public:
      * @throw exception if the pattern is invalid
      */
     pattern_formatter(const std::string& pattern);
+    pattern_formatter(const pattern_formatter& fmt) = delete;
+    pattern_formatter(pattern_formatter&& fmt) = default;
     //@}
 
     virtual std::string format(const event& evt) override;
@@ -401,14 +403,14 @@ private:
         std::string key_;
     };
 
-    CHUCHO_NO_EXPORT std::shared_ptr<piece> create_piece(std::string::const_iterator& pos,
+    CHUCHO_NO_EXPORT std::unique_ptr<piece> create_piece(std::string::const_iterator& pos,
                                                          std::string::const_iterator end,
                                                          const format_params& params);
     CHUCHO_NO_EXPORT void parse(const std::string& pattern);
     CHUCHO_NO_EXPORT std::string get_argument(std::string::const_iterator& pos,
                                               std::string::const_iterator end);
 
-    std::vector<std::shared_ptr<piece>> pieces_;
+    std::vector<std::unique_ptr<piece>> pieces_;
 };
 
 }

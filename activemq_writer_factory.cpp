@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,13 +28,17 @@ activemq_writer_factory::activemq_writer_factory()
     set_status_origin("activemq_writer_factory");
 }
 
-std::shared_ptr<configurable> activemq_writer_factory::create_configurable(std::shared_ptr<memento> mnto)
+std::unique_ptr<configurable> activemq_writer_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-    auto am = std::dynamic_pointer_cast<activemq_writer_memento>(mnto);
-    assert(am);
-    if (!am->get_formatter())
+    auto am = dynamic_cast<activemq_writer_memento*>(mnto.get());
+    assert(am != nullptr);
+    if (am->get_name().empty())
+        throw exception("activemq_writer_factory: The name is not set");
+    auto fmt = std::move(am->get_formatter());
+    if (!fmt)
         throw exception("activemq_writer_factory: The writer's formatter is not set");
-    if (!am->get_serializer())
+    auto ser = std::move(am->get_serializer());
+    if (!ser)
         throw exception("activemq_writer_factory: The writer's serializer is not set");
     if (am->get_broker().empty())
         throw exception("activemq_writer_factory: The broker is not set");
@@ -42,22 +46,23 @@ std::shared_ptr<configurable> activemq_writer_factory::create_configurable(std::
         throw exception("activemq_writer_factory: The consumer type is not set");
     if (am->get_topic_or_queue().empty())
         throw exception("activemq_writer_factory: The topic or queue name is not set");
-    auto aw = std::make_shared<activemq_writer>(am->get_formatter(),
-                                                am->get_serializer(),
+    auto aw = std::make_unique<activemq_writer>(am->get_name(),
+                                                std::move(fmt),
+                                                std::move(ser),
                                                 am->get_coalesce_max(),
-                                                am->get_compressor(),
+                                                std::move(am->get_compressor()),
                                                 am->get_broker(),
                                                 *am->get_consumer_type(),
                                                 am->get_topic_or_queue());
-    set_filters(aw, am);
+    set_filters(*aw, *am);
     report_info("Created a " + demangle::get_demangled_name(typeid(*aw)));
-    return aw;
+    return std::move(aw);
 }
 
-std::shared_ptr<memento> activemq_writer_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> activemq_writer_factory::create_memento(configurator& cfg)
 {
-    std::shared_ptr<memento> mnto = std::make_shared<activemq_writer_memento>(cfg);
-    return mnto;
+    std::unique_ptr<memento> mnto = std::make_unique<activemq_writer_memento>(cfg);
+    return std::move(mnto);
 }
 
 }

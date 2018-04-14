@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ public:
      * @param cfg the @ref configuration performing configuration
      * @return a @ref file_compressor_memento
      */
-    virtual std::shared_ptr<memento> create_memento(configurator& cfg) override;
+    virtual std::unique_ptr<memento> create_memento(configurator& cfg) override;
 };
 
 }

@@ -1,5 +1,5 @@
 --
--- Copyright 2013-2017 Will Mason
+-- Copyright 2013-2018 Will Mason
 -- 
 --    Licensed under the Apache License, Version 2.0 (the "License");
 --    you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ CREATE TABLE chucho_event
    level_name VARCHAR(256) NOT NULL,
    marker VARCHAR(1024),
    thread VARCHAR(256) NOT NULL,
-   host_name VARCHAR(256) NOT NULL
+   host_name VARCHAR(256) NOT NULL,
+   process_id INT UNSIGNED NOT NULL
 );
 COMMIT;

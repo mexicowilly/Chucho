@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 #include <chucho/memento.hpp>
 #include <chucho/optional.hpp>
 #include <chucho/writer.hpp>
-#include <chucho/level.hpp>
 
 namespace chucho
 {
@@ -34,22 +33,24 @@ class async_writer_memento : public memento
 public:
     async_writer_memento(configurator& cfg);
 
-    std::shared_ptr<level> get_discard_threshold() const;
+    const optional<std::size_t>& get_chunk_size() const;
     const optional<bool>& get_flush_on_destruct() const;
-    const optional<std::size_t>& get_queue_capacity() const;
-    std::shared_ptr<writer> get_writer() const;
-    virtual void handle(std::shared_ptr<configurable> cnf) override;
+    const optional<std::size_t>& get_max_chunks() const;
+    const std::string& get_name() const;
+    std::unique_ptr<writer>& get_writer();
+    virtual void handle(std::unique_ptr<configurable>&& cnf) override;
 
 private:
-    std::shared_ptr<level> discard_threshold_;
-    optional<std::size_t> queue_capacity_;
-    std::shared_ptr<writer> writer_;
+    optional<std::size_t> chunk_size_;
+    optional<std::size_t> max_chunks_;
+    std::unique_ptr<writer> writer_;
     optional<bool> flush_on_destruct_;
+    std::string name_;
 };
 
-inline std::shared_ptr<level> async_writer_memento::get_discard_threshold() const
+inline const optional<std::size_t>& async_writer_memento::get_chunk_size() const
 {
-    return discard_threshold_;
+    return chunk_size_;
 }
 
 inline const optional<bool>& async_writer_memento::get_flush_on_destruct() const
@@ -57,12 +58,17 @@ inline const optional<bool>& async_writer_memento::get_flush_on_destruct() const
     return flush_on_destruct_;
 }
 
-inline const optional<std::size_t>& async_writer_memento::get_queue_capacity() const
+inline const optional<std::size_t>& async_writer_memento::get_max_chunks() const
 {
-    return queue_capacity_;
+    return max_chunks_;
 }
 
-inline std::shared_ptr<writer> async_writer_memento::get_writer() const
+inline const std::string& async_writer_memento::get_name() const
+{
+    return name_;
+}
+
+inline std::unique_ptr<writer>& async_writer_memento::get_writer()
 {
     return writer_;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 #include <chucho/message_queue_writer_memento.hpp>
 #include <chucho/message_queue_writer.hpp>
+#include <chucho/move_util.hpp>
 
 namespace chucho
 {
@@ -36,20 +37,20 @@ message_queue_writer_memento::message_queue_writer_memento(configurator& cfg)
                 });
 }
 
-void message_queue_writer_memento::handle(std::shared_ptr<configurable> cnf)
+void message_queue_writer_memento::handle(std::unique_ptr<configurable>&& cnf)
 {
-    auto ser = std::dynamic_pointer_cast<serializer>(cnf);
+    auto ser = dynamic_move<serializer>(std::move(cnf));
     if (ser)
     {
-        serializer_ = ser;
+        serializer_ = std::move(ser);
     }
     else
     {
-        auto cmp = std::dynamic_pointer_cast<compressor>(cnf);
+        auto cmp = dynamic_move<compressor>(std::move(cnf));
         if (cmp)
-            compressor_ = cmp;
+            compressor_ = std::move(cmp);
         else
-            writer_memento::handle(cnf);
+            writer_memento::handle(std::move(cnf));
     }
 }
 

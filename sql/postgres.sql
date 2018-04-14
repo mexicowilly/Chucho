@@ -1,5 +1,5 @@
 --
--- Copyright 2013-2017 Will Mason
+-- Copyright 2013-2018 Will Mason
 --
 --    Licensed under the Apache License, Version 2.0 (the "License");
 --    you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ CREATE TABLE chucho_event
 (
     event_id BIGINT DEFAULT NEXTVAL('chucho_id_seq') PRIMARY KEY,
     formatted_message TEXT NOT NULL,
-    timestamp TIMESTAMPTZ NOT NULL,
+    timestmp TIMESTAMPTZ NOT NULL,
     file_name TEXT NOT NULL,
     line_number INTEGER NOT NULL,
     function_name TEXT NOT NULL,
@@ -31,5 +31,6 @@ CREATE TABLE chucho_event
     level_name TEXT NOT NULL,
     marker TEXT,
     thread TEXT NOT NULL,
-    host_name TEXT NOT NULL
+    host_name TEXT NOT NULL,
+    process_id INTEGER NOT NULL
 );

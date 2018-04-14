@@ -7,9 +7,9 @@ int main()
 {
     chucho::configuration::set_style(chucho::configuration::style::OFF);
     auto lgr = chucho::logger::get("will");
-    auto fmt = std::make_shared<chucho::pattern_formatter>("%m%n");
-    auto wrt = std::make_shared<chucho::cout_writer>(fmt);
-    lgr->add_writer(wrt);
+    auto fmt = std::make_unique<chucho::pattern_formatter>("%m%n");
+    auto wrt = std::make_unique<chucho::cout_writer>("cout", std::move(fmt));
+    lgr->add_writer(std::move(wrt));
     CHUCHO_INFO(lgr, "hello");
     return 0;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #pragma warning(disable:4251)
 #endif
 
-#include <chucho/memento.hpp>
+#include <chucho/nameable_memento.hpp>
 #include <chucho/filter.hpp>
 #include <chucho/formatter.hpp>
 #include <vector>
@@ -38,7 +38,7 @@ namespace chucho
  *  
  * @ingroup configuration 
  */
-class CHUCHO_EXPORT writer_memento : public memento
+class CHUCHO_EXPORT writer_memento : public nameable_memento
 {
 public:
     /**
@@ -59,27 +59,27 @@ public:
      * 
      * @return the filters
      */
-    const std::vector<std::shared_ptr<filter>>& get_filters() const;
+    std::vector<std::unique_ptr<filter>>& get_filters();
     /**
      * Return the formatter that has been discovered during 
      * configuration time. 
      * 
      * @return the formatter
      */
-    std::shared_ptr<formatter> get_formatter() const;
-    virtual void handle(std::shared_ptr<configurable> cnf) override;
+    std::unique_ptr<formatter>& get_formatter();
+    virtual void handle(std::unique_ptr<configurable>&& cnf) override;
 
 private:
-    std::shared_ptr<formatter> fmt_;
-    std::vector<std::shared_ptr<filter>> filters_;
+    std::unique_ptr<formatter> fmt_;
+    std::vector<std::unique_ptr<filter>> filters_;
 };
 
-inline const std::vector<std::shared_ptr<filter>>& writer_memento::get_filters() const
+inline std::vector<std::unique_ptr<filter>>& writer_memento::get_filters()
 {
     return filters_;
 }
 
-inline std::shared_ptr<formatter> writer_memento::get_formatter() const
+inline std::unique_ptr<formatter>& writer_memento::get_formatter()
 {
     return fmt_;
 }

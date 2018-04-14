@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,19 +30,18 @@ class pipe_writer_test : public ::testing::Test
 {
 public:
     pipe_writer_test()
+      : writer_("pipe", std::move(std::make_unique<chucho::pattern_formatter>("%m")))
     {
-        auto fmt = std::make_shared<chucho::pattern_formatter>("%m");
-        writer_ = std::make_shared<chucho::pipe_writer>(fmt);
     }
 
     std::string read(std::size_t num)
     {
         std::vector<char> buf(num);
         #if defined(CHUCHO_POSIX)
-        auto actual = ::read(writer_->get_input(), &buf[0], num);
+        auto actual = ::read(writer_.get_input(), &buf[0], num);
         #elif defined(CHUCHO_WINDOWS)
         DWORD actual;
-        EXPECT_NE(0, ReadFile(writer_->get_input(), &buf[0], num, &actual, NULL));
+        EXPECT_NE(0, ReadFile(writer_.get_input(), &buf[0], num, &actual, NULL));
         #endif
         EXPECT_EQ(num, actual);
         return std::string(&buf[0], num);
@@ -52,11 +51,11 @@ public:
     {
         std::shared_ptr<chucho::logger> log = chucho::logger::get("pipe_writer_test");
         chucho::event evt(log, chucho::level::INFO_(), str, __FILE__, __LINE__, __FUNCTION__);
-        writer_->write(evt);
+        writer_.write(evt);
     }
 
 private:
-    std::shared_ptr<chucho::pipe_writer> writer_;
+    chucho::pipe_writer writer_;
 };
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -53,18 +53,22 @@ public:
             connect = chucho::email_writer::connection_type::SSL;
         else if (*connect_text == "starttls")
             connect = chucho::email_writer::connection_type::STARTTLS;
-        auto fmt = std::make_shared<chucho::pattern_formatter>("%m");
-        wrt_ = std::make_shared<chucho::email_writer>(fmt,
-                                                      *host,
-                                                      connect,
-                                                      to,
-                                                      *from,
-                                                      "%c",
-                                                      std::make_shared<chucho::level_threshold_email_trigger>(chucho::level::ERROR_()),
-                                                      *user,
-                                                      *password,
-                                                      port);
-        get_logger()->add_writer(wrt_);
+        auto fmt = std::make_unique<chucho::pattern_formatter>("%m");
+        auto trig = std::make_unique<chucho::level_threshold_email_trigger>(chucho::level::ERROR_());
+        auto wrt = std::make_unique<chucho::email_writer>("email",
+                                                          std::move(fmt),
+                                                          *host,
+                                                          connect,
+                                                          to,
+                                                          *from,
+                                                          "%c",
+                                                          std::move(trig),
+                                                          *user,
+                                                          *password,
+                                                          port);
+        get_logger()->add_writer(std::move(wrt));
+        wrt_ = dynamic_cast<chucho::email_writer*>(&get_logger()->get_writer("email"));
+        ASSERT_NE(nullptr, wrt_);
     }
 
     std::shared_ptr<chucho::logger> get_logger()
@@ -73,7 +77,7 @@ public:
     }
 
 protected:
-    std::shared_ptr<chucho::email_writer> wrt_;
+    chucho::email_writer* wrt_;
 };
 
 }

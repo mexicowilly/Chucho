@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,10 +25,10 @@ file_compressor_factory::file_compressor_factory()
     set_status_origin("file_compressor_factory");
 }
 
-std::shared_ptr<memento> file_compressor_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> file_compressor_factory::create_memento(configurator& cfg)
 {
-    auto mnto = std::make_shared<file_compressor_memento>(cfg);
-    return mnto;
+    auto mnto = std::make_unique<file_compressor_memento>(cfg);
+    return std::move(mnto);
 }
 
 }

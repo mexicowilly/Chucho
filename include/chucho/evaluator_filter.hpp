@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -35,7 +35,25 @@ namespace chucho
 
 class evaluator_filter : public filter
 {
+protected:
+    /**
+     * @name Constructor
+     * @{
+     */
+    /**
+     * Construct a filter.
+     * @param name the name
+     */
+    evaluator_filter(const std::string& name);
+    /**
+     * @}
+     */
 };
+
+inline evaluator_filter::evaluator_filter(const std::string& name)
+    : filter(name)
+{
+}
 
 }
 

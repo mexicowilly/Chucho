@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ protected:
      * @param cnf the @ref writer that wants filters
      * @param mnto the @ref memento that has the filters
      */
-    void set_filters(std::shared_ptr<configurable> cnf, std::shared_ptr<writer_memento> mnto);
+    void set_filters(configurable& cnf, writer_memento& mnto);
 };
 
 }

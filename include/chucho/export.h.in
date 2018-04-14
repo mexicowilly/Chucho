@@ -1,0 +1,67 @@
+/*
+ * Copyright 2013-2018 Will Mason
+ * 
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#if !defined(CHUCHO_EXPORT__)
+#define CHUCHO_EXPORT__
+
+// This definition is set by CMake at build time. If defined, then Chucho
+// is configured as a static library. It corresponds to the CMake variable
+// CHUCHO_STATIC.
+#cmakedefine CHUCHO_STATIC
+
+#if defined(CHUCHO_STATIC)
+
+#define CHUCHO_EXPORT
+#define CHUCHO_NO_EXPORT
+#define CHUCHO_PRIV_EXPORT
+
+#else
+
+#if defined(chucho_EXPORTS)
+
+#if defined(_MSC_VER)
+#define CHUCHO_EXPORT __declspec(dllexport)
+#elif defined(__clang__) || (defined(__GNUC__) && __GNUC__ >= 4)
+#define CHUCHO_EXPORT __attribute__ ((visibility ("default")))
+#else
+#define CHUCHO_EXPORT
+#endif
+
+#else
+
+#if defined(_MSC_VER)
+#define CHUCHO_EXPORT __declspec(dllimport)
+#elif defined(__clang__) || (defined(__GNUC__) && __GNUC__ >= 4)
+#define CHUCHO_EXPORT __attribute__ ((visibility ("default")))
+#else
+#define CHUCHO_EXPORT
+#endif
+
+#endif
+
+#if !defined(CHUCHO_PRIV_EXPORT)
+#define CHUCHO_PRIV_EXPORT
+#endif
+
+#if !defined(__CYGWIN__) && (defined(__clang__) || (defined(__GNUC__) && __GNUC__ >= 4))
+#define CHUCHO_NO_EXPORT __attribute__ ((visibility ("hidden")))
+#else
+#define CHUCHO_NO_EXPORT
+#endif
+
+#endif
+
+#endif

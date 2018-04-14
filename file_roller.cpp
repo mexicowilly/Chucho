@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@
 namespace chucho
 {
 
-file_roller::file_roller(std::shared_ptr<file_compressor> cmp)
+file_roller::file_roller(std::unique_ptr<file_compressor>&& cmp)
     : file_writer_(nullptr),
-      compressor_(cmp)
+      compressor_(std::move(cmp))
 {
 }
 

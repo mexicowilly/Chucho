@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -37,7 +37,8 @@ private:
 
 TEST_F(level_threshold_filter_test, evaluate)
 {
-    chucho::level_threshold_filter f(chucho::level::INFO_());
+    chucho::level_threshold_filter f("thresh", chucho::level::INFO_());
+    EXPECT_EQ(std::string("thresh"), f.get_name());
     EXPECT_EQ(chucho::filter::result::DENY, f.evaluate(get_event(chucho::level::TRACE_())));
     EXPECT_EQ(chucho::filter::result::DENY, f.evaluate(get_event(chucho::level::DEBUG_())));
     EXPECT_EQ(chucho::filter::result::NEUTRAL, f.evaluate(get_event(chucho::level::INFO_())));

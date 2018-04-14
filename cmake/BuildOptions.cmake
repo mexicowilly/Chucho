@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2017 Will Mason
+# Copyright 2013-2018 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -63,26 +63,6 @@ OPTION(ENABLE_SHARED "Whether to build a shared object" OFF)
 
 OPTION(ENABLE_FRAMEWORK "Whether to build as a framework on Macintosh" ON)
 
-# Whether to install the Chucho server, chuchod, as a service on systems that
-# support system services. The operating systems on which the build system knows
-# how to install a service include Windows, Linux, Macintosh and FreeBSD. The
-# service installation may succeed on other systems, but they are untested.
-
-OPTION(INSTALL_SERVICE "Whether to install chuchod as a system service" OFF)
-
-# Whether to build the C API. Chucho supports a C99 interface if your program is
-# written in C or you are using a compiler that cannot understand C++11. This is
-# normally disabled, as it will increase the size of the Chucho library
-# significantly.
-
-OPTION(C_API "Whether the C API should be built into this Chucho" OFF)
-
-# Whether to build the log server, chuchod. This is only necessary if you are planning
-# on installing the server to this host. If you only need to use remote_writer to
-# forward event to another host, then there is no need to build chuchod.
-
-OPTION(CHUCHOD "Whether the log server, chuchod, should be built into this Chucho" OFF)
-
 # Whether to use libstdc++ when compiling with Clang.
 OPTION(CLANG_LIBSTDCXX "Whether to use libstdc++ with the Clang compiler" OFF)
 
@@ -95,6 +75,7 @@ OPTION(CLANG_LIBSTDCXX "Whether to use libstdc++ with the Clang compiler" OFF)
 #     test/yaml_configurator_test.cpp
 #     test/chucho_config_file_configurator_test.cpp
 #     test/log4cplus_config_file_configurator_test.cpp
+#     test/json_configurator_test.cpp
 
 # YAML configuration.
 
@@ -122,20 +103,18 @@ OPTION(JSON_CONFIG "Whether to support reading JSON configuration files" OFF)
 # The feature names and what they provide are:
 #
 # activemq: activemq_writer
+# awssdk: cloudwatch_writer
 # bzip2: bzip2_compressor, bzip2_file_compressor
 # capn_proto: capn_proto_serializer
-# curl: email_writer, email_trigger, level_threshold_email_trigger
-# db2: db2_writer
+# curl: email_writer, email_trigger, level_threshold_email_trigger, loggly_writer
 # flatbuffers: flatbuffers_serializer
 # libarchive: zip_file_compressor
 # liblzma: lzma_compressor, lzma_file_compressor
-# mysql: mysql_writer
-# oracle: oracle_writer
-# postgres: postgres_writer
+# lz4: lz4_compressor
 # protobuf: protobuf_serializer
 # rabbitmq: rabbitmq_writer
 # ruby: ruby_evaluator_filter
-# sqlite: sqlite_writer
+# soci: database_writer
 # zeromq: zeromq_writer
 # zlib: zlib_compressor, gzip_file_compressor
 #

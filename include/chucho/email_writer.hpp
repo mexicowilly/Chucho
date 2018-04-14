@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 Will Mason
+ * Copyright 2013-2018 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,12 +20,12 @@
 #include <chucho/writer.hpp>
 #include <chucho/email_trigger.hpp>
 #include <chucho/optional.hpp>
-#include <chucho/exception.hpp>
 #include <queue>
-#include <curl/curl.h>
 
 namespace chucho
 {
+
+class curl;
 
 /**
  * @class email_writer email_writer.hpp chucho/email_writer.hpp
@@ -104,7 +104,8 @@ public:
      */
     /**
      * Construct an email writer.
-     * 
+     *
+     * @param name the name of the writer
      * @param fmt the formatter
      * @param host the SMTP host
      * @param connect the connection type
@@ -118,18 +119,20 @@ public:
      * @param buffer_capacity the capacity of the buffer that holds
      *        events until the @ref email_trigger is triggered
      */
-    email_writer(std::shared_ptr<formatter> fmt,
+    email_writer(const std::string& name,
+                 std::unique_ptr<formatter>&& fmt,
                  const std::string& host,
                  connection_type connect,
                  const std::vector<std::string>& to,
                  const std::string& from,
                  const std::string& subject,
-                 std::shared_ptr<email_trigger> trigger,
+                 std::unique_ptr<email_trigger>&& trigger,
                  std::uint16_t port = DEFAULT_PORT,
                  std::size_t buffer_capacity = DEFAULT_BUFFER_CAPACITY);
     /**
      * Construct an email writer.
-     * 
+     *
+     * @param name the name of this writer
      * @param fmt the formatter
      * @param host the SMTP host
      * @param connect the connection type
@@ -145,13 +148,14 @@ public:
      * @param buffer_capacity the capacity of the buffer that holds
      *        events until the @ref email_trigger is triggered
      */
-    email_writer(std::shared_ptr<formatter> fmt,
+    email_writer(const std::string& name,
+                 std::unique_ptr<formatter>&& fmt,
                  const std::string& host,
                  connection_type connect,
                  const std::vector<std::string>& to,
                  const std::string& from,
                  const std::string& subject,
-                 std::shared_ptr<email_trigger> trigger,
+                 std::unique_ptr<email_trigger>&& trigger,
                  const std::string& user,
                  const std::string& password,
                  std::uint16_t port = DEFAULT_PORT,
@@ -231,7 +235,7 @@ public:
      * 
      * @return the trigger
      */
-    std::shared_ptr<email_trigger> get_trigger() const;
+    email_trigger& get_trigger() const;
     /**
      * Return the user used for user/password
      * authentication, if there is one.
@@ -261,12 +265,6 @@ protected:
     virtual void write_impl(const event& evt) override;
 
 private:
-    friend CHUCHO_NO_EXPORT int curl_debug_callback(CURL* curl,
-                                                    curl_infotype info_type,
-                                                    char* text,
-                                                    std::size_t num,
-                                                    void* user_data);
-
     class CHUCHO_NO_EXPORT fixed_size_queue
     {
     public:
@@ -284,21 +282,13 @@ private:
         std::size_t max_;
     };
 
-    class CHUCHO_NO_EXPORT curl_exception : public chucho::exception
-    {
-    public:
-        curl_exception(CURLcode err, const std::string& msg);
-    };
-
     CHUCHO_NO_EXPORT std::string format_date() const;
     CHUCHO_NO_EXPORT std::string format_message(const event& evt);
     CHUCHO_NO_EXPORT void init();
-    template<typename arg_type>
-    CHUCHO_NO_EXPORT void set_curl_option(CURLoption opt, arg_type arg, const char* const err_msg);
 
     fixed_size_queue evts_;
-    CURL* curl_;
-    std::shared_ptr<email_trigger> trigger_;
+    std::unique_ptr<curl> curl_;
+    std::unique_ptr<email_trigger> trigger_;
     std::string from_;
     std::vector<std::string> to_;
     std::string host_;
@@ -307,8 +297,6 @@ private:
     optional<std::string> user_;
     optional<std::string> password_;
     connection_type connection_type_;
-    bool verbose_;
-    struct curl_slist* rcpts_;
 };
 
 inline std::size_t email_writer::get_buffer_capacity() const
@@ -356,27 +344,14 @@ inline const std::string& email_writer::get_subject() const
     return subject_;
 }
 
-inline std::shared_ptr<email_trigger> email_writer::get_trigger() const
+inline email_trigger& email_writer::get_trigger() const
 {
-    return trigger_;
+    return *trigger_;
 }
 
 inline const optional<std::string>& email_writer::get_user() const
 {
     return user_;
-}
-
-inline bool email_writer::get_verbose() const
-{
-    return verbose_;
-}
-
-template<typename arg_type>
-void email_writer::set_curl_option(CURLoption opt, arg_type arg, const char* const err_msg)
-{
-    CURLcode rc = curl_easy_setopt(curl_, opt, arg);
-    if (rc != CURLE_OK)
-        throw curl_exception(rc, std::string("Could not set CURL option ") + err_msg);
 }
 
 inline std::size_t email_writer::fixed_size_queue::capacity() const
