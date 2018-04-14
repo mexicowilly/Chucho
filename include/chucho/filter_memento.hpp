@@ -22,6 +22,13 @@
 namespace chucho
 {
 
+/**
+ * @class filter_memento filter_memento.hpp chucho/filter_memento.hpp
+ * A @ref memento that has common functionality for filters. All
+ * filters need a name.
+ *
+ * @ingroup filters
+ */
 class CHUCHO_EXPORT filter_memento : public nameable_memento
 {
 public:
