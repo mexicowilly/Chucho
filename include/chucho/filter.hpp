@@ -21,6 +21,11 @@
 #include <chucho/status_reporter.hpp>
 #include <chucho/configurable.hpp>
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 namespace chucho
 {
 
@@ -107,5 +112,9 @@ inline const std::string& filter::get_name() const
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif
