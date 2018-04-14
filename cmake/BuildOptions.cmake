@@ -63,7 +63,6 @@ OPTION(ENABLE_SHARED "Whether to build a shared object" OFF)
 
 OPTION(ENABLE_FRAMEWORK "Whether to build as a framework on Macintosh" ON)
 
-
 # Whether to use libstdc++ when compiling with Clang.
 OPTION(CLANG_LIBSTDCXX "Whether to use libstdc++ with the Clang compiler" OFF)
 
@@ -108,18 +107,14 @@ OPTION(JSON_CONFIG "Whether to support reading JSON configuration files" OFF)
 # bzip2: bzip2_compressor, bzip2_file_compressor
 # capn_proto: capn_proto_serializer
 # curl: email_writer, email_trigger, level_threshold_email_trigger, loggly_writer
-# db2: db2_writer
 # flatbuffers: flatbuffers_serializer
 # libarchive: zip_file_compressor
 # liblzma: lzma_compressor, lzma_file_compressor
 # lz4: lz4_compressor
-# mysql: mysql_writer
-# oracle: oracle_writer
-# postgres: postgres_writer
 # protobuf: protobuf_serializer
 # rabbitmq: rabbitmq_writer
 # ruby: ruby_evaluator_filter
-# sqlite: sqlite_writer
+# soci: database_writer
 # zeromq: zeromq_writer
 # zlib: zlib_compressor, gzip_file_compressor
 #

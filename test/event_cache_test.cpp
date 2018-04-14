@@ -72,9 +72,9 @@ TEST(event_cache, cull)
         ++popped;
     } while (evt);
     thr.join();
-    EXPECT_GT(culled_bytes, 0);
+    EXPECT_GT(culled_bytes, 0U);
     --popped;
-    EXPECT_LT(popped, 1000000);
+    EXPECT_LT(popped, 1000000U);
     auto stats = cache.get_stats();
     EXPECT_EQ(culled_bytes, stats.get_bytes_culled());
     std::cout << cache.get_stats() << std::endl;
@@ -86,7 +86,7 @@ TEST(event_cache, full_speed)
     std::thread thr(full_speed_main, std::ref(cache), 1000000, 0ms);
     for (std::size_t i = 0; i < 1000000; i++)
     {
-        auto evt = cache.pop(250ms);
+        auto evt = cache.pop(5000ms);
         ASSERT_TRUE(evt);
         EXPECT_EQ(std::to_string(i), evt->get_message());
     }

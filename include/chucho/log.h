@@ -45,14 +45,17 @@ extern "C"
 #endif
 #endif
 
+/**
+ * The predefined levels.
+ */
 typedef enum
 {
-    CHUCHO_TRACE,
-    CHUCHO_DEBUG,
-    CHUCHO_INFO,
-    CHUCHO_WARN,
-    CHUCHO_ERROR,
-    CHUCHO_FATAL
+    CHUCHO_TRACE, /**< Trace */
+    CHUCHO_DEBUG, /**< Debug */
+    CHUCHO_INFO,  /**< Info */
+    CHUCHO_WARN,  /**< Warn */
+    CHUCHO_ERROR, /**< Error */
+    CHUCHO_FATAL  /**< Fatal */
 } chucho_level_t;
 
 /**

@@ -173,6 +173,8 @@ public:
      * @throw exception if the pattern is invalid
      */
     pattern_formatter(const std::string& pattern);
+    pattern_formatter(const pattern_formatter& fmt) = delete;
+    pattern_formatter(pattern_formatter&& fmt) = default;
     //@}
 
     virtual std::string format(const event& evt) override;
