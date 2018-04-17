@@ -1006,7 +1006,7 @@ IF(ENABLE_SHARED)
     ENDIF()
     IF(CMAKE_GENERATOR STREQUAL Xcode AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         SET_TARGET_PROPERTIES(chucho PROPERTIES
-                              LINK_FLAGS "-std=c++11 -stdlib=libc++")
+                              LINK_FLAGS "-std=c++14 -stdlib=libc++")
     ENDIF()
     IF(CHUCHO_WINDOWS)
         SET(CHUCHO_RT_DEST bin)
