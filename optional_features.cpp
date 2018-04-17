@@ -16,6 +16,7 @@
 
 #include <chucho/optional_features.hpp>
 #include <mutex>
+#include <functional>
 
 namespace
 {
