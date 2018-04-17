@@ -1,5 +1,5 @@
 # Chucho
-Chucho is a C++14 logging library that support hierarchical
+Chucho is a C++14 logging library that supports hierarchical
 loggers and many different output destinations, called writers.
 
 Chucho is built with CMake, and you can see what options are available
