@@ -176,6 +176,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                formatted_message_serializer_test.cpp
                harness.cpp
                interval_file_roll_trigger_test.cpp
+               json_formatter_test.cpp
                level_test.cpp
                level_filter_test.cpp
                level_threshold_filter_test.cpp
