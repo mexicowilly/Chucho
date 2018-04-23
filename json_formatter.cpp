@@ -39,6 +39,10 @@ json_formatter::json_formatter(field_disposition dis,
     }
 }
 
+json_formatter::~json_formatter()
+{
+}
+
 std::string json_formatter::format(const event& evt)
 {
     std::string result;

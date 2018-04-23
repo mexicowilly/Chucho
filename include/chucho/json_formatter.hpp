@@ -75,6 +75,7 @@ public:
                    style styl = style::COMPACT,
                    time_zone tz = time_zone::LOCAL,
                    const std::string& time_format = "%Y%m%dT%H%M%S");
+    virtual ~json_formatter();
 
     virtual std::string format(const event& evt) override;
 
