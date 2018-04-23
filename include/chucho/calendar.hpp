@@ -27,8 +27,11 @@
 #endif
 
 #include <chucho/export.h>
-#include <ctime>
 #include <string>
+#include <vector>
+#include <chrono>
+#include <sstream>
+#include <iomanip>
 
 namespace chucho
 {
@@ -53,6 +56,49 @@ CHUCHO_PRIV_EXPORT long get_time_zone_offset_in_minutes();
 CHUCHO_PRIV_EXPORT pieces get_utc(std::time_t t);
 CHUCHO_PRIV_EXPORT std::time_t to_time_t(const pieces& cal);
 
+class CHUCHO_PRIV_EXPORT formatter
+{
+public:
+    enum location
+    {
+        LOCAL,
+        UTC
+    };
+
+    formatter(const std::string& pattern, location loc);
+
+    template <typename rep, typename period>
+    std::string format(const std::chrono::duration<rep, period>& dur)
+    {
+        auto micros = std::chrono::duration_cast<std::chrono::microseconds>(dur);
+        std::string pat = pattern_;
+        if (!frac_positions_.empty())
+        {
+            std::ostringstream stream;
+            stream << std::setfill('0');
+            stream << std::setw(3) << ((micros.count() / 1000) % 1000);
+            auto milli_str = stream.str();
+            stream.str("");
+            stream << std::setw(6) << (micros.count() % 1000000);
+            auto micro_str = stream.str();
+            for (const auto& t : frac_positions_)
+                pat.replace(std::get<1>(t), 2, (std::get<0>(t) == frac_type::MILLI) ? milli_str : micro_str);
+        }
+        pieces cal = pieces_getter_(micros.count() / 1000000);
+        return calendar::format(cal, pat);
+    };
+
+private:
+    enum class frac_type
+    {
+        MILLI,
+        MICRO
+    };
+
+    std::string pattern_;
+    std::vector<std::tuple<frac_type, std::size_t>> frac_positions_;
+    std::function<pieces(std::time_t)> pieces_getter_;
+};
 }
 
 }

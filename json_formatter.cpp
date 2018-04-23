@@ -10,14 +10,21 @@
 namespace chucho
 {
 
-json_formatter::json_formatter(style styl)
-    : style_(styl)
+json_formatter::json_formatter(style styl, time_zone tz, const std::string& time_format)
+    : style_(styl), fmt_(std::make_unique<calendar::formatter>(time_format,
+                                                               (tz == time_zone::LOCAL) ?
+                                                                 calendar::formatter::location::LOCAL :
+                                                                 calendar::formatter::location::UTC))
 {
     fields_.set();
 }
 
-json_formatter::json_formatter(field_disposition dis, const std::vector<field>& fields, style styl)
-    : style_(styl)
+json_formatter::json_formatter(field_disposition dis,
+                               const std::vector<field>& fields,
+                               style styl,
+                               time_zone tz,
+                               const std::string& time_format)
+    : json_formatter(styl, tz, time_format)
 {
     if (dis == field_disposition::INCLUDED)
     {
@@ -62,10 +69,7 @@ std::string json_formatter::format(const event& evt)
     }
     if (fields_.test(static_cast<std::size_t>(field::TIMESTAMP)))
     {
-        auto tt = event::clock_type::to_time_t(evt.get_time());
-        auto pieces = calendar::get_utc(tt);
-        auto str = calendar::format(pieces, "%Y%m%dT%H%M%SZ");
-        cJSON_AddStringToObject(json, "timestamp", str.c_str());
+        cJSON_AddStringToObject(json, "timestamp", fmt_->format(evt.get_time().time_since_epoch()).c_str());
     }
     if (fields_.test(static_cast<std::size_t>(field::HOST_NAME)))
         cJSON_AddStringToObject(json, "host_name", host::get_full_name().c_str());

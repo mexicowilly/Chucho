@@ -24,6 +24,13 @@
 namespace chucho
 {
 
+namespace calendar
+{
+
+class formatter;
+
+}
+
 class CHUCHO_EXPORT json_formatter : public formatter
 {
 public:
@@ -54,16 +61,27 @@ public:
         EXCLUDED
     };
 
-    json_formatter(style styl = style::COMPACT);
+    enum class time_zone
+    {
+        LOCAL,
+        UTC
+    };
+
+    json_formatter(style styl = style::COMPACT,
+                   time_zone tz = time_zone::LOCAL,
+                   const std::string& time_format = "%Y%m%dT%H%M%S");
     json_formatter(field_disposition dis,
                    const std::vector<field>& fields,
-                   style styl = style::COMPACT);
+                   style styl = style::COMPACT,
+                   time_zone tz = time_zone::LOCAL,
+                   const std::string& time_format = "%Y%m%dT%H%M%S");
 
     virtual std::string format(const event& evt) override;
 
 private:
     style style_;
     std::bitset<11> fields_;
+    std::unique_ptr<calendar::formatter> fmt_;
 };
 
 }
