@@ -3,6 +3,7 @@
 #include <chucho/calendar.hpp>
 #include <chucho/host.hpp>
 #include <chucho/diagnostic_context.hpp>
+#include <chucho/process.hpp>
 #include <cJSON.h>
 #include <sstream>
 #include <thread>
@@ -28,6 +29,7 @@ json_formatter::json_formatter(field_disposition dis,
 {
     if (dis == field_disposition::INCLUDED)
     {
+        fields_.reset();
         for (auto f : fields)
             fields_.set(static_cast<std::size_t>(f));
     }
@@ -72,9 +74,7 @@ std::string json_formatter::format(const event& evt)
         cJSON_AddStringToObject(json, "thread", stream.str().c_str());
     }
     if (fields_.test(static_cast<std::size_t>(field::TIMESTAMP)))
-    {
         cJSON_AddStringToObject(json, "timestamp", fmt_->format(evt.get_time().time_since_epoch()).c_str());
-    }
     if (fields_.test(static_cast<std::size_t>(field::HOST_NAME)))
         cJSON_AddStringToObject(json, "host_name", host::get_full_name().c_str());
     if (!diagnostic_context::empty() && fields_.test(static_cast<std::size_t>(field::DIAGNOSTIC_CONTEXT)))
@@ -85,6 +85,8 @@ std::string json_formatter::format(const event& evt)
             cJSON_AddStringToObject(jdc, kv.first.c_str(), kv.second.c_str());
         cJSON_AddItemToObject(json, "diagnostic_context", jdc);
     }
+    if (fields_.test(static_cast<std::size_t>(field::PROCESS_ID)))
+        cJSON_AddNumberToObject(json, "process_id", process::id());
     char* raw = (style_ == style::PRETTY) ? cJSON_Print(json) : cJSON_PrintUnformatted(json);
     result = raw;
     free(raw);

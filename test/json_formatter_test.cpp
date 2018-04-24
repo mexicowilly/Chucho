@@ -18,7 +18,9 @@
 #include <chucho/json_formatter.hpp>
 #include <chucho/logger.hpp>
 #include <chucho/diagnostic_context.hpp>
+#include <chucho/process.hpp>
 #include <cJSON.h>
+#include <thread>
 
 namespace
 {
@@ -84,6 +86,17 @@ TEST_F(json_formatter_test, all)
     ASSERT_TRUE(cJSON_IsString(item));
     EXPECT_STREQ("chucho", item->valuestring);
     EXPECT_FALSE(cJSON_HasObjectItem(json, "diagnostic_context"));
+    item = cJSON_GetObjectItem(json, "process_id");
+    ASSERT_TRUE(item != nullptr);
+    ASSERT_TRUE(cJSON_IsNumber(item));
+    EXPECT_EQ(chucho::process::id(), item->valuedouble);
+    item = cJSON_GetObjectItem(json, "thread");
+    ASSERT_TRUE(item != nullptr);
+    ASSERT_TRUE(cJSON_IsString(item));
+    std::ostringstream stream;
+    stream << std::this_thread::get_id();
+    EXPECT_STREQ(stream.str().c_str(), item->valuestring);
+    stream.str("");
     cJSON_Delete(json);
 
     chucho::json_formatter fmt2(chucho::json_formatter::style::PRETTY);
@@ -119,6 +132,16 @@ TEST_F(json_formatter_test, all)
     ASSERT_TRUE(cJSON_IsString(item));
     EXPECT_STREQ("chucho", item->valuestring);
     EXPECT_FALSE(cJSON_HasObjectItem(json, "diagnostic_context"));
+    item = cJSON_GetObjectItem(json, "process_id");
+    ASSERT_TRUE(item != nullptr);
+    ASSERT_TRUE(cJSON_IsNumber(item));
+    EXPECT_EQ(chucho::process::id(), item->valuedouble);
+    item = cJSON_GetObjectItem(json, "thread");
+    ASSERT_TRUE(item != nullptr);
+    ASSERT_TRUE(cJSON_IsString(item));
+    stream << std::this_thread::get_id();
+    EXPECT_STREQ(stream.str().c_str(), item->valuestring);
+    stream.str("");
     cJSON_Delete(json);
 }
 
@@ -181,6 +204,17 @@ TEST_F(json_formatter_test, exclusion)
     ASSERT_TRUE(cJSON_IsString(item));
     EXPECT_STREQ("chucho", item->valuestring);
     EXPECT_FALSE(cJSON_HasObjectItem(json, "diagnostic_context"));
+    item = cJSON_GetObjectItem(json, "process_id");
+    ASSERT_TRUE(item != nullptr);
+    ASSERT_TRUE(cJSON_IsNumber(item));
+    EXPECT_EQ(chucho::process::id(), item->valuedouble);
+    item = cJSON_GetObjectItem(json, "thread");
+    ASSERT_TRUE(item != nullptr);
+    ASSERT_TRUE(cJSON_IsString(item));
+    std::ostringstream stream;
+    stream << std::this_thread::get_id();
+    EXPECT_STREQ(stream.str().c_str(), item->valuestring);
+    stream.str("");
     cJSON_Delete(json);
 
     chucho::json_formatter fmt2(chucho::json_formatter::field_disposition::EXCLUDED,
@@ -212,6 +246,16 @@ TEST_F(json_formatter_test, exclusion)
     ASSERT_TRUE(cJSON_IsString(item));
     EXPECT_STREQ("chucho", item->valuestring);
     EXPECT_FALSE(cJSON_HasObjectItem(json, "diagnostic_context"));
+    item = cJSON_GetObjectItem(json, "process_id");
+    ASSERT_TRUE(item != nullptr);
+    ASSERT_TRUE(cJSON_IsNumber(item));
+    EXPECT_EQ(chucho::process::id(), item->valuedouble);
+    item = cJSON_GetObjectItem(json, "thread");
+    ASSERT_TRUE(item != nullptr);
+    ASSERT_TRUE(cJSON_IsString(item));
+    stream << std::this_thread::get_id();
+    EXPECT_STREQ(stream.str().c_str(), item->valuestring);
+    stream.str("");
     cJSON_Delete(json);
 }
 
@@ -236,6 +280,8 @@ TEST_F(json_formatter_test, inclusion)
     EXPECT_FALSE(cJSON_HasObjectItem(json, "function_name"));
     EXPECT_FALSE(cJSON_HasObjectItem(json, "marker"));
     EXPECT_FALSE(cJSON_HasObjectItem(json, "diagnostic_context"));
+    EXPECT_FALSE(cJSON_HasObjectItem(json, "process_id"));
+    EXPECT_FALSE(cJSON_HasObjectItem(json, "thread"));
     cJSON_Delete(json);
 
     chucho::json_formatter fmt2(chucho::json_formatter::field_disposition::INCLUDED,
@@ -258,5 +304,7 @@ TEST_F(json_formatter_test, inclusion)
     EXPECT_FALSE(cJSON_HasObjectItem(json, "function_name"));
     EXPECT_FALSE(cJSON_HasObjectItem(json, "marker"));
     EXPECT_FALSE(cJSON_HasObjectItem(json, "diagnostic_context"));
+    EXPECT_FALSE(cJSON_HasObjectItem(json, "process_id"));
+    EXPECT_FALSE(cJSON_HasObjectItem(json, "thread"));
     cJSON_Delete(json);
 }

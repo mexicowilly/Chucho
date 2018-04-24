@@ -42,17 +42,18 @@ public:
 
     enum class field
     {
-        LOGGER,
-        LEVEL,
-        MESSAGE,
+        DIAGNOSTIC_CONTEXT,
         FILE_NAME,
-        LINE_NUMBER,
         FUNCTION_NAME,
-        MARKER,
-        THREAD,
-        TIMESTAMP,
         HOST_NAME,
-        DIAGNOSTIC_CONTEXT
+        LEVEL,
+        LINE_NUMBER,
+        LOGGER,
+        MARKER,
+        MESSAGE,
+        PROCESS_ID,
+        THREAD,
+        TIMESTAMP
     };
 
     enum class field_disposition
@@ -81,7 +82,7 @@ public:
 
 private:
     style style_;
-    std::bitset<11> fields_;
+    std::bitset<12> fields_;
     std::unique_ptr<calendar::formatter> fmt_;
 };
 
