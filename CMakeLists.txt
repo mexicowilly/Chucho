@@ -642,6 +642,7 @@ SET(CHUCHO_SOURCES
     interval_file_roll_trigger_factory.cpp
     interval_file_roll_trigger_memento.cpp
     json_formatter.cpp
+    json_formatter_memento.cpp
     level.cpp
     level_filter.cpp
     level_filter_factory.cpp
@@ -728,6 +729,7 @@ SET(CHUCHO_SOURCES
     include/chucho/host.hpp
     include/chucho/interval_file_roll_trigger_factory.hpp
     include/chucho/interval_file_roll_trigger_memento.hpp
+    include/chucho/json_formatter_memento.hpp
     include/chucho/level_filter_factory.hpp
     include/chucho/level_filter_memento.hpp
     include/chucho/level_threshold_filter_factory.hpp
