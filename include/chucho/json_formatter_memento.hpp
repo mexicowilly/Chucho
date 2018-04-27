@@ -33,8 +33,8 @@ class json_formatter_memento : public memento
 public:
     json_formatter_memento(configurator& cfg);
 
-    const optional<std::bitset<12>>& get_excluded_fields() const;
-    const optional<std::bitset<12>>& get_included_fields() const;
+    const std::vector<json_formatter::field>& get_excluded_fields() const;
+    const std::vector<json_formatter::field>& get_included_fields() const;
     const optional<json_formatter::style>& get_style() const;
     const std::string& get_time_format() const;
     const optional<json_formatter::time_zone>& get_time_zone() const;
@@ -44,21 +44,21 @@ private:
     void handle_included_fields(const std::string& str);
     void handle_style(const std::string& str);
     void handle_time_zone(const std::string& str);
-    std::bitset<12> parse_fields(const std::string& str) const;
+    std::vector<json_formatter::field> parse_fields(const std::string& str) const;
 
     optional<json_formatter::style> style_;
-    optional<std::bitset<12>> included_fields_;
-    optional<std::bitset<12>> excluded_fields_;
+    std::vector<json_formatter::field> included_fields_;
+    std::vector<json_formatter::field> excluded_fields_;
     optional<json_formatter::time_zone> time_zone_;
     std::string time_format_;
 };
 
-inline const optional<std::bitset<12>>& json_formatter_memento::get_excluded_fields() const
+inline const std::vector<json_formatter::field>& json_formatter_memento::get_excluded_fields() const
 {
     return excluded_fields_;
 }
 
-inline const optional<std::bitset<12>>& json_formatter_memento::get_included_fields() const
+inline const std::vector<json_formatter::field>& json_formatter_memento::get_included_fields() const
 {
     return included_fields_;
 }

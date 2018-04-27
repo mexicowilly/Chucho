@@ -69,38 +69,38 @@ void json_formatter_memento::handle_time_zone(const std::string& str)
         throw exception("time_zone has an invalid value of " + str);
 }
 
-std::bitset<12> json_formatter_memento::parse_fields(const std::string& str) const
+std::vector<json_formatter::field> json_formatter_memento::parse_fields(const std::string& str) const
 {
-    std::bitset<12> result;
+    std::vector<json_formatter::field> result;
     auto fields = text_util::tokenize(str, ',');
     for (auto& field : fields)
     {
         text_util::trim(field);
         auto low = text_util::to_lower(field);
         if (low == "diagnostic_context")
-            result.set(static_cast<std::size_t>(json_formatter::field::DIAGNOSTIC_CONTEXT));
+            result.push_back(json_formatter::field::DIAGNOSTIC_CONTEXT);
         else if (low == "file_name")
-            result.set(static_cast<std::size_t>(json_formatter::field::FILE_NAME));
+            result.push_back(json_formatter::field::FILE_NAME);
         else if (low == "function_name")
-            result.set(static_cast<std::size_t>(json_formatter::field::FUNCTION_NAME));
+            result.push_back(json_formatter::field::FUNCTION_NAME);
         else if (low == "host_name")
-            result.set(static_cast<std::size_t>(json_formatter::field::HOST_NAME));
+            result.push_back(json_formatter::field::HOST_NAME);
         else if (low == "level")
-            result.set(static_cast<std::size_t>(json_formatter::field::LEVEL));
+            result.push_back(json_formatter::field::LEVEL);
         else if (low == "line_number")
-            result.set(static_cast<std::size_t>(json_formatter::field::LINE_NUMBER));
+            result.push_back(json_formatter::field::LINE_NUMBER);
         else if (low == "logger")
-            result.set(static_cast<std::size_t>(json_formatter::field::LOGGER));
+            result.push_back(json_formatter::field::LOGGER);
         else if (low == "marker")
-            result.set(static_cast<std::size_t>(json_formatter::field::MARKER));
+            result.push_back(json_formatter::field::MARKER);
         else if (low == "message")
-            result.set(static_cast<std::size_t>(json_formatter::field::MESSAGE));
+            result.push_back(json_formatter::field::MESSAGE);
         else if (low == "process_id")
-            result.set(static_cast<std::size_t>(json_formatter::field::PROCESS_ID));
+            result.push_back(json_formatter::field::PROCESS_ID);
         else if (low == "thread")
-            result.set(static_cast<std::size_t>(json_formatter::field::THREAD));
+            result.push_back(json_formatter::field::THREAD);
         else if (low == "timestamp")
-            result.set(static_cast<std::size_t>(json_formatter::field::TIMESTAMP));
+            result.push_back(json_formatter::field::TIMESTAMP);
         else
             throw exception("json_formatter invalid field: " + str);
     }

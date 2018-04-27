@@ -43,6 +43,7 @@ public:
                "dowdy",
                "chucho")
     {
+        chucho::diagnostic_context::clear();
     }
 
 protected:

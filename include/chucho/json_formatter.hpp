@@ -68,14 +68,18 @@ public:
         UTC
     };
 
-    json_formatter(style styl = style::COMPACT,
-                   time_zone tz = time_zone::LOCAL,
-                   const std::string& time_format = "%Y%m%dT%H%M%S");
+    static constexpr style DEFAULT_STYLE = style::COMPACT;
+    static constexpr time_zone DEFAULT_TIME_ZONE = time_zone::LOCAL;
+    static constexpr char const * DEFAULT_TIME_FORMAT = "%Y%m%dT%H%M%S";
+
+    json_formatter(style styl = DEFAULT_STYLE,
+                   time_zone tz = DEFAULT_TIME_ZONE,
+                   const std::string& time_format = DEFAULT_TIME_FORMAT);
     json_formatter(field_disposition dis,
                    const std::vector<field>& fields,
-                   style styl = style::COMPACT,
-                   time_zone tz = time_zone::LOCAL,
-                   const std::string& time_format = "%Y%m%dT%H%M%S");
+                   style styl = DEFAULT_STYLE,
+                   time_zone tz = DEFAULT_TIME_ZONE,
+                   const std::string& time_format = DEFAULT_TIME_FORMAT);
     virtual ~json_formatter();
 
     virtual std::string format(const event& evt) override;

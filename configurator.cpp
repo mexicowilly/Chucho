@@ -29,6 +29,7 @@
 #include <chucho/formatted_message_serializer_factory.hpp>
 #include <chucho/gzip_file_compressor_factory.hpp>
 #include <chucho/interval_file_roll_trigger_factory.hpp>
+#include <chucho/json_formatter_factory.hpp>
 #include <chucho/level_filter_factory.hpp>
 #include <chucho/level_threshold_filter_factory.hpp>
 #include <chucho/logger_factory.hpp>
@@ -183,6 +184,8 @@ void configurator::initialize_impl()
                              std::make_shared<formatted_message_serializer_factory>());
     add_configurable_factory("chucho::lzma_file_compressor",
                              std::make_shared<lzma_file_compressor_factory>());
+    add_configurable_factory("chucho::json_formatter",
+                             std::make_shared<json_formatter_factory>());
 #if defined(CHUCHO_WINDOWS)
     add_configurable_factory("chucho::windows_event_log_writer",
                              std::make_shared<windows_event_log_writer_factory>());
