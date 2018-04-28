@@ -70,7 +70,7 @@ public:
 
     static constexpr style DEFAULT_STYLE = style::COMPACT;
     static constexpr time_zone DEFAULT_TIME_ZONE = time_zone::LOCAL;
-    static constexpr char const * DEFAULT_TIME_FORMAT = "%Y%m%dT%H%M%S";
+    static constexpr char const* DEFAULT_TIME_FORMAT = "%Y%m%dT%H%M%S";
 
     json_formatter(style styl = DEFAULT_STYLE,
                    time_zone tz = DEFAULT_TIME_ZONE,
