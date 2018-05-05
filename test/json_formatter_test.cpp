@@ -21,6 +21,7 @@
 #include <chucho/process.hpp>
 #include <cJSON.h>
 #include <thread>
+#include <cstring>
 
 namespace
 {

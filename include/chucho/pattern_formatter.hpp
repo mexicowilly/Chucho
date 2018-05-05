@@ -201,6 +201,7 @@ private:
     {
     public:
         piece(const format_params& params);
+        virtual ~piece() { }
 
         std::string get_text(const event& evt) const;
 

@@ -15,11 +15,11 @@
  */
 
 #include <chucho/calendar.hpp>
-#include <iomanip>
 #include <sstream>
 #include <array>
 #include <tuple>
 #include <vector>
+#include <algorithm>
 
 namespace
 {

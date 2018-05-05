@@ -32,6 +32,7 @@
 #include <chrono>
 #include <sstream>
 #include <iomanip>
+#include <functional>
 
 namespace chucho
 {
