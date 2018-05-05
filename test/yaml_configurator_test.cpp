@@ -377,6 +377,20 @@ TEST_F(yaml_configurator, invalid_utf8)
                                "    name: \x81\x82\x83"));
 }
 
+TEST_F(yaml_configurator, json_formatter)
+{
+    std::string tmpl(R"tmpl(
+chucho::logger:
+    name: will
+    chucho::cout_writer:
+        chucho::json_formatter:
+            style: PrEtTy
+            time_zone: uTc
+            DScluded_fields: FIELDS
+)tmpl");
+    json_formatter_body(tmpl);
+}
+
 TEST_F(yaml_configurator, level_filter)
 {
     std::string tmpl("- chucho::logger:\n"

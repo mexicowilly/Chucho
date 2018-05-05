@@ -31,3 +31,22 @@ TEST(text_util, tokenize)
     EXPECT_STREQ("has", tokes[2].c_str());
     EXPECT_STREQ("fleas", tokes[3].c_str());
 }
+
+TEST(text_util, trim)
+{
+    std::string s("hello");
+    chucho::text_util::trim(s);
+    EXPECT_STREQ("hello", s.c_str());
+    s = "    \tis it me\t\t    ";
+    chucho::text_util::trim(s);
+    EXPECT_STREQ("is it me", s.c_str());
+    s = "you're looking        \t";
+    chucho::text_util::trim(s);
+    EXPECT_STREQ("you're looking", s.c_str());
+    s = "\t     for";
+    chucho::text_util::trim(s);
+    EXPECT_STREQ("for", s.c_str());
+    s.clear();
+    chucho::text_util::trim(s);
+    EXPECT_TRUE(s.empty());
+}

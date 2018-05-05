@@ -213,6 +213,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/formatter.hpp
     include/chucho/function_name.hpp
     include/chucho/interval_file_roll_trigger.hpp
+    include/chucho/json_formatter.hpp
     include/chucho/level.hpp
     include/chucho/level_filter.hpp
     include/chucho/level_threshold_filter.hpp
@@ -348,11 +349,6 @@ IF(CURL_FOUND)
          include/chucho/level_threshold_email_trigger_memento.hpp
          include/chucho/loggly_writer_factory.hpp
          include/chucho/loggly_writer_memento.hpp)
-    IF(NOT JSON_CONFIG)
-        LIST(APPEND CHUCHO_EMBEDDED_SOURCES
-            "${CMAKE_SOURCE_DIR}/embedded/cJSON/cJSON.c"
-            "${CMAKE_SOURCE_DIR}/embedded/include/cJSON.h")
-    ENDIF()
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
@@ -560,9 +556,6 @@ IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
 ENDIF()
 
 IF(JSON_CONFIG)
-    LIST(APPEND CHUCHO_EMBEDDED_SOURCES
-         "${CMAKE_SOURCE_DIR}/embedded/cJSON/cJSON.c"
-         "${CMAKE_SOURCE_DIR}/embedded/include/cJSON.h")
     LIST(APPEND CHUCHO_CONFIGURATOR_SOURCES
         json_configurator.cpp
         include/chucho/json_configurator.hpp)
@@ -601,6 +594,10 @@ IF(CHUCHO_HAVE_FLATBUFFERS)
     LIST(APPEND CHUCHO_MQ_GEN_SOURCES "${CMAKE_BINARY_DIR}/chucho_generated.h")
     SET_SOURCE_FILES_PROPERTIES("${CMAKE_BINARY_DIR}/chucho_generated.h" PROPERTIES GENERATED TRUE)
 ENDIF()
+
+LIST(APPEND CHUCHO_EMBEDDED_SOURCES
+     "${CMAKE_SOURCE_DIR}/embedded/cJSON/cJSON.c"
+     "${CMAKE_SOURCE_DIR}/embedded/include/cJSON.h")
 
 SET(CHUCHO_SOURCES
     async_writer.cpp
@@ -644,6 +641,9 @@ SET(CHUCHO_SOURCES
     interval_file_roll_trigger.cpp
     interval_file_roll_trigger_factory.cpp
     interval_file_roll_trigger_memento.cpp
+    json_formatter.cpp
+    json_formatter_factory.cpp
+    json_formatter_memento.cpp
     level.cpp
     level_filter.cpp
     level_filter_factory.cpp
@@ -730,6 +730,8 @@ SET(CHUCHO_SOURCES
     include/chucho/host.hpp
     include/chucho/interval_file_roll_trigger_factory.hpp
     include/chucho/interval_file_roll_trigger_memento.hpp
+    include/chucho/json_formatter_factory.hpp
+    include/chucho/json_formatter_memento.hpp
     include/chucho/level_filter_factory.hpp
     include/chucho/level_filter_memento.hpp
     include/chucho/level_threshold_filter_factory.hpp
