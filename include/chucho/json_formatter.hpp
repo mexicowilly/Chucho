@@ -31,56 +31,110 @@ class formatter;
 
 }
 
+/**
+ * @class json_formatter json_formatter.hpp chucho/json_formatter.hpp
+ * A formatter that produces JSON.
+ *
+ * @ingroup formatters
+ */
 class CHUCHO_EXPORT json_formatter : public formatter
 {
 public:
+    /**
+     * The style of the output.
+     */
     enum class style
     {
-        PRETTY,
-        COMPACT
+        PRETTY,     /**< Human readable output */
+        COMPACT     /**< Machine readable output */
     };
 
+    /**
+     * Fields that can appear in the output.
+     */
     enum class field
     {
-        DIAGNOSTIC_CONTEXT,
-        FILE_NAME,
-        FUNCTION_NAME,
-        HOST_NAME,
-        LEVEL,
-        LINE_NUMBER,
-        LOGGER,
-        MARKER,
-        MESSAGE,
-        PROCESS_ID,
-        THREAD,
-        TIMESTAMP
+        DIAGNOSTIC_CONTEXT,     /**< The thread's @ref diagnostic_context */
+        FILE_NAME,              /**< The file name of the event */
+        FUNCTION_NAME,          /**< The function name */
+        HOST_NAME,              /**< The host on which the event occurred */
+        LEVEL,                  /**< The level of the event */
+        LINE_NUMBER,            /**< The line number */
+        LOGGER,                 /**< The name of the logger */
+        MARKER,                 /**< The marker if there is one */
+        MESSAGE,                /**< The message */
+        PROCESS_ID,             /**< The pid */
+        THREAD,                 /**< The thread identifier */
+        TIMESTAMP               /**< The timestamp, formatted according to the time format parameter */
     };
 
+    /**
+     * Whether fields are included or excluded in the constructor
+     */
     enum class field_disposition
     {
-        INCLUDED,
-        EXCLUDED
+        INCLUDED,   /**< Fields are included */
+        EXCLUDED    /**< Fields are excluded */
     };
 
+    /**
+     * The time zone of the timestamp field
+     */
     enum class time_zone
     {
-        LOCAL,
-        UTC
+        LOCAL,  /**< Local time */
+        UTC     /**< UTC */
     };
 
+    /**
+     * The default style
+     */
     static constexpr style DEFAULT_STYLE = style::COMPACT;
+    /**
+     * The default time zone
+     */
     static constexpr time_zone DEFAULT_TIME_ZONE = time_zone::LOCAL;
+    /**
+     * The default time format
+     */
     static constexpr char const* DEFAULT_TIME_FORMAT = "%Y%m%dT%H%M%S";
 
+    /**
+     * @name Constructors and Destructor
+     * @{
+     */
+    /**
+     * Construct a formatter with all fields included.
+     *
+     * @param styl the style, pretty or compact
+     * @param tz the time zone
+     * @param time_format the time format
+     */
     json_formatter(style styl = DEFAULT_STYLE,
                    time_zone tz = DEFAULT_TIME_ZONE,
                    const std::string& time_format = DEFAULT_TIME_FORMAT);
+    /**
+     * Construct a formatter with only certain fields included
+     * or excluded.
+     *
+     * @param dis whether the given fields are included or excluded
+     * @param fields the fields to include or exclude
+     * @param styl the style, pretty or compact
+     * @param tz the time zone
+     * @param time_format the time format
+     */
     json_formatter(field_disposition dis,
                    const std::vector<field>& fields,
                    style styl = DEFAULT_STYLE,
                    time_zone tz = DEFAULT_TIME_ZONE,
                    const std::string& time_format = DEFAULT_TIME_FORMAT);
+    /**
+     * Destruct a formatter
+     */
     virtual ~json_formatter();
+    /**
+     * @}
+     */
 
     virtual std::string format(const event& evt) override;
 
