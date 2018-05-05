@@ -35,16 +35,17 @@ json_formatter_memento::json_formatter_memento(configurator& cfg)
                 std::bind(&json_formatter_memento::handle_excluded_fields, this, std::placeholders::_1));
     set_handler("included_fields",
                 std::bind(&json_formatter_memento::handle_included_fields, this, std::placeholders::_1));
+    set_handler("time_format", [this] (const std::string& val) { time_format_ = validate("json_formatter::time_format", val); });
 }
 
 void json_formatter_memento::handle_excluded_fields(const std::string& str)
 {
-    excluded_fields_ = parse_fields(validate("json_formatter:excluded_fields", str));
+    excluded_fields_ = parse_fields(validate("json_formatter::excluded_fields", str));
 }
 
 void json_formatter_memento::handle_included_fields(const std::string& str)
 {
-    included_fields_ = parse_fields(validate("json_formatter:included_fields", str));
+    included_fields_ = parse_fields(validate("json_formatter::included_fields", str));
 }
 
 void json_formatter_memento::handle_style(const std::string& str)

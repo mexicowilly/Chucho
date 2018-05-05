@@ -56,6 +56,7 @@ TEST_F(json_formatter_test, all)
 {
     chucho::json_formatter fmt;
     auto s = fmt.format(evt_);
+    std::cout << s << std::endl;
     auto json = cJSON_Parse(s.c_str());
     ASSERT_TRUE(json != nullptr);
     auto item = cJSON_GetObjectItem(json, "logger");
@@ -98,10 +99,18 @@ TEST_F(json_formatter_test, all)
     stream << std::this_thread::get_id();
     EXPECT_STREQ(stream.str().c_str(), item->valuestring);
     stream.str("");
+    item = cJSON_GetObjectItem(json, "host_name");
+    ASSERT_TRUE(item != nullptr);
+    ASSERT_TRUE(cJSON_IsString(item));
+    item = cJSON_GetObjectItem(json, "timestamp");
+    ASSERT_TRUE(item != nullptr);
+    ASSERT_TRUE(cJSON_IsString(item));
+    EXPECT_EQ(15, std::strlen(item->valuestring));
     cJSON_Delete(json);
 
     chucho::json_formatter fmt2(chucho::json_formatter::style::PRETTY);
     s = fmt2.format(evt_);
+    std::cout << s << std::endl;
     json = cJSON_Parse(s.c_str());
     ASSERT_TRUE(json != nullptr);
     item = cJSON_GetObjectItem(json, "logger");
@@ -143,6 +152,13 @@ TEST_F(json_formatter_test, all)
     stream << std::this_thread::get_id();
     EXPECT_STREQ(stream.str().c_str(), item->valuestring);
     stream.str("");
+    item = cJSON_GetObjectItem(json, "host_name");
+    ASSERT_TRUE(item != nullptr);
+    ASSERT_TRUE(cJSON_IsString(item));
+    item = cJSON_GetObjectItem(json, "timestamp");
+    ASSERT_TRUE(item != nullptr);
+    ASSERT_TRUE(cJSON_IsString(item));
+    EXPECT_EQ(15, std::strlen(item->valuestring));
     cJSON_Delete(json);
 }
 
@@ -257,6 +273,13 @@ TEST_F(json_formatter_test, exclusion)
     stream << std::this_thread::get_id();
     EXPECT_STREQ(stream.str().c_str(), item->valuestring);
     stream.str("");
+    item = cJSON_GetObjectItem(json, "host_name");
+    ASSERT_TRUE(item != nullptr);
+    ASSERT_TRUE(cJSON_IsString(item));
+    item = cJSON_GetObjectItem(json, "timestamp");
+    ASSERT_TRUE(item != nullptr);
+    ASSERT_TRUE(cJSON_IsString(item));
+    EXPECT_EQ(15, std::strlen(item->valuestring));
     cJSON_Delete(json);
 }
 
@@ -283,6 +306,8 @@ TEST_F(json_formatter_test, inclusion)
     EXPECT_FALSE(cJSON_HasObjectItem(json, "diagnostic_context"));
     EXPECT_FALSE(cJSON_HasObjectItem(json, "process_id"));
     EXPECT_FALSE(cJSON_HasObjectItem(json, "thread"));
+    EXPECT_FALSE(cJSON_HasObjectItem(json, "host_name"));
+    EXPECT_FALSE(cJSON_HasObjectItem(json, "timestamp"));
     cJSON_Delete(json);
 
     chucho::json_formatter fmt2(chucho::json_formatter::field_disposition::INCLUDED,
@@ -307,5 +332,7 @@ TEST_F(json_formatter_test, inclusion)
     EXPECT_FALSE(cJSON_HasObjectItem(json, "diagnostic_context"));
     EXPECT_FALSE(cJSON_HasObjectItem(json, "process_id"));
     EXPECT_FALSE(cJSON_HasObjectItem(json, "thread"));
+    EXPECT_FALSE(cJSON_HasObjectItem(json, "host_name"));
+    EXPECT_FALSE(cJSON_HasObjectItem(json, "timestamp"));
     cJSON_Delete(json);
 }
