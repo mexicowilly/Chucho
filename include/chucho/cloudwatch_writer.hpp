@@ -17,7 +17,7 @@
 #ifndef CHUCHO_CLOUDWATCH_WRITER_HPP__
 #define CHUCHO_CLOUDWATCH_WRITER_HPP__
 
-#include <chucho/writer.hpp>
+#include <chucho/cloud_writer.hpp>
 #include <aws/logs/CloudWatchLogsClient.h>
 #include <aws/logs/model/InputLogEvent.h>
 
@@ -36,7 +36,7 @@ namespace chucho
  *
  * @ingroup writers
  */
-class CHUCHO_EXPORT cloudwatch_writer : public writer
+class CHUCHO_EXPORT cloudwatch_writer : public cloud_writer
 {
 public:
     /**

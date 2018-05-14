@@ -17,7 +17,7 @@
 #ifndef CHUCHO_LOGGLY_WRITER_HPP__
 #define CHUCHO_LOGGLY_WRITER_HPP__
 
-#include <chucho/writer.hpp>
+#include <chucho/cloud_writer.hpp>
 
 namespace chucho
 {
@@ -32,7 +32,7 @@ class curl;
  *
  * @ingroup writers
  */
-class CHUCHO_EXPORT loggly_writer : public writer
+class CHUCHO_EXPORT loggly_writer : public cloud_writer
 {
 public:
     /**

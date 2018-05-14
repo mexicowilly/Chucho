@@ -90,7 +90,7 @@ cloudwatch_writer::cloudwatch_writer(const std::string& name,
                                      const std::string& log_stream,
                                      const std::string& region,
                                      std::size_t batch_size)
-    : writer(name, std::move(fmt)),
+    : cloud_writer(name, std::move(fmt)),
       log_group_(log_group),
       log_stream_(log_stream),
       wire_size_(0),

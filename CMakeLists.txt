@@ -182,6 +182,7 @@ ENDIF()
 SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/async_writer.hpp
     include/chucho/cerr_writer.hpp
+    include/chucho/cloud_writer.hpp
     include/chucho/compressor.hpp
     include/chucho/configurable.hpp
     include/chucho/configurable_factory.hpp
