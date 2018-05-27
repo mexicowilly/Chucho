@@ -72,6 +72,16 @@
 #define CHUCHO_INTERNAL_LOG_M(mrk, lvl, lg, fl, ln, fnc, msg) CHUCHO_LOG_M(mrk, ::chucho::level::lvl(), lg, fl, ln, fnc, msg)
 #define CHUCHO_INTERNAL_LOG_STR_M(mrk, lvl, lg, fl, ln, fnc, msg) CHUCHO_LOG_STR_M(mrk, ::chucho::level::lvl(), lg, fl, ln, fnc, msg)
 
+#define CHUCHO_EVERY_N_INTERNAL(n, body) \
+    do \
+    { \
+        static std::size_t __chucho_every_n_count_mod_n = 0; \
+        if (++__chucho_every_n_count_mod_n > (n)) \
+            __chucho_every_n_count_mod_n -= (n); \
+        if (__chucho_every_n_count_mod_n == 1) \
+            body ; \
+    } while (false)
+
 #endif
 
 /**
@@ -722,5 +732,29 @@
  * @copydoc CHUCHO_FATAL_LGBL_STR_M(mrk, msg)
  */
 #define CHUCHO_FATAL_L_STR_M(mrk, msg) CHUCHO_FATAL_LGBL_STR_M(mrk, msg)
+
+#define CHUCHO_EVERY_N(lvl, n, lg, msg) CHUCHO_EVERY_N_INTERNAL((n), CHUCHO_ ## lvl(lg, msg))
+
+#define CHUCHO_EVERY_N_LGBL(lvl, n, msg) CHUCHO_EVERY_N_INTERNAL((n), CHUCHO_ ## lvl ## _LGBL(msg))
+
+#define CHUCHO_EVERY_N_L(lvl, n, msg) CHUCHO_EVERY_N_LGBL(lvl, n, msg)
+
+#define CHUCHO_EVERY_N_STR(lvl, n, lg, msg) CHUCHO_EVERY_N_INTERNAL((n), CHUCHO_ ## lvl ## _STR(lg, msg))
+
+#define CHUCHO_EVERY_N_LGBL_STR(lvl, n, msg) CHUCHO_EVERY_N_INTERNAL((n), CHUCHO_ ## lvl ## _LGBL_STR(msg))
+
+#define CHUCHO_EVERY_N_L_STR(lvl, n, msg) CHUCHO_EVERY_N_LGBL_STR(lvl, n, msg)
+
+#define CHUCHO_EVERY_N_M(lvl, n, mrk, lg, msg) CHUCHO_EVERY_N_INTERNAL((n), CHUCHO_ ## lvl ## _M(mrk, lg, msg))
+
+#define CHUCHO_EVERY_N_LGBL_M(lvl, n, mrk, msg) CHUCHO_EVERY_N_INTERNAL((n), CHUCHO_ ## lvl ## _LGBL_M(mrk, msg))
+
+#define CHUCHO_EVERY_N_L_M(lvl, n, mrk, msg) CHUCHO_EVERY_N_LGBL_M(lvl, n, mrk, msg)
+
+#define CHUCHO_EVERY_N_STR_M(lvl, n, mrk, lg, msg) CHUCHO_EVERY_N_INTERNAL((n), CHUCHO_ ## lvl ## _STR_M(mrk, lg, msg))
+
+#define CHUCHO_EVERY_N_LGBL_STR_M(lvl, n, mrk, msg) CHUCHO_EVERY_N_INTERNAL((n), CHUCHO_ ## lvl ## _LGBL_STR_M(mrk, msg))
+
+#define CHUCHO_EVERY_N_L_STR_M(lvl, n, mrk, msg) CHUCHO_EVERY_N_LGBL_STR_M(lvl, n, mrk, msg)
 
 #endif

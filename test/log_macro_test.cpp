@@ -85,6 +85,21 @@ public:
     }
 
 protected:
+    void every_n() {
+        for (int i = 0; i < 8; i++)
+            CHUCHO_EVERY_N(TRACE, 10, lgr_, "my dog " << "has fleas");
+        for (int i = 0; i < 8; i++)
+            CHUCHO_EVERY_N(DEBUG, 10, lgr_, "my dog " << "has fleas");
+        for (int i = 0; i < 8; i++)
+            CHUCHO_EVERY_N(INFO, 10, lgr_, "my dog " << "has fleas");
+        for (int i = 0; i < 8; i++)
+            CHUCHO_EVERY_N(WARN, 10, lgr_, "my dog " << "has fleas");
+        for (int i = 0; i < 8; i++)
+            CHUCHO_EVERY_N(ERROR, 10, lgr_, "my dog " << "has fleas");
+        for (int i = 0; i < 8; i++)
+            CHUCHO_EVERY_N(FATAL, 10, lgr_, "my dog " << "has fleas");
+    }
+
     void log()
     {
         CHUCHO_TRACE(lgr_, "my dog " << "has fleas");
@@ -330,6 +345,14 @@ TEST_F(log_macro, debug_lgbl_str)
     get_logger()->set_level(chucho::level::DEBUG_());
     log_lgbl_str();
     expect(chucho::level::DEBUG_(), expected_logger::INTRINSIC);
+}
+
+TEST_F(log_macro, debug_every_n)
+{
+    SCOPED_TRACE("debug_every_n");
+    lgr_->set_level(chucho::level::DEBUG_());
+    every_n();
+    expect(chucho::level::DEBUG_(), expected_logger::EXPLICIT);
 }
 
 TEST_F(log_macro, error)
