@@ -85,198 +85,6 @@ public:
     }
 
 protected:
-    void every_n()
-    {
-        for (int i = 0; i < 25; i++)
-            CHUCHO_EVERY_N(TRACE, 10, lgr_, "my dog " << "has fleas");
-        for (int i = 0; i < 25; i++)
-            CHUCHO_EVERY_N(DEBUG, 10, lgr_, "my dog " << "has fleas");
-        for (int i = 0; i < 25; i++)
-            CHUCHO_EVERY_N(INFO, 10, lgr_, "my dog " << "has fleas");
-        for (int i = 0; i < 25; i++)
-            CHUCHO_EVERY_N(WARN, 10, lgr_, "my dog " << "has fleas");
-        for (int i = 0; i < 25; i++)
-            CHUCHO_EVERY_N(ERROR, 10, lgr_, "my dog " << "has fleas");
-        for (int i = 0; i < 25; i++)
-            CHUCHO_EVERY_N(FATAL, 10, lgr_, "my dog " << "has fleas");
-    }
-
-    void every_n_lgbl()
-    {
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL(TRACE, 1000, "my dog " << "has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL(DEBUG, 1000, "my dog " << "has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL(INFO, 1000, "my dog " << "has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL(WARN, 1000, "my dog " << "has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL(ERROR, 1000, "my dog " << "has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL(FATAL, 1000, "my dog " << "has fleas");
-    }
-
-    void every_n_l()
-    {
-        for (int i = 0; i < 800; i++)
-            CHUCHO_EVERY_N_L(TRACE, 1000, "my dog " << "has fleas");
-        for (int i = 0; i < 800; i++)
-            CHUCHO_EVERY_N_L(DEBUG, 1000, "my dog " << "has fleas");
-        for (int i = 0; i < 800; i++)
-            CHUCHO_EVERY_N_L(INFO, 1000, "my dog " << "has fleas");
-        for (int i = 0; i < 800; i++)
-            CHUCHO_EVERY_N_L(WARN, 1000, "my dog " << "has fleas");
-        for (int i = 0; i < 800; i++)
-            CHUCHO_EVERY_N_L(ERROR, 1000, "my dog " << "has fleas");
-        for (int i = 0; i < 800; i++)
-            CHUCHO_EVERY_N_L(FATAL, 1000, "my dog " << "has fleas");
-    }
-
-    void every_n_str()
-    {
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_STR(TRACE, 1000, lgr_, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_STR(DEBUG, 1000, lgr_, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_STR(INFO, 1000, lgr_, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_STR(WARN, 1000, lgr_, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_STR(ERROR, 1000, lgr_, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_STR(FATAL, 1000, lgr_, "my dog has fleas");
-    }
-
-    void every_n_lgbl_str()
-    {
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL_STR(TRACE, 1000, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL_STR(DEBUG, 1000, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL_STR(INFO, 1000, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL_STR(WARN, 1000, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL_STR(ERROR, 1000, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL_STR(FATAL, 1000, "my dog has fleas");
-    }
-
-    void every_n_l_str()
-    {
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_L_STR(TRACE, 1000, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_L_STR(DEBUG, 1000, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_L_STR(INFO, 1000, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_L_STR(WARN, 1000, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_L_STR(ERROR, 1000, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_L_STR(FATAL, 1000, "my dog has fleas");
-    }
-
-    void every_n_m()
-    {
-        for (int i = 0; i < 25; i++)
-            CHUCHO_EVERY_N_M(TRACE, 10, MARK, lgr_, "my dog " << "has fleas");
-        for (int i = 0; i < 25; i++)
-            CHUCHO_EVERY_N_M(DEBUG, 10, MARK, lgr_, "my dog " << "has fleas");
-        for (int i = 0; i < 25; i++)
-            CHUCHO_EVERY_N_M(INFO, 10, MARK, lgr_, "my dog " << "has fleas");
-        for (int i = 0; i < 25; i++)
-            CHUCHO_EVERY_N_M(WARN, 10, MARK, lgr_, "my dog " << "has fleas");
-        for (int i = 0; i < 25; i++)
-            CHUCHO_EVERY_N_M(ERROR, 10, MARK, lgr_, "my dog " << "has fleas");
-        for (int i = 0; i < 25; i++)
-            CHUCHO_EVERY_N_M(FATAL, 10, MARK, lgr_, "my dog " << "has fleas");
-    }
-
-    void every_n_lgbl_m()
-    {
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL_M(TRACE, 1000, MARK, "my dog " << "has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL_M(DEBUG, 1000, MARK, "my dog " << "has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL_M(INFO, 1000, MARK, "my dog " << "has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL_M(WARN, 1000, MARK, "my dog " << "has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL_M(ERROR, 1000, MARK, "my dog " << "has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL_M(FATAL, 1000, MARK, "my dog " << "has fleas");
-    }
-
-    void every_n_l_m()
-    {
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_L_M(TRACE, 1000, MARK, "my dog " << "has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_L_M(DEBUG, 1000, MARK, "my dog " << "has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_L_M(INFO, 1000, MARK, "my dog " << "has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_L_M(WARN, 1000, MARK, "my dog " << "has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_L_M(ERROR, 1000, MARK, "my dog " << "has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_L_M(FATAL, 1000, MARK, "my dog " << "has fleas");
-    }
-
-    void every_n_str_m()
-    {
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_STR_M(TRACE, 1000, MARK, lgr_, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_STR_M(DEBUG, 1000, MARK, lgr_, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_STR_M(INFO, 1000, MARK, lgr_, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_STR_M(WARN, 1000, MARK, lgr_, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_STR_M(ERROR, 1000, MARK, lgr_, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_STR_M(FATAL, 1000, MARK, lgr_, "my dog has fleas");
-    }
-
-    void every_n_lgbl_str_m()
-    {
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL_STR_M(TRACE, 1000, MARK, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL_STR_M(DEBUG, 1000, MARK, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL_STR_M(INFO, 1000, MARK, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL_STR_M(WARN, 1000, MARK, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL_STR_M(ERROR, 1000, MARK, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_LGBL_STR_M(FATAL, 1000, MARK, "my dog has fleas");
-    }
-
-    void every_n_l_str_m()
-    {
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_L_STR_M(TRACE, 1000, MARK, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_L_STR_M(DEBUG, 1000, MARK, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_L_STR_M(INFO, 1000, MARK, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_L_STR_M(WARN, 1000, MARK, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_L_STR_M(ERROR, 1000, MARK, "my dog has fleas");
-        for (int i = 0; i < 2500; i++)
-            CHUCHO_EVERY_N_L_STR_M(FATAL, 1000, MARK, "my dog has fleas");
-    }
-
     void log()
     {
         CHUCHO_TRACE(lgr_, "my dog " << "has fleas");
@@ -420,6 +228,8 @@ protected:
         {
             if (cur > 0 && (cur % lines_per_lvl) == 0)
                 ++i;
+//            std::cout << "cur " << cur << " '" << lines[cur] << "'" << std::endl;
+//            std::cout << "lvl " << i << " " << lvls[i]->get_name() << std::endl;
             EXPECT_STREQ(lvls[i]->get_name(), lines[cur].substr(0, std::strlen(lvls[i]->get_name())).c_str());
             if (mark)
                 EXPECT_NE(std::string::npos, lines[cur].find(mark->get_name()));
@@ -531,7 +341,18 @@ TEST_F(log_macro, debug_every_n)
 {
     SCOPED_TRACE("debug_every_n");
     lgr_->set_level(chucho::level::DEBUG_());
-    every_n();
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(TRACE, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(DEBUG, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(INFO, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(WARN, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(ERROR, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(FATAL, 10, lgr_, "my dog " << "has fleas");
     expect(chucho::level::DEBUG_(),
            expected_logger::EXPLICIT,
            chucho::optional<chucho::marker>(),
@@ -542,7 +363,18 @@ TEST_F(log_macro, debug_every_n_lgbl)
 {
     SCOPED_TRACE("debug_every_n_lgbl");
     get_logger()->set_level(chucho::level::DEBUG_());
-    every_n_lgbl();
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(TRACE, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(DEBUG, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(INFO, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(WARN, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(ERROR, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(FATAL, 1000, "my dog " << "has fleas");
     expect(chucho::level::DEBUG_(),
            expected_logger::INTRINSIC,
            chucho::optional<chucho::marker>(),
@@ -553,7 +385,18 @@ TEST_F(log_macro, debug_every_n_l)
 {
     SCOPED_TRACE("debug_every_n_l");
     get_logger()->set_level(chucho::level::DEBUG_());
-    every_n_l();
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(TRACE, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(DEBUG, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(INFO, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(WARN, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(ERROR, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(FATAL, 1000, "my dog " << "has fleas");
     expect(chucho::level::DEBUG_(), expected_logger::INTRINSIC);
 }
 
@@ -561,7 +404,18 @@ TEST_F(log_macro, debug_every_n_str)
 {
     SCOPED_TRACE("debug_every_n_str");
     lgr_->set_level(chucho::level::DEBUG_());
-    every_n_str();
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(TRACE, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(DEBUG, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(INFO, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(WARN, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(ERROR, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(FATAL, 1000, lgr_, "my dog has fleas");
     expect(chucho::level::DEBUG_(),
            expected_logger::EXPLICIT,
            chucho::optional<chucho::marker>(),
@@ -572,7 +426,18 @@ TEST_F(log_macro, debug_every_n_lgbl_str)
 {
     SCOPED_TRACE("debug_every_n_lgbl_str");
     get_logger()->set_level(chucho::level::DEBUG_());
-    every_n_lgbl_str();
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(TRACE, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(DEBUG, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(INFO, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(WARN, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(ERROR, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(FATAL, 1000, "my dog has fleas");
     expect(chucho::level::DEBUG_(),
            expected_logger::INTRINSIC,
            chucho::optional<chucho::marker>(),
@@ -583,7 +448,18 @@ TEST_F(log_macro, debug_every_n_l_str)
 {
     SCOPED_TRACE("debug_every_n_l_str");
     get_logger()->set_level(chucho::level::DEBUG_());
-    every_n_l_str();
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(TRACE, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(DEBUG, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(INFO, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(WARN, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(ERROR, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(FATAL, 1000, "my dog has fleas");
     expect(chucho::level::DEBUG_(),
            expected_logger::INTRINSIC,
            chucho::optional<chucho::marker>(),
@@ -594,7 +470,18 @@ TEST_F(log_macro, debug_every_n_m)
 {
     SCOPED_TRACE("debug_every_n_m");
     lgr_->set_level(chucho::level::DEBUG_());
-    every_n_m();
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(TRACE, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(DEBUG, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(INFO, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(WARN, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(ERROR, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(FATAL, 10, MARK, lgr_, "my dog " << "has fleas");
     expect(chucho::level::DEBUG_(),
            expected_logger::EXPLICIT,
            MARK,
@@ -605,7 +492,18 @@ TEST_F(log_macro, debug_every_n_lgbl_m)
 {
     SCOPED_TRACE("debug_every_n_lgbl_m");
     get_logger()->set_level(chucho::level::DEBUG_());
-    every_n_lgbl_m();
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(TRACE, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(DEBUG, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(INFO, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(WARN, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(ERROR, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(FATAL, 1000, MARK, "my dog " << "has fleas");
     expect(chucho::level::DEBUG_(),
            expected_logger::INTRINSIC,
            MARK,
@@ -616,7 +514,18 @@ TEST_F(log_macro, debug_every_n_l_m)
 {
     SCOPED_TRACE("debug_every_n_l_m");
     get_logger()->set_level(chucho::level::DEBUG_());
-    every_n_l_m();
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(TRACE, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(DEBUG, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(INFO, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(WARN, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(ERROR, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(FATAL, 1000, MARK, "my dog " << "has fleas");
     expect(chucho::level::DEBUG_(),
            expected_logger::INTRINSIC,
            MARK,
@@ -627,7 +536,18 @@ TEST_F(log_macro, debug_every_n_str_m)
 {
     SCOPED_TRACE("debug_every_n_str_m");
     lgr_->set_level(chucho::level::DEBUG_());
-    every_n_str_m();
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(TRACE, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(DEBUG, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(INFO, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(WARN, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(ERROR, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(FATAL, 1000, MARK, lgr_, "my dog has fleas");
     expect(chucho::level::DEBUG_(),
            expected_logger::EXPLICIT,
            MARK,
@@ -638,7 +558,18 @@ TEST_F(log_macro, debug_every_n_lgbl_str_m)
 {
     SCOPED_TRACE("debug_every_n_lgbl_str_m");
     get_logger()->set_level(chucho::level::DEBUG_());
-    every_n_lgbl_str_m();
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(TRACE, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(DEBUG, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(INFO, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(WARN, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(ERROR, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(FATAL, 1000, MARK, "my dog has fleas");
     expect(chucho::level::DEBUG_(),
            expected_logger::INTRINSIC,
            MARK,
@@ -649,7 +580,18 @@ TEST_F(log_macro, debug_every_n_l_str_m)
 {
     SCOPED_TRACE("debug_every_n_l_str_m");
     get_logger()->set_level(chucho::level::DEBUG_());
-    every_n_l_str_m();
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(TRACE, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(DEBUG, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(INFO, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(WARN, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(ERROR, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(FATAL, 1000, MARK, "my dog has fleas");
     expect(chucho::level::DEBUG_(),
            expected_logger::INTRINSIC,
            MARK,
@@ -752,6 +694,267 @@ TEST_F(log_macro, error_lgbl_str)
     expect(chucho::level::ERROR_(), expected_logger::INTRINSIC);
 }
 
+TEST_F(log_macro, error_every_n)
+{
+    SCOPED_TRACE("error_every_n");
+    lgr_->set_level(chucho::level::ERROR_());
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(TRACE, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(DEBUG, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(INFO, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(WARN, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(ERROR, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(FATAL, 10, lgr_, "my dog " << "has fleas");
+    expect(chucho::level::ERROR_(),
+           expected_logger::EXPLICIT,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, error_every_n_lgbl)
+{
+    SCOPED_TRACE("error_every_n_lgbl");
+    get_logger()->set_level(chucho::level::ERROR_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(TRACE, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(DEBUG, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(INFO, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(WARN, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(ERROR, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(FATAL, 1000, "my dog " << "has fleas");
+    expect(chucho::level::ERROR_(),
+           expected_logger::INTRINSIC,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, error_every_n_l)
+{
+    SCOPED_TRACE("error_every_n_l");
+    get_logger()->set_level(chucho::level::ERROR_());
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(TRACE, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(DEBUG, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(INFO, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(WARN, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(ERROR, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(FATAL, 1000, "my dog " << "has fleas");
+    expect(chucho::level::ERROR_(), expected_logger::INTRINSIC);
+}
+
+TEST_F(log_macro, error_every_n_str)
+{
+    SCOPED_TRACE("error_every_n_str");
+    lgr_->set_level(chucho::level::ERROR_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(TRACE, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(DEBUG, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(INFO, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(WARN, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(ERROR, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(FATAL, 1000, lgr_, "my dog has fleas");
+    expect(chucho::level::ERROR_(),
+           expected_logger::EXPLICIT,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, error_every_n_lgbl_str)
+{
+    SCOPED_TRACE("error_every_n_lgbl_str");
+    get_logger()->set_level(chucho::level::ERROR_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(TRACE, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(DEBUG, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(INFO, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(WARN, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(ERROR, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(FATAL, 1000, "my dog has fleas");
+    expect(chucho::level::ERROR_(),
+           expected_logger::INTRINSIC,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, error_every_n_l_str)
+{
+    SCOPED_TRACE("error_every_n_l_str");
+    get_logger()->set_level(chucho::level::ERROR_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(TRACE, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(DEBUG, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(INFO, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(WARN, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(ERROR, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(FATAL, 1000, "my dog has fleas");
+    expect(chucho::level::ERROR_(),
+           expected_logger::INTRINSIC,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, error_every_n_m)
+{
+    SCOPED_TRACE("error_every_n_m");
+    lgr_->set_level(chucho::level::ERROR_());
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(TRACE, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(DEBUG, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(INFO, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(WARN, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(ERROR, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(FATAL, 10, MARK, lgr_, "my dog " << "has fleas");
+    expect(chucho::level::ERROR_(),
+           expected_logger::EXPLICIT,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, error_every_n_lgbl_m)
+{
+    SCOPED_TRACE("error_every_n_lgbl_m");
+    get_logger()->set_level(chucho::level::ERROR_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(TRACE, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(DEBUG, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(INFO, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(WARN, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(ERROR, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(FATAL, 1000, MARK, "my dog " << "has fleas");
+    expect(chucho::level::ERROR_(),
+           expected_logger::INTRINSIC,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, error_every_n_l_m)
+{
+    SCOPED_TRACE("error_every_n_l_m");
+    get_logger()->set_level(chucho::level::ERROR_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(TRACE, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(DEBUG, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(INFO, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(WARN, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(ERROR, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(FATAL, 1000, MARK, "my dog " << "has fleas");
+    expect(chucho::level::ERROR_(),
+           expected_logger::INTRINSIC,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, error_every_n_str_m)
+{
+    SCOPED_TRACE("error_every_n_str_m");
+    lgr_->set_level(chucho::level::ERROR_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(TRACE, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(DEBUG, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(INFO, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(WARN, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(ERROR, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(FATAL, 1000, MARK, lgr_, "my dog has fleas");
+    expect(chucho::level::ERROR_(),
+           expected_logger::EXPLICIT,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, error_every_n_lgbl_str_m)
+{
+    SCOPED_TRACE("error_every_n_lgbl_str_m");
+    get_logger()->set_level(chucho::level::ERROR_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(TRACE, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(DEBUG, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(INFO, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(WARN, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(ERROR, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(FATAL, 1000, MARK, "my dog has fleas");
+    expect(chucho::level::ERROR_(),
+           expected_logger::INTRINSIC,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, error_every_n_l_str_m)
+{
+    SCOPED_TRACE("error_every_n_l_str_m");
+    get_logger()->set_level(chucho::level::ERROR_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(TRACE, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(DEBUG, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(INFO, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(WARN, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(ERROR, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(FATAL, 1000, MARK, "my dog has fleas");
+    expect(chucho::level::ERROR_(),
+           expected_logger::INTRINSIC,
+           MARK,
+           3);
+}
+
 TEST_F(log_macro, fatal)
 {
     SCOPED_TRACE("fatal");
@@ -846,6 +1049,267 @@ TEST_F(log_macro, fatal_lgbl_str)
     get_logger()->set_level(chucho::level::FATAL_());
     log_lgbl_str();
     expect(chucho::level::FATAL_(), expected_logger::INTRINSIC);
+}
+
+TEST_F(log_macro, fatal_every_n)
+{
+    SCOPED_TRACE("fatal_every_n");
+    lgr_->set_level(chucho::level::FATAL_());
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(TRACE, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(DEBUG, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(INFO, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(WARN, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(ERROR, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(FATAL, 10, lgr_, "my dog " << "has fleas");
+    expect(chucho::level::FATAL_(),
+           expected_logger::EXPLICIT,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, fatal_every_n_lgbl)
+{
+    SCOPED_TRACE("fatal_every_n_lgbl");
+    get_logger()->set_level(chucho::level::FATAL_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(TRACE, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(DEBUG, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(INFO, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(WARN, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(ERROR, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(FATAL, 1000, "my dog " << "has fleas");
+    expect(chucho::level::FATAL_(),
+           expected_logger::INTRINSIC,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, fatal_every_n_l)
+{
+    SCOPED_TRACE("fatal_every_n_l");
+    get_logger()->set_level(chucho::level::FATAL_());
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(TRACE, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(DEBUG, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(INFO, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(WARN, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(ERROR, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(FATAL, 1000, "my dog " << "has fleas");
+    expect(chucho::level::FATAL_(), expected_logger::INTRINSIC);
+}
+
+TEST_F(log_macro, fatal_every_n_str)
+{
+    SCOPED_TRACE("fatal_every_n_str");
+    lgr_->set_level(chucho::level::FATAL_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(TRACE, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(DEBUG, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(INFO, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(WARN, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(ERROR, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(FATAL, 1000, lgr_, "my dog has fleas");
+    expect(chucho::level::FATAL_(),
+           expected_logger::EXPLICIT,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, fatal_every_n_lgbl_str)
+{
+    SCOPED_TRACE("fatal_every_n_lgbl_str");
+    get_logger()->set_level(chucho::level::FATAL_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(TRACE, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(DEBUG, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(INFO, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(WARN, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(ERROR, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(FATAL, 1000, "my dog has fleas");
+    expect(chucho::level::FATAL_(),
+           expected_logger::INTRINSIC,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, fatal_every_n_l_str)
+{
+    SCOPED_TRACE("fatal_every_n_l_str");
+    get_logger()->set_level(chucho::level::FATAL_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(TRACE, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(DEBUG, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(INFO, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(WARN, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(ERROR, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(FATAL, 1000, "my dog has fleas");
+    expect(chucho::level::FATAL_(),
+           expected_logger::INTRINSIC,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, fatal_every_n_m)
+{
+    SCOPED_TRACE("fatal_every_n_m");
+    lgr_->set_level(chucho::level::FATAL_());
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(TRACE, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(DEBUG, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(INFO, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(WARN, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(ERROR, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(FATAL, 10, MARK, lgr_, "my dog " << "has fleas");
+    expect(chucho::level::FATAL_(),
+           expected_logger::EXPLICIT,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, fatal_every_n_lgbl_m)
+{
+    SCOPED_TRACE("fatal_every_n_lgbl_m");
+    get_logger()->set_level(chucho::level::FATAL_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(TRACE, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(DEBUG, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(INFO, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(WARN, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(ERROR, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(FATAL, 1000, MARK, "my dog " << "has fleas");
+    expect(chucho::level::FATAL_(),
+           expected_logger::INTRINSIC,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, fatal_every_n_l_m)
+{
+    SCOPED_TRACE("fatal_every_n_l_m");
+    get_logger()->set_level(chucho::level::FATAL_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(TRACE, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(DEBUG, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(INFO, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(WARN, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(ERROR, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(FATAL, 1000, MARK, "my dog " << "has fleas");
+    expect(chucho::level::FATAL_(),
+           expected_logger::INTRINSIC,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, fatal_every_n_str_m)
+{
+    SCOPED_TRACE("fatal_every_n_str_m");
+    lgr_->set_level(chucho::level::FATAL_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(TRACE, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(DEBUG, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(INFO, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(WARN, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(ERROR, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(FATAL, 1000, MARK, lgr_, "my dog has fleas");
+    expect(chucho::level::FATAL_(),
+           expected_logger::EXPLICIT,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, fatal_every_n_lgbl_str_m)
+{
+    SCOPED_TRACE("fatal_every_n_lgbl_str_m");
+    get_logger()->set_level(chucho::level::FATAL_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(TRACE, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(DEBUG, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(INFO, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(WARN, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(ERROR, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(FATAL, 1000, MARK, "my dog has fleas");
+    expect(chucho::level::FATAL_(),
+           expected_logger::INTRINSIC,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, fatal_every_n_l_str_m)
+{
+    SCOPED_TRACE("fatal_every_n_l_str_m");
+    get_logger()->set_level(chucho::level::FATAL_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(TRACE, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(DEBUG, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(INFO, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(WARN, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(ERROR, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(FATAL, 1000, MARK, "my dog has fleas");
+    expect(chucho::level::FATAL_(),
+           expected_logger::INTRINSIC,
+           MARK,
+           3);
 }
 
 TEST_F(log_macro, info)
@@ -944,6 +1408,267 @@ TEST_F(log_macro, info_lgbl_str)
     expect(chucho::level::INFO_(), expected_logger::INTRINSIC);
 }
 
+TEST_F(log_macro, info_every_n)
+{
+    SCOPED_TRACE("info_every_n");
+    lgr_->set_level(chucho::level::INFO_());
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(TRACE, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(DEBUG, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(INFO, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(WARN, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(ERROR, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(FATAL, 10, lgr_, "my dog " << "has fleas");
+    expect(chucho::level::INFO_(),
+           expected_logger::EXPLICIT,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, info_every_n_lgbl)
+{
+    SCOPED_TRACE("info_every_n_lgbl");
+    get_logger()->set_level(chucho::level::INFO_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(TRACE, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(DEBUG, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(INFO, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(WARN, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(ERROR, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(FATAL, 1000, "my dog " << "has fleas");
+    expect(chucho::level::INFO_(),
+           expected_logger::INTRINSIC,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, info_every_n_l)
+{
+    SCOPED_TRACE("info_every_n_l");
+    get_logger()->set_level(chucho::level::INFO_());
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(TRACE, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(DEBUG, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(INFO, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(WARN, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(ERROR, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(FATAL, 1000, "my dog " << "has fleas");
+    expect(chucho::level::INFO_(), expected_logger::INTRINSIC);
+}
+
+TEST_F(log_macro, info_every_n_str)
+{
+    SCOPED_TRACE("info_every_n_str");
+    lgr_->set_level(chucho::level::INFO_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(TRACE, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(DEBUG, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(INFO, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(WARN, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(ERROR, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(FATAL, 1000, lgr_, "my dog has fleas");
+    expect(chucho::level::INFO_(),
+           expected_logger::EXPLICIT,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, info_every_n_lgbl_str)
+{
+    SCOPED_TRACE("info_every_n_lgbl_str");
+    get_logger()->set_level(chucho::level::INFO_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(TRACE, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(DEBUG, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(INFO, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(WARN, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(ERROR, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(FATAL, 1000, "my dog has fleas");
+    expect(chucho::level::INFO_(),
+           expected_logger::INTRINSIC,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, info_every_n_l_str)
+{
+    SCOPED_TRACE("info_every_n_l_str");
+    get_logger()->set_level(chucho::level::INFO_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(TRACE, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(DEBUG, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(INFO, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(WARN, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(ERROR, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(FATAL, 1000, "my dog has fleas");
+    expect(chucho::level::INFO_(),
+           expected_logger::INTRINSIC,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, info_every_n_m)
+{
+    SCOPED_TRACE("info_every_n_m");
+    lgr_->set_level(chucho::level::INFO_());
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(TRACE, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(DEBUG, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(INFO, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(WARN, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(ERROR, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(FATAL, 10, MARK, lgr_, "my dog " << "has fleas");
+    expect(chucho::level::INFO_(),
+           expected_logger::EXPLICIT,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, info_every_n_lgbl_m)
+{
+    SCOPED_TRACE("info_every_n_lgbl_m");
+    get_logger()->set_level(chucho::level::INFO_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(TRACE, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(DEBUG, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(INFO, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(WARN, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(ERROR, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(FATAL, 1000, MARK, "my dog " << "has fleas");
+    expect(chucho::level::INFO_(),
+           expected_logger::INTRINSIC,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, info_every_n_l_m)
+{
+    SCOPED_TRACE("info_every_n_l_m");
+    get_logger()->set_level(chucho::level::INFO_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(TRACE, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(DEBUG, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(INFO, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(WARN, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(ERROR, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(FATAL, 1000, MARK, "my dog " << "has fleas");
+    expect(chucho::level::INFO_(),
+           expected_logger::INTRINSIC,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, info_every_n_str_m)
+{
+    SCOPED_TRACE("info_every_n_str_m");
+    lgr_->set_level(chucho::level::INFO_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(TRACE, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(DEBUG, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(INFO, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(WARN, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(ERROR, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(FATAL, 1000, MARK, lgr_, "my dog has fleas");
+    expect(chucho::level::INFO_(),
+           expected_logger::EXPLICIT,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, info_every_n_lgbl_str_m)
+{
+    SCOPED_TRACE("info_every_n_lgbl_str_m");
+    get_logger()->set_level(chucho::level::INFO_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(TRACE, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(DEBUG, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(INFO, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(WARN, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(ERROR, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(FATAL, 1000, MARK, "my dog has fleas");
+    expect(chucho::level::INFO_(),
+           expected_logger::INTRINSIC,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, info_every_n_l_str_m)
+{
+    SCOPED_TRACE("info_every_n_l_str_m");
+    get_logger()->set_level(chucho::level::INFO_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(TRACE, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(DEBUG, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(INFO, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(WARN, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(ERROR, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(FATAL, 1000, MARK, "my dog has fleas");
+    expect(chucho::level::INFO_(),
+           expected_logger::INTRINSIC,
+           MARK,
+           3);
+}
+
 TEST_F(log_macro, trace)
 {
     SCOPED_TRACE("trace");
@@ -1038,6 +1763,267 @@ TEST_F(log_macro, trace_lgbl_str)
     get_logger()->set_level(chucho::level::TRACE_());
     log_lgbl_str();
     expect(chucho::level::TRACE_(), expected_logger::INTRINSIC);
+}
+
+TEST_F(log_macro, trace_every_n)
+{
+    SCOPED_TRACE("trace_every_n");
+    lgr_->set_level(chucho::level::TRACE_());
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(TRACE, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(DEBUG, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(INFO, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(WARN, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(ERROR, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(FATAL, 10, lgr_, "my dog " << "has fleas");
+    expect(chucho::level::TRACE_(),
+           expected_logger::EXPLICIT,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, trace_every_n_lgbl)
+{
+    SCOPED_TRACE("trace_every_n_lgbl");
+    get_logger()->set_level(chucho::level::TRACE_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(TRACE, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(DEBUG, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(INFO, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(WARN, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(ERROR, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(FATAL, 1000, "my dog " << "has fleas");
+    expect(chucho::level::TRACE_(),
+           expected_logger::INTRINSIC,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, trace_every_n_l)
+{
+    SCOPED_TRACE("trace_every_n_l");
+    get_logger()->set_level(chucho::level::TRACE_());
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(TRACE, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(DEBUG, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(INFO, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(WARN, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(ERROR, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(FATAL, 1000, "my dog " << "has fleas");
+    expect(chucho::level::TRACE_(), expected_logger::INTRINSIC);
+}
+
+TEST_F(log_macro, trace_every_n_str)
+{
+    SCOPED_TRACE("trace_every_n_str");
+    lgr_->set_level(chucho::level::TRACE_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(TRACE, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(DEBUG, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(INFO, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(WARN, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(ERROR, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(FATAL, 1000, lgr_, "my dog has fleas");
+    expect(chucho::level::TRACE_(),
+           expected_logger::EXPLICIT,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, trace_every_n_lgbl_str)
+{
+    SCOPED_TRACE("trace_every_n_lgbl_str");
+    get_logger()->set_level(chucho::level::TRACE_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(TRACE, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(DEBUG, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(INFO, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(WARN, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(ERROR, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(FATAL, 1000, "my dog has fleas");
+    expect(chucho::level::TRACE_(),
+           expected_logger::INTRINSIC,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, trace_every_n_l_str)
+{
+    SCOPED_TRACE("trace_every_n_l_str");
+    get_logger()->set_level(chucho::level::TRACE_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(TRACE, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(DEBUG, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(INFO, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(WARN, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(ERROR, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(FATAL, 1000, "my dog has fleas");
+    expect(chucho::level::TRACE_(),
+           expected_logger::INTRINSIC,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, trace_every_n_m)
+{
+    SCOPED_TRACE("trace_every_n_m");
+    lgr_->set_level(chucho::level::TRACE_());
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(TRACE, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(DEBUG, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(INFO, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(WARN, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(ERROR, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(FATAL, 10, MARK, lgr_, "my dog " << "has fleas");
+    expect(chucho::level::TRACE_(),
+           expected_logger::EXPLICIT,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, trace_every_n_lgbl_m)
+{
+    SCOPED_TRACE("trace_every_n_lgbl_m");
+    get_logger()->set_level(chucho::level::TRACE_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(TRACE, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(DEBUG, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(INFO, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(WARN, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(ERROR, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(FATAL, 1000, MARK, "my dog " << "has fleas");
+    expect(chucho::level::TRACE_(),
+           expected_logger::INTRINSIC,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, trace_every_n_l_m)
+{
+    SCOPED_TRACE("trace_every_n_l_m");
+    get_logger()->set_level(chucho::level::TRACE_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(TRACE, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(DEBUG, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(INFO, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(WARN, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(ERROR, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(FATAL, 1000, MARK, "my dog " << "has fleas");
+    expect(chucho::level::TRACE_(),
+           expected_logger::INTRINSIC,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, trace_every_n_str_m)
+{
+    SCOPED_TRACE("trace_every_n_str_m");
+    lgr_->set_level(chucho::level::TRACE_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(TRACE, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(DEBUG, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(INFO, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(WARN, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(ERROR, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(FATAL, 1000, MARK, lgr_, "my dog has fleas");
+    expect(chucho::level::TRACE_(),
+           expected_logger::EXPLICIT,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, trace_every_n_lgbl_str_m)
+{
+    SCOPED_TRACE("trace_every_n_lgbl_str_m");
+    get_logger()->set_level(chucho::level::TRACE_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(TRACE, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(DEBUG, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(INFO, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(WARN, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(ERROR, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(FATAL, 1000, MARK, "my dog has fleas");
+    expect(chucho::level::TRACE_(),
+           expected_logger::INTRINSIC,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, trace_every_n_l_str_m)
+{
+    SCOPED_TRACE("trace_every_n_l_str_m");
+    get_logger()->set_level(chucho::level::TRACE_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(TRACE, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(DEBUG, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(INFO, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(WARN, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(ERROR, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(FATAL, 1000, MARK, "my dog has fleas");
+    expect(chucho::level::TRACE_(),
+           expected_logger::INTRINSIC,
+           MARK,
+           3);
 }
 
 TEST_F(log_macro, warn)
@@ -1135,3 +2121,265 @@ TEST_F(log_macro, warn_lgbl_str)
     log_lgbl_str();
     expect(chucho::level::WARN_(), expected_logger::INTRINSIC);
 }
+
+TEST_F(log_macro, warn_every_n)
+{
+    SCOPED_TRACE("warn_every_n");
+    lgr_->set_level(chucho::level::WARN_());
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(TRACE, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(DEBUG, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(INFO, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(WARN, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(ERROR, 10, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N(FATAL, 10, lgr_, "my dog " << "has fleas");
+    expect(chucho::level::WARN_(),
+           expected_logger::EXPLICIT,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, warn_every_n_lgbl)
+{
+    SCOPED_TRACE("warn_every_n_lgbl");
+    get_logger()->set_level(chucho::level::WARN_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(TRACE, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(DEBUG, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(INFO, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(WARN, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(ERROR, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL(FATAL, 1000, "my dog " << "has fleas");
+    expect(chucho::level::WARN_(),
+           expected_logger::INTRINSIC,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, warn_every_n_l)
+{
+    SCOPED_TRACE("warn_every_n_l");
+    get_logger()->set_level(chucho::level::WARN_());
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(TRACE, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(DEBUG, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(INFO, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(WARN, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(ERROR, 1000, "my dog " << "has fleas");
+    for (int i = 0; i < 800; i++)
+        CHUCHO_EVERY_N_L(FATAL, 1000, "my dog " << "has fleas");
+    expect(chucho::level::WARN_(), expected_logger::INTRINSIC);
+}
+
+TEST_F(log_macro, warn_every_n_str)
+{
+    SCOPED_TRACE("warn_every_n_str");
+    lgr_->set_level(chucho::level::WARN_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(TRACE, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(DEBUG, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(INFO, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(WARN, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(ERROR, 1000, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR(FATAL, 1000, lgr_, "my dog has fleas");
+    expect(chucho::level::WARN_(),
+           expected_logger::EXPLICIT,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, warn_every_n_lgbl_str)
+{
+    SCOPED_TRACE("warn_every_n_lgbl_str");
+    get_logger()->set_level(chucho::level::WARN_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(TRACE, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(DEBUG, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(INFO, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(WARN, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(ERROR, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR(FATAL, 1000, "my dog has fleas");
+    expect(chucho::level::WARN_(),
+           expected_logger::INTRINSIC,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, warn_every_n_l_str)
+{
+    SCOPED_TRACE("warn_every_n_l_str");
+    get_logger()->set_level(chucho::level::WARN_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(TRACE, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(DEBUG, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(INFO, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(WARN, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(ERROR, 1000, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR(FATAL, 1000, "my dog has fleas");
+    expect(chucho::level::WARN_(),
+           expected_logger::INTRINSIC,
+           chucho::optional<chucho::marker>(),
+           3);
+}
+
+TEST_F(log_macro, warn_every_n_m)
+{
+    SCOPED_TRACE("warn_every_n_m");
+    lgr_->set_level(chucho::level::WARN_());
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(TRACE, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(DEBUG, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(INFO, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(WARN, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(ERROR, 10, MARK, lgr_, "my dog " << "has fleas");
+    for (int i = 0; i < 25; i++)
+        CHUCHO_EVERY_N_M(FATAL, 10, MARK, lgr_, "my dog " << "has fleas");
+    expect(chucho::level::WARN_(),
+           expected_logger::EXPLICIT,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, warn_every_n_lgbl_m)
+{
+    SCOPED_TRACE("warn_every_n_lgbl_m");
+    get_logger()->set_level(chucho::level::WARN_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(TRACE, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(DEBUG, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(INFO, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(WARN, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(ERROR, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_M(FATAL, 1000, MARK, "my dog " << "has fleas");
+    expect(chucho::level::WARN_(),
+           expected_logger::INTRINSIC,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, warn_every_n_l_m)
+{
+    SCOPED_TRACE("warn_every_n_l_m");
+    get_logger()->set_level(chucho::level::WARN_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(TRACE, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(DEBUG, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(INFO, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(WARN, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(ERROR, 1000, MARK, "my dog " << "has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_M(FATAL, 1000, MARK, "my dog " << "has fleas");
+    expect(chucho::level::WARN_(),
+           expected_logger::INTRINSIC,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, warn_every_n_str_m)
+{
+    SCOPED_TRACE("warn_every_n_str_m");
+    lgr_->set_level(chucho::level::WARN_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(TRACE, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(DEBUG, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(INFO, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(WARN, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(ERROR, 1000, MARK, lgr_, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_STR_M(FATAL, 1000, MARK, lgr_, "my dog has fleas");
+    expect(chucho::level::WARN_(),
+           expected_logger::EXPLICIT,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, warn_every_n_lgbl_str_m)
+{
+    SCOPED_TRACE("warn_every_n_lgbl_str_m");
+    get_logger()->set_level(chucho::level::WARN_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(TRACE, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(DEBUG, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(INFO, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(WARN, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(ERROR, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_LGBL_STR_M(FATAL, 1000, MARK, "my dog has fleas");
+    expect(chucho::level::WARN_(),
+           expected_logger::INTRINSIC,
+           MARK,
+           3);
+}
+
+TEST_F(log_macro, warn_every_n_l_str_m)
+{
+    SCOPED_TRACE("warn_every_n_l_str_m");
+    get_logger()->set_level(chucho::level::WARN_());
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(TRACE, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(DEBUG, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(INFO, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(WARN, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(ERROR, 1000, MARK, "my dog has fleas");
+    for (int i = 0; i < 2500; i++)
+        CHUCHO_EVERY_N_L_STR_M(FATAL, 1000, MARK, "my dog has fleas");
+    expect(chucho::level::WARN_(),
+           expected_logger::INTRINSIC,
+           MARK,
+           3);
+}
+

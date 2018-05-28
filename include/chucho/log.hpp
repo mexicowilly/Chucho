@@ -75,10 +75,10 @@
 #define CHUCHO_EVERY_N_INTERNAL(n, body) \
     do \
     { \
-        static std::size_t __chucho_every_n_count_mod_n = 0; \
-        if (++__chucho_every_n_count_mod_n > (n)) \
-            __chucho_every_n_count_mod_n -= (n); \
-        if (__chucho_every_n_count_mod_n == 1) \
+        static std::size_t __chucho_every_n_counter = 0; \
+        if (++__chucho_every_n_counter > (n)) \
+            __chucho_every_n_counter -= (n); \
+        if (__chucho_every_n_counter == 1) \
             body ; \
     } while (false)
 
