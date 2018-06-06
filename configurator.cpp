@@ -37,6 +37,7 @@
 #include <chucho/named_pipe_writer_factory.hpp>
 #include <chucho/noop_compressor_factory.hpp>
 #include <chucho/numbered_file_roller_factory.hpp>
+#include <chucho/on_start_file_roll_trigger_factory.hpp>
 #include <chucho/pattern_formatter_factory.hpp>
 #include <chucho/pipe_writer_factory.hpp>
 #include <chucho/rolling_file_writer_factory.hpp>
@@ -156,6 +157,8 @@ void configurator::initialize_impl()
                              std::make_shared<noop_compressor_factory>());
     add_configurable_factory("chucho::numbered_file_roller",
                              std::make_shared<numbered_file_roller_factory>());
+    add_configurable_factory("chucho::on_start_file_roll_trigger",
+                             std::make_shared<on_start_file_roll_trigger_factory>());
     add_configurable_factory("chucho::pattern_formatter",
                              std::make_shared<pattern_formatter_factory>());
     add_configurable_factory("chucho::pipe_writer",

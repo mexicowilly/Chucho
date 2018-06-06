@@ -188,6 +188,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                multithread_test.cpp
                named_pipe_writer_test.cpp
                noop_compressor_test.cpp
+               on_start_file_roll_trigger_test.cpp
                optional_test.cpp
                optional_features_test.cpp
                pattern_formatter_test.cpp

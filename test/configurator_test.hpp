@@ -65,6 +65,7 @@ protected:
     void multiple_writer_body();
     void named_pipe_writer_body();
     void numbered_file_roller_body();
+    void on_start_file_roll_trigger_body();
     void pipe_writer_body();
 #if defined(CHUCHO_HAVE_RABBITMQ)
     void rabbitmq_writer_body();

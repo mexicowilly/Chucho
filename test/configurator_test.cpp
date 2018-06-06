@@ -30,6 +30,7 @@
 #include <chucho/syslog_writer.hpp>
 #include <chucho/noop_file_compressor.hpp>
 #include <chucho/json_formatter.hpp>
+#include <chucho/on_start_file_roll_trigger.hpp>
 #if defined(CHUCHO_HAVE_BZIP2)
 #include <chucho/bzip2_file_compressor.hpp>
 #endif
@@ -524,6 +525,14 @@ void configurator::numbered_file_roller_body()
     auto& nrlr = dynamic_cast<chucho::numbered_file_roller&>(fwrt.get_file_roller());
     EXPECT_EQ(5, nrlr.get_max_index());
     EXPECT_EQ(-3, nrlr.get_min_index());
+}
+
+void configurator::on_start_file_roll_trigger_body()
+{
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& fwrt = dynamic_cast<chucho::rolling_file_writer&>(lgr->get_writer("chucho::rolling_file_writer"));
+    EXPECT_NO_THROW(auto& ons = dynamic_cast<chucho::on_start_file_roll_trigger&>(fwrt.get_file_roll_trigger()));
 }
 
 void configurator::pipe_writer_body()

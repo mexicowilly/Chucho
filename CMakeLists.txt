@@ -233,6 +233,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/noop_compressor.hpp
     include/chucho/noop_file_compressor.hpp
     include/chucho/numbered_file_roller.hpp
+    include/chucho/on_start_file_roll_trigger.hpp
     include/chucho/optional.hpp
     include/chucho/optional_features.hpp
     include/chucho/pattern_formatter.hpp
@@ -673,6 +674,8 @@ SET(CHUCHO_SOURCES
     numbered_file_roller.cpp
     numbered_file_roller_factory.cpp
     numbered_file_roller_memento.cpp
+    on_start_file_roll_trigger.cpp
+    on_start_file_roll_trigger_factory.cpp
     optional_features.cpp
     pattern_formatter.cpp
     pattern_formatter_factory.cpp
@@ -749,6 +752,7 @@ SET(CHUCHO_SOURCES
     include/chucho/noop_compressor_factory.hpp
     include/chucho/numbered_file_roller_factory.hpp
     include/chucho/numbered_file_roller_memento.hpp
+    include/chucho/on_start_file_roll_trigger_factory.hpp
     include/chucho/pattern_formatter_factory.hpp
     include/chucho/pattern_formatter_memento.hpp
     include/chucho/pipe_writer_factory.hpp

@@ -489,6 +489,21 @@ TEST_F(yaml_configurator, numbered_file_roller)
     numbered_file_roller_body();
 }
 
+TEST_F(yaml_configurator, on_start_file_roll_trigger)
+{
+    configure(R"cnf(
+chucho::logger:
+    name: will
+    chucho::rolling_file_writer:
+        - chucho::pattern_formatter:
+            pattern: '%m%n'
+        - chucho::numbered_file_roller:
+            max_index: 1
+        - chucho::on_start_file_roll_trigger
+        - file_name: what.log)cnf");
+    on_start_file_roll_trigger_body();
+}
+
 TEST_F(yaml_configurator, pipe_writer)
 {
     configure("chucho::logger:\n"
