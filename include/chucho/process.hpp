@@ -21,13 +21,15 @@
 #error "This header is private"
 #endif
 
+#include <chucho/export.h>
+
 namespace chucho
 {
 
 namespace process
 {
 
-int id();
+CHUCHO_PRIV_EXPORT int id();
 
 }
 

@@ -177,6 +177,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                harness.cpp
                interval_file_roll_trigger_test.cpp
                json_formatter_test.cpp
+               ../embedded/cJSON/cJSON.c
                level_test.cpp
                level_filter_test.cpp
                level_threshold_filter_test.cpp
