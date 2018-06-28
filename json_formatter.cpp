@@ -11,6 +11,10 @@
 namespace chucho
 {
 
+constexpr json_formatter::style json_formatter::DEFAULT_STYLE;
+constexpr json_formatter::time_zone json_formatter::DEFAULT_TIME_ZONE;
+constexpr char const* json_formatter::DEFAULT_TIME_FORMAT;
+
 json_formatter::json_formatter(style styl, time_zone tz, const std::string& time_format)
     : style_(styl), fmt_(std::make_unique<calendar::formatter>(time_format,
                                                                (tz == time_zone::LOCAL) ?
