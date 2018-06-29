@@ -30,7 +30,7 @@ namespace chucho
 namespace environment
 {
 
-CHUCHO_NO_EXPORT optional<std::string> get(const std::string& var);
+CHUCHO_PRIV_EXPORT optional<std::string> get(const std::string& var);
 
 }
 
