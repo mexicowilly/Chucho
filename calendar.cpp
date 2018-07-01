@@ -15,11 +15,11 @@
  */
 
 #include <chucho/calendar.hpp>
-#include <iomanip>
 #include <sstream>
 #include <array>
 #include <tuple>
 #include <vector>
+#include <algorithm>
 
 namespace
 {
@@ -113,6 +113,35 @@ std::string format(const pieces& cal, const std::string& pattern)
     return result;
 
     #endif
+}
+
+formatter::formatter(const std::string& pattern, location loc)
+    : pattern_(pattern),
+      pieces_getter_((loc == LOCAL) ? get_local : get_utc)
+{
+    enum class state
+    {
+        NORMAL,
+        PERCENT
+    };
+    auto st = state::NORMAL;
+    for (std::size_t i = 0; i < pattern.length(); i++)
+    {
+        if (st == state::NORMAL)
+        {
+            if (pattern[i] == '%')
+                st = state::PERCENT;
+        }
+        else if (st == state::PERCENT)
+        {
+            if (pattern[i] == 'q')
+                frac_positions_.emplace_back(frac_type::MILLI, i - 1);
+            else if (pattern[i] == 'Q')
+                frac_positions_.emplace_back(frac_type::MICRO, i - 1);
+            st = state::NORMAL;
+        }
+    }
+    std::reverse(frac_positions_.begin(), frac_positions_.end());
 }
 
 }

@@ -14,6 +14,9 @@
  *    limitations under the License.
  */
 
+#if !defined(CHUCHO_SIZE_FILE_ROLL_TRIGGER__)
+#define CHUCHO_SIZE_FILE_ROLL_TRIGGER__
+
 #include <chucho/file_roll_trigger.hpp>
 #include <cstdint>
 
@@ -70,3 +73,5 @@ inline std::uintmax_t size_file_roll_trigger::get_max_size() const
 }
 
 }
+
+#endif

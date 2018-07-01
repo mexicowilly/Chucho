@@ -29,6 +29,8 @@
 #include <chucho/duplicate_message_filter.hpp>
 #include <chucho/syslog_writer.hpp>
 #include <chucho/noop_file_compressor.hpp>
+#include <chucho/json_formatter.hpp>
+#include <chucho/on_start_file_roll_trigger.hpp>
 #if defined(CHUCHO_HAVE_BZIP2)
 #include <chucho/bzip2_file_compressor.hpp>
 #endif
@@ -357,6 +359,49 @@ void configurator::interval_file_roll_trigger_body(const std::string& tmpl)
     }
 }
 
+void configurator::json_formatter_body(const std::string &tmpl)
+{
+    auto dpos = tmpl.find("DS");
+    auto fpos = tmpl.find("FIELDS");
+    std::array<const char*, 2> dispositions = { "in", "ex" };
+    for (const auto& dis : dispositions)
+    {
+        std::array<const char *, 3> bad =
+        {
+            "message, file_name, doggies, line_number",
+            "dirty stuff",
+            "message file_name"
+        };
+        for (const auto &b : bad)
+        {
+            chucho::logger::remove_unused_loggers();
+            chucho::status_manager::get().clear();
+            std::string rep = tmpl;
+            rep.replace(dpos, 2, dis);
+            rep.replace(fpos, 6, b);
+            configure(rep.c_str());
+            EXPECT_EQ(chucho::status::level::ERROR_, chucho::status_manager::get().get_level());
+        }
+        chucho::status_manager::get().clear();
+        std::array<const char *, 3> good =
+        {
+            "message",
+            "message, file_name, line_number",
+            "message,file_name,line_number,logger,host_name,diagnostic_context,function_name,level,marker,timestamp,process_id,thread"
+        };
+        for (const auto &g : good)
+        {
+            chucho::logger::remove_unused_loggers();
+            chucho::status_manager::get().clear();
+            std::string rep = tmpl;
+            rep.replace(dpos, 2, dis);
+            rep.replace(fpos, 6, g);
+            configure(rep.c_str());
+            EXPECT_EQ(chucho::status::level::INFO_, chucho::status_manager::get().get_level());
+        }
+    }
+}
+
 void configurator::level_filter_body(const std::string& tmpl)
 {
     std::size_t pos = tmpl.find("RESULT");
@@ -480,6 +525,14 @@ void configurator::numbered_file_roller_body()
     auto& nrlr = dynamic_cast<chucho::numbered_file_roller&>(fwrt.get_file_roller());
     EXPECT_EQ(5, nrlr.get_max_index());
     EXPECT_EQ(-3, nrlr.get_min_index());
+}
+
+void configurator::on_start_file_roll_trigger_body()
+{
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& fwrt = dynamic_cast<chucho::rolling_file_writer&>(lgr->get_writer("chucho::rolling_file_writer"));
+    EXPECT_NO_THROW(auto& ons = dynamic_cast<chucho::on_start_file_roll_trigger&>(fwrt.get_file_roll_trigger()));
 }
 
 void configurator::pipe_writer_body()

@@ -38,7 +38,7 @@ namespace chucho
 loggly_writer::loggly_writer(const std::string& name,
                              std::unique_ptr<formatter>&& fmt,
                              const std::string& token)
-    : writer(name, std::move(fmt)),
+    : cloud_writer(name, std::move(fmt)),
       curl_(std::make_unique<curl>()),
       token_(token)
 {

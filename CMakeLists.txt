@@ -22,7 +22,7 @@ ENDIF()
 PROJECT(chucho CXX C)
 
 SET(CHUCHO_MAJOR_VERSION 2)
-SET(CHUCHO_MINOR_VERSION 2)
+SET(CHUCHO_MINOR_VERSION 3)
 SET(CHUCHO_VERSION ${CHUCHO_MAJOR_VERSION}.${CHUCHO_MINOR_VERSION})
 
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -182,6 +182,7 @@ ENDIF()
 SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/async_writer.hpp
     include/chucho/cerr_writer.hpp
+    include/chucho/cloud_writer.hpp
     include/chucho/compressor.hpp
     include/chucho/configurable.hpp
     include/chucho/configurable_factory.hpp
@@ -213,6 +214,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/formatter.hpp
     include/chucho/function_name.hpp
     include/chucho/interval_file_roll_trigger.hpp
+    include/chucho/json_formatter.hpp
     include/chucho/level.hpp
     include/chucho/level_filter.hpp
     include/chucho/level_threshold_filter.hpp
@@ -231,6 +233,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/noop_compressor.hpp
     include/chucho/noop_file_compressor.hpp
     include/chucho/numbered_file_roller.hpp
+    include/chucho/on_start_file_roll_trigger.hpp
     include/chucho/optional.hpp
     include/chucho/optional_features.hpp
     include/chucho/pattern_formatter.hpp
@@ -348,11 +351,6 @@ IF(CURL_FOUND)
          include/chucho/level_threshold_email_trigger_memento.hpp
          include/chucho/loggly_writer_factory.hpp
          include/chucho/loggly_writer_memento.hpp)
-    IF(NOT JSON_CONFIG)
-        LIST(APPEND CHUCHO_EMBEDDED_SOURCES
-            "${CMAKE_SOURCE_DIR}/embedded/cJSON/cJSON.c"
-            "${CMAKE_SOURCE_DIR}/embedded/include/cJSON.h")
-    ENDIF()
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
@@ -560,9 +558,6 @@ IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
 ENDIF()
 
 IF(JSON_CONFIG)
-    LIST(APPEND CHUCHO_EMBEDDED_SOURCES
-         "${CMAKE_SOURCE_DIR}/embedded/cJSON/cJSON.c"
-         "${CMAKE_SOURCE_DIR}/embedded/include/cJSON.h")
     LIST(APPEND CHUCHO_CONFIGURATOR_SOURCES
         json_configurator.cpp
         include/chucho/json_configurator.hpp)
@@ -601,6 +596,10 @@ IF(CHUCHO_HAVE_FLATBUFFERS)
     LIST(APPEND CHUCHO_MQ_GEN_SOURCES "${CMAKE_BINARY_DIR}/chucho_generated.h")
     SET_SOURCE_FILES_PROPERTIES("${CMAKE_BINARY_DIR}/chucho_generated.h" PROPERTIES GENERATED TRUE)
 ENDIF()
+
+LIST(APPEND CHUCHO_EMBEDDED_SOURCES
+     "${CMAKE_SOURCE_DIR}/embedded/cJSON/cJSON.c"
+     "${CMAKE_SOURCE_DIR}/embedded/include/cJSON.h")
 
 SET(CHUCHO_SOURCES
     async_writer.cpp
@@ -644,6 +643,9 @@ SET(CHUCHO_SOURCES
     interval_file_roll_trigger.cpp
     interval_file_roll_trigger_factory.cpp
     interval_file_roll_trigger_memento.cpp
+    json_formatter.cpp
+    json_formatter_factory.cpp
+    json_formatter_memento.cpp
     level.cpp
     level_filter.cpp
     level_filter_factory.cpp
@@ -672,6 +674,8 @@ SET(CHUCHO_SOURCES
     numbered_file_roller.cpp
     numbered_file_roller_factory.cpp
     numbered_file_roller_memento.cpp
+    on_start_file_roll_trigger.cpp
+    on_start_file_roll_trigger_factory.cpp
     optional_features.cpp
     pattern_formatter.cpp
     pattern_formatter_factory.cpp
@@ -730,6 +734,8 @@ SET(CHUCHO_SOURCES
     include/chucho/host.hpp
     include/chucho/interval_file_roll_trigger_factory.hpp
     include/chucho/interval_file_roll_trigger_memento.hpp
+    include/chucho/json_formatter_factory.hpp
+    include/chucho/json_formatter_memento.hpp
     include/chucho/level_filter_factory.hpp
     include/chucho/level_filter_memento.hpp
     include/chucho/level_threshold_filter_factory.hpp
@@ -746,6 +752,7 @@ SET(CHUCHO_SOURCES
     include/chucho/noop_compressor_factory.hpp
     include/chucho/numbered_file_roller_factory.hpp
     include/chucho/numbered_file_roller_memento.hpp
+    include/chucho/on_start_file_roll_trigger_factory.hpp
     include/chucho/pattern_formatter_factory.hpp
     include/chucho/pattern_formatter_memento.hpp
     include/chucho/pipe_writer_factory.hpp
@@ -993,6 +1000,10 @@ IF(CHUCHO_HAVE_LZ4)
          include/chucho/lz4_compressor_factory.hpp)
 ENDIF()
 
+IF(AWSSDK_FOUND)
+    LINK_DIRECTORIES(${AWSSDK_LIB_DIR})
+ENDIF()
+
 IF(ENABLE_SHARED)
     ADD_LIBRARY(chucho SHARED ${CHUCHO_SOURCES})
     SET_TARGET_PROPERTIES(chucho PROPERTIES
@@ -1033,7 +1044,6 @@ IF(RUBY_FOUND)
 ENDIF()
 
 IF(AWSSDK_FOUND)
-    LINK_DIRECTORIES(${AWSSDK_LIB_DIR})
     TARGET_LINK_LIBRARIES(chucho ${AWSSDK_LIBS} ${AWSSDK_PLATFORM_DEPS})
 ENDIF()
 

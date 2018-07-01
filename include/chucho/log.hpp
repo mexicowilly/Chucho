@@ -72,6 +72,16 @@
 #define CHUCHO_INTERNAL_LOG_M(mrk, lvl, lg, fl, ln, fnc, msg) CHUCHO_LOG_M(mrk, ::chucho::level::lvl(), lg, fl, ln, fnc, msg)
 #define CHUCHO_INTERNAL_LOG_STR_M(mrk, lvl, lg, fl, ln, fnc, msg) CHUCHO_LOG_STR_M(mrk, ::chucho::level::lvl(), lg, fl, ln, fnc, msg)
 
+#define CHUCHO_EVERY_N_INTERNAL(n, body) \
+    do \
+    { \
+        static std::size_t __chucho_every_n_counter = 0; \
+        if (++__chucho_every_n_counter > (n)) \
+            __chucho_every_n_counter -= (n); \
+        if (__chucho_every_n_counter == 1) \
+            body ; \
+    } while (false)
+
 #endif
 
 /**
@@ -92,7 +102,7 @@
  *            output to a std::stream, like "I have " << 7 << "
  *            dreams."
  */
-#define CHUCHO_TRACE_LGBL(msg) CHUCHO_INTERNAL_LOG(TRACE_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_TRACE_LGBL(msg) CHUCHO_INTERNAL_LOG(TRACE_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_TRACE_L(msg)
  * @copydoc CHUCHO_TRACE_LGBL(msg)
@@ -114,7 +124,7 @@
  * @param msg the message to write, which can only be a const 
  *            char* or a std::string
  */
-#define CHUCHO_TRACE_LGBL_STR(msg) CHUCHO_INTERNAL_LOG_STR(TRACE_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_TRACE_LGBL_STR(msg) CHUCHO_INTERNAL_LOG_STR(TRACE_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_TRACE_L_STR(msg)
  * @copydoc CHUCHO_TRACE_LGBL_STR(msg)
@@ -146,7 +156,7 @@
  *            output to a std::stream, like "I have " << 7 << "
  *            dreams."
  */
-#define CHUCHO_TRACE_LGBL_M(mrk, msg) CHUCHO_INTERNAL_LOG_M(mrk, TRACE_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_TRACE_LGBL_M(mrk, msg) CHUCHO_INTERNAL_LOG_M(mrk, TRACE_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_TRACE_L_M(mrk, msg)
  * @copydoc CHUCHO_TRACE_LGBL_M(mrk, msg)
@@ -176,7 +186,7 @@
  * @param msg the message to write, which can only be a const 
  *            char* or a std::string
  */
-#define CHUCHO_TRACE_LGBL_STR_M(mrk, msg) CHUCHO_INTERNAL_LOG_STR_M(mrk, TRACE_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_TRACE_LGBL_STR_M(mrk, msg) CHUCHO_INTERNAL_LOG_STR_M(mrk, TRACE_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_TRACE_L_STR_M(mrk, msg)
  * @copydoc CHUCHO_TRACE_LGBL_STR_M(mrk, msg)
@@ -200,7 +210,7 @@
  *            output to a std::stream, like "I have " << 7 << "
  *            dreams."
  */
-#define CHUCHO_DEBUG_LGBL(msg) CHUCHO_INTERNAL_LOG(DEBUG_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_DEBUG_LGBL(msg) CHUCHO_INTERNAL_LOG(DEBUG_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_DEBUG_L(msg)
  * @copydoc CHUCHO_DEBUG_LGBL(msg)
@@ -222,7 +232,7 @@
  * @param msg the message to write, which can only be a const 
  *            char* or a std::string
  */
-#define CHUCHO_DEBUG_LGBL_STR(msg) CHUCHO_INTERNAL_LOG_STR(DEBUG_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_DEBUG_LGBL_STR(msg) CHUCHO_INTERNAL_LOG_STR(DEBUG_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_DEBUG_L_STR(msg)
  * @copydoc CHUCHO_DEBUG_LGBL_STR(msg)
@@ -254,7 +264,7 @@
  *            output to a std::stream, like "I have " << 7 << "
  *            dreams."
  */
-#define CHUCHO_DEBUG_LGBL_M(mrk, msg) CHUCHO_INTERNAL_LOG_M(mrk, DEBUG_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_DEBUG_LGBL_M(mrk, msg) CHUCHO_INTERNAL_LOG_M(mrk, DEBUG_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_DEBUG_L_M(mrk, msg)
  * @copydoc CHUCHO_DEBUG_LGBL_M(mrk, msg)
@@ -284,7 +294,7 @@
  * @param msg the message to write, which can only be a const 
  *            char* or a std::string
  */
-#define CHUCHO_DEBUG_LGBL_STR_M(mrk, msg) CHUCHO_INTERNAL_LOG_STR_M(mrk, DEBUG_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_DEBUG_LGBL_STR_M(mrk, msg) CHUCHO_INTERNAL_LOG_STR_M(mrk, DEBUG_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_DEBUG_L_STR_M(mrk, msg)
  * @copydoc CHUCHO_DEBUG_LGBL_STR_M(mrk, msg)
@@ -308,7 +318,7 @@
  *            output to a std::stream, like "I have " << 7 << "
  *            dreams."
  */
-#define CHUCHO_INFO_LGBL(msg) CHUCHO_INTERNAL_LOG(INFO_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_INFO_LGBL(msg) CHUCHO_INTERNAL_LOG(INFO_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_INFO_L(msg)
  * @copydoc CHUCHO_INFO_LGBL(msg)
@@ -330,7 +340,7 @@
  * @param msg the message to write, which can only be a const 
  *            char* or a std::string
  */
-#define CHUCHO_INFO_LGBL_STR(msg) CHUCHO_INTERNAL_LOG_STR(INFO_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_INFO_LGBL_STR(msg) CHUCHO_INTERNAL_LOG_STR(INFO_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_INFO_L_STR(msg)
  * @copydoc CHUCHO_INFO_LGBL_STR(msg)
@@ -362,7 +372,7 @@
  *            output to a std::stream, like "I have " << 7 << "
  *            dreams."
  */
-#define CHUCHO_INFO_LGBL_M(mrk, msg) CHUCHO_INTERNAL_LOG_M(mrk, INFO_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_INFO_LGBL_M(mrk, msg) CHUCHO_INTERNAL_LOG_M(mrk, INFO_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_INFO_L_M(mrk, msg)
  * @copydoc CHUCHO_INFO_LGBL_M(mrk, msg)
@@ -392,7 +402,7 @@
  * @param msg the message to write, which can only be a const 
  *            char* or a std::string
  */
-#define CHUCHO_INFO_LGBL_STR_M(mrk, msg) CHUCHO_INTERNAL_LOG_STR_M(mrk, INFO_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_INFO_LGBL_STR_M(mrk, msg) CHUCHO_INTERNAL_LOG_STR_M(mrk, INFO_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_INFO_L_STR_M(mrk, msg)
  * @copydoc CHUCHO_INFO_LGBL_STR_M(mrk, msg)
@@ -416,7 +426,7 @@
  *            output to a std::stream, like "I have " << 7 << "
  *            dreams."
  */
-#define CHUCHO_WARN_LGBL(msg) CHUCHO_INTERNAL_LOG(WARN_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_WARN_LGBL(msg) CHUCHO_INTERNAL_LOG(WARN_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_WARN_L(msg)
  * @copydoc CHUCHO_WARN_LGBL(msg)
@@ -438,7 +448,7 @@
  * @param msg the message to write, which can only be a const 
  *            char* or a std::string
  */
-#define CHUCHO_WARN_LGBL_STR(msg) CHUCHO_INTERNAL_LOG_STR(WARN_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_WARN_LGBL_STR(msg) CHUCHO_INTERNAL_LOG_STR(WARN_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_WARN_L_STR(msg)
  * @copydoc CHUCHO_WARN_LGBL_STR(msg)
@@ -470,7 +480,7 @@
  *            output to a std::stream, like "I have " << 7 << "
  *            dreams."
  */
-#define CHUCHO_WARN_LGBL_M(mrk, msg) CHUCHO_INTERNAL_LOG_M(mrk, WARN_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_WARN_LGBL_M(mrk, msg) CHUCHO_INTERNAL_LOG_M(mrk, WARN_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_WARN_L_M(mrk, msg)
  * @copydoc CHUCHO_WARN_LGBL_M(mrk, msg)
@@ -500,7 +510,7 @@
  * @param msg the message to write, which can only be a const 
  *            char* or a std::string
  */
-#define CHUCHO_WARN_LGBL_STR_M(mrk, msg) CHUCHO_INTERNAL_LOG_STR_M(mrk, WARN_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_WARN_LGBL_STR_M(mrk, msg) CHUCHO_INTERNAL_LOG_STR_M(mrk, WARN_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_WARN_L_STR_M(mrk, msg)
  * @copydoc CHUCHO_WARN_LGBL_STR_M(mrk, msg)
@@ -524,7 +534,7 @@
  *            output to a std::stream, like "I have " << 7 << "
  *            dreams."
  */
-#define CHUCHO_ERROR_LGBL(msg) CHUCHO_INTERNAL_LOG(ERROR_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_ERROR_LGBL(msg) CHUCHO_INTERNAL_LOG(ERROR_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_ERROR_L(msg)
  * @copydoc CHUCHO_ERROR_LGBL(msg)
@@ -546,7 +556,7 @@
  * @param msg the message to write, which can only be a const 
  *            char* or a std::string
  */
-#define CHUCHO_ERROR_LGBL_STR(msg) CHUCHO_INTERNAL_LOG_STR(ERROR_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_ERROR_LGBL_STR(msg) CHUCHO_INTERNAL_LOG_STR(ERROR_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_ERROR_L_STR(msg)
  * @copydoc CHUCHO_ERROR_LGBL_STR(msg)
@@ -578,7 +588,7 @@
  *            output to a std::stream, like "I have " << 7 << "
  *            dreams."
  */
-#define CHUCHO_ERROR_LGBL_M(mrk, msg) CHUCHO_INTERNAL_LOG_M(mrk, ERROR_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_ERROR_LGBL_M(mrk, msg) CHUCHO_INTERNAL_LOG_M(mrk, ERROR_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_ERROR_L_M(mrk, msg)
  * @copydoc CHUCHO_ERROR_LGBL_M(mrk, msg)
@@ -608,7 +618,7 @@
  * @param msg the message to write, which can only be a const 
  *            char* or a std::string
  */
-#define CHUCHO_ERROR_LGBL_STR_M(mrk, msg) CHUCHO_INTERNAL_LOG_STR_M(mrk, ERROR_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_ERROR_LGBL_STR_M(mrk, msg) CHUCHO_INTERNAL_LOG_STR_M(mrk, ERROR_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_ERROR_L_STR_M(mrk, msg)
  * @copydoc CHUCHO_ERROR_LGBL_STR_M(mrk, msg)
@@ -632,7 +642,7 @@
  *            output to a std::stream, like "I have " << 7 << "
  *            dreams."
  */
-#define CHUCHO_FATAL_LGBL(msg) CHUCHO_INTERNAL_LOG(FATAL_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_FATAL_LGBL(msg) CHUCHO_INTERNAL_LOG(FATAL_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_FATAL_L(msg)
  * @copydoc CHUCHO_FATAL_LGBL(msg)
@@ -654,7 +664,7 @@
  * @param msg the message to write, which can only be a const 
  *            char* or a std::string
  */
-#define CHUCHO_FATAL_LGBL_STR(msg) CHUCHO_INTERNAL_LOG_STR(FATAL_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_FATAL_LGBL_STR(msg) CHUCHO_INTERNAL_LOG_STR(FATAL_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_FATAL_L_STR(msg)
  * @copydoc CHUCHO_FATAL_LGBL_STR(msg)
@@ -686,7 +696,7 @@
  *            output to a std::stream, like "I have " << 7 << "
  *            dreams."
  */
-#define CHUCHO_FATAL_LGBL_M(mrk, msg) CHUCHO_INTERNAL_LOG_M(mrk, FATAL_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_FATAL_LGBL_M(mrk, msg) CHUCHO_INTERNAL_LOG_M(mrk, FATAL_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_FATAL_L_M(mrk, msg)
  * @copydoc CHUCHO_FATAL_LGBL_M(mrk, msg)
@@ -716,11 +726,159 @@
  * @param msg the message to write, which can only be a const 
  *            char* or a std::string
  */
-#define CHUCHO_FATAL_LGBL_STR_M(mrk, msg) CHUCHO_INTERNAL_LOG_STR_M(mrk, FATAL_, get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
+#define CHUCHO_FATAL_LGBL_STR_M(mrk, msg) CHUCHO_INTERNAL_LOG_STR_M(mrk, FATAL_, this->get_logger(), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, msg)
 /**
  * @def CHUCHO_FATAL_L_STR_M(mrk, msg)
  * @copydoc CHUCHO_FATAL_LGBL_STR_M(mrk, msg)
  */
 #define CHUCHO_FATAL_L_STR_M(mrk, msg) CHUCHO_FATAL_LGBL_STR_M(mrk, msg)
+
+/**
+ * @def CHUCHO_EVERY_N(lvl, n, lg, msg)
+ * Log an event every N times. The level must be one of TRACE, DEBUG,
+ * INFO, WARN, ERROR or FATAL. This will behave exactly as the corresponding
+ * macro, like @ref CHUCHO_INFO, does with the level replaced.
+ *
+ * @param lvl the level, one of TRACE, DEBUG, INFO, WARN ERROR or FATAL
+ * @param n the count after which the event should be logged
+ * @param lg the logger
+ * @param msg the message to write, which may be formatted for
+ *            output to a std::stream, like "I have " << 7 << "
+ *            dreams."
+ */
+#define CHUCHO_EVERY_N(lvl, n, lg, msg) CHUCHO_EVERY_N_INTERNAL((n), CHUCHO_ ## lvl(lg, msg))
+
+/**
+ * @def CHUCHO_EVERY_N_LGBL(lvl, n, msg)
+ * Log an event every N times. The level must be one of TRACE, DEBUG,
+ * INFO, WARN, ERROR or FATAL. This will behave exactly as the corresponding
+ * macro, like @ref CHUCHO_INFO_LGBL, does with the level replaced.
+ *
+ * @param lvl the level, one of TRACE, DEBUG, INFO, WARN ERROR or FATAL
+ * @param n the count after which the event should be logged
+ * @param msg the message to write, which may be formatted for
+ *            output to a std::stream, like "I have " << 7 << "
+ *            dreams."
+ */
+#define CHUCHO_EVERY_N_LGBL(lvl, n, msg) CHUCHO_EVERY_N_INTERNAL((n), CHUCHO_ ## lvl ## _LGBL(msg))
+
+/**
+ * @def CHUCHO_EVERY_N_L(lvl, n, msg)
+ * @copydoc CHUCHO_EVERY_N_LGBL(lvl, n, msg)
+ */
+#define CHUCHO_EVERY_N_L(lvl, n, msg) CHUCHO_EVERY_N_LGBL(lvl, n, msg)
+
+/**
+ * @def CHUCHO_EVERY_N_STR(lvl, n, lg, msg)
+ * Log an event every N times. The level must be one of TRACE, DEBUG,
+ * INFO, WARN, ERROR or FATAL. This will behave exactly as the corresponding
+ * macro, like @ref CHUCHO_INFO_STR, does with the level replaced.
+ *
+ * @param lvl the level, one of TRACE, DEBUG, INFO, WARN ERROR or FATAL
+ * @param n the count after which the event should be logged
+ * @param lg the logger
+ * @param msg the message to write
+ */
+#define CHUCHO_EVERY_N_STR(lvl, n, lg, msg) CHUCHO_EVERY_N_INTERNAL((n), CHUCHO_ ## lvl ## _STR(lg, msg))
+
+/**
+ * @def CHUCHO_EVERY_N_LGBL_STR(lvl, n, msg)
+ * Log an event every N times. The level must be one of TRACE, DEBUG,
+ * INFO, WARN, ERROR or FATAL. This will behave exactly as the corresponding
+ * macro, like @ref CHUCHO_INFO_LGBL_STR, does with the level replaced.
+ *
+ * @param lvl the level, one of TRACE, DEBUG, INFO, WARN ERROR or FATAL
+ * @param n the count after which the event should be logged
+ * @param msg the message to write
+ */
+#define CHUCHO_EVERY_N_LGBL_STR(lvl, n, msg) CHUCHO_EVERY_N_INTERNAL((n), CHUCHO_ ## lvl ## _LGBL_STR(msg))
+
+/**
+ * @def CHUCHO_EVERY_N_L_STR(lvl, n, msg)
+ * @copydoc CHUCHO_EVERY_N_LGBL_STR(lvl, n, msg)
+ */
+#define CHUCHO_EVERY_N_L_STR(lvl, n, msg) CHUCHO_EVERY_N_LGBL_STR(lvl, n, msg)
+
+/**
+ * @def CHUCHO_EVERY_N_M(lvl, n, mrk, lg, msg)
+ * Log an event every N times. The level must be one of TRACE, DEBUG,
+ * INFO, WARN, ERROR or FATAL. This will behave exactly as the corresponding
+ * macro, like @ref CHUCHO_INFO_M, does with the level replaced.
+ *
+ * @param lvl the level, one of TRACE, DEBUG, INFO, WARN ERROR or FATAL
+ * @param n the count after which the event should be logged
+ * @param mrk the marker, which may either be a marker reference
+ *            or a piece of text (const char* or std::string
+ *            reference), in which case a marker will be created
+ *            on the fly
+ * @param lg the logger
+ * @param msg the message to write, which may be formatted for
+ *            output to a std::stream, like "I have " << 7 << "
+ *            dreams."
+ */
+#define CHUCHO_EVERY_N_M(lvl, n, mrk, lg, msg) CHUCHO_EVERY_N_INTERNAL((n), CHUCHO_ ## lvl ## _M(mrk, lg, msg))
+
+/**
+ * @def CHUCHO_EVERY_N_LGBL_M(lvl, n, mrk, msg)
+ * Log an event every N times. The level must be one of TRACE, DEBUG,
+ * INFO, WARN, ERROR or FATAL. This will behave exactly as the corresponding
+ * macro, like @ref CHUCHO_INFO_LGBL_M, does with the level replaced.
+ *
+ * @param lvl the level, one of TRACE, DEBUG, INFO, WARN ERROR or FATAL
+ * @param n the count after which the event should be logged
+ * @param mrk the marker, which may either be a marker reference
+ *            or a piece of text (const char* or std::string
+ *            reference), in which case a marker will be created
+ *            on the fly
+ * @param msg the message to write, which may be formatted for
+ *            output to a std::stream, like "I have " << 7 << "
+ *            dreams."
+ */
+#define CHUCHO_EVERY_N_LGBL_M(lvl, n, mrk, msg) CHUCHO_EVERY_N_INTERNAL((n), CHUCHO_ ## lvl ## _LGBL_M(mrk, msg))
+
+/**
+ * @def CHUCHO_EVERY_N_L_M(lvl, n, mrk, msg)
+ * @copydoc CHUCHO_EVERY_N_LGBL_M(lvl, n, mrk, msg)
+ */
+#define CHUCHO_EVERY_N_L_M(lvl, n, mrk, msg) CHUCHO_EVERY_N_LGBL_M(lvl, n, mrk, msg)
+
+/**
+ * @def CHUCHO_EVERY_N_STR_M(lvl, n, mrk, lg, msg)
+ * Log an event every N times. The level must be one of TRACE, DEBUG,
+ * INFO, WARN, ERROR or FATAL. This will behave exactly as the corresponding
+ * macro, like @ref CHUCHO_INFO_STR_M, does with the level replaced.
+ *
+ * @param lvl the level, one of TRACE, DEBUG, INFO, WARN ERROR or FATAL
+ * @param n the count after which the event should be logged
+ * @param mrk the marker, which may either be a marker reference
+ *            or a piece of text (const char* or std::string
+ *            reference), in which case a marker will be created
+ *            on the fly
+ * @param lg the logger
+ * @param msg the message to write
+ */
+#define CHUCHO_EVERY_N_STR_M(lvl, n, mrk, lg, msg) CHUCHO_EVERY_N_INTERNAL((n), CHUCHO_ ## lvl ## _STR_M(mrk, lg, msg))
+
+/**
+ * @def CHUCHO_EVERY_N_LGBL_STR_M(lvl, n, mrk, msg)
+ * Log an event every N times. The level must be one of TRACE, DEBUG,
+ * INFO, WARN, ERROR or FATAL. This will behave exactly as the corresponding
+ * macro, like @ref CHUCHO_INFO_LGBL_STR_M, does with the level replaced.
+ *
+ * @param lvl the level, one of TRACE, DEBUG, INFO, WARN ERROR or FATAL
+ * @param n the count after which the event should be logged
+ * @param mrk the marker, which may either be a marker reference
+ *            or a piece of text (const char* or std::string
+ *            reference), in which case a marker will be created
+ *            on the fly
+ * @param msg the message to write
+ */
+#define CHUCHO_EVERY_N_LGBL_STR_M(lvl, n, mrk, msg) CHUCHO_EVERY_N_INTERNAL((n), CHUCHO_ ## lvl ## _LGBL_STR_M(mrk, msg))
+
+/**
+ * @def CHUCHO_EVERY_N_L_STR_M(lvl, n, mrk, msg)
+ * @copydoc CHUCHO_EVERY_N_LGBL_STR_M(lvl, n, mrk, msg)
+ */
+#define CHUCHO_EVERY_N_L_STR_M(lvl, n, mrk, msg) CHUCHO_EVERY_N_LGBL_STR_M(lvl, n, mrk, msg)
 
 #endif

@@ -377,6 +377,20 @@ TEST_F(yaml_configurator, invalid_utf8)
                                "    name: \x81\x82\x83"));
 }
 
+TEST_F(yaml_configurator, json_formatter)
+{
+    std::string tmpl(R"tmpl(
+chucho::logger:
+    name: will
+    chucho::cout_writer:
+        chucho::json_formatter:
+            style: PrEtTy
+            time_zone: uTc
+            DScluded_fields: FIELDS
+)tmpl");
+    json_formatter_body(tmpl);
+}
+
 TEST_F(yaml_configurator, level_filter)
 {
     std::string tmpl("- chucho::logger:\n"
@@ -473,6 +487,21 @@ TEST_F(yaml_configurator, numbered_file_roller)
               "            max_size: 5000\n"
               "        file_name: hello");
     numbered_file_roller_body();
+}
+
+TEST_F(yaml_configurator, on_start_file_roll_trigger)
+{
+    configure(R"cnf(
+chucho::logger:
+    name: will
+    chucho::rolling_file_writer:
+        - chucho::pattern_formatter:
+            pattern: '%m%n'
+        - chucho::numbered_file_roller:
+            max_index: 1
+        - chucho::on_start_file_roll_trigger
+        - file_name: what.log)cnf");
+    on_start_file_roll_trigger_body();
 }
 
 TEST_F(yaml_configurator, pipe_writer)

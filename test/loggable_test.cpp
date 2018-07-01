@@ -16,6 +16,8 @@
 
 #include <gtest/gtest.h>
 #include <chucho/loggable.hpp>
+#include <chucho/log.hpp>
+#include <iostream>
 
 namespace one
 {
@@ -55,6 +57,25 @@ public:
     }
 };
 
+template <int num>
+class templated : public chucho::loggable<templated<num>>
+{
+public:
+    templated()
+    {
+        std::cout << "Logger name: " << this->get_logger()->get_name() << std::endl;
+    }
+
+    int get_val() const {
+        CHUCHO_INFO_L("Getting " << val_;);
+        return val_;
+    }
+
+private:
+    int val_{num};
+};
+
+
 }
 
 }
@@ -81,4 +102,10 @@ TEST(loggable, rename_by_type)
 {
     one::two::my_other_loggable oth;
     EXPECT_EQ(std::string("one.two.my_other_loggable"), oth.get_logger_name());
+}
+
+TEST(loggable, templated)
+{
+    one::two::templated<5> t;
+    t.get_val();
 }

@@ -14,34 +14,28 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_TEXT_UTIL_HPP__)
-#define CHUCHO_TEXT_UTIL_HPP__
+#if !defined(CHUCHO_ON_START_FILE_ROLL_TRIGGER_FACTORY_HPP__)
+#define CHUCHO_ON_START_FILE_ROLL_TRIGGER_FACTORY_HPP__
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"
 #endif
 
-#include <chucho/export.h>
-#include <string>
-#include <vector>
-#include <cstdarg>
+#include <chucho/configurable_factory.hpp>
 
 namespace chucho
 {
 
-namespace text_util
+class on_start_file_roll_trigger_factory : public configurable_factory
 {
+public:
+    on_start_file_roll_trigger_factory();
 
-const std::size_t MAX_MESSAGE_SIZE = 500 * 1024;
-
-CHUCHO_PRIV_EXPORT std::string format(const char* const fmt, va_list args);
-CHUCHO_PRIV_EXPORT std::uintmax_t parse_byte_size(const std::string& spec);
-CHUCHO_PRIV_EXPORT std::string to_lower(const std::string& text);
-CHUCHO_PRIV_EXPORT std::vector<std::string> tokenize(const std::string& text, char delim);
-CHUCHO_PRIV_EXPORT void trim(std::string& text);
-
-}
+    virtual std::unique_ptr<configurable> create_configurable(std::unique_ptr<memento>& mnto) override;
+    virtual std::unique_ptr<memento> create_memento(configurator& cfg) override;
+};
 
 }
 
 #endif
+

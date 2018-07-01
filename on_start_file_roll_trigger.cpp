@@ -14,25 +14,20 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_PROCESS_HPP__)
-#define CHUCHO_PROCESS_HPP__
-
-#if !defined(CHUCHO_BUILD)
-#error "This header is private"
-#endif
-
-#include <chucho/export.h>
+#include <chucho/on_start_file_roll_trigger.hpp>
 
 namespace chucho
 {
 
-namespace process
+bool on_start_file_roll_trigger::is_triggered(const std::string& active_file, const event& e)
 {
-
-CHUCHO_PRIV_EXPORT int id();
-
+    if (!has_fired_)
+    {
+        has_fired_ = true;
+        return true;
+    }
+    return false;
 }
 
 }
 
-#endif

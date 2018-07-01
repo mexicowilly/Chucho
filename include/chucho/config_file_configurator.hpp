@@ -49,6 +49,7 @@ private:
     {
     public:
         properties_processor(config_file_configurator& cfg);
+        virtual ~properties_processor() { }
 
         virtual void process(const properties& props) = 0;
 

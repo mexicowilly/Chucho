@@ -87,6 +87,14 @@ std::vector<std::string> tokenize(const std::string& text, char delim)
     return result;
 }
 
+void trim(std::string& text)
+{
+    text.erase(text.begin(),
+               std::find_if(text.begin(), text.end(), [] (int ch) { return !std::isblank(ch); }));
+    text.erase(std::find_if(text.rbegin(), text.rend(), [] (int ch) { return !std::isblank(ch); }).base(),
+               text.end());
+}
+
 }
 
 }

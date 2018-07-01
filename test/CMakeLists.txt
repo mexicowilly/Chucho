@@ -160,6 +160,10 @@ IF(AWSSDK_FOUND)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_AWSSDK)
 ENDIF()
 
+IF(CHUCHO_PRIV_EXPORT)
+    SET(CHUCHO_TEST_JSON_SOURCES ../embedded/cJSON/cJSON.c)
+ENDIF()
+
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
                c_test.cpp
@@ -176,6 +180,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                formatted_message_serializer_test.cpp
                harness.cpp
                interval_file_roll_trigger_test.cpp
+               json_formatter_test.cpp
                level_test.cpp
                level_filter_test.cpp
                level_threshold_filter_test.cpp
@@ -187,6 +192,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                multithread_test.cpp
                named_pipe_writer_test.cpp
                noop_compressor_test.cpp
+               on_start_file_roll_trigger_test.cpp
                optional_test.cpp
                optional_features_test.cpp
                pattern_formatter_test.cpp
@@ -206,7 +212,8 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                ${CHUCHO_TEST_DOOR_SOURCES}
                ${CHUCHO_TEST_CURL_SOURCES}
                ${CHUCHO_TEST_AWS_SOURCES}
-               ${CHUCHO_TEST_DB_SOURCES})
+               ${CHUCHO_TEST_DB_SOURCES}
+               ${CHUCHO_TEST_JSON_SOURCES})
 TARGET_LINK_LIBRARIES(unit-test chucho gtest)
 
 IF(MSVC)

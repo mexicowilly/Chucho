@@ -33,6 +33,8 @@
 #include <iomanip>
 #include <algorithm>
 
+#include <iostream>
+
 namespace
 {
 
@@ -364,76 +366,29 @@ std::string pattern_formatter::logger_piece::get_text_impl(const event& evt) con
 }
 
 pattern_formatter::date_time_piece::date_time_piece(const std::string& date_pattern,
-                                                    const format_params& params)
+                                                    const format_params& params,
+                                                    int location)
     : piece(params),
-      date_pattern_(date_pattern)
+      fmt_(std::make_unique<calendar::formatter>(date_pattern,
+                                                 static_cast<calendar::formatter::location>(location)))
 {
-    enum class state
-    {
-        NORMAL,
-        PERCENT
-    };
-    auto st = state::NORMAL;
-    for (std::size_t i = 0; i < date_pattern.length(); i++)
-    {
-        if (st == state::NORMAL)
-        {
-            if (date_pattern[i] == '%')
-                st = state::PERCENT;
-        }
-        else if (st == state::PERCENT)
-        {
-            if (date_pattern[i] == 'q')
-                frac_positions_.emplace_back(frac_type::MILLI, i - 1);
-            else if (date_pattern[i] == 'Q')
-                frac_positions_.emplace_back(frac_type::MICRO, i - 1);
-            st = state::NORMAL;
-        }
-    }
-    std::reverse(frac_positions_.begin(), frac_positions_.end());
 }
 
 std::string pattern_formatter::date_time_piece::get_text_impl(const event& evt) const
 {
-    auto micros = std::chrono::duration_cast<std::chrono::microseconds>(evt.get_time().time_since_epoch());
-    std::string pat = date_pattern_;
-    if (!frac_positions_.empty())
-    {
-        std::ostringstream stream;
-        stream << std::setfill('0');
-        stream << std::setw(3) << ((micros.count() / 1000) % 1000);
-        auto milli_str = stream.str();
-        stream.str("");
-        stream << std::setw(6) << (micros.count() % 1000000);
-        auto micro_str = stream.str();
-        for (const auto& t : frac_positions_)
-            pat.replace(std::get<1>(t), 2, (std::get<0>(t) == frac_type::MILLI) ? milli_str : micro_str);
-    }
-    calendar::pieces cal;
-    to_calendar(micros.count() / 1000000, cal);
-    return calendar::format(cal, pat);
+    return fmt_->format(evt.get_time().time_since_epoch());
 }
 
 pattern_formatter::utc_date_time_piece::utc_date_time_piece(const std::string& date_pattern,
                                                             const format_params& params)
-    : date_time_piece(date_pattern, params)
+    : date_time_piece(date_pattern, params, calendar::formatter::UTC)
 {
-}
-
-void pattern_formatter::utc_date_time_piece::to_calendar(time_t t, calendar::pieces& cal) const
-{
-    cal = calendar::get_utc(t);
 }
 
 pattern_formatter::local_date_time_piece::local_date_time_piece(const std::string& date_pattern,
                                                                 const format_params& params)
-    : date_time_piece(date_pattern, params)
+    : date_time_piece(date_pattern, params, calendar::formatter::LOCAL)
 {
-}
-
-void pattern_formatter::local_date_time_piece::to_calendar(time_t t, calendar::pieces& cal) const
-{
-    cal = calendar::get_local(t);
 }
 
 pattern_formatter::base_host_piece::base_host_piece(const format_params& params)

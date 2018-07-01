@@ -57,6 +57,7 @@ protected:
     virtual chucho::configurator& get_configurator() = 0;
     void gzip_file_compressor_body();
     void interval_file_roll_trigger_body(const std::string& tmpl);
+    void json_formatter_body(const std::string &tmpl);
     void level_filter_body(const std::string& tmpl);
     void level_threshold_filter_body();
     void logger_body();
@@ -64,6 +65,7 @@ protected:
     void multiple_writer_body();
     void named_pipe_writer_body();
     void numbered_file_roller_body();
+    void on_start_file_roll_trigger_body();
     void pipe_writer_body();
 #if defined(CHUCHO_HAVE_RABBITMQ)
     void rabbitmq_writer_body();

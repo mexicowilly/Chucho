@@ -32,7 +32,7 @@ namespace chucho
 namespace calendar
 {
 
-struct pieces;
+class formatter;
 
 }
 
@@ -201,6 +201,7 @@ private:
     {
     public:
         piece(const format_params& params);
+        virtual ~piece() { }
 
         std::string get_text(const event& evt) const;
 
@@ -240,23 +241,15 @@ private:
 
     class CHUCHO_NO_EXPORT date_time_piece : public piece
     {
-    public:
-        date_time_piece(const std::string& date_pattern,
-                        const format_params& params);
-
     protected:
+        date_time_piece(const std::string& date_pattern,
+                        const format_params& params,
+                        int location);
+
         virtual std::string get_text_impl(const event& evt) const override;
-        virtual void to_calendar(time_t t, calendar::pieces& cal) const = 0;
 
     private:
-        enum class frac_type
-        {
-            MILLI,
-            MICRO
-        };
-
-        std::string date_pattern_;
-        std::vector<std::tuple<frac_type, std::size_t>> frac_positions_;
+        std::unique_ptr<calendar::formatter> fmt_;
     };
 
     class CHUCHO_NO_EXPORT utc_date_time_piece : public date_time_piece
@@ -264,9 +257,6 @@ private:
     public:
         utc_date_time_piece(const std::string& date_pattern,
                             const format_params& params);
-
-    protected:
-        virtual void to_calendar(time_t t, calendar::pieces& cal) const override;
     };
 
     class CHUCHO_NO_EXPORT local_date_time_piece : public date_time_piece
@@ -274,9 +264,6 @@ private:
     public:
         local_date_time_piece(const std::string& date_pattern,
                               const format_params& params);
-
-    protected:
-        virtual void to_calendar(time_t t, calendar::pieces& cal) const override;
     };
 
     class CHUCHO_NO_EXPORT base_host_piece : public piece

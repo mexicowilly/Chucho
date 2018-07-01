@@ -29,6 +29,7 @@
 #include <chucho/formatted_message_serializer_factory.hpp>
 #include <chucho/gzip_file_compressor_factory.hpp>
 #include <chucho/interval_file_roll_trigger_factory.hpp>
+#include <chucho/json_formatter_factory.hpp>
 #include <chucho/level_filter_factory.hpp>
 #include <chucho/level_threshold_filter_factory.hpp>
 #include <chucho/logger_factory.hpp>
@@ -36,6 +37,7 @@
 #include <chucho/named_pipe_writer_factory.hpp>
 #include <chucho/noop_compressor_factory.hpp>
 #include <chucho/numbered_file_roller_factory.hpp>
+#include <chucho/on_start_file_roll_trigger_factory.hpp>
 #include <chucho/pattern_formatter_factory.hpp>
 #include <chucho/pipe_writer_factory.hpp>
 #include <chucho/rolling_file_writer_factory.hpp>
@@ -155,6 +157,8 @@ void configurator::initialize_impl()
                              std::make_shared<noop_compressor_factory>());
     add_configurable_factory("chucho::numbered_file_roller",
                              std::make_shared<numbered_file_roller_factory>());
+    add_configurable_factory("chucho::on_start_file_roll_trigger",
+                             std::make_shared<on_start_file_roll_trigger_factory>());
     add_configurable_factory("chucho::pattern_formatter",
                              std::make_shared<pattern_formatter_factory>());
     add_configurable_factory("chucho::pipe_writer",
@@ -183,6 +187,8 @@ void configurator::initialize_impl()
                              std::make_shared<formatted_message_serializer_factory>());
     add_configurable_factory("chucho::lzma_file_compressor",
                              std::make_shared<lzma_file_compressor_factory>());
+    add_configurable_factory("chucho::json_formatter",
+                             std::make_shared<json_formatter_factory>());
 #if defined(CHUCHO_WINDOWS)
     add_configurable_factory("chucho::windows_event_log_writer",
                              std::make_shared<windows_event_log_writer_factory>());
