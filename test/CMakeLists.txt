@@ -160,6 +160,10 @@ IF(AWSSDK_FOUND)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_AWSSDK)
 ENDIF()
 
+IF(CHUCHO_PRIV_EXPORT)
+    SET(CHUCHO_TEST_JSON_SOURCES ../embedded/cJSON/cJSON.c)
+ENDIF()
+
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
                c_test.cpp
@@ -208,7 +212,8 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                ${CHUCHO_TEST_DOOR_SOURCES}
                ${CHUCHO_TEST_CURL_SOURCES}
                ${CHUCHO_TEST_AWS_SOURCES}
-               ${CHUCHO_TEST_DB_SOURCES})
+               ${CHUCHO_TEST_DB_SOURCES}
+               ${CHUCHO_TEST_JSON_SOURCES})
 TARGET_LINK_LIBRARIES(unit-test chucho gtest)
 
 IF(MSVC)

@@ -67,11 +67,18 @@ WHILE(NOT YAML_VAL STREQUAL END)
         SET(ERR_MSG "CMake failed")
         BREAK()
     ENDIF()
-    EXECUTE_PROCESS(COMMAND "${CHUCHO_BUILD_TOOL}" check
+    EXECUTE_PROCESS(COMMAND "${CHUCHO_BUILD_TOOL}" unit-test
                     WORKING_DIRECTORY check_config_build
                     RESULT_VARIABLE CMD_RESULT)
     IF(NOT CMD_RESULT EQUAL 0)
-        SET(ERR_MSG "check failed")
+        SET(ERR_MSG "make unit-test failed")
+        BREAK()
+    ENDIF()
+    EXECUTE_PROCESS(COMMAND test/unit-test --gtest_filter=-event_cache.*
+                    WORKING_DIRECTORY check_config_build
+                    RESULT_VARIABLE CMD_RESULT)
+    IF(NOT CMD_RESULT EQUAL 0)
+        SET(ERR_MSG "run unit-test failed")
         BREAK()
     ENDIF()
     MATH(EXPR IDX "${IDX} + 1")

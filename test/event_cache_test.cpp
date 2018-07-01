@@ -83,12 +83,16 @@ TEST(event_cache, cull)
 TEST(event_cache, full_speed)
 {
     chucho::event_cache cache(1024 * 1024, 100 * 1024 * 1024);
-    std::thread thr(full_speed_main, std::ref(cache), 1000000, 0ms);
+    std::thread thr(full_speed_main, std::ref(cache), 1000000, 5ms);
     for (std::size_t i = 0; i < 1000000; i++)
     {
         auto evt = cache.pop(5000ms);
         ASSERT_TRUE(evt);
-        EXPECT_EQ(std::to_string(i), evt->get_message());
+        if (std::to_string(i) != evt->get_message())
+        {
+            std::cout << cache.get_stats() << std::endl;
+            FAIL();
+        }
     }
     thr.join();
     std::cout << cache.get_stats() << std::endl;
