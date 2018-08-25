@@ -20,9 +20,6 @@
 #include <chucho/logger.hpp>
 #include <cstdarg>
 
-namespace
-{
-
 std::shared_ptr<chucho::level> c_to_level(chucho_level_t lvl)
 {
     switch (lvl)
@@ -41,8 +38,6 @@ std::shared_ptr<chucho::level> c_to_level(chucho_level_t lvl)
         return chucho::level::FATAL_();
     }
     return chucho::level::INFO_();
-}
-
 }
 
 extern "C"
