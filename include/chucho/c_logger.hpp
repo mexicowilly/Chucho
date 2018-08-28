@@ -14,28 +14,27 @@
  *    limitations under the License.
  */
 
-#include <chucho/logger.h>
+#if !defined(CHUCHO_C_LOGGER_H__)
+#define CHUCHO_C_LOGGER_H__
+
+#if !defined(CHUCHO_BUILD)
+#error "This header is private"
+#endif
+
+#include <chucho/level.hpp>
 #include <chucho/logger.hpp>
-#include <chucho/c_logger.hpp>
+#include <chucho/logger.h>
 
-extern "C"
+namespace chucho
 {
 
-chucho_logger_t* chucho_get_logger(const char* const name)
-{
-    auto result = new chucho_logger_t();
-    result->logger = chucho::logger::get(name);
-    return result;
-}
-
-void chucho_destroy_logger(chucho_logger_t* lgr)
-{
-    delete lgr;
-}
-
-int chucho_logger_permits(const chucho_logger_t* lgr, chucho_level_t lvl)
-{
-    return lgr->logger->permits(chucho::c_to_level(lvl));
-}
+std::shared_ptr<chucho::level> c_to_level(chucho_level_t lvl);
 
 }
+
+struct chucho_logger_t
+{
+    std::shared_ptr<chucho::logger> logger;
+};
+
+#endif

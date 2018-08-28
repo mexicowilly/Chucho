@@ -21,7 +21,7 @@
 #error "When using C++, you should include finalize.hpp"
 #endif
 
-#include <chucho/log.h>
+#include <chucho/export.h>
 
 /**
  * @file
@@ -35,19 +35,23 @@ extern "C"
 
 typedef struct chucho_logger_t chucho_logger_t;
 
-chucho_logger_t* chucho_get_logger(const char* const name);
-void chucho_destroy_logger(chucho_logger_t* lgr);
+/**
+ * The predefined levels.
+ */
+typedef enum
+{
+  CHUCHO_TRACE, /**< Trace */
+  CHUCHO_DEBUG, /**< Debug */
+  CHUCHO_INFO,  /**< Info */
+  CHUCHO_WARN,  /**< Warn */
+  CHUCHO_ERROR, /**< Error */
+  CHUCHO_FATAL  /**< Fatal */
+} chucho_level_t;
+
+CHUCHO_EXPORT chucho_logger_t* chucho_get_logger(const char* const name);
+CHUCHO_EXPORT void chucho_destroy_logger(chucho_logger_t* lgr);
 
 /**
- * Finalize the Chucho library. This function should be called
- * if you believe your memory leak analysis tools when they tell
- * you that static objects that live the life of the application
- * are memory leaks. You should also use this function if you
- * are using Chucho as a shared object or within an enclosing
- * shared object.
- *
- * @note No Chucho APIs may be used after calling this function.
- *       The result is extremely undefined.
  * @ingroup c_miscellaneous
  */
 CHUCHO_EXPORT int chucho_logger_permits(const chucho_logger_t* lgr, chucho_level_t lvl);

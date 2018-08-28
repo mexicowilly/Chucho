@@ -21,7 +21,7 @@
 #error "When using C++, you want the header log.hpp"
 #endif
 
-#include <chucho/export.h>
+#include <chucho/logger.h>
 
 /**
  * @file 
@@ -43,20 +43,15 @@ extern "C"
 #else
 #define CHUCHO_FUNCTION_NAME __FUNCTION__
 #endif
-#endif
 
-/**
- * The predefined levels.
- */
-typedef enum
-{
-    CHUCHO_TRACE, /**< Trace */
-    CHUCHO_DEBUG, /**< Debug */
-    CHUCHO_INFO,  /**< Info */
-    CHUCHO_WARN,  /**< Warn */
-    CHUCHO_ERROR, /**< Error */
-    CHUCHO_FATAL  /**< Fatal */
-} chucho_level_t;
+#define CHUCHO_C_INTERNAL(lvl, lgr, fl, ln, fnc, ...) \
+    _Generic((lgr), chucho_logger_t*: chucho_log_logger, default: chucho_log) \
+    ((lvl), (lgr), (fl), (ln), (fnc), __VA_ARGS__)
+#define CHUCHO_C_INTERNAL_M(lvl, lgr, fl, ln, fnc, mrk, ...) \
+    _Generic((lgr), chucho_logger_t*: chucho_log_mark_logger, default: chucho_log_mark) \
+    ((lvl), (lgr), (fl), (ln), (fnc), (mrk), __VA_ARGS__)
+
+#endif
 
 /**
  * Log an event. 
@@ -102,6 +97,19 @@ CHUCHO_EXPORT void chucho_log_mark(chucho_level_t lvl,
                                    const char* const mark,
                                    const char* const format, ...);
 
+CHUCHO_EXPORT void chucho_log_logger(chucho_level_t lvl,
+                                     chucho_logger_t* lgr,
+                                     const char* const file,
+                                     int line,
+                                     const char* const func,
+                                     const char* const format, ...);
+CHUCHO_EXPORT void chucho_log_mark_logger(chucho_level_t lvl,
+                                          chucho_logger_t* lgr,
+                                          const char* const file,
+                                          int line,
+                                          const char* const func,
+                                          const char* const mark,
+                                          const char* const format, ...);
 /**
  * @def CHUCHO_C_TRACE(lgr, ...) 
  * Log a trace level message. 
@@ -110,7 +118,7 @@ CHUCHO_EXPORT void chucho_log_mark(chucho_level_t lvl,
  * @param ... printf-style parameters that must include the
  *        format text first
  */
-#define CHUCHO_C_TRACE(lgr, ...) chucho_log(CHUCHO_TRACE, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, __VA_ARGS__)
+#define CHUCHO_C_TRACE(lgr, ...) CHUCHO_C_INTERNAL(CHUCHO_TRACE, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, __VA_ARGS__)
 /**
  * @def CHUCHO_C_TRACE_M(lgr, mrk, ...) 
  * Log a trace level message with a marker.
@@ -120,7 +128,7 @@ CHUCHO_EXPORT void chucho_log_mark(chucho_level_t lvl,
  * @param ... printf-style parameters that must include the
  *        format text first
  */
-#define CHUCHO_C_TRACE_M(lgr, mrk, ...) chucho_log_mark(CHUCHO_TRACE, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, (mrk), __VA_ARGS__)
+#define CHUCHO_C_TRACE_M(lgr, mrk, ...) CHUCHO_C_INTERNAL_M(CHUCHO_TRACE, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, (mrk), __VA_ARGS__)
 /**
  * @def CHUCHO_C_DEBUG(lgr, ...) 
  * Log a debug level message. 
@@ -129,7 +137,7 @@ CHUCHO_EXPORT void chucho_log_mark(chucho_level_t lvl,
  * @param ... printf-style parameters that must include the
  *        format text first
  */
-#define CHUCHO_C_DEBUG(lgr, ...) chucho_log(CHUCHO_DEBUG, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, __VA_ARGS__)
+#define CHUCHO_C_DEBUG(lgr, ...) CHUCHO_C_INTERNAL(CHUCHO_DEBUG, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, __VA_ARGS__)
 /**
  * @def CHUCHO_C_DEBUG_M(lgr, mrk, ...) 
  * Log a debug level message with a marker.
@@ -139,7 +147,7 @@ CHUCHO_EXPORT void chucho_log_mark(chucho_level_t lvl,
  * @param ... printf-style parameters that must include the
  *        format text first
  */
-#define CHUCHO_C_DEBUG_M(lgr, mrk, ...) chucho_log_mark(CHUCHO_DEBUG, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, (mrk), __VA_ARGS__)
+#define CHUCHO_C_DEBUG_M(lgr, mrk, ...) CHUCHO_C_INTERNAL_M(CHUCHO_DEBUG, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, (mrk), __VA_ARGS__)
 /**
  * @def CHUCHO_C_INFO(lgr, ...) 
  * Log a info level message. 
@@ -148,7 +156,7 @@ CHUCHO_EXPORT void chucho_log_mark(chucho_level_t lvl,
  * @param ... printf-style parameters that must include the
  *        format text first
  */
-#define CHUCHO_C_INFO(lgr, ...) chucho_log(CHUCHO_INFO, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, __VA_ARGS__)
+#define CHUCHO_C_INFO(lgr, ...) CHUCHO_C_INTERNAL(CHUCHO_INFO, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, __VA_ARGS__)
 /**
  * @def CHUCHO_C_INFO_M(lgr, mrk, ...) 
  * Log a info level message with a marker.
@@ -158,7 +166,7 @@ CHUCHO_EXPORT void chucho_log_mark(chucho_level_t lvl,
  * @param ... printf-style parameters that must include the
  *        format text first
  */
-#define CHUCHO_C_INFO_M(lgr, mrk, ...) chucho_log_mark(CHUCHO_INFO, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, (mrk), __VA_ARGS__)
+#define CHUCHO_C_INFO_M(lgr, mrk, ...) CHUCHO_C_INTERNAL_M(CHUCHO_INFO, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, (mrk), __VA_ARGS__)
 /**
  * @def CHUCHO_C_WARN(lgr, ...) 
  * Log a warn level message. 
@@ -167,7 +175,7 @@ CHUCHO_EXPORT void chucho_log_mark(chucho_level_t lvl,
  * @param ... printf-style parameters that must include the
  *        format text first
  */
-#define CHUCHO_C_WARN(lgr, ...) chucho_log(CHUCHO_WARN, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, __VA_ARGS__)
+#define CHUCHO_C_WARN(lgr, ...) CHUCHO_C_INTERNAL(CHUCHO_WARN, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, __VA_ARGS__)
 /**
  * @def CHUCHO_C_WARN_M(lgr, mrk, ...) 
  * Log a warn level message with a marker.
@@ -177,7 +185,7 @@ CHUCHO_EXPORT void chucho_log_mark(chucho_level_t lvl,
  * @param ... printf-style parameters that must include the
  *        format text first
  */
-#define CHUCHO_C_WARN_M(lgr, mrk, ...) chucho_log_mark(CHUCHO_WARN, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, (mrk), __VA_ARGS__)
+#define CHUCHO_C_WARN_M(lgr, mrk, ...) CHUCHO_C_INTERNAL_M(CHUCHO_WARN, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, (mrk), __VA_ARGS__)
 /**
  * @def CHUCHO_C_ERROR(lgr, ...) 
  * Log a error level message. 
@@ -186,7 +194,7 @@ CHUCHO_EXPORT void chucho_log_mark(chucho_level_t lvl,
  * @param ... printf-style parameters that must include the
  *        format text first
  */
-#define CHUCHO_C_ERROR(lgr, ...) chucho_log(CHUCHO_ERROR, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, __VA_ARGS__)
+#define CHUCHO_C_ERROR(lgr, ...) CHUCHO_C_INTERNAL(CHUCHO_ERROR, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, __VA_ARGS__)
 /**
  * @def CHUCHO_C_ERROR_M(lgr, mrk, ...) 
  * Log a error level message with a marker.
@@ -196,7 +204,7 @@ CHUCHO_EXPORT void chucho_log_mark(chucho_level_t lvl,
  * @param ... printf-style parameters that must include the
  *        format text first
  */
-#define CHUCHO_C_ERROR_M(lgr, mrk, ...) chucho_log_mark(CHUCHO_ERROR, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, (mrk), __VA_ARGS__)
+#define CHUCHO_C_ERROR_M(lgr, mrk, ...) CHUCHO_C_INTERNAL_M(CHUCHO_ERROR, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, (mrk), __VA_ARGS__)
 /**
  * @def CHUCHO_C_FATAL(lgr, ...) 
  * Log a fatal level message. 
@@ -205,7 +213,7 @@ CHUCHO_EXPORT void chucho_log_mark(chucho_level_t lvl,
  * @param ... printf-style parameters that must include the
  *        format text first
  */
-#define CHUCHO_C_FATAL(lgr, ...) chucho_log(CHUCHO_FATAL, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, __VA_ARGS__)
+#define CHUCHO_C_FATAL(lgr, ...) CHUCHO_C_INTERNAL(CHUCHO_FATAL, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, __VA_ARGS__)
 /**
  * @def CHUCHO_C_FATAL_M(lgr, mrk, ...) 
  * Log a fatal level message with a marker.
@@ -215,7 +223,7 @@ CHUCHO_EXPORT void chucho_log_mark(chucho_level_t lvl,
  * @param ... printf-style parameters that must include the
  *        format text first
  */
-#define CHUCHO_C_FATAL_M(lgr, mrk, ...) chucho_log_mark(CHUCHO_FATAL, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, (mrk), __VA_ARGS__)
+#define CHUCHO_C_FATAL_M(lgr, mrk, ...) CHUCHO_C_INTERNAL_M(CHUCHO_FATAL, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, (mrk), __VA_ARGS__)
 
 #if defined(__cplusplus)
 }

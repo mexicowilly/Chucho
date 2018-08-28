@@ -18,7 +18,11 @@
 #include <chucho/event.hpp>
 #include <chucho/text_util.hpp>
 #include <chucho/logger.hpp>
+#include <chucho/c_logger.hpp>
 #include <cstdarg>
+
+namespace chucho
+{
 
 std::shared_ptr<chucho::level> c_to_level(chucho_level_t lvl)
 {
@@ -40,6 +44,57 @@ std::shared_ptr<chucho::level> c_to_level(chucho_level_t lvl)
     return chucho::level::INFO_();
 }
 
+}
+
+namespace
+{
+
+void log_impl(chucho_level_t lvl,
+              std::shared_ptr<chucho::logger> lgr,
+              const char* const file,
+              int line,
+              const char* const func,
+              const char* const format,
+              va_list args)
+{
+    auto lv = chucho::c_to_level(lvl);
+    if (lgr->permits(lv))
+    {
+        auto msg = chucho::text_util::format(format, args);
+        lgr->write(chucho::event(lgr,
+                                 lv,
+                                 msg,
+                                 file,
+                                 line,
+                                 func));
+    }
+}
+
+void log_impl_mark(chucho_level_t lvl,
+                   std::shared_ptr<chucho::logger> lgr,
+                   const char* const file,
+                   int line,
+                   const char* const func,
+                   const char* const mark,
+                   const char* const format,
+                   va_list args)
+{
+    auto lv = chucho::c_to_level(lvl);
+    if (lgr->permits(lv))
+    {
+        auto msg = chucho::text_util::format(format, args);
+        lgr->write(chucho::event(lgr,
+                                 lv,
+                                 msg,
+                                 file,
+                                 line,
+                                 func,
+                                 mark));
+    }
+}
+
+}
+
 extern "C"
 {
 
@@ -48,23 +103,11 @@ void chucho_log(chucho_level_t lvl,
                 const char* const file,
                 int line,
                 const char* const func,
-                const char* const format, ...)
-{
-    auto l = chucho::logger::get(lgr);
-    auto lv = c_to_level(lvl);
-    if (l->permits(lv))
-    {
-        va_list args;
-        va_start(args, format);
-        auto msg = chucho::text_util::format(format, args);
-        va_end(args);
-        l->write(chucho::event(l,
-                               lv,
-                               msg,
-                               file,
-                               line,
-                               func));
-    }
+                const char* const format, ...) {
+    va_list args;
+    va_start(args, format);
+    log_impl(lvl, chucho::logger::get(lgr), file, line, func, format, args);
+    va_end(args);
 }
 
 void chucho_log_mark(chucho_level_t lvl,
@@ -73,24 +116,36 @@ void chucho_log_mark(chucho_level_t lvl,
                      int line,
                      const char* const func,
                      const char* const mark,
-                     const char* const format, ...)
-{
-    auto l = chucho::logger::get(lgr);
-    auto lv = c_to_level(lvl);
-    if (l->permits(lv))
-    {
-        va_list args;
-        va_start(args, format);
-        auto msg = chucho::text_util::format(format, args);
-        va_end(args);
-        l->write(chucho::event(l,
-                               lv,
-                               msg,
-                               file,
-                               line,
-                               func,
-                               mark));
-    }
+                     const char* const format, ...) {
+    va_list args;
+    va_start(args, format);
+    log_impl_mark(lvl, chucho::logger::get(lgr), file, line, func, mark, format, args);
+    va_end(args);
+}
+
+void chucho_log_logger(chucho_level_t lvl,
+                       chucho_logger_t* lgr,
+                       const char* const file,
+                       int line,
+                       const char* const func,
+                       const char* const format, ...) {
+    va_list args;
+    va_start(args, format);
+    log_impl(lvl, lgr->logger, file, line, func, format, args);
+    va_end(args);
+}
+
+void chucho_log_mark_logger(chucho_level_t lvl,
+                            chucho_logger_t* lgr,
+                            const char* const file,
+                            int line,
+                            const char* const func,
+                            const char* const mark,
+                            const char* const format, ...) {
+    va_list args;
+    va_start(args, format);
+    log_impl_mark(lvl, lgr->logger, file, line, func, mark, format, args);
+    va_end(args);
 }
 
 }
