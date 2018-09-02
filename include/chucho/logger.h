@@ -49,12 +49,13 @@ typedef enum
 } chucho_level_t;
 
 CHUCHO_EXPORT chucho_logger_t* chucho_get_logger(const char* const name);
-CHUCHO_EXPORT void chucho_destroy_logger(chucho_logger_t* lgr);
+CHUCHO_EXPORT void chucho_release_logger(chucho_logger_t* lgr);
 
 /**
  * @ingroup c_miscellaneous
  */
 CHUCHO_EXPORT int chucho_logger_permits(const chucho_logger_t* lgr, chucho_level_t lvl);
+CHUCHO_EXPORT void chucho_logger_set_level(chucho_logger_t* lgr, chucho_level_t lvl);
 
 #if defined(__cplusplus)
 }

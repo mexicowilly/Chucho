@@ -28,7 +28,7 @@ chucho_logger_t* chucho_get_logger(const char* const name)
     return result;
 }
 
-void chucho_destroy_logger(chucho_logger_t* lgr)
+void chucho_release_logger(chucho_logger_t* lgr)
 {
     delete lgr;
 }
@@ -36,6 +36,11 @@ void chucho_destroy_logger(chucho_logger_t* lgr)
 int chucho_logger_permits(const chucho_logger_t* lgr, chucho_level_t lvl)
 {
     return lgr->logger->permits(chucho::c_to_level(lvl));
+}
+
+void chucho_logger_set_level(chucho_logger_t* lgr, chucho_level_t lvl)
+{
+    lgr->logger->set_level(chucho::c_to_level(lvl));
 }
 
 }

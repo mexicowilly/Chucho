@@ -16,6 +16,7 @@
 
 #include <gtest/gtest.h>
 #include <chucho/file.hpp>
+#include <chucho/logger.h>
 #include <fstream>
 
 TEST(c, simple)
@@ -38,19 +39,46 @@ TEST(c, simple)
     }
     stream.close();
     lines.pop_back();
-    ASSERT_EQ(12, lines.size());
-    EXPECT_STREQ("TRACE 1", lines[0].c_str());
-    EXPECT_STREQ("TRACE mark 2", lines[1].c_str());
-    EXPECT_STREQ("DEBUG 3", lines[2].c_str());
-    EXPECT_STREQ("DEBUG mark 4", lines[3].c_str());
-    EXPECT_STREQ("INFO 5", lines[4].c_str());
-    EXPECT_STREQ("INFO mark 6", lines[5].c_str());
-    EXPECT_STREQ("WARN 7", lines[6].c_str());
-    EXPECT_STREQ("WARN mark 8", lines[7].c_str());
-    EXPECT_STREQ("ERROR 9", lines[8].c_str());
-    EXPECT_STREQ("ERROR mark 10", lines[9].c_str());
-    EXPECT_STREQ("FATAL 11", lines[10].c_str());
-    EXPECT_STREQ("FATAL mark 12", lines[11].c_str());
+    ASSERT_EQ(24, lines.size());
+    EXPECT_STREQ("TRACE c 1", lines[0].c_str());
+    EXPECT_STREQ("TRACE c_by_logger 2", lines[0].c_str());
+    EXPECT_STREQ("TRACE mark c 3", lines[1].c_str());
+    EXPECT_STREQ("TRACE mark c_by_logger 4", lines[1].c_str());
+    EXPECT_STREQ("DEBUG c 5", lines[2].c_str());
+    EXPECT_STREQ("DEBUG c_by_logger 6", lines[2].c_str());
+    EXPECT_STREQ("DEBUG mark c 7", lines[3].c_str());
+    EXPECT_STREQ("DEBUG mark c_by_logger 8", lines[3].c_str());
+    EXPECT_STREQ("INFO c 9", lines[4].c_str());
+    EXPECT_STREQ("INFO c_by_logger 10", lines[4].c_str());
+    EXPECT_STREQ("INFO mark c 11", lines[5].c_str());
+    EXPECT_STREQ("INFO mark c_by_logger 12", lines[5].c_str());
+    EXPECT_STREQ("WARN c 13", lines[6].c_str());
+    EXPECT_STREQ("WARN c_by_logger 14", lines[6].c_str());
+    EXPECT_STREQ("WARN mark c 15", lines[7].c_str());
+    EXPECT_STREQ("WARN mark c_by_logger 16", lines[7].c_str());
+    EXPECT_STREQ("ERROR c 17", lines[8].c_str());
+    EXPECT_STREQ("ERROR c_by_logger 18", lines[8].c_str());
+    EXPECT_STREQ("ERROR mark c 19", lines[9].c_str());
+    EXPECT_STREQ("ERROR mark c_by_logger 20", lines[9].c_str());
+    EXPECT_STREQ("FATAL c 21", lines[10].c_str());
+    EXPECT_STREQ("FATAL c_by_logger 22", lines[10].c_str());
+    EXPECT_STREQ("FATAL mark c 23", lines[11].c_str());
+    EXPECT_STREQ("FATAL mark c_by_logger 24", lines[11].c_str());
     chucho::file::remove("c-test.log");
 #endif
+}
+
+TEST(c, permits)
+{
+    chucho_logger_t* lgr;
+
+    lgr = chucho_get_logger("c.permits");
+    chucho_logger_set_level(lgr, CHUCHO_WARN);
+    EXPECT_FALSE(chucho_logger_permits(lgr, CHUCHO_TRACE));
+    EXPECT_FALSE(chucho_logger_permits(lgr, CHUCHO_DEBUG));
+    EXPECT_FALSE(chucho_logger_permits(lgr, CHUCHO_INFO));
+    EXPECT_TRUE(chucho_logger_permits(lgr, CHUCHO_WARN));
+    EXPECT_TRUE(chucho_logger_permits(lgr, CHUCHO_ERROR));
+    EXPECT_TRUE(chucho_logger_permits(lgr, CHUCHO_FATAL));
+    chucho_release_logger(lgr);
 }
