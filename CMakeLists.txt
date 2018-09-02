@@ -224,6 +224,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/log.h
     include/chucho/loggable.hpp
     include/chucho/logger.hpp
+    include/chucho/logger.h
     include/chucho/marker.hpp
     include/chucho/memento.hpp
     include/chucho/message_queue_writer.hpp
@@ -614,6 +615,7 @@ SET(CHUCHO_SOURCES
     c_configuration.cpp
     c_finalize.cpp
     c_log.cpp
+    c_logger.cpp
     configurator.cpp
     cout_writer_factory.cpp
     demangle.cpp
@@ -715,6 +717,7 @@ SET(CHUCHO_SOURCES
     include/chucho/async_writer_factory.hpp
     include/chucho/async_writer_memento.hpp
     include/chucho/bzip2_file_compressor_factory.hpp
+    include/chucho/c_logger.hpp
     include/chucho/calendar.hpp
     include/chucho/cerr_writer_factory.hpp
     include/chucho/configurator.hpp
