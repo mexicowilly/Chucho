@@ -37,8 +37,9 @@ extern "C"
 {
 #endif
 
-#if !defined(CHUCHO_DONT_DOCUMENT) && !defined(CHUCHO_FUNCTION_NAME)
-#if defined(__GNUC__) || defined(__clang__) || defined(__SUNPRO_C)
+#if !defined(CHUCHO_DONT_DOCUMENT)
+
+#if !defined(CHUCHO_FUNCTION_NAME) && (defined(__GNUC__) || defined(__clang__) || defined(__SUNPRO_C))
 #define CHUCHO_FUNCTION_NAME __PRETTY_FUNCTION__
 #else
 #define CHUCHO_FUNCTION_NAME __FUNCTION__
@@ -97,12 +98,42 @@ CHUCHO_EXPORT void chucho_log_mark(chucho_level_t lvl,
                                    const char* const mark,
                                    const char* const format, ...);
 
+/**
+ * Log an event with a logger object.
+ *
+ * @note This function is used by the C logging macros. You
+ *       probably don't need to call it yourself.
+ *
+ * @param[in] lvl the level
+ * @param[in] lgr the logger
+ * @param[in] file the file name
+ * @param[in] line the line number
+ * @param[in] func the function name
+ * @param[in] format the printf-style format
+ * @param[in] ... any printf-style format parameters
+ */
 CHUCHO_EXPORT void chucho_log_logger(chucho_level_t lvl,
                                      chucho_logger_t* lgr,
                                      const char* const file,
                                      int line,
                                      const char* const func,
                                      const char* const format, ...);
+
+/**
+ * Log an event with a marker using a logger object.
+ *
+ * @note This function is used by the C logging macros. You
+ *       probably don't need to call it yourself.
+ *
+ * @param[in] lvl the level
+ * @param[in] lgr the logger
+ * @param[in] file the file name
+ * @param[in] line the line number
+ * @param[in] func the function name
+ * @param[in] mark the marker
+ * @param[in] format the printf-style format
+ * @param[in] ... any printf-style format parameters
+ */
 CHUCHO_EXPORT void chucho_log_mark_logger(chucho_level_t lvl,
                                           chucho_logger_t* lgr,
                                           const char* const file,
@@ -110,11 +141,12 @@ CHUCHO_EXPORT void chucho_log_mark_logger(chucho_level_t lvl,
                                           const char* const func,
                                           const char* const mark,
                                           const char* const format, ...);
+
 /**
  * @def CHUCHO_C_TRACE(lgr, ...) 
  * Log a trace level message. 
  *  
- * @param lgr the logger
+ * @param lgr the logger, which can either be a char* or a chucho_logger_t*
  * @param ... printf-style parameters that must include the
  *        format text first
  */
@@ -123,7 +155,7 @@ CHUCHO_EXPORT void chucho_log_mark_logger(chucho_level_t lvl,
  * @def CHUCHO_C_TRACE_M(lgr, mrk, ...) 
  * Log a trace level message with a marker.
  *  
- * @param lgr the logger
+ * @param lgr the logger, which can either be a char* or a chucho_logger_t*
  * @param mrk the marker, which must be of type char*
  * @param ... printf-style parameters that must include the
  *        format text first
@@ -133,7 +165,7 @@ CHUCHO_EXPORT void chucho_log_mark_logger(chucho_level_t lvl,
  * @def CHUCHO_C_DEBUG(lgr, ...) 
  * Log a debug level message. 
  *  
- * @param lgr the logger
+ * @param lgr the logger, which can either be a char* or a chucho_logger_t*
  * @param ... printf-style parameters that must include the
  *        format text first
  */
@@ -142,7 +174,7 @@ CHUCHO_EXPORT void chucho_log_mark_logger(chucho_level_t lvl,
  * @def CHUCHO_C_DEBUG_M(lgr, mrk, ...) 
  * Log a debug level message with a marker.
  *  
- * @param lgr the logger
+ * @param lgr the logger, which can either be a char* or a chucho_logger_t*
  * @param mrk the marker, which must be of type char*
  * @param ... printf-style parameters that must include the
  *        format text first
@@ -152,7 +184,7 @@ CHUCHO_EXPORT void chucho_log_mark_logger(chucho_level_t lvl,
  * @def CHUCHO_C_INFO(lgr, ...) 
  * Log a info level message. 
  *  
- * @param lgr the logger
+ * @param lgr the logger, which can either be a char* or a chucho_logger_t*
  * @param ... printf-style parameters that must include the
  *        format text first
  */
@@ -161,7 +193,7 @@ CHUCHO_EXPORT void chucho_log_mark_logger(chucho_level_t lvl,
  * @def CHUCHO_C_INFO_M(lgr, mrk, ...) 
  * Log a info level message with a marker.
  *  
- * @param lgr the logger
+ * @param lgr the logger, which can either be a char* or a chucho_logger_t*
  * @param mrk the marker, which must be of type char*
  * @param ... printf-style parameters that must include the
  *        format text first
@@ -171,7 +203,7 @@ CHUCHO_EXPORT void chucho_log_mark_logger(chucho_level_t lvl,
  * @def CHUCHO_C_WARN(lgr, ...) 
  * Log a warn level message. 
  *  
- * @param lgr the logger
+ * @param lgr the logger, which can either be a char* or a chucho_logger_t*
  * @param ... printf-style parameters that must include the
  *        format text first
  */
@@ -180,7 +212,7 @@ CHUCHO_EXPORT void chucho_log_mark_logger(chucho_level_t lvl,
  * @def CHUCHO_C_WARN_M(lgr, mrk, ...) 
  * Log a warn level message with a marker.
  *  
- * @param lgr the logger
+ * @param lgr the logger, which can either be a char* or a chucho_logger_t*
  * @param mrk the marker, which must be of type char*
  * @param ... printf-style parameters that must include the
  *        format text first
@@ -190,7 +222,7 @@ CHUCHO_EXPORT void chucho_log_mark_logger(chucho_level_t lvl,
  * @def CHUCHO_C_ERROR(lgr, ...) 
  * Log a error level message. 
  *  
- * @param lgr the logger
+ * @param lgr the logger, which can either be a char* or a chucho_logger_t*
  * @param ... printf-style parameters that must include the
  *        format text first
  */
@@ -199,7 +231,7 @@ CHUCHO_EXPORT void chucho_log_mark_logger(chucho_level_t lvl,
  * @def CHUCHO_C_ERROR_M(lgr, mrk, ...) 
  * Log a error level message with a marker.
  *  
- * @param lgr the logger
+ * @param lgr the logger, which can either be a char* or a chucho_logger_t*
  * @param mrk the marker, which must be of type char*
  * @param ... printf-style parameters that must include the
  *        format text first
@@ -209,7 +241,7 @@ CHUCHO_EXPORT void chucho_log_mark_logger(chucho_level_t lvl,
  * @def CHUCHO_C_FATAL(lgr, ...) 
  * Log a fatal level message. 
  *  
- * @param lgr the logger
+ * @param lgr the logger, which can either be a char* or a chucho_logger_t*
  * @param ... printf-style parameters that must include the
  *        format text first
  */
@@ -218,7 +250,7 @@ CHUCHO_EXPORT void chucho_log_mark_logger(chucho_level_t lvl,
  * @def CHUCHO_C_FATAL_M(lgr, mrk, ...) 
  * Log a fatal level message with a marker.
  *  
- * @param lgr the logger
+ * @param lgr the logger, which can either be a char* or a chucho_logger_t*
  * @param mrk the marker, which must be of type char*
  * @param ... printf-style parameters that must include the
  *        format text first
