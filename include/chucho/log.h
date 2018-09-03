@@ -38,7 +38,7 @@ extern "C"
 #endif
 
 #if !defined(CHUCHO_DONT_DOCUMENT) && !defined(CHUCHO_FUNCTION_NAME)
-#if defined(__GNUC__) || defined(__clang__) || defined(__SUNPRO_CC)
+#if defined(__GNUC__) || defined(__clang__) || defined(__SUNPRO_C)
 #define CHUCHO_FUNCTION_NAME __PRETTY_FUNCTION__
 #else
 #define CHUCHO_FUNCTION_NAME __FUNCTION__
