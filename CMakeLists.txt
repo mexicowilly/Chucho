@@ -221,7 +221,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/log_stream.hpp
     include/chucho/log_streambuf.hpp
     include/chucho/log.hpp
-    include/chucho/log.h
+    "${CMAKE_BINARY_DIR}/chucho/log.h"
     include/chucho/loggable.hpp
     include/chucho/logger.hpp
     include/chucho/logger.h

@@ -500,6 +500,17 @@ ENDIF()
 # assert
 CHUCHO_REQUIRE_SYMBOLS(assert.h assert)
 
+# _Generic
+CHECK_C_SOURCE_COMPILES("
+#define GEN_CHK(v) _Generic(v, int: \"my dog\", double: \"has fleas\")
+int main()
+{
+    char* t1 = GEN_CHK(1);
+    char* t2 = GEN_CHK(1.0);
+    return 0;
+}" CHUCHO_HAVE_C_GENERIC)
+CONFIGURE_FILE(include/chucho/log.h.in "${CMAKE_BINARY_DIR}/chucho/log.h")
+
 # Things Chucho may or may not depend on
 CHUCHO_FIND_PACKAGE(CURL)
 CHUCHO_FIND_PACKAGE(Ruby)
