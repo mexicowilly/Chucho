@@ -171,6 +171,8 @@ void configurator::async_writer_with_opts_body()
     EXPECT_FALSE(awrt.get_flush_on_destruct());
 }
 
+#if defined(CHUCHO_HAVE_BZIP2)
+
 void configurator::bzip2_file_compressor_body()
 {
     auto lgr = chucho::logger::get("will");
@@ -179,14 +181,11 @@ void configurator::bzip2_file_compressor_body()
     auto& rlr = dynamic_cast<chucho::numbered_file_roller&>(fwrt.get_file_roller());
     auto cmp = rlr.get_file_compressor();
     ASSERT_TRUE(cmp != nullptr);
-#if defined(CHUCHO_HAVE_BZIP2)
     ASSERT_EQ(typeid(chucho::bzip2_file_compressor), typeid(*cmp));
     EXPECT_EQ(1, cmp->get_min_index());
-#else
-    ASSERT_EQ(typeid(chucho::noop_file_compressor), typeid(*cmp));
-    chucho::status_manager::get().clear();
-#endif
 }
+
+#endif
 
 void configurator::cerr_writer_body()
 {
@@ -300,6 +299,8 @@ void configurator::file_writer_body()
     EXPECT_EQ(chucho::file_writer::on_start::TRUNCATE, fwrt.get_on_start());
 }
 
+#if defined(CHUCHO_HAVE_ZLIB)
+
 void configurator::gzip_file_compressor_body()
 {
     auto lgr = chucho::logger::get("will");
@@ -308,14 +309,11 @@ void configurator::gzip_file_compressor_body()
     auto& rlr = fwrt.get_file_roller();
     auto cmp = rlr.get_file_compressor();
     ASSERT_TRUE(cmp != nullptr);
-#if defined(CHUCHO_HAVE_ZLIB)
     ASSERT_EQ(typeid(chucho::gzip_file_compressor), typeid(*cmp));
     EXPECT_EQ(7, cmp->get_min_index());
-#else
-    ASSERT_EQ(typeid(chucho::noop_file_compressor), typeid(*cmp));
-    chucho::status_manager::get().clear();
-#endif
 }
+
+#endif
 
 void configurator::interval_file_roll_trigger_body(const std::string& tmpl)
 {
@@ -474,6 +472,8 @@ void configurator::logger_body()
     EXPECT_FALSE(lgr->writes_to_ancestors());
 }
 
+#if defined(CHUCHO_HAVE_LZMA)
+
 void configurator::lzma_file_compressor_body()
 {
     auto lgr = chucho::logger::get("will");
@@ -482,14 +482,11 @@ void configurator::lzma_file_compressor_body()
     auto& rlr = fwrt.get_file_roller();
     auto cmp = rlr.get_file_compressor();
     ASSERT_TRUE(cmp != nullptr);
-#if defined(CHUCHO_HAVE_LZMA)
     ASSERT_EQ(typeid(chucho::lzma_file_compressor), typeid(*cmp));
     EXPECT_EQ(1, cmp->get_min_index());
-#else
-    ASSERT_EQ(typeid(chucho::noop_file_compressor), typeid(*cmp));
-    chucho::status_manager::get().clear();
-#endif
 }
+
+#endif
 
 void configurator::multiple_writer_body()
 {
@@ -875,6 +872,8 @@ void configurator::zeromq_writer_flatbuffers_body()
 
 #endif
 
+#if defined(CHUCHO_HAVE_LIBARCHIVE)
+
 void configurator::zip_file_compressor_body()
 {
     auto lgr = chucho::logger::get("will");
@@ -883,14 +882,11 @@ void configurator::zip_file_compressor_body()
     auto& trlr = dynamic_cast<chucho::time_file_roller&>(fwrt.get_file_roller());
     auto cmp = trlr.get_file_compressor();
     ASSERT_TRUE(static_cast<bool>(cmp));
-#if defined(CHUCHO_HAVE_LIBARCHIVE)
     ASSERT_EQ(typeid(chucho::zip_file_compressor), typeid(*cmp));
     EXPECT_EQ(700, cmp->get_min_index());
-#else
-    ASSERT_EQ(typeid(chucho::noop_file_compressor), typeid(*cmp));
-    chucho::status_manager::get().clear();
-#endif
 }
+
+#endif
 
 }
 

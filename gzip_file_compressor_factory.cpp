@@ -16,10 +16,7 @@
 
 #include <chucho/gzip_file_compressor_factory.hpp>
 #include <chucho/file_compressor_memento.hpp>
-#if defined(CHUCHO_HAVE_ZLIB)
 #include <chucho/gzip_file_compressor.hpp>
-#endif
-#include <chucho/noop_file_compressor.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
 #include <assert.h>
@@ -34,7 +31,6 @@ gzip_file_compressor_factory::gzip_file_compressor_factory()
 
 std::unique_ptr<configurable> gzip_file_compressor_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-#if defined(CHUCHO_HAVE_ZLIB)
     auto fcm = dynamic_cast<file_compressor_memento*>(mnto.get());
     assert(fcm != nullptr);
     if (!fcm->get_min_index())
@@ -46,10 +42,6 @@ std::unique_ptr<configurable> gzip_file_compressor_factory::create_configurable(
         mi = 1;
     }
     auto gfc = std::make_unique<gzip_file_compressor>(mi);
-#else
-    report_warning("A gzip_file_compressor was requested in the configuration, but this Chucho library was built without gzip support.");
-    auto gfc = std::make_unique<noop_file_compressor>();
-#endif
     report_info("Created a " + demangle::get_demangled_name(typeid(*gfc)));
     return std::move(gfc);
 }
