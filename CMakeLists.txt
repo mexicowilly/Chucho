@@ -232,7 +232,6 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/named_pipe_writer.hpp
     include/chucho/non_copyable.hpp
     include/chucho/noop_compressor.hpp
-    include/chucho/noop_file_compressor.hpp
     include/chucho/numbered_file_roller.hpp
     include/chucho/on_start_file_roll_trigger.hpp
     include/chucho/optional.hpp
@@ -672,7 +671,6 @@ SET(CHUCHO_SOURCES
     named_pipe_writer_memento.cpp
     noop_compressor.cpp
     noop_compressor_factory.cpp
-    noop_file_compressor.cpp
     numbered_file_roller.cpp
     numbered_file_roller_factory.cpp
     numbered_file_roller_memento.cpp
@@ -863,6 +861,10 @@ IF(LIBLZMA_FOUND)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_LZMA)
 ENDIF()
 
+IF(LibArchive_FOUND)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_LIBARCHIVE)
+ENDIF()
+
 IF(CHUCHO_HAVE_LZ4)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_LZ4)
 ENDIF()
@@ -965,8 +967,6 @@ IF(ZLIB_FOUND)
         SET_SOURCE_FILES_PROPERTIES(gzip_file_compressor.cpp PROPERTIES
                                     COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
     ENDIF()
-    SET_SOURCE_FILES_PROPERTIES(gzip_file_compressor_factory.cpp PROPERTIES
-                                COMPILE_DEFINITIONS CHUCHO_HAVE_ZLIB)
 ENDIF()
 
 IF(BZIP2_FOUND)
@@ -975,15 +975,11 @@ IF(BZIP2_FOUND)
          bzip2_compressor_factory.cpp
          bzip2_file_compressor.cpp
          include/chucho/bzip2_compressor_factory.hpp)
-    SET_SOURCE_FILES_PROPERTIES(bzip2_file_compressor_factory.cpp PROPERTIES
-                                COMPILE_DEFINITIONS CHUCHO_HAVE_BZIP2)
 ENDIF()
 
 IF(LibArchive_FOUND)
     LIST(APPEND CHUCHO_SOURCES
          zip_file_compressor.cpp)
-    SET_SOURCE_FILES_PROPERTIES(zip_file_compressor_factory.cpp PROPERTIES
-                                COMPILE_DEFINITIONS CHUCHO_HAVE_LIBARCHIVE)
 ENDIF()
 
 IF(LIBLZMA_FOUND)
@@ -992,8 +988,6 @@ IF(LIBLZMA_FOUND)
          lzma_compressor.cpp
          lzma_compressor_factory.cpp
          include/chucho/lzma_compressor_factory.hpp)
-    SET_SOURCE_FILES_PROPERTIES(lzma_file_compressor_factory.cpp PROPERTIES
-                                COMPILE_DEFINITIONS CHUCHO_HAVE_LZMA)
 ENDIF()
 
 IF(CHUCHO_HAVE_LZ4)

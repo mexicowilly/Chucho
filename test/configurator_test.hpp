@@ -37,7 +37,9 @@ protected:
 #endif
     void async_writer_body();
     void async_writer_with_opts_body();
+#if defined(CHUCHO_HAVE_BZIP2)
     void bzip2_file_compressor_body();
+#endif
     void cerr_writer_body();
 #if defined(CHUCHO_HAVE_AWSSDK)
     void cloudwatch_writer_body();
@@ -55,13 +57,17 @@ protected:
 #endif
     void file_writer_body();
     virtual chucho::configurator& get_configurator() = 0;
+#if defined(CHUCHO_HAVE_ZLIB)
     void gzip_file_compressor_body();
+#endif
     void interval_file_roll_trigger_body(const std::string& tmpl);
     void json_formatter_body(const std::string &tmpl);
     void level_filter_body(const std::string& tmpl);
     void level_threshold_filter_body();
     void logger_body();
+#if defined(CHUCHO_HAVE_LZMA)
     void lzma_file_compressor_body();
+#endif
     void multiple_writer_body();
     void named_pipe_writer_body();
     void numbered_file_roller_body();
@@ -101,7 +107,9 @@ protected:
     void zeromq_writer_flatbuffers_body();
 #endif
 #endif
+#if defined(CHUCHO_HAVE_LIBARCHIVE)
     void zip_file_compressor_body();
+#endif
 };
 
 }

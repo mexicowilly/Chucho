@@ -159,6 +159,8 @@ TEST_F(yaml_configurator, async_writer_with_opts)
     async_writer_with_opts_body();
 }
 
+#if defined(CHUCHO_HAVE_BZIP2)
+
 TEST_F(yaml_configurator, bzip2_file_compressor)
 {
     configure("chucho::logger:\n"
@@ -176,6 +178,8 @@ TEST_F(yaml_configurator, bzip2_file_compressor)
               "        file_name: what.log");
     bzip2_file_compressor_body();
 }
+
+#endif
 
 TEST_F(yaml_configurator, cerr_writer)
 {
@@ -341,6 +345,8 @@ TEST_F(yaml_configurator, file_writer_invalid_2)
                          "        flush:");
 }
 
+#if defined(CHUCHO_HAVE_ZLIB)
+
 TEST_F(yaml_configurator, gzip_file_compressor)
 {
     configure("chucho::logger:\n"
@@ -355,6 +361,8 @@ TEST_F(yaml_configurator, gzip_file_compressor)
               "                min_index: 7");
     gzip_file_compressor_body();
 }
+
+#endif
 
 TEST_F(yaml_configurator, interval_file_roll_trigger)
 {
@@ -426,6 +434,8 @@ TEST_F(yaml_configurator, logger)
     logger_body();
 }
 
+#if defined(CHUCHO_HAVE_LZMA)
+
 TEST_F(yaml_configurator, lzma_file_compressor)
 {
     configure("chucho::logger:\n"
@@ -443,6 +453,8 @@ TEST_F(yaml_configurator, lzma_file_compressor)
                   "        file_name: what.log");
     lzma_file_compressor_body();
 }
+
+#endif
 
 TEST_F(yaml_configurator, multiple_writer)
 {
@@ -846,6 +858,8 @@ TEST_F(yaml_configurator, zeromq_writer_flatbuffers)
 
 #endif
 
+#if defined(CHUCHO_HAVE_LIBARCHIVE)
+
 TEST_F(yaml_configurator, zip_file_compressor)
 {
     configure("chucho::logger:\n"
@@ -860,3 +874,5 @@ TEST_F(yaml_configurator, zip_file_compressor)
               "                min_index: 700");
     zip_file_compressor_body();
 }
+
+#endif

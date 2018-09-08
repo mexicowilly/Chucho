@@ -16,10 +16,7 @@
 
 #include <chucho/zip_file_compressor_factory.hpp>
 #include <chucho/file_compressor_memento.hpp>
-#if defined(CHUCHO_HAVE_LIBARCHIVE)
 #include <chucho/zip_file_compressor.hpp>
-#endif
-#include <chucho/noop_file_compressor.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
 #include <assert.h>
@@ -34,7 +31,6 @@ zip_file_compressor_factory::zip_file_compressor_factory()
 
 std::unique_ptr<configurable> zip_file_compressor_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-#if defined(CHUCHO_HAVE_LIBARCHIVE)
     auto fcm = dynamic_cast<file_compressor_memento*>(mnto.get());
     assert(fcm != nullptr);
     if (!fcm->get_min_index())
@@ -46,10 +42,6 @@ std::unique_ptr<configurable> zip_file_compressor_factory::create_configurable(s
         mi = 1;
     }
     auto zfc = std::make_unique<zip_file_compressor>(mi);
-#else
-    report_warning("A zip_file_compressor was requested in the configuration, but this Chucho library was built without zip archive support.");
-    auto zfc = std::make_unique<noop_file_compressor>();
-#endif
     report_info("Created a " + demangle::get_demangled_name(typeid(*zfc)));
     return std::move(zfc);
 }
