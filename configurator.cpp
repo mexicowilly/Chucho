@@ -21,19 +21,16 @@
 #include <chucho/regex.hpp>
 
 #include <chucho/async_writer_factory.hpp>
-#include <chucho/bzip2_file_compressor_factory.hpp>
 #include <chucho/cerr_writer_factory.hpp>
 #include <chucho/cout_writer_factory.hpp>
 #include <chucho/duplicate_message_filter_factory.hpp>
 #include <chucho/file_writer_factory.hpp>
 #include <chucho/formatted_message_serializer_factory.hpp>
-#include <chucho/gzip_file_compressor_factory.hpp>
 #include <chucho/interval_file_roll_trigger_factory.hpp>
 #include <chucho/json_formatter_factory.hpp>
 #include <chucho/level_filter_factory.hpp>
 #include <chucho/level_threshold_filter_factory.hpp>
 #include <chucho/logger_factory.hpp>
-#include <chucho/lzma_file_compressor_factory.hpp>
 #include <chucho/named_pipe_writer_factory.hpp>
 #include <chucho/noop_compressor_factory.hpp>
 #include <chucho/numbered_file_roller_factory.hpp>
@@ -45,7 +42,6 @@
 #include <chucho/sliding_numbered_file_roller_factory.hpp>
 #include <chucho/syslog_writer_factory.hpp>
 #include <chucho/time_file_roller_factory.hpp>
-#include <chucho/zip_file_compressor_factory.hpp>
 
 #if defined(CHUCHO_WINDOWS)
 #include <chucho/windows_event_log_writer_factory.hpp>
@@ -66,6 +62,7 @@
 #endif
 #if defined(CHUCHO_HAVE_ZLIB)
 #include <chucho/zlib_compressor_factory.hpp>
+#include <chucho/gzip_file_compressor_factory.hpp>
 #endif
 #if defined(CHUCHO_HAVE_ACTIVEMQ)
 #include <chucho/activemq_writer_factory.hpp>
@@ -78,12 +75,17 @@
 #endif
 #if defined(CHUCHO_HAVE_BZIP2)
 #include <chucho/bzip2_compressor_factory.hpp>
+#include <chucho/bzip2_file_compressor_factory.hpp>
 #endif
 #if defined(CHUCHO_HAVE_CAPN_PROTO)
 #include <chucho/capn_proto_serializer_factory.hpp>
 #endif
 #if defined(CHUCHO_HAVE_LZMA)
 #include <chucho/lzma_compressor_factory.hpp>
+#include <chucho/lzma_file_compressor_factory.hpp>
+#endif
+#if defined(CHUCHO_HAVE_LIBARCHIVE)
+#include <chucho/zip_file_compressor_factory.hpp>
 #endif
 #if defined(CHUCHO_HAVE_LZ4)
 #include <chucho/lz4_compressor_factory.hpp>
@@ -171,12 +173,6 @@ void configurator::initialize_impl()
                              std::make_shared<time_file_roller_factory>());
     add_configurable_factory("chucho::syslog_writer",
                              std::make_shared<syslog_writer_factory>());
-    add_configurable_factory("chucho::bzip2_file_compressor",
-                             std::make_shared<bzip2_file_compressor_factory>());
-    add_configurable_factory("chucho::gzip_file_compressor",
-                             std::make_shared<gzip_file_compressor_factory>());
-    add_configurable_factory("chucho::zip_file_compressor",
-                             std::make_shared<zip_file_compressor_factory>());
     add_configurable_factory("chucho::async_writer",
                              std::make_shared<async_writer_factory>());
     add_configurable_factory("chucho::sliding_numbered_file_roller",
@@ -185,8 +181,6 @@ void configurator::initialize_impl()
                              std::make_shared<interval_file_roll_trigger_factory>());
     add_configurable_factory("chucho::formatted_message_serializer",
                              std::make_shared<formatted_message_serializer_factory>());
-    add_configurable_factory("chucho::lzma_file_compressor",
-                             std::make_shared<lzma_file_compressor_factory>());
     add_configurable_factory("chucho::json_formatter",
                              std::make_shared<json_formatter_factory>());
 #if defined(CHUCHO_WINDOWS)
@@ -216,6 +210,8 @@ void configurator::initialize_impl()
 #if defined(CHUCHO_HAVE_ZLIB)
     add_configurable_factory("chucho::zlib_compressor",
                              std::make_shared<zlib_compressor_factory>());
+    add_configurable_factory("chucho::gzip_file_compressor",
+                             std::make_shared<gzip_file_compressor_factory>());
 #endif
 #if defined(CHUCHO_HAVE_ACTIVEMQ)
     add_configurable_factory("chucho::activemq_writer",
@@ -232,6 +228,8 @@ void configurator::initialize_impl()
 #if defined(CHUCHO_HAVE_BZIP2)
     add_configurable_factory("chucho::bzip2_compressor",
                              std::make_shared<bzip2_compressor_factory>());
+    add_configurable_factory("chucho::bzip2_file_compressor",
+                             std::make_shared<bzip2_file_compressor_factory>());
 #endif
 #if defined(CHUCHO_HAVE_CAPN_PROTO)
     add_configurable_factory("chucho::capn_proto_serializer",
@@ -240,6 +238,8 @@ void configurator::initialize_impl()
 #if defined(CHUCHO_HAVE_LZMA)
     add_configurable_factory("chucho::lzma_compressor",
                              std::make_shared<lzma_compressor_factory>());
+    add_configurable_factory("chucho::lzma_file_compressor",
+                             std::make_shared<lzma_file_compressor_factory>());
 #endif
 #if defined(CHUCHO_HAVE_LZ4)
     add_configurable_factory("chucho::lz4_compressor",
@@ -256,6 +256,10 @@ void configurator::initialize_impl()
 #if defined(CHUCHO_HAVE_SOCI)
     add_configurable_factory("chucho::database_writer",
                              std::make_shared<database_writer_factory>());
+#endif
+#if defined(CHUCHO_HAVE_LIBARCHIVE)
+    add_configurable_factory("chucho::zip_file_compressor",
+                             std::make_shared<zip_file_compressor_factory>());
 #endif
 }
 

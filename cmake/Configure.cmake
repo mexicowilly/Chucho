@@ -68,7 +68,7 @@ IF(NOT CMAKE_CXX_COMPILER_ID STREQUAL SunPro)
     SET(CMAKE_CXX_STANDARD 14)
     SET(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 ENDIF()
-SET(CMAKE_C_STANDARD 99)
+SET(CMAKE_C_STANDARD 11)
 SET(CMAKE_C_STANDARD_REQUIRED TRUE)
 
 # Compiler flags
@@ -499,6 +499,17 @@ ENDIF()
 
 # assert
 CHUCHO_REQUIRE_SYMBOLS(assert.h assert)
+
+# _Generic
+CHECK_C_SOURCE_COMPILES("
+#define GEN_CHK(v) _Generic(v, int: \"my dog\", double: \"has fleas\")
+int main()
+{
+    char* t1 = GEN_CHK(1);
+    char* t2 = GEN_CHK(1.0);
+    return 0;
+}" CHUCHO_HAVE_C_GENERIC)
+CONFIGURE_FILE(include/chucho/log.h.in "${CMAKE_BINARY_DIR}/chucho/log.h")
 
 # Things Chucho may or may not depend on
 CHUCHO_FIND_PACKAGE(CURL)

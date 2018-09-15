@@ -97,6 +97,8 @@ TEST_F(json_configurator, logger)
     logger_body();
 }
 
+#if defined(CHUCHO_HAVE_LZMA)
+
 TEST_F(json_configurator, lzma_file_compressor)
 {
     configure(R"cnf(
@@ -121,6 +123,8 @@ TEST_F(json_configurator, lzma_file_compressor)
 )cnf");
     lzma_file_compressor_body();
 }
+
+#endif
 
 TEST_F(json_configurator, multiple_writer)
 {

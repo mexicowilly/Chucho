@@ -223,6 +223,11 @@ IF(MSVC)
                                 COMPILE_FLAGS /wd4018)
 ENDIF()
 
+IF(CHUCHO_HAVE_C_GENERIC)
+    SET_TARGET_PROPERTIES(unit-test PROPERTIES
+                          COMPILE_DEFINITIONS CHUCHO_HAVE_C_GENERIC)
+ENDIF()
+
 ADD_EXECUTABLE(named-pipe-writer-test-helper EXCLUDE_FROM_ALL
                named_pipe_writer_test_helper.cpp)
 TARGET_LINK_LIBRARIES(named-pipe-writer-test-helper chucho)

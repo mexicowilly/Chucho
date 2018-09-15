@@ -16,10 +16,7 @@
 
 #include <chucho/bzip2_file_compressor_factory.hpp>
 #include <chucho/file_compressor_memento.hpp>
-#include <chucho/noop_file_compressor.hpp>
-#if defined(CHUCHO_HAVE_BZIP2)
 #include <chucho/bzip2_file_compressor.hpp>
-#endif
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
 #include <assert.h>
@@ -34,7 +31,6 @@ bzip2_file_compressor_factory::bzip2_file_compressor_factory()
 
 std::unique_ptr<configurable> bzip2_file_compressor_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
-#if defined(CHUCHO_HAVE_BZIP2)
     auto fcm = dynamic_cast<file_compressor_memento*>(mnto.get());
     assert(fcm != nullptr);
     if (!fcm->get_min_index())
@@ -46,10 +42,6 @@ std::unique_ptr<configurable> bzip2_file_compressor_factory::create_configurable
         mi = 1;
     }
     auto bfc = std::make_unique<bzip2_file_compressor>(mi);
-#else
-    report_warning("A bzip2_file_compressor was requested in the configuration, but this Chucho library was built without bzip2 support.");
-    auto bfc = std::make_unique<noop_file_compressor>();
-#endif
     report_info("Created a " + demangle::get_demangled_name(typeid(*bfc)));
     return std::move(bfc);
 }

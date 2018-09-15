@@ -145,6 +145,8 @@ TEST_F(chucho_config_file_configurator, async_writer_with_opts)
     async_writer_with_opts_body();
 }
 
+#if defined(CHUCHO_HAVE_BZIP2)
+
 TEST_F(chucho_config_file_configurator, bzip2_file_compressor)
 {
     configure("chucho.logger = will\n"
@@ -166,6 +168,8 @@ TEST_F(chucho_config_file_configurator, bzip2_file_compressor)
               "chucho.file_roll_trigger.sfrt.max_size = 5000");
     bzip2_file_compressor_body();
 }
+
+#endif
 
 TEST_F(chucho_config_file_configurator, cerr_writer)
 {
@@ -390,6 +394,8 @@ TEST_F(chucho_config_file_configurator, filter_order)
               *dynamic_cast<chucho::level_threshold_filter&>(wrt.get_filter("three")).get_level());
 }
 
+#if defined(CHUCHO_HAVE_ZLIB)
+
 TEST_F(chucho_config_file_configurator, gzip_file_compressor)
 {
     configure("chucho.logger = will\n"
@@ -407,6 +413,8 @@ TEST_F(chucho_config_file_configurator, gzip_file_compressor)
               "chucho.file_compressor.gz.min_index = 7");
     gzip_file_compressor_body();
 }
+
+#endif
 
 TEST_F(chucho_config_file_configurator, interval_file_roll_trigger)
 {
@@ -464,6 +472,8 @@ TEST_F(chucho_config_file_configurator, logger)
     logger_body();
 }
 
+#if defined(CHUCHO_HAVE_LZMA)
+
 TEST_F(chucho_config_file_configurator, lzma_file_compressor)
 {
     configure("chucho.logger = will\n"
@@ -485,6 +495,8 @@ TEST_F(chucho_config_file_configurator, lzma_file_compressor)
                   "chucho.file_roll_trigger.sfrt.max_size = 5000");
     lzma_file_compressor_body();
 }
+
+#endif
 
 TEST_F(chucho_config_file_configurator, multiple_writer)
 {
@@ -877,6 +889,8 @@ TEST_F(chucho_config_file_configurator, zeromq_writer_flatbuffers)
 
 #endif
 
+#if defined(CHUCHO_HAVE_LIBARCHIVE)
+
 TEST_F(chucho_config_file_configurator, zip_file_compressor)
 {
     configure("chucho.logger = will\n"
@@ -894,3 +908,5 @@ TEST_F(chucho_config_file_configurator, zip_file_compressor)
               "chucho.file_compressor.zfc.min_index = 700");
     zip_file_compressor_body();
 }
+
+#endif

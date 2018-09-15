@@ -15,14 +15,11 @@
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.1.3)
-IF(POLICY CMP0042)
-    CMAKE_POLICY(SET CMP0042 OLD)
-ENDIF()
 
 PROJECT(chucho CXX C)
 
 SET(CHUCHO_MAJOR_VERSION 2)
-SET(CHUCHO_MINOR_VERSION 3)
+SET(CHUCHO_MINOR_VERSION 4)
 SET(CHUCHO_VERSION ${CHUCHO_MAJOR_VERSION}.${CHUCHO_MINOR_VERSION})
 
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -221,9 +218,10 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/log_stream.hpp
     include/chucho/log_streambuf.hpp
     include/chucho/log.hpp
-    include/chucho/log.h
+    "${CMAKE_BINARY_DIR}/chucho/log.h"
     include/chucho/loggable.hpp
     include/chucho/logger.hpp
+    include/chucho/logger.h
     include/chucho/marker.hpp
     include/chucho/memento.hpp
     include/chucho/message_queue_writer.hpp
@@ -231,7 +229,6 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/named_pipe_writer.hpp
     include/chucho/non_copyable.hpp
     include/chucho/noop_compressor.hpp
-    include/chucho/noop_file_compressor.hpp
     include/chucho/numbered_file_roller.hpp
     include/chucho/on_start_file_roll_trigger.hpp
     include/chucho/optional.hpp
@@ -605,7 +602,6 @@ SET(CHUCHO_SOURCES
     async_writer.cpp
     async_writer_factory.cpp
     async_writer_memento.cpp
-    bzip2_file_compressor_factory.cpp
     calendar.cpp
     cerr_writer_factory.cpp
     configurable.cpp
@@ -614,6 +610,7 @@ SET(CHUCHO_SOURCES
     c_configuration.cpp
     c_finalize.cpp
     c_log.cpp
+    c_logger.cpp
     configurator.cpp
     cout_writer_factory.cpp
     demangle.cpp
@@ -638,7 +635,6 @@ SET(CHUCHO_SOURCES
     formatted_message_serializer.cpp
     formatted_message_serializer_factory.cpp
     garbage_cleaner.cpp
-    gzip_file_compressor_factory.cpp
     host.cpp
     interval_file_roll_trigger.cpp
     interval_file_roll_trigger_factory.cpp
@@ -658,7 +654,6 @@ SET(CHUCHO_SOURCES
     logger.cpp
     logger_factory.cpp
     logger_memento.cpp
-    lzma_file_compressor_factory.cpp
     marker.cpp
     memento.cpp
     memento_key_set.cpp
@@ -670,7 +665,6 @@ SET(CHUCHO_SOURCES
     named_pipe_writer_memento.cpp
     noop_compressor.cpp
     noop_compressor_factory.cpp
-    noop_file_compressor.cpp
     numbered_file_roller.cpp
     numbered_file_roller_factory.cpp
     numbered_file_roller_memento.cpp
@@ -711,10 +705,9 @@ SET(CHUCHO_SOURCES
     writer.cpp
     writer_factory.cpp
     writer_memento.cpp
-    zip_file_compressor_factory.cpp
     include/chucho/async_writer_factory.hpp
     include/chucho/async_writer_memento.hpp
-    include/chucho/bzip2_file_compressor_factory.hpp
+    include/chucho/c_logger.hpp
     include/chucho/calendar.hpp
     include/chucho/cerr_writer_factory.hpp
     include/chucho/configurator.hpp
@@ -730,7 +723,6 @@ SET(CHUCHO_SOURCES
     include/chucho/file_writer_memento.hpp
     include/chucho/formatted_message_serializer_factory.hpp
     include/chucho/garbage_cleaner.hpp
-    include/chucho/gzip_file_compressor_factory.hpp
     include/chucho/host.hpp
     include/chucho/interval_file_roll_trigger_factory.hpp
     include/chucho/interval_file_roll_trigger_memento.hpp
@@ -743,7 +735,6 @@ SET(CHUCHO_SOURCES
     include/chucho/line_ending.hpp
     include/chucho/logger_factory.hpp
     include/chucho/logger_memento.hpp
-    include/chucho/lzma_file_compressor_factory.hpp
     include/chucho/memento_key_set.hpp
     include/chucho/message_queue_writer_memento.hpp
     include/chucho/move_util.hpp
@@ -777,7 +768,6 @@ SET(CHUCHO_SOURCES
     include/chucho/time_file_roller_memento.hpp
     include/chucho/time_util.hpp
     include/chucho/utf8.hpp
-    include/chucho/zip_file_compressor_factory.hpp
     ${CHUCHO_CONFIGURATOR_SOURCES}
     ${CHUCHO_PLATFORM_SOURCES}
     ${CHUCHO_EMBEDDED_SOURCES}
@@ -858,6 +848,10 @@ ENDIF()
 
 IF(LIBLZMA_FOUND)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_LZMA)
+ENDIF()
+
+IF(LibArchive_FOUND)
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_LIBARCHIVE)
 ENDIF()
 
 IF(CHUCHO_HAVE_LZ4)
@@ -953,17 +947,17 @@ ENDIF()
 IF(ZLIB_FOUND)
     LIST(APPEND CHUCHO_SOURCES
          gzip_file_compressor.cpp
+         gzip_file_compressor_factory.cpp
          zlib_compressor.cpp
          zlib_compressor_factory.cpp
          zlib_compressor_memento.cpp
          include/chucho/zlib_compressor_factory.hpp
-         include/chucho/zlib_compressor_memento.hpp)
+         include/chucho/zlib_compressor_memento.hpp
+         include/chucho/gzip_file_compressor_factory.hpp)
     IF(MSVC)
         SET_SOURCE_FILES_PROPERTIES(gzip_file_compressor.cpp PROPERTIES
                                     COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
     ENDIF()
-    SET_SOURCE_FILES_PROPERTIES(gzip_file_compressor_factory.cpp PROPERTIES
-                                COMPILE_DEFINITIONS CHUCHO_HAVE_ZLIB)
 ENDIF()
 
 IF(BZIP2_FOUND)
@@ -971,26 +965,25 @@ IF(BZIP2_FOUND)
          bzip2_compressor.cpp
          bzip2_compressor_factory.cpp
          bzip2_file_compressor.cpp
+         bzip2_file_compressor_factory.cpp
          include/chucho/bzip2_compressor_factory.hpp)
-    SET_SOURCE_FILES_PROPERTIES(bzip2_file_compressor_factory.cpp PROPERTIES
-                                COMPILE_DEFINITIONS CHUCHO_HAVE_BZIP2)
 ENDIF()
 
 IF(LibArchive_FOUND)
     LIST(APPEND CHUCHO_SOURCES
-         zip_file_compressor.cpp)
-    SET_SOURCE_FILES_PROPERTIES(zip_file_compressor_factory.cpp PROPERTIES
-                                COMPILE_DEFINITIONS CHUCHO_HAVE_LIBARCHIVE)
+         zip_file_compressor.cpp
+         zip_file_compressor_factory.cpp
+         include/chucho/zip_file_compressor_factory.hpp)
 ENDIF()
 
 IF(LIBLZMA_FOUND)
     LIST(APPEND CHUCHO_SOURCES
          lzma_file_compressor.cpp
+         lzma_file_compressor_factory.cpp
          lzma_compressor.cpp
          lzma_compressor_factory.cpp
-         include/chucho/lzma_compressor_factory.hpp)
-    SET_SOURCE_FILES_PROPERTIES(lzma_file_compressor_factory.cpp PROPERTIES
-                                COMPILE_DEFINITIONS CHUCHO_HAVE_LZMA)
+         include/chucho/lzma_compressor_factory.hpp
+         include/chucho/lzma_file_compressor_factory.hpp)
 ENDIF()
 
 IF(CHUCHO_HAVE_LZ4)

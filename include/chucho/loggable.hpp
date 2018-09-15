@@ -27,11 +27,11 @@ namespace chucho
  * @class loggable loggable.hpp chucho/loggable.hpp
  * A class that inherits from loggable gets a logger associated 
  * with each instance for free. This gives you the ability to 
- * use the log macros tagged with @c LGBL in order to avoid 
+ * use the log macros tagged with @c L or @c LGBL in order to avoid
  * having to manage the logger and what it might be called. For 
  * example, 
  * @code 
- * CHUCHO_INFO_LGBL("I just found " << num << " cats"); 
+ * CHUCHO_INFO_L("I just found " << num << " cats");
  * @endcode 
  * Instead of, 
  * @code 
@@ -49,7 +49,7 @@ class loggable
 {
 protected:
     /**
-     * @name Constructors
+     * @name Constructors and Destructor
      */
     //@{
     /**
@@ -65,6 +65,10 @@ protected:
      * @param name the name of the logger
      */
     loggable(const std::string& name);
+    /**
+     * Destroy a loggable.
+     */
+     virtual ~loggable() { }
     //@}
 
     /**
