@@ -40,6 +40,7 @@ TEST(c, simple)
     stream.close();
     lines.pop_back();
 #if defined(CHUCHO_HAVE_C_GENERIC)
+    std::cout << "Expecting tests using _Generic" << std::endl;
     ASSERT_EQ(36, lines.size());
     EXPECT_STREQ("TRACE c 1", lines[0].c_str());
     EXPECT_STREQ("TRACE c_by_logger 2", lines[1].c_str());
@@ -78,6 +79,7 @@ TEST(c, simple)
     EXPECT_STREQ("FATAL mark c_by_logger 35", lines[34].c_str());
     EXPECT_STREQ("FATAL mark c_by_logger 36", lines[35].c_str());
 #else
+    std::cout << "Expecting tests without _Generic" << std::endl;
     ASSERT_EQ(24, lines.size());
     EXPECT_STREQ("TRACE c 1", lines[0].c_str());
     EXPECT_STREQ("TRACE c_by_logger 2", lines[1].c_str());

@@ -155,6 +155,8 @@ void configurator::initialize_impl()
                              std::make_shared<logger_factory>());
     add_configurable_factory("chucho::named_pipe_writer",
                              std::make_shared<named_pipe_writer_factory>());
+    add_configurable_factory("chucho::noop_compressor",
+                             std::make_shared<noop_compressor_factory>());
     add_configurable_factory("chucho::numbered_file_roller",
                              std::make_shared<numbered_file_roller_factory>());
     add_configurable_factory("chucho::on_start_file_roll_trigger",
