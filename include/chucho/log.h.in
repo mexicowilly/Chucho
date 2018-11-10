@@ -58,6 +58,8 @@ extern "C"
 #else
 #define CHUCHO_C_INTERNAL(lvl, lgr, fl, ln, fnc, ...) \
     chucho_log((lvl), (lgr), (fl), (ln), (fnc), __VA_ARGS__)
+#define CHUCHO_C_INTERNAL_M(lvl, lgr, fl, ln, fnc, mrk, ...) \
+    chucho_log_mark((lvl), (lgr), (fl), (ln), (fnc), (mrk), __VA_ARGS__)
 #endif
 
 #endif

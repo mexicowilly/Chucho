@@ -35,7 +35,7 @@ struct static_data
     static_data();
 
     std::map<std::string, std::shared_ptr<chucho::logger>> all_loggers_;
-    std::recursive_mutex loggers_guard_;
+    std::mutex loggers_guard_;
     std::atomic<bool> is_initialized_;
 };
 
@@ -85,7 +85,7 @@ logger::logger(const std::string& name, std::shared_ptr<level> lvl)
     ancestors.pop_back();
     std::vector<std::shared_ptr<logger>> resolved;
     std::string ancestor_name;
-    std::lock_guard<std::recursive_mutex> lg(data().loggers_guard_);
+    static_data& sd(data());
     for (std::string& a : ancestors)
     {
         if (!ancestor_name.empty())
@@ -130,14 +130,14 @@ void logger::add_writer(std::unique_ptr<writer>&& wrt)
 {
     if (!wrt)
         throw std::invalid_argument("The writer cannot be an uninitialized std::unique_ptr");
-    std::lock_guard<std::recursive_mutex> lg(guard_);
+    std::lock_guard<std::mutex> lg(guard_);
     writers_.push_back(std::move(wrt));
 }
 
 std::shared_ptr<logger> logger::get(const std::string& name)
 {
     static_data& sd(data());
-    std::lock_guard<std::recursive_mutex> lg(sd.loggers_guard_);
+    std::lock_guard<std::mutex> lg(sd.loggers_guard_);
     // std::call_once does not remove the need for the atomic bool,
     // so we just use that and roll our own call_once.
     if (!sd.is_initialized_)
@@ -147,7 +147,7 @@ std::shared_ptr<logger> logger::get(const std::string& name)
 
 std::shared_ptr<level> logger::get_effective_level() const
 {
-    std::lock_guard<std::recursive_mutex> lg(data().loggers_guard_);
+    std::lock_guard<std::mutex> lg(data().loggers_guard_);
     auto lgr = shared_from_this();
     while (!lgr->level_ && lgr->parent_)
         lgr = lgr->parent_;
@@ -159,7 +159,7 @@ std::vector<std::shared_ptr<logger>> logger::get_existing_loggers()
 {
     std::vector<std::shared_ptr<logger>> result;
     static_data& sd(data());
-    std::lock_guard<std::recursive_mutex> lg(sd.loggers_guard_);
+    std::lock_guard<std::mutex> lg(sd.loggers_guard_);
     for (const std::map<std::string, std::shared_ptr<logger>>::value_type& i : sd.all_loggers_)
         result.push_back(i.second);
     return result;
@@ -168,7 +168,6 @@ std::vector<std::shared_ptr<logger>> logger::get_existing_loggers()
 std::shared_ptr<logger> logger::get_impl(const std::string& name)
 {
     static_data& sd(data());
-    std::lock_guard<std::recursive_mutex> lg(sd.loggers_guard_);
     auto found = sd.all_loggers_.find(name);
     if (found == sd.all_loggers_.end())
     {
@@ -180,13 +179,13 @@ std::shared_ptr<logger> logger::get_impl(const std::string& name)
 
 std::shared_ptr<level> logger::get_level()
 {
-    std::lock_guard<std::recursive_mutex> lg(guard_);
+    std::lock_guard<std::mutex> lg(guard_);
     return level_;
 }
 
 writer& logger::get_writer(const std::string& name)
 {
-    std::lock_guard<std::recursive_mutex> lg(guard_);
+    std::lock_guard<std::mutex> lg(guard_);
     auto found = std::find_if(writers_.begin(),
                               writers_.end(),
                               [&name](const std::unique_ptr<writer>& w) { return w->get_name() == name; });
@@ -198,7 +197,7 @@ writer& logger::get_writer(const std::string& name)
 std::vector<std::string> logger::get_writer_names()
 {
     std::vector<std::string> result;
-    std::lock_guard<std::recursive_mutex> lg(guard_);
+    std::lock_guard<std::mutex> lg(guard_);
     for (const auto& w : writers_)
         result.push_back(w->get_name());
     return result;
@@ -208,7 +207,6 @@ void logger::initialize()
 {
     time_util::start_now();
     static_data& sd(data());
-    std::lock_guard<std::recursive_mutex> lg(sd.loggers_guard_);
     // When loggers are created during configuration, this variable
     // must be true, so that we don't recurse the initialization.
     sd.is_initialized_ = true;
@@ -220,20 +218,20 @@ void logger::initialize()
 
 bool logger::permits(std::shared_ptr<level> lvl)
 {
-    std::lock_guard<std::recursive_mutex> lg(guard_);
+    std::lock_guard<std::mutex> lg(guard_);
     return *lvl >= *get_effective_level();
 }
 
 void logger::clear_writers()
 {
-    std::lock_guard<std::recursive_mutex> lg(guard_);
+    std::lock_guard<std::mutex> lg(guard_);
     writers_.clear();
 }
 
 void logger::remove_unused_loggers()
 {
     static_data& sd(data());
-    std::lock_guard<std::recursive_mutex> lg(sd.loggers_guard_);
+    std::lock_guard<std::mutex> lg(sd.loggers_guard_);
     std::set<std::string> to_erase;
     for (std::map<std::string, std::shared_ptr<logger>>::iterator itor = sd.all_loggers_.begin();
          itor != sd.all_loggers_.end();
@@ -262,13 +260,13 @@ void logger::remove_unused_loggers()
 
 void logger::remove_writer(const std::string& wrt)
 {
-    std::lock_guard<std::recursive_mutex> lg(guard_);
+    std::lock_guard<std::mutex> lg(guard_);
     writers_.remove_if([&wrt] (const std::unique_ptr<writer>& w) { return w->get_name() == wrt; });
 }
 
 void logger::reset()
 {
-    std::lock_guard<std::recursive_mutex> lg(guard_);
+    std::lock_guard<std::mutex> lg(guard_);
     writers_.clear();
     level_.reset();
     writes_to_ancestors_ = true;
@@ -276,13 +274,13 @@ void logger::reset()
 
 void logger::set_level(std::shared_ptr<level> lvl)
 {
-    std::lock_guard<std::recursive_mutex> lg(guard_);
+    std::lock_guard<std::mutex> lg(guard_);
     level_ = lvl;
 }
 
 void logger::set_writes_to_ancestors(bool val)
 {
-    std::lock_guard<std::recursive_mutex> lg(guard_);
+    std::lock_guard<std::mutex> lg(guard_);
     writes_to_ancestors_ = val;
 }
 
@@ -303,7 +301,7 @@ std::string logger::type_to_logger_name(const std::type_info& info)
 
 void logger::write(const event& evt)
 {
-    std::unique_lock<std::recursive_mutex> ul(guard_);
+    std::unique_lock<std::mutex> ul(guard_);
     for (auto& w : writers_)
         w->write(evt);
     ul.unlock();
@@ -313,7 +311,7 @@ void logger::write(const event& evt)
 
 bool logger::writes_to_ancestors()
 {
-    std::lock_guard<std::recursive_mutex> lg(guard_);
+    std::lock_guard<std::mutex> lg(guard_);
     return writes_to_ancestors_;
 }
 

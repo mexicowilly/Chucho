@@ -28,7 +28,6 @@
 #include <chucho/time_file_roller.hpp>
 #include <chucho/duplicate_message_filter.hpp>
 #include <chucho/syslog_writer.hpp>
-#include <chucho/noop_file_compressor.hpp>
 #include <chucho/json_formatter.hpp>
 #include <chucho/on_start_file_roll_trigger.hpp>
 #if defined(CHUCHO_HAVE_BZIP2)
