@@ -130,11 +130,6 @@ IF(CHUCHO_POSIX)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
                                     COMPILE_FLAGS "-Wno-unused-result")
     ENDIF()
-    # CHUCHO_POSIX_FILE_DEFS might already be set from the check for large
-    # file support flags in Configure.cmake
-    IF(CHUCHO_NO_FTS)
-        LIST(APPEND CHUCHO_POSIX_FILE_DEFS CHUCHO_NO_FTS)
-    ENDIF()
     IF(CHUCHO_DIRENT_NEEDS_NAME)
         LIST(APPEND CHUCHO_POSIX_FILE_DEFS CHUCHO_DIRENT_NEEDS_NAME)
     ENDIF()

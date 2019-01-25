@@ -221,33 +221,18 @@ IF(CHUCHO_POSIX)
         CHECK_CXX_SYMBOL_EXISTS(${SYM} time.h CHUCHO_HAVE_${CHUCHO_UPPER_${SYM}})
     ENDFOREACH()
 
-    # fts
-    CHECK_INCLUDE_FILE_CXX(fts.h CHUCHO_HAVE_FTS_H)
-    IF(CHUCHO_HAVE_FTS_H)
-        FOREACH(SYM fts_open fts_read fts_close)
-            CHECK_CXX_SYMBOL_EXISTS(${SYM} fts.h CHUCHO_HAVE_${SYM})
-            IF(NOT CHUCHO_HAVE_${SYM})
-                SET(CHUCHO_NO_FTS TRUE)
-                BREAK()
-            ENDIF()
-        ENDFOREACH()
-    ELSE()
-        SET(CHUCHO_NO_FTS TRUE)
-    ENDIF()
-
-    IF(CHUCHO_NO_FTS)
-        CHECK_INCLUDE_FILE_CXX(dirent.h CHUCHO_HAVE_DIRENT_H)
-        IF(NOT CHUCHO_HAVE_DIRENT_H)
-            MESSAGE(FATAL_ERROR "Either fts.h or dirent.h is required")
-        ENDIF()
-        # opendir/readdir_r/closedir
-        CHUCHO_REQUIRE_SYMBOLS(dirent.h opendir readdir_r closedir)
-        CHUCHO_REQUIRE_SYMBOLS(unistd.h pathconf)
-        # The variable setting is flipped here. So, 1 is success, meaing the
-        # program returned 0 for the exit code.
-        CHECK_CXX_SOURCE_RUNS("#include <dirent.h>\n#include <unistd.h>\nint main() { return sizeof(struct dirent) >= pathconf(\"/\", _PC_NAME_MAX); }"
-                              CHUCHO_DIRENT_NEEDS_NAME)
-    ENDIF()
+    # dirent
+	CHECK_INCLUDE_FILE_CXX(dirent.h CHUCHO_HAVE_DIRENT_H)
+	IF(NOT CHUCHO_HAVE_DIRENT_H)
+		MESSAGE(FATAL_ERROR "Either fts.h or dirent.h is required")
+	ENDIF()
+	# opendir/readdir_r/closedir
+	CHUCHO_REQUIRE_SYMBOLS(dirent.h opendir readdir_r closedir)
+	CHUCHO_REQUIRE_SYMBOLS(unistd.h pathconf)
+	# The variable setting is flipped here. So, 1 is success, meaing the
+	# program returned 0 for the exit code.
+	CHECK_CXX_SOURCE_RUNS("#include <dirent.h>\n#include <unistd.h>\nint main() { return sizeof(struct dirent) >= pathconf(\"/\", _PC_NAME_MAX); }"
+						  CHUCHO_DIRENT_NEEDS_NAME)
 
     # realpath
     CHUCHO_REQUIRE_SYMBOLS(stdlib.h realpath)
