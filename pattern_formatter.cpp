@@ -25,6 +25,7 @@
 #include <chucho/host.hpp>
 #include <chucho/time_util.hpp>
 #include <chucho/process.hpp>
+#include <chucho/regex.hpp>
 #include <limits>
 #include <sstream>
 #include <mutex>
@@ -32,8 +33,7 @@
 #include <cstdio>
 #include <iomanip>
 #include <algorithm>
-
-#include <iostream>
+#include <cassert>
 
 namespace
 {
@@ -134,6 +134,13 @@ std::unique_ptr<pattern_formatter::piece> pattern_formatter::create_piece(std::s
         break;
     case 'r':
         result.reset(new milliseconds_since_start_piece(params));
+        break;
+    case 'R':
+        arg = get_argument(pos, end);
+        if (arg.empty())
+            report_error("The pattern parameter %R requires three parameters enclosed in curly braces and separated by commas");
+        else
+            result.reset(new regex_replace_piece(arg, params));
         break;
     case 't':
         result.reset(new thread_piece(params));
@@ -534,6 +541,30 @@ pattern_formatter::diagnostic_context_piece::diagnostic_context_piece(const std:
 std::string pattern_formatter::diagnostic_context_piece::get_text_impl(const event& evt) const
 {
     return diagnostic_context::at(key_);
+}
+
+pattern_formatter::regex_replace_piece::regex_replace_piece(const std::string& args,
+                                                            const format_params& params)
+    : piece(params)
+{
+    regex::expression arg_re("^ *\"([^\"]+)\" *, *\"([^\"]+)\" *, *\"([^\"]*)\" *$");
+    regex::match mch;
+    if (regex::search(args, arg_re, mch))
+    {
+        assert(mch.size() == 4);
+        fmt_.reset(new pattern_formatter(args.substr(mch[1].begin(), mch[1].length())));
+        re_.reset(new regex::expression(args.substr(mch[2].begin(), mch[2].length())));
+        replacement_ = args.substr(mch[3].begin(), mch[3].length());
+    }
+    else
+    {
+        throw exception("Invalid replacement arguments: '" + args + "'");
+    }
+}
+
+std::string pattern_formatter::regex_replace_piece::get_text_impl(const event& evt) const
+{
+    return regex::replace(fmt_->format(evt), *re_, replacement_);
 }
 
 pattern_formatter::format_params::format_params()

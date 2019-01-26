@@ -36,6 +36,13 @@ class formatter;
 
 }
 
+namespace regex
+{
+
+struct expression;
+
+}
+
 /**
  * @class pattern_formatter pattern_formatter.hpp chucho/pattern_formatter.hpp 
  * A pattern_formatter accepts a pattern in its constructor that 
@@ -147,6 +154,17 @@ class formatter;
  *     <tr><td>r</td>
  *         <td>The number of milliseconds that have elapsed
  *         since the program started running.</td></tr>
+ *     <tr><td>R{&lt;spec&gt;}</td>
+ *         <td>Replace a regular expression. The arguments are
+ *         enclosed in curly braces, and each one is enclosed
+ *         in double quotation marks. Three arguments are required:
+ *          the pattern, the regular expression, and the
+ *         replacement. The pattern may include any formatting parameters.
+ *         For example, you may put '%%m' to perform replacement within
+ *         the message of the event. An example is '%%R{"%m", " ", ""}'
+ *         to remove any spaces from the event's message. The
+ *         regular expression of the second parameter follows the POSIX
+ *         extended regular expression syntax.</td></tr>
  *     <tr><td>t</td>
  *         <td>The thread from which the @ref event
  *         originated. This is the same value returned
@@ -388,6 +406,21 @@ private:
 
     private:
         std::string key_;
+    };
+
+    class CHUCHO_NO_EXPORT regex_replace_piece : public piece
+    {
+    public:
+        regex_replace_piece(const std::string& args,
+                            const format_params& params);
+
+    protected:
+        virtual std::string get_text_impl(const event& evt) const override;
+
+    private:
+        std::unique_ptr<pattern_formatter> fmt_;
+        std::unique_ptr<regex::expression> re_;
+        std::string replacement_;
     };
 
     CHUCHO_NO_EXPORT std::unique_ptr<piece> create_piece(std::string::const_iterator& pos,
