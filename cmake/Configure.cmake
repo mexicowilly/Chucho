@@ -575,8 +575,8 @@ IF(GTEST_PACKAGE AND EXISTS "${GTEST_PACKAGE}")
         URL_HASH SHA1=${CHUCHO_GTEST_SHA1})
 ELSE()
     SET(CHUCHO_GTEST_PACKAGE_ARGS
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG release-1.8.1)
+        URL https://github.com/google/googletest/archive/release-1.8.1.tar.gz
+        URL_HASH SHA1=152b849610d91a9dfa1401293f43230c2e0c33f8)
 ENDIF()
 ExternalProject_Add(gtest-external
                     ${CHUCHO_GTEST_PACKAGE_ARGS}
@@ -588,12 +588,16 @@ IF(MSVC)
                              COMMAND "${CMAKE_COMMAND}" -DFILE_NAME=<SOURCE_DIR>/googletest/cmake/internal_utils.cmake -P "${CMAKE_SOURCE_DIR}/cmake/UpdateGtestForMsvc.cmake")
 ENDIF()
 ADD_LIBRARY(gtest STATIC IMPORTED)
+STRING(TOLOWER ${CMAKE_BUILD_TYPE} CHUCHO_LOWER_BUILD_TYPE)
+IF(CHUCHO_LOWER_BUILD_TYPE STREQUAL debug)
+    SET(CHUCHO_GTEST_SUFFIX d)
+ENDIF()
 IF(CHUCHO_WINDOWS)
     SET_TARGET_PROPERTIES(gtest PROPERTIES
-                          IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/gtestd.lib")
+                          IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/gtest${CHUCHO_GTEST_SUFFIX}.lib")
 ELSE()
     SET_TARGET_PROPERTIES(gtest PROPERTIES
-                          IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/libgtestd.a")
+                          IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/libgtest${CHUCHO_GTEST_SUFFIX}.a")
 ENDIF()
 ADD_DEPENDENCIES(gtest gtest-external)
 SET_TARGET_PROPERTIES(gtest-external PROPERTIES
