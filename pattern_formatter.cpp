@@ -33,8 +33,7 @@
 #include <cstdio>
 #include <iomanip>
 #include <algorithm>
-
-#include <iostream>
+#include <cassert>
 
 namespace
 {
@@ -548,7 +547,7 @@ pattern_formatter::regex_replace_piece::regex_replace_piece(const std::string& a
                                                             const format_params& params)
     : piece(params)
 {
-    regex::expression arg_re("^ *\"([^\"]+)\" *, *\"([^\"]+)\" *, *\"([^\"]+)\" *$");
+    regex::expression arg_re("^ *\"([^\"]+)\" *, *\"([^\"]+)\" *, *\"([^\"]*)\" *$");
     regex::match mch;
     if (regex::search(args, arg_re, mch))
     {
@@ -556,6 +555,10 @@ pattern_formatter::regex_replace_piece::regex_replace_piece(const std::string& a
         fmt_.reset(new pattern_formatter(args.substr(mch[1].begin(), mch[1].length())));
         re_.reset(new regex::expression(args.substr(mch[2].begin(), mch[2].length())));
         replacement_ = args.substr(mch[3].begin(), mch[3].length());
+    }
+    else
+    {
+        throw exception("Invalid replacement arguments: '" + args + "'");
     }
 }
 

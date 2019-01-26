@@ -154,6 +154,17 @@ struct expression;
  *     <tr><td>r</td>
  *         <td>The number of milliseconds that have elapsed
  *         since the program started running.</td></tr>
+ *     <tr><td>R{&lt;spec&gt;}</td>
+ *         <td>Replace a regular expression. The arguments are
+ *         enclosed in curly braces, and each one is enclosed
+ *         in double quotation marks. Three arguments are required:
+ *          the pattern, the regular expression, and the
+ *         replacement. The pattern may include any formatting parameters.
+ *         For example, you may put '%%m' to perform replacement within
+ *         the message of the event. An example is '%%R{"%m", " ", ""}'
+ *         to remove any spaces from the event's message. The
+ *         regular expression of the second parameter follows the POSIX
+ *         extended regular expression syntax.</td></tr>
  *     <tr><td>t</td>
  *         <td>The thread from which the @ref event
  *         originated. This is the same value returned
