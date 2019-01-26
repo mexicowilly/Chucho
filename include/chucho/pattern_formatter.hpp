@@ -36,6 +36,13 @@ class formatter;
 
 }
 
+namespace regex
+{
+
+struct expression;
+
+}
+
 /**
  * @class pattern_formatter pattern_formatter.hpp chucho/pattern_formatter.hpp 
  * A pattern_formatter accepts a pattern in its constructor that 
@@ -388,6 +395,21 @@ private:
 
     private:
         std::string key_;
+    };
+
+    class CHUCHO_NO_EXPORT regex_replace_piece : public piece
+    {
+    public:
+        regex_replace_piece(const std::string& args,
+                            const format_params& params);
+
+    protected:
+        virtual std::string get_text_impl(const event& evt) const override;
+
+    private:
+        std::unique_ptr<pattern_formatter> fmt_;
+        std::unique_ptr<regex::expression> re_;
+        std::string replacement_;
     };
 
     CHUCHO_NO_EXPORT std::unique_ptr<piece> create_piece(std::string::const_iterator& pos,

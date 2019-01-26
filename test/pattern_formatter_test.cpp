@@ -259,3 +259,9 @@ TEST_F(pattern_formatter_test, diagnostic_context)
     chucho::diagnostic_context::at("name") = "funky";
     EXPECT_STREQ("funky", f->format(evt_).c_str());
 }
+
+TEST_F(pattern_formatter_test, regex_replace)
+{
+    auto f = std::make_unique<chucho::pattern_formatter>("%R{\"%m %M\", \"i|d\", \"\"}");
+    EXPECT_STREQ("h owy", f->format(evt_).c_str());
+}
