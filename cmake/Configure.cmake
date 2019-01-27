@@ -226,13 +226,8 @@ IF(CHUCHO_POSIX)
 	IF(NOT CHUCHO_HAVE_DIRENT_H)
 		MESSAGE(FATAL_ERROR "Either fts.h or dirent.h is required")
 	ENDIF()
-	# opendir/readdir_r/closedir
-	CHUCHO_REQUIRE_SYMBOLS(dirent.h opendir readdir_r closedir)
-	CHUCHO_REQUIRE_SYMBOLS(unistd.h pathconf)
-	# The variable setting is flipped here. So, 1 is success, meaing the
-	# program returned 0 for the exit code.
-	CHECK_CXX_SOURCE_RUNS("#include <dirent.h>\n#include <unistd.h>\nint main() { return sizeof(struct dirent) >= pathconf(\"/\", _PC_NAME_MAX); }"
-						  CHUCHO_DIRENT_NEEDS_NAME)
+	# opendir/readdir/closedir
+	CHUCHO_REQUIRE_SYMBOLS(dirent.h opendir readdir closedir)
 
     # realpath
     CHUCHO_REQUIRE_SYMBOLS(stdlib.h realpath)

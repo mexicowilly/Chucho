@@ -130,9 +130,6 @@ IF(CHUCHO_POSIX)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
                                     COMPILE_FLAGS "-Wno-unused-result")
     ENDIF()
-    IF(CHUCHO_DIRENT_NEEDS_NAME)
-        LIST(APPEND CHUCHO_POSIX_FILE_DEFS CHUCHO_DIRENT_NEEDS_NAME)
-    ENDIF()
     IF(CHUCHO_POSIX_FILE_DEFS)
         SET_SOURCE_FILES_PROPERTIES(platform/posix/file_posix.cpp PROPERTIES
                                     COMPILE_DEFINITIONS "${CHUCHO_POSIX_FILE_DEFS}")

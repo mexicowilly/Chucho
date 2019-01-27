@@ -68,8 +68,6 @@ struct directory_iterator_impl
     ~directory_iterator_impl();
 
     DIR* dir_;
-    std::unique_ptr<std::uint8_t[]> dirent_bytes_;
-    struct dirent* entry_;
     std::string parent_;
 };
 
@@ -244,13 +242,15 @@ directory_iterator& directory_iterator::operator++ ()
     {
         while (true)
         {
-            struct dirent* result;
-            if (readdir_r(pimpl_->dir_, pimpl_->entry_, &result) != 0)
-                throw chucho::file_exception("Could not read directory " + pimpl_->parent_ + ": " + std::strerror(errno));
+            errno = 0;
+            struct dirent* result = readdir(pimpl_->dir_);
             if (result == nullptr)
             {
+                auto err = errno;
                 pimpl_.reset();
                 cur_.clear();
+                if (err != 0)
+                    throw chucho::file_exception("Could not read directory " + pimpl_->parent_ + ": " + std::strerror(err));
                 break;
             }
             else
@@ -261,7 +261,7 @@ directory_iterator& directory_iterator::operator++ ()
                     break;
                 }
             }
-        };
+        }
     }
     return *this;
 }
@@ -272,14 +272,8 @@ directory_iterator_impl::directory_iterator_impl(const std::string& dir)
 {
     if (dir_ == nullptr)
         throw chucho::file_exception("Could not open directory " + dir + ": " + std::strerror(errno));
-    if (parent_[parent_.length() - 1] != '/')
+    if (parent_.back() != '/')
         parent_ += '/';
-#if defined(CHUCHO_DIRENT_NEEDS_NAME)
-    dirent_bytes_ = std::make_unique<std::uint8_t[]>(sizeof(struct dirent) + pathconf(dir.c_str(), _PC_NAME_MAX));
-#else
-    dirent_bytes_ = std::make_unique<std::uint8_t[]>(sizeof(struct dirent));
-#endif
-    entry_ = reinterpret_cast<struct dirent*>(dirent_bytes_.get());
 }
 
 directory_iterator_impl::~directory_iterator_impl()
