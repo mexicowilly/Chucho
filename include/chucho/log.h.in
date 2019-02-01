@@ -62,6 +62,16 @@ extern "C"
     chucho_log_mark((lvl), (lgr), (fl), (ln), (fnc), (mrk), __VA_ARGS__)
 #endif
 
+#define CHUCHO_C_EVERY_N_INTERNAL(n, ...) \
+    do \
+    { \
+        static size_t __chucho_every_n_counter = 0; \
+        if (++__chucho_every_n_counter > (n)) \
+            __chucho_every_n_counter -= (n); \
+        if (__chucho_every_n_counter == 1) \
+            __VA_ARGS__ ; \
+    } while (false)
+
 #endif
 
 /**
@@ -380,6 +390,58 @@ CHUCHO_EXPORT void chucho_log_mark_logger(chucho_level_t lvl,
  *        format text first
  */
 #define CHUCHO_C_FATAL_M_L(lgr, mrk, ...) chucho_log_mark_logger(CHUCHO_FATAL, (lgr), __FILE__, __LINE__, CHUCHO_FUNCTION_NAME, (mrk), __VA_ARGS__)
+/**
+ * @def CHUCHO_C_EVERY_N(lvl, n, lg, ...)
+ * Log an event every N times. The level must be one of TRACE, DEBUG,
+ * INFO, WARN, ERROR or FATAL. This will behave exactly as the corresponding
+ * macro, like @ref CHUCHO_C_INFO, does with the level replaced.
+ *
+ * @param lvl the level, one of TRACE, DEBUG, INFO, WARN ERROR or FATAL
+ * @param n the count after which the event should be logged
+ * @param lg the logger, which can either be a char* or a chucho_logger_t*
+ * @param ... printf-style parameters that must include the
+ *        format text first
+ */
+#define CHUCHO_C_EVERY_N(lvl, n, lg, ...) CHUCHO_C_EVERY_N_INTERNAL((n), CHUCHO_C_ ## lvl(lg, __VA_ARGS__))
+/**
+ * @def CHUCHO_C_EVERY_N_L(lvl, n, lg, ...)
+ * Log an event every N times. The level must be one of TRACE, DEBUG,
+ * INFO, WARN, ERROR or FATAL. This will behave exactly as the corresponding
+ * macro, like @ref CHUCHO_C_INFO, does with the level replaced.
+ *
+ * @param lvl the level, one of TRACE, DEBUG, INFO, WARN ERROR or FATAL
+ * @param n the count after which the event should be logged
+ * @param lg the logger, which must be a chucho_logger_t*
+ * @param ... printf-style parameters that must include the
+ *        format text first
+ */
+#define CHUCHO_C_EVERY_N_L(lvl, n, lg, ...) CHUCHO_C_EVERY_N_INTERNAL((n), CHUCHO_C_ ## lvl ## _L(lg, __VA_ARGS__))
+/**
+ * @def CHUCHO_C_EVERY_N_M(lvl, n, lg, ...)
+ * Log an event every N times. The level must be one of TRACE, DEBUG,
+ * INFO, WARN, ERROR or FATAL. This will behave exactly as the corresponding
+ * macro, like @ref CHUCHO_C_INFO, does with the level replaced.
+ *
+ * @param lvl the level, one of TRACE, DEBUG, INFO, WARN ERROR or FATAL
+ * @param n the count after which the event should be logged
+ * @param lg the logger, which can either be a char* or a chucho_logger_t*
+ * @param ... printf-style parameters that must include the
+ *        marker text first, then the format text, then the format parameters if any
+ */
+#define CHUCHO_C_EVERY_N_M(lvl, n, lg, ...) CHUCHO_C_EVERY_N_INTERNAL((n), CHUCHO_C_ ## lvl ## _M(lg, __VA_ARGS__))
+/**
+ * @def CHUCHO_C_EVERY_N_M_L(lvl, n, lg, ...)
+ * Log an event every N times. The level must be one of TRACE, DEBUG,
+ * INFO, WARN, ERROR or FATAL. This will behave exactly as the corresponding
+ * macro, like @ref CHUCHO_C_INFO, does with the level replaced.
+ *
+ * @param lvl the level, one of TRACE, DEBUG, INFO, WARN ERROR or FATAL
+ * @param n the count after which the event should be logged
+ * @param lg the logger, which must be a chucho_logger_t*
+ * @param ... printf-style parameters that must include the
+ *        marker text first, then the format text, then the format parameters if any
+ */
+#define CHUCHO_C_EVERY_N_M_L(lvl, n, lg, ...) CHUCHO_C_EVERY_N_INTERNAL((n), CHUCHO_C_ ## lvl ## _M_L(lg, __VA_ARGS__))
 
 #if defined(__cplusplus)
 }
