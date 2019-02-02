@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2018 Will Mason
+# Copyright 2013-2019 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,19 +14,14 @@
 #    limitations under the License.
 #
 
-if [ "`uname`" != "SunOS" ] ; then
-    echo "This is only know to work on Solaris. I tried it once on Linux and it got freaky and spun forever."
-    exit
-fi
-
 if [ "$#" -ne 2 ] ; then
     echo "You must provide the old year as arg 1 and the new year as arg 2"
     exit
 fi
 
-for FILE in `find . -type d \( -name build -o -name util \) -prune -o -type f -exec egrep -s '^.+Copyright.+2013-.*$' {} \; -print | sort`
+for FILE in `find . \( -type d \( -name build -o -name util -o -name cmake-build\* \) -prune \) -o \( -type f -exec egrep -q '^.+Copyright.+2013-.*$' {} \; -print \) | sort`
 do
-    nawk -f util/change-copyright.awk old=$1 new=$2 ${FILE} > ${FILE}.copyright.change
+    awk -f util/change-copyright.awk old=$1 new=$2 ${FILE} > ${FILE}.copyright.change
     mv -f ${FILE}.copyright.change ${FILE}
     echo "Changed ${FILE}"
 done
