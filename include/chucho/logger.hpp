@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 Will Mason
+ * Copyright 2013-2019 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -225,6 +225,8 @@ public:
     bool writes_to_ancestors();
 
 private:
+    friend class logger_factory;
+
     static CHUCHO_NO_EXPORT std::shared_ptr<logger> get_impl(const std::string& name);
     static CHUCHO_NO_EXPORT void initialize();
 
@@ -234,7 +236,7 @@ private:
     std::string name_;
     std::shared_ptr<level> level_;
     std::list<std::unique_ptr<writer>> writers_;
-    std::recursive_mutex guard_;
+    std::mutex guard_;
     bool writes_to_ancestors_;
 };
 

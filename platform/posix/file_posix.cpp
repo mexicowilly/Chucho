@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 Will Mason
+ * Copyright 2013-2019 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,13 +28,8 @@
 // Needed for realpath, which is not in <cstdlib>
 #include <stdlib.h>
 #include <dirent.h>
-#if defined(CHUCHO_NO_FTS)
 #include <cstdint>
-#else
-#include <fts.h>
-#endif
 
-#if defined(CHUCHO_NO_FTS)
 namespace
 {
 
@@ -58,7 +53,6 @@ void remove_all_impl(const std::string& name)
 }
 
 }
-#endif
 
 namespace chucho
 {
@@ -74,8 +68,6 @@ struct directory_iterator_impl
     ~directory_iterator_impl();
 
     DIR* dir_;
-    std::unique_ptr<std::uint8_t[]> dirent_bytes_;
-    struct dirent* entry_;
     std::string parent_;
 };
 
@@ -205,35 +197,7 @@ void remove_all(const std::string& name)
         }
         return;
     }
-#if defined(CHUCHO_NO_FTS)
     remove_all_impl(name);
-#else
-    const char* names[] = { name.c_str(), nullptr };
-    FTS* fts = fts_open(const_cast<char* const*>(names), FTS_NOSTAT, nullptr);
-    if (fts == nullptr)
-        throw file_exception("Could not open directory hierarchy of \"" + name + "\" for reading");
-    struct sentry
-    {
-        sentry(FTS* f) { fts_ = f; }
-        ~sentry() { fts_close(fts_); }
-        FTS* fts_;
-    } s(fts);
-    FTSENT* ent = fts_read(fts);
-    std::array<char, PATH_MAX + 1> path_buf;
-    while (ent != nullptr)
-    {
-        if (ent->fts_info & (FTS_DP | FTS_F | FTS_SL))
-        {
-            if (std::remove(ent->fts_accpath) != 0)
-            {
-                int this_err = errno;
-                realpath(ent->fts_accpath, path_buf.data());
-                throw file_exception(std::string("Could not remove \"") + path_buf.data() + "\": " + std::strerror(this_err));
-            }
-        }
-        ent = fts_read(fts);
-    }
-#endif
 }
 
 std::uintmax_t size(const std::string& name)
@@ -278,13 +242,15 @@ directory_iterator& directory_iterator::operator++ ()
     {
         while (true)
         {
-            struct dirent* result;
-            if (readdir_r(pimpl_->dir_, pimpl_->entry_, &result) != 0)
-                throw chucho::file_exception("Could not read directory " + pimpl_->parent_ + ": " + std::strerror(errno));
+            errno = 0;
+            struct dirent* result = readdir(pimpl_->dir_);
             if (result == nullptr)
             {
+                auto err = errno;
                 pimpl_.reset();
                 cur_.clear();
+                if (err != 0)
+                    throw chucho::file_exception("Could not read directory " + pimpl_->parent_ + ": " + std::strerror(err));
                 break;
             }
             else
@@ -295,7 +261,7 @@ directory_iterator& directory_iterator::operator++ ()
                     break;
                 }
             }
-        };
+        }
     }
     return *this;
 }
@@ -306,14 +272,8 @@ directory_iterator_impl::directory_iterator_impl(const std::string& dir)
 {
     if (dir_ == nullptr)
         throw chucho::file_exception("Could not open directory " + dir + ": " + std::strerror(errno));
-    if (parent_[parent_.length() - 1] != '/')
+    if (parent_.back() != '/')
         parent_ += '/';
-#if defined(CHUCHO_DIRENT_NEEDS_NAME)
-    dirent_bytes_ = std::make_unique<std::uint8_t[]>(sizeof(struct dirent) + pathconf(dir.c_str(), _PC_NAME_MAX));
-#else
-    dirent_bytes_ = std::make_unique<std::uint8_t[]>(sizeof(struct dirent));
-#endif
-    entry_ = reinterpret_cast<struct dirent*>(dirent_bytes_.get());
 }
 
 directory_iterator_impl::~directory_iterator_impl()

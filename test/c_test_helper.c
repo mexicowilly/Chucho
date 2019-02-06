@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 Will Mason
+ * Copyright 2013-2019 Will Mason
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ int main(int argc, char* argv[])
 {
     char fallback[1024];
     chucho_logger_t* lgr;
+    int i;
 
     snprintf(fallback, sizeof(fallback), fb, argv[1]);
     chucho_cnf_set_fallback(fallback);
@@ -76,6 +77,18 @@ int main(int argc, char* argv[])
     CHUCHO_C_FATAL_M("c", " mark", "%i", 34);
     CHUCHO_C_FATAL_M(lgr, " mark", "%i", 35);
     CHUCHO_C_FATAL_M_L(lgr, " mark", "%i", 36);
+    for (i = 0; i < 12000; i++)
+        CHUCHO_C_EVERY_N(INFO, 12000, "c", "every n %i", i);
+    for (i = 12000; i < 24000; i++)
+        CHUCHO_C_EVERY_N(INFO, 6000, lgr, "every n %i", i);
+    for (i = 24000; i < 36000; i++)
+        CHUCHO_C_EVERY_N_L(INFO, 4000, lgr, "every n %i", i);
+    for (i = 36000; i < 48000; i++)
+        CHUCHO_C_EVERY_N_M(INFO, 3000, "c", " mark", "every n %i", i);
+    for (i = 48000; i < 60000; i++)
+        CHUCHO_C_EVERY_N_M(INFO, 2000, lgr, " mark", "every n %i", i);
+    for (i = 60000; i < 72000; i++)
+        CHUCHO_C_EVERY_N_M_L(INFO, 1000, lgr, " mark", "every n %i", i);
 #else
     CHUCHO_C_TRACE("c", "%i", 1);
     CHUCHO_C_TRACE_L(lgr, "%i", 2);
@@ -101,6 +114,14 @@ int main(int argc, char* argv[])
     CHUCHO_C_FATAL_L(lgr, "%i", 22);
     CHUCHO_C_FATAL_M("c", " mark", "%i", 23);
     CHUCHO_C_FATAL_M_L(lgr, " mark", "%i", 24);
+    for (i = 0; i < 12000; i++)
+        CHUCHO_C_EVERY_N(INFO, 12000, "c", "every n %i", i);
+    for (i = 24000; i < 36000; i++)
+        CHUCHO_C_EVERY_N_L(INFO, 4000, lgr, "every n %i", i);
+    for (i = 36000; i < 48000; i++)
+        CHUCHO_C_EVERY_N_M(INFO, 3000, "c", " mark", "every n %i", i);
+    for (i = 60000; i < 72000; i++)
+        CHUCHO_C_EVERY_N_M_L(INFO, 1000, lgr, " mark", "every n %i", i);
 #endif
     chucho_release_logger(lgr);
 #if !defined(__SUNPRO_C)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 Will Mason
+ * Copyright 2013-2019 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -258,4 +258,10 @@ TEST_F(pattern_formatter_test, diagnostic_context)
     f = std::make_unique<chucho::pattern_formatter>("%C{name}");
     chucho::diagnostic_context::at("name") = "funky";
     EXPECT_STREQ("funky", f->format(evt_).c_str());
+}
+
+TEST_F(pattern_formatter_test, regex_replace)
+{
+    auto f = std::make_unique<chucho::pattern_formatter>("%R{\"%m %M\", \"i|d\", \"\"}");
+    EXPECT_STREQ("h owy", f->format(evt_).c_str());
 }
