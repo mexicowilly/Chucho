@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 Will Mason
+ * Copyright 2013-2019 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -91,4 +91,20 @@ TEST(regex, search_with_match)
     EXPECT_EQ(3, mch[1].length());
     EXPECT_EQ(11, mch[2].begin());
     EXPECT_EQ(5, mch[2].length());
+}
+
+TEST(regex, more_search_with_match)
+{
+    chucho::regex::expression re("^ *\"([^\"]+)\" *, *\"([^\"]+)\" *, *\"([^\"]+)\" *$");
+    chucho::regex::match mch;
+    ASSERT_TRUE(chucho::regex::search("  \"one\" , \"two\",\"three\"", re, mch));
+    ASSERT_EQ(4, mch.size());
+    EXPECT_EQ(0, mch[0].begin());
+    EXPECT_EQ(23, mch[0].length());
+    EXPECT_EQ(3, mch[1].begin());
+    EXPECT_EQ(3, mch[1].length());
+    EXPECT_EQ(11, mch[2].begin());
+    EXPECT_EQ(3, mch[2].length());
+    EXPECT_EQ(17, mch[3].begin());
+    EXPECT_EQ(5, mch[3].length());
 }

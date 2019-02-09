@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2018 Will Mason
+# Copyright 2013-2019 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -68,8 +68,6 @@ IF(NOT CMAKE_CXX_COMPILER_ID STREQUAL SunPro)
     SET(CMAKE_CXX_STANDARD 14)
     SET(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 ENDIF()
-SET(CMAKE_C_STANDARD 11)
-SET(CMAKE_C_STANDARD_REQUIRED TRUE)
 
 # Compiler flags
 IF(CMAKE_CXX_COMPILER_ID MATCHES Clang)
@@ -92,12 +90,13 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES Clang)
         ENDIF()
     ENDIF()
     IF(CMAKE_GENERATOR STREQUAL Xcode)
-        SET(CMAKE_EXE_LINKER_FLAGS "-std=c++11 ${CHUCHO_LIBCXX_FLAG}")
+        SET(CMAKE_EXE_LINKER_FLAGS "-std=c++14 ${CHUCHO_LIBCXX_FLAG}")
     ENDIF()
     CHECK_CXX_COMPILER_FLAG(-Wno-potentially-evaluated-expression CHUCHO_HAVE_NO_POT_EVAL_EXP)
     IF(CHUCHO_HAVE_NO_POT_EVAL_EXP)
         SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-potentially-evaluated-expression")
     ENDIF()
+    SET(CHUCHO_REQUIRED_FLAGS -std=c++14)
 ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
     IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.7)
         MESSAGE(FATAL_ERROR "g++ version 4.7 or later is required")
@@ -109,6 +108,7 @@ ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
             SET(CHUCHO_SO_FLAGS "-fvisibility=hidden")
         ENDIF()
     ENDIF()
+    SET(CHUCHO_REQUIRED_FLAGS -std=c++14)
 ELSEIF(MSVC)
     IF(MSVC_VERSION LESS 1700)
         MESSAGE(FATAL_ERROR "Microsoft compiler version 17 or later is required (the compiler that ships with Visual Studio 2012)")
@@ -221,33 +221,13 @@ IF(CHUCHO_POSIX)
         CHECK_CXX_SYMBOL_EXISTS(${SYM} time.h CHUCHO_HAVE_${CHUCHO_UPPER_${SYM}})
     ENDFOREACH()
 
-    # fts
-    CHECK_INCLUDE_FILE_CXX(fts.h CHUCHO_HAVE_FTS_H)
-    IF(CHUCHO_HAVE_FTS_H)
-        FOREACH(SYM fts_open fts_read fts_close)
-            CHECK_CXX_SYMBOL_EXISTS(${SYM} fts.h CHUCHO_HAVE_${SYM})
-            IF(NOT CHUCHO_HAVE_${SYM})
-                SET(CHUCHO_NO_FTS TRUE)
-                BREAK()
-            ENDIF()
-        ENDFOREACH()
-    ELSE()
-        SET(CHUCHO_NO_FTS TRUE)
-    ENDIF()
-
-    IF(CHUCHO_NO_FTS)
-        CHECK_INCLUDE_FILE_CXX(dirent.h CHUCHO_HAVE_DIRENT_H)
-        IF(NOT CHUCHO_HAVE_DIRENT_H)
-            MESSAGE(FATAL_ERROR "Either fts.h or dirent.h is required")
-        ENDIF()
-        # opendir/readdir_r/closedir
-        CHUCHO_REQUIRE_SYMBOLS(dirent.h opendir readdir_r closedir)
-        CHUCHO_REQUIRE_SYMBOLS(unistd.h pathconf)
-        # The variable setting is flipped here. So, 1 is success, meaing the
-        # program returned 0 for the exit code.
-        CHECK_CXX_SOURCE_RUNS("#include <dirent.h>\n#include <unistd.h>\nint main() { return sizeof(struct dirent) >= pathconf(\"/\", _PC_NAME_MAX); }"
-                              CHUCHO_DIRENT_NEEDS_NAME)
-    ENDIF()
+    # dirent
+	CHECK_INCLUDE_FILE_CXX(dirent.h CHUCHO_HAVE_DIRENT_H)
+	IF(NOT CHUCHO_HAVE_DIRENT_H)
+		MESSAGE(FATAL_ERROR "Either fts.h or dirent.h is required")
+	ENDIF()
+	# opendir/readdir/closedir
+	CHUCHO_REQUIRE_SYMBOLS(dirent.h opendir readdir closedir)
 
     # realpath
     CHUCHO_REQUIRE_SYMBOLS(stdlib.h realpath)
@@ -405,6 +385,8 @@ ENDIF()
 # CHECK_CXX_SYMBOL_EXISTS does not work for the following
 #
 
+SET(CMAKE_REQUIRED_FLAGS ${CHUCHO_REQUIRED_FLAGS})
+
 # std::put_time
 # We have to check whether it exists and whether it is buggy. put_time
 # on VS2012 is broken when it tries to format time zones. It just crashes.
@@ -496,6 +478,8 @@ ELSE()
     CHUCHO_REQUIRE_SYMBOLS(regex.h regcomp regerror regexec regfree REG_EXTENDED)
     MESSAGE(STATUS "Using regular expressions - POSIX")
 ENDIF()
+
+UNSET(CMAKE_REQUIRED_FLAGS)
 
 # assert
 CHUCHO_REQUIRE_SYMBOLS(assert.h assert)
@@ -591,11 +575,11 @@ IF(GTEST_PACKAGE AND EXISTS "${GTEST_PACKAGE}")
 ELSE()
     SET(CHUCHO_GTEST_PACKAGE_ARGS
         GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG release-1.8.0)
+        GIT_TAG release-1.8.1)
 ENDIF()
 ExternalProject_Add(gtest-external
                     ${CHUCHO_GTEST_PACKAGE_ARGS}
-                    CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} ${CHUCHO_ADDL_GTEST_CXX_FLAGS}" -DBUILD_GTEST=ON -DBUILD_GMOCK=OFF "-DCMAKE_INSTALL_PREFIX=${CHUCHO_EXTERNAL_PREFIX}" ${CHUCHO_GTEST_CMAKE_FLAGS}
+                    CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} ${CHUCHO_ADDL_GTEST_CXX_FLAGS}" -DBUILD_GMOCK=OFF "-DCMAKE_INSTALL_PREFIX=${CHUCHO_EXTERNAL_PREFIX}" ${CHUCHO_GTEST_CMAKE_FLAGS}
                     CMAKE_GENERATOR "${CHUCHO_GTEST_GENERATOR}")
 IF(MSVC)
     ExternalProject_Add_Step(gtest-external patch-for-msvc
@@ -603,12 +587,16 @@ IF(MSVC)
                              COMMAND "${CMAKE_COMMAND}" -DFILE_NAME=<SOURCE_DIR>/googletest/cmake/internal_utils.cmake -P "${CMAKE_SOURCE_DIR}/cmake/UpdateGtestForMsvc.cmake")
 ENDIF()
 ADD_LIBRARY(gtest STATIC IMPORTED)
+STRING(TOLOWER ${CMAKE_BUILD_TYPE} CHUCHO_LOWER_BUILD_TYPE)
+IF(CHUCHO_LOWER_BUILD_TYPE STREQUAL debug)
+    SET(CHUCHO_GTEST_SUFFIX d)
+ENDIF()
 IF(CHUCHO_WINDOWS)
     SET_TARGET_PROPERTIES(gtest PROPERTIES
-                          IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/gtest.lib")
+                          IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/gtest${CHUCHO_GTEST_SUFFIX}.lib")
 ELSE()
     SET_TARGET_PROPERTIES(gtest PROPERTIES
-                          IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/libgtest.a")
+                          IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/libgtest${CHUCHO_GTEST_SUFFIX}.a")
 ENDIF()
 ADD_DEPENDENCIES(gtest gtest-external)
 SET_TARGET_PROPERTIES(gtest-external PROPERTIES

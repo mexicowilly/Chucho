@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 Will Mason
+ * Copyright 2013-2019 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@ namespace chucho
 
 writer::writer(const std::string& name, std::unique_ptr<formatter>&& fmt)
     : formatter_(std::move(fmt)),
-      guard_(std::make_unique<std::recursive_mutex>()),
-      i_am_writing_(false),
       name_(name)
 {
     if (!formatter_)
@@ -38,13 +36,13 @@ writer::~writer()
 
 void writer::add_filter(std::unique_ptr<filter>&& flt)
 {
-    std::lock_guard<std::recursive_mutex> lg(*guard_);
+    std::lock_guard<std::mutex> lg(guard_);
     filters_.push_back(std::move(flt));
 }
 
 void writer::clear_filters()
 {
-    std::lock_guard<std::recursive_mutex> lg(*guard_);
+    std::lock_guard<std::mutex> lg(guard_);
     filters_.clear();
 }
 
@@ -54,7 +52,7 @@ void writer::flush()
 
 filter& writer::get_filter(const std::string& name)
 {
-    std::lock_guard<std::recursive_mutex> lg(*guard_);
+    std::lock_guard<std::mutex> lg(guard_);
     auto found = std::find_if(filters_.begin(),
                               filters_.end(),
                               [&name] (const std::unique_ptr<filter>& f) { return f->get_name() == name; });
@@ -66,12 +64,13 @@ filter& writer::get_filter(const std::string& name)
 std::vector<std::string> writer::get_filter_names()
 {
     std::vector<std::string> result;
-    std::lock_guard<std::recursive_mutex> lg(*guard_);
+    std::lock_guard<std::mutex> lg(guard_);
     for (const auto& f : filters_)
         result.push_back(f->get_name());
     return result;
 }
 
+// Already locked
 bool writer::permits(const event& evt)
 {
     for (const auto& f : filters_)
@@ -87,32 +86,21 @@ bool writer::permits(const event& evt)
 
 void writer::remove_filter(const std::string& name)
 {
-    std::lock_guard<std::recursive_mutex> lg(*guard_);
+    std::lock_guard<std::mutex> lg(guard_);
     filters_.remove_if([&name] (const std::unique_ptr<filter>& f) { return f->get_name() == name; });
 }
 
 void writer::write(const event& evt)
 {
-    std::lock_guard<std::recursive_mutex> lg(*guard_);
-    // Prevent writing more than once in same thread
-    if (!i_am_writing_)
+    std::lock_guard<std::mutex> lg(guard_);
+    try
     {
-        i_am_writing_ = true;
-        struct sentry
-        {
-            sentry(bool& i_am_writing) : i_am_writing_(i_am_writing) { }
-            ~sentry() { i_am_writing_ = false; }
-            bool& i_am_writing_;
-        } s(i_am_writing_);
-        try
-        {
-            if (permits(evt))
-                write_impl(evt);
-        }
-        catch (std::exception& e)
-        {
-            report_error("Error writing event: " + exception::nested_whats(e));
-        }
+        if (permits(evt))
+            write_impl(evt);
+    }
+    catch (std::exception& e)
+    {
+        report_error("Error writing event: " + exception::nested_whats(e));
     }
 }
 

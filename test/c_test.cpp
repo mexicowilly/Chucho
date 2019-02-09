@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 Will Mason
+ * Copyright 2013-2019 Will Mason
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ TEST(c, simple)
     lines.pop_back();
 #if defined(CHUCHO_HAVE_C_GENERIC)
     std::cout << "Expecting tests using _Generic" << std::endl;
-    ASSERT_EQ(36, lines.size());
+    ASSERT_EQ(64, lines.size());
     EXPECT_STREQ("TRACE c 1", lines[0].c_str());
     EXPECT_STREQ("TRACE c_by_logger 2", lines[1].c_str());
     EXPECT_STREQ("TRACE c_by_logger 3", lines[2].c_str());
@@ -78,9 +78,43 @@ TEST(c, simple)
     EXPECT_STREQ("FATAL mark c 34", lines[33].c_str());
     EXPECT_STREQ("FATAL mark c_by_logger 35", lines[34].c_str());
     EXPECT_STREQ("FATAL mark c_by_logger 36", lines[35].c_str());
+
+    EXPECT_STREQ("INFO c every n 0", lines[36].c_str());
+
+    EXPECT_STREQ("INFO c_by_logger every n 12000", lines[37].c_str());
+    EXPECT_STREQ("INFO c_by_logger every n 18000", lines[38].c_str());
+
+    EXPECT_STREQ("INFO c_by_logger every n 24000", lines[39].c_str());
+    EXPECT_STREQ("INFO c_by_logger every n 28000", lines[40].c_str());
+    EXPECT_STREQ("INFO c_by_logger every n 32000", lines[41].c_str());
+
+    EXPECT_STREQ("INFO mark c every n 36000", lines[42].c_str());
+    EXPECT_STREQ("INFO mark c every n 39000", lines[43].c_str());
+    EXPECT_STREQ("INFO mark c every n 42000", lines[44].c_str());
+    EXPECT_STREQ("INFO mark c every n 45000", lines[45].c_str());
+
+    EXPECT_STREQ("INFO mark c_by_logger every n 48000", lines[46].c_str());
+    EXPECT_STREQ("INFO mark c_by_logger every n 50000", lines[47].c_str());
+    EXPECT_STREQ("INFO mark c_by_logger every n 52000", lines[48].c_str());
+    EXPECT_STREQ("INFO mark c_by_logger every n 54000", lines[49].c_str());
+    EXPECT_STREQ("INFO mark c_by_logger every n 56000", lines[50].c_str());
+    EXPECT_STREQ("INFO mark c_by_logger every n 58000", lines[51].c_str());
+
+    EXPECT_STREQ("INFO mark c_by_logger every n 60000", lines[52].c_str());
+    EXPECT_STREQ("INFO mark c_by_logger every n 61000", lines[53].c_str());
+    EXPECT_STREQ("INFO mark c_by_logger every n 62000", lines[54].c_str());
+    EXPECT_STREQ("INFO mark c_by_logger every n 63000", lines[55].c_str());
+    EXPECT_STREQ("INFO mark c_by_logger every n 64000", lines[56].c_str());
+    EXPECT_STREQ("INFO mark c_by_logger every n 65000", lines[57].c_str());
+    EXPECT_STREQ("INFO mark c_by_logger every n 66000", lines[58].c_str());
+    EXPECT_STREQ("INFO mark c_by_logger every n 67000", lines[59].c_str());
+    EXPECT_STREQ("INFO mark c_by_logger every n 68000", lines[60].c_str());
+    EXPECT_STREQ("INFO mark c_by_logger every n 69000", lines[61].c_str());
+    EXPECT_STREQ("INFO mark c_by_logger every n 70000", lines[62].c_str());
+    EXPECT_STREQ("INFO mark c_by_logger every n 71000", lines[63].c_str());
 #else
     std::cout << "Expecting tests without _Generic" << std::endl;
-    ASSERT_EQ(24, lines.size());
+    ASSERT_EQ(44, lines.size());
     EXPECT_STREQ("TRACE c 1", lines[0].c_str());
     EXPECT_STREQ("TRACE c_by_logger 2", lines[1].c_str());
     EXPECT_STREQ("TRACE mark c 3", lines[2].c_str());
@@ -105,6 +139,8 @@ TEST(c, simple)
     EXPECT_STREQ("FATAL c_by_logger 22", lines[21].c_str());
     EXPECT_STREQ("FATAL mark c 23", lines[22].c_str());
     EXPECT_STREQ("FATAL mark c_by_logger 24", lines[23].c_str());
+
+    EXPECT_STREQ("INFO c every n 0", lines[24].c_str());
 #endif
     chucho::file::remove("c-test.log");
 #endif

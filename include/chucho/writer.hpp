@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 Will Mason
+ * Copyright 2013-2019 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -151,8 +151,7 @@ private:
     CHUCHO_NO_EXPORT bool permits(const event& evt);
 
     std::list<std::unique_ptr<filter>> filters_;
-    std::unique_ptr<std::recursive_mutex> guard_;
-    bool i_am_writing_;
+    std::mutex guard_;
     std::string name_;
 };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 Will Mason
+ * Copyright 2013-2019 Will Mason
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,6 +16,11 @@
 
 #if !defined(CHUCHO_CACHE_PROVIDER_HPP__)
 #define CHUCHO_CACHE_PROVIDER_HPP__
+
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
 
 #include <chucho/event_cache_stats.hpp>
 #include <memory>
@@ -79,5 +84,9 @@ protected:
 };
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

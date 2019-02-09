@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 Will Mason
+ * Copyright 2013-2019 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ std::unique_ptr<configurable> logger_factory::create_configurable(std::unique_pt
     auto nm = *lm->get_name();
     if (nm == "<root>")
         nm.clear();
-    auto lgr = logger::get(nm);
+    auto lgr = logger::get_impl(nm);
     if (lm->get_level())
         lgr->set_level(lm->get_level());
     std::for_each(lm->get_writers().begin(),
