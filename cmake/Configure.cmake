@@ -68,8 +68,6 @@ IF(NOT CMAKE_CXX_COMPILER_ID STREQUAL SunPro)
     SET(CMAKE_CXX_STANDARD 14)
     SET(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 ENDIF()
-SET(CMAKE_C_STANDARD 11)
-SET(CMAKE_C_STANDARD_REQUIRED TRUE)
 
 # Compiler flags
 IF(CMAKE_CXX_COMPILER_ID MATCHES Clang)
@@ -92,12 +90,13 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES Clang)
         ENDIF()
     ENDIF()
     IF(CMAKE_GENERATOR STREQUAL Xcode)
-        SET(CMAKE_EXE_LINKER_FLAGS "-std=c++11 ${CHUCHO_LIBCXX_FLAG}")
+        SET(CMAKE_EXE_LINKER_FLAGS "-std=c++14 ${CHUCHO_LIBCXX_FLAG}")
     ENDIF()
     CHECK_CXX_COMPILER_FLAG(-Wno-potentially-evaluated-expression CHUCHO_HAVE_NO_POT_EVAL_EXP)
     IF(CHUCHO_HAVE_NO_POT_EVAL_EXP)
         SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-potentially-evaluated-expression")
     ENDIF()
+    SET(CHUCHO_REQUIRED_FLAGS -std=c++14)
 ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
     IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.7)
         MESSAGE(FATAL_ERROR "g++ version 4.7 or later is required")
@@ -109,6 +108,7 @@ ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
             SET(CHUCHO_SO_FLAGS "-fvisibility=hidden")
         ENDIF()
     ENDIF()
+    SET(CHUCHO_REQUIRED_FLAGS -std=c++14)
 ELSEIF(MSVC)
     IF(MSVC_VERSION LESS 1700)
         MESSAGE(FATAL_ERROR "Microsoft compiler version 17 or later is required (the compiler that ships with Visual Studio 2012)")
@@ -385,6 +385,8 @@ ENDIF()
 # CHECK_CXX_SYMBOL_EXISTS does not work for the following
 #
 
+SET(CMAKE_REQUIRED_FLAGS ${CHUCHO_REQUIRED_FLAGS})
+
 # std::put_time
 # We have to check whether it exists and whether it is buggy. put_time
 # on VS2012 is broken when it tries to format time zones. It just crashes.
@@ -476,6 +478,8 @@ ELSE()
     CHUCHO_REQUIRE_SYMBOLS(regex.h regcomp regerror regexec regfree REG_EXTENDED)
     MESSAGE(STATUS "Using regular expressions - POSIX")
 ENDIF()
+
+UNSET(CMAKE_REQUIRED_FLAGS)
 
 # assert
 CHUCHO_REQUIRE_SYMBOLS(assert.h assert)
@@ -570,8 +574,8 @@ IF(GTEST_PACKAGE AND EXISTS "${GTEST_PACKAGE}")
         URL_HASH SHA1=${CHUCHO_GTEST_SHA1})
 ELSE()
     SET(CHUCHO_GTEST_PACKAGE_ARGS
-        URL https://github.com/google/googletest/archive/release-1.8.1.tar.gz
-        URL_HASH SHA1=152b849610d91a9dfa1401293f43230c2e0c33f8)
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG release-1.8.1)
 ENDIF()
 ExternalProject_Add(gtest-external
                     ${CHUCHO_GTEST_PACKAGE_ARGS}

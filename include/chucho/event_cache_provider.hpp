@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_CACHE_PROVIDER_HPP__)
 #define CHUCHO_CACHE_PROVIDER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/event_cache_stats.hpp>
 #include <memory>
 
@@ -79,5 +84,9 @@ protected:
 };
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif
