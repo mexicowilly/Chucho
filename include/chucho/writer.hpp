@@ -143,6 +143,8 @@ protected:
     std::unique_ptr<formatter> formatter_;
 
 private:
+    friend class cache_filter;
+
     /**
      * @pre guard_ must be locked
      * @param evt the event to evaluate
