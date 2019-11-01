@@ -32,12 +32,19 @@ public:
                  std::shared_ptr<level> threshold,
                  std::size_t chunk_size,
                  std::size_t max_chunks);
+    cache_filter(const std::string& name,
+                 const std::string& writer_name,
+                 std::shared_ptr<level> threshold,
+                 std::size_t chunk_size,
+                 std::size_t max_chunks);
 
     virtual result evaluate(const event& evt) override;
 
 private:
-    writer& writer_;
+    /* This is just a settable reference */
+    writer* writer_;
     std::shared_ptr<level> threshold_;
+    std::string writer_name_;
 };
 
 }

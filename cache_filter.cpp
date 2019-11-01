@@ -16,6 +16,7 @@
 
 #include <chucho/cache_filter.hpp>
 #include <chucho/event_cache.hpp>
+#include <chucho/logger.hpp>
 
 namespace chucho
 {
@@ -29,20 +30,35 @@ cache_filter::cache_filter(const std::string& name,
                            std::size_t max_chunks)
   : filter(name),
     event_cache_provider(chunk_size, chunk_size * max_chunks),
-    writer_(wrt),
+    writer_(&wrt),
     threshold_(threshold)
+{
+}
+
+cache_filter::cache_filter(const std::string& name,
+                           const std::string& writer_name,
+                           std::shared_ptr<level> threshold,
+                           std::size_t chunk_size,
+                           std::size_t max_chunks)
+    : filter(name),
+      event_cache_provider(chunk_size, chunk_size * max_chunks),
+      writer_(nullptr),
+      threshold_(threshold),
+      writer_name_(writer_name)
 {
 }
 
 filter::result cache_filter::evaluate(const event& evt)
 {
-    result rs = result::NEUTRAL;
+    result rs = result::DENY;
     if (*evt.get_level() >= *threshold_)
     {
+        if (writer_ == nullptr)
+            writer_ = &evt.get_logger()->get_writer(writer_name_);
         auto e = cache_->pop(1ms);
         while (e)
         {
-            writer_.write_impl(*e);
+            writer_->write_impl(*e);
             e = cache_->pop(1ms);
         }
         rs = result::ACCEPT;
