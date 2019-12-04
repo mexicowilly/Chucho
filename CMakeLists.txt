@@ -596,6 +596,7 @@ SET(CHUCHO_SOURCES
     async_writer_factory.cpp
     async_writer_memento.cpp
     cache_filter.cpp
+    cache_filter_memento.cpp
     calendar.cpp
     cerr_writer_factory.cpp
     configurable.cpp
@@ -702,6 +703,7 @@ SET(CHUCHO_SOURCES
     include/chucho/async_writer_factory.hpp
     include/chucho/async_writer_memento.hpp
     include/chucho/c_logger.hpp
+    include/chucho/cache_filter_memento.hpp
     include/chucho/calendar.hpp
     include/chucho/cerr_writer_factory.hpp
     include/chucho/configurator.hpp

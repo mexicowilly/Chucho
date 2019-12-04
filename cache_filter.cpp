@@ -25,36 +25,32 @@ using namespace std::chrono_literals;
 
 cache_filter::cache_filter(const std::string& name,
                            writer& wrt,
-                           std::shared_ptr<level> threshold,
+                           std::shared_ptr<level> allow_threshold,
                            std::size_t chunk_size,
                            std::size_t max_chunks)
-  : filter(name),
-    event_cache_provider(chunk_size, chunk_size * max_chunks),
-    writer_(&wrt),
-    threshold_(threshold)
+  : cache_filter(name, allow_threshold, chunk_size, max_chunks)
 {
+    writer_ = &wrt;
 }
 
 cache_filter::cache_filter(const std::string& name,
-                           const std::string& writer_name,
-                           std::shared_ptr<level> threshold,
+                           std::shared_ptr<level> allow_threshold,
                            std::size_t chunk_size,
                            std::size_t max_chunks)
     : filter(name),
       event_cache_provider(chunk_size, chunk_size * max_chunks),
       writer_(nullptr),
-      threshold_(threshold),
-      writer_name_(writer_name)
+      allow_threshold_(allow_threshold)
 {
 }
 
 filter::result cache_filter::evaluate(const event& evt)
 {
-    result rs = result::DENY;
-    if (*evt.get_level() >= *threshold_)
+    result rs = result::NEUTRAL;
+    if (*evt.get_level() >= *allow_threshold_)
     {
         if (writer_ == nullptr)
-            writer_ = &evt.get_logger()->get_writer(writer_name_);
+            throw std::runtime_error("No writer has been set in the cache_filter '" + get_name() + "'");
         auto e = cache_->pop(1ms);
         while (e)
         {
@@ -62,6 +58,10 @@ filter::result cache_filter::evaluate(const event& evt)
             e = cache_->pop(1ms);
         }
         rs = result::ACCEPT;
+    }
+    else if (*evt.get_level() <= *cache_threshold_)
+    {
+        cache_->push(evt);
     }
     return rs;
 }
