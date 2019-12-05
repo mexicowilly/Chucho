@@ -143,7 +143,7 @@ protected:
     std::unique_ptr<formatter> formatter_;
 
 private:
-    friend class cache_filter;
+    friend class cache_and_release_filter;
 
     /**
      * @pre guard_ must be locked

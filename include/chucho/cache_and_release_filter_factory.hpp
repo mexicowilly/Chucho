@@ -26,10 +26,10 @@
 namespace chucho
 {
 
-class cache_filter_factory : public configurable_factory
+class cache_and_release_filter_factory : public configurable_factory
 {
 public:
-    cache_filter_factory();
+    cache_and_release_filter_factory();
 
     virtual std::unique_ptr<configurable> create_configurable(std::unique_ptr<memento>& mnto) override;
     virtual std::unique_ptr<memento> create_memento(configurator& cfg) override;

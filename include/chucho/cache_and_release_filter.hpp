@@ -24,18 +24,20 @@
 namespace chucho
 {
 
-class CHUCHO_EXPORT cache_filter : public filter, public event_cache_provider
+class CHUCHO_EXPORT cache_and_release_filter : public filter, public event_cache_provider
 {
 public:
-    cache_filter(const std::string& name,
-                 writer& wrt,
-                 std::shared_ptr<level> allow_threshold,
-                 std::size_t chunk_size,
-                 std::size_t max_chunks);
-    cache_filter(const std::string& name,
-                 std::shared_ptr<level> allow_threshold,
-                 std::size_t chunk_size,
-                 std::size_t max_chunks);
+    cache_and_release_filter(const std::string& name,
+                             writer& wrt,
+                             std::shared_ptr<level> cache_threshold,
+                             std::shared_ptr<level> release_threshold,
+                             std::size_t chunk_size,
+                             std::size_t max_chunks);
+    cache_and_release_filter(const std::string& name,
+                             std::shared_ptr<level> cache_threshold,
+                             std::shared_ptr<level> release_threshold,
+                             std::size_t chunk_size,
+                             std::size_t max_chunks);
 
     virtual result evaluate(const event& evt) override;
     void set_writer(writer& wrt);
@@ -43,11 +45,11 @@ public:
 private:
     /* This is just a settable reference */
     writer* writer_;
-    std::shared_ptr<level> allow_threshold_;
+    std::shared_ptr<level> release_threshold_;
     std::shared_ptr<level> cache_threshold_;
 };
 
-inline void cache_filter::set_writer(writer& wrt)
+inline void cache_and_release_filter::set_writer(writer& wrt)
 {
     writer_ = &wrt;
 }

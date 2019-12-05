@@ -170,7 +170,7 @@ ENDIF()
 
 SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/async_writer.hpp
-    include/chucho/cache_filter.hpp
+    include/chucho/cache_and_release_filter.hpp
     include/chucho/cerr_writer.hpp
     include/chucho/cloud_writer.hpp
     include/chucho/compressor.hpp
@@ -595,8 +595,9 @@ SET(CHUCHO_SOURCES
     async_writer.cpp
     async_writer_factory.cpp
     async_writer_memento.cpp
-    cache_filter.cpp
-    cache_filter_memento.cpp
+    cache_and_release_filter.cpp
+    cache_and_release_filter_factory.cpp
+    cache_and_release_filter_memento.cpp
     calendar.cpp
     cerr_writer_factory.cpp
     configurable.cpp
@@ -703,7 +704,8 @@ SET(CHUCHO_SOURCES
     include/chucho/async_writer_factory.hpp
     include/chucho/async_writer_memento.hpp
     include/chucho/c_logger.hpp
-    include/chucho/cache_filter_memento.hpp
+    include/chucho/cache_and_release_filter_factory.hpp
+    include/chucho/cache_and_release_filter_memento.hpp
     include/chucho/calendar.hpp
     include/chucho/cerr_writer_factory.hpp
     include/chucho/configurator.hpp

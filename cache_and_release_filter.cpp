@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include <chucho/cache_filter.hpp>
+#include <chucho/cache_and_release_filter.hpp>
 #include <chucho/event_cache.hpp>
 #include <chucho/logger.hpp>
 
@@ -23,31 +23,34 @@ namespace chucho
 
 using namespace std::chrono_literals;
 
-cache_filter::cache_filter(const std::string& name,
-                           writer& wrt,
-                           std::shared_ptr<level> allow_threshold,
-                           std::size_t chunk_size,
-                           std::size_t max_chunks)
-  : cache_filter(name, allow_threshold, chunk_size, max_chunks)
+cache_and_release_filter::cache_and_release_filter(const std::string& name,
+                                                   writer& wrt,
+                                                   std::shared_ptr<level> cache_threshold,
+                                                   std::shared_ptr<level> release_threshold,
+                                                   std::size_t chunk_size,
+                                                   std::size_t max_chunks)
+  : cache_and_release_filter(name, cache_threshold, release_threshold, chunk_size, max_chunks)
 {
     writer_ = &wrt;
 }
 
-cache_filter::cache_filter(const std::string& name,
-                           std::shared_ptr<level> allow_threshold,
-                           std::size_t chunk_size,
-                           std::size_t max_chunks)
+cache_and_release_filter::cache_and_release_filter(const std::string& name,
+                                                   std::shared_ptr<level> cache_threshold,
+                                                   std::shared_ptr<level> release_threshold,
+                                                   std::size_t chunk_size,
+                                                   std::size_t max_chunks)
     : filter(name),
       event_cache_provider(chunk_size, chunk_size * max_chunks),
       writer_(nullptr),
-      allow_threshold_(allow_threshold)
+      release_threshold_(release_threshold),
+      cache_threshold_(cache_threshold)
 {
 }
 
-filter::result cache_filter::evaluate(const event& evt)
+filter::result cache_and_release_filter::evaluate(const event& evt)
 {
     result rs = result::NEUTRAL;
-    if (*evt.get_level() >= *allow_threshold_)
+    if (*evt.get_level() >= *release_threshold_)
     {
         if (writer_ == nullptr)
             throw std::runtime_error("No writer has been set in the cache_filter '" + get_name() + "'");
@@ -62,6 +65,7 @@ filter::result cache_filter::evaluate(const event& evt)
     else if (*evt.get_level() <= *cache_threshold_)
     {
         cache_->push(evt);
+        rs = result::DENY;
     }
     return rs;
 }

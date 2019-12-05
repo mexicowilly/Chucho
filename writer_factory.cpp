@@ -16,7 +16,7 @@
 
 #include <chucho/writer_factory.hpp>
 #include <chucho/writer.hpp>
-#include <chucho/cache_filter.hpp>
+#include <chucho/cache_and_release_filter.hpp>
 #include <assert.h>
 
 namespace chucho
@@ -28,7 +28,7 @@ void writer_factory::set_filters(configurable& cnf, writer_memento& mnto)
     assert(wrt != nullptr);
     for (auto& f : mnto.get_filters())
     {
-        auto cf = dynamic_cast<cache_filter*>(f.get());
+        auto cf = dynamic_cast<cache_and_release_filter*>(f.get());
         if (cf != nullptr)
             cf->set_writer(*wrt);
         wrt->add_filter(std::move(f));
