@@ -167,6 +167,7 @@ ENDIF()
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
                c_test.cpp
+               cache_and_release_filter_test.cpp
                calendar_test.cpp
                configuration_test.cpp
                configurator_test.cpp

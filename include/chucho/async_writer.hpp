@@ -48,15 +48,6 @@ class CHUCHO_EXPORT async_writer : public writer, public event_cache_provider
 {
 public:
     /**
-     * The default size of a single chunk.
-     */
-    static constexpr std::size_t DEFAULT_CHUNK_SIZE = 1024 * 1024;
-    /**
-     * The default maximum number of chunks.
-     */
-    static constexpr std::size_t DEFAULT_MAX_CHUNKS = 2;
-
-    /**
      * @name Constructor and destructor
      */
     //@{

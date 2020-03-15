@@ -20,6 +20,9 @@
 namespace chucho
 {
 
+constexpr std::size_t event_cache_provider::DEFAULT_CHUNK_SIZE;
+constexpr std::size_t event_cache_provider::DEFAULT_MAX_CHUNKS;
+
 event_cache_provider::event_cache_provider(std::size_t chunk_size, std::size_t max_size)
     : cache_(std::make_unique<event_cache>(chunk_size, max_size))
 {

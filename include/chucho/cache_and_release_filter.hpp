@@ -31,13 +31,13 @@ public:
                              writer& wrt,
                              std::shared_ptr<level> cache_threshold,
                              std::shared_ptr<level> release_threshold,
-                             std::size_t chunk_size,
-                             std::size_t max_chunks);
+                             std::size_t chunk_size = DEFAULT_CHUNK_SIZE,
+                             std::size_t max_chunks = DEFAULT_MAX_CHUNKS);
     cache_and_release_filter(const std::string& name,
                              std::shared_ptr<level> cache_threshold,
                              std::shared_ptr<level> release_threshold,
-                             std::size_t chunk_size,
-                             std::size_t max_chunks);
+                             std::size_t chunk_size = DEFAULT_CHUNK_SIZE,
+                             std::size_t max_chunks = DEFAULT_MAX_CHUNKS);
 
     virtual result evaluate(const event& evt) override;
     void set_writer(writer& wrt);

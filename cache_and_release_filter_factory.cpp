@@ -46,8 +46,8 @@ std::unique_ptr<configurable> cache_and_release_filter_factory::create_configura
     auto cnf = std::make_unique<cache_and_release_filter>(cfm->get_name(),
                                                           cfm->get_cache_threshold(),
                                                           cfm->get_release_threshold(),
-                                                          cfm->get_chunk_size(),
-                                                          cfm->get_max_chunks());
+                                                          *cfm->get_chunk_size(),
+                                                          *cfm->get_max_chunks());
     report_info("Created a " + demangle::get_demangled_name(typeid(*cnf)));
     return std::move(cnf);
 }

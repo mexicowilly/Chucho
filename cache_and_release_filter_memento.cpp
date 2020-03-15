@@ -22,7 +22,9 @@ namespace chucho
 {
 
 cache_and_release_filter_memento::cache_and_release_filter_memento(configurator &cfg)
-    : filter_memento(cfg)
+    : filter_memento(cfg),
+      chunk_size_(cache_and_release_filter::DEFAULT_CHUNK_SIZE),
+      max_chunks_(cache_and_release_filter::DEFAULT_MAX_CHUNKS)
 {
     set_status_origin("cache_and_release_filter_memento");
     set_default_name(typeid(cache_and_release_filter));
