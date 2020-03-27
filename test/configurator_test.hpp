@@ -40,6 +40,7 @@ protected:
 #if defined(CHUCHO_HAVE_BZIP2)
     void bzip2_file_compressor_body();
 #endif
+    void cache_and_release_filter_body();
     void cerr_writer_body();
 #if defined(CHUCHO_HAVE_AWSSDK)
     void cloudwatch_writer_body();

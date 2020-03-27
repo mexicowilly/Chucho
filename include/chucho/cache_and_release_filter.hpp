@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CACHE_FILTER_HPP__)
-#define CHUCHO_CACHE_FILTER_HPP__
+#if !defined(CHUCHO_CACHE_AND_RELEASE_FILTER_HPP__)
+#define CHUCHO_CACHE_AND_RELEASE_FILTER_HPP__
 
 #include <chucho/filter.hpp>
 #include <chucho/event_cache_provider.hpp>
@@ -40,6 +40,9 @@ public:
                              std::size_t max_chunks = DEFAULT_MAX_CHUNKS);
 
     virtual result evaluate(const event& evt) override;
+    std::shared_ptr<level> get_cache_threshold() const;
+    std::shared_ptr<level> get_release_threshold() const;
+    writer& get_writer() const;
     void set_writer(writer& wrt);
 
 private:
@@ -48,6 +51,21 @@ private:
     std::shared_ptr<level> release_threshold_;
     std::shared_ptr<level> cache_threshold_;
 };
+
+inline std::shared_ptr<level> cache_and_release_filter::get_cache_threshold() const
+{
+    return cache_threshold_;
+}
+
+inline std::shared_ptr<level> cache_and_release_filter::get_release_threshold() const
+{
+    return release_threshold_;
+}
+
+inline writer& cache_and_release_filter::get_writer() const
+{
+    return *writer_;
+}
 
 inline void cache_and_release_filter::set_writer(writer& wrt)
 {

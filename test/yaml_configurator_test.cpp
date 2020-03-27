@@ -181,6 +181,23 @@ TEST_F(yaml_configurator, bzip2_file_compressor)
 
 #endif
 
+TEST_F(yaml_configurator, cache_and_release_filter)
+{
+    configure(R"cnf(
+chucho::logger:
+    name: will
+    chucho::cout_writer:
+        - chucho::pattern_formatter:
+            pattern: '%m%n'
+        - chucho::cache_and_release_filter:
+            cache_threshold: debug
+            release_threshold: ErRoR
+            chunk_size: 256k
+            max_chunks: 7
+)cnf");
+    cache_and_release_filter_body();
+}
+
 TEST_F(yaml_configurator, cerr_writer)
 {
     configure("chucho::logger:\n"
