@@ -39,9 +39,6 @@ namespace chucho
 
 using namespace std::chrono_literals;
 
-constexpr std::size_t async_writer::DEFAULT_CHUNK_SIZE;
-constexpr std::size_t async_writer::DEFAULT_MAX_CHUNKS;
-
 async_writer::async_writer(const std::string& name,
                            std::unique_ptr<writer>&& wrt,
                            bool flush_on_destruct)

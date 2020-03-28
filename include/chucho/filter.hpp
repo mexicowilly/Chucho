@@ -90,7 +90,7 @@ public:
      * @return result the level of acceptance
      */
     virtual result evaluate(const event& evt) = 0;
-    /*
+    /**
      * Return the name of this filter.
      *
      * @return the name

@@ -17,6 +17,7 @@
 #include "configurator_test.hpp"
 #include <chucho/logger.hpp>
 #include <chucho/status_manager.hpp>
+#include <chucho/cache_and_release_filter.hpp>
 #include <chucho/cerr_writer.hpp>
 #include <chucho/cout_writer.hpp>
 #include <chucho/file_writer.hpp>
@@ -185,6 +186,19 @@ void configurator::bzip2_file_compressor_body()
 }
 
 #endif
+
+void configurator::cache_and_release_filter_body()
+{
+    auto& wrt = chucho::logger::get("will")->get_writer("chucho::cout_writer");
+    ASSERT_EQ(1, wrt.get_filter_names().size());
+    auto& flt = dynamic_cast<chucho::cache_and_release_filter&>(wrt.get_filter("chucho::cache_and_release_filter"));
+    EXPECT_STREQ("chucho::cache_and_release_filter", flt.get_name().c_str());
+    EXPECT_EQ(chucho::level::DEBUG_(), flt.get_cache_threshold());
+    EXPECT_EQ(chucho::level::ERROR_(), flt.get_release_threshold());
+    auto stats = flt.get_cache_stats();
+    EXPECT_EQ(256 * 1024, stats.get_chunk_size());
+    EXPECT_EQ(256 * 1024 * 7, stats.get_max_size());
+}
 
 void configurator::cerr_writer_body()
 {

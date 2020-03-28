@@ -14,25 +14,27 @@
  *    limitations under the License.
  */
 
-#include <chucho/writer_factory.hpp>
-#include <chucho/writer.hpp>
-#include <chucho/cache_and_release_filter.hpp>
-#include <assert.h>
+#if !defined(CHUCHO_CACHE_FILTER_FACTORY_HPP__)
+#define CHUCHO_CACHE_FILTER_FACTORY_HPP__
+
+#if !defined(CHUCHO_BUILD)
+#error "This header is private"
+#endif
+
+#include <chucho/configurable_factory.hpp>
 
 namespace chucho
 {
 
-void writer_factory::set_filters(configurable& cnf, writer_memento& mnto)
+class cache_and_release_filter_factory : public configurable_factory
 {
-    auto wrt = dynamic_cast<writer*>(&cnf);
-    assert(wrt != nullptr);
-    for (auto& f : mnto.get_filters())
-    {
-        auto cf = dynamic_cast<cache_and_release_filter*>(f.get());
-        if (cf != nullptr)
-            cf->set_writer(*wrt);
-        wrt->add_filter(std::move(f));
-    }
-}
+public:
+    cache_and_release_filter_factory();
+
+    virtual std::unique_ptr<configurable> create_configurable(std::unique_ptr<memento>& mnto) override;
+    virtual std::unique_ptr<memento> create_memento(configurator& cfg) override;
+};
 
 }
+
+#endif

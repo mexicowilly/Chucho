@@ -170,6 +170,7 @@ ENDIF()
 
 SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/async_writer.hpp
+    include/chucho/cache_and_release_filter.hpp
     include/chucho/cerr_writer.hpp
     include/chucho/cloud_writer.hpp
     include/chucho/compressor.hpp
@@ -594,6 +595,9 @@ SET(CHUCHO_SOURCES
     async_writer.cpp
     async_writer_factory.cpp
     async_writer_memento.cpp
+    cache_and_release_filter.cpp
+    cache_and_release_filter_factory.cpp
+    cache_and_release_filter_memento.cpp
     calendar.cpp
     cerr_writer_factory.cpp
     configurable.cpp
@@ -700,6 +704,8 @@ SET(CHUCHO_SOURCES
     include/chucho/async_writer_factory.hpp
     include/chucho/async_writer_memento.hpp
     include/chucho/c_logger.hpp
+    include/chucho/cache_and_release_filter_factory.hpp
+    include/chucho/cache_and_release_filter_memento.hpp
     include/chucho/calendar.hpp
     include/chucho/cerr_writer_factory.hpp
     include/chucho/configurator.hpp
@@ -1142,7 +1148,6 @@ IF(DOXYGEN_FOUND)
     EXECUTE_PROCESS(COMMAND "${DOXYGEN_EXECUTABLE}" -w html "${CMAKE_BINARY_DIR}/doc_header.html" "${CMAKE_BINARY_DIR}/doc_footer.html" "${CMAKE_BINARY_DIR}/doc_stylesheet.html" "${CMAKE_BINARY_DIR}/doxygen.conf"
                     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
     FILE(STRINGS "${CMAKE_BINARY_DIR}/doc_header.html" CHUCHO_HTML_HEADER)
-    FILE(STRINGS "${CMAKE_BINARY_DIR}/doc_footer.html" CHUCHO_HTML_FOOTER)
     FILE(REMOVE "${CMAKE_BINARY_DIR}/doc_header.html" "${CMAKE_BINARY_DIR}/doc_footer.html" "${CMAKE_BINARY_DIR}/doc_stylesheet.html")
     LIST(FIND CHUCHO_HTML_HEADER <head> CHUCHO_HEAD_INDEX)
     IF(CHUCHO_HEAD_INDEX EQUAL -1)
@@ -1154,6 +1159,7 @@ IF(DOXYGEN_FOUND)
         FILE(APPEND "${CMAKE_BINARY_DIR}/doc_header.html" ${LINE})
         FILE(APPEND "${CMAKE_BINARY_DIR}/doc_header.html" "\n")
     ENDFOREACH()
+    FILE(APPEND "${CMAKE_BINARY_DIR}/doxygen.conf" "\nHTML_HEADER=\"${CMAKE_BINARY_DIR}/doc_header.html\"")
     ADD_CUSTOM_TARGET(doc
                       COMMAND "${DOXYGEN_EXECUTABLE}" "${CMAKE_BINARY_DIR}/doxygen.conf"
                       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")

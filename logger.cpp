@@ -190,7 +190,7 @@ writer& logger::get_writer(const std::string& name)
                               writers_.end(),
                               [&name](const std::unique_ptr<writer>& w) { return w->get_name() == name; });
     if (found == writers_.end())
-        throw std::invalid_argument("Writer " + name + " was not found");
+        throw std::invalid_argument("Writer '" + name + "' was not found");
     return **found;
 }
 

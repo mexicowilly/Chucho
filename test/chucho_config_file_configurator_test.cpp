@@ -171,6 +171,25 @@ TEST_F(chucho_config_file_configurator, bzip2_file_compressor)
 
 #endif
 
+TEST_F(chucho_config_file_configurator, cache_and_release_filter)
+{
+    configure(R"cnf(
+chucho.logger = will
+chucho.logger.will.writer = co
+chucho.writer.co = chucho::cout_writer
+chucho.writer.co.filter = crf
+chucho.filter.crf = chucho::cache_and_release_filter
+chucho.filter.crf.cache_threshold = DeBuG
+chucho.filter.crf.release_threshold = ERROR
+chucho.filter.crf.chunk_size = 256k
+chucho.filter.crf.max_chunks = 7
+chucho.writer.co.formatter = pf
+chucho.formatter.pf = chucho::pattern_formatter
+chucho.formatter.pf.pattern = %m%n
+)cnf");
+    cache_and_release_filter_body();
+}
+
 TEST_F(chucho_config_file_configurator, cerr_writer)
 {
     configure("chucho.logger = will\n"

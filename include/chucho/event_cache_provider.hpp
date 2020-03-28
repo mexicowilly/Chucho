@@ -33,7 +33,7 @@ class event_cache;
 /**
  * @class event_cache_provider event_cache_provider.hpp chucho/event_cache_provider.hpp
  * A holder of an event cache. An event cache is a disk-backed queue of log events.
- * The cache stores its data in chunks. One chunk is held in memory, and the other  chunks
+ * The cache stores its data in chunks. One chunk is held in memory, and the other chunks
  * are stored on disk. Once the cache reaches its maximum size, the oldest chunk is
  * deleted.
  *
@@ -47,6 +47,14 @@ class event_cache;
 class CHUCHO_EXPORT event_cache_provider
 {
 public:
+    /**
+     * The default size of a single chunk.
+     */
+    static constexpr std::size_t DEFAULT_CHUNK_SIZE = 1024 * 1024;
+    /**
+     * The default maximum number of chunks.
+     */
+    static constexpr std::size_t DEFAULT_MAX_CHUNKS = 2;
     /**
      * Return the cache stats.
      *
