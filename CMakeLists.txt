@@ -1148,7 +1148,6 @@ IF(DOXYGEN_FOUND)
     EXECUTE_PROCESS(COMMAND "${DOXYGEN_EXECUTABLE}" -w html "${CMAKE_BINARY_DIR}/doc_header.html" "${CMAKE_BINARY_DIR}/doc_footer.html" "${CMAKE_BINARY_DIR}/doc_stylesheet.html" "${CMAKE_BINARY_DIR}/doxygen.conf"
                     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
     FILE(STRINGS "${CMAKE_BINARY_DIR}/doc_header.html" CHUCHO_HTML_HEADER)
-    FILE(STRINGS "${CMAKE_BINARY_DIR}/doc_footer.html" CHUCHO_HTML_FOOTER)
     FILE(REMOVE "${CMAKE_BINARY_DIR}/doc_header.html" "${CMAKE_BINARY_DIR}/doc_footer.html" "${CMAKE_BINARY_DIR}/doc_stylesheet.html")
     LIST(FIND CHUCHO_HTML_HEADER <head> CHUCHO_HEAD_INDEX)
     IF(CHUCHO_HEAD_INDEX EQUAL -1)
@@ -1160,6 +1159,7 @@ IF(DOXYGEN_FOUND)
         FILE(APPEND "${CMAKE_BINARY_DIR}/doc_header.html" ${LINE})
         FILE(APPEND "${CMAKE_BINARY_DIR}/doc_header.html" "\n")
     ENDFOREACH()
+    FILE(APPEND "${CMAKE_BINARY_DIR}/doxygen.conf" "\nHTML_HEADER=\"${CMAKE_BINARY_DIR}/doc_header.html\"")
     ADD_CUSTOM_TARGET(doc
                       COMMAND "${DOXYGEN_EXECUTABLE}" "${CMAKE_BINARY_DIR}/doxygen.conf"
                       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
