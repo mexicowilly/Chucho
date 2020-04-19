@@ -106,6 +106,7 @@ protected:
      *         "false"
      */
     bool boolean_value(const std::string& value);
+    virtual void default_handler(const std::string& key, const std::string& value);
     /**
      * Set an alias for a given key. For example, if you have a 
      * handler for the key "hello", then you may want to set an 

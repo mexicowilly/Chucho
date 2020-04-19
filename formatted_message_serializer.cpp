@@ -29,7 +29,9 @@ std::vector<std::uint8_t> formatted_message_serializer::finish_blob()
 
 void formatted_message_serializer::serialize(const event& evt, formatter& fmt)
 {
-    events_ += fmt.format(evt) + line_ending::EOL;
+    if (!events_.empty())
+        events_ += line_ending::EOL;
+    events_ += fmt.format(evt);
 }
 
 }

@@ -100,6 +100,10 @@
 #if defined(CHUCHO_HAVE_SOCI)
 #include <chucho/database_writer_factory.hpp>
 #endif
+#if defined(CHUCHO_HAVE_RDKAFKA)
+#include <chucho/kafka_writer_factory.hpp>
+#include <chucho/kafka_configuration_factory.hpp>
+#endif
 
 #include <cstring>
 #include <mutex>
@@ -263,6 +267,12 @@ void configurator::initialize_impl()
 #if defined(CHUCHO_HAVE_LIBARCHIVE)
     add_configurable_factory("chucho::zip_file_compressor",
                              std::make_shared<zip_file_compressor_factory>());
+#endif
+#if defined(CHUCHO_HAVE_RDKAFKA)
+    add_configurable_factory("kafka_configuration",
+                             std::make_shared<kafka_configuration_factory>());
+    add_configurable_factory("chucho::kafka_writer",
+                             std::make_shared<kafka_writer_factory>());
 #endif
 }
 

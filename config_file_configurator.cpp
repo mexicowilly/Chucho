@@ -167,6 +167,9 @@ std::unique_ptr<configurable> config_file_configurator::chucho_properties_proces
     #if defined(CHUCHO_HAVE_CURL)
     generics.push_back("email_trigger");
     #endif
+    #if defined(CHUCHO_HAVE_RDKAFKA)
+    generics.push_back("kafka");
+    #endif
     for (const auto& cur : cur_props)
     {
         if (cur.first == "file_roller")

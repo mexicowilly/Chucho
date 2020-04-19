@@ -404,13 +404,13 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
 
 IF(CHUCHO_HAVE_ACTIVEMQ)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
-         include/chucho/activemq_writer.hpp
-         include/chucho/activemq_writer_factory.hpp
-         include/chucho/activemq_writer_memento.hpp)
+         include/chucho/activemq_writer.hpp)
     LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
          activemq_writer.cpp
          activemq_writer_factory.cpp
-         activemq_writer_memento.cpp)
+         include/chucho/activemq_writer_factory.hpp
+         activemq_writer_memento.cpp
+         include/chucho/activemq_writer_memento.hpp)
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
@@ -418,13 +418,13 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
 
 IF(CHUCHO_HAVE_RABBITMQ)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
-         include/chucho/rabbitmq_writer.hpp
-         include/chucho/rabbitmq_writer_factory.hpp
-         include/chucho/rabbitmq_writer_memento.hpp)
+         include/chucho/rabbitmq_writer.hpp)
     LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
          rabbitmq_writer.cpp
          rabbitmq_writer_factory.cpp
-         rabbitmq_writer_memento.cpp)
+         include/chucho/rabbitmq_writer_factory.hpp
+         rabbitmq_writer_memento.cpp
+         include/chucho/rabbitmq_writer_memento.hpp)
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
@@ -432,14 +432,13 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
 
 IF(CHUCHO_HAVE_DOORS)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
-         include/chucho/door_event.h
-         include/chucho/door_writer.hpp
-         include/chucho/door_writer_factory.hpp
-         include/chucho/door_writer_memento.hpp)
+         include/chucho/door_event.h)
     LIST(APPEND CHUCHO_DOOR_SOURCES
          platform/solaris/door_writer.cpp
          platform/solaris/door_writer_factory.cpp
-         platform/solaris/door_writer_memento.cpp)
+         include/chucho/door_writer_factory.hpp
+         platform/solaris/door_writer_memento.cpp
+         include/chucho/door_writer_memento.hpp)
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
@@ -477,12 +476,18 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
 IF(CHUCHO_HAVE_RDKAFKA)
         LIST(APPEND CHUCHO_PUBLIC_HEADERS
              include/chucho/kafka_writer.hpp)
-#             include/chucho/rabbitmq_writer_factory.hpp
-#             include/chucho/rabbitmq_writer_memento.hpp)
         LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
-             kafka_writer.cpp)
-#             rabbitmq_writer_factory.cpp
-#             rabbitmq_writer_memento.cpp)
+             kafka_configuration.cpp
+             include/chucho/kafka_configuration.hpp
+             kafka_configuration_factory.cpp
+             include/chucho/kafka_configuration_factory.hpp
+             kafka_configuration_memento.cpp
+             include/chucho/kafka_configuration_memento.hpp
+             kafka_writer.cpp
+             kafka_writer_factory.cpp
+             include/chucho/kafka_writer_factory.hpp
+             kafka_writer_memento.cpp
+             include/chucho/kafka_writer_memento.hpp)
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
@@ -548,7 +553,7 @@ IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
     SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
                                 COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATION_DEFS};CHUCHO_CONFIG_FILE_CONFIG")
     IF(CONFIG_FILE_CONFIG)
-        SET(CHUCHO_CONFIGURATOR_DEFS CHUCHO_CONFIG_FILE)
+        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_CONFIG_FILE)
         MESSAGE(STATUS "Chucho has config file configuration parsing enabled")
     ENDIF()
     IF(LOG4CPLUS_CONFIG)
@@ -557,6 +562,9 @@ IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
     ENDIF()
     IF(CURL_FOUND)
         LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_CURL)
+    ENDIF()
+    IF(CHUCHO_HAVE_RDKAFKA)
+        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RDKAFKA)
     ENDIF()
     SET_SOURCE_FILES_PROPERTIES(config_file_configurator.cpp PROPERTIES
                                 COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATOR_DEFS}")
@@ -882,7 +890,10 @@ IF(AWSSDK_FOUND)
 ENDIF()
 
 IF(CHUCHO_HAVE_RDKAFKA)
-    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RDKAFKA)
+    LIST(FIND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RDKAFKA CHUCHO_HRK_INDEX)
+    IF(CHUCHO_HRK_INDEX EQUAL -1)
+        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RDKAFKA)
+    ENDIF()
 ENDIF()
 
 IF(DEFINED CHUCHO_CONFIGURATOR_DEFS)
