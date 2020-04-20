@@ -70,6 +70,7 @@ enum feature
     LOGGLY_WRITER,              /**< Loggly writer */
     CLOUDWATCH_WRITER,          /**< AWS Cloudwatch writer */
     DATABASE_WRITER,            /**< Database writer */
+    KAFKA_WRITER,               /**< Kafka writer */
     FEATURE_COUNT               /**< Do not use. This is just so I can know how many there are. */
 };
 

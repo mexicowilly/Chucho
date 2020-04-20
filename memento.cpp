@@ -41,11 +41,16 @@ bool memento::boolean_value(const std::string& value)
     return (low.empty() || low == zero || low == falso) ? false : true;
 }
 
+void memento::default_handler(const std::string& key, const std::string& value)
+{
+    report_error("The key '" + key + "' is not supported with " + demangle::get_demangled_name(typeid(*this)));
+}
+
 void memento::handle(const std::string& key, const std::string& value)
 {
     auto found = handlers_.find(key);
     if (found == handlers_.end())
-        report_error("The key " + key + " is not supported with " + demangle::get_demangled_name(typeid(*this)));
+        default_handler(key, value);
     else
         found->second(value);
 }

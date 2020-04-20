@@ -90,6 +90,9 @@
 #if defined(CHUCHO_HAVE_AWSSDK)
 #include <chucho/cloudwatch_writer.hpp>
 #endif
+#if defined(CHUCHO_HAVE_RDKAFKA)
+#include <chucho/kafka_writer.hpp>
+#endif
 
 namespace chucho
 {
@@ -412,6 +415,28 @@ void configurator::json_formatter_body(const std::string &tmpl)
         }
     }
 }
+
+#if defined(CHUCHO_HAVE_RDKAFKA)
+
+void configurator::kafka_writer_brokers_body()
+{
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& kwrt = dynamic_cast<chucho::kafka_writer&>(lgr->get_writer("chucho::kafka_writer"));
+    EXPECT_STREQ("monkeyballs", kwrt.get_topic().c_str());
+    EXPECT_STREQ("192.168.56.101", kwrt.get_config_value("bootstrap.servers").c_str());
+}
+
+void configurator::kafka_writer_config_body()
+{
+    auto lgr = chucho::logger::get("will");
+    ASSERT_EQ(1, lgr->get_writer_names().size());
+    auto& kwrt = dynamic_cast<chucho::kafka_writer&>(lgr->get_writer("chucho::kafka_writer"));
+    EXPECT_STREQ("chunkymonkey", kwrt.get_topic().c_str());
+    EXPECT_STREQ("192.168.56.101", kwrt.get_config_value("bootstrap.servers").c_str());
+}
+
+#endif
 
 void configurator::level_filter_body(const std::string& tmpl)
 {

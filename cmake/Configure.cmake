@@ -530,6 +530,12 @@ IF(AWSSDK_FOUND)
     SET(AWS_SVCS logs)
     AWSSDK_DETERMINE_LIBS_TO_LINK(AWS_SVCS AWSSDK_LIBS)
 ENDIF()
+CHUCHO_FIND_PACKAGE(RDKAFKA INCLUDE librdkafka/rdkafka.h LIBS rdkafka SYMBOLS
+    rd_kafka_conf_new rd_kafka_conf_set rd_kafka_new rd_kafka_flush rd_kafka_topic_new
+    rd_kafka_topic_destroy rd_kafka_destroy rd_kafka_poll rd_kafka_produce
+    rd_kafka_last_error rd_kafka_err2str rd_kafka_topic_name rd_kafka_flush
+    rd_kafka_poll_set_consumer rd_kafka_topic_partition_list_new rd_kafka_topic_partition_list_add
+    rd_kafka_subscribe rd_kafka_topic_partition_list_destroy rd_kafka_consumer_poll rd_kafka_message_destroy)
 
 # This must appear after the above package searches
 CHUCHO_GENERATE_PKG_CONFIG_FILE()

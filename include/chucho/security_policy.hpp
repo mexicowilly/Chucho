@@ -140,6 +140,14 @@ namespace chucho
  *         <td>[1, 5000]</td></tr>
  *     <tr><td>interval_file_roll_trigger::period(text)</td>
  *         <td>12</td></tr>
+ *     <tr><td>kafka_configuration::key</td>
+ *         <td><i>default</i></td></tr>
+ *     <tr><td>kafka_configuration::value</td>
+ *         <td><i>default</i></td></tr>
+ *     <tr><td>kafka_writer::brokers</td>
+ *         <td><i>default</i></td></tr>
+ *     <tr><td>kafka_writer::topic</td>
+ *         <td><i>default</i></td></tr>
  *     <tr><td>level_filter::level</td>
  *         <td><i>default</i></td></tr>
  *     <tr><td>level_filter::on_match</td>

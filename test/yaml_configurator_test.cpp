@@ -416,6 +416,41 @@ chucho::logger:
     json_formatter_body(tmpl);
 }
 
+#if defined(CHUCHO_HAVE_RDKAFKA)
+
+TEST_F(yaml_configurator, kafka_writer_brokers)
+{
+    configure(R"cnf(
+chucho::logger:
+    name: will
+    chucho::kafka_writer:
+        - chucho::pattern_formatter:
+            - pattern: '%m'
+        - chucho::formatted_message_serializer
+        - brokers: 192.168.56.101
+        - topic: monkeyballs
+)cnf");
+    kafka_writer_brokers_body();
+}
+
+TEST_F(yaml_configurator, kafka_writer_config)
+{
+    configure(R"cnf(
+chucho::logger:
+    name: will
+    chucho::kafka_writer:
+        - chucho::pattern_formatter:
+            - pattern: '%m'
+        - chucho::formatted_message_serializer
+        - kafka_configuration:
+            bootstrap.servers: 192.168.56.101
+        - topic: chunkymonkey
+)cnf");
+    kafka_writer_config_body();
+}
+
+#endif
+
 TEST_F(yaml_configurator, level_filter)
 {
     std::string tmpl("- chucho::logger:\n"
