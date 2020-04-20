@@ -106,6 +106,13 @@ protected:
      *         "false"
      */
     bool boolean_value(const std::string& value);
+    /**
+     * The handler that should be used when no specific handler is given
+     * for a key. The base method simply reports an error.
+     *
+     * @param key the key
+     * @param value the value
+     */
     virtual void default_handler(const std::string& key, const std::string& value);
     /**
      * Set an alias for a given key. For example, if you have a 

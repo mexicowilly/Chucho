@@ -98,5 +98,8 @@ TEST(optional_features, simple)
 #if defined(CHUCHO_HAVE_SOCI)
     EXPECT_FEATURE(chucho::optional_features::DATABASE_WRITER);
 #endif
+#if defined(CHUCHO_HAVE_RDKAFKA)
+    EXPECT_FEATURE(chucho::optional_features::KAFKA_WRITER);
+#endif
     EXPECT_TRUE(fs.none());
 }

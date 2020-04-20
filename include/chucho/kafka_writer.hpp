@@ -24,17 +24,57 @@
 namespace chucho
 {
 
+/**
+ * @class kafka_writer kafka_writer.hpp chucho/kafka_writer.hpp
+ * Write to a Kafka server. The configuration must that one created
+ * with @c librdkafka. When using the configuration file for
+ * instantiation, the configuraiton may be set using a map of
+ * @c kafka_configuration keys and values.
+ *
+ * @ingroup writers
+ */
 class kafka_writer : public message_queue_writer
 {
 public:
+    /**
+     * @name Constructor and Destructor
+     * @{
+     */
+    /**
+     * Create a writer.
+     *
+     * @param name the name
+     * @param fmt the formatter
+     * @param ser the serializer
+     * @param topic the name of the topic to which to write
+     * @param conf the @c librdkafka configuration
+     */
     kafka_writer(const std::string& name,
                  std::unique_ptr<formatter>&& fmt,
                  std::unique_ptr<serializer>&& ser,
                  const std::string& topic,
                  rd_kafka_conf_t* conf);
+    /**
+     * Destroy a writer.
+     */
     ~kafka_writer();
+    /**
+     * @}
+     */
 
+    /**
+     * Return a value from the configuration. These may be keys
+     * defined for configurations by the library @c librdkafka.
+     *
+     * @param key the @c librdkafka key
+     * @return the value
+     */
     std::string get_config_value(const std::string& key) const;
+    /**
+     * Return the topic to which this writer is writing.
+     *
+     * @return the topic
+     */
     std::string get_topic() const;
 
 protected:

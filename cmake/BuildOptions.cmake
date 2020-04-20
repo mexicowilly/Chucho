@@ -113,6 +113,7 @@ OPTION(JSON_CONFIG "Whether to support reading JSON configuration files" OFF)
 # lz4: lz4_compressor
 # protobuf: protobuf_serializer
 # rabbitmq: rabbitmq_writer
+# rdkafka: kafka_writer
 # ruby: ruby_evaluator_filter
 # soci: database_writer
 # zeromq: zeromq_writer
