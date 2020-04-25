@@ -19,6 +19,7 @@
 #include <chucho/file.hpp>
 #include <fstream>
 #include <algorithm>
+#include <random>
 
 namespace
 {
@@ -29,7 +30,9 @@ void make_file(const std::string& name)
     for (int i = 0; i < (100 * 1024) / (26 * 2); i++)
     {
         std::string chars("abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVXYZ");
-        std::random_shuffle(chars.begin(), chars.end());
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::shuffle(chars.begin(), chars.end(), gen);
         stream << chars;
     }
 }
