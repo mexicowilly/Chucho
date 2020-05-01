@@ -25,7 +25,7 @@ INCLUDE(CheckTypeSize)
 INCLUDE(CheckStructHasMember)
 INCLUDE(ChuchoFindProgram)
 INCLUDE(ChuchoFindPackage)
-INCLUDE(ChuchoGeneratePkgConfigFile)
+INCLUDE(ChuchoProcessPkgDeps)
 
 # framework or not
 SET(CHUCHO_NEEDS_TO_USE_THE_FRAMEWORK_VARIABLE_OR_CMAKE_COMPLAINS ${ENABLE_FRAMEWORK})
@@ -538,7 +538,7 @@ CHUCHO_FIND_PACKAGE(RDKAFKA INCLUDE librdkafka/rdkafka.h LIBS rdkafka SYMBOLS
     rd_kafka_subscribe rd_kafka_topic_partition_list_destroy rd_kafka_consumer_poll rd_kafka_message_destroy)
 
 # This must appear after the above package searches
-CHUCHO_GENERATE_PKG_CONFIG_FILE()
+CHUCHO_PROCESS_PKG_DEPS()
 
 # doxygen
 FIND_PACKAGE(Doxygen)
