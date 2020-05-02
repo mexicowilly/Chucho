@@ -28,22 +28,32 @@ kafka_writer::kafka_writer(const std::string& name,
                            const std::string& topic,
                            rd_kafka_conf_t* conf)
     : message_queue_writer(name, std::move(fmt), std::move(ser), 1),
+      config_(conf),
       should_stop_(false)
 {
-    char err_msg[1024];
-    producer_ = rd_kafka_new(RD_KAFKA_PRODUCER, conf, err_msg, sizeof(err_msg));
-    if (producer_ == nullptr)
+    try
     {
-        rd_kafka_conf_destroy(conf);
-        throw exception(std::string("Unable to initialize rdkafka: ") + err_msg);
+        char err_msg[1024];
+        auto local = rd_kafka_conf_dup(config_);
+        producer_ = rd_kafka_new(RD_KAFKA_PRODUCER, local, err_msg, sizeof(err_msg));
+        if (producer_ == nullptr)
+        {
+            rd_kafka_conf_destroy(local);
+            throw exception(std::string("Unable to initialize rdkafka: ") + err_msg);
+        }
+        topic_ = rd_kafka_topic_new(producer_, topic.c_str(), nullptr);
+        if (topic_ == nullptr)
+        {
+            rd_kafka_destroy(producer_);
+            throw exception("Unable to create topic '" + topic + "': " + rd_kafka_err2str(rd_kafka_last_error()));
+        }
+        poller_ = std::thread(&kafka_writer::poller_main, this);
     }
-    topic_ = rd_kafka_topic_new(producer_, topic.c_str(), nullptr);
-    if (topic_ == nullptr)
+    catch (...)
     {
-        rd_kafka_destroy(producer_);
-        throw exception("Unable to create topic '" + topic + "': " + rd_kafka_err2str(rd_kafka_last_error()));
+        rd_kafka_conf_destroy(config_);
+        throw;
     }
-    poller_ = std::thread(&kafka_writer::poller_main, this);
 }
 
 kafka_writer::~kafka_writer()
@@ -53,6 +63,7 @@ kafka_writer::~kafka_writer()
     rd_kafka_flush(producer_, 5000);
     rd_kafka_topic_destroy(topic_);
     rd_kafka_destroy(producer_);
+    rd_kafka_conf_destroy(config_);
 }
 
 void kafka_writer::flush_impl(const std::vector<std::uint8_t>& blob)
@@ -85,10 +96,9 @@ void kafka_writer::flush_impl(const std::vector<std::uint8_t>& blob)
 
 std::string kafka_writer::get_config_value(const std::string& key) const
 {
-    auto conf = rd_kafka_conf(producer_);
     char value[1024 * 4];
     std::size_t len = sizeof(value);
-    if (rd_kafka_conf_get(conf, key.c_str(), value, &len) == RD_KAFKA_CONF_OK)
+    if (rd_kafka_conf_get(config_, key.c_str(), value, &len) == RD_KAFKA_CONF_OK)
         return value;
     throw exception("Unable to retrieve Kafka setting for '" + key + '"');
 }

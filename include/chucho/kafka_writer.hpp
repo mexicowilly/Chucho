@@ -43,6 +43,8 @@ public:
     /**
      * Create a writer.
      *
+     * @post The writer takes ownership of the @c conf parameter.
+     *
      * @param name the name
      * @param fmt the formatter
      * @param ser the serializer
@@ -83,6 +85,7 @@ protected:
 private:
     void poller_main();
 
+    rd_kafka_conf_t* config_;
     rd_kafka_t* producer_;
     rd_kafka_topic_t* topic_;
     std::thread poller_;

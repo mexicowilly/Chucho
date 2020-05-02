@@ -19,6 +19,7 @@
 #include <chucho/kafka_writer.hpp>
 #include <chucho/demangle.hpp>
 #include <librdkafka/rdkafka.h>
+#include <cassert>
 
 namespace chucho
 {
