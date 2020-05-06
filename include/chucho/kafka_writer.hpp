@@ -33,7 +33,7 @@ namespace chucho
  *
  * @ingroup writers
  */
-class kafka_writer : public message_queue_writer
+class CHUCHO_EXPORT kafka_writer : public message_queue_writer
 {
 public:
     /**
@@ -83,7 +83,7 @@ protected:
     virtual void flush_impl(const std::vector<std::uint8_t>& blob) override;
 
 private:
-    void poller_main();
+    CHUCHO_NO_EXPORT void poller_main();
 
     rd_kafka_conf_t* config_;
     rd_kafka_t* producer_;
