@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_CACHE_AND_RELEASE_FILTER_HPP__)
 #define CHUCHO_CACHE_AND_RELEASE_FILTER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/filter.hpp>
 #include <chucho/event_cache_provider.hpp>
 #include <chucho/writer.hpp>
@@ -145,5 +150,9 @@ inline void cache_and_release_filter::set_writer(writer& wrt)
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif
