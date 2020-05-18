@@ -19,7 +19,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.1.3)
 PROJECT(chucho CXX C)
 
 SET(CHUCHO_MAJOR_VERSION 2)
-SET(CHUCHO_MINOR_VERSION 5)
+SET(CHUCHO_MINOR_VERSION 6)
 SET(CHUCHO_VERSION ${CHUCHO_MAJOR_VERSION}.${CHUCHO_MINOR_VERSION})
 
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -30,9 +30,25 @@ INCLUDE(Configure)
 # We can release stuff
 SET(CPACK_PACKAGE_VERSION_MAJOR ${CHUCHO_MAJOR_VERSION})
 SET(CPACK_PACKAGE_VERSION_MINOR ${CHUCHO_MINOR_VERSION})
-SET(CPACK_SOURCE_PACKAGE_FILE_NAME ${CMAKE_PROJECT_NAME}-${CHUCHO_VERSION})
+SET(CPACK_SOURCE_PACKAGE_FILE_NAME chucho-${CHUCHO_VERSION})
 SET(CPACK_SOURCE_IGNORE_FILES "build;\.git;\.idea;^.*\.swp$;${CPACK_SOURCE_IGNORE_FILES}")
 SET(CPACK_SOURCE_GENERATOR TGZ ZIP)
+
+SET(CPACK_PACKAGE_NAME chucho)
+SET(CPACK_PACKAGE_CONTACT will@chucho-log.org)
+SET(CPACK_PACKAGE_VENDOR "Will Mason")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A C++14 and C11 logging library")
+
+# CPACK_DEBIAN_PACKAGE_DEPENDS is set during CHUCHO_PROCESS_PKG_DEPS
+SET(CPACK_DEBIAN_PACKAGE_RELEASE 1)
+SET(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
+
+# CPACK_RPM_PACKAGE_REQUIRES is set during CHUCHO_PROCESS_PKG_DEPS
+SET(CPACK_RPM_FILE_NAME RPM-DEFAULT)
+SET(CPACK_RPM_PACKAGE_LICENSE "ASL 2.0")
+SET(CPACK_RPM_PACKAGE_GROUP "Development/Libraries")
+SET(CPACK_RPM_PACKAGE_DESCRIPTION "A C++14 and C11 logging library")
+
 INCLUDE(CPack)
 
 # Include CMAKE_BINARY_DIR because that's where the generated file
@@ -87,6 +103,9 @@ IF(AWSSDK_FOUND)
 ENDIF()
 IF(CHUCHO_HAVE_SOCI)
     INCLUDE_DIRECTORIES("${SOCI_INCLUDE_DIR}")
+ENDIF()
+IF(CHUCHO_HAVE_RDKAFKA)
+    INCLUDE_DIRECTORIES("${RDKAFKA_INCLUDE_DIR}")
 ENDIF()
 
 IF(CHUCHO_POSIX)
@@ -170,6 +189,7 @@ ENDIF()
 
 SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/async_writer.hpp
+    include/chucho/cache_and_release_filter.hpp
     include/chucho/cerr_writer.hpp
     include/chucho/cloud_writer.hpp
     include/chucho/compressor.hpp
@@ -400,13 +420,13 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
 
 IF(CHUCHO_HAVE_ACTIVEMQ)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
-         include/chucho/activemq_writer.hpp
-         include/chucho/activemq_writer_factory.hpp
-         include/chucho/activemq_writer_memento.hpp)
+         include/chucho/activemq_writer.hpp)
     LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
          activemq_writer.cpp
          activemq_writer_factory.cpp
-         activemq_writer_memento.cpp)
+         include/chucho/activemq_writer_factory.hpp
+         activemq_writer_memento.cpp
+         include/chucho/activemq_writer_memento.hpp)
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
@@ -414,13 +434,13 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
 
 IF(CHUCHO_HAVE_RABBITMQ)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
-         include/chucho/rabbitmq_writer.hpp
-         include/chucho/rabbitmq_writer_factory.hpp
-         include/chucho/rabbitmq_writer_memento.hpp)
+         include/chucho/rabbitmq_writer.hpp)
     LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
          rabbitmq_writer.cpp
          rabbitmq_writer_factory.cpp
-         rabbitmq_writer_memento.cpp)
+         include/chucho/rabbitmq_writer_factory.hpp
+         rabbitmq_writer_memento.cpp
+         include/chucho/rabbitmq_writer_memento.hpp)
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
@@ -428,14 +448,13 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
 
 IF(CHUCHO_HAVE_DOORS)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
-         include/chucho/door_event.h
-         include/chucho/door_writer.hpp
-         include/chucho/door_writer_factory.hpp
-         include/chucho/door_writer_memento.hpp)
+         include/chucho/door_event.h)
     LIST(APPEND CHUCHO_DOOR_SOURCES
          platform/solaris/door_writer.cpp
          platform/solaris/door_writer_factory.cpp
-         platform/solaris/door_writer_memento.cpp)
+         include/chucho/door_writer_factory.hpp
+         platform/solaris/door_writer_memento.cpp
+         include/chucho/door_writer_memento.hpp)
 ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
@@ -469,6 +488,26 @@ ENDIF()
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/database_writer.hpp)
+
+IF(CHUCHO_HAVE_RDKAFKA)
+        LIST(APPEND CHUCHO_PUBLIC_HEADERS
+             include/chucho/kafka_writer.hpp)
+        LIST(APPEND CHUCHO_MESSAGE_QUEUE_SOURCES
+             kafka_configuration.cpp
+             include/chucho/kafka_configuration.hpp
+             kafka_configuration_factory.cpp
+             include/chucho/kafka_configuration_factory.hpp
+             kafka_configuration_memento.cpp
+             include/chucho/kafka_configuration_memento.hpp
+             kafka_writer.cpp
+             kafka_writer_factory.cpp
+             include/chucho/kafka_writer_factory.hpp
+             kafka_writer_memento.cpp
+             include/chucho/kafka_writer_memento.hpp)
+ENDIF()
+
+LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+     include/chucho/kafka_writer.hpp)
 
 # The libyaml sources are required by chuchod
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
@@ -530,7 +569,7 @@ IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
     SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
                                 COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATION_DEFS};CHUCHO_CONFIG_FILE_CONFIG")
     IF(CONFIG_FILE_CONFIG)
-        SET(CHUCHO_CONFIGURATOR_DEFS CHUCHO_CONFIG_FILE)
+        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_CONFIG_FILE)
         MESSAGE(STATUS "Chucho has config file configuration parsing enabled")
     ENDIF()
     IF(LOG4CPLUS_CONFIG)
@@ -539,6 +578,9 @@ IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
     ENDIF()
     IF(CURL_FOUND)
         LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_CURL)
+    ENDIF()
+    IF(CHUCHO_HAVE_RDKAFKA)
+        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RDKAFKA)
     ENDIF()
     SET_SOURCE_FILES_PROPERTIES(config_file_configurator.cpp PROPERTIES
                                 COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATOR_DEFS}")
@@ -594,6 +636,9 @@ SET(CHUCHO_SOURCES
     async_writer.cpp
     async_writer_factory.cpp
     async_writer_memento.cpp
+    cache_and_release_filter.cpp
+    cache_and_release_filter_factory.cpp
+    cache_and_release_filter_memento.cpp
     calendar.cpp
     cerr_writer_factory.cpp
     configurable.cpp
@@ -700,6 +745,8 @@ SET(CHUCHO_SOURCES
     include/chucho/async_writer_factory.hpp
     include/chucho/async_writer_memento.hpp
     include/chucho/c_logger.hpp
+    include/chucho/cache_and_release_filter_factory.hpp
+    include/chucho/cache_and_release_filter_memento.hpp
     include/chucho/calendar.hpp
     include/chucho/cerr_writer_factory.hpp
     include/chucho/configurator.hpp
@@ -858,6 +905,13 @@ IF(AWSSDK_FOUND)
     LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_AWSSDK)
 ENDIF()
 
+IF(CHUCHO_HAVE_RDKAFKA)
+    LIST(FIND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RDKAFKA CHUCHO_HRK_INDEX)
+    IF(CHUCHO_HRK_INDEX EQUAL -1)
+        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RDKAFKA)
+    ENDIF()
+ENDIF()
+
 IF(DEFINED CHUCHO_CONFIGURATOR_DEFS)
     SET_SOURCE_FILES_PROPERTIES(configurator.cpp PROPERTIES
                                 COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATOR_DEFS}")
@@ -917,6 +971,9 @@ IF(CHUCHO_HAVE_LZ4)
 ENDIF()
 IF(AWSSDK_FOUND)
     LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_AWSSDK)
+ENDIF()
+IF(CHUCHO_HAVE_RDKAFKA)
+    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_RDKAFKA)
 ENDIF()
 IF(DEFINED CHUCHO_FEATURE_DEFS)
     SET_SOURCE_FILES_PROPERTIES(optional_features.cpp PROPERTIES
@@ -1088,6 +1145,10 @@ IF(CHUCHO_HAVE_SOCI)
     TARGET_LINK_LIBRARIES(chucho ${SOCI_LIBS})
 ENDIF()
 
+IF(CHUCHO_HAVE_RDKAFKA)
+    TARGET_LINK_LIBRARIES(chucho ${RDKAFKA_LIBS})
+ENDIF()
+
 TARGET_LINK_LIBRARIES(chucho ${CMAKE_THREAD_LIBS_INIT})
 
 IF(CHUCHO_SOLARIS)
@@ -1142,7 +1203,6 @@ IF(DOXYGEN_FOUND)
     EXECUTE_PROCESS(COMMAND "${DOXYGEN_EXECUTABLE}" -w html "${CMAKE_BINARY_DIR}/doc_header.html" "${CMAKE_BINARY_DIR}/doc_footer.html" "${CMAKE_BINARY_DIR}/doc_stylesheet.html" "${CMAKE_BINARY_DIR}/doxygen.conf"
                     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
     FILE(STRINGS "${CMAKE_BINARY_DIR}/doc_header.html" CHUCHO_HTML_HEADER)
-    FILE(STRINGS "${CMAKE_BINARY_DIR}/doc_footer.html" CHUCHO_HTML_FOOTER)
     FILE(REMOVE "${CMAKE_BINARY_DIR}/doc_header.html" "${CMAKE_BINARY_DIR}/doc_footer.html" "${CMAKE_BINARY_DIR}/doc_stylesheet.html")
     LIST(FIND CHUCHO_HTML_HEADER <head> CHUCHO_HEAD_INDEX)
     IF(CHUCHO_HEAD_INDEX EQUAL -1)
@@ -1154,15 +1214,7 @@ IF(DOXYGEN_FOUND)
         FILE(APPEND "${CMAKE_BINARY_DIR}/doc_header.html" ${LINE})
         FILE(APPEND "${CMAKE_BINARY_DIR}/doc_header.html" "\n")
     ENDFOREACH()
-    LIST(FIND CHUCHO_HTML_FOOTER </body> CHUCHO_BODY_INDEX)
-    IF(CHUCHO_BODY_INDEX EQUAL -1)
-        MESSAGE(FATAL_ERROR "The </body> section of the HTML footer could not be found")
-    ENDIF()
-    LIST(INSERT CHUCHO_HTML_FOOTER ${CHUCHO_BODY_INDEX} "<script async src=\"//radar.cedexis.com/1/23762/radar.js\"></script>")
-    FOREACH(LINE ${CHUCHO_HTML_FOOTER})
-        FILE(APPEND "${CMAKE_BINARY_DIR}/doc_footer.html" ${LINE})
-        FILE(APPEND "${CMAKE_BINARY_DIR}/doc_footer.html" "\n")
-    ENDFOREACH()
+    FILE(APPEND "${CMAKE_BINARY_DIR}/doxygen.conf" "\nHTML_HEADER=\"${CMAKE_BINARY_DIR}/doc_header.html\"")
     ADD_CUSTOM_TARGET(doc
                       COMMAND "${DOXYGEN_EXECUTABLE}" "${CMAKE_BINARY_DIR}/doxygen.conf"
                       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")

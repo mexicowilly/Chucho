@@ -48,15 +48,6 @@ class CHUCHO_EXPORT async_writer : public writer, public event_cache_provider
 {
 public:
     /**
-     * The default size of a single chunk.
-     */
-    static constexpr std::size_t DEFAULT_CHUNK_SIZE = 1024 * 1024;
-    /**
-     * The default maximum number of chunks.
-     */
-    static constexpr std::size_t DEFAULT_MAX_CHUNKS = 2;
-
-    /**
      * @name Constructor and destructor
      */
     //@{
@@ -67,12 +58,20 @@ public:
      * @param wrt the underlying slow writer
      * @param flush_on_destruct whether to flush the pending events
      *                          when the writer is destroyed
-     * @throw std::invalid_argument if fmt is an uninitialized 
-     *        std::unique_ptr
      */
     async_writer(const std::string& name,
                  std::unique_ptr<writer>&& wrt,
                  bool flush_on_destruct = true);
+    /**
+     * Construct an asynchronous writer.
+     *
+     * @param name the name of the writer
+     * @param wrt the underlying slow writer
+     * @param chunk_size the size of each chunk in the cache
+     * @param max_chunks the maximum number of chunks for the cache
+     * @param flush_on_destruct whether to flush the pending events
+     *                          when the writer is destroyed
+     */
     async_writer(const std::string& name,
                  std::unique_ptr<writer>&& wrt,
                  std::size_t chunk_size,

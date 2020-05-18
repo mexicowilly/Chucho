@@ -54,6 +54,10 @@ IF(CHUCHO_HAVE_RABBITMQ)
     LIST(APPEND CHUCHO_TEST_MQ_SOURCES rabbitmq_writer_test.cpp)
 ENDIF()
 
+IF(CHUCHO_HAVE_RDKAFKA)
+    LIST(APPEND CHUCHO_TEST_MQ_SOURCES kafka_writer_test.cpp)
+ENDIF()
+
 IF(ZLIB_FOUND)
     LIST(APPEND CHUCHO_TEST_COMPRESSION_SOURCES
          gzip_file_compressor_test.cpp
@@ -146,6 +150,10 @@ IF(CHUCHO_HAVE_RABBITMQ)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_RABBITMQ)
 ENDIF()
 
+IF(CHUCHO_HAVE_RDKAFKA)
+    ADD_DEFINITIONS(-DCHUCHO_HAVE_RDKAFKA)
+ENDIF()
+
 IF(CHUCHO_HAVE_DOORS)
     LIST(APPEND CHUCHO_TEST_DOOR_SOURCES door_writer_test.cpp)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_DOORS)
@@ -167,6 +175,7 @@ ENDIF()
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                async_writer_test.cpp
                c_test.cpp
+               cache_and_release_filter_test.cpp
                calendar_test.cpp
                configuration_test.cpp
                configurator_test.cpp
@@ -258,6 +267,13 @@ IF(CHUCHO_HAVE_RABBITMQ)
                    rabbitmq_writer_test_helper.cpp)
     TARGET_LINK_LIBRARIES(rabbitmq-writer-test-helper chucho)
     ADD_DEPENDENCIES(unit-test rabbitmq-writer-test-helper)
+ENDIF()
+
+IF(CHUCHO_HAVE_RDKAFKA)
+    ADD_EXECUTABLE(kafka-writer-test-helper EXCLUDE_FROM_ALL
+                   kafka_writer_test_helper.cpp)
+    TARGET_LINK_LIBRARIES(kafka-writer-test-helper chucho)
+    ADD_DEPENDENCIES(unit-test kafka-writer-test-helper)
 ENDIF()
 
 IF(CHUCHO_HAVE_DOORS)

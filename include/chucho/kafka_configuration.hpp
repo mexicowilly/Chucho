@@ -1,12 +1,12 @@
 /*
  * Copyright 2013-2019 Will Mason
- * 
+ *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,24 +14,33 @@
  *    limitations under the License.
  */
 
-#include <chucho/formatted_message_serializer.hpp>
-#include <chucho/line_ending.hpp>
+#if !defined(CHUCHO_KAFKA_CONFIGURATION_HPP__)
+#define CHUCHO_KAFKA_CONFIGURATION_HPP__
+
+#if !defined(CHUCHO_BUILD)
+#error "This header is private"
+#endif
+
+#include <chucho/configurable.hpp>
+#include <librdkafka/rdkafka.h>
+#include <map>
+#include <string>
 
 namespace chucho
 {
 
-std::vector<std::uint8_t> formatted_message_serializer::finish_blob()
+class kafka_configuration : public configurable
 {
-    auto result(std::vector<std::uint8_t>(events_.begin(), events_.end()));
-    events_.clear();
-    return result;
-}
+public:
+    kafka_configuration(const std::map<std::string, std::string>& key_values);
+    ~kafka_configuration();
 
-void formatted_message_serializer::serialize(const event& evt, formatter& fmt)
-{
-    if (!events_.empty())
-        events_ += line_ending::EOL;
-    events_ += fmt.format(evt);
-}
+    rd_kafka_conf_t* get_conf();
+
+private:
+    rd_kafka_conf_t* conf_;
+};
 
 }
+
+#endif

@@ -1,5 +1,5 @@
 .DS_Store
 build
 .idea
-cmake-build-debug
+cmake-build*
 .directory

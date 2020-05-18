@@ -78,6 +78,18 @@ namespace chucho
  *         <td>[2, 1000000]</td></tr>
  *     <tr><td>async_writer::max_chunks(text)</td>
  *         <td>7</td></tr>
+ *     <tr><td>cache_and_release_filter::cache_threshold</td>
+ *         <td><i>default</i></td></tr>
+ *     <tr><td>cache_and_release_filter::chunk_size</td>
+ *         <td>[1024, 104857600]</td></tr>
+ *     <tr><td>cache_and_release_filter::chunk_size(text)</td>
+ *         <td>9</td></tr>
+ *     <tr><td>cache_and_release_filter::max_chunks</td>
+ *         <td>[2, 1000000]</td></tr>
+ *     <tr><td>cache_and_release_filter::max_chunks(text)</td>
+ *         <td>7</td></tr>
+ *     <tr><td>cache_and_release_filter::release_threshold</td>
+ *         <td><i>default</i></td></tr>
  *     <tr><td>cloudwatch_writer::batch_size</td>
  *         <td>[1, 10000]</td></tr>
  *     <tr><td>cloudwatch_writer::batch_size(text)</td>
@@ -128,6 +140,14 @@ namespace chucho
  *         <td>[1, 5000]</td></tr>
  *     <tr><td>interval_file_roll_trigger::period(text)</td>
  *         <td>12</td></tr>
+ *     <tr><td>kafka_configuration::key</td>
+ *         <td><i>default</i></td></tr>
+ *     <tr><td>kafka_configuration::value</td>
+ *         <td><i>default</i></td></tr>
+ *     <tr><td>kafka_writer::brokers</td>
+ *         <td><i>default</i></td></tr>
+ *     <tr><td>kafka_writer::topic</td>
+ *         <td><i>default</i></td></tr>
  *     <tr><td>level_filter::level</td>
  *         <td><i>default</i></td></tr>
  *     <tr><td>level_filter::on_match</td>

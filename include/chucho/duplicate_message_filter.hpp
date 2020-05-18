@@ -46,6 +46,8 @@ public:
     //@{
     /**
      * Construct a duplicate_message_filter.
+     *
+     * @param name the name of the filter
      */
     duplicate_message_filter(const std::string& name);
     //@}

@@ -52,7 +52,7 @@
  * target="_blank">Logback</a>, which involes loggers, writers, 
  * formatters and other elements. For more information on the 
  * design and use of Chucho, please visit the <a 
- * href="https://www.assembla.com/spaces/chucho/wiki" 
+ * href="https://github.com/mexicowilly/Chucho/wiki"
  * target="_blank">user manual</a>, which is under construction.
  *  
  * @subsection c C API

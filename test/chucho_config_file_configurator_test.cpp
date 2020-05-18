@@ -171,6 +171,25 @@ TEST_F(chucho_config_file_configurator, bzip2_file_compressor)
 
 #endif
 
+TEST_F(chucho_config_file_configurator, cache_and_release_filter)
+{
+    configure(R"cnf(
+chucho.logger = will
+chucho.logger.will.writer = co
+chucho.writer.co = chucho::cout_writer
+chucho.writer.co.filter = crf
+chucho.filter.crf = chucho::cache_and_release_filter
+chucho.filter.crf.cache_threshold = DeBuG
+chucho.filter.crf.release_threshold = ERROR
+chucho.filter.crf.chunk_size = 256k
+chucho.filter.crf.max_chunks = 7
+chucho.writer.co.formatter = pf
+chucho.formatter.pf = chucho::pattern_formatter
+chucho.formatter.pf.pattern = %m%n
+)cnf");
+    cache_and_release_filter_body();
+}
+
 TEST_F(chucho_config_file_configurator, cerr_writer)
 {
     configure("chucho.logger = will\n"
@@ -433,6 +452,46 @@ TEST_F(chucho_config_file_configurator, interval_file_roll_trigger)
                      "chucho.writer.rfw.file_name = what.log");
     interval_file_roll_trigger_body(tmpl);
 }
+
+#if defined(CHUCHO_HAVE_RDKAFKA)
+
+TEST_F(chucho_config_file_configurator, kafka_writer_brokers)
+{
+    configure(R"cnf(
+chucho.logger = will
+chucho.logger.will.writer = kw
+chucho.writer.kw = chucho::kafka_writer
+chucho.writer.kw.formatter = pf
+chucho.formatter.pf = chucho::pattern_formatter
+chucho.formatter.pf.pattern = %m
+chucho.writer.kw.serializer = fms
+chucho.serializer.fms = chucho::formatted_message_serializer
+chucho.writer.kw.brokers = 192.168.56.101
+chucho.writer.kw.topic = monkeyballs
+)cnf");
+    kafka_writer_brokers_body();
+}
+
+TEST_F(chucho_config_file_configurator, kafka_writer_config)
+{
+    configure(R"cnf(
+chucho.logger = will
+chucho.logger.will.writer = kw
+chucho.writer.kw = chucho::kafka_writer
+chucho.writer.kw.formatter = pf
+chucho.formatter.pf = chucho::pattern_formatter
+chucho.formatter.pf.pattern = %m
+chucho.writer.kw.serializer = fms
+chucho.serializer.fms = chucho::formatted_message_serializer
+chucho.writer.kw.topic = chunkymonkey
+chucho.writer.kw.kafka = kc
+chucho.kafka.kc = kafka_configuration
+chucho.kafka.kc.bootstrap.servers = 192.168.56.101
+)cnf");
+    kafka_writer_config_body();
+}
+
+#endif
 
 TEST_F(chucho_config_file_configurator, level_filter)
 {

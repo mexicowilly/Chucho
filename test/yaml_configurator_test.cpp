@@ -181,6 +181,23 @@ TEST_F(yaml_configurator, bzip2_file_compressor)
 
 #endif
 
+TEST_F(yaml_configurator, cache_and_release_filter)
+{
+    configure(R"cnf(
+chucho::logger:
+    name: will
+    chucho::cout_writer:
+        - chucho::pattern_formatter:
+            pattern: '%m%n'
+        - chucho::cache_and_release_filter:
+            cache_threshold: debug
+            release_threshold: ErRoR
+            chunk_size: 256k
+            max_chunks: 7
+)cnf");
+    cache_and_release_filter_body();
+}
+
 TEST_F(yaml_configurator, cerr_writer)
 {
     configure("chucho::logger:\n"
@@ -398,6 +415,41 @@ chucho::logger:
 )tmpl");
     json_formatter_body(tmpl);
 }
+
+#if defined(CHUCHO_HAVE_RDKAFKA)
+
+TEST_F(yaml_configurator, kafka_writer_brokers)
+{
+    configure(R"cnf(
+chucho::logger:
+    name: will
+    chucho::kafka_writer:
+        - chucho::pattern_formatter:
+            - pattern: '%m'
+        - chucho::formatted_message_serializer
+        - brokers: 192.168.56.101
+        - topic: monkeyballs
+)cnf");
+    kafka_writer_brokers_body();
+}
+
+TEST_F(yaml_configurator, kafka_writer_config)
+{
+    configure(R"cnf(
+chucho::logger:
+    name: will
+    chucho::kafka_writer:
+        - chucho::pattern_formatter:
+            - pattern: '%m'
+        - chucho::formatted_message_serializer
+        - kafka_configuration:
+            bootstrap.servers: 192.168.56.101
+        - topic: chunkymonkey
+)cnf");
+    kafka_writer_config_body();
+}
+
+#endif
 
 TEST_F(yaml_configurator, level_filter)
 {

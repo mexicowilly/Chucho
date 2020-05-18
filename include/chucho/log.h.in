@@ -27,7 +27,13 @@
  * @file 
  * Logging macros functions that use the Chucho C API. These 
  * macros handle the machinery of filtering messages by level 
- * and adding markers. 
+ * and adding markers.
+ *
+ * @note If your compiler supports the @c _Generic keyword, then you may
+ * use these macros with either a @ref chucho_logger_t* or a
+ * const char* for the lgr parameter. If your compiler does not
+ * support @c _Generic, then you may only use const char* for the
+ * lgr parameter.
  *  
  * @ingroup c_loggers 
  */

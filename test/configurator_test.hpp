@@ -40,6 +40,7 @@ protected:
 #if defined(CHUCHO_HAVE_BZIP2)
     void bzip2_file_compressor_body();
 #endif
+    void cache_and_release_filter_body();
     void cerr_writer_body();
 #if defined(CHUCHO_HAVE_AWSSDK)
     void cloudwatch_writer_body();
@@ -62,6 +63,10 @@ protected:
 #endif
     void interval_file_roll_trigger_body(const std::string& tmpl);
     void json_formatter_body(const std::string &tmpl);
+#if defined(CHUCHO_HAVE_RDKAFKA)
+    void kafka_writer_brokers_body();
+    void kafka_writer_config_body();
+#endif
     void level_filter_body(const std::string& tmpl);
     void level_threshold_filter_body();
     void logger_body();

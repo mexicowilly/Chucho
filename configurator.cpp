@@ -21,6 +21,7 @@
 #include <chucho/regex.hpp>
 
 #include <chucho/async_writer_factory.hpp>
+#include <chucho/cache_and_release_filter_factory.hpp>
 #include <chucho/cerr_writer_factory.hpp>
 #include <chucho/cout_writer_factory.hpp>
 #include <chucho/duplicate_message_filter_factory.hpp>
@@ -98,6 +99,10 @@
 #endif
 #if defined(CHUCHO_HAVE_SOCI)
 #include <chucho/database_writer_factory.hpp>
+#endif
+#if defined(CHUCHO_HAVE_RDKAFKA)
+#include <chucho/kafka_writer_factory.hpp>
+#include <chucho/kafka_configuration_factory.hpp>
 #endif
 
 #include <cstring>
@@ -183,6 +188,8 @@ void configurator::initialize_impl()
                              std::make_shared<formatted_message_serializer_factory>());
     add_configurable_factory("chucho::json_formatter",
                              std::make_shared<json_formatter_factory>());
+    add_configurable_factory("chucho::cache_and_release_filter",
+                             std::make_shared<cache_and_release_filter_factory>());
 #if defined(CHUCHO_WINDOWS)
     add_configurable_factory("chucho::windows_event_log_writer",
                              std::make_shared<windows_event_log_writer_factory>());
@@ -260,6 +267,12 @@ void configurator::initialize_impl()
 #if defined(CHUCHO_HAVE_LIBARCHIVE)
     add_configurable_factory("chucho::zip_file_compressor",
                              std::make_shared<zip_file_compressor_factory>());
+#endif
+#if defined(CHUCHO_HAVE_RDKAFKA)
+    add_configurable_factory("kafka_configuration",
+                             std::make_shared<kafka_configuration_factory>());
+    add_configurable_factory("chucho::kafka_writer",
+                             std::make_shared<kafka_writer_factory>());
 #endif
 }
 

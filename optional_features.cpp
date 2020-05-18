@@ -83,6 +83,9 @@ void init_feature_set(chucho::optional_features::feature_set& fs)
 #if defined(CHUCHO_HAVE_SOCI)
     fs.set(chucho::optional_features::DATABASE_WRITER);
 #endif
+#if defined(CHUCHO_HAVE_RDKAFKA)
+    fs.set(chucho::optional_features::KAFKA_WRITER);
+#endif
 }
 
 }

@@ -14,24 +14,27 @@
  *    limitations under the License.
  */
 
-#include <chucho/formatted_message_serializer.hpp>
-#include <chucho/line_ending.hpp>
+#if !defined(CHUCHO_CACHE_FILTER_FACTORY_HPP__)
+#define CHUCHO_CACHE_FILTER_FACTORY_HPP__
+
+#if !defined(CHUCHO_BUILD)
+#error "This header is private"
+#endif
+
+#include <chucho/configurable_factory.hpp>
 
 namespace chucho
 {
 
-std::vector<std::uint8_t> formatted_message_serializer::finish_blob()
+class cache_and_release_filter_factory : public configurable_factory
 {
-    auto result(std::vector<std::uint8_t>(events_.begin(), events_.end()));
-    events_.clear();
-    return result;
-}
+public:
+    cache_and_release_filter_factory();
 
-void formatted_message_serializer::serialize(const event& evt, formatter& fmt)
-{
-    if (!events_.empty())
-        events_ += line_ending::EOL;
-    events_ += fmt.format(evt);
-}
+    virtual std::unique_ptr<configurable> create_configurable(std::unique_ptr<memento>& mnto) override;
+    virtual std::unique_ptr<memento> create_memento(configurator& cfg) override;
+};
 
 }
+
+#endif
