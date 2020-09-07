@@ -29,9 +29,11 @@ cache_and_release_filter::cache_and_release_filter(const std::string& name,
                                                    std::shared_ptr<level> release_threshold,
                                                    std::size_t chunk_size,
                                                    std::size_t max_chunks)
-  : cache_and_release_filter(name, cache_threshold, release_threshold, chunk_size, max_chunks)
+  : writeable_filter(name, wrt),
+    event_cache_provider(chunk_size, chunk_size * max_chunks),
+    release_threshold_(release_threshold),
+    cache_threshold_(cache_threshold)
 {
-    writer_ = &wrt;
 }
 
 cache_and_release_filter::cache_and_release_filter(const std::string& name,
@@ -39,9 +41,8 @@ cache_and_release_filter::cache_and_release_filter(const std::string& name,
                                                    std::shared_ptr<level> release_threshold,
                                                    std::size_t chunk_size,
                                                    std::size_t max_chunks)
-    : filter(name),
+    : writeable_filter(name),
       event_cache_provider(chunk_size, chunk_size * max_chunks),
-      writer_(nullptr),
       release_threshold_(release_threshold),
       cache_threshold_(cache_threshold)
 {
@@ -52,12 +53,12 @@ filter::result cache_and_release_filter::evaluate(const event& evt)
     result rs = result::NEUTRAL;
     if (*evt.get_level() >= *release_threshold_)
     {
-        if (writer_ == nullptr)
+        if (!has_writer())
             throw std::runtime_error("No writer has been set in the cache_filter '" + get_name() + "'");
         auto e = cache_->pop(1ms);
         while (e)
         {
-            writer_->write_impl(*e);
+            write(*e);
             e = cache_->pop(1ms);
         }
         rs = result::ACCEPT;

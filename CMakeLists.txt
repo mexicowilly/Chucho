@@ -262,6 +262,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/syslog_writer.hpp
     include/chucho/time_file_roller.hpp
     "${CMAKE_BINARY_DIR}/chucho/version.hpp"
+    include/chucho/writeable_filter.hpp
     include/chucho/writer.hpp
     include/chucho/writer_factory.hpp
     include/chucho/writer_memento.hpp)

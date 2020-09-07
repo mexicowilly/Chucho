@@ -20,7 +20,13 @@ namespace chucho
 {
 
 duplicate_message_filter::duplicate_message_filter(const std::string& name)
-    : filter(name),
+    : writeable_filter(name),
+      count_(0)
+{
+}
+
+duplicate_message_filter::duplicate_message_filter(const std::string& name, writer& wrt)
+    : writeable_filter(name, wrt),
       count_(0)
 {
 }
@@ -28,7 +34,10 @@ duplicate_message_filter::duplicate_message_filter(const std::string& name)
 filter::result duplicate_message_filter::evaluate(const event& evt)
 {
     result res = result::NEUTRAL;
-    if (count_ > 0 && evt.get_message() == message_)
+    if (!has_writer())
+        throw std::runtime_error("No writer has been set in the duplicate_message_filter '" + get_name() + "'");
+    auto fmsg = get_writer().get_formatter().format(evt);
+    if (count_ > 0 && fmsg == message_)
     {
         count_++;
         res = result::DENY;
@@ -36,8 +45,17 @@ filter::result duplicate_message_filter::evaluate(const event& evt)
     else
     {
         if (count_ > 1)
-            report_info("The message \"" + message_ + "\" was logged " + std::to_string(count_) + " times in a row");
-        message_ = evt.get_message();
+        {
+            event levt(evt.get_logger(),
+                       evt.get_level(),
+                       "The last message was logged " + std::to_string(count_) + " times in a row",
+                       evt.get_file_name(),
+                       evt.get_line_number(),
+                       evt.get_function_name(),
+                       evt.get_marker());
+            write(levt);
+        }
+        message_ = fmsg;
         count_ = 1;
     }
     return res;

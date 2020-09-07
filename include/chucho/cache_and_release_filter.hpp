@@ -22,9 +22,8 @@
 #pragma warning(disable:4251)
 #endif
 
-#include <chucho/filter.hpp>
+#include <chucho/writeable_filter.hpp>
 #include <chucho/event_cache_provider.hpp>
-#include <chucho/writer.hpp>
 
 namespace chucho
 {
@@ -43,7 +42,7 @@ namespace chucho
  *
  * @ingroup filters
  */
-class CHUCHO_EXPORT cache_and_release_filter : public filter, public event_cache_provider
+class CHUCHO_EXPORT cache_and_release_filter : public writeable_filter, public event_cache_provider
 {
 public:
     /**
@@ -108,23 +107,8 @@ public:
      * @return the release threshold
      */
     std::shared_ptr<level> get_release_threshold() const;
-    /**
-     * Return the writer that is associated with this filter.
-     * @return the writer
-     */
-    writer& get_writer() const;
-    /**
-     * Set the writer. This should be the writer that owns this filter.
-     * The reason this method exists is that during configuration the filters
-     * are constructed before the writers that hold them.
-     *
-     * @param wrt the writer that holds this filter
-     */
-    void set_writer(writer& wrt);
 
 private:
-    /* This is just a settable reference */
-    writer* writer_;
     std::shared_ptr<level> release_threshold_;
     std::shared_ptr<level> cache_threshold_;
 };
@@ -137,16 +121,6 @@ inline std::shared_ptr<level> cache_and_release_filter::get_cache_threshold() co
 inline std::shared_ptr<level> cache_and_release_filter::get_release_threshold() const
 {
     return release_threshold_;
-}
-
-inline writer& cache_and_release_filter::get_writer() const
-{
-    return *writer_;
-}
-
-inline void cache_and_release_filter::set_writer(writer& wrt)
-{
-    writer_ = &wrt;
 }
 
 }

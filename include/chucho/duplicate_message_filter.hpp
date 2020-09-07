@@ -22,7 +22,7 @@
 #pragma warning(disable:4251)
 #endif
 
-#include <chucho/filter.hpp>
+#include <chucho/writeable_filter.hpp>
 
 namespace chucho
 {
@@ -32,12 +32,12 @@ namespace chucho
  * A filter for removing duplicate messages. The message of an 
  * event is examined to see if it matches the last message 
  * written. If it does, then the event is denied. Once a new 
- * message is received, then the filter reports the number of 
- * duplicate messages seen to the @ref status_manager. 
+ * message is received, then the filter writes that a message
+ * was repeated a certain number of times.
  *  
  * @ingroup filters 
  */
-class CHUCHO_EXPORT duplicate_message_filter : public filter
+class CHUCHO_EXPORT duplicate_message_filter : public writeable_filter
 {
 public:
     /**
@@ -45,11 +45,19 @@ public:
      */
     //@{
     /**
-     * Construct a duplicate_message_filter.
+     * Construct a duplicate_message_filter. This filter will not have a
+     * writer set yet.
      *
      * @param name the name of the filter
      */
     duplicate_message_filter(const std::string& name);
+    /**
+     * Construct a duplicate_message_filter.
+     *
+     * @param name the name of the filter
+     * @param wrt the writer
+     */
+    duplicate_message_filter(const std::string& name, writer& wrt);
     //@}
 
     /**
