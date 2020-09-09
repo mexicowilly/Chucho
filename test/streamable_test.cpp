@@ -54,7 +54,7 @@ public:
     my_streamable(const std::string& logger_name = std::string())
     {
         if (!logger_name.empty())
-            rename_logger(logger_name);
+            rename_stream(logger_name);
     }
 
     std::shared_ptr<chucho::level> get_level() const

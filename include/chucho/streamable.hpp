@@ -109,8 +109,31 @@ protected:
      * @return the stream
      */
     log_stream& get_log_stream() const;
-    virtual void rename_logger(const std::type_info& new_type) override;
-    virtual void rename_logger(const std::string& name) override;
+
+    /**
+     * Rename the stream. This method is meant to be used in cases
+     * where a subclass of a subclass of streamable needs a different
+     * stream name. Say you have a class hierarchy built off the
+     * abstract class shape. You make shape a subclass of streamable,
+     * so that everyone gets a stream. Subclasses of shape don't
+     * want their streams to be named shape, so they rename the
+     * stream in the subclass' constructor.
+     *
+     * @param new_type the type on which to base the new name
+     */
+    void rename_stream(const std::type_info& new_type);
+    /**
+     * Rename the stream. This method is meant to be used in cases
+     * where a subclass of a subclass of streamable needs a different
+     * stream name. Say you have a class hierarchy built off the
+     * abstract class shape. You make shape a subclass of streamable,
+     * so that everyone gets a stream. Subclasses of shape don't
+     * want their streams to be named shape, so they rename the
+     * stream in the subclass' constructor.
+     *
+     * @param name the new logger name
+     */
+    void rename_stream(const std::string& name);
 
 private:
     std::unique_ptr<log_stream> log_stream_;
@@ -177,14 +200,14 @@ log_stream& streamable<type>::get_log_stream() const
 }
 
 template <typename type>
-void streamable<type>::rename_logger(const std::type_info& new_type)
+void streamable<type>::rename_stream(const std::type_info& new_type)
 {
     loggable<type>::rename_logger(new_type);
     log_stream_.reset(new log_stream(loggable<type>::get_logger(), log_stream_->get_level()));
 }
 
 template <typename type>
-void streamable<type>::rename_logger(const std::string& name)
+void streamable<type>::rename_stream(const std::string& name)
 {
     loggable<type>::rename_logger(name);
     log_stream_.reset(new log_stream(loggable<type>::get_logger(), log_stream_->get_level()));
