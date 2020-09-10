@@ -64,7 +64,11 @@ OPTION(ENABLE_SHARED "Whether to build a shared object" OFF)
 OPTION(ENABLE_FRAMEWORK "Whether to build as a framework on Macintosh" ON)
 
 # Whether to use libstdc++ when compiling with Clang.
-OPTION(CLANG_LIBSTDCXX "Whether to use libstdc++ with the Clang compiler" OFF)
+IF(CMAKE_SYSTEM_NAME STREQUAL Linux AND CMAKE_CXX_COMPILER_ID MATCHES Clang)
+    OPTION(CLANG_LIBSTDCXX "Whether to use libstdc++ with the Clang compiler" ON)
+ELSE()
+    OPTION(CLANG_LIBSTDCXX "Whether to use libstdc++ with the Clang compiler" OFF)
+ENDIF()
 
 # CONFIGURATION FORMATS
 # ================================================================================
