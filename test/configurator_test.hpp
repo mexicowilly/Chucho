@@ -100,6 +100,7 @@ protected:
     void windows_event_log_writer_body();
     void windows_event_log_writer_no_log_body();
 #endif
+    void yaml_formatter_body(const std::string& tmpl);
 #if defined(CHUCHO_HAVE_ZEROMQ)
     void zeromq_writer_body();
     void zeromq_writer_coalesce_body();

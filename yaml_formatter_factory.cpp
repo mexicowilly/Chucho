@@ -14,9 +14,9 @@
  *    limitations under the License.
  */
 
-#include <chucho/json_formatter_factory.hpp>
+#include <chucho/yaml_formatter_factory.hpp>
 #include <chucho/serialization_formatter_memento.hpp>
-#include <chucho/json_formatter.hpp>
+#include <chucho/yaml_formatter.hpp>
 #include <chucho/exception.hpp>
 #include <chucho/demangle.hpp>
 #include <assert.h>
@@ -24,28 +24,28 @@
 namespace chucho
 {
 
-json_formatter_factory::json_formatter_factory()
+yaml_formatter_factory::yaml_formatter_factory()
 {
-    set_status_origin("json_formatter_factory");
+    set_status_origin("yaml_formatter_factory");
 }
 
-std::unique_ptr<configurable> json_formatter_factory::create_configurable(std::unique_ptr<memento>& mnto)
+std::unique_ptr<configurable> yaml_formatter_factory::create_configurable(std::unique_ptr<memento>& mnto)
 {
     auto sfm = dynamic_cast<serialization_formatter_memento*>(mnto.get());
     assert(sfm != nullptr);
     if (!sfm->get_excluded_fields().empty() && !sfm->get_included_fields().empty())
-        throw exception("[json_formatter_factory] Either excluded_fields or included_fields may be set, not both");
-    json_formatter::style style = sfm->get_style() ? *sfm->get_style() : json_formatter::DEFAULT_STYLE;
-    json_formatter::time_zone tz = sfm->get_time_zone() ? *sfm->get_time_zone() : json_formatter::DEFAULT_TIME_ZONE;
-    std::string t_fmt = sfm->get_time_format().empty() ? json_formatter::DEFAULT_TIME_FORMAT : sfm->get_time_format();
-    std::unique_ptr<json_formatter> cnf;
+        throw exception("[yaml_formatter_factory] Either excluded_fields or included_fields may be set, not both");
+    yaml_formatter::style style = sfm->get_style() ? *sfm->get_style() : yaml_formatter::DEFAULT_STYLE;
+    yaml_formatter::time_zone tz = sfm->get_time_zone() ? *sfm->get_time_zone() : yaml_formatter::DEFAULT_TIME_ZONE;
+    std::string t_fmt = sfm->get_time_format().empty() ? yaml_formatter::DEFAULT_TIME_FORMAT : sfm->get_time_format();
+    std::unique_ptr<yaml_formatter> cnf;
     if (sfm->get_excluded_fields().empty() && sfm->get_included_fields().empty())
     {
-        cnf = std::make_unique<json_formatter>(style, tz, t_fmt);
+        cnf = std::make_unique<yaml_formatter>(style, tz, t_fmt);
     }
     else if (sfm->get_excluded_fields().empty())
     {
-        cnf = std::make_unique<json_formatter>(json_formatter::field_disposition::INCLUDED,
+        cnf = std::make_unique<yaml_formatter>(yaml_formatter::field_disposition::INCLUDED,
                                                sfm->get_included_fields(),
                                                style,
                                                tz,
@@ -53,7 +53,7 @@ std::unique_ptr<configurable> json_formatter_factory::create_configurable(std::u
     }
     else
     {
-        cnf = std::make_unique<json_formatter>(json_formatter::field_disposition::EXCLUDED,
+        cnf = std::make_unique<yaml_formatter>(yaml_formatter::field_disposition::EXCLUDED,
                                                sfm->get_excluded_fields(),
                                                style,
                                                tz,
@@ -63,7 +63,7 @@ std::unique_ptr<configurable> json_formatter_factory::create_configurable(std::u
     return std::move(cnf);
 }
 
-std::unique_ptr<memento> json_formatter_factory::create_memento(configurator& cfg)
+std::unique_ptr<memento> yaml_formatter_factory::create_memento(configurator& cfg)
 {
     auto mnto = std::make_unique<serialization_formatter_memento>(cfg);
     return std::move(mnto);

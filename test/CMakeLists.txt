@@ -169,7 +169,8 @@ IF(AWSSDK_FOUND)
 ENDIF()
 
 IF(CHUCHO_PRIV_EXPORT)
-    SET(CHUCHO_TEST_JSON_SOURCES ../embedded/cJSON/cJSON.c)
+    SET(CHUCHO_TEST_EMBEDDED_SOURCES ../embedded/cJSON/cJSON.c)
+    CHUCHO_SET_YAML_SOURCES(CHUCHO_TEST_EMBEDDED_SOURCES)
 ENDIF()
 
 ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
@@ -213,6 +214,8 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                streamable_test.cpp
                text_util_test.cpp
                utf8_test.cpp
+               yaml_formatter_test.cpp
+               ${CHUCHO_TEST_EMBEDDED_SOURCES}
                ${CHUCHO_TEST_COMPRESSION_SOURCES}
                ${CHUCHO_CONFIGURATOR_TESTS}
                ${CHUCHO_TEST_EVALUATOR_SOURCES}
@@ -221,8 +224,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                ${CHUCHO_TEST_DOOR_SOURCES}
                ${CHUCHO_TEST_CURL_SOURCES}
                ${CHUCHO_TEST_AWS_SOURCES}
-               ${CHUCHO_TEST_DB_SOURCES}
-               ${CHUCHO_TEST_JSON_SOURCES})
+               ${CHUCHO_TEST_DB_SOURCES})
 TARGET_LINK_LIBRARIES(unit-test chucho gtest)
 
 IF(MSVC)

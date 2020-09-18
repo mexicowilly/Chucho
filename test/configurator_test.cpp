@@ -373,20 +373,20 @@ void configurator::interval_file_roll_trigger_body(const std::string& tmpl)
     }
 }
 
-void configurator::json_formatter_body(const std::string &tmpl)
+void configurator::json_formatter_body(const std::string& tmpl)
 {
     auto dpos = tmpl.find("DS");
     auto fpos = tmpl.find("FIELDS");
     std::array<const char*, 2> dispositions = { "in", "ex" };
     for (const auto& dis : dispositions)
     {
-        std::array<const char *, 3> bad =
+        std::array<const char*, 3> bad =
         {
             "message, file_name, doggies, line_number",
             "dirty stuff",
             "message file_name"
         };
-        for (const auto &b : bad)
+        for (const auto& b : bad)
         {
             chucho::logger::remove_unused_loggers();
             chucho::status_manager::get().clear();
@@ -397,13 +397,13 @@ void configurator::json_formatter_body(const std::string &tmpl)
             EXPECT_EQ(chucho::status::level::ERROR_, chucho::status_manager::get().get_level());
         }
         chucho::status_manager::get().clear();
-        std::array<const char *, 3> good =
+        std::array<const char*, 3> good =
         {
             "message",
             "message, file_name, line_number",
             "message,file_name,line_number,logger,host_name,diagnostic_context,function_name,level,marker,timestamp,process_id,thread"
         };
-        for (const auto &g : good)
+        for (const auto& g : good)
         {
             chucho::logger::remove_unused_loggers();
             chucho::status_manager::get().clear();
@@ -823,6 +823,49 @@ void configurator::windows_event_log_writer_no_log_body()
 }
 
 #endif
+
+void configurator::yaml_formatter_body(const std::string& tmpl)
+{
+    auto dpos = tmpl.find("DS");
+    auto fpos = tmpl.find("FIELDS");
+    std::array<const char*, 2> dispositions = { "in", "ex" };
+    for (const auto& dis : dispositions)
+    {
+        std::array<const char*, 3> bad =
+        {
+            "message, file_name, doggies, line_number",
+            "dirty stuff",
+            "message file_name"
+        };
+        for (const auto& b : bad)
+        {
+            chucho::logger::remove_unused_loggers();
+            chucho::status_manager::get().clear();
+            std::string rep = tmpl;
+            rep.replace(dpos, 2, dis);
+            rep.replace(fpos, 6, b);
+            configure(rep.c_str());
+            EXPECT_EQ(chucho::status::level::ERROR_, chucho::status_manager::get().get_level());
+        }
+        chucho::status_manager::get().clear();
+        std::array<const char*, 3> good =
+        {
+            "message",
+            "message, file_name, line_number",
+            "message,file_name,line_number,logger,host_name,diagnostic_context,function_name,level,marker,timestamp,process_id,thread"
+        };
+        for (const auto& g : good)
+        {
+            chucho::logger::remove_unused_loggers();
+            chucho::status_manager::get().clear();
+            std::string rep = tmpl;
+            rep.replace(dpos, 2, dis);
+            rep.replace(fpos, 6, g);
+            configure(rep.c_str());
+            EXPECT_EQ(chucho::status::level::INFO_, chucho::status_manager::get().get_level());
+        }
+    }
+}
 
 #if defined(CHUCHO_HAVE_ZEROMQ)
 

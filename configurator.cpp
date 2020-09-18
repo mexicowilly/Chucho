@@ -43,6 +43,7 @@
 #include <chucho/sliding_numbered_file_roller_factory.hpp>
 #include <chucho/syslog_writer_factory.hpp>
 #include <chucho/time_file_roller_factory.hpp>
+#include <chucho/yaml_formatter_factory.hpp>
 
 #if defined(CHUCHO_WINDOWS)
 #include <chucho/windows_event_log_writer_factory.hpp>
@@ -190,6 +191,8 @@ void configurator::initialize_impl()
                              std::make_shared<json_formatter_factory>());
     add_configurable_factory("chucho::cache_and_release_filter",
                              std::make_shared<cache_and_release_filter_factory>());
+    add_configurable_factory("chucho::yaml_formatter",
+                             std::make_shared<yaml_formatter_factory>());
 #if defined(CHUCHO_WINDOWS)
     add_configurable_factory("chucho::windows_event_log_writer",
                              std::make_shared<windows_event_log_writer_factory>());

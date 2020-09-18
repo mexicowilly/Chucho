@@ -251,6 +251,8 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/ruby_evaluator_filter.hpp
     include/chucho/security_policy.hpp
     include/chucho/serializer.hpp
+    include/chucho/serialization_formatter.hpp
+    include/chucho/serialization_formatter_memento.hpp
     include/chucho/size_file_roll_trigger.hpp
     include/chucho/sliding_numbered_file_roller.hpp
     include/chucho/status.hpp
@@ -265,7 +267,8 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/writeable_filter.hpp
     include/chucho/writer.hpp
     include/chucho/writer_factory.hpp
-    include/chucho/writer_memento.hpp)
+    include/chucho/writer_memento.hpp
+    include/chucho/yaml_formatter.hpp)
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS ${CHUCHO_PUBLIC_HEADERS})
 
@@ -514,22 +517,29 @@ LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
     # Update this when you rev libyaml
     SET(CHUCHO_LIBYAML_VERSION_MAJOR 0)
-    SET(CHUCHO_LIBYAML_VERSION_MINOR 1)
-    SET(CHUCHO_LIBYAML_VERSION_PATCH 7)
+    SET(CHUCHO_LIBYAML_VERSION_MINOR 2)
+    SET(CHUCHO_LIBYAML_VERSION_PATCH 5)
 
     LIST(APPEND ${CHUCHO_YAML_SOURCE_VAR}
         "${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c"
+        "${CMAKE_SOURCE_DIR}/embedded/libyaml/dumper.c"
+        "${CMAKE_SOURCE_DIR}/embedded/libyaml/emitter.c"
         "${CMAKE_SOURCE_DIR}/embedded/libyaml/loader.c"
         "${CMAKE_SOURCE_DIR}/embedded/libyaml/parser.c"
         "${CMAKE_SOURCE_DIR}/embedded/libyaml/reader.c"
-        "${CMAKE_SOURCE_DIR}/embedded/libyaml/scanner.c")
+        "${CMAKE_SOURCE_DIR}/embedded/libyaml/scanner.c"
+        "${CMAKE_SOURCE_DIR}/embedded/libyaml/writer.c")
 
     SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
                                 COMPILE_DEFINITIONS "YAML_VERSION_MAJOR=${CHUCHO_LIBYAML_VERSION_MAJOR};YAML_VERSION_MINOR=${CHUCHO_LIBYAML_VERSION_MINOR};YAML_VERSION_PATCH=${CHUCHO_LIBYAML_VERSION_PATCH};YAML_VERSION_STRING=\"${CHUCHO_LIB_YAML_VERSION_MAJOR}.${CHUCHO_LIBYAML_VERSION_MINOR}.${CHUCHO_LIBYAML_VERSION_PATCH}\";YAML_DECLARE_STATIC")
-    SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/loader.c"
+
+    SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/dumper.c"
+                                "${CMAKE_SOURCE_DIR}/embedded/libyaml/emitter.c"
+                                "${CMAKE_SOURCE_DIR}/embedded/libyaml/loader.c"
                                 "${CMAKE_SOURCE_DIR}/embedded/libyaml/parser.c"
                                 "${CMAKE_SOURCE_DIR}/embedded/libyaml/reader.c"
                                 "${CMAKE_SOURCE_DIR}/embedded/libyaml/scanner.c"
+                                "${CMAKE_SOURCE_DIR}/embedded/libyaml/writer.c"
                                 PROPERTIES
                                 COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
     IF(MSVC)
@@ -539,14 +549,18 @@ MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
                                     PROPERTIES
                                     COMPILE_FLAGS "/wd4996 /wd4267 /wd4244")
     ELSEIF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER_ID STREQUAL Clang)
-        SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
+        SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c"
+                                    PROPERTIES
                                     COMPILE_FLAGS "-Wno-implicit-function-declaration -Wno-int-to-pointer-cast")
     ENDIF()
 ENDMACRO()
 
+# Always include the YAML embedded sources, because they are needed
+# for the YAML formatter.
+CHUCHO_SET_YAML_SOURCES(CHUCHO_EMBEDDED_SOURCES)
+
 # Configurator settings
 IF(YAML_CONFIG)
-    CHUCHO_SET_YAML_SOURCES(CHUCHO_EMBEDDED_SOURCES)
     LIST(APPEND CHUCHO_CONFIGURATOR_SOURCES
          yaml_configurator.cpp
          yaml_parser.cpp
@@ -679,7 +693,6 @@ SET(CHUCHO_SOURCES
     interval_file_roll_trigger_memento.cpp
     json_formatter.cpp
     json_formatter_factory.cpp
-    json_formatter_memento.cpp
     level.cpp
     level_filter.cpp
     level_filter_factory.cpp
@@ -720,6 +733,8 @@ SET(CHUCHO_SOURCES
     rolling_file_writer_factory.cpp
     rolling_file_writer_memento.cpp
     security_policy.cpp
+    serialization_formatter.cpp
+    serialization_formatter_memento.cpp
     size_file_roll_trigger.cpp
     size_file_roll_trigger_factory.cpp
     size_file_roll_trigger_memento.cpp
@@ -743,6 +758,8 @@ SET(CHUCHO_SOURCES
     writer.cpp
     writer_factory.cpp
     writer_memento.cpp
+    yaml_formatter.cpp
+    yaml_formatter_factory.cpp
     include/chucho/async_writer_factory.hpp
     include/chucho/async_writer_memento.hpp
     include/chucho/c_logger.hpp
@@ -767,7 +784,6 @@ SET(CHUCHO_SOURCES
     include/chucho/interval_file_roll_trigger_factory.hpp
     include/chucho/interval_file_roll_trigger_memento.hpp
     include/chucho/json_formatter_factory.hpp
-    include/chucho/json_formatter_memento.hpp
     include/chucho/level_filter_factory.hpp
     include/chucho/level_filter_memento.hpp
     include/chucho/level_threshold_filter_factory.hpp
@@ -808,6 +824,7 @@ SET(CHUCHO_SOURCES
     include/chucho/time_file_roller_memento.hpp
     include/chucho/time_util.hpp
     include/chucho/utf8.hpp
+    include/chucho/yaml_formatter_factory.hpp
     ${CHUCHO_CONFIGURATOR_SOURCES}
     ${CHUCHO_PLATFORM_SOURCES}
     ${CHUCHO_EMBEDDED_SOURCES}

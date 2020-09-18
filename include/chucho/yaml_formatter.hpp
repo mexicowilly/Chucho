@@ -14,26 +14,15 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_JSON_FORMATTER_HPP__)
-#define CHUCHO_JSON_FORMATTER_HPP__
-
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable:4251)
-#endif
+#if !defined(CHUCHO_YAML_FORMATTER_HPP__)
+#define CHUCHO_YAML_FORMATTER_HPP__
 
 #include <chucho/serialization_formatter.hpp>
 
 namespace chucho
 {
 
-/**
- * @class json_formatter json_formatter.hpp chucho/json_formatter.hpp
- * A formatter that produces JSON.
- *
- * @ingroup formatters
- */
-class CHUCHO_EXPORT json_formatter : public serialization_formatter
+class CHUCHO_EXPORT yaml_formatter : public serialization_formatter
 {
 public:
     /**
@@ -47,7 +36,7 @@ public:
      * @param tz the time zone
      * @param time_format the time format
      */
-    json_formatter(style styl = DEFAULT_STYLE,
+    yaml_formatter(style styl = DEFAULT_STYLE,
                    time_zone tz = DEFAULT_TIME_ZONE,
                    const std::string& time_format = DEFAULT_TIME_FORMAT);
     /**
@@ -60,7 +49,7 @@ public:
      * @param tz the time zone
      * @param time_format the time format
      */
-    json_formatter(field_disposition dis,
+    yaml_formatter(field_disposition dis,
                    const std::vector<field>& fields,
                    style styl = DEFAULT_STYLE,
                    time_zone tz = DEFAULT_TIME_ZONE,
@@ -73,9 +62,5 @@ public:
 };
 
 }
-
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
 
 #endif

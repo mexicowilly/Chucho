@@ -794,6 +794,20 @@ TEST_F(yaml_configurator, variables)
     EXPECT_FALSE(lgr->writes_to_ancestors());
 }
 
+TEST_F(yaml_configurator, yaml_formatter)
+{
+    std::string tmpl(R"tmpl(
+chucho::logger:
+    name: will
+    chucho::cout_writer:
+        chucho::yaml_formatter:
+            style: PrEtTy
+            time_zone: uTc
+            DScluded_fields: FIELDS
+)tmpl");
+    yaml_formatter_body(tmpl);
+}
+
 #if defined(CHUCHO_WINDOWS)
 TEST_F(yaml_configurator, windows_event_log_writer)
 {

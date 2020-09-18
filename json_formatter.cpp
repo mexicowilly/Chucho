@@ -21,23 +21,18 @@
 #include <chucho/diagnostic_context.hpp>
 #include <chucho/process.hpp>
 #include <cJSON.h>
-#include <sstream>
 #include <thread>
 
 namespace chucho
 {
 
-constexpr json_formatter::style json_formatter::DEFAULT_STYLE;
-constexpr json_formatter::time_zone json_formatter::DEFAULT_TIME_ZONE;
-constexpr char const* json_formatter::DEFAULT_TIME_FORMAT;
+//constexpr json_formatter::style json_formatter::DEFAULT_STYLE;
+//constexpr json_formatter::time_zone json_formatter::DEFAULT_TIME_ZONE;
+//constexpr char const* json_formatter::DEFAULT_TIME_FORMAT;
 
 json_formatter::json_formatter(style styl, time_zone tz, const std::string& time_format)
-    : style_(styl), fmt_(std::make_unique<calendar::formatter>(time_format,
-                                                               (tz == time_zone::LOCAL) ?
-                                                                 calendar::formatter::location::LOCAL :
-                                                                 calendar::formatter::location::UTC))
+    : serialization_formatter(styl, tz, time_format)
 {
-    fields_.set();
 }
 
 json_formatter::json_formatter(field_disposition dis,
@@ -45,23 +40,7 @@ json_formatter::json_formatter(field_disposition dis,
                                style styl,
                                time_zone tz,
                                const std::string& time_format)
-    : json_formatter(styl, tz, time_format)
-{
-    if (dis == field_disposition::INCLUDED)
-    {
-        fields_.reset();
-        for (auto f : fields)
-            fields_.set(static_cast<std::size_t>(f));
-    }
-    else
-    {
-        fields_.set();
-        for (auto f : fields)
-            fields_.reset(static_cast<std::size_t>(f));
-    }
-}
-
-json_formatter::~json_formatter()
+    : serialization_formatter(dis, fields, styl, tz, time_format)
 {
 }
 
@@ -94,7 +73,7 @@ std::string json_formatter::format(const event& evt)
         cJSON_AddStringToObject(json, "thread", stream.str().c_str());
     }
     if (fields_.test(static_cast<std::size_t>(field::TIMESTAMP)))
-        cJSON_AddStringToObject(json, "timestamp", fmt_->format(evt.get_time().time_since_epoch()).c_str());
+        cJSON_AddStringToObject(json, "timestamp", cal_fmt_->format(evt.get_time().time_since_epoch()).c_str());
     if (fields_.test(static_cast<std::size_t>(field::HOST_NAME)))
         cJSON_AddStringToObject(json, "host_name", host::get_full_name().c_str());
     if (!diagnostic_context::empty() && fields_.test(static_cast<std::size_t>(field::DIAGNOSTIC_CONTEXT)))
