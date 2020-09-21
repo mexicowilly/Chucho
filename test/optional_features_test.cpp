@@ -40,16 +40,12 @@ TEST(optional_features, simple)
 #if defined(CHUCHO_HAVE_DB2)
     EXPECT_FEATURE(chucho::optional_features::DB2_WRITER);
 #endif
-#if defined(CHUCHO_CONFIG_FILE_CONFIG)
     EXPECT_FEATURE(chucho::optional_features::CONFIG_FILE_CONFIGURATION);
-#endif
 #if defined(CHUCHO_HAVE_CURL)
     EXPECT_FEATURE(chucho::optional_features::EMAIL_WRITER);
     EXPECT_FEATURE(chucho::optional_features::LOGGLY_WRITER);
 #endif
-#if defined(CHUCHO_LOG4CPLUS_CONFIG)
     EXPECT_FEATURE(chucho::optional_features::LOG4CPLUS_CONFIGURATION);
-#endif
 #if defined(CHUCHO_HAVE_LIBARCHIVE)
     EXPECT_FEATURE(chucho::optional_features::LIBARCHIVE_COMPRESSION);
 #endif
@@ -77,9 +73,7 @@ TEST(optional_features, simple)
 #if defined(CHUCHO_HAVE_SQLITE)
     EXPECT_FEATURE(chucho::optional_features::SQLITE_WRITER);
 #endif
-#if defined(CHUCHO_YAML_CONFIG)
     EXPECT_FEATURE(chucho::optional_features::YAML_CONFIGURATION);
-#endif
 #if defined(CHUCHO_HAVE_ZEROMQ)
     EXPECT_FEATURE(chucho::optional_features::ZEROMQ_WRITER);
 #endif

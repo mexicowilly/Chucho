@@ -25,17 +25,11 @@
 #include <chucho/configurator.hpp>
 #include <chucho/configurable_factory.hpp>
 
-#if defined(CHUCHO_YAML_CONFIG)
 #include <chucho/yaml_parser.hpp>
 #include <chucho/yaml_configurator.hpp>
-#endif
-#if defined(CHUCHO_CONFIG_FILE_CONFIG)
 #include <chucho/config_file_configurator.hpp>
 #include <chucho/properties.hpp>
-#endif
-#if defined(CHUCHO_JSON_CONFIG)
 #include <chucho/json_configurator.hpp>
-#endif
 
 #include <fstream>
 #include <algorithm>
@@ -102,8 +96,6 @@ enum class format
 
 format detect_text_format(const std::string& text)
 {
-#if defined(CHUCHO_YAML_CONFIG)
-
     std::istringstream stream1(text);
     chucho::yaml_parser prs(stream1);
     yaml_document_t doc;
@@ -117,28 +109,16 @@ format detect_text_format(const std::string& text)
         if (tp != YAML_SCALAR_NODE)
             return format::YAML;
     }
-
-#endif
-
-#if defined(CHUCHO_JSON_CONFIG)
-
     auto json = cJSON_Parse(text.c_str());
     if (json != nullptr)
     {
         cJSON_Delete(json);
         return format::JSON;
     }
-
-#endif
-
-#if defined(CHUCHO_CONFIG_FILE_CONFIG)
-
     std::istringstream stream2(text);
     chucho::properties props(stream2);
     if (props.size() > 0)
         return format::CONFIG_FILE;
-
-#endif
 
     return format::DONT_KNOW;
 }
@@ -166,37 +146,22 @@ bool configuration::configure_from_file(const std::string& file_name, reporter& 
     format fmt = detect_file_format(file_name);
     std::unique_ptr<configurator> cfg;
 
-    #if defined(CHUCHO_YAML_CONFIG)
-
     if (fmt == format::YAML)
     {
         report.info("The file, " + file_name + ", is in YAML format");
-        cfg.reset(new yaml_configurator(data().security_policy_));
+        cfg = std::make_unique<yaml_configurator>(data().security_policy_);
     }
-
-    #endif
-
-    #if defined(CHUCHO_JSON_CONFIG)
-
-    if (fmt == format::JSON)
+    else if (fmt == format::JSON)
     {
         report.info("The file, " + file_name + ", is in JSON format");
-        cfg.reset(new json_configurator(data().security_policy_));
+        cfg = std::make_unique<json_configurator>(data().security_policy_);
     }
-
-    #endif
-
-    #if defined(CHUCHO_CONFIG_FILE_CONFIG)
-
-    if (fmt == format::CONFIG_FILE)
+    else if (fmt == format::CONFIG_FILE)
     {
         report.info("The file, " + file_name + ", is in config file format");
-        cfg.reset(new config_file_configurator(data().security_policy_));
+        cfg = std::make_unique<config_file_configurator>(data().security_policy_);
     }
-
-    #endif
-
-    if (fmt == format::DONT_KNOW)
+    else if (fmt == format::DONT_KNOW)
     {
         report.warning("Unable to determine the format of the file " + file_name);
         return result;
@@ -226,13 +191,11 @@ bool configuration::configure_from_file(const std::string& file_name, reporter& 
 
 bool configuration::configure_from_text(const std::string& cfg, reporter& report)
 {
-    bool result = false;
+    bool result = true;
     static_data& sd(data());
     try
     {
         format fmt = detect_text_format(cfg);
-
-        #if defined(CHUCHO_YAML_CONFIG)
 
         if (fmt == format::YAML)
         {
@@ -241,42 +204,31 @@ bool configuration::configure_from_text(const std::string& cfg, reporter& report
             yam.configure(in);
             report.info("Using the YAML format configuration"); 
         }
-
-        #endif
-
-        #if defined(CHUCHO_JSON_CONFIG)
-
-        if (fmt == format::JSON)
+        else if (fmt == format::JSON)
         {
             json_configurator js(sd.security_policy_);
             std::istringstream in(cfg);
             js.configure(in);
             report.info("Using the JSON format configuration");
         }
-
-        #endif
-
-        #if defined(CHUCHO_CONFIG_FILE_CONFIG)
-
-        if (fmt == format::CONFIG_FILE)
+        else if (fmt == format::CONFIG_FILE)
         {
             config_file_configurator cnf(sd.security_policy_);
             std::istringstream in(cfg);
             cnf.configure(in);
             report.info("Using the config file format configuration"); 
         }
-
-        #endif
-
-        if (fmt == format::DONT_KNOW)
+        else if (fmt == format::DONT_KNOW)
+        {
             report.warning("Unable to detect the format of the configuration");
-        else
-            result = true;
+            result = false;
+        }
     }
     catch (std::exception& e)
     {
         logger::remove_unused_loggers();
         report.error("Error setting configuration: " + exception::nested_whats(e));
+        result = false;
     }
     return result;
 }
@@ -326,32 +278,13 @@ configuration::unknown_handler_type configuration::get_unknown_handler()
 
 void configuration::initialize_security_policy()
 {
-    #if defined(CHUCHO_YAML_CONFIG) || defined(CHUCHO_CONFIG_FILE_CONFIG) | defined(CHUCHO_JSON_CONFIG)
-
-    #if defined(CHUCHO_YAML_CONFIG)
-
+    // We only need one of the formats
     yaml_configurator cnf(data().security_policy_);
-
-    #elif defined(CHUCHO_CONFIG_FILE_CONFIG)
-
-    config_file_configurator cnf(data().security_policy_);
-
-    #elif defined(CHUCHO_JSON_CONFIG)
-
-    json_configurator cnf(data().security_policy_);
-
-    #else
-
-    return;
-
-    #endif
     // The mementos are where each configurable configures
     // its security policy.
     auto& facts(configurator::get_factories());
     for (const auto& fact : facts)
         fact.second->create_memento(cnf);
-
-    #endif
 }
 
 void configuration::perform(std::shared_ptr<logger> root_logger)
@@ -364,8 +297,6 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
         report.info("Configuration will not be performed because it has been turned off");
         return;
     }
-
-    #if defined(CHUCHO_YAML_CONFIG) || defined(CHUCHO_CONFIG_FILE_CONFIG) || defined(CHUCHO_JSON_CONFIG)
 
     configurator::initialize();
     std::string fn;
@@ -405,8 +336,6 @@ void configuration::perform(std::shared_ptr<logger> root_logger)
         if (!sd.is_configured_)
             logger::remove_unused_loggers();
     }
-
-    #endif
 
     if (!sd.is_configured_ && sd.allow_default_config_)
     {

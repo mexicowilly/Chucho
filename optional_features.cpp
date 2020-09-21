@@ -34,16 +34,12 @@ void init_feature_set(chucho::optional_features::feature_set& fs)
 #if defined(CHUCHO_HAVE_CAPN_PROTO_SERIALIZER)
     fs.set(chucho::optional_features::CAPN_PROTO_SERIALIZER);
 #endif
-#if defined(CHUCHO_HAVE_CONFIG_FILE_CONFIG)
     fs.set(chucho::optional_features::CONFIG_FILE_CONFIGURATION);
-#endif
 #if defined(CHUCHO_HAVE_CURL)
     fs.set(chucho::optional_features::EMAIL_WRITER);
     fs.set(chucho::optional_features::LOGGLY_WRITER);
 #endif
-#if defined(CHUCHO_HAVE_LOG4CPLUS_CONFIG)
     fs.set(chucho::optional_features::LOG4CPLUS_CONFIGURATION);
-#endif
 #if defined(CHUCHO_HAVE_MINIZIP_COMPRESSION)
     fs.set(chucho::optional_features::MINIZIP_COMPRESSION);
 #endif
@@ -56,9 +52,7 @@ void init_feature_set(chucho::optional_features::feature_set& fs)
 #if defined(CHUCHO_HAVE_RUBY_EVALUATOR_FILTER)
     fs.set(chucho::optional_features::RUBY_EVALUATOR_FILTER);
 #endif
-#if defined(CHUCHO_HAVE_YAML_CONFIG)
     fs.set(chucho::optional_features::YAML_CONFIGURATION);
-#endif
 #if defined(CHUCHO_HAVE_ZEROMQ_WRITER)
     fs.set(chucho::optional_features::ZEROMQ_WRITER);
 #endif

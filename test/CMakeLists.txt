@@ -90,28 +90,6 @@ IF(CHUCHO_HAVE_LZ4)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_LZ4)
 ENDIF()
 
-IF(YAML_CONFIG)
-    LIST(APPEND CHUCHO_CONFIGURATOR_TESTS yaml_configurator_test.cpp utf8_test.cpp)
-    ADD_DEFINITIONS(-DCHUCHO_YAML_CONFIG)
-ENDIF()
-
-IF(JSON_CONFIG)
-    LIST(APPEND CHUCHO_CONFIGURATOR_TESTS json_configurator_test.cpp utf8_test.cpp)
-    ADD_DEFINITIONS(-DCHUCHO_JSON_CONFIG)
-ENDIF()
-
-IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
-    LIST(APPEND CHUCHO_CONFIGURATOR_TESTS properties_test.cpp)
-    IF(CONFIG_FILE_CONFIG)
-        LIST(APPEND CHUCHO_CONFIGURATOR_TESTS chucho_config_file_configurator_test.cpp)
-        ADD_DEFINITIONS(-DCHUCHO_CONFIG_FILE_CONFIG)
-    ENDIF()
-    IF(LOG4CPLUS_CONFIG)
-        LIST(APPEND CHUCHO_CONFIGURATOR_TESTS log4cplus_config_file_configurator_test.cpp)
-        ADD_DEFINITIONS(-DCHUCHO_LOG4CPLUS_CONFIG)
-    ENDIF()
-ENDIF()
-
 IF(CHUCHO_HAVE_SOCI)
     LIST(APPEND CHUCHO_TEST_DB_SOURCES database_writer_test.cpp)
     ADD_DEFINITIONS(-DCHUCHO_HAVE_SOCI)
@@ -178,6 +156,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                c_test.cpp
                cache_and_release_filter_test.cpp
                calendar_test.cpp
+               chucho_config_file_configurator_test.cpp
                configuration_test.cpp
                configurator_test.cpp
                configurator_test.hpp
@@ -190,12 +169,14 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                formatted_message_serializer_test.cpp
                harness.cpp
                interval_file_roll_trigger_test.cpp
+               json_configurator_test.cpp
                json_formatter_test.cpp
                level_test.cpp
                level_filter_test.cpp
                level_threshold_filter_test.cpp
                log_macro_test.cpp
                log_stream_test.cpp
+               log4cplus_config_file_configurator_test.cpp
                loggable_test.cpp
                logger_test.cpp
                marker_test.cpp
@@ -206,6 +187,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                optional_test.cpp
                optional_features_test.cpp
                pattern_formatter_test.cpp
+               properties_test.cpp
                pipe_writer_test.cpp
                regex_test.cpp
                rolling_file_writer_test.cpp
@@ -214,10 +196,10 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                streamable_test.cpp
                text_util_test.cpp
                utf8_test.cpp
+               yaml_configurator_test.cpp
                yaml_formatter_test.cpp
                ${CHUCHO_TEST_EMBEDDED_SOURCES}
                ${CHUCHO_TEST_COMPRESSION_SOURCES}
-               ${CHUCHO_CONFIGURATOR_TESTS}
                ${CHUCHO_TEST_EVALUATOR_SOURCES}
                ${CHUCHO_TEST_SERIALIZER_SOURCES}
                ${CHUCHO_TEST_MQ_SOURCES}
@@ -324,9 +306,6 @@ ENDIF()
 ADD_EXECUTABLE(configuration-off EXCLUDE_FROM_ALL
                configuration_off.cpp)
 TARGET_LINK_LIBRARIES(configuration-off chucho)
-
-ADD_CUSTOM_TARGET(check-config
-                  COMMAND "${CMAKE_COMMAND}" "-DCHUCHO_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -DCLANG_LIBSTDCXX=${CLANG_LIBSTDCXX} -P "${CMAKE_CURRENT_SOURCE_DIR}/CheckAllConfigs.cmake")
 
 ADD_CUSTOM_TARGET(all-test
                   DEPENDS unit-test time-rolling-file-test syslog-writer-test windows-event-log-writer-test)

@@ -54,8 +54,6 @@ protected:
 
 }
 
-#if defined(CHUCHO_CONFIG_FILE_CONFIG)
-
 TEST_F(configuration, set_config)
 {
     std::ostringstream stream;
@@ -69,10 +67,6 @@ TEST_F(configuration, set_config)
     EXPECT_NO_THROW(get_logger()->get_writer("chucho::cerr_writer"));
 }
 
-#endif
-
-#if defined(CHUCHO_LOG4CPLUS_CONFIG)
-
 TEST_F(configuration, set_log4cplus)
 {
     std::ostringstream stream;
@@ -84,10 +78,6 @@ TEST_F(configuration, set_log4cplus)
     ASSERT_TRUE(chucho::configuration::set(stream.str()));
     EXPECT_NO_THROW(get_logger()->get_writer("chucho::cerr_writer"));
 }
-
-#endif
-
-#if defined(CHUCHO_YAML_CONFIG)
 
 TEST_F(configuration, set_yaml)
 {
@@ -113,5 +103,3 @@ TEST_F(configuration, set_yaml_error)
     auto wrts = get_logger()->get_writer_names();
     EXPECT_EQ(0, wrts.size());
 }
-
-#endif
