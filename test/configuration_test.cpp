@@ -20,6 +20,7 @@
 #include <chucho/pattern_formatter.hpp>
 #include <chucho/cout_writer.hpp>
 #include <chucho/cerr_writer.hpp>
+#include <chucho/regex.hpp>
 
 namespace
 {
@@ -50,56 +51,98 @@ protected:
     {
         return "one";
     }
+
+    bool set_config(const char* const tmpl)
+    {
+        chucho::regex::expression re("LGR");
+        auto cfg = chucho::regex::replace(tmpl, re, get_logger_name());
+        return chucho::configuration::set(cfg);
+    }
 };
 
 }
 
 TEST_F(configuration, set_config)
 {
-    std::ostringstream stream;
-    stream << "chucho.logger = " << get_logger_name() << std::endl
-           << "chucho.logger." << get_logger_name() << ".writer = ce" << std::endl
-           << "chucho.writer.ce = chucho::cerr_writer" << std::endl
-           << "chucho.writer.ce.formatter = pf" << std::endl
-           << "chucho.formatter.pf = chucho::pattern_formatter" << std::endl
-           << "chucho.formatter.pf.pattern = %m%n";
-    ASSERT_TRUE(chucho::configuration::set(stream.str()));
+    const char* tmpl = R"cfg(
+chucho.logger = LGR
+chucho.logger.LGR.writer = ce
+chucho.writer.ce = chucho::cerr_writer
+chucho.writer.ce.formatter = pf
+chucho.formatter.pf = chucho::pattern_formatter
+chucho.formatter.pf.pattern = %m%n
+)cfg";
+    ASSERT_TRUE(set_config(tmpl));
+    EXPECT_NO_THROW(get_logger()->get_writer("chucho::cerr_writer"));
+}
+
+TEST_F(configuration, set_invalid)
+{
+    const char* tmpl = R"cfg(
+- chucho::logger:
+ name: LGR
+  chucho::cerr_writer:
+    chucho::pattern_formatter:
+      pattern: '%m%n'
+)cfg";
+    ASSERT_FALSE(set_config(tmpl));
+}
+
+TEST_F(configuration, set_json)
+{
+    const char* tmpl = R"cfg(
+{
+    "chucho_loggers" : {
+        "LGR" : {
+            "writers" : [{
+                "chucho::cerr_writer" : {
+                    "chucho::pattern_formatter" : { "pattern" : "%m%n" }
+                }
+            }]
+        }
+    }
+}
+)cfg";
+    ASSERT_TRUE(set_config(tmpl));
     EXPECT_NO_THROW(get_logger()->get_writer("chucho::cerr_writer"));
 }
 
 TEST_F(configuration, set_log4cplus)
 {
-    std::ostringstream stream;
-    stream << "log4cplus.logger." << get_logger_name() << " = info, ce\n"
-           << "log4cplus.appender.ce = log4cplus::ConsoleAppender\n"
-           << "log4cplus.appender.ce.logToStdErr = true\n"
-           << "log4cplus.appender.ce.layout = log4cplus::PatternLayout\n"
-           << "log4cplus.appender.ce.layout.ConversionPattern = %m%n";
-    ASSERT_TRUE(chucho::configuration::set(stream.str()));
+    const char* tmpl = R"cfg(
+log4cplus.logger.LGR = info, ce
+log4cplus.appender.ce = log4cplus::ConsoleAppender
+log4cplus.appender.ce.logToStdErr = true
+log4cplus.appender.ce.layout = log4cplus::PatternLayout
+log4cplus.appender.ce.layout.ConversionPattern = %m%n
+)cfg";
+    ASSERT_TRUE(set_config(tmpl));
     EXPECT_NO_THROW(get_logger()->get_writer("chucho::cerr_writer"));
 }
 
 TEST_F(configuration, set_yaml)
 {
-    std::ostringstream stream;
-    stream << "- chucho::logger:" << std::endl
-           << "    name: " << get_logger_name() << std::endl
-           << "    chucho::cerr_writer:" << std::endl
-           << "        chucho::pattern_formatter:" << std::endl
-           << "            pattern: '%m%n'";
-    ASSERT_TRUE(chucho::configuration::set(stream.str()));
+    const char* tmpl = R"cfg(
+- chucho::logger:
+    name: LGR
+    chucho::cerr_writer:
+        chucho::pattern_formatter:
+            pattern: '%m%n'
+)cfg";
+    ASSERT_TRUE(set_config(tmpl));
     EXPECT_NO_THROW(get_logger()->get_writer("chucho::cerr_writer"));
 }
 
 TEST_F(configuration, set_yaml_error)
 {
-    std::ostringstream stream;
-    stream << "- chucho::logger:" << std::endl
-           << "    name: " << get_logger_name() << std::endl
-           << "    chucho::cerr_writer:" << std::endl
-           << "        chucho::monkey_balls:" << std::endl
-           << "            pattern: '%m%n'";
-    ASSERT_TRUE(chucho::configuration::set(stream.str()));
+    const char* tmpl = R"cfg(
+- chucho::logger:
+    name: LGR
+    chucho::cerr_writer:
+        chucho::monkey_balls:
+            pattern: '%m%n'
+)cfg";
+    ASSERT_TRUE(set_config(tmpl));
     auto wrts = get_logger()->get_writer_names();
     EXPECT_EQ(0, wrts.size());
 }

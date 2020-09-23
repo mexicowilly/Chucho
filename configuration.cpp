@@ -35,6 +35,7 @@
 #include <algorithm>
 #include <sstream>
 #include <assert.h>
+#include <cstring>
 
 namespace
 {
@@ -99,25 +100,59 @@ format detect_text_format(const std::string& text)
     std::istringstream stream1(text);
     chucho::yaml_parser prs(stream1);
     yaml_document_t doc;
+    bool good = false;
     if (yaml_parser_load(prs, &doc))
     {
-        yaml_node_type_t tp = yaml_document_get_root_node(&doc)->type;
+        auto root = yaml_document_get_root_node(&doc);
+        yaml_node_type_t tp = root->type;
+        if (tp == YAML_MAPPING_NODE)
+        {
+            for (auto mn = root->data.mapping.pairs.start;
+                 mn < root->data.mapping.pairs.top;
+                 mn++)
+            {
+                auto k = reinterpret_cast<char*>(yaml_document_get_node(&doc, mn->key)->data.scalar.value);
+                if (std::strcmp(k, "chucho::logger") == 0)
+                {
+                    good = true;
+                    break;
+                }
+            }
+        }
+        else if (tp == YAML_SEQUENCE_NODE)
+        {
+            for (auto item = root->data.sequence.items.start;
+                 item < root->data.sequence.items.top;
+                 item++)
+            {
+                auto sn = yaml_document_get_node(&doc, *item);
+                if (sn->type == YAML_MAPPING_NODE)
+                {
+                    auto k = reinterpret_cast<char*>(yaml_document_get_node(&doc, sn->data.mapping.pairs.start->key)->data.scalar.value);
+                    if (std::strcmp(k, "chucho::logger") == 0)
+                    {
+                        good = true;
+                        break;
+                    }
+                }
+            }
+        }
         yaml_document_delete(&doc);
-        // A config file format will have one scalar node. A valid
-        // Chucho YAML config will not have any scalar nodes at the
-        // top level.
-        if (tp != YAML_SCALAR_NODE)
+        if (good)
             return format::YAML;
     }
     auto json = cJSON_Parse(text.c_str());
     if (json != nullptr)
     {
+        if (cJSON_GetObjectItem(json, "chucho_loggers") != nullptr)
+            good = true;
         cJSON_Delete(json);
-        return format::JSON;
+        if (good)
+            return format::JSON;
     }
     std::istringstream stream2(text);
     chucho::properties props(stream2);
-    if (props.size() > 0)
+    if (!props.empty())
         return format::CONFIG_FILE;
 
     return format::DONT_KNOW;
