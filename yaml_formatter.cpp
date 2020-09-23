@@ -20,6 +20,7 @@
 #include <chucho/host.hpp>
 #include <chucho/diagnostic_context.hpp>
 #include <chucho/process.hpp>
+#include <chucho/utf8.hpp>
 #include <sstream>
 #include <thread>
 #define YAML_DECLARE_STATIC
@@ -77,13 +78,13 @@ std::string yaml_formatter::format(const event& evt)
                                           nullptr,
                                           (style_ == style::COMPACT) ? YAML_FLOW_MAPPING_STYLE : YAML_BLOCK_MAPPING_STYLE);
     if (fields_.test(static_cast<std::size_t>(field::LOGGER)))
-        append_mapping(doc, node, "logger", evt.get_logger()->get_name().c_str());
+        append_mapping(doc, node, "logger", utf8::escape_invalid(evt.get_logger()->get_name()).c_str());
     if (fields_.test(static_cast<std::size_t>(field::LEVEL)))
-        append_mapping(doc, node, "level", evt.get_level()->get_name());
+        append_mapping(doc, node, "level", utf8::escape_invalid(evt.get_level()->get_name()).c_str());
     if (fields_.test(static_cast<std::size_t>(field::MESSAGE)))
-        append_mapping(doc, node, "message", evt.get_message().c_str());
+        append_mapping(doc, node, "message", utf8::escape_invalid(evt.get_message()).c_str());
     if (fields_.test(static_cast<std::size_t>(field::FILE_NAME)))
-        append_mapping(doc, node, "file_name", evt.get_file_name());
+        append_mapping(doc, node, "file_name", utf8::escape_invalid(evt.get_file_name()).c_str());
     if (fields_.test(static_cast<std::size_t>(field::LINE_NUMBER)))
         append_mapping(doc, node, "line_number", std::to_string(evt.get_line_number()).c_str());
     if (fields_.test(static_cast<std::size_t>(field::FUNCTION_NAME)))
@@ -92,7 +93,7 @@ std::string yaml_formatter::format(const event& evt)
     {
         std::ostringstream stream;
         stream << *evt.get_marker();
-        append_mapping(doc, node, "marker", stream.str().c_str());
+        append_mapping(doc, node, "marker", utf8::escape_invalid(stream.str()).c_str());
     }
     if (fields_.test(static_cast<std::size_t>(field::THREAD)))
     {
@@ -111,7 +112,7 @@ std::string yaml_formatter::format(const event& evt)
                                                  nullptr,
                                                  (style_ == style::COMPACT) ? YAML_FLOW_MAPPING_STYLE : YAML_BLOCK_MAPPING_STYLE);
         for (const auto& kv : dc)
-            append_mapping(doc, dc_node, kv.first.c_str(), kv.second.c_str());
+            append_mapping(doc, dc_node, utf8::escape_invalid(kv.first).c_str(), utf8::escape_invalid(kv.second).c_str());
         const char* dc_name = "diagnostic_context";
         auto k = yaml_document_add_scalar(&doc,
                                           nullptr,
