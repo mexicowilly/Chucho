@@ -19,7 +19,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.1.3)
 PROJECT(chucho CXX C)
 
 SET(CHUCHO_MAJOR_VERSION 2)
-SET(CHUCHO_MINOR_VERSION 6)
+SET(CHUCHO_MINOR_VERSION 7)
 SET(CHUCHO_VERSION ${CHUCHO_MAJOR_VERSION}.${CHUCHO_MINOR_VERSION})
 
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -555,63 +555,7 @@ MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
     ENDIF()
 ENDMACRO()
 
-# Always include the YAML embedded sources, because they are needed
-# for the YAML formatter.
 CHUCHO_SET_YAML_SOURCES(CHUCHO_EMBEDDED_SOURCES)
-
-# Configurator settings
-#IF(YAML_CONFIG)
-#    LIST(APPEND CHUCHO_CONFIGURATOR_SOURCES
-#         yaml_configurator.cpp
-#         yaml_parser.cpp
-#         include/chucho/utf8.hpp
-#         include/chucho/yaml_configurator.hpp
-#         include/chucho/yaml_parser.hpp)
-#    SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
-#                                COMPILE_DEFINITIONS "CHUCHO_YAML_CONFIG;YAML_DECLARE_STATIC")
-#    SET_SOURCE_FILES_PROPERTIES(yaml_parser.cpp PROPERTIES
-#                                COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
-#    MESSAGE(STATUS "Chucho has YAML configuration parsing enabled")
-#ENDIF()
-#
-#IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
-#    LIST(APPEND CHUCHO_CONFIGURATOR_SOURCES
-#         config_file_configurator.cpp
-#         properties.cpp
-#         include/chucho/config_file_configurator.hpp
-#         include/chucho/properties.hpp)
-#    GET_SOURCE_FILE_PROPERTY(CHUCHO_CONFIGURATION_DEFS configuration.cpp COMPILE_DEFINITIONS)
-#    SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
-#                                COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATION_DEFS};CHUCHO_CONFIG_FILE_CONFIG")
-#    IF(CONFIG_FILE_CONFIG)
-#        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_CONFIG_FILE)
-#        MESSAGE(STATUS "Chucho has config file configuration parsing enabled")
-#    ENDIF()
-#    IF(LOG4CPLUS_CONFIG)
-#        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_LOG4CPLUS_FILE)
-#        MESSAGE(STATUS "Chucho has log4cplus configuration parsing enabled")
-#    ENDIF()
-#    IF(CURL_FOUND)
-#        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_CURL)
-#    ENDIF()
-#    IF(CHUCHO_HAVE_RDKAFKA)
-#        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RDKAFKA)
-#    ENDIF()
-#    SET_SOURCE_FILES_PROPERTIES(config_file_configurator.cpp PROPERTIES
-#                                COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATOR_DEFS}")
-#    SET_SOURCE_FILES_PROPERTIES(memento_key_set.cpp PROPERTIES
-#                                COMPILE_DEFINITIONS CHUCHO_CONFIG_FILE_CONFIG)
-#ENDIF()
-#
-#IF(JSON_CONFIG)
-#    LIST(APPEND CHUCHO_CONFIGURATOR_SOURCES
-#        json_configurator.cpp
-#        include/chucho/json_configurator.hpp)
-#    GET_SOURCE_FILE_PROPERTY(CHUCHO_CONFIGURATION_DEFS configuration.cpp COMPILE_DEFINITIONS)
-#    SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
-#                                COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATION_DEFS};CHUCHO_JSON_CONFIG")
-#    MESSAGE(STATUS "Chucho has JSON configuration parsing enabled")
-#ENDIF()
 
 IF(MSVC)
     SET_SOURCE_FILES_PROPERTIES(c_diagnostic_context.cpp PROPERTIES
