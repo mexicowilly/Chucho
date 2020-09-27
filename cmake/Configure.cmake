@@ -581,7 +581,7 @@ IF(GTEST_PACKAGE AND EXISTS "${GTEST_PACKAGE}")
 ELSE()
     SET(CHUCHO_GTEST_PACKAGE_ARGS
         GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG release-1.8.1)
+        GIT_TAG release-1.10.0)
 ENDIF()
 ExternalProject_Add(gtest-external
                     ${CHUCHO_GTEST_PACKAGE_ARGS}
