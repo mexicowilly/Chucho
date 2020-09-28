@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 Will Mason
+ * Copyright 2013-2020 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -143,7 +143,7 @@ protected:
     std::unique_ptr<formatter> formatter_;
 
 private:
-    friend class cache_and_release_filter;
+    friend class writeable_filter;
 
     /**
      * @pre guard_ must be locked

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 Will Mason
+ * Copyright 2013-2020 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ class pattern_formatter_test : public ::testing::Test
 {
 public:
     pattern_formatter_test()
-        : evt_(chucho::logger::get("pattern logger"),
+        : evt_(chucho::logger::get("pattern.formatter.logger"),
                chucho::level::INFO_(),
                "hi",
                file_name,
@@ -121,7 +121,17 @@ TEST_F(pattern_formatter_test, local_date_time)
 TEST_F(pattern_formatter_test, logger)
 {
     chucho::pattern_formatter f("%c");
-    EXPECT_STREQ("pattern logger", f.format(evt_).c_str());
+    EXPECT_STREQ("pattern.formatter.logger", f.format(evt_).c_str());
+    chucho::pattern_formatter f1("%c{1}");
+    EXPECT_STREQ("logger", f1.format(evt_).c_str());
+    chucho::pattern_formatter f2("%c{2}");
+    EXPECT_STREQ("formatter.logger", f2.format(evt_).c_str());
+    chucho::pattern_formatter f3("%c{3}");
+    EXPECT_STREQ("pattern.formatter.logger", f3.format(evt_).c_str());
+    chucho::pattern_formatter fe("%c{seven}");
+    EXPECT_STREQ("pattern.formatter.logger", fe.format(evt_).c_str());
+    chucho::pattern_formatter fb("%c{12}");
+    EXPECT_STREQ("pattern.formatter.logger", fb.format(evt_).c_str());
 }
 
 TEST_F(pattern_formatter_test, message)

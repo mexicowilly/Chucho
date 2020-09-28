@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 Will Mason
+ * Copyright 2013-2020 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -84,9 +84,14 @@ struct expression;
  *      @ref event originated. The base file name does not
  *      include any path prefix from the name of the
  *      file.</td></tr>
- *     <tr><td>c</td>
+ *     <tr><td>c{&lt;number&gt;}</td>
  *         <td>The name of the @ref logger that is writing this
- *         event.</td></tr>
+ *         event. If the optional @i number argument is given,
+ *         then the logger name hierarchy can be clipped from the
+ *         output. For example, if you have a logger named
+ *         @c my.dog.has.fleas and you use the number 1, then the
+ *         output will be @c fleas. The number 2 will give you
+ *         @c has.fleas, and so on.</td></tr>
  *     <tr><td>C{&lt;key&gt;}</td>
  *         <td>The key from this thread's @ref
  *         diagnostic_context is looked up, and its value is
@@ -251,10 +256,13 @@ private:
     class CHUCHO_NO_EXPORT logger_piece : public piece
     {
     public:
-        logger_piece(const format_params& params);
+        logger_piece(const std::string& num, const format_params& params);
 
     protected:
         virtual std::string get_text_impl(const event& evt) const override;
+
+    private:
+        std::size_t count_;
     };
 
     class CHUCHO_NO_EXPORT date_time_piece : public piece

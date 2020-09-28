@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 Will Mason
+ * Copyright 2013-2020 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -100,6 +100,7 @@ protected:
     void windows_event_log_writer_body();
     void windows_event_log_writer_no_log_body();
 #endif
+    void yaml_formatter_body(const std::string& tmpl);
 #if defined(CHUCHO_HAVE_ZEROMQ)
     void zeromq_writer_body();
     void zeromq_writer_coalesce_body();

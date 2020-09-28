@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 Will Mason
+ * Copyright 2013-2020 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ public:
      *             of the class in question
      */
     static void add_configurable_factory(const std::string& name,
-                                         std::shared_ptr<configurable_factory> fact);
+                                         std::unique_ptr<configurable_factory>&& fact);
 
     /**
      * @name Constructor and Destructor
@@ -106,7 +106,7 @@ protected:
      * 
      * @return the factories
      */
-    static std::map<std::string, std::shared_ptr<configurable_factory>>& get_factories();
+    static std::map<std::string, std::unique_ptr<configurable_factory>>& get_factories();
 
     /**
      * Add variables. As the configurator is operating, it may 
@@ -137,12 +137,6 @@ private:
     std::map<std::string, std::string> variables_;
     security_policy& security_policy_;
 };
-
-inline void configurator::add_configurable_factory(const std::string& name,
-                                                   std::shared_ptr<configurable_factory> fact)
-{
-    get_factories()[name] = fact;
-}
 
 inline void configurator::add_variables(const std::map<std::string, std::string>& vars)
 {

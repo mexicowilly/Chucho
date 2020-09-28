@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 Will Mason
+ * Copyright 2013-2020 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ void json_configurator::configure(std::istream& in)
     auto cl = cJSON_GetObjectItemCaseSensitive(json, "chucho_loggers");
     if (cl == nullptr)
         throw std::runtime_error("Could not find \"chucho_loggers\" element in the JSON configuration");
-    auto lgr_fact = get_factory("chucho::logger");
+    auto& lgr_fact = get_factory("chucho::logger");
     auto jlgr = cl->child;
     while (jlgr != nullptr)
     {
@@ -67,7 +67,7 @@ void json_configurator::configure(std::istream& in)
                 for (int i = 0; i < cJSON_GetArraySize(lgr_child); i++)
                 {
                     auto jwrt = cJSON_GetArrayItem(lgr_child, i)->child;
-                    auto fact = get_factory(jwrt->string);
+                    auto& fact = get_factory(jwrt->string);
                     lgr_mnto->handle(create_subobject(jwrt->child, fact));
                 }
             }
@@ -83,9 +83,9 @@ void json_configurator::configure(std::istream& in)
 }
 
 std::unique_ptr<configurable> json_configurator::create_subobject(const cJSON* json,
-                                                                  std::shared_ptr<configurable_factory> fact)
+                                                                  std::unique_ptr<configurable_factory>& fact)
 {
-    auto facts = get_factories();
+    auto& facts = get_factories();
     auto mnto = std::move(fact->create_memento(*this));
     while (json != nullptr)
     {
@@ -99,7 +99,7 @@ std::unique_ptr<configurable> json_configurator::create_subobject(const cJSON* j
     return std::move(fact->create_configurable(mnto));
 }
 
-std::shared_ptr<configurable_factory> json_configurator::get_factory(const char* const str)
+std::unique_ptr<configurable_factory>& json_configurator::get_factory(const char* const str)
 {
     auto fact = get_factories().find(str);
     if (fact == get_factories().end())

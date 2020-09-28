@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 Will Mason
+ * Copyright 2013-2020 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ enum feature
     CONFIG_FILE_CONFIGURATION,  /**< Config file format configuration */
     EMAIL_WRITER,               /**< Whether CURL is present */
     LOG4CPLUS_CONFIGURATION,    /**< Log4cplus config file format configuration */
-    MINIZIP_COMPRESSION,        /**< Minizip, which is used for zip file format compression. Version 1.11 and later will never have this option. */
+    MINIZIP_COMPRESSION,        /**< Minizip, which is used for zip file format compression. Chucho Version 1.11 and later will never have this option. */
     MYSQL_WRITER,               /**< MySQL */
     ORACLE_WRITER,              /**< Oracle */
     POSTGRESQL_WRITER,          /**< PostgreSQL */
@@ -63,7 +63,7 @@ enum feature
     YAML_CONFIGURATION,         /**< YAML config file format configuration */
     ZEROMQ_WRITER,              /**< ZeroMQ */
     ZLIB_COMPRESSION,           /**< Zlib */
-    LIBARCHIVE_COMPRESSION,     /**< Libarchive, which is used for zip file format compression after Version 1.11 */
+    LIBARCHIVE_COMPRESSION,     /**< Libarchive, which is used for zip file format compression after Chucho Version 1.11 */
     LZMA_COMPRESSION,           /**< LZMA compression */
     LZ4_COMPRESSION,            /**< LZ4 compression */
     FLATBUFFERS_SERIALIZER,     /**< Flatbuffers serialization */

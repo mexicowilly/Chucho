@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 Will Mason
+ * Copyright 2013-2020 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -57,8 +57,6 @@ private:
         config_file_configurator& cfg_;
     };
 
-    #if defined(CHUCHO_CONFIG_FILE)
-
     class chucho_properties_processor : public properties_processor
     {
     public:
@@ -75,14 +73,10 @@ private:
                                                          const properties& props);
         std::unique_ptr<configurable> create_writer(const std::string& name,
                                                     const properties& props);
-        std::shared_ptr<configurable_factory> get_factory(const std::string& type,
-                                                          const std::string& name,
-                                                          const properties& props);
+        configurable_factory& get_factory(const std::string& type,
+                                          const std::string& name,
+                                          const properties& props);
     };
-
-    #endif
-
-    #if defined(CHUCHO_LOG4CPLUS_FILE)
 
     class log4cplus_properties_processor : public properties_processor
     {
@@ -118,8 +112,6 @@ private:
 
         std::map<std::string, std::string> factory_keys_;
     };
-
-    #endif
 
     memento_key_set memento_key_set_;
 };

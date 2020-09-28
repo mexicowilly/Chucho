@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2019 Will Mason
+# Copyright 2013-2020 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.1.3)
 PROJECT(chucho CXX C)
 
 SET(CHUCHO_MAJOR_VERSION 2)
-SET(CHUCHO_MINOR_VERSION 6)
+SET(CHUCHO_MINOR_VERSION 7)
 SET(CHUCHO_VERSION ${CHUCHO_MAJOR_VERSION}.${CHUCHO_MINOR_VERSION})
 
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -251,6 +251,7 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/ruby_evaluator_filter.hpp
     include/chucho/security_policy.hpp
     include/chucho/serializer.hpp
+    include/chucho/serialization_formatter.hpp
     include/chucho/size_file_roll_trigger.hpp
     include/chucho/sliding_numbered_file_roller.hpp
     include/chucho/status.hpp
@@ -262,9 +263,11 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/syslog_writer.hpp
     include/chucho/time_file_roller.hpp
     "${CMAKE_BINARY_DIR}/chucho/version.hpp"
+    include/chucho/writeable_filter.hpp
     include/chucho/writer.hpp
     include/chucho/writer_factory.hpp
-    include/chucho/writer_memento.hpp)
+    include/chucho/writer_memento.hpp
+    include/chucho/yaml_formatter.hpp)
 
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS ${CHUCHO_PUBLIC_HEADERS})
 
@@ -509,94 +512,50 @@ ENDIF()
 LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
      include/chucho/kafka_writer.hpp)
 
-# The libyaml sources are required by chuchod
+# This macro is also used in test/CMakeLists.txt
 MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
     # Update this when you rev libyaml
     SET(CHUCHO_LIBYAML_VERSION_MAJOR 0)
-    SET(CHUCHO_LIBYAML_VERSION_MINOR 1)
-    SET(CHUCHO_LIBYAML_VERSION_PATCH 7)
+    SET(CHUCHO_LIBYAML_VERSION_MINOR 2)
+    SET(CHUCHO_LIBYAML_VERSION_PATCH 5)
 
     LIST(APPEND ${CHUCHO_YAML_SOURCE_VAR}
-        "${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c"
-        "${CMAKE_SOURCE_DIR}/embedded/libyaml/loader.c"
-        "${CMAKE_SOURCE_DIR}/embedded/libyaml/parser.c"
-        "${CMAKE_SOURCE_DIR}/embedded/libyaml/reader.c"
-        "${CMAKE_SOURCE_DIR}/embedded/libyaml/scanner.c")
+         "${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c"
+         "${CMAKE_SOURCE_DIR}/embedded/libyaml/dumper.c"
+         "${CMAKE_SOURCE_DIR}/embedded/libyaml/emitter.c"
+         "${CMAKE_SOURCE_DIR}/embedded/libyaml/loader.c"
+         "${CMAKE_SOURCE_DIR}/embedded/libyaml/parser.c"
+         "${CMAKE_SOURCE_DIR}/embedded/libyaml/reader.c"
+         "${CMAKE_SOURCE_DIR}/embedded/libyaml/scanner.c"
+         "${CMAKE_SOURCE_DIR}/embedded/libyaml/writer.c")
 
     SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
                                 COMPILE_DEFINITIONS "YAML_VERSION_MAJOR=${CHUCHO_LIBYAML_VERSION_MAJOR};YAML_VERSION_MINOR=${CHUCHO_LIBYAML_VERSION_MINOR};YAML_VERSION_PATCH=${CHUCHO_LIBYAML_VERSION_PATCH};YAML_VERSION_STRING=\"${CHUCHO_LIB_YAML_VERSION_MAJOR}.${CHUCHO_LIBYAML_VERSION_MINOR}.${CHUCHO_LIBYAML_VERSION_PATCH}\";YAML_DECLARE_STATIC")
-    SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/loader.c"
+
+    SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/dumper.c"
+                                "${CMAKE_SOURCE_DIR}/embedded/libyaml/emitter.c"
+                                "${CMAKE_SOURCE_DIR}/embedded/libyaml/loader.c"
                                 "${CMAKE_SOURCE_DIR}/embedded/libyaml/parser.c"
                                 "${CMAKE_SOURCE_DIR}/embedded/libyaml/reader.c"
                                 "${CMAKE_SOURCE_DIR}/embedded/libyaml/scanner.c"
+                                "${CMAKE_SOURCE_DIR}/embedded/libyaml/writer.c"
                                 PROPERTIES
                                 COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
     IF(MSVC)
-        SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/loader.c"
+        SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/dumper.c"
+                                    "${CMAKE_SOURCE_DIR}/embedded/libyaml/loader.c"
                                     "${CMAKE_SOURCE_DIR}/embedded/libyaml/scanner.c"
                                     "${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c"
                                     PROPERTIES
                                     COMPILE_FLAGS "/wd4996 /wd4267 /wd4244")
     ELSEIF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER_ID STREQUAL Clang)
-        SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c" PROPERTIES
+        SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c"
+                                    PROPERTIES
                                     COMPILE_FLAGS "-Wno-implicit-function-declaration -Wno-int-to-pointer-cast")
     ENDIF()
 ENDMACRO()
 
-# Configurator settings
-IF(YAML_CONFIG)
-    CHUCHO_SET_YAML_SOURCES(CHUCHO_EMBEDDED_SOURCES)
-    LIST(APPEND CHUCHO_CONFIGURATOR_SOURCES
-         yaml_configurator.cpp
-         yaml_parser.cpp
-         include/chucho/utf8.hpp
-         include/chucho/yaml_configurator.hpp
-         include/chucho/yaml_parser.hpp)
-    SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
-                                COMPILE_DEFINITIONS "CHUCHO_YAML_CONFIG;YAML_DECLARE_STATIC")
-    SET_SOURCE_FILES_PROPERTIES(yaml_parser.cpp PROPERTIES
-                                COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
-    MESSAGE(STATUS "Chucho has YAML configuration parsing enabled")
-ENDIF()
-
-IF(CONFIG_FILE_CONFIG OR LOG4CPLUS_CONFIG)
-    LIST(APPEND CHUCHO_CONFIGURATOR_SOURCES
-         config_file_configurator.cpp
-         properties.cpp
-         include/chucho/config_file_configurator.hpp
-         include/chucho/properties.hpp)
-    GET_SOURCE_FILE_PROPERTY(CHUCHO_CONFIGURATION_DEFS configuration.cpp COMPILE_DEFINITIONS)
-    SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
-                                COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATION_DEFS};CHUCHO_CONFIG_FILE_CONFIG")
-    IF(CONFIG_FILE_CONFIG)
-        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_CONFIG_FILE)
-        MESSAGE(STATUS "Chucho has config file configuration parsing enabled")
-    ENDIF()
-    IF(LOG4CPLUS_CONFIG)
-        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_LOG4CPLUS_FILE)
-        MESSAGE(STATUS "Chucho has log4cplus configuration parsing enabled")
-    ENDIF()
-    IF(CURL_FOUND)
-        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_CURL)
-    ENDIF()
-    IF(CHUCHO_HAVE_RDKAFKA)
-        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RDKAFKA)
-    ENDIF()
-    SET_SOURCE_FILES_PROPERTIES(config_file_configurator.cpp PROPERTIES
-                                COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATOR_DEFS}")
-    SET_SOURCE_FILES_PROPERTIES(memento_key_set.cpp PROPERTIES
-                                COMPILE_DEFINITIONS CHUCHO_CONFIG_FILE_CONFIG)
-ENDIF()
-
-IF(JSON_CONFIG)
-    LIST(APPEND CHUCHO_CONFIGURATOR_SOURCES
-        json_configurator.cpp
-        include/chucho/json_configurator.hpp)
-    GET_SOURCE_FILE_PROPERTY(CHUCHO_CONFIGURATION_DEFS configuration.cpp COMPILE_DEFINITIONS)
-    SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
-                                COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATION_DEFS};CHUCHO_JSON_CONFIG")
-    MESSAGE(STATUS "Chucho has JSON configuration parsing enabled")
-ENDIF()
+CHUCHO_SET_YAML_SOURCES(CHUCHO_EMBEDDED_SOURCES)
 
 IF(MSVC)
     SET_SOURCE_FILES_PROPERTIES(c_diagnostic_context.cpp PROPERTIES
@@ -641,6 +600,7 @@ SET(CHUCHO_SOURCES
     cache_and_release_filter_memento.cpp
     calendar.cpp
     cerr_writer_factory.cpp
+    config_file_configurator.cpp
     configurable.cpp
     configurable_factory.cpp
     configuration.cpp
@@ -676,9 +636,9 @@ SET(CHUCHO_SOURCES
     interval_file_roll_trigger.cpp
     interval_file_roll_trigger_factory.cpp
     interval_file_roll_trigger_memento.cpp
+    json_configurator.cpp
     json_formatter.cpp
     json_formatter_factory.cpp
-    json_formatter_memento.cpp
     level.cpp
     level_filter.cpp
     level_filter_factory.cpp
@@ -713,12 +673,15 @@ SET(CHUCHO_SOURCES
     pattern_formatter_memento.cpp
     pipe_writer_factory.cpp
     pipe_writer_memento.cpp
+    properties.cpp
     regex.cpp
     regex_exception.cpp
     rolling_file_writer.cpp
     rolling_file_writer_factory.cpp
     rolling_file_writer_memento.cpp
     security_policy.cpp
+    serialization_formatter.cpp
+    serialization_formatter_memento.cpp
     size_file_roll_trigger.cpp
     size_file_roll_trigger_factory.cpp
     size_file_roll_trigger_memento.cpp
@@ -742,6 +705,10 @@ SET(CHUCHO_SOURCES
     writer.cpp
     writer_factory.cpp
     writer_memento.cpp
+    yaml_configurator.cpp
+    yaml_formatter.cpp
+    yaml_formatter_factory.cpp
+    yaml_parser.cpp
     include/chucho/async_writer_factory.hpp
     include/chucho/async_writer_memento.hpp
     include/chucho/c_logger.hpp
@@ -749,6 +716,7 @@ SET(CHUCHO_SOURCES
     include/chucho/cache_and_release_filter_memento.hpp
     include/chucho/calendar.hpp
     include/chucho/cerr_writer_factory.hpp
+    include/chucho/config_file_configurator.hpp
     include/chucho/configurator.hpp
     include/chucho/cout_writer_factory.hpp
     include/chucho/demangle.hpp
@@ -765,8 +733,8 @@ SET(CHUCHO_SOURCES
     include/chucho/host.hpp
     include/chucho/interval_file_roll_trigger_factory.hpp
     include/chucho/interval_file_roll_trigger_memento.hpp
+    include/chucho/json_configurator.hpp
     include/chucho/json_formatter_factory.hpp
-    include/chucho/json_formatter_memento.hpp
     include/chucho/level_filter_factory.hpp
     include/chucho/level_filter_memento.hpp
     include/chucho/level_threshold_filter_factory.hpp
@@ -788,10 +756,12 @@ SET(CHUCHO_SOURCES
     include/chucho/pipe_writer_factory.hpp
     include/chucho/pipe_writer_memento.hpp
     include/chucho/process.hpp
+    include/chucho/properties.hpp
     include/chucho/regex.hpp
     include/chucho/regex_exception.hpp
     include/chucho/rolling_file_writer_factory.hpp
     include/chucho/rolling_file_writer_memento.hpp
+    include/chucho/serialization_formatter_memento.hpp
     include/chucho/size_file_roll_trigger_factory.hpp
     include/chucho/size_file_roll_trigger_memento.hpp
     include/chucho/sliding_numbered_file_roller_factory.hpp
@@ -807,6 +777,9 @@ SET(CHUCHO_SOURCES
     include/chucho/time_file_roller_memento.hpp
     include/chucho/time_util.hpp
     include/chucho/utf8.hpp
+    include/chucho/yaml_configurator.hpp
+    include/chucho/yaml_formatter_factory.hpp
+    include/chucho/yaml_parser.hpp
     ${CHUCHO_CONFIGURATOR_SOURCES}
     ${CHUCHO_PLATFORM_SOURCES}
     ${CHUCHO_EMBEDDED_SOURCES}
@@ -821,6 +794,10 @@ SET(CHUCHO_SOURCES
     ${CHUCHO_MQ_GEN_SOURCES}
     ${CHUCHO_AWS_SOURCES})
 
+SET_SOURCE_FILES_PROPERTIES(configuration.cpp PROPERTIES
+                            COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
+SET_SOURCE_FILES_PROPERTIES(yaml_parser.cpp PROPERTIES
+                            COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
 IF(CHUCHO_HAVE_PUT_TIME)
     SET_SOURCE_FILES_PROPERTIES(calendar.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_HAVE_PUT_TIME)
@@ -847,10 +824,7 @@ IF(RUBY_FOUND)
 ENDIF()
 
 IF(CURL_FOUND)
-    LIST(FIND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_CURL CHUCHO_HEW_INDEX)
-    IF(CHUCHO_HEW_INDEX EQUAL -1)
-        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_CURL)
-    ENDIF()
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_CURL)
 ENDIF()
 
 IF(PROTOBUF_FOUND)
@@ -906,27 +880,17 @@ IF(AWSSDK_FOUND)
 ENDIF()
 
 IF(CHUCHO_HAVE_RDKAFKA)
-    LIST(FIND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RDKAFKA CHUCHO_HRK_INDEX)
-    IF(CHUCHO_HRK_INDEX EQUAL -1)
-        LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RDKAFKA)
-    ENDIF()
+    LIST(APPEND CHUCHO_CONFIGURATOR_DEFS CHUCHO_HAVE_RDKAFKA)
 ENDIF()
 
 IF(DEFINED CHUCHO_CONFIGURATOR_DEFS)
     SET_SOURCE_FILES_PROPERTIES(configurator.cpp PROPERTIES
                                 COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATOR_DEFS}")
+    SET_SOURCE_FILES_PROPERTIES(config_file_configurator.cpp PROPERTIES
+                                COMPILE_DEFINITIONS "${CHUCHO_CONFIGURATOR_DEFS}")
 ENDIF()
 
 # Feature definitions
-IF(YAML_CONFIG)
-    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_YAML_CONFIG)
-ENDIF()
-IF(CONFIG_FILE_CONFIG)
-    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_CONFIG_FILE_CONFIG)
-ENDIF()
-IF(LOG4CPLUS_CONFIG)
-    LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_LOG4CPLUS_CONFIG)
-ENDIF()
 IF(CURL_FOUND)
     LIST(APPEND CHUCHO_FEATURE_DEFS CHUCHO_HAVE_CURL)
 ENDIF()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 Will Mason
+ * Copyright 2013-2020 Will Mason
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -39,8 +39,8 @@ public:
 
 private:
     std::unique_ptr<configurable> create_subobject(const cJSON* json,
-                                                   std::shared_ptr<configurable_factory> fact);
-    std::shared_ptr<configurable_factory> get_factory(const char* const str);
+                                                   std::unique_ptr<configurable_factory>& fact);
+    std::unique_ptr<configurable_factory>& get_factory(const char* const str);
     std::string value_to_text(const cJSON* json);
 };
 

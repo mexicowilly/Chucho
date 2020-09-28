@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 Will Mason
+ * Copyright 2013-2020 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -69,40 +69,19 @@ void config_file_configurator::configure(std::istream& in)
     std::unique_ptr<properties_processor> proc;
     properties props(in);
 
-    #if defined(CHUCHO_CONFIG_FILE)
-
-    std::unique_ptr<properties> id(new properties(props.get_subset("chucho.")));
+    auto id = std::make_unique<properties>(props.get_subset("chucho."));
     if (!id->empty())
     {
-        proc.reset(new chucho_properties_processor(*this));
+        proc = std::make_unique<chucho_properties_processor>(*this);
     }
     else
     {
-        #if defined(CHUCHO_LOG4CPLUS_FILE)
-
-        id.reset(new properties(props.get_subset("log4cplus.")));
+        id = std::make_unique<properties>(props.get_subset("log4cplus."));
         if (id->empty())
             throw exception("Found neither Chucho nor log4cplus keys in the configuration");
-        // Valgrind says this pointer is leaking, but it is confused
-        proc.reset(new log4cplus_properties_processor(*this));
+        proc = std::make_unique<log4cplus_properties_processor>(*this);
         memento_key_set_ = memento_key_set::LOG4CPLUS;
-
-        #else
-
-        throw exception("Found no Chucho keys in the configuration");
-
-        #endif
     }
-
-    #elif defined(CHUCHO_LOG4CPLUS_FILE)
-
-    std::unique_ptr<properties> id(new properties(props.get_subset("log4cplus.")));
-    if (id->empty())
-        throw exception("Found no log4cplus keys in the configuration");
-    proc.reset(new log4cplus_properties_processor(*this));
-    memento_key_set_ = memento_key_set::LOG4CPLUS;
-
-    #endif
 
     id.reset();
     proc->process(props);
@@ -112,8 +91,6 @@ config_file_configurator::properties_processor::properties_processor(config_file
     : cfg_(cfg)
 {
 }
-
-#if defined(CHUCHO_CONFIG_FILE)
 
 config_file_configurator::chucho_properties_processor::chucho_properties_processor(config_file_configurator& cfg)
     : properties_processor(cfg)
@@ -125,20 +102,20 @@ std::unique_ptr<configurable> config_file_configurator::chucho_properties_proces
                                                                                                          const std::string& name,
                                                                                                          const properties& props)
 {
-    auto fact = get_factory(type, name, props);
-    auto mnto = std::move(fact->create_memento(cfg_));
+    auto& fact = get_factory(type, name, props);
+    auto mnto = std::move(fact.create_memento(cfg_));
     auto cur_props = props.get_subset(type + '.' + name + '.');
-    for (auto cur : cur_props)
+    for (const auto& cur : cur_props)
         mnto->handle(cur.first, cur.second);
-    return std::move(fact->create_configurable(mnto));
+    return std::move(fact.create_configurable(mnto));
 }
 
 std::unique_ptr<configurable> config_file_configurator::chucho_properties_processor::create_file_roller(const std::string& name,
                                                                                                         const properties& props)
 {
     std::string type("file_roller");
-    auto fact = get_factory(type, name, props);
-    auto mnto = fact->create_memento(cfg_);
+    auto& fact = get_factory(type, name, props);
+    auto mnto = fact.create_memento(cfg_);
     auto cur_props = props.get_subset(type + '.' + name + '.');
     for (auto cur : cur_props)
     {
@@ -147,23 +124,17 @@ std::unique_ptr<configurable> config_file_configurator::chucho_properties_proces
         else 
             mnto->handle(cur.first, cur.second);
     }
-    return fact->create_configurable(mnto); 
+    return fact.create_configurable(mnto);
 }
 
 std::unique_ptr<configurable> config_file_configurator::chucho_properties_processor::create_writer(const std::string& name,
                                                                                                    const properties& props)
 {
     std::string type("writer");
-    auto fact = get_factory(type, name, props); 
-    auto mnto = std::move(fact->create_memento(cfg_));
+    auto& fact = get_factory(type, name, props);
+    auto mnto = std::move(fact.create_memento(cfg_));
     auto cur_props = props.get_subset(type + '.' + name + '.');
-    std::vector<std::string> generics;
-    // VS2012 does not support initializer lists. Piece of shit.
-    generics.push_back("filter");
-    generics.push_back("formatter");
-    generics.push_back("file_roll_trigger");
-    generics.push_back("serializer");
-    generics.push_back("compressor");
+    std::vector<std::string> generics({"filter", "formatter", "file_roll_trigger", "serializer", "compressor"});
     #if defined(CHUCHO_HAVE_CURL)
     generics.push_back("email_trigger");
     #endif
@@ -181,12 +152,12 @@ std::unique_ptr<configurable> config_file_configurator::chucho_properties_proces
         else if (cur.first.find('.') == std::string::npos)
             mnto->handle(cur.first, cur.second); 
     }
-    return std::move(fact->create_configurable(mnto));
+    return std::move(fact.create_configurable(mnto));
 }
 
-std::shared_ptr<configurable_factory> config_file_configurator::chucho_properties_processor::get_factory(const std::string& type,
-                                                                                                         const std::string& name,
-                                                                                                         const properties& props)
+configurable_factory& config_file_configurator::chucho_properties_processor::get_factory(const std::string& type,
+                                                                                         const std::string& name,
+                                                                                         const properties& props)
 {
     auto cls = props.get_one(type + '.' + name);
     if (!cls)
@@ -194,7 +165,7 @@ std::shared_ptr<configurable_factory> config_file_configurator::chucho_propertie
     auto fact = get_factories().find(*cls);
     if (fact == get_factories().end())
         throw exception("No " + type + " named " + *cls + " exists");
-    return fact->second;
+    return *fact->second;
 }
 
 void config_file_configurator::chucho_properties_processor::process(const properties& props)
@@ -202,7 +173,7 @@ void config_file_configurator::chucho_properties_processor::process(const proper
     auto chuprops = props.get_subset("chucho.");
     auto loggers = props.get("chucho.logger");
     assert(get_factories().find("chucho::logger") != get_factories().end());
-    auto lgr_fact = get_factories().find("chucho::logger")->second;
+    auto& lgr_fact = get_factories().find("chucho::logger")->second;
     while (loggers.first != loggers.second)
     {
         try
@@ -227,10 +198,6 @@ void config_file_configurator::chucho_properties_processor::process(const proper
         ++loggers.first;
     }
 }
-
-#endif
-
-#if defined(CHUCHO_LOG4CPLUS_FILE)
 
 config_file_configurator::log4cplus_properties_processor::log4cplus_properties_processor(config_file_configurator& cfg)
     : properties_processor(cfg)
@@ -271,7 +238,7 @@ void config_file_configurator::log4cplus_properties_processor::add_filters(write
             }
             else
             {
-                auto fact = cfg_.get_factories().find(key->second);
+                const auto& fact = cfg_.get_factories().find(key->second);
                 assert(fact != cfg_.get_factories().end());
                 auto mnto = std::move(fact->second->create_memento(cfg_));
                 auto flt_props = get_non_empty_subset(flts, name + ".");
@@ -300,7 +267,7 @@ std::unique_ptr<configurable> config_file_configurator::log4cplus_properties_pro
                                                                                                             const properties& wrt_props)
 {
     assert(cfg_.get_factories().find("chucho::async_writer") != cfg_.get_factories().end());
-    auto fact = cfg_.get_factories().find("chucho::async_writer")->second;
+    auto& fact = cfg_.get_factories().find("chucho::async_writer")->second;
     auto mnto = std::move(fact->create_memento(cfg_));
     auto app = wrt_props.get_one("Appender");
     if (app)
@@ -352,7 +319,7 @@ void config_file_configurator::log4cplus_properties_processor::create_logger(con
                                                                              const properties& props)
 {
     assert(get_factories().find("chucho::logger") != get_factories().end());
-    auto lgr_fact = get_factories().find("chucho::logger")->second;
+    auto& lgr_fact = get_factories().find("chucho::logger")->second;
     auto mnto = std::move(lgr_fact->create_memento(cfg_));
     mnto->handle("name", name);
     auto tokens = split_logger_descriptor(desc);
@@ -375,17 +342,17 @@ std::unique_ptr<configurable> config_file_configurator::log4cplus_properties_pro
                                                                                                                    const properties& props)
 {
     assert(cfg_.get_factories().find("chucho::rolling_file_writer") != cfg_.get_factories().end());
-    auto fact = cfg_.get_factories().find("chucho::rolling_file_writer")->second;
+    auto& fact = cfg_.get_factories().find("chucho::rolling_file_writer")->second;
     auto mnto = std::move(fact->create_memento(cfg_));
     fill_file_writer_memento(mnto, std::move(fmt), props);
     assert(cfg_.get_factories().find("chucho::numbered_file_roller") != cfg_.get_factories().end()); 
-    auto roller_fact = cfg_.get_factories().find("chucho::numbered_file_roller")->second;
+    auto& roller_fact = cfg_.get_factories().find("chucho::numbered_file_roller")->second;
     auto roller_mnto = std::move(roller_fact->create_memento(cfg_));
     auto prop = props.get_one("MaxBackupIndex");
     roller_mnto->handle("max_index", (prop ? *prop : "1"));
     mnto->handle(std::move(roller_fact->create_configurable(roller_mnto)));
     assert(cfg_.get_factories().find("chucho::size_file_roll_trigger") != cfg_.get_factories().end()); 
-    auto trigger_fact = cfg_.get_factories().find("chucho::size_file_roll_trigger")->second;
+    auto& trigger_fact = cfg_.get_factories().find("chucho::size_file_roll_trigger")->second;
     auto trigger_mnto = std::move(trigger_fact->create_memento(cfg_));
     prop = props.get_one("MaxFileSize");
     trigger_mnto->handle("max_size", (prop ? *prop : "10m"));
@@ -397,11 +364,11 @@ std::unique_ptr<configurable> config_file_configurator::log4cplus_properties_pro
                                                                                                                    const properties& props)
 {
     assert(cfg_.get_factories().find("chucho::rolling_file_writer") != cfg_.get_factories().end());
-    auto fact = cfg_.get_factories().find("chucho::rolling_file_writer")->second;
+    auto& fact = cfg_.get_factories().find("chucho::rolling_file_writer")->second;
     auto mnto = std::move(fact->create_memento(cfg_));
     fill_file_writer_memento(mnto, std::move(fmt), props);
     assert(cfg_.get_factories().find("chucho::time_file_roller") != cfg_.get_factories().end()); 
-    auto roller_fact = cfg_.get_factories().find("chucho::time_file_roller")->second;
+    auto& roller_fact = cfg_.get_factories().find("chucho::time_file_roller")->second;
     auto roller_mnto = std::move(roller_fact->create_memento(cfg_));
     auto prop = props.get_one("MaxBackupIndex");
     roller_mnto->handle("max_history", prop ? *prop : "10");
@@ -457,7 +424,7 @@ std::unique_ptr<configurable> config_file_configurator::log4cplus_properties_pro
         }
         else
         {
-            auto fact = cfg_.get_factories().find(key->second);
+            const auto& fact = cfg_.get_factories().find(key->second);
             assert(fact != cfg_.get_factories().end());
             auto mnto = std::move(fact->second->create_memento(cfg_));
             if (fmt)
@@ -554,7 +521,5 @@ std::string config_file_configurator::log4cplus_properties_processor::time_patte
     }
     return result;
 }
-
-#endif
 
 }

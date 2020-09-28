@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 Will Mason
+ * Copyright 2013-2020 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -792,6 +792,20 @@ TEST_F(yaml_configurator, variables)
     ASSERT_NE(nullptr, lgr->get_level().get());
     EXPECT_EQ(*chucho::level::FATAL_(), *lgr->get_level());
     EXPECT_FALSE(lgr->writes_to_ancestors());
+}
+
+TEST_F(yaml_configurator, yaml_formatter)
+{
+    std::string tmpl(R"tmpl(
+chucho::logger:
+    name: will
+    chucho::cout_writer:
+        chucho::yaml_formatter:
+            style: PrEtTy
+            time_zone: uTc
+            DScluded_fields: FIELDS
+)tmpl");
+    yaml_formatter_body(tmpl);
 }
 
 #if defined(CHUCHO_WINDOWS)

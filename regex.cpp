@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 Will Mason
+ * Copyright 2013-2020 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -59,7 +59,6 @@ expression::~expression()
 #if defined(CHUCHO_HAVE_POSIX_REGEX)
     regfree(&pimpl_->re_);
 #endif
-    delete pimpl_;
 }
 
 struct iterator_impl
@@ -110,13 +109,12 @@ iterator::iterator(const std::string& text, expression& re)
 iterator::iterator(const iterator& it)
     : text_(it.text_),
       match_(it.match_),
-      pimpl_(new iterator_impl(*it.pimpl_))
+      pimpl_(std::make_unique<iterator_impl>(*it.pimpl_))
 {
 }
 
 iterator::~iterator()
 {
-    delete pimpl_;
 }
 
 iterator& iterator::operator= (const iterator& it)
@@ -125,8 +123,7 @@ iterator& iterator::operator= (const iterator& it)
     {
         text_ = it.text_;
         match_ = it.match_;
-        delete pimpl_;
-        pimpl_ = new iterator_impl(*it.pimpl_);
+        pimpl_ = std::make_unique<iterator_impl>(*it.pimpl_);
     }
     return *this;
 }

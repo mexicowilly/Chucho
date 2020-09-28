@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 Will Mason
+ * Copyright 2013-2020 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -80,17 +80,18 @@ std::unique_ptr<pattern_formatter::piece> pattern_formatter::create_piece(std::s
     switch (c)
     {
     case 'b':
-        result.reset(new base_file_piece(params));
+        result = std::make_unique<base_file_piece>(params);
         break;
     case 'c':
-        result.reset(new logger_piece(params));
+        arg = get_argument(pos, end);
+        result = std::make_unique<logger_piece>(arg, params);
         break;
     case 'C':
         arg = get_argument(pos, end);
         if (arg.empty())
             report_error("The pattern parameter %C requires an argument");
         else
-            result.reset(new diagnostic_context_piece(arg, params));
+            result = std::make_unique<diagnostic_context_piece>(arg, params);
         break;
     case 'd':
     case 'D':
@@ -98,52 +99,52 @@ std::unique_ptr<pattern_formatter::piece> pattern_formatter::create_piece(std::s
         if (arg.empty())
             arg = "%Y-%m-%d %H:%M:%S";
         if (c == 'd')
-            result.reset(new utc_date_time_piece(arg, params));
+            result = std::make_unique<utc_date_time_piece>(arg, params);
         else
-            result.reset(new local_date_time_piece(arg, params));
+            result = std::make_unique<local_date_time_piece>(arg, params);
         break;
     case 'F':
-        result.reset(new full_file_piece(params));
+        result = std::make_unique<full_file_piece>(params);
         break;
     case 'h':
-        result.reset(new base_host_piece(params));
+        result = std::make_unique<base_host_piece>(params);
         break;
     case 'H':
-        result.reset(new full_host_piece(params));
+        result = std::make_unique<full_host_piece>(params);
         break;
     case 'i':
-        result.reset(new pid_piece(params));
+        result = std::make_unique<pid_piece>(params);
         break;
     case 'k':
-        result.reset(new marker_piece(params));
+        result = std::make_unique<marker_piece>(params);
         break;
     case 'L':
-        result.reset(new line_number_piece(params));
+        result = std::make_unique<line_number_piece>(params);
         break;
     case 'm':
-        result.reset(new message_piece(params));
+        result = std::make_unique<message_piece>(params);
         break;
     case 'M':
-        result.reset(new function_piece(params));
+        result = std::make_unique<function_piece>(params);
         break;
     case 'n':
-        result.reset(new end_of_line_piece(params));
+        result = std::make_unique<end_of_line_piece>(params);
         break;
     case 'p':
-        result.reset(new level_piece(params));
+        result = std::make_unique<level_piece>(params);
         break;
     case 'r':
-        result.reset(new milliseconds_since_start_piece(params));
+        result = std::make_unique<milliseconds_since_start_piece>(params);
         break;
     case 'R':
         arg = get_argument(pos, end);
         if (arg.empty())
             report_error("The pattern parameter %R requires three parameters enclosed in curly braces and separated by commas");
         else
-            result.reset(new regex_replace_piece(arg, params));
+            result = std::make_unique<regex_replace_piece>(arg, params);
         break;
     case 't':
-        result.reset(new thread_piece(params));
+        result = std::make_unique<thread_piece>(params);
         break;
     default:
         report_error(std::string("Unexpected character '") + c + "' in pattern");
@@ -362,14 +363,33 @@ std::string pattern_formatter::full_file_piece::get_text_impl(const event& evt) 
     return evt.get_file_name();
 }
 
-pattern_formatter::logger_piece::logger_piece(const format_params& params)
-    : piece(params)
+pattern_formatter::logger_piece::logger_piece(const std::string& num, const format_params& params)
+    : piece(params),
+      count_(std::numeric_limits<std::size_t>::max())
 {
+    try
+    {
+        if (!num.empty())
+            count_ = std::stoul(num);
+    }
+    catch (...)
+    {
+    }
 }
 
 std::string pattern_formatter::logger_piece::get_text_impl(const event& evt) const
 {
-    return evt.get_logger()->get_name();
+    std::string nm = evt.get_logger()->get_name();
+    std::size_t hrchy_count = std::count(nm.begin(), nm.end(), '.') + 1;
+    if (hrchy_count > 1 && count_ <= hrchy_count)
+    {
+        std::size_t pos = 0;
+        for (std::size_t i = 0; i < hrchy_count - count_; i++)
+            pos = nm.find('.', pos) + 1;
+        if (pos > 0 && pos < nm.length() - 1)
+            nm.erase(0, pos);
+    }
+    return nm;
 }
 
 pattern_formatter::date_time_piece::date_time_piece(const std::string& date_pattern,
@@ -552,8 +572,8 @@ pattern_formatter::regex_replace_piece::regex_replace_piece(const std::string& a
     if (regex::search(args, arg_re, mch))
     {
         assert(mch.size() == 4);
-        fmt_.reset(new pattern_formatter(args.substr(mch[1].begin(), mch[1].length())));
-        re_.reset(new regex::expression(args.substr(mch[2].begin(), mch[2].length())));
+        fmt_ = std::make_unique<pattern_formatter>(args.substr(mch[1].begin(), mch[1].length()));
+        re_ = std::make_unique<regex::expression>(args.substr(mch[2].begin(), mch[2].length()));
         replacement_ = args.substr(mch[3].begin(), mch[3].length());
     }
     else

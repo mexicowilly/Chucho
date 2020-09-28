@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 Will Mason
+ * Copyright 2013-2020 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ struct CHUCHO_PRIV_EXPORT expression : non_copyable
     expression(const std::string& re);
     ~expression();
 
-    expression_impl* pimpl_;
+    std::unique_ptr<expression_impl> pimpl_;
 };
 
 class CHUCHO_PRIV_EXPORT sub_match
@@ -96,7 +96,7 @@ public:
 private:
     std::string text_;
     match match_;
-    iterator_impl* pimpl_;
+    std::unique_ptr<iterator_impl> pimpl_;
 };
 
 CHUCHO_PRIV_EXPORT std::string replace(const std::string& text, expression& re, const std::string& rep);

@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2019 Will Mason
+# Copyright 2013-2020 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -38,7 +38,6 @@
 #
 #     Sections include:
 #         * GENERAL
-#         * CONFIGURATION FORMATS
 #         * OPTIONAL FEATURES
 # GENERAL
 # ================================================================================
@@ -64,34 +63,11 @@ OPTION(ENABLE_SHARED "Whether to build a shared object" OFF)
 OPTION(ENABLE_FRAMEWORK "Whether to build as a framework on Macintosh" ON)
 
 # Whether to use libstdc++ when compiling with Clang.
-OPTION(CLANG_LIBSTDCXX "Whether to use libstdc++ with the Clang compiler" OFF)
-
-# CONFIGURATION FORMATS
-# ================================================================================
-#     Chucho is able to parse configuration files using three different formats,
-# YAML, config file and Log4cplus. Any or all may be included in the build, and
-# Chucho will figure out the format of the file being used at run time. For
-# examples showing how each of these formats works, please refer to the files:
-#     test/yaml_configurator_test.cpp
-#     test/chucho_config_file_configurator_test.cpp
-#     test/log4cplus_config_file_configurator_test.cpp
-#     test/json_configurator_test.cpp
-
-# YAML configuration.
-
-OPTION(YAML_CONFIG "Whether to include the YAML configuration parser" ON)
-
-# Config file format using Chucho keys.
-
-OPTION(CONFIG_FILE_CONFIG "Whether to include the config file configuration parser that uses Chucho keys" OFF)
-
-# Config file format using Log4cplus keys.
-
-OPTION(LOG4CPLUS_CONFIG "Whether to support reading log4cplus configuration files" OFF)
-
-# JSON file format
-
-OPTION(JSON_CONFIG "Whether to support reading JSON configuration files" OFF)
+IF(CMAKE_SYSTEM_NAME STREQUAL Linux AND CMAKE_CXX_COMPILER_ID MATCHES Clang)
+    OPTION(CLANG_LIBSTDCXX "Whether to use libstdc++ with the Clang compiler" ON)
+ELSE()
+    OPTION(CLANG_LIBSTDCXX "Whether to use libstdc++ with the Clang compiler" OFF)
+ENDIF()
 
 # OPTIONAL FEATURES
 # ================================================================================
