@@ -35,7 +35,7 @@ class formatter;
  * @class serialization_formatter serialization_formatter.hpp chucho/serialization_formatter.hpp
  * A formatter that produces output in a serialized fashion. Rather than formatting an event
  * in such a way as to produce a single message, like @ref pattern_formatter, this
- * formatter will include selected event fields in a serialized manner.
+ * formatter will include selected event fields.
  *
  * @sa json_formatter, yaml_formatter
  *

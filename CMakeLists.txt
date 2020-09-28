@@ -252,7 +252,6 @@ SET(CHUCHO_PUBLIC_HEADERS
     include/chucho/security_policy.hpp
     include/chucho/serializer.hpp
     include/chucho/serialization_formatter.hpp
-    include/chucho/serialization_formatter_memento.hpp
     include/chucho/size_file_roll_trigger.hpp
     include/chucho/sliding_numbered_file_roller.hpp
     include/chucho/status.hpp
@@ -761,6 +760,7 @@ SET(CHUCHO_SOURCES
     include/chucho/regex_exception.hpp
     include/chucho/rolling_file_writer_factory.hpp
     include/chucho/rolling_file_writer_memento.hpp
+    include/chucho/serialization_formatter_memento.hpp
     include/chucho/size_file_roll_trigger_factory.hpp
     include/chucho/size_file_roll_trigger_memento.hpp
     include/chucho/sliding_numbered_file_roller_factory.hpp
