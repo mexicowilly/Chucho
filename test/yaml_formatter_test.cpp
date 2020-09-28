@@ -14,6 +14,8 @@
  *    limitations under the License.
  */
 
+#define YAML_DECLARE_STATIC
+
 #include <gtest/gtest.h>
 #include <chucho/yaml_formatter.hpp>
 #include <chucho/logger.hpp>

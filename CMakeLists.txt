@@ -542,7 +542,8 @@ MACRO(CHUCHO_SET_YAML_SOURCES CHUCHO_YAML_SOURCE_VAR)
                                 PROPERTIES
                                 COMPILE_DEFINITIONS YAML_DECLARE_STATIC)
     IF(MSVC)
-        SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/loader.c"
+        SET_SOURCE_FILES_PROPERTIES("${CMAKE_SOURCE_DIR}/embedded/libyaml/dumper.c"
+                                    "${CMAKE_SOURCE_DIR}/embedded/libyaml/loader.c"
                                     "${CMAKE_SOURCE_DIR}/embedded/libyaml/scanner.c"
                                     "${CMAKE_SOURCE_DIR}/embedded/libyaml/api.c"
                                     PROPERTIES

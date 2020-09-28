@@ -380,11 +380,11 @@ pattern_formatter::logger_piece::logger_piece(const std::string& num, const form
 std::string pattern_formatter::logger_piece::get_text_impl(const event& evt) const
 {
     std::string nm = evt.get_logger()->get_name();
-    auto hrchy_count = std::count(nm.begin(), nm.end(), '.') + 1;
+    std::size_t hrchy_count = std::count(nm.begin(), nm.end(), '.') + 1;
     if (hrchy_count > 1 && count_ <= hrchy_count)
     {
-        auto pos = 0;
-        for (auto i = 0; i < hrchy_count - count_; i++)
+        std::size_t pos = 0;
+        for (std::size_t i = 0; i < hrchy_count - count_; i++)
             pos = nm.find('.', pos) + 1;
         if (pos > 0 && pos < nm.length() - 1)
             nm.erase(0, pos);

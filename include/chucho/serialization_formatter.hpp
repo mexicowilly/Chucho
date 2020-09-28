@@ -17,6 +17,11 @@
 #if !defined(CHUCHO_SERIALIZATION_FORMATTER_HPP__)
 #define CHUCHO_SERIALIZATION_FORMATTER_HPP__
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 #include <chucho/formatter.hpp>
 #include <bitset>
 #include <vector>
@@ -147,5 +152,9 @@ protected:
 };
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif
