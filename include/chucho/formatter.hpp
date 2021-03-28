@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_FORMATTER_HPP__)
-#define CHUCHO_FORMATTER_HPP__
+#if !defined(CHUCHO_FORMATTER_HPP_)
+#define CHUCHO_FORMATTER_HPP_
 
 #include <chucho/event.hpp>
 #include <chucho/status_reporter.hpp>

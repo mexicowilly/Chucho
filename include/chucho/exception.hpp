@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_EXCEPTION_HPP__)
-#define CHUCHO_EXCEPTION_HPP__
+#if !defined(CHUCHO_EXCEPTION_HPP_)
+#define CHUCHO_EXCEPTION_HPP_
 
 #if defined(_MSC_VER)
 #pragma warning(push)

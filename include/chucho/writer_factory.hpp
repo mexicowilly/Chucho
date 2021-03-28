@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_WRITER_FACTORY_HPP__)
-#define CHUCHO_WRITER_FACTORY_HPP__
+#if !defined(CHUCHO_WRITER_FACTORY_HPP_)
+#define CHUCHO_WRITER_FACTORY_HPP_
 
 #include <chucho/configurable_factory.hpp>
 #include <chucho/writer_memento.hpp>

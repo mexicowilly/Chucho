@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_LEVEL_HPP__)
-#define CHUCHO_LEVEL_HPP__
+#if !defined(CHUCHO_LEVEL_HPP_)
+#define CHUCHO_LEVEL_HPP_
 
 #include <chucho/export.h>
 #include <chucho/syslog_constants.hpp>

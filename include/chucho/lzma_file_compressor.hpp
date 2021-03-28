@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(LZMA_FILE_COMPRESSOR_HPP__)
-#define LZMA_FILE_COMPRESSOR_HPP__
+#if !defined(LZMA_FILE_COMPRESSOR_HPP_)
+#define LZMA_FILE_COMPRESSOR_HPP_
 
 #include <chucho/file_compressor.hpp>
 

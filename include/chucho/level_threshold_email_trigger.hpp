@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_LEVEL_THRESHOLD_EMAIL_TRIGGER_HPP__)
-#define CHUCHO_LEVEL_THRESHOLD_EMAIL_TRIGGER_HPP__
+#if !defined(CHUCHO_LEVEL_THRESHOLD_EMAIL_TRIGGER_HPP_)
+#define CHUCHO_LEVEL_THRESHOLD_EMAIL_TRIGGER_HPP_
 
 #include <chucho/email_trigger.hpp>
 #include <chucho/level.hpp>

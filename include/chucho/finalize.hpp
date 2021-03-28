@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_FINALIZE_HPP__)
-#define CHUCHO_FINALIZE_HPP__
+#if !defined(CHUCHO_FINALIZE_HPP_)
+#define CHUCHO_FINALIZE_HPP_
 
 #include <chucho/export.h>
 

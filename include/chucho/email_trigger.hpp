@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_EMAIL_TRIGGER_HPP__)
-#define CHUCHO_EMAIL_TRIGGER_HPP__
+#if !defined(CHUCHO_EMAIL_TRIGGER_HPP_)
+#define CHUCHO_EMAIL_TRIGGER_HPP_
 
 #include <chucho/event.hpp>
 #include <chucho/status_reporter.hpp>

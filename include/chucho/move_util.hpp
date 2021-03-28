@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#ifndef CHUCHO_MOVE_UTIL_HPP__
-#define CHUCHO_MOVE_UTIL_HPP__
+#ifndef CHUCHO_MOVE_UTIL_HPP_
+#define CHUCHO_MOVE_UTIL_HPP_
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"

@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_NAMED_PIPE_WRITER_HPP__)
-#define CHUCHO_NAMED_PIPE_WRITER_HPP__
+#if !defined(CHUCHO_NAMED_PIPE_WRITER_HPP_)
+#define CHUCHO_NAMED_PIPE_WRITER_HPP_
 
 #include <chucho/file_writer.hpp>
 

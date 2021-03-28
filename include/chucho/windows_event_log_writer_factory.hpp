@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_WINDOWS_EVENT_LOG_WRITER_FACTORY_HPP__)
-#define CHUCHO_WINDOWS_EVENT_LOG_WRITER_FACTORY_HPP__
+#if !defined(CHUCHO_WINDOWS_EVENT_LOG_WRITER_FACTORY_HPP_)
+#define CHUCHO_WINDOWS_EVENT_LOG_WRITER_FACTORY_HPP_
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"

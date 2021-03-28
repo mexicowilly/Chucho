@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_DATABASE_WRITER_HPP__)
-#define CHUCHO_DATABASE_WRITER_HPP__
+#if !defined(CHUCHO_DATABASE_WRITER_HPP_)
+#define CHUCHO_DATABASE_WRITER_HPP_
 
 #include <chucho/writer.hpp>
 #include <soci/soci.h>

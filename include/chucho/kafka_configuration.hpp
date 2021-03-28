@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_KAFKA_CONFIGURATION_HPP__)
-#define CHUCHO_KAFKA_CONFIGURATION_HPP__
+#if !defined(CHUCHO_KAFKA_CONFIGURATION_HPP_)
+#define CHUCHO_KAFKA_CONFIGURATION_HPP_
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"

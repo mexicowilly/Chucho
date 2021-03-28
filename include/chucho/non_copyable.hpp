@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_NON_COPYABLE_HPP__)
-#define CHUCHO_NON_COPYABLE_HPP__
+#if !defined(CHUCHO_NON_COPYABLE_HPP_)
+#define CHUCHO_NON_COPYABLE_HPP_
 
 #include <chucho/export.h>
 

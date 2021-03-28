@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_LOGGABLE_HPP__)
-#define CHUCHO_LOGGABLE_HPP__
+#if !defined(CHUCHO_LOGGABLE_HPP_)
+#define CHUCHO_LOGGABLE_HPP_
 
 #include <chucho/logger.hpp>
 #include <type_traits>

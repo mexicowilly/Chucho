@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_VERSION_HPP__)
-#define CHUCHO_VERSION_HPP__
+#if !defined(CHUCHO_VERSION_HPP_)
+#define CHUCHO_VERSION_HPP_
 
 #if defined(major)
 #undef major

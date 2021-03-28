@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_STREAMABLE_HPP__)
-#define CHUCHO_STREAMABLE_HPP__
+#if !defined(CHUCHO_STREAMABLE_HPP_)
+#define CHUCHO_STREAMABLE_HPP_
 
 #include <chucho/loggable.hpp>
 #include <chucho/log_stream.hpp>

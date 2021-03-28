@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#ifndef CHUCHO_CLOUDWATCH_WRITER_HPP__
-#define CHUCHO_CLOUDWATCH_WRITER_HPP__
+#ifndef CHUCHO_CLOUDWATCH_WRITER_HPP_
+#define CHUCHO_CLOUDWATCH_WRITER_HPP_
 
 #include <chucho/cloud_writer.hpp>
 #include <aws/logs/CloudWatchLogsClient.h>

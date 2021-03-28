@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_ON_START_FILE_ROLL_TRIGGER_FACTORY_HPP__)
-#define CHUCHO_ON_START_FILE_ROLL_TRIGGER_FACTORY_HPP__
+#if !defined(CHUCHO_ON_START_FILE_ROLL_TRIGGER_FACTORY_HPP_)
+#define CHUCHO_ON_START_FILE_ROLL_TRIGGER_FACTORY_HPP_
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"

@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_ZLIB_COMPRESSOR_HPP__)
-#define CHUCHO_ZLIB_COMPRESSOR_HPP__
+#if !defined(CHUCHO_ZLIB_COMPRESSOR_HPP_)
+#define CHUCHO_ZLIB_COMPRESSOR_HPP_
 
 #include <chucho/compressor.hpp>
 #include <zlib.h>

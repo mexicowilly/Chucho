@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_LOG_HPP__)
-#define CHUCHO_LOG_HPP__
+#if !defined(CHUCHO_LOG_HPP_)
+#define CHUCHO_LOG_HPP_
 
 /**
  * @file

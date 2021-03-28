@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_JSON_FORMATTER_HPP__)
-#define CHUCHO_JSON_FORMATTER_HPP__
+#if !defined(CHUCHO_JSON_FORMATTER_HPP_)
+#define CHUCHO_JSON_FORMATTER_HPP_
 
 #if defined(_MSC_VER)
 #pragma warning(push)

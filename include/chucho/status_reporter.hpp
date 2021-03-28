@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_STATUS_REPORTER_HPP__)
-#define CHUCHO_STATUS_REPORTER_HPP__
+#if !defined(CHUCHO_STATUS_REPORTER_HPP_)
+#define CHUCHO_STATUS_REPORTER_HPP_
 
 #if defined(_MSC_VER)
 #pragma warning(push)

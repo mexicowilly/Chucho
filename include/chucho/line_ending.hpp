@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_LINE_ENDING_HPP__)
-#define CHUCHO_LINE_ENDING_HPP__
+#if !defined(CHUCHO_LINE_ENDING_HPP_)
+#define CHUCHO_LINE_ENDING_HPP_
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"

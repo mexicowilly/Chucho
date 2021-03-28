@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_DOOR_EVENT_H__)
-#define CHUCHO_DOOR_EVENT_H__
+#if !defined(CHUCHO_DOOR_EVENT_H_)
+#define CHUCHO_DOOR_EVENT_H_
 
 /**
  * @file

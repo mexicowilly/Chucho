@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_RABBITMQ_WRITER_HPP__)
-#define CHUCHO_RABBITMQ_WRITER_HPP__
+#if !defined(CHUCHO_RABBITMQ_WRITER_HPP_)
+#define CHUCHO_RABBITMQ_WRITER_HPP_
 
 #include <chucho/message_queue_writer.hpp>
 #include <chucho/optional.hpp>

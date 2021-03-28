@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_EXPORT__)
-#define CHUCHO_EXPORT__
+#if !defined(CHUCHO_EXPORT_H_)
+#define CHUCHO_EXPORT_H_
 
 // This definition is set by CMake at build time. If defined, then Chucho
 // is configured as a static library. It corresponds to the CMake variable

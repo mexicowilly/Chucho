@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_INTERVAL_FILE_ROLL_TRIGGER_HPP__)
-#define CHUCHO_INTERVAL_FILE_ROLL_TRIGGER_HPP__
+#if !defined(CHUCHO_INTERVAL_FILE_ROLL_TRIGGER_HPP_)
+#define CHUCHO_INTERVAL_FILE_ROLL_TRIGGER_HPP_
 
 #if defined(_MSC_VER)
 #pragma warning(push)

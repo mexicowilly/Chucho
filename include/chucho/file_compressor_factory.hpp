@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_FILE_COMPRESSOR_FACTORY_HPP__)
-#define CHUCHO_FILE_COMPRESSOR_FACTORY_HPP__
+#if !defined(CHUCHO_FILE_COMPRESSOR_FACTORY_HPP_)
+#define CHUCHO_FILE_COMPRESSOR_FACTORY_HPP_
 
 #include <chucho/configurable_factory.hpp>
 

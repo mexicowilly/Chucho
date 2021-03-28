@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_LOGGER_H__)
-#define CHUCHO_LOGGER_H__
+#if !defined(CHUCHO_LOGGER_H_)
+#define CHUCHO_LOGGER_H_
 
 #if !defined(CHUCHO_BUILD) && defined(__cplusplus)
 #error "When using C++, you should include finalize.hpp"

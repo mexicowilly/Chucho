@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_OPTIONAL_HPP__)
-#define CHUCHO_OPTIONAL_HPP__
+#if !defined(CHUCHO_OPTIONAL_HPP_)
+#define CHUCHO_OPTIONAL_HPP_
 
 #include <chucho/export.h>
 #include <type_traits>

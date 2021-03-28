@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_YAML_PARSER_HPP__)
-#define CHUCHO_YAML_PARSER_HPP__
+#if !defined(CHUCHO_YAML_PARSER_HPP_)
+#define CHUCHO_YAML_PARSER_HPP_
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"

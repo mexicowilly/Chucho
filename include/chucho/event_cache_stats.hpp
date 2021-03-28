@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_EVENT_CACHE_STATS_HPP__)
-#define CHUCHO_EVENT_CACHE_STATS_HPP__
+#if !defined(CHUCHO_EVENT_CACHE_STATS_HPP_)
+#define CHUCHO_EVENT_CACHE_STATS_HPP_
 
 #include <chucho/export.h>
 #include <cstdint>

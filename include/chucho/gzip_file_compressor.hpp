@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(GZIP_FILE_COMPRESSOR_HPP__)
-#define GZIP_FILE_COMPRESSOR_HPP__
+#if !defined(GZIP_FILE_COMPRESSOR_HPP_)
+#define GZIP_FILE_COMPRESSOR_HPP_
 
 #include <chucho/file_compressor.hpp>
 

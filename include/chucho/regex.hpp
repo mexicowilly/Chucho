@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_REGEX_HPP__)
-#define CHUCHO_REGEX_HPP__
+#if !defined(CHUCHO_REGEX_HPP_)
+#define CHUCHO_REGEX_HPP_
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"

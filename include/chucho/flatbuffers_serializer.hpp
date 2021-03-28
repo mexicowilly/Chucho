@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_FLATBUFFERS_SERIALIZER_HPP__)
-#define CHUCHO_FLATBUFFERS_SERIALIZER_HPP__
+#if !defined(CHUCHO_FLATBUFFERS_SERIALIZER_HPP_)
+#define CHUCHO_FLATBUFFERS_SERIALIZER_HPP_
 
 #include <chucho/serializer.hpp>
 

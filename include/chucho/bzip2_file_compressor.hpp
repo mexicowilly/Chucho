@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(BZIP2_FILE_COMPRESSOR_HPP__)
-#define BZIP2_FILE_COMPRESSOR_HPP__
+#if !defined(BZIP2_FILE_COMPRESSOR_HPP_)
+#define BZIP2_FILE_COMPRESSOR_HPP_
 
 #if defined(_MSC_VER)
 #pragma warning(push)

@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_NOOP_COMPRESSOR_FACTORY_HPP__)
-#define CHUCHO_NOOP_COMPRESSOR_FACTORY_HPP__
+#if !defined(CHUCHO_NOOP_COMPRESSOR_FACTORY_HPP_)
+#define CHUCHO_NOOP_COMPRESSOR_FACTORY_HPP_
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"

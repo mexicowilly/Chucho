@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_STATUS_OBSERVER_HPP__)
-#define CHUCHO_STATUS_OBSERVER_HPP__
+#if !defined(CHUCHO_STATUS_OBSERVER_HPP_)
+#define CHUCHO_STATUS_OBSERVER_HPP_
 
 #include <chucho/status.hpp>
 

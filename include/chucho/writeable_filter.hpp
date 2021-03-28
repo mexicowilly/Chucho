@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_WRITEABLE_FILTER_HPP__)
-#define CHUCHO_WRITEABLE_FILTER_HPP__
+#if !defined(CHUCHO_WRITEABLE_FILTER_HPP_)
+#define CHUCHO_WRITEABLE_FILTER_HPP_
 
 #include <chucho/filter.hpp>
 #include <chucho/writer.hpp>

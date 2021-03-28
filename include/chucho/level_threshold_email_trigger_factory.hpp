@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_LEVEL_THRESHOLD_EMAIL_TRIGGER_FACTORY_HPP__)
-#define CHUCHO_LEVEL_THRESHOLD_EMAIL_TRIGGER_FACTORY_HPP__
+#if !defined(CHUCHO_LEVEL_THRESHOLD_EMAIL_TRIGGER_FACTORY_HPP_)
+#define CHUCHO_LEVEL_THRESHOLD_EMAIL_TRIGGER_FACTORY_HPP_
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"

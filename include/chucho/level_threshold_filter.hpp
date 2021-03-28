@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_LEVEL_THRESHOLD_FILTER_HPP__)
-#define CHUCHO_LEVEL_THRESHOLD_FILTER_HPP__
+#if !defined(CHUCHO_LEVEL_THRESHOLD_FILTER_HPP_)
+#define CHUCHO_LEVEL_THRESHOLD_FILTER_HPP_
 
 #if defined(_MSC_VER)
 #pragma warning(push)

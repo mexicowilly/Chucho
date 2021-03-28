@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_C_LOGGER_H__)
-#define CHUCHO_C_LOGGER_H__
+#if !defined(CHUCHO_C_LOGGER_HPP_)
+#define CHUCHO_C_LOGGER_HPP_
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"

@@ -73,8 +73,8 @@
  * Share and Enjoy!	:-)
  */
 
-#if !defined(__FNV_H__)
-#define __FNV_H__
+#if !defined(__FNV_H_)
+#define __FNV_H_
 
 #include <sys/types.h>
 /*
@@ -272,4 +272,4 @@ extern void print_fnv64(Fnv64_t hval, Fnv64_t mask, int verbose, char *arg);
  * End Chucho addition
  */
 
-#endif /* __FNV_H__ */
+#endif /* __FNV_H_ */

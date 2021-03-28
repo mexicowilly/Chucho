@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_SIZE_FILE_ROLL_TRIGGER_MEMENTO_HPP__)
-#define CHUCHO_SIZE_FILE_ROLL_TRIGGER_MEMENTO_HPP__
+#if !defined(CHUCHO_SIZE_FILE_ROLL_TRIGGER_MEMENTO_HPP_)
+#define CHUCHO_SIZE_FILE_ROLL_TRIGGER_MEMENTO_HPP_
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"

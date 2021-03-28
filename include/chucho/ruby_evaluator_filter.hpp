@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_RUBY_EVALUATOR_FILTER_HPP__)
-#define CHUCHO_RUBY_EVALUATOR_FILTER_HPP__
+#if !defined(CHUCHO_RUBY_EVALUATOR_FILTER_HPP_)
+#define CHUCHO_RUBY_EVALUATOR_FILTER_HPP_
 
 #include <chucho/evaluator_filter.hpp>
 #include <mutex>

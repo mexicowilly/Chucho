@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_FORMATTED_MESSAGE_SERIALIZER_HPP__)
-#define CHUCHO_FORMATTED_MESSAGE_SERIALIZER_HPP__
+#if !defined(CHUCHO_FORMATTED_MESSAGE_SERIALIZER_HPP_)
+#define CHUCHO_FORMATTED_MESSAGE_SERIALIZER_HPP_
 
 #if defined(_MSC_VER)
 #pragma warning(push)

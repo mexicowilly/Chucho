@@ -14,6 +14,9 @@
  *    limitations under the License.
  */
 
+#if !defined(CHUCHO_CONFIGURATOR_TEST_HPP_)
+#define CHUCHO_CONFIGURATOR_TEST_HPP_
+
 #include <gtest/gtest.h>
 #include <chucho/configurator.hpp>
 
@@ -121,3 +124,5 @@ protected:
 }
 
 }
+
+#endif

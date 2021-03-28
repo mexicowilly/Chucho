@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_EVALUATOR_FILTER_HPP__)
-#define CHUCHO_EVALUATOR_FILTER_HPP__
+#if !defined(CHUCHO_EVALUATOR_FILTER_HPP_)
+#define CHUCHO_EVALUATOR_FILTER_HPP_
 
 #include <chucho/filter.hpp>
 

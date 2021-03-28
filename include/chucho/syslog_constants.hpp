@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_SYSLOG_CONSTANTS_HPP__)
-#define CHUCHO_SYSLOG_CONSTANTS_HPP__
+#if !defined(CHUCHO_SYSLOG_CONSTANTS_HPP_)
+#define CHUCHO_SYSLOG_CONSTANTS_HPP_
 
 #include <chucho/export.h>
 #include <cstdint>

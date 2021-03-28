@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_YAML_FORMATTER_HPP__)
-#define CHUCHO_YAML_FORMATTER_HPP__
+#if !defined(CHUCHO_YAML_FORMATTER_HPP_)
+#define CHUCHO_YAML_FORMATTER_HPP_
 
 #include <chucho/serialization_formatter.hpp>
 

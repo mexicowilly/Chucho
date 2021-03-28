@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_TIME_FILE_ROLLER_HPP__)
-#define CHUCHO_TIME_FILE_ROLLER_HPP__
+#if !defined(CHUCHO_TIME_FILE_ROLLER_HPP_)
+#define CHUCHO_TIME_FILE_ROLLER_HPP_
 
 #if defined(_MSC_VER)
 #pragma warning(push)

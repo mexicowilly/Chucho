@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#ifndef CHUCHO_JSON_CONFIGURATOR_HPP
-#define CHUCHO_JSON_CONFIGURATOR_HPP
+#if !defined(CHUCHO_JSON_CONFIGURATOR_HPP_)
+#define CHUCHO_JSON_CONFIGURATOR_HPP_
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"

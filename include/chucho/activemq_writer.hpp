@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_ACTIVEMQ_WRITER_HPP__)
-#define CHUCHO_ACTIVEMQ_WRITER_HPP__
+#if !defined(CHUCHO_ACTIVEMQ_WRITER_HPP_)
+#define CHUCHO_ACTIVEMQ_WRITER_HPP_
 
 #include <chucho/message_queue_writer.hpp>
 #include <cms/Connection.h>

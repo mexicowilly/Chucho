@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_ASYNC_WRITER_HPP__)
-#define CHUCHO_ASYNC_WRITER_HPP__
+#if !defined(CHUCHO_ASYNC_WRITER_HPP_)
+#define CHUCHO_ASYNC_WRITER_HPP_
 
 #if defined(_MSC_VER)
 #pragma warning(push)

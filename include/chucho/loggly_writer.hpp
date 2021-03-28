@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#ifndef CHUCHO_LOGGLY_WRITER_HPP__
-#define CHUCHO_LOGGLY_WRITER_HPP__
+#ifndef CHUCHO_LOGGLY_WRITER_HPP_
+#define CHUCHO_LOGGLY_WRITER_HPP_
 
 #include <chucho/cloud_writer.hpp>
 

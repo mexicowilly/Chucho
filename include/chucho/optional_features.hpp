@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_OPTIONAL_FEATURES_HPP__)
-#define CHUCHO_OPTIONAL_FEATURES_HPP__
+#if !defined(CHUCHO_OPTIONAL_FEATURES_HPP_)
+#define CHUCHO_OPTIONAL_FEATURES_HPP_
 
 /**
  * @file optional_features.hpp

@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_WINSOCK_STARTUP_HPP__)
-#define CHUCHO_WINSOCK_STARTUP_HPP__
+#if !defined(CHUCHO_WINSOCK_STARTUP_HPP_)
+#define CHUCHO_WINSOCK_STARTUP_HPP_
 
 #include <mutex>
 

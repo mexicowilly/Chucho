@@ -14,8 +14,8 @@
 ; *    limitations under the License.
 ; */
 
-;#if !defined(CHUCHO_EVENT_LOG_HPP__)
-;#define CHUCHO_EVENT_LOG_HPP__
+;#if !defined(CHUCHO_EVENT_LOG_HPP_)
+;#define CHUCHO_EVENT_LOG_HPP_
 
 LanguageNames=(Neutral=0x0000:MSG00000)
 

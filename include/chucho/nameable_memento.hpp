@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#ifndef CHUCHO_NAMEABLE_MEMENTO_HPP__
-#define CHUCHO_NAMEABLE_MEMENTO_HPP__
+#ifndef CHUCHO_NAMEABLE_MEMENTO_HPP_
+#define CHUCHO_NAMEABLE_MEMENTO_HPP_
 
 #include <chucho/memento.hpp>
 #include <typeinfo>

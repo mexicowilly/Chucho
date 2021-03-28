@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_MARKER_HPP__)
-#define CHUCHO_MARKER_HPP__
+#if !defined(CHUCHO_MARKER_HPP_)
+#define CHUCHO_MARKER_HPP_
 
 #if defined(_MSC_VER)
 #pragma warning(push)

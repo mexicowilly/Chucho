@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_FUNCTION_NAME_HPP__)
-#define CHUCHO_FUNCTION_NAME_HPP__
+#if !defined(CHUCHO_FUNCTION_NAME_HPP_)
+#define CHUCHO_FUNCTION_NAME_HPP_
 
 #if !defined(CHUCHO_DONT_DOCUMENT)
 

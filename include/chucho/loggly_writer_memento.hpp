@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#ifndef CHUCHO_LOGGLY_WRITER_MEMENTO_HPP__
-#define CHUCHO_LOGGLY_WRITER_MEMENTO_HPP__
+#ifndef CHUCHO_LOGGLY_WRITER_MEMENTO_HPP_
+#define CHUCHO_LOGGLY_WRITER_MEMENTO_HPP_
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"

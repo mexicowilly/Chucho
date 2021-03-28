@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_ERROR_UTIL_HPP__)
-#define CHUCHO_ERROR_UTIL_HPP__
+#if !defined(CHUCHO_ERROR_UTIL_HPP_)
+#define CHUCHO_ERROR_UTIL_HPP_
 
 #include <string>
 #include <windows.h>

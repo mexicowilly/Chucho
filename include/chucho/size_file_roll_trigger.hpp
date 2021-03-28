@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_SIZE_FILE_ROLL_TRIGGER__)
-#define CHUCHO_SIZE_FILE_ROLL_TRIGGER__
+#if !defined(CHUCHO_SIZE_FILE_ROLL_TRIGGER_HPP_)
+#define CHUCHO_SIZE_FILE_ROLL_TRIGGER_HPP_
 
 #include <chucho/file_roll_trigger.hpp>
 #include <cstdint>

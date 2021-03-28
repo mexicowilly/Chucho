@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_EVENT_CACHE_HPP__)
-#define CHUCHO_EVENT_CACHE_HPP__
+#if !defined(CHUCHO_EVENT_CACHE_HPP_)
+#define CHUCHO_EVENT_CACHE_HPP_
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"

@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_WINDOWS_EVENT_LOG_WRITER__)
-#define CHUCHO_WINDOWS_EVENT_LOG_WRITER__
+#if !defined(CHUCHO_WINDOWS_EVENT_LOG_WRITER_HPP_)
+#define CHUCHO_WINDOWS_EVENT_LOG_WRITER_HPP_
 
 #if defined(_MSC_VER)
 #pragma warning(push)

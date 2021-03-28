@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CALENDAR_HPP__)
-#define CHUCHO_CALENDAR_HPP__
+#if !defined(CHUCHO_CALENDAR_HPP_)
+#define CHUCHO_CALENDAR_HPP_
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"

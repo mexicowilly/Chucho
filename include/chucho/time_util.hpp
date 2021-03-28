@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_TIME_UTIL_HPP__)
-#define CHUCHO_TIME_UTIL_HPP__
+#if !defined(CHUCHO_TIME_UTIL_HPP_)
+#define CHUCHO_TIME_UTIL_HPP_
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"

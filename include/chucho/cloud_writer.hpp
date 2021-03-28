@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#ifndef CHUCHO_CLOUD_WRITER_HPP__
-#define CHUCHO_CLOUD_WRITER_HPP__
+#ifndef CHUCHO_CLOUD_WRITER_HPP_
+#define CHUCHO_CLOUD_WRITER_HPP_
 
 #include <chucho/writer.hpp>
 

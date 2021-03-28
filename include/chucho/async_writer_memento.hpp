@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_ASYNC_WRITER_MEMENTO_HPP__)
-#define CHUCHO_ASYNC_WRITER_MEMENTO_HPP__
+#if !defined(CHUCHO_ASYNC_WRITER_MEMENTO_HPP_)
+#define CHUCHO_ASYNC_WRITER_MEMENTO_HPP_
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"

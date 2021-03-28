@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CONFIGURABLE_FACTORY_HPP__)
-#define CHUCHO_CONFIGURABLE_FACTORY_HPP__
+#if !defined(CHUCHO_CONFIGURABLE_FACTORY_HPP_)
+#define CHUCHO_CONFIGURABLE_FACTORY_HPP_
 
 #if defined(_MSC_VER)
 #pragma warning(push)

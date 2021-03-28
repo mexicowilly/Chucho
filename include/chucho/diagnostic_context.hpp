@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_DIAGNOSTIC_CONTEXT_HPP__)
-#define CHUCHO_DIAGNOSTIC_CONTEXT_HPP__
+#if !defined(CHUCHO_DIAGNOSTIC_CONTEXT_HPP_)
+#define CHUCHO_DIAGNOSTIC_CONTEXT_HPP_
 
 #include <chucho/export.h>
 #include <string>

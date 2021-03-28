@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_COMPRESSOR_HPP__)
-#define CHUCHO_COMPRESSOR_HPP__
+#if !defined(CHUCHO_COMPRESSOR_HPP_)
+#define CHUCHO_COMPRESSOR_HPP_
 
 #include <chucho/configurable.hpp>
 #include <chucho/status_reporter.hpp>

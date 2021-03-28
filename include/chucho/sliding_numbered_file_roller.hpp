@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_SLIDING_NUMBERED_FILE_ROLLER_HPP__)
-#define CHUCHO_SLIDING_NUMBERED_FILE_ROLLER_HPP__
+#if !defined(CHUCHO_SLIDING_NUMBERED_FILE_ROLLER_HPP_)
+#define CHUCHO_SLIDING_NUMBERED_FILE_ROLLER_HPP_
 
 #include <chucho/file_roller.hpp>
 

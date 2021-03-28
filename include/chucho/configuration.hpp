@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CONFIGURATION_HPP__)
-#define CHUCHO_CONFIGURATION_HPP__
+#if !defined(CHUCHO_CONFIGURATION_HPP_)
+#define CHUCHO_CONFIGURATION_HPP_
 
 #include <chucho/security_policy.hpp>
 #include <chucho/status_reporter.hpp>

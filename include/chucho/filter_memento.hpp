@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#ifndef CHUCHO_FILTER_MEMENTO_HPP__
-#define CHUCHO_FILTER_MEMENTO_HPP__
+#ifndef CHUCHO_FILTER_MEMENTO_HPP_
+#define CHUCHO_FILTER_MEMENTO_HPP_
 
 #include <chucho/nameable_memento.hpp>
 

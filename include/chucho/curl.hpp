@@ -13,8 +13,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#ifndef CHUCHO_CURL_HPP__
-#define CHUCHO_CURL_HPP__
+#ifndef CHUCHO_CURL_HPP_
+#define CHUCHO_CURL_HPP_
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"
