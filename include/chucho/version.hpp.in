@@ -45,20 +45,20 @@ namespace version
  * @ingroup miscellaneous
  * @return the major version
  */
-inline int major() { return ${CHUCHO_VERSION_MAJOR}; }
+constexpr int major() { return ${CHUCHO_VERSION_MAJOR}; }
 /**
  * The minor version of Chucho in <chucho/version.hpp>.
  * @ingroup miscellaneous
  * @return the minor version
  */
-inline int minor() { return ${CHUCHO_VERSION_MINOR}; }
+constexpr int minor() { return ${CHUCHO_VERSION_MINOR}; }
 /**
  * A textual representation of Chucho's version, like "1.3" in 
  * <chucho/version.hpp>. 
  * @ingroup miscellaneous
  * @return a textual representation of Chucho's version
  */
-inline const char* text() { return "${CHUCHO_VERSION}"; }
+constexpr const char* text() { return "${CHUCHO_VERSION}"; }
 
 }
 
