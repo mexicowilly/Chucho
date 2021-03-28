@@ -1141,7 +1141,11 @@ IF(CHUCHO_WINDOWS)
             RUNTIME DESTINATION bin)
 ENDIF()
 
-ADD_SUBDIRECTORY(test)
+IF(GTEST_FOUND)
+    ADD_SUBDIRECTORY(test)
+ELSE()
+    MESSAGE(WARNING "GTest was not found, so the tests cannot be built")
+ENDIF()
 
 # Documentation
 IF(DOXYGEN_FOUND)

@@ -207,7 +207,7 @@ ADD_EXECUTABLE(unit-test EXCLUDE_FROM_ALL
                ${CHUCHO_TEST_CURL_SOURCES}
                ${CHUCHO_TEST_AWS_SOURCES}
                ${CHUCHO_TEST_DB_SOURCES})
-TARGET_LINK_LIBRARIES(unit-test chucho gtest)
+TARGET_LINK_LIBRARIES(unit-test chucho ${GTEST_LIBRARIES})
 
 IF(MSVC)
     SET_SOURCE_FILES_PROPERTIES(pattern_formatter_test.cpp PROPERTIES
@@ -280,12 +280,12 @@ ENDIF()
 ADD_EXECUTABLE(time-rolling-file-test EXCLUDE_FROM_ALL
                harness.cpp
                time_rolling_file_test.cpp)
-TARGET_LINK_LIBRARIES(time-rolling-file-test chucho gtest)
+TARGET_LINK_LIBRARIES(time-rolling-file-test chucho ${GTEST_LIBRARIES})
 
 ADD_EXECUTABLE(syslog-writer-test EXCLUDE_FROM_ALL
                harness.cpp
                syslog_writer_test.cpp)
-TARGET_LINK_LIBRARIES(syslog-writer-test chucho gtest)
+TARGET_LINK_LIBRARIES(syslog-writer-test chucho ${GTEST_LIBRARIES})
 
 IF(CHUCHO_WINDOWS)
     ADD_EXECUTABLE(windows-event-log-writer-test EXCLUDE_FROM_ALL
@@ -293,14 +293,14 @@ IF(CHUCHO_WINDOWS)
                    windows_event_log_writer_test.cpp)
     SET_SOURCE_FILES_PROPERTIES(windows_event_log_writer_test.cpp PROPERTIES
                                 COMPILE_DEFINITIONS CHUCHO_EVENT_LOG_DLL="${CHUCHO_EVENT_LOG_DLL}")
-    TARGET_LINK_LIBRARIES(windows-event-log-writer-test chucho gtest)
+    TARGET_LINK_LIBRARIES(windows-event-log-writer-test chucho ${GTEST_LIBRARIES})
 ENDIF()
 
 IF(CURL_FOUND)
     ADD_EXECUTABLE(email-writer-test EXCLUDE_FROM_ALL
                    harness.cpp
                    email_writer_test.cpp)
-    TARGET_LINK_LIBRARIES(email-writer-test chucho gtest)
+    TARGET_LINK_LIBRARIES(email-writer-test chucho ${GTEST_LIBRARIES})
 ENDIF()
 
 ADD_EXECUTABLE(configuration-off EXCLUDE_FROM_ALL
