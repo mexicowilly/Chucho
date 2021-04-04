@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2020 Will Mason
+# Copyright 2013-2021 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -18,12 +18,14 @@ if [ "$#" -ne 2 ] ; then
     echo "You must provide the old year as arg 1 and the new year as arg 2"
     exit
 fi
-
+count=0
 for FILE in `find . \( -type d \( -name build -o -name util -o -name cmake-build\* \) -prune \) -o \( -type f -exec egrep -q '^.+Copyright.+2013-.*$' {} \; -print \) | sort`
 do
     awk -f util/change-copyright.awk old=$1 new=$2 ${FILE} > ${FILE}.copyright.change
     mv -f ${FILE}.copyright.change ${FILE}
     echo "Changed ${FILE}"
+    count=$(( count + 1 ))
 done
+echo "Changed ${count} files"
 echo "# Don't forget to change the scripts in the util directory"
 echo "# Also, don't forget to change the main_page.hpp file"
