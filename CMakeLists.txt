@@ -1149,7 +1149,7 @@ ENDIF()
 
 # Documentation
 IF(DOXYGEN_FOUND)
-    SET(CHUCHO_DOXYGEN_INPUT main_page.hpp)
+    SET(CHUCHO_DOXYGEN_INPUT "doc/main_page.hpp doc/config_ref.hpp")
     IF(CHUCHO_DOCUMENT_ALL)
         FILE(GLOB CHUCHO_ALL_HEADERS RELATIVE "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/include/chucho/*")
         FOREACH(HEAD ${CHUCHO_ALL_HEADERS})
@@ -1166,7 +1166,7 @@ IF(DOXYGEN_FOUND)
         ENDFOREACH()
         SET(CHUCHO_DOXYGEN_EXTRACT_ALL NO)
     ENDIF()
-    CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/doxygen.conf.in" "${CMAKE_BINARY_DIR}/doxygen.conf")
+    CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/doc/doxygen.conf.in" "${CMAKE_BINARY_DIR}/doxygen.conf")
     MESSAGE(STATUS "Generating HTML header and footer for API documentation")
     EXECUTE_PROCESS(COMMAND "${DOXYGEN_EXECUTABLE}" -w html "${CMAKE_BINARY_DIR}/doc_header.html" "${CMAKE_BINARY_DIR}/doc_footer.html" "${CMAKE_BINARY_DIR}/doc_stylesheet.html" "${CMAKE_BINARY_DIR}/doxygen.conf"
                     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
