@@ -121,9 +121,159 @@
  *             pattern: '%m%n'
  * @endcode
  *
+ * @subsection cloudwatch chucho::cloudwatch_writer
+ * @subsubsection cloudwatch_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>log_group</td><td>The AWS Cloudwatch log group</td><td>n/a</td></tr>
+ * <tr><td>log_stream</td><td>The AWS Cloudwatch log stream</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any object from the @ref Formatters group</td><td>n/a</td></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>name</td><td>The name of the writer</td><td>%chucho::cloudwatch_writer</td></tr>
+ * <tr><td>region</td><td>The region</td><td>From env or AWS config file</td></tr>
+ * <tr><td>batch_size</td><td>The number of events to send at a time</td><td>50</td></tr>
+ * <tr><td colspan="2">Any number of objects from the @ref Filters group</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection cloudwatch_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::cloudwatch_writer:
+ *         chucho::pattern_formatter
+ *             pattern: '%m'
+ *         log_group: mygroup
+ *         log_stream: mystream
+ *         region: us-west-1
+ * @endcode
+ *
+ * @subsection cout chucho::cout_writer
+ * @subsubsection cout_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td colspan="2">Any object from the @ref Formatters group</td><td>n/a</td></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>name</td><td>The name of the writer</td><td>%chucho::cout_writer</td></tr>
+ * <tr><td colspan="2">Any number objects from the @ref Filters group</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection cout_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::cout_writer:
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ * @endcode
+ *
+ * @subsection database chucho::database_writer
+ * @subsubsection database_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>connection</td><td>The database connection</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any object from the @ref Formatters group</td><td>n/a</td></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>name</td><td>The name of the writer</td><td>%chucho::database_writer</td></tr>
+ * <tr><td colspan="2">Any number objects from the @ref Filters group</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection database_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::database_writer:
+ *         chucho::pattern_formatter:
+ *             pattern: '%m'
+ *         connection: 'postgresql://host=lotsofdoggies.com port=5432 dbname=chucho user=scrumpy password=dumpy'
+ * @endcode
+ *
+ * @subsection email chucho::email_writer
+ * @subsubsection email_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>connection_type</td><td>The type of connection: clear, ssl, or starttls</td><td>n/a</td></tr>
+ * <tr><td>from</td><td>The email address of the sender</td><td>n/a</td></tr>
+ * <tr><td>host</td><td>The server from which to send</td><td>n/a</td></tr>
+ * <tr><td>subject</td><td>The email subject with follows the same rules as @ref chucho::pattern_formatter "pattern_formatter"</td><td>n/a</td></tr>
+ * <tr><td>to</td><td>The email addresses of the recipients, comma-separated</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any object from the @ref Formatters group</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any object from the @ref email_triggers "Email Triggers" group</td><td>n/a</td></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>buffer_size</td><td>The maximum number of events to send in a single email</td><td>256</td></tr>
+ * <tr><td>name</td><td>The name of the writer</td><td>%chucho::email_writer</td></tr>
+ * <tr><td>password</td><td>The password</td><td>n/a</td></tr>
+ * <tr><td>port</td><td>The port to which to connect</td><td>25</td></tr>
+ * <tr><td>user</td><td>The user name</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any number objects from the @ref Filters group</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection email_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::email_writer
+ *         chucho::pattern_formatter:
+ *             pattern: '%m'
+ *         chucho::level_threshold_email_trigger:
+ *             level: error
+ *         host: mail.dummy.com
+ *         from: whistler@mctweaky.com
+ *         to: one@blubbery.com,two@humid.org
+ *         subject: '%c'
+ *         connection_type: clear
+ *         user: scrumpy
+ *         password: lumpy
+ * @endcode
+ *
+ * @subsection file chucho::file_writer
+ * @subsubsection file_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>file_name</td><td>The name of the file</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any object from the @ref Formatters group</td><td>n/a</td></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>flush</td><td>Whether to flush the file after every write: true or false</td><td>true</td></tr>
+ * <tr><td>name</td><td>The name of the writer</td><td>%chucho::file_writer</td></tr>
+ * <tr><td>on_start</td><td>Where to start writing: truncate or append</td><td>append</td></tr>
+ * <tr><td colspan="2">Any number objects from the @ref Filters group</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection file_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::file_writer:
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ *         file_name: hello.log
+ * @endcode
+ *
+ * @subsection loggly chucho::loggly_writer
+ * @subsubsection loggly_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>token</td><td>The Loggly authorization token</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any object from the @ref Formatters group</td><td>n/a</td></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>name</td><td>The name of the writer</td><td>%chucho::loggly_writer</td></tr>
+ * <tr><td colspan="2">Any number objects from the @ref Filters group</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection loggly_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::loggly_writer:
+ *         chucho::pattern_formatter:
+ *             pattern: '%m'
+ *         token: blah.blah.blah
+ * @endcode
+ *
  * @section Formatters
  *
  * @section Filters
  *
  * @section Compressors
+ *
+ * @section email_triggers Email Triggers
  */
