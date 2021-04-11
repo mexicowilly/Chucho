@@ -248,6 +248,32 @@
  *         file_name: hello.log
  * @endcode
  *
+ * @subsection kafka chucho::kafka_writer
+ * @subsubsection kafka_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>topic</td><td>The topic</td><td>n/a</td></tr>
+ * <tr><td>brokers</td><td>A comma-separated list of Kafka brokers</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any object from the @ref Formatters group</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any object from the @ref Serializers group</td><td>n/a</td></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>name</td><td>The name of the writer</td><td>%chucho::kafka_writer</td></tr>
+ * <tr><td colspan="2">Any number objects from the @ref Filters group</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any object from the @ref Compressors group</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection kafka_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: will
+ *     chucho::kafka_writer:
+ *         chucho::pattern_formatter:
+ *             pattern: '%m'
+ *         chucho::formatted_message_serializer
+ *         brokers: 192.168.56.101
+ *         topic: doggies
+ * @endcode
+ *
  * @subsection loggly chucho::loggly_writer
  * @subsubsection loggly_params Parameters
  * <table>
@@ -269,11 +295,199 @@
  *         token: blah.blah.blah
  * @endcode
  *
+ * @subsection named_pipe chucho::named_pipe_writer
+ * @subsubsection named_pipe_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>pipe_name</td><td>The name of the pipe</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any object from the @ref Formatters group</td><td>n/a</td></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>flush</td><td>Whether to flush the pipe after every write: true or false</td><td>true</td></tr>
+ * <tr><td>name</td><td>The name of the writer</td><td>%chucho::named_pipe_writer</td></tr>
+ * <tr><td colspan="2">Any number objects from the @ref Filters group</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection named_pipe_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::named_pipe_writer:
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ *         pipe_name: donglehead
+ * @endcode
+ *
+ * @subsection pipe chucho::pipe_writer
+ * @subsubsection pipe_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td colspan="2">Any object from the @ref Formatters group</td><td>n/a</td></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>flush</td><td>Whether to flush the pipe after every write: true or false</td><td>true</td></tr>
+ * <tr><td>name</td><td>The name of the writer</td><td>%chucho::pipe_writer</td></tr>
+ * <tr><td colspan="2">Any number objects from the @ref Filters group</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection pipe_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::pipe_writer:
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ * @endcode
+ *
+ * @subsection rabbitmq chucho::rabbitmq_writer
+ * @subsubsection rabbitmq_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>exchange</td><td>The exchange to which to write</td><td>n/a</td></tr>
+ * <tr><td>url</td><td>The URL of the RabbitMQ instance</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any object from the @ref Formatters group</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any object from the @ref Serializers group</td><td>n/a</td></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>name</td><td>The name of the writer</td><td>%chucho::rabbitmq_writer</td></tr>
+ * <tr><td>routing_key</td><td>The routing key</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any number objects from the @ref Filters group</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any number objects from the @ref Compressors group</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection rabbitmq_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::rabbitmq_writer:
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ *         chucho::formatted_message_serializer
+ *         url: 'amqp://user:pass@host:10000/vhost'
+ *         exchange: fleas
+ * @endcode
+ *
+ * @subsection rolling_file chucho::rolling_file_writer
+ * @subsubsection rolling_file_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td colspan="2">Any object from the @ref Formatters group</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any object from the @ref rollers "File Rollers" group</td><td>n/a</td></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>file_name</td><td>The name of the file. If the @ref rollers "roller" does not set the active
+ *   file name, then this field is required</td><td>n/a</td></tr>
+ * <tr><td>flush</td><td>Whether to flush the file after every write: true or false</td><td>true</td></tr>
+ * <tr><td>name</td><td>The name of the writer</td><td>%chucho::rolling_file_writer</td></tr>
+ * <tr><td>on_start</td><td>Where to start writing: truncate or append</td><td>append</td></tr>
+ * <tr><td colspan="2">Any number objects from the @ref Filters group</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any object from the @ref triggers "File Roll Triggers" group. If the @ref rollers "roller"
+ *   is not also a @ref triggers "trigger", then this field is required.</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection rolling_file_example Example
+ * @code{.yaml}
+ * - chucho::logger:
+ *       name: example1
+ *       chucho::rolling_file_writer:
+ *           file_name: my_stuff.log
+ *           chucho::pattern_formatter:
+ *               pattern: '%m%n'
+ *           chucho::numbered_file_roller:
+ *               max_index: 10
+ *           chucho::size_file_roll_trigger:
+ *               max_size: 10MB
+ * - chucho::logger:
+ *       name: example2
+ *       chucho::rolling_file_writer:
+ *           chucho::pattern_formatter:
+ *               pattern: '%m%n'
+ *           chucho::time_file_roller:
+ *               file_name_pattern: '%d{%d}'
+ *               max_history: 5
+ * @endcode
+ *
+ * @subsection syslog chucho::syslog_writer
+ * @subsubsection syslog_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>facility</td><td>The syslog facility. Can be one of kern, user, mail, daemon, auth, syslog, lpr,
+ *   news, uucp, cron, authpriv, ftp, local0, local1, local2, local3, local4, local5, local6, or local7.</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any object from the @ref Formatters group</td><td>n/a</td></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>host</td><td>The host, which can be omitted if writing to local host</td><td>n/a</td></tr>
+ * <tr><td>name</td><td>The name of the writer</td><td>%chucho::syslog_writer</td></tr>
+ * <tr><td>port</td><td>The port</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any number objects from the @ref Filters group</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection syslog_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::syslog_writer:
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ *         facility: local0
+ * @endcode
+ *
+ * @subsection windows_event_log chucho::windows_event_log_writer
+ * @subsubsection windows_event_log_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>source</td><td>The name of the log source</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any object from the @ref Formatters group</td><td>n/a</td></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>host</td><td>The host, which can be omitted if writing to local host</td><td>n/a</td></tr>
+ * <tr><td>log</td><td>The name of the log, which can be omitted if the Registry is prepared outside of Chucho</td><td>n/a</td></tr>
+ * <tr><td>name</td><td>The name of the writer</td><td>%chucho::windows_event_log_writer</td></tr>
+ * <tr><td colspan="2">Any number objects from the @ref Filters group</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection windows_event_log_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::windows_event_log_writer:
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ *         source: what
+ *         log: hello
+ * @endcode
+ *
+ * @subsection zeromq chucho::zeromq_writer
+ * @subsubsection zeromq_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>endpoint</td><td>The endopoint</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any object from the @ref Formatters group</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any object from the @ref Serializers group</td><td>n/a</td></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>name</td><td>The name of the writer</td><td>%chucho::zeromq_writer</td></tr>
+ * <tr><td>prefix</td><td>A message prefix, which can be used as a queue topic</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any number objects from the @ref Filters group</td><td>n/a</td></tr>
+ * <tr><td colspan="2">Any object from the @ref Compressors group</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection zeromq_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::zeromq_writer:
+ *         chucho::pattern_formatter:
+ *             pattern: '%m'
+ *             chucho::formatted_message_serializer
+ *             endpoint: 'tcp://127.0.0.1:7777'
+ *             prefix: Hi
+ * @endcode
+ *
  * @section Formatters
+ *
+ * @section rollers File Rollers
+ *
+ * @section triggers File Roll Triggers
  *
  * @section Filters
  *
  * @section Compressors
+ *
+ * @section Serializers
  *
  * @section email_triggers Email Triggers
  */
