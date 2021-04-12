@@ -668,6 +668,10 @@
  *             max_size: 10MB
  * @endcode
  *
+ * @subsection time_trigger chucho::time_file_roller
+ *
+ * The @ref time "chucho::time_file_roller" is also a trigger.
+ *
  * @section Filters
  *
  * @section file_compressors File Compressors
