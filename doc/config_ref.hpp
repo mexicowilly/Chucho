@@ -544,9 +544,133 @@
  *
  * @section rollers File Rollers
  *
+ * @subsection numbered chucho::numbered_file_roller
+ * @subsubsection numbered_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>max_index</td><td>The maximum index of the file name suffix, which must be greater than
+ *   or equal to @c min_index</td><td>n/a</td></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>min_index</td><td>The minimum index of the file name suffix</td><td>1</td></tr>
+ * <tr><td colspan="2">Any object from the @ref file_compressors "File Compressors" group</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection numbered_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::rolling_file_writer:
+ *         file_name: my_stuff.log
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ *         chucho::numbered_file_roller:
+ *             max_index: 10
+ *         chucho::size_file_roll_trigger:
+ *             max_size: 10MB
+ * @endcode
+ *
+ * @subsection sliding_numbered chucho::sliding_numbered_file_roller
+ * @subsubsection sliding_numbered_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>max_count</td><td>The maximum number of files that can exist at a time, which must
+ *   be greater than zero</td><td>n/a</td></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>min_index</td><td>The minimum index of the file name suffix</td><td>1</td></tr>
+ * <tr><td colspan="2">Any object from the @ref file_compressors "File Compressors" group</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection sliding_numbered_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::rolling_file_writer:
+ *         file_name: my_stuff.log
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ *         chucho::sliding_numbered_file_roller:
+ *             max_count: 10
+ *         chucho::size_file_roll_trigger:
+ *             max_size: 10MB
+ * @endcode
+ *
+ * @subsection time chucho::time_file_roller
+ * @subsubsection time_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>file_name_pattern</td><td>The file name that carries a date specification. Refer to
+ *   @ref chucho::time_file_roller "time_file_roller" for details.</td><td>n/a</td></tr>
+ * <tr><td>max_history</td><td>The maximum number of files to keep</td><td>n/a</td></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td colspan="2">Any object from the @ref file_compressors "File Compressors" group</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection time_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::rolling_file_writer:
+ *         file_name: my_stuff.log
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ *         chucho::time_file_roller:
+ *             file_name_pattern: '/my/logs/%d{%Y.%m.%d}.log'
+ *             max_history: 5
+ * @endcode
+ *
  * @section triggers File Roll Triggers
  *
+ * @subsection interval chucho::interval_file_roll_trigger
+ * @subsubsection interval_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>every</td><td>Indicator of what the time interval is. Format is <tt>&lt;count&gt; &lt;period&gt;</tt>,
+ *   where count is a number and period is one of: minutes, hours, days, weeks or months.</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection interval_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::rolling_file_writer:
+ *         file_name: my_stuff.log
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ *         chucho::sliding_numbered_file_roller:
+ *             max_count: 10
+ *         chucho::interval_file_roll_trigger:
+ *             every: 5 hours
+ * @endcode
+ *
+ * @subsection on_start chucho::on_start_file_roll_trigger
+ *
+ * Takes no parameters
+ *
+ * @subsection size chucho::size_file_roll_trigger
+ * @subsubsection size_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>max_size</td><td>The maximum size of a log file. This can be expressed with a case-insensitive suffix
+ *   of k, m or g (with an optional b) to indicate kilobytes, megabytes or gigabytes.</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection size_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::rolling_file_writer:
+ *         file_name: my_stuff.log
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ *         chucho::numbered_file_roller:
+ *             max_index: 10
+ *         chucho::size_file_roll_trigger:
+ *             max_size: 10MB
+ * @endcode
+ *
  * @section Filters
+ *
+ * @section file_compressors File Compressors
  *
  * @section Compressors
  *
