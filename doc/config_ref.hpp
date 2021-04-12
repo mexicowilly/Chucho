@@ -20,7 +20,7 @@
  */
 
 /**
- * @page Configuration Configuration
+ * @page Configuration Configuration File
  * This is the configuration reference.
  *
  * @section Logger
@@ -478,6 +478,69 @@
  * @endcode
  *
  * @section Formatters
+ *
+ * @subsection json chucho::json_formatter
+ * @subsubsection json_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>excluded</td><td>The comma-separated list of fields to exclude: diagnostic_context, file_name,
+ *   function_name, host_name, level, line_number, logger, marker, message, process_id, thread,
+ *   timestamp</td><td>n/a</td></tr>
+ * <tr><td>included</td><td>The comma-separated list of fields to include: diagnostic_context, file_name,
+ *   function_name, host_name, level, line_number, logger, marker, message, process_id, thread,
+ *   timestamp. This parameter is ignored if @c excluded is also set.</td><td>all of them</td></tr>
+ * <tr><td>style</td><td>The output style: compact or pretty</td><td>compact</td></tr>
+ * <tr><td>time_zone</td><td>The time zone: local or utc</td><td>local</td></tr>
+ * </table>
+ * @subsubsection json_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::cout_writer:
+ *         chucho::json_formatter:
+ *             included_fields: message,thread
+ * @endcode
+ *
+ * @subsection pattern chucho::pattern_formatter
+ * @subsubsection pattern_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>pattern</td><td>The pattern for formatting the message. Refer to
+ *   @ref chucho::pattern_formatter "pattern_formatter" for details.</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection pattern_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::cout_writer:
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ * @endcode
+ *
+ * @subsection yaml chucho::yaml_formatter
+ * @subsubsection yaml_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>excluded</td><td>The comma-separated list of fields to exclude: diagnostic_context, file_name,
+ *   function_name, host_name, level, line_number, logger, marker, message, process_id, thread,
+ *   timestamp</td><td>n/a</td></tr>
+ * <tr><td>included</td><td>The comma-separated list of fields to include: diagnostic_context, file_name,
+ *   function_name, host_name, level, line_number, logger, marker, message, process_id, thread,
+ *   timestamp. This parameter is ignored if @c excluded is also set.</td><td>all of them</td></tr>
+ * <tr><td>style</td><td>The output style: compact or pretty</td><td>compact</td></tr>
+ * <tr><td>time_zone</td><td>The time zone: local or utc</td><td>local</td></tr>
+ * </table>
+ * @subsubsection yaml_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::cout_writer:
+ *         chucho::yaml_formatter:
+ *             included_fields: message,thread
+ * @endcode
  *
  * @section rollers File Rollers
  *
