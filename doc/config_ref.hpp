@@ -875,6 +875,110 @@
  *
  * @section file_compressors File Compressors
  *
+ * @subsection bzip2f chucho::bzip2_file_compressor
+ *
+ * Refer to @ref chucho::bzip2_file_compressor "bzip2_file_compressor" for details.
+ *
+ * @subsubsection bzip2f_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>min_index</td><td>The minimum index at which to start compressing rolled files</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection bzip2f_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::rolling_file_writer:
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ *         chucho::numbered_file_roller:
+ *             max_index: 5
+ *             chucho::bzip2_file_compressor:
+ *                 min_index: 1
+ *         chucho::size_file_roll_trigger:
+ *             max_size: 5MB
+ *         file_name: what.log
+ * @endcode
+ *
+ * @subsection gzipf chucho::gzip_file_compressor
+ *
+ * Refer to @ref chucho::gzip_file_compressor "gzip_file_compressor" for details.
+ *
+ * @subsubsection gzipf_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>min_index</td><td>The minimum index at which to start compressing rolled files</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection gzipf_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::rolling_file_writer:
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ *         chucho::numbered_file_roller:
+ *             max_index: 5
+ *             chucho::gzip_file_compressor:
+ *                 min_index: 1
+ *         chucho::size_file_roll_trigger:
+ *             max_size: 5MB
+ *         file_name: what.log
+ * @endcode
+ *
+ * @subsection lzmaf chucho::lzma_file_compressor
+ *
+ * Refer to @ref chucho::lzma_file_compressor "lzma_file_compressor" for details.
+ *
+ * @subsubsection lzmaf_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>min_index</td><td>The minimum index at which to start compressing rolled files</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection lzmaf_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::rolling_file_writer:
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ *         chucho::numbered_file_roller:
+ *             max_index: 5
+ *             chucho::lzma_file_compressor:
+ *                 min_index: 1
+ *         chucho::size_file_roll_trigger:
+ *             max_size: 5MB
+ *         file_name: what.log
+ * @endcode
+ *
+ * @subsection zipf chucho::zip_file_compressor
+ *
+ * Refer to @ref chucho::zip_file_compressor "zip_file_compressor" for details.
+ *
+ * @subsubsection zipf_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>min_index</td><td>The minimum index at which to start compressing rolled files</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection zipf_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::rolling_file_writer:
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ *         chucho::numbered_file_roller:
+ *             max_index: 5
+ *             chucho::zip_file_compressor:
+ *                 min_index: 1
+ *         chucho::size_file_roll_trigger:
+ *             max_size: 5MB
+ *         file_name: what.log
+ * @endcode
+ *
  * @section Compressors
  *
  * @section Serializers
