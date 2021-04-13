@@ -30,6 +30,9 @@
  * The @c %chucho::logger is the top-level for all Chucho information that will appear in a
  * configuration file. You may include as many @c %chucho::logger instances as are
  * necessary.
+ *
+ * Refer to @ref chucho::logger "logger" for details.
+ *
  * @subsubsection logger_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -52,6 +55,9 @@
  * @section Writers
  *
  * @subsection activemq chucho::activemq_writer
+ *
+ * Refer to @ref chucho::activemq_writer "activemq_writer" for details.
+ *
  * @subsubsection activemq_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -80,6 +86,9 @@
  * @endcode
  *
  * @subsection async chucho::async_writer
+ *
+ * Refer to @ref chucho::async_writer "async_writer" for details.
+ *
  * @subsubsection async_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -103,6 +112,9 @@
  * @endcode
  *
  * @subsection cerr chucho::cerr_writer
+ *
+ * Refer to @ref chucho::cerr_writer "cerr_writer" for details.
+ *
  * @subsubsection cerr_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -122,6 +134,9 @@
  * @endcode
  *
  * @subsection cloudwatch chucho::cloudwatch_writer
+ *
+ * Refer to @ref chucho::cloudwatch_writer "cloudwatch_writer" for details.
+ *
  * @subsubsection cloudwatch_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -148,6 +163,9 @@
  * @endcode
  *
  * @subsection cout chucho::cout_writer
+ *
+ * Refer to @ref chucho::cout_writer "cout_writer" for details.
+ *
  * @subsubsection cout_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -167,6 +185,9 @@
  * @endcode
  *
  * @subsection database chucho::database_writer
+ *
+ * Refer to @ref chucho::database_writer "database_writer" for details.
+ *
  * @subsubsection database_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -188,6 +209,9 @@
  * @endcode
  *
  * @subsection email chucho::email_writer
+ *
+ * Refer to @ref chucho::email_writer "email_writer" for details.
+ *
  * @subsubsection email_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -226,6 +250,9 @@
  * @endcode
  *
  * @subsection file chucho::file_writer
+ *
+ * Refer to @ref chucho::file_writer "file_writer" for details.
+ *
  * @subsubsection file_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -249,6 +276,9 @@
  * @endcode
  *
  * @subsection kafka chucho::kafka_writer
+ *
+ * Refer to @ref chucho::kafka_writer "kafka_writer" for details.
+ *
  * @subsubsection kafka_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -275,6 +305,9 @@
  * @endcode
  *
  * @subsection loggly chucho::loggly_writer
+ *
+ * Refer to @ref chucho::loggly_writer "loggly_writer" for details.
+ *
  * @subsubsection loggly_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -296,6 +329,9 @@
  * @endcode
  *
  * @subsection named_pipe chucho::named_pipe_writer
+ *
+ * Refer to @ref chucho::named_pipe_writer "named_pipe_writer" for details.
+ *
  * @subsubsection named_pipe_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -318,6 +354,9 @@
  * @endcode
  *
  * @subsection pipe chucho::pipe_writer
+ *
+ * Refer to @ref chucho::pipe_writer "pipe_writer" for details.
+ *
  * @subsubsection pipe_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -338,6 +377,9 @@
  * @endcode
  *
  * @subsection rabbitmq chucho::rabbitmq_writer
+ *
+ * Refer to @ref chucho::rabbitmq_writer "rabbitmq_writer" for details.
+ *
  * @subsubsection rabbitmq_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -365,6 +407,9 @@
  * @endcode
  *
  * @subsection rolling_file chucho::rolling_file_writer
+ *
+ * Refer to @ref chucho::rolling_file_writer "rolling_file_writer" for details.
+ *
  * @subsubsection rolling_file_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -404,6 +449,9 @@
  * @endcode
  *
  * @subsection syslog chucho::syslog_writer
+ *
+ * Refer to @ref chucho::syslog_writer "syslog_writer" for details.
+ *
  * @subsubsection syslog_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -428,6 +476,9 @@
  * @endcode
  *
  * @subsection windows_event_log chucho::windows_event_log_writer
+ *
+ * Refer to @ref chucho::windows_event_log_writer "windows_event_log_writer" for details.
+ *
  * @subsubsection windows_event_log_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -452,6 +503,9 @@
  * @endcode
  *
  * @subsection zeromq chucho::zeromq_writer
+ *
+ * Refer to @ref chucho::zeromq_writer "zeromq_writer" for details.
+ *
  * @subsubsection zeromq_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -480,6 +534,9 @@
  * @section Formatters
  *
  * @subsection json chucho::json_formatter
+ *
+ * Refer to @ref chucho::json_formatter "json_formmatter" for details.
+ *
  * @subsubsection json_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -503,6 +560,9 @@
  * @endcode
  *
  * @subsection pattern chucho::pattern_formatter
+ *
+ * Refer to @ref chucho::pattern_formatter "pattern_formmatter" for details.
+ *
  * @subsubsection pattern_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -520,6 +580,9 @@
  * @endcode
  *
  * @subsection yaml chucho::yaml_formatter
+ *
+ * Refer to @ref chucho::yaml_formatter "yaml_formmatter" for details.
+ *
  * @subsubsection yaml_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -545,6 +608,9 @@
  * @section rollers File Rollers
  *
  * @subsection numbered chucho::numbered_file_roller
+ *
+ * Refer to @ref chucho::numbered_file_roller "numbered_file_roller" for details.
+ *
  * @subsubsection numbered_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -570,6 +636,9 @@
  * @endcode
  *
  * @subsection sliding_numbered chucho::sliding_numbered_file_roller
+ *
+ * Refer to @ref chucho::sliding_numbered_file_roller "sliding_numbered_file_roller" for details.
+ *
  * @subsubsection sliding_numbered_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -595,6 +664,9 @@
  * @endcode
  *
  * @subsection time chucho::time_file_roller
+ *
+ * Refer to @ref chucho::time_file_roller "time_file_roller" for details.
+ *
  * @subsubsection time_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -621,6 +693,9 @@
  * @section triggers File Roll Triggers
  *
  * @subsection interval chucho::interval_file_roll_trigger
+ *
+ * Refer to @ref chucho::interval_file_roll_trigger "interval_file_roll_trigger" for details.
+ *
  * @subsubsection interval_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -644,9 +719,12 @@
  *
  * @subsection on_start chucho::on_start_file_roll_trigger
  *
- * Takes no parameters
+ * Takes no parameters. Refer to @ref chucho::on_start_file_roll_trigger "on_start_file_roll_trigger" for details.
  *
  * @subsection size chucho::size_file_roll_trigger
+ *
+ * Refer to @ref chucho::size_file_roll_trigger "size_file_roll_trigger" for details.
+ *
  * @subsubsection size_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
@@ -673,6 +751,127 @@
  * The @ref time "chucho::time_file_roller" is also a trigger.
  *
  * @section Filters
+ *
+ * @subsection cache_and_release chucho::cache_and_release_filter
+ *
+ * Refer to @ref chucho::cache_and_release_filter "cache_and_release_filter" for details.
+ *
+ * @subsubsection cache_and_release_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>cache_threshold</td><td>The highest level that will go into the cache: trace, debug, info, warn, error or fatal</td><td>n/a</td></tr>
+ * <tr><td>release_threshold</td><td>The level at which to release the cache: trace, debug, info, warn, error or fatal</td><td>n/a</td></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>chunk_size</td><td>The byte size of each chunk in the cache</td><td>1MB</td></tr>
+ * <tr><td>max_chunks</td><td>The number of chunks to keep in the cache</td><td>2</td></tr>
+ * <tr><td>name</td><td>The name of the filter</td><td>%chucho::cache_and_release_filter</td></tr>
+ * </table>
+ * @subsubsection cache_and_release_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::cout_writer:
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ *         chucho::cache_and_release_filter:
+ *             cache_threshold: debug
+ *             release_threshold: error
+ * @endcode
+ *
+ * @subsection duplicate chucho::duplicate_message_filter
+ *
+ * Refer to @ref chucho::duplicate_message_filter "duplicate_message_filter" for details.
+ *
+ * @subsubsection duplicate_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>name</td><td>The name of the filter</td><td>%chucho::duplicate_message_filter</td></tr>
+ * </table>
+ * @subsubsection duplicate_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::cout_writer:
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ *         chucho::duplicate_message_filter
+ * @endcode
+ *
+ * @subsection level chucho::level_filter
+ *
+ * Refer to @ref chucho::level_filter "level_filter" for details.
+ *
+ * @subsubsection level_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>level</td><td>The level of interest: trace, debug, info, warn, error or fatal</td><td>n/a</td></tr>
+ * <tr><td>on_match</td><td>What to do if the level matches: deny, neutral or accept</td><td>n/a</td></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>name</td><td>The name of the filter</td><td>%chucho::level_filter</td></tr>
+ * <tr><td>on_mismatch</td><td>What to do if the level doesn't match: deny, neutral or accept</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection level_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::cout_writer:
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ *         chucho::level_filter:
+ *             level: info
+ *             on_match: deny
+ * @endcode
+ *
+ * @subsection level_threshold chucho::level_threshold_filter
+ *
+ * Refer to @ref chucho::level_threshold_filter "level_threshold_filter" for details.
+ *
+ * @subsubsection level_threshold_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>level</td><td>The level of interest: trace, debug, info, warn, error or fatal</td><td>n/a</td></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>name</td><td>The name of the filter</td><td>%chucho::level_threshold_filter</td></tr>
+ * </table>
+ * @subsubsection level_threshold_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::cout_writer:
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ *         chucho::level_threshold_filter:
+ *             level: warn
+ * @endcode
+ *
+ * @subsection ruby_evaluator chucho::ruby_evaluator_filter
+ *
+ * Refer to @ref chucho::ruby_evaluator_filter "ruby_evaluator_filter" for details.
+ *
+ * @subsubsection ruby_evaluator_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>expression</td><td>A Ruby expression that will evaluate the log event. Please refer to
+ *   @ref chucho::ruby_evaluator_filter "ruby_evaluator_filter" to see what global variables are
+ *   available to the expression that correspond to fields in the log event.</td><td>n/a</td></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>name</td><td>The name of the filter</td><td>%chucho::ruby_evaluator_filter</td></tr>
+ * </table>
+ * @subsubsection ruby_evaluator_example Example
+ * @code{.yaml}
+ * chucho::logger:
+ *     name: example
+ *     chucho::cout_writer:
+ *         chucho::pattern_formatter:
+ *             pattern: '%m%n'
+ *         chucho::ruby_evaluator_filter:
+ *             expression: '$logger == "example"'
+ * @endcode
  *
  * @section file_compressors File Compressors
  *
