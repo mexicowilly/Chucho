@@ -68,6 +68,7 @@
  * <tr><td colspan="2">Any object from the @ref Formatters group</td><td>n/a</td></tr>
  * <tr><td colspan="2">Any object from the @ref Serializers group</td><td>n/a</td></tr>
  * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>coalesce_max</td><td>The number of events to send at once</td><td>25</td></tr>
  * <tr><td>name</td><td>The name of the writer</td><td>%chucho::activemq_writer</td></tr>
  * <tr><td colspan="2">Any object from the @ref Compressors group</td><td>n/a</td></tr>
  * <tr><td colspan="2">Any number of objects from the @ref Filters group</td><td>n/a</td></tr>
@@ -288,6 +289,7 @@
  * <tr><td colspan="2">Any object from the @ref Formatters group</td><td>n/a</td></tr>
  * <tr><td colspan="2">Any object from the @ref Serializers group</td><td>n/a</td></tr>
  * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>coalesce_max</td><td>The number of events to send at once</td><td>25</td></tr>
  * <tr><td>name</td><td>The name of the writer</td><td>%chucho::kafka_writer</td></tr>
  * <tr><td colspan="2">Any number objects from the @ref Filters group</td><td>n/a</td></tr>
  * <tr><td colspan="2">Any object from the @ref Compressors group</td><td>n/a</td></tr>
@@ -389,6 +391,7 @@
  * <tr><td colspan="2">Any object from the @ref Formatters group</td><td>n/a</td></tr>
  * <tr><td colspan="2">Any object from the @ref Serializers group</td><td>n/a</td></tr>
  * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>coalesce_max</td><td>The number of events to send at once</td><td>25</td></tr>
  * <tr><td>name</td><td>The name of the writer</td><td>%chucho::rabbitmq_writer</td></tr>
  * <tr><td>routing_key</td><td>The routing key</td><td>n/a</td></tr>
  * <tr><td colspan="2">Any number objects from the @ref Filters group</td><td>n/a</td></tr>
@@ -514,6 +517,7 @@
  * <tr><td colspan="2">Any object from the @ref Formatters group</td><td>n/a</td></tr>
  * <tr><td colspan="2">Any object from the @ref Serializers group</td><td>n/a</td></tr>
  * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>coalesce_max</td><td>The number of events to send at once</td><td>25</td></tr>
  * <tr><td>name</td><td>The name of the writer</td><td>%chucho::zeromq_writer</td></tr>
  * <tr><td>prefix</td><td>A message prefix, which can be used as a queue topic</td><td>n/a</td></tr>
  * <tr><td colspan="2">Any number objects from the @ref Filters group</td><td>n/a</td></tr>
@@ -1087,5 +1091,111 @@
  *
  * @section Serializers
  *
+ * @subsection capn chucho::capn_proto_serializer
+ *
+ * Refer to @ref chucho::capn_proto_serializer "capn_proto_serializer" for details.
+ *
+ * @subsubsection capn_params Parameters
+ *
+ * Takes no parameters.
+ *
+ * @subsubsection capn_example Example
+ * @code{.yaml}
+ * chucho::logger:
+       name: example
+       chucho::zeromq_writer:
+           endpoint: 'tcp://127.0.0.1:7776'
+           chucho::pattern_formatter:
+               pattern: '%m'
+           chucho::capn_proto_serializer
+ * @endcode
+ *
+ * @subsection flatbuffers chucho::flatbuffers_serializer
+ *
+ * Refer to @ref chucho::flatbuffers_serializer "flatbuffers_serializer" for details.
+ *
+ * @subsubsection flatbuffers_params Parameters
+ *
+ * Takes no parameters.
+ *
+ * @subsubsection flatbuffers_example Example
+ * @code{.yaml}
+ * chucho::logger:
+       name: example
+       chucho::zeromq_writer:
+           endpoint: 'tcp://127.0.0.1:7776'
+           chucho::pattern_formatter:
+               pattern: '%m'
+           chucho::flatbuffers_serializer
+ * @endcode
+ *
+ * @subsection formatted_message chucho::formatted_message_serializer
+ *
+ * Refer to @ref chucho::formatted_message_serializer "formatted_message_serializer" for details.
+ *
+ * @subsubsection formatted_message_params Parameters
+ *
+ * Takes no parameters.
+ *
+ * @subsubsection formatted_message_example Example
+ * @code{.yaml}
+ * chucho::logger:
+       name: example
+       chucho::zeromq_writer:
+           endpoint: 'tcp://127.0.0.1:7776'
+           chucho::pattern_formatter:
+               pattern: '%m'
+           chucho::formatted_message_serializer
+ * @endcode
+ *
+ * @subsection protobuf chucho::protobuf_serializer
+ *
+ * Refer to @ref chucho::protobuf_serializer "protobuf_serializer" for details.
+ *
+ * @subsubsection protobuf_params Parameters
+ *
+ * Takes no parameters.
+ *
+ * @subsubsection protobuf_example Example
+ * @code{.yaml}
+ * chucho::logger:
+       name: example
+       chucho::zeromq_writer:
+           endpoint: 'tcp://127.0.0.1:7776'
+           chucho::pattern_formatter:
+               pattern: '%m'
+           chucho::protobuf_serializer
+ * @endcode
+ *
  * @section email_triggers Email Triggers
+ *
+ * @subsection level_threshold_email chucho::level_threshold_email_trigger
+ *
+ * Refer to @ref chucho::level_threshold_email_trigger "level_threshold_email_trigger" for details.
+ *
+ * @subsubsection level_threshold_email_params Parameters
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
+ * <tr><td>level</td><td>The level at which email will be sent: trace, debug, info, warn, error or fatal</td><td>n/a</td></tr>
+ * </table>
+ * @subsubsection level_threshold_email_example Example
+ * @code{.yaml}
+ * chucho::logger:
+       name: example
+       chucho::email_writer:
+           chucho::pattern_formatter:
+               pattern: '%m'
+           chucho::level_threshold_email_trigger:
+               level: error
+           host: mail.dummy.com
+           port: 123
+           from: whistler@mctweaky.com
+           to: one@blubbery.com,two@humid.org
+           subject: '%c'
+           connection_type: clear
+           user: scrumpy
+           password: lumpy
+           buffer_size: 7000
+ * @endcode
  */
