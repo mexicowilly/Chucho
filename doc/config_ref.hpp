@@ -981,6 +981,110 @@
  *
  * @section Compressors
  *
+ * @subsection bzip2 chucho::bzip2_compressor
+ *
+ * Refer to @ref chucho::bzip2_compressor "bzip2_compressor" for details.
+ *
+ * @subsubsection bzip2_params Parameters
+ *
+ * Takes no parameters.
+ *
+ * @subsubsection bzip2_example Example
+ * @code{.yaml}
+ * chucho::logger:
+       name: example
+       chucho::zeromq_writer:
+           endpoint: 'tcp://127.0.0.1:7776'
+           chucho::pattern_formatter:
+               pattern: '%m'
+           chucho::formatted_message_serializer
+           chucho::bzip2_compressor
+ * @endcode
+ *
+ * @subsection lz4 chucho::lz4_compressor
+ *
+ * Refer to @ref chucho::lz4_compressor "lz4_compressor" for details.
+ *
+ * @subsubsection lz4_params Parameters
+ *
+ * Takes no parameters.
+ *
+ * @subsubsection lz4_example Example
+ * @code{.yaml}
+ * chucho::logger:
+       name: example
+       chucho::zeromq_writer:
+           endpoint: 'tcp://127.0.0.1:7776'
+           chucho::pattern_formatter:
+               pattern: '%m'
+           chucho::formatted_message_serializer
+           chucho::lz4_compressor
+ * @endcode
+ *
+ * @subsection lzma chucho::lzma_compressor
+ *
+ * Refer to @ref chucho::lzma_compressor "lzma_compressor" for details.
+ *
+ * @subsubsection lzma_params Parameters
+ *
+ * Takes no parameters.
+ *
+ * @subsubsection lzma_example Example
+ * @code{.yaml}
+ * chucho::logger:
+       name: example
+       chucho::zeromq_writer:
+           endpoint: 'tcp://127.0.0.1:7776'
+           chucho::pattern_formatter:
+               pattern: '%m'
+           chucho::formatted_message_serializer
+           chucho::lzma_compressor
+ * @endcode
+ *
+ * @subsection noop chucho::noop_compressor
+ *
+ * Refer to @ref chucho::noop_compressor "noop_compressor" for details.
+ *
+ * @subsubsection noop_params Parameters
+ *
+ * Takes no parameters.
+ *
+ * @subsubsection noop_example Example
+ * @code{.yaml}
+ * chucho::logger:
+       name: example
+       chucho::zeromq_writer:
+           endpoint: 'tcp://127.0.0.1:7776'
+           chucho::pattern_formatter:
+               pattern: '%m'
+           chucho::formatted_message_serializer
+           chucho::noop_compressor
+ * @endcode
+ *
+ * @subsection zlib chucho::zlib_compressor
+ *
+ * Refer to @ref chucho::zlib_compressor "zlib_compressor" for details.
+ *
+ * @subsubsection zlib_params Parameters
+ *
+ * <table>
+ * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
+ * <tr><td colspan="3"><b>Optional Parameters</b></td></tr>
+ * <tr><td>compression_level</td><td>The level of compression, which must be in the range [0, 9].</td><td>6</td></tr>
+ * </table>
+ *
+ * @subsubsection zlib_example Example
+ * @code{.yaml}
+ * chucho::logger:
+       name: example
+       chucho::zeromq_writer:
+           endpoint: 'tcp://127.0.0.1:7776'
+           chucho::pattern_formatter:
+               pattern: '%m'
+           chucho::formatted_message_serializer
+           chucho::zlib_compressor
+ * @endcode
+ *
  * @section Serializers
  *
  * @section email_triggers Email Triggers
