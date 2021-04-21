@@ -26,6 +26,7 @@
 #include <stdexcept>
 #include <atomic>
 #include <algorithm>
+#include <sstream>
 
 namespace
 {
@@ -230,32 +231,76 @@ void logger::clear_writers()
 
 void logger::remove_unused_loggers()
 {
+    class reporter : public status_reporter
+    {
+    public:
+        ~reporter()
+        {
+            try
+            {
+                std::ostringstream stream;
+                stream << "Removed " << names_.size() << " unused logger";
+                std::string msg;
+                if (names_.empty())
+                {
+                    stream << 's';
+                    msg = stream.str();
+                }
+                else
+                {
+                    if (names_.size() > 1)
+                        stream << 's';
+                    stream << ':';
+                    for (const auto& name : names_)
+                        stream << " '" << name << "',";
+                    msg = stream.str();
+                    msg.pop_back();
+                }
+                report_info(msg);
+            }
+            catch (...)
+            {
+                // Failure to report this message is not important enough to get upset
+            }
+        }
+
+        void add(const std::string& to_add)
+        {
+            names_.push_back(to_add);
+        }
+
+    private:
+        std::vector<std::string> names_;
+    };
+
     static_data& sd(data());
     std::lock_guard<std::mutex> lg(sd.loggers_guard_);
     std::set<std::string> to_erase;
-    for (std::map<std::string, std::shared_ptr<logger>>::iterator itor = sd.all_loggers_.begin();
-         itor != sd.all_loggers_.end();
-         itor++) 
+    for (const auto& cur : sd.all_loggers_)
     {
         // Never erase root
-        if (itor->second->parent_)
+        if (cur.second->parent_)
         {
             // If it's all alone, then this one's gone.
-            if (itor->second.unique())
-                to_erase.insert(itor->first);
+            if (cur.second.unique())
+                to_erase.insert(cur.first);
             // If the child is the only logger that holds a
             // reference to the parent and the parent is not
             // root, then the parent is gone.
             // (use_count 2 because 1 is the child and the other is all_loggers_)
-            if (itor->second->parent_.use_count() == 2 &&
-                itor->second->parent_->parent_)
+            if (cur.second->parent_.use_count() == 2 &&
+                cur.second->parent_->parent_)
             {
-                to_erase.insert(itor->second->parent_->get_name());
+                to_erase.insert(cur.second->parent_->get_name());
             }
         }
     }
-    for (auto tgt : to_erase) 
+    reporter rpt;
+    for (const auto& tgt : to_erase)
+    {
         sd.all_loggers_.erase(tgt);
+        rpt.add(tgt);
+    }
 }
 
 void logger::remove_writer(const std::string& wrt)
