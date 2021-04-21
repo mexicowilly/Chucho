@@ -20,8 +20,23 @@
  */
 
 /**
- * @page Configuration Configuration File
- * This is the configuration reference.
+ * @page config_file Configuration File
+ * The configuration file is your primary interface to Chucho.
+ *
+ * Places to start:
+ *   - @ref logger "chucho::logger"
+ *   - @ref cout "chucho::cout_writer"
+ *   - @ref pattern "chucho::pattern_formatter"
+ *   - @ref rolling_file "chucho::rolling_file_writer"
+ *   - @ref numbered "chucho::numbered_file_roller"
+ *   - @ref size "chucho::size_file_roll_trigger"
+ *
+ * Chucho supports four different configuration file formats: YAML, JSON, config file, and some basic instances of
+ * Log4Cplus. It will automatically determine which format you have on hand. It will also ignore any elements in
+ * your configuration file that it does not recognize, allowing you to use one configuration file for your application,
+ * even if the file contains elements unimportant to Chucho.
+ *
+ * The examples below all show instances of a YAML configuration.
  *
  * @section Logger
  * The loggers that contain all other elements.
@@ -530,9 +545,9 @@
  *     chucho::zeromq_writer:
  *         chucho::pattern_formatter:
  *             pattern: '%m'
- *             chucho::formatted_message_serializer
- *             endpoint: 'tcp://127.0.0.1:7777'
- *             prefix: Hi
+ *         chucho::formatted_message_serializer
+ *         endpoint: 'tcp://127.0.0.1:7777'
+ *         prefix: Hi
  * @endcode
  *
  * @section Formatters
