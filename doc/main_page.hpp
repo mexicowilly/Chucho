@@ -40,13 +40,9 @@
  * visit the <a href="https://github.com/mexicowilly/Chucho"
  * target="_blank">project site</a>.
  *
- * For documentation of how to create a configuration file for
- * Chucho that will establish the run-time settings, please see
- * <a href="https://github.com/mexicowilly/Chucho/wiki/Configuration"
- * target="_blank">configuration documentation</a> and
- * <a href="https://github.com/mexicowilly/Chucho/wiki/Configuration-Reference"
- * target="_blank">configuration reference</a>.
- *  
+ * @attention The @ref config_file "configuration file" is your primary
+ * interface to the library.
+ *
  * Chucho uses the same architecture as <a 
  * href="http://logback.qos.ch/" 
  * target="_blank">Logback</a>, which involes loggers, writers, 
