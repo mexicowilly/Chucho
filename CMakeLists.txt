@@ -460,9 +460,9 @@ IF(CHUCHO_HAVE_DOORS)
          include/chucho/door_writer_memento.hpp)
 ENDIF()
 
-LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
-     include/chucho/door_event.h
-     include/chucho/door_writer.hpp)
+#LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+#     include/chucho/door_event.h
+#     include/chucho/door_writer.hpp)
 
 IF(AWSSDK_FOUND)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
