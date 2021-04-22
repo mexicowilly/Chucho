@@ -51,9 +51,9 @@
  * href="https://github.com/mexicowilly/Chucho/wiki"
  * target="_blank">user manual</a>, which is under construction.
  *  
- * @subsection c C API
- * Though the core of Chucho is written in C++14, a wrapping C
- * API is also exposed. This allows Chucho to be used in C 
+ * @subsection csection C API
+ * Though the core of Chucho is written in C++14, a wrapping @ref c "C API"
+ * is also exposed. This allows Chucho to be used in C
  * programs and in C++ programs that may be built with a 
  * compiler that cannot build Chucho, such as a non-C++14
  * compiler. 
@@ -64,9 +64,7 @@
  *  
  * Some documentation for the C API is copied directly from the 
  * C++ documentation, so you may find reference to C++ classes 
- * in the C documentation. All the referenced functionality can 
- * also be found in the C API, usually with a same or similar 
- * name. 
+ * in the C documentation.
  *
  * @subsection Contact
  * If you need answers to questions or help in any way, please 
