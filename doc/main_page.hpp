@@ -20,13 +20,11 @@
  */
 
 /**
- * @mainpage API
+ * @mainpage Introduction
  *  
  * @image html itzcuintli.png "Chucho"
  *  
- * @section Chucho 
- *  
- * @subsection Welcome 
+ * @section Welcome
  * Chucho is a logging framework based on the popular Java 
  * library, <a href="http://logback.qos.ch/" 
  * target="_blank">Logback</a>. Chucho makes it easy to add 
@@ -51,7 +49,7 @@
  * href="https://github.com/mexicowilly/Chucho/wiki"
  * target="_blank">user manual</a>, which is under construction.
  *  
- * @subsection csection C API
+ * @section csection C API
  * Though the core of Chucho is written in C++14, a wrapping @ref c "C API"
  * is also exposed. This allows Chucho to be used in C
  * programs and in C++ programs that may be built with a 
@@ -66,7 +64,7 @@
  * C++ documentation, so you may find reference to C++ classes 
  * in the C documentation.
  *
- * @subsection Contact
+ * @section Contact
  * If you need answers to questions or help in any way, please 
  * join our <a 
  * href="https://groups.google.com/forum/?fromgroups#!forum/chucho-logging" 

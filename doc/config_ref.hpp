@@ -567,6 +567,8 @@
  *   function_name, host_name, level, line_number, logger, marker, message, process_id, thread,
  *   timestamp. This parameter is ignored if @c excluded is also set.</td><td>all of them</td></tr>
  * <tr><td>style</td><td>The output style: compact or pretty</td><td>compact</td></tr>
+ * <tr><td>time_format</td><td>The format of the event's time, which must be compatible with std::put_time</td>
+ *   <td nowrap="nowrap">@%Y@%m@%dT@%H@%M@%S</td></tr>
  * <tr><td>time_zone</td><td>The time zone: local or utc</td><td>local</td></tr>
  * </table>
  * @subsubsection json_example Example
@@ -613,6 +615,8 @@
  *   function_name, host_name, level, line_number, logger, marker, message, process_id, thread,
  *   timestamp. This parameter is ignored if @c excluded is also set.</td><td>all of them</td></tr>
  * <tr><td>style</td><td>The output style: compact or pretty</td><td>compact</td></tr>
+ * <tr><td>time_format</td><td>The format of the event's time, which must be compatible with std::put_time</td>
+ *   <td nowrap="nowrap">@%Y@%m@%dT@%H@%M@%S</td></tr>
  * <tr><td>time_zone</td><td>The time zone: local or utc</td><td>local</td></tr>
  * </table>
  * @subsubsection yaml_example Example
@@ -818,11 +822,11 @@
  *         chucho::duplicate_message_filter
  * @endcode
  *
- * @subsection level chucho::level_filter
+ * @subsection level_filter chucho::level_filter
  *
  * Refer to @ref chucho::level_filter "level_filter" for details.
  *
- * @subsubsection level_params Parameters
+ * @subsubsection level_filter_params Parameters
  * <table>
  * <tr><th>Name</th><th>Description</th><th>Default</th></tr>
  * <tr><td colspan="3"><b>Required Parameters</b></td></tr>
@@ -832,7 +836,7 @@
  * <tr><td>name</td><td>The name of the filter</td><td>%chucho::level_filter</td></tr>
  * <tr><td>on_mismatch</td><td>What to do if the level doesn't match: deny, neutral or accept</td><td>n/a</td></tr>
  * </table>
- * @subsubsection level_example Example
+ * @subsubsection level_filter_example Example
  * @code{.yaml}
  * chucho::logger:
  *     name: example

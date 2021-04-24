@@ -22,6 +22,12 @@
 namespace chucho
 {
 
+/**
+ * @class yaml_formatter yaml_formatter.hpp chucho/yaml_formatter.hpp
+ * A formatter that produces YAML.
+ *
+ * @ingroup formatters
+ */
 class CHUCHO_EXPORT yaml_formatter : public serialization_formatter
 {
 public:
