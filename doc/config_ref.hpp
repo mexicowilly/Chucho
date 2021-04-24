@@ -568,7 +568,7 @@
  *   timestamp. This parameter is ignored if @c excluded is also set.</td><td>all of them</td></tr>
  * <tr><td>style</td><td>The output style: compact or pretty</td><td>compact</td></tr>
  * <tr><td>time_format</td><td>The format of the event's time, which must be compatible with std::put_time</td>
- *   <td nowrap="nowrap">@%Y@%m@%dT@%H@%M@%S</td></tr>
+ *   <td style="white-space: nowrap;">@%Y@%m@%dT@%H@%M@%S</td></tr>
  * <tr><td>time_zone</td><td>The time zone: local or utc</td><td>local</td></tr>
  * </table>
  * @subsubsection json_example Example
@@ -616,7 +616,7 @@
  *   timestamp. This parameter is ignored if @c excluded is also set.</td><td>all of them</td></tr>
  * <tr><td>style</td><td>The output style: compact or pretty</td><td>compact</td></tr>
  * <tr><td>time_format</td><td>The format of the event's time, which must be compatible with std::put_time</td>
- *   <td nowrap="nowrap">@%Y@%m@%dT@%H@%M@%S</td></tr>
+ *   <td style="white-space: nowrap;">@%Y@%m@%dT@%H@%M@%S</td></tr>
  * <tr><td>time_zone</td><td>The time zone: local or utc</td><td>local</td></tr>
  * </table>
  * @subsubsection yaml_example Example
