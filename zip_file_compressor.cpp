@@ -21,6 +21,7 @@
 #include <archive_entry.h>
 #include <fstream>
 #include <memory>
+#include <functional>
 
 namespace chucho
 {
