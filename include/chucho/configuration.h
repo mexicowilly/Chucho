@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 Will Mason
+ * Copyright 2013-2021 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_CONFIGURATION_H__)
-#define CHUCHO_CONFIGURATION_H__
+#if !defined(CHUCHO_CONFIGURATION_H_)
+#define CHUCHO_CONFIGURATION_H_
 
 #if !defined(CHUCHO_BUILD) && defined(__cplusplus)
 #error "When using C++, you should include configuration.hpp"

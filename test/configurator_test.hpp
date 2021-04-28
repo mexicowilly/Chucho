@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 Will Mason
+ * Copyright 2013-2021 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,6 +13,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#if !defined(CHUCHO_CONFIGURATOR_TEST_HPP_)
+#define CHUCHO_CONFIGURATOR_TEST_HPP_
 
 #include <gtest/gtest.h>
 #include <chucho/configurator.hpp>
@@ -121,3 +124,5 @@ protected:
 }
 
 }
+
+#endif

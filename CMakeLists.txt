@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2020 Will Mason
+# Copyright 2013-2021 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.1.3)
 PROJECT(chucho CXX C)
 
 SET(CHUCHO_MAJOR_VERSION 2)
-SET(CHUCHO_MINOR_VERSION 7)
+SET(CHUCHO_MINOR_VERSION 8)
 SET(CHUCHO_VERSION ${CHUCHO_MAJOR_VERSION}.${CHUCHO_MINOR_VERSION})
 
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -460,9 +460,9 @@ IF(CHUCHO_HAVE_DOORS)
          include/chucho/door_writer_memento.hpp)
 ENDIF()
 
-LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
-     include/chucho/door_event.h
-     include/chucho/door_writer.hpp)
+#LIST(APPEND CHUCHO_DOCUMENTABLE_HEADERS
+#     include/chucho/door_event.h
+#     include/chucho/door_writer.hpp)
 
 IF(AWSSDK_FOUND)
     LIST(APPEND CHUCHO_PUBLIC_HEADERS
@@ -1141,11 +1141,15 @@ IF(CHUCHO_WINDOWS)
             RUNTIME DESTINATION bin)
 ENDIF()
 
-ADD_SUBDIRECTORY(test)
+IF(GTEST_FOUND)
+    ADD_SUBDIRECTORY(test)
+ELSE()
+    MESSAGE(WARNING "GTest was not found, so the tests cannot be built")
+ENDIF()
 
 # Documentation
 IF(DOXYGEN_FOUND)
-    SET(CHUCHO_DOXYGEN_INPUT main_page.hpp)
+    SET(CHUCHO_DOXYGEN_INPUT "doc/main_page.hpp doc/config_ref.hpp")
     IF(CHUCHO_DOCUMENT_ALL)
         FILE(GLOB CHUCHO_ALL_HEADERS RELATIVE "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/include/chucho/*")
         FOREACH(HEAD ${CHUCHO_ALL_HEADERS})
@@ -1162,7 +1166,7 @@ IF(DOXYGEN_FOUND)
         ENDFOREACH()
         SET(CHUCHO_DOXYGEN_EXTRACT_ALL NO)
     ENDIF()
-    CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/doxygen.conf.in" "${CMAKE_BINARY_DIR}/doxygen.conf")
+    CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/doc/doxygen.conf.in" "${CMAKE_BINARY_DIR}/doxygen.conf")
     MESSAGE(STATUS "Generating HTML header and footer for API documentation")
     EXECUTE_PROCESS(COMMAND "${DOXYGEN_EXECUTABLE}" -w html "${CMAKE_BINARY_DIR}/doc_header.html" "${CMAKE_BINARY_DIR}/doc_footer.html" "${CMAKE_BINARY_DIR}/doc_stylesheet.html" "${CMAKE_BINARY_DIR}/doxygen.conf"
                     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")

@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2020 Will Mason
+# Copyright 2013-2021 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -22,6 +22,30 @@ LIST(APPEND WITH_LIBS $ENV{CHUCHO_WITH_LIBS})
 STRING(TOLOWER "${WITH_LIBS}" LOWER_WITH_LIBS)
 LIST(REMOVE_DUPLICATES LOWER_WITH_LIBS)
 SET(CHUCHO_BUILT_INS curl protobuf ruby zlib bzip2 liblzma libarchive awssdk)
+LIST(APPEND CHUCHO_SUPPORTED_LIBS
+     acitvemq
+     awssdk
+     bzip2
+     capn_proto
+     curl
+     flatbuffers
+     libarchive
+     liblzma
+     lz4
+     protobuf
+     rabbitmq
+     rdkafka
+     ruby
+     soci
+     zeromq
+     zlib)
+
+FOREACH(ARG ${LOWER_WITH_LIBS})
+    LIST(FIND CHUCHO_SUPPORTED_LIBS ${ARG} CHUCHO_${ARG}_SUPPORTED)
+    IF(${CHUCHO_${ARG}_SUPPORTED} EQUAL -1)
+        MESSAGE(FATAL_ERROR "The requested library '${ARG}' is not supported")
+    ENDIF()
+ENDFOREACH()
 
 # This cannot be a function, because then FIND_PACKAGE will fail
 # to put its variables in the right scope

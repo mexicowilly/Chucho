@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2020 Will Mason
+# Copyright 2013-2021 Will Mason
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -554,57 +554,4 @@ SET(CHUCHO_EXTERNAL_PREFIX "${CMAKE_BINARY_DIR}" CACHE STRING "The path to Chuch
 SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX "${CHUCHO_EXTERNAL_PREFIX}")
 
 # Gtest
-IF(CHUCHO_WINDOWS)
-    SET(CHUCHO_GTEST_GENERATOR "NMake Makefiles")
-ELSE()
-    SET(CHUCHO_GTEST_GENERATOR "Unix Makefiles")
-ENDIF()
-
-IF(MSVC)
-    SET(CHUCHO_ADDL_GTEST_CXX_FLAGS "-D_VARIADIC_MAX=10")
-ELSEIF(CHUCHO_CYGWIN)
-    SET(CHUCHO_ADDL_GTEST_CXX_FLAGS "-D_BSD_SOURCE")
-ENDIF()
-
-IF(CHUCHO_WINDOWS)
-    SET(CHUCHO_GTEST_CMAKE_FLAGS -Dgtest_force_shared_crt:BOOL=ON)
-ENDIF()
-
-# Not all cmakes can download URLs of the https variety. Therefore, if
-# there is no specific package, we just clone the repository.
-IF(GTEST_PACKAGE AND EXISTS "${GTEST_PACKAGE}")
-    FILE(SHA1 "${GTEST_PACKAGE}" CHUCHO_GTEST_SHA1)
-    FILE(TO_CMAKE_PATH "${GTEST_PACKAGE}" GTEST_PACKAGE_CMAKE_PATH)
-    SET(CHUCHO_GTEST_PACKAGE_ARGS
-        URL "${GTEST_PACKAGE_CMAKE_PATH}"
-        URL_HASH SHA1=${CHUCHO_GTEST_SHA1})
-ELSE()
-    SET(CHUCHO_GTEST_PACKAGE_ARGS
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG release-1.10.0)
-ENDIF()
-ExternalProject_Add(gtest-external
-                    ${CHUCHO_GTEST_PACKAGE_ARGS}
-                    CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} ${CHUCHO_ADDL_GTEST_CXX_FLAGS}" -DBUILD_GMOCK=OFF "-DCMAKE_INSTALL_PREFIX=${CHUCHO_EXTERNAL_PREFIX}" ${CHUCHO_GTEST_CMAKE_FLAGS}
-                    CMAKE_GENERATOR "${CHUCHO_GTEST_GENERATOR}")
-IF(MSVC)
-    ExternalProject_Add_Step(gtest-external patch-for-msvc
-                             DEPENDEES download DEPENDERS configure
-                             COMMAND "${CMAKE_COMMAND}" -DFILE_NAME=<SOURCE_DIR>/googletest/cmake/internal_utils.cmake -P "${CMAKE_SOURCE_DIR}/cmake/UpdateGtestForMsvc.cmake")
-ENDIF()
-ADD_LIBRARY(gtest STATIC IMPORTED)
-STRING(TOLOWER ${CMAKE_BUILD_TYPE} CHUCHO_LOWER_BUILD_TYPE)
-IF(CHUCHO_LOWER_BUILD_TYPE STREQUAL debug)
-    SET(CHUCHO_GTEST_SUFFIX d)
-ENDIF()
-IF(CHUCHO_WINDOWS)
-    SET_TARGET_PROPERTIES(gtest PROPERTIES
-                          IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/gtest${CHUCHO_GTEST_SUFFIX}.lib")
-ELSE()
-    SET_TARGET_PROPERTIES(gtest PROPERTIES
-                          IMPORTED_LOCATION "${CHUCHO_EXTERNAL_PREFIX}/lib/libgtest${CHUCHO_GTEST_SUFFIX}.a")
-ENDIF()
-ADD_DEPENDENCIES(gtest gtest-external)
-SET_TARGET_PROPERTIES(gtest-external PROPERTIES
-                      EXCLUDE_FROM_ALL TRUE)
-ADD_DEPENDENCIES(external gtest-external)
+FIND_PACKAGE(GTest)

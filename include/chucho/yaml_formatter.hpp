@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 Will Mason
+ * Copyright 2013-2021 Will Mason
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,14 +14,20 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_YAML_FORMATTER_HPP__)
-#define CHUCHO_YAML_FORMATTER_HPP__
+#if !defined(CHUCHO_YAML_FORMATTER_HPP_)
+#define CHUCHO_YAML_FORMATTER_HPP_
 
 #include <chucho/serialization_formatter.hpp>
 
 namespace chucho
 {
 
+/**
+ * @class yaml_formatter yaml_formatter.hpp chucho/yaml_formatter.hpp
+ * A formatter that produces YAML.
+ *
+ * @ingroup formatters
+ */
 class CHUCHO_EXPORT yaml_formatter : public serialization_formatter
 {
 public:

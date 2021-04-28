@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 Will Mason
+ * Copyright 2013-2021 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,13 +20,11 @@
  */
 
 /**
- * @mainpage API
+ * @mainpage Introduction
  *  
  * @image html itzcuintli.png "Chucho"
  *  
- * @section Chucho 
- *  
- * @subsection Welcome 
+ * @section Welcome
  * Chucho is a logging framework based on the popular Java 
  * library, <a href="http://logback.qos.ch/" 
  * target="_blank">Logback</a>. Chucho makes it easy to add 
@@ -40,13 +38,9 @@
  * visit the <a href="https://github.com/mexicowilly/Chucho"
  * target="_blank">project site</a>.
  *
- * For documentation of how to create a configuration file for
- * Chucho that will establish the run-time settings, please see
- * <a href="https://github.com/mexicowilly/Chucho/wiki/Configuration"
- * target="_blank">configuration documentation</a> and
- * <a href="https://github.com/mexicowilly/Chucho/wiki/Configuration-Reference"
- * target="_blank">configuration reference</a>.
- *  
+ * @attention The @ref config_file "configuration file" is your primary
+ * interface to the library.
+ *
  * Chucho uses the same architecture as <a 
  * href="http://logback.qos.ch/" 
  * target="_blank">Logback</a>, which involes loggers, writers, 
@@ -55,9 +49,9 @@
  * href="https://github.com/mexicowilly/Chucho/wiki"
  * target="_blank">user manual</a>, which is under construction.
  *  
- * @subsection c C API
- * Though the core of Chucho is written in C++14, a wrapping C
- * API is also exposed. This allows Chucho to be used in C 
+ * @section csection C API
+ * Though the core of Chucho is written in C++14, a wrapping @ref c "C API"
+ * is also exposed. This allows Chucho to be used in C
  * programs and in C++ programs that may be built with a 
  * compiler that cannot build Chucho, such as a non-C++14
  * compiler. 
@@ -68,17 +62,15 @@
  *  
  * Some documentation for the C API is copied directly from the 
  * C++ documentation, so you may find reference to C++ classes 
- * in the C documentation. All the referenced functionality can 
- * also be found in the C API, usually with a same or similar 
- * name. 
+ * in the C documentation.
  *
- * @subsection Contact
+ * @section Contact
  * If you need answers to questions or help in any way, please 
  * join our <a 
  * href="https://groups.google.com/forum/?fromgroups#!forum/chucho-logging" 
  * target="_blank">Google group</a>. 
  *  
- * @copyright &copy; 2013-2020 Will Mason
+ * @copyright &copy; 2013-2021 Will Mason
  */
 
 /**

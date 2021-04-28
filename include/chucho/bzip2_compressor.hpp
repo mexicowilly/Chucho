@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 Will Mason
+ * Copyright 2013-2021 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(CHUCHO_BZIP2_COMPRESSOR_HPP__)
-#define CHUCHO_BZIP2_COMPRESSOR_HPP__
+#if !defined(CHUCHO_BZIP2_COMPRESSOR_HPP_)
+#define CHUCHO_BZIP2_COMPRESSOR_HPP_
 
 #include <chucho/compressor.hpp>
 

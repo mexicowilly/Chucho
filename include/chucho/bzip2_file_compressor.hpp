@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 Will Mason
+ * Copyright 2013-2021 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#if !defined(BZIP2_FILE_COMPRESSOR_HPP__)
-#define BZIP2_FILE_COMPRESSOR_HPP__
+#if !defined(BZIP2_FILE_COMPRESSOR_HPP_)
+#define BZIP2_FILE_COMPRESSOR_HPP_
 
 #if defined(_MSC_VER)
 #pragma warning(push)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 Will Mason
+ * Copyright 2013-2021 Will Mason
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#ifndef CHUCHO_CURL_HPP__
-#define CHUCHO_CURL_HPP__
+#ifndef CHUCHO_CURL_HPP_
+#define CHUCHO_CURL_HPP_
 
 #if !defined(CHUCHO_BUILD)
 #error "This header is private"

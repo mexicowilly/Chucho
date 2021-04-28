@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 Will Mason
+ * Copyright 2013-2021 Will Mason
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <archive_entry.h>
 #include <fstream>
 #include <memory>
+#include <functional>
 
 namespace chucho
 {
